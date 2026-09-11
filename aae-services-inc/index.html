@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AAE Services Inc · Licensed Electrician in Monrovia, CA</title>
+<meta name="description" content="AAE Services Inc, a licensed electrical contractor at 1973 S Myrtle Ave, Monrovia, CA 91016. Call (626) 599-7736 for service.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0D1B2E; --navy-2:#132640; --navy-3:#1A3050;
+  --paper:#F7F5EF;
+  --ink:#16202E; --ink-soft:#4A5A6E;
+  --volt:#FFC93C; --volt-deep:#E0A400; --volt-soft:#FFF3D1;
+  --copper:#C97B2D;
+  --teal:#3FA796;
+  --red:#D64545;
+  --radius:16px;
+  --shadow:0 24px 50px -22px rgba(13,27,46,.45);
+  --shadow-sm:0 10px 24px -12px rgba(13,27,46,.35);
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Inter",system-ui,sans-serif;
+  background:var(--paper);color:var(--ink);line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%}
+a{color:#0A5FB4}
+::selection{background:var(--volt);color:var(--navy)}
+.wrap{max-width:1160px;margin:0 auto;padding:0 24px}
+h1,h2,h3,.sg{font-family:"Space Grotesk",sans-serif}
+.mono{font-family:var(--mono)}
+
+/* ---------- utility strip + header ---------- */
+.util{background:var(--navy);color:#C9D6E8;font-family:var(--mono);font-size:.74rem;letter-spacing:.06em}
+.util .wrap{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:7px 24px}
+.util a{color:var(--volt);text-decoration:none}
+header.site{position:sticky;top:0;z-index:60;background:rgba(247,245,239,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid rgba(13,27,46,.14)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
+.brand-badge{width:46px;height:46px;border-radius:12px;background:var(--navy);display:grid;place-items:center;flex:none;box-shadow:var(--shadow-sm)}
+.brand-name{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:1.22rem;line-height:1.05}
+.brand-name small{display:block;font-family:var(--mono);font-weight:500;font-size:.64rem;letter-spacing:2.6px;text-transform:uppercase;color:var(--copper)}
+.call-btn{display:inline-flex;align-items:center;gap:9px;background:var(--volt);color:var(--navy);text-decoration:none;font-weight:700;font-family:"Space Grotesk",sans-serif;padding:11px 20px;border-radius:999px;box-shadow:var(--shadow-sm);transition:transform .18s,box-shadow .18s;white-space:nowrap}
+.call-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.burger{display:inline-flex;flex-direction:column;align-items:center;gap:5px;background:var(--navy);color:var(--volt);border:0;cursor:pointer;padding:11px 18px;border-radius:12px;font-family:var(--mono);font-size:.7rem;letter-spacing:.14em}
+.burger span{display:block;width:24px;height:2.5px;border-radius:3px;background:var(--volt)}
+
+/* ---------- side drawer nav ---------- */
+.scrim{position:fixed;inset:0;background:rgba(13,27,46,.55);opacity:0;pointer-events:none;transition:opacity .3s;z-index:70}
+.scrim.show{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:-380px;width:min(360px,88vw);height:100%;background:var(--navy);color:#EAF0FA;z-index:71;transition:right .34s cubic-bezier(.32,.72,.28,1);display:flex;flex-direction:column;padding:28px 30px;overflow-y:auto}
+.drawer.open{right:0}
+.drawer-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.drawer-top .mono{font-size:.72rem;letter-spacing:.2em;color:var(--volt)}
+.drawer-close{background:none;border:1px solid rgba(255,201,60,.45);color:var(--volt);border-radius:10px;width:42px;height:42px;font-size:1.25rem;cursor:pointer;line-height:1}
+.drawer nav{display:flex;flex-direction:column;margin:22px 0;counter-reset:navc}
+.drawer nav a{counter-increment:navc;text-decoration:none;color:#EAF0FA;font-family:"Space Grotesk",sans-serif;font-size:1.55rem;font-weight:600;padding:13px 4px;border-bottom:1px solid rgba(234,240,250,.12);display:flex;align-items:baseline;gap:14px;transition:color .18s,padding-left .18s}
+.drawer nav a::before{content:"0" counter(navc);font-family:var(--mono);font-size:.72rem;color:var(--volt)}
+.drawer nav a:hover,.drawer nav a.active{color:var(--volt);padding-left:12px}
+.drawer-foot{margin-top:auto;border-top:1px solid rgba(234,240,250,.14);padding-top:18px;font-size:.92rem;color:#B9C7DC}
+.drawer-foot a{color:var(--volt);text-decoration:none;font-weight:600}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .32s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- hero: split ---------- */
+.hero{position:relative;overflow:hidden;background:var(--navy);color:#EDF2FA}
+.hero::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,201,60,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(255,201,60,.055) 1px,transparent 1px);background-size:44px 44px;pointer-events:none}
+.hero::after{content:"";position:absolute;inset:0;background:radial-gradient(900px 380px at 85% 10%,rgba(255,201,60,.14),transparent 60%),radial-gradient(700px 340px at 8% 90%,rgba(63,167,150,.16),transparent 60%);pointer-events:none}
+.hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:1.02fr .98fr;gap:56px;align-items:center;padding:78px 0 70px}
+.kicker{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:.74rem;letter-spacing:.22em;text-transform:uppercase;color:var(--navy);background:var(--volt);padding:8px 18px;border-radius:999px;margin-bottom:20px;font-weight:600}
+h1{font-size:clamp(2.7rem,5.4vw,4.4rem);line-height:1.02;letter-spacing:-.5px;margin-bottom:18px;font-weight:700}
+h1 .volt{color:var(--volt)}
+.lede{font-size:1.12rem;color:#B9C7DC;max-width:34rem;margin-bottom:28px}
+.lede strong{color:#fff}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:28px}
+.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;font-family:"Space Grotesk",sans-serif;padding:15px 28px;border-radius:999px;font-size:1rem;transition:transform .18s,box-shadow .18s,background .18s;border:0;cursor:pointer}
+.btn-volt{background:var(--volt);color:var(--navy);box-shadow:0 12px 26px -12px rgba(255,201,60,.7)}
+.btn-volt:hover{transform:translateY(-2px);background:#FFD75F}
+.btn-outline{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.35)}
+.btn-outline:hover{border-color:var(--volt);color:var(--volt);transform:translateY(-2px)}
+.trust-row{display:flex;flex-wrap:wrap;gap:10px 22px;font-family:var(--mono);font-size:.8rem;color:#9FB0C9}
+.trust-row b{color:var(--volt);font-weight:600}
+
+/* breaker panel card */
+.panel{background:linear-gradient(160deg,#1D3454,#0F2038);border:1px solid rgba(255,201,60,.28);border-radius:22px;padding:26px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.panel::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,201,60,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,201,60,.05) 1px,transparent 1px);background-size:22px 22px;pointer-events:none}
+.panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;position:relative;z-index:1}
+.panel-head .mono{font-size:.74rem;letter-spacing:.18em;color:#8FA2BC;text-transform:uppercase}
+.panel-led{width:12px;height:12px;border-radius:50%;background:#5BD67A;box-shadow:0 0 12px #5BD67A}
+.breakers{display:grid;grid-template-columns:1fr 1fr;gap:10px;position:relative;z-index:1}
+.breaker{background:rgba(13,27,46,.7);border:1px solid rgba(255,201,60,.22);border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:border-color .2s,transform .15s;user-select:none}
+.breaker:hover{transform:translateY(-2px)}
+.breaker .lbl{font-family:var(--mono);font-size:.72rem;color:#B9C7DC;letter-spacing:.06em}
+.breaker .sw{width:44px;height:24px;border-radius:999px;background:#2C3F59;position:relative;transition:background .2s;flex:none}
+.breaker .sw::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#8FA2BC;transition:left .2s,background .2s}
+.breaker.on .sw{background:var(--volt)}
+.breaker.on .sw::after{left:23px;background:var(--navy)}
+.breaker.on{border-color:var(--volt)}
+.breaker.off .lbl{color:#5E7189;text-decoration:line-through}
+.panel-foot{margin-top:16px;font-family:var(--mono);font-size:.72rem;color:#8FA2BC;position:relative;z-index:1}
+.panel-foot b{color:var(--volt)}
+.panel-note{position:relative;z-index:1;margin-top:10px;font-size:.78rem;color:#8FA2BC;font-style:italic}
+
+/* ---------- bands ---------- */
+.band{padding:74px 0}
+.band-dark{background:var(--navy);color:#EDF2FA}
+.band-dark h2{color:#fff}
+.band-alt{background:#fff}
+.sec-head{max-width:720px;margin-bottom:38px}
+.sec-kick{font-family:var(--mono);font-size:.74rem;letter-spacing:.22em;text-transform:uppercase;color:var(--copper);display:block;margin-bottom:12px}
+.band-dark .sec-kick{color:var(--volt)}
+h2{font-size:clamp(1.9rem,3.6vw,2.8rem);line-height:1.08;letter-spacing:-.4px;margin-bottom:14px;font-weight:700}
+.sec-sub{color:var(--ink-soft);font-size:1.05rem}
+.band-dark .sec-sub{color:#B9C7DC}
+
+/* home service cards */
+.svc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.svc-card{background:#fff;border:1px solid rgba(13,27,46,.12);border-radius:var(--radius);padding:26px 22px;box-shadow:var(--shadow-sm);transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden}
+.svc-card::before{content:"";position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,var(--volt),var(--copper))}
+.svc-card:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+.svc-ico{width:52px;height:52px;border-radius:14px;background:var(--volt-soft);display:grid;place-items:center;margin-bottom:16px}
+.svc-ico svg{width:28px;height:28px}
+.svc-card h3{font-size:1.08rem;margin-bottom:8px}
+.svc-card p{font-size:.92rem;color:var(--ink-soft)}
+.band-dark .svc-card{background:var(--navy-2);border-color:rgba(255,201,60,.16)}
+.band-dark .svc-card p{color:#B9C7DC}
+.band-dark .svc-card h3{color:#fff}
+
+/* process steps */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;counter-reset:step}
+.step{border-top:3px solid var(--volt);padding-top:20px;counter-increment:step}
+.step::before{content:"0" counter(step);font-family:var(--mono);font-size:.8rem;color:var(--copper);letter-spacing:.1em}
+.step h3{font-size:1.12rem;margin:8px 0 8px}
+.step p{font-size:.93rem;color:var(--ink-soft)}
+
+/* badge */
+.badge{display:inline-block;font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;background:#FFF3D1;color:#8A5A00;border:1px dashed #C9982B;padding:6px 14px;border-radius:999px;margin-bottom:16px}
+.band-dark .badge{background:rgba(255,201,60,.12);color:var(--volt);border-color:rgba(255,201,60,.5)}
+
+/* ---------- accordion ---------- */
+.acc{border:1px solid rgba(13,27,46,.14);border-radius:var(--radius);overflow:hidden;background:#fff;box-shadow:var(--shadow-sm)}
+.acc-item{border-bottom:1px solid rgba(13,27,46,.1)}
+.acc-item:last-child{border-bottom:0}
+.acc-btn{width:100%;background:none;border:0;cursor:pointer;display:flex;align-items:center;gap:16px;padding:20px 24px;text-align:left;font-family:"Space Grotesk",sans-serif;font-size:1.12rem;font-weight:600;color:var(--ink)}
+.acc-btn .num{font-family:var(--mono);font-size:.74rem;color:var(--copper);border:1px solid rgba(201,123,45,.5);border-radius:8px;padding:5px 10px;flex:none}
+.acc-btn .plus{margin-left:auto;font-size:1.5rem;color:var(--copper);transition:transform .25s;flex:none}
+.acc-item.open .acc-btn .plus{transform:rotate(45deg)}
+.acc-panel{max-height:0;overflow:hidden;transition:max-height .34s ease}
+.acc-body{padding:0 24px 24px 66px;color:var(--ink-soft);font-size:.97rem}
+.acc-body ul{margin:10px 0 0 18px}
+.acc-body li{margin-bottom:6px}
+
+/* ---------- gallery carousel ---------- */
+.car{position:relative;background:var(--navy);border-radius:22px;overflow:hidden;box-shadow:var(--shadow)}
+.car-view{aspect-ratio:16/9;position:relative}
+.car-slide{position:absolute;inset:0;display:none;align-items:center;justify-content:center;text-align:center;padding:40px}
+.car-slide.on{display:flex;animation:fadeIn .4s ease}
+.car-slide h3{color:#fff;font-size:clamp(1.4rem,3vw,2.2rem);margin-bottom:10px}
+.car-slide p{color:#B9C7DC;max-width:36rem;margin:0 auto}
+.ph-badge{display:inline-block;font-family:var(--mono);font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--volt);border:1px dashed rgba(255,201,60,.55);padding:6px 16px;border-radius:999px;margin-bottom:18px}
+.car-bar{display:flex;align-items:center;gap:14px;padding:16px 20px;background:var(--navy-2);border-top:1px solid rgba(255,201,60,.16)}
+.car-btn{background:var(--volt);color:var(--navy);border:0;border-radius:999px;width:48px;height:48px;font-size:1.3rem;cursor:pointer;font-weight:700;transition:transform .15s}
+.car-btn:hover{transform:scale(1.07)}
+.car-count{font-family:var(--mono);color:#B9C7DC;font-size:.85rem;margin-left:auto}
+.car-dots{display:flex;gap:8px}
+.car-dots button{width:10px;height:10px;border-radius:50%;border:0;background:#3A4E69;cursor:pointer;padding:0}
+.car-dots button.on{background:var(--volt)}
+
+/* ---------- reviews ---------- */
+.rev-hero{background:linear-gradient(160deg,#FFF9E3,#FCEFC7);border:1px solid rgba(201,123,45,.3);border-radius:22px;padding:44px 40px;text-align:center;box-shadow:var(--shadow-sm);margin-bottom:36px}
+.rev-hero .stars{font-size:2.2rem;letter-spacing:6px;color:var(--volt-deep);margin-bottom:10px}
+.rev-hero h2{margin-bottom:8px}
+.rev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.rev-card{background:#fff;border:1px solid rgba(13,27,46,.12);border-radius:var(--radius);padding:28px 24px;box-shadow:var(--shadow-sm);position:relative}
+.rev-card .stars{color:var(--volt-deep);letter-spacing:3px;margin-bottom:12px}
+.rev-card p{font-size:.95rem;color:var(--ink-soft);margin-bottom:14px}
+.rev-card .who{font-family:var(--mono);font-size:.76rem;color:var(--copper);letter-spacing:.08em}
+.sample-tag{position:absolute;top:14px;right:14px;font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;background:#EDEFF3;color:#6A7686;padding:4px 10px;border-radius:999px}
+.g-link{display:inline-flex;align-items:center;gap:10px;background:var(--navy);color:#fff;text-decoration:none;font-weight:700;font-family:"Space Grotesk",sans-serif;padding:15px 30px;border-radius:999px;margin-top:34px;transition:transform .18s}
+.g-link:hover{transform:translateY(-2px)}
+
+/* ---------- contact ---------- */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:30px}
+.c-card{background:#fff;border:1px solid rgba(13,27,46,.12);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm)}
+.c-card h3{font-size:1.15rem;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.c-card p{color:var(--ink-soft);font-size:.97rem;margin-bottom:8px}
+.c-card a.big{font-family:"Space Grotesk",sans-serif;font-size:1.5rem;font-weight:700;color:var(--navy);text-decoration:none}
+.c-card a.big:hover{color:#0A5FB4}
+.hours-note{background:var(--volt-soft);border:1px dashed #C9982B;border-radius:12px;padding:14px 18px;font-size:.92rem;margin-top:14px}
+.map-ph{background:linear-gradient(150deg,#DDE7F2,#C4D4E8);border-radius:var(--radius);min-height:280px;display:flex;align-items:center;justify-content:center;text-align:center;padding:40px;position:relative;overflow:hidden}
+.map-ph::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(13,27,46,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(13,27,46,.08) 1px,transparent 1px);background-size:34px 34px}
+
+/* ---------- footer minimal stacked ---------- */
+footer.site{background:var(--navy);color:#B9C7DC;margin-top:0}
+.foot-stack{padding:56px 0 26px;text-align:center}
+.foot-brand{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:1.5rem;color:#fff;margin-bottom:6px}
+.foot-nav{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 26px;margin:20px 0 26px}
+.foot-nav a{color:#B9C7DC;text-decoration:none;font-size:.93rem}
+.foot-nav a:hover{color:var(--volt)}
+.copy{border-top:1px solid rgba(255,255,255,.12);padding-top:22px;font-size:.9rem;color:#8FA2BC}
+
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:940px){
+  .hero-grid{grid-template-columns:1fr;gap:40px;padding:56px 0}
+  .about-grid{grid-template-columns:1fr !important}
+  .svc-grid{grid-template-columns:1fr 1fr}
+  .steps{grid-template-columns:1fr 1fr}
+  .rev-grid{grid-template-columns:1fr}
+  .contact-grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .svc-grid{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr}
+  .util .wrap{font-size:.66rem}
+}
+</style>
+</head>
+<body>
+
+<div class="util">
+  <div class="wrap">
+    <span>CA LICENSED ELECTRICAL CONTRACTOR · MONROVIA, CA</span>
+    <a href="tel:+16265997736">(626) 599-7736</a>
+  </div>
+</div>
+
+<header class="site">
+  <div class="wrap bar">
+    <a class="brand" href="#home" data-page="home" aria-label="AAE Services Inc, home">
+      <span class="brand-badge" aria-hidden="true">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M13 2 4.5 13.5H11L9.5 22 19 10h-6.5L13 2Z" fill="#FFC93C" stroke="#FFC93C" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      </span>
+      <span class="brand-name">AAE Services Inc.<small>Electrician</small></span>
+    </a>
+    <div style="display:flex;gap:12px;align-items:center">
+      <a class="call-btn" href="tel:+16265997736">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.13.96.36 1.9.7 2.8a2 2 0 0 1-.45 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.45c.9.34 1.84.57 2.8.7a2 2 0 0 1 1.7 2.05Z"/></svg>
+        (626) 599-7736
+      </a>
+      <button class="burger" id="burger" aria-expanded="false" aria-controls="drawer" aria-label="Open navigation menu">
+        <span></span><span></span><span></span>MENU
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Site navigation">
+  <div class="drawer-top">
+    <span class="mono">NAVIGATE</span>
+    <button class="drawer-close" id="drawerClose" aria-label="Close navigation menu">&times;</button>
+  </div>
+  <nav id="mainNav" class="drawer-nav">
+    <a href="#home" data-page="home" class="active" aria-current="page">Home</a>
+    <a href="#services" data-page="services">Services</a>
+    <a href="#about" data-page="about">About</a>
+    <a href="#gallery" data-page="gallery">Gallery</a>
+    <a href="#reviews" data-page="reviews">Reviews</a>
+    <a href="#contact" data-page="contact">Contact</a>
+  </nav>
+  <div class="drawer-foot">
+    <p><strong style="color:#fff">AAE Services Inc.</strong><br>1973 S Myrtle Ave<br>Monrovia, CA 91016</p>
+    <p style="margin-top:10px"><a href="tel:+16265997736">(626) 599-7736</a></p>
+  </div>
+</aside>
+
+<main>
+
+<section class="page" id="page-home">
+  <div class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="kicker">Licensed Electrical Contractor</span>
+        <h1>Power you can trust, <span class="volt">wired right</span> the first time.</h1>
+        <p class="lede">AAE Services Inc. is a <strong>California licensed electrical contractor</strong> based in Monrovia, serving homes and businesses across the San Gabriel Valley. From panel upgrades to troubleshooting, the work gets done safely, cleanly, and to code.</p>
+        <div class="cta-row">
+          <a class="btn btn-volt" href="tel:+16265997736">Call (626) 599-7736</a>
+          <a class="btn btn-outline" href="#services" data-page="services">See Services</a>
+        </div>
+        <div class="trust-row">
+          <span><b>BUILDZOOM 104</b> · top 9% of CA contractors</span>
+          <span><b>ACTIVE</b> · CA electrical license</span>
+        </div>
+      </div>
+      <div>
+        <div class="panel" role="group" aria-label="Interactive breaker panel demo">
+          <div class="panel-head">
+            <span class="mono">AAE · SERVICE PANEL 200A</span>
+            <span class="panel-led" aria-hidden="true"></span>
+          </div>
+          <div class="breakers" id="breakers">
+            <div class="breaker on" data-l="KITCHEN"><span class="lbl">KITCHEN</span><span class="sw"></span></div>
+            <div class="breaker on" data-l="HVAC"><span class="lbl">HVAC</span><span class="sw"></span></div>
+            <div class="breaker on" data-l="LIGHTING"><span class="lbl">LIGHTING</span><span class="sw"></span></div>
+            <div class="breaker on" data-l="GARAGE"><span class="lbl">GARAGE</span><span class="sw"></span></div>
+            <div class="breaker on" data-l="EV CHARGER"><span class="lbl">EV CHARGER</span><span class="sw"></span></div>
+            <div class="breaker on" data-l="SPARES"><span class="lbl">SPARES</span><span class="sw"></span></div>
+          </div>
+          <p class="panel-foot">LOAD: <b id="loadPct">100%</b> · CIRCUITS ON: <b id="cktCount">6</b>/6</p>
+          <p class="panel-note">Try the switches. Then call us before you touch a real one.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="band band-alt">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-kick">What we do</span>
+        <h2>Everyday electrical work, handled like it matters.</h2>
+        <p class="sec-sub">Safe wiring is not glamorous. It is the difference between a quiet house and a 2 AM problem. Here is where AAE Services Inc. earns its keep.</p>
+      </div>
+      <div class="svc-grid">
+        <div class="svc-card reveal">
+          <div class="svc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#C97B2D" stroke-width="2" stroke-linecap="round"><path d="M13 2 4.5 13.5H11L9.5 22 19 10h-6.5L13 2Z"/></svg></div>
+          <h3>Panel Upgrades</h3>
+          <p>200-amp upgrades and breaker replacements that bring older Monrovia homes up to modern demand.</p>
+        </div>
+        <div class="svc-card reveal">
+          <div class="svc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#C97B2D" stroke-width="2" stroke-linecap="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.8.7 1 1.5 1 2.5h6c0-1 .2-1.8 1-2.5A6 6 0 0 0 12 3Z"/></svg></div>
+          <h3>Lighting and Ceiling Fans</h3>
+          <p>Recessed lighting, fixture swaps, and fan installs that brighten rooms without the flicker.</p>
+        </div>
+        <div class="svc-card reveal">
+          <div class="svc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#C97B2D" stroke-width="2" stroke-linecap="round"><rect x="3" y="8" width="18" height="10" rx="2"/><path d="M7 8V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2M7 13h.01M17 13h.01"/></svg></div>
+          <h3>Outlets and Switches</h3>
+          <p>GFCI protection, dedicated circuits, and USB outlets where your family actually charges things.</p>
+        </div>
+        <div class="svc-card reveal">
+          <div class="svc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#C97B2D" stroke-width="2" stroke-linecap="round"><path d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg></div>
+          <h3>Troubleshooting and Repair</h3>
+          <p>Dead outlets, tripping breakers, mystery outages. Diagnosed properly, fixed once.</p>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:34px">
+        <a class="btn btn-volt" href="#services" data-page="services">Full Service List</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="band band-dark">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-kick">How it works</span>
+        <h2>Four steps, no surprises.</h2>
+      </div>
+      <div class="steps">
+        <div class="step reveal"><h3>Call or text</h3><p>Tell us what is happening. We ask the right questions so we show up prepared.</p></div>
+        <div class="step reveal"><h3>On-site look</h3><p>A licensed electrician inspects the panel, circuits, and fixtures involved.</p></div>
+        <div class="step reveal"><h3>Straight quote</h3><p>You approve a clear price before any work starts. No mid-job add-ons.</p></div>
+        <div class="step reveal"><h3>Done to code</h3><p>Work finished cleanly, tested, and permitted where the city requires it.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-kick">Why Monrovia calls</span>
+        <h2>Licensed, local, and easy to work with.</h2>
+        <p class="sec-sub">Based on public reviews, customers describe the crew as very knowledgeable. Check their license status with the CSLB before you hire anyone, including us.</p>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:14px">
+        <a class="btn btn-volt" href="tel:+16265997736">Call (626) 599-7736</a>
+        <a class="btn btn-outline" style="color:var(--ink);border-color:rgba(22,32,46,.3)" href="#reviews" data-page="reviews">Read Reviews</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="band">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-kick">Services</span>
+        <h2>Electrical services for home and business.</h2>
+        <p class="sec-sub">Typical scope for a licensed electrical contractor. Confirm your project with a call.</p>
+      </div>
+      <span class="badge">Sample scope menu · confirm by phone</span>
+      <div class="acc" id="svcAcc">
+        <div class="acc-item">
+          <button class="acc-btn" aria-expanded="false"><span class="num">01</span>Panel Upgrades and Breakers<span class="plus">+</span></button>
+          <div class="acc-panel"><div class="acc-body">Service panel upgrades to 200 amps, breaker replacements, sub-panels for additions and garages, and whole-panel safety inspections.<ul><li>Fuse box to breaker panel conversions</li><li>Dedicated 220V circuits for dryers, ranges, and shop tools</li><li>Panel labeling and load balancing</li></ul></div></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-btn" aria-expanded="false"><span class="num">02</span>Lighting Design and Install<span class="plus">+</span></button>
+          <div class="acc-panel"><div class="acc-body">Recessed can lights, under-cabinet lighting, landscape and security lighting, dimmers, and smart switch installs.<ul><li>LED retrofits that cut the lighting bill</li><li>Motion and dusk-to-dawn security lights</li><li>Ceiling fan installation with proper bracing</li></ul></div></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-btn" aria-expanded="false"><span class="num">03</span>Outlets, Switches, and GFCI<span class="plus">+</span></button>
+          <div class="acc-panel"><div class="acc-body">New outlet and switch placement, GFCI and AFCI protection for kitchens, baths, and garages, and USB combo outlets.<ul><li>Troubleshooting dead or sparking outlets</li><li>Child-safe tamper-resistant receptacles</li><li>Outdoor and weatherproof outlets</li></ul></div></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-btn" aria-expanded="false"><span class="num">04</span>EV Chargers and Dedicated Circuits<span class="plus">+</span></button>
+          <div class="acc-panel"><div class="acc-body">Level 2 EV charger circuits sized for your panel, plus dedicated runs for hot tubs, welders, and home offices.<ul><li>Load calculation before you buy the charger</li><li>Permit-ready installs where required</li></ul></div></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-btn" aria-expanded="false"><span class="num">05</span>Troubleshooting and Safety Checks<span class="plus">+</span></button>
+          <div class="acc-panel"><div class="acc-body">Breaker trips, flickering lights, burning smells, and partial outages diagnosed at the source, not guessed at.<ul><li>Whole-home electrical safety inspections</li><li>Aluminum wiring evaluation and remediation</li><li>Smoke and CO detector hardwiring</li></ul></div></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-btn" aria-expanded="false"><span class="num">06</span>Commercial and Tenant Work<span class="plus">+</span></button>
+          <div class="acc-panel"><div class="acc-body">Tenant improvements, office lighting, dedicated equipment circuits, and scheduled maintenance for local businesses.<ul><li>After-hours scheduling to avoid downtime</li><li>Code compliance for inspections</li></ul></div></div>
+        </div>
+      </div>
+      <div style="margin-top:34px;background:var(--navy);color:#EDF2FA;border-radius:var(--radius);padding:34px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px">
+        <div><h3 style="color:#fff;margin-bottom:6px">Not sure what you need?</h3><p style="color:#B9C7DC;margin:0">Describe the symptom. A licensed electrician will point you in the right direction.</p></div>
+        <a class="btn btn-volt" href="tel:+16265997736">Call (626) 599-7736</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-about">
+  <div class="band band-dark">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-kick">About</span>
+        <h2>A licensed electrical shop on South Myrtle Ave.</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:1.1fr .9fr;gap:44px;align-items:start" class="about-grid">
+        <div>
+          <p style="color:#D5DFEE;font-size:1.08rem;margin-bottom:18px">AAE Services Inc. is an electrical contractor based at <strong style="color:#fff">1973 S Myrtle Ave in Monrovia, California</strong>, serving the San Gabriel Valley. The company holds an active electrical license with the California Contractors State License Board, and public records show a BuildZoom score of 104, ranking in the top 9% of licensed contractors in California.</p>
+          <p style="color:#B9C7DC;margin-bottom:18px">Customers who have left public reviews describe the crew as very knowledgeable, a reputation the company carries onto every job, from a single dead outlet to a full panel replacement.</p>
+          <p style="color:#B9C7DC">Before hiring any contractor, double-check license status with the CSLB. We encourage it.</p>
+        </div>
+        <div>
+          <div class="panel">
+            <div class="panel-head"><span class="mono">AAE · CREDENTIALS</span></div>
+            <div style="position:relative;z-index:1;display:grid;gap:14px">
+              <div><div class="mono" style="font-size:.72rem;color:#8FA2BC;letter-spacing:.14em">LICENSE</div><div style="color:#fff;font-weight:600">California Electrical Contractor · active</div></div>
+              <div><div class="mono" style="font-size:.72rem;color:#8FA2BC;letter-spacing:.14em">BUILDZOOM SCORE</div><div style="color:var(--volt);font-weight:700;font-size:1.4rem">104 · top 9% of CA contractors</div></div>
+              <div><div class="mono" style="font-size:.72rem;color:#8FA2BC;letter-spacing:.14em">BASE</div><div style="color:#fff">1973 S Myrtle Ave, Monrovia, CA 91016</div></div>
+              <div><div class="mono" style="font-size:.72rem;color:#8FA2BC;letter-spacing:.14em">PHONE</div><div><a href="tel:+16265997736" style="color:var(--volt);font-weight:700;text-decoration:none">(626) 599-7736</a></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="band band-alt">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-kick">What guides the work</span>
+        <h2>Three rules on every job.</h2>
+      </div>
+      <div class="steps">
+        <div class="step"><h3>Safety first</h3><p>Lockout, test, then touch. No shortcuts around live circuits, ever.</p></div>
+        <div class="step"><h3>To code</h3><p>Work that passes inspection the first time, with permits where required.</p></div>
+        <div class="step"><h3>Left clean</h3><p>Drop cloths down, debris out, panel labeled. You should not know we were in the attic.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="band">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-kick">Gallery</span>
+        <h2>The kind of work we do.</h2>
+        <p class="sec-sub">Placeholder images stand in for real job photos until the owner adds their own.</p>
+      </div>
+      <div class="car">
+        <div class="car-view" id="carView">
+          <div class="car-slide on" style="background:linear-gradient(150deg,#1D3454,#0F2038)"><div><span class="ph-badge">Placeholder image</span><h3>200-amp panel upgrade</h3><p>Full service panel replacement with labeled breakers and room to grow.</p></div></div>
+          <div class="car-slide" style="background:linear-gradient(150deg,#233B5C,#12263F)"><div><span class="ph-badge">Placeholder image</span><h3>Recessed lighting install</h3><p>Even, flicker-free LED cans across living spaces and kitchens.</p></div></div>
+          <div class="car-slide" style="background:linear-gradient(150deg,#1A3050,#0C1D33)"><div><span class="ph-badge">Placeholder image</span><h3>EV charger circuit</h3><p>Dedicated Level 2 circuit run from panel to garage, permitted and tested.</p></div></div>
+          <div class="car-slide" style="background:linear-gradient(150deg,#26405F,#101F36)"><div><span class="ph-badge">Placeholder image</span><h3>Troubleshooting call</h3><p>Breaker trips and dead outlets traced to the source and fixed once.</p></div></div>
+        </div>
+        <div class="car-bar">
+          <button class="car-btn" id="carPrev" aria-label="Previous gallery image">&#8592;</button>
+          <button class="car-btn" id="carNext" aria-label="Next gallery image">&#8594;</button>
+          <div class="car-dots" id="carDots" role="tablist" aria-label="Gallery image selector"></div>
+          <span class="car-count" id="carCount">1 / 4</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="band">
+    <div class="wrap">
+      <div class="rev-hero">
+        <div class="stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <h2>What customers say about AAE Services Inc.</h2>
+        <p style="color:#6A5B3F;max-width:34rem;margin:0 auto">Public reviews describe the crew as <strong>very knowledgeable</strong> and customers report a great experience with the company. Read the full reviews on Google.</p>
+        <a class="g-link" href="https://www.google.com/maps/place/?q=place_id:ChIJ9denDXbZwoARNq5e3msGkxc" target="_blank" rel="noopener">See reviews on Google</a>
+      </div>
+      <div class="rev-grid">
+        <div class="rev-card"><span class="sample-tag">Sample</span><div class="stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p>Placeholder review card. The owner can feature real Google reviews here once they claim the listing.</p><div class="who">SAMPLE REVIEW</div></div>
+        <div class="rev-card"><span class="sample-tag">Sample</span><div class="stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p>Placeholder review card. Real customer feedback replaces these cards.</p><div class="who">SAMPLE REVIEW</div></div>
+        <div class="rev-card"><span class="sample-tag">Sample</span><div class="stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p>Placeholder review card. Link above opens the live Google listing.</p><div class="who">SAMPLE REVIEW</div></div>
+      </div>
+      <p style="margin-top:26px;color:var(--ink-soft);font-size:.9rem;text-align:center">Review counts and ratings change over time. See the live listing for current numbers: <a href="https://www.google.com/maps/place/?q=place_id:ChIJ9denDXbZwoARNq5e3msGkxc" target="_blank" rel="noopener">AAE Services Inc. on Google Maps</a>.</p>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-contact">
+  <div class="band">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-kick">Contact</span>
+        <h2>Get in touch.</h2>
+        <p class="sec-sub">Call for a quote, a question, or a second opinion on another bid.</p>
+      </div>
+      <div class="contact-grid">
+        <div class="c-card">
+          <h3>Call us</h3>
+          <p><a class="big" href="tel:+16265997736">(626) 599-7736</a></p>
+          <div class="hours-note"><strong>Hours:</strong> call to confirm current hours.</div>
+          <p style="margin-top:16px"><a class="btn btn-volt" href="https://www.google.com/maps/place/?q=place_id:ChIJ9denDXbZwoARNq5e3msGkxc" target="_blank" rel="noopener">Get Directions</a></p>
+        </div>
+        <div class="c-card">
+          <h3>Visit the shop</h3>
+          <p>AAE Services Inc.<br>1973 S Myrtle Ave<br>Monrovia, CA 91016</p>
+          <p style="margin-top:10px">Serving Monrovia and the San Gabriel Valley.</p>
+        </div>
+      </div>
+      <div class="map-ph">
+        <div style="position:relative;z-index:1">
+          <span class="ph-badge" style="color:#0A5FB4;border-color:#0A5FB4">Map placeholder</span>
+          <h3 style="margin-bottom:8px">1973 S Myrtle Ave, Monrovia, CA 91016</h3>
+          <p style="color:var(--ink-soft);margin-bottom:16px">The live map and directions live on the Google listing.</p>
+          <a class="btn btn-volt" href="https://www.google.com/maps/place/?q=place_id:ChIJ9denDXbZwoARNq5e3msGkxc" target="_blank" rel="noopener">Open in Google Maps</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="site">
+  <div class="wrap foot-stack">
+    <div class="foot-brand">AAE Services Inc.</div>
+    <p style="font-size:.92rem">Licensed electrician in Monrovia, CA · (626) 599-7736</p>
+    <nav class="foot-nav" aria-label="Footer">
+      <a href="#home" data-page="home">Home</a>
+      <a href="#services" data-page="services">Services</a>
+      <a href="#about" data-page="about">About</a>
+      <a href="#gallery" data-page="gallery">Gallery</a>
+      <a href="#reviews" data-page="reviews">Reviews</a>
+      <a href="#contact" data-page="contact">Contact</a>
+    </nav>
+    <div class="copy">© AAE Services Inc.</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "contact"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    var drawer = document.getElementById("drawer");
+    var scrim = document.getElementById("scrim");
+    if(drawer){ drawer.classList.remove("open"); }
+    if(scrim){ scrim.classList.remove("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  /* ---------- drawer ---------- */
+  var drawer = document.getElementById("drawer");
+  var scrim = document.getElementById("scrim");
+  var drawerClose = document.getElementById("drawerClose");
+  function openDrawer(){
+    if(drawer){ drawer.classList.add("open"); }
+    if(scrim){ scrim.classList.add("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "true"); }
+  }
+  if(burger){
+    burger.addEventListener("click", function(){
+      if(drawer && drawer.classList.contains("open")){ closeMenu(); }
+      else { openDrawer(); }
+    });
+  }
+  if(drawerClose){ drawerClose.addEventListener("click", closeMenu); }
+  if(scrim){ scrim.addEventListener("click", closeMenu); }
+
+  /* ---------- interactive breaker panel ---------- */
+  var breakers = document.querySelectorAll("#breakers .breaker");
+  function updateLoad(){
+    var on = 0;
+    for(var k = 0; k < breakers.length; k++){
+      if(breakers[k].classList.contains("on")){ on++; }
+    }
+    var pct = document.getElementById("loadPct");
+    var cnt = document.getElementById("cktCount");
+    if(pct){ pct.textContent = Math.round(on / breakers.length * 100) + "%"; }
+    if(cnt){ cnt.textContent = on; }
+  }
+  for(var b = 0; b < breakers.length; b++){
+    breakers[b].addEventListener("click", function(){
+      this.classList.toggle("on");
+      this.classList.toggle("off");
+      this.setAttribute("aria-pressed", this.classList.contains("on") ? "true" : "false");
+      updateLoad();
+    });
+    breakers[b].setAttribute("role", "button");
+    breakers[b].setAttribute("tabindex", "0");
+    breakers[b].setAttribute("aria-pressed", "true");
+    breakers[b].addEventListener("keydown", function(ev){
+      if(ev.key === "Enter" || ev.key === " "){ ev.preventDefault(); this.click(); }
+    });
+  }
+  updateLoad();
+
+  /* ---------- accordion ---------- */
+  var accItems = document.querySelectorAll("#svcAcc .acc-item");
+  for(var a = 0; a < accItems.length; a++){
+    (function(item){
+      var btn = item.querySelector(".acc-btn");
+      var panel = item.querySelector(".acc-panel");
+      btn.addEventListener("click", function(){
+        var isOpen = item.classList.contains("open");
+        for(var q = 0; q < accItems.length; q++){
+          accItems[q].classList.remove("open");
+          accItems[q].querySelector(".acc-panel").style.maxHeight = null;
+          accItems[q].querySelector(".acc-btn").setAttribute("aria-expanded", "false");
+        }
+        if(!isOpen){
+          item.classList.add("open");
+          panel.style.maxHeight = panel.scrollHeight + "px";
+          btn.setAttribute("aria-expanded", "true");
+        }
+      });
+    })(accItems[a]);
+  }
+
+  /* ---------- gallery carousel ---------- */
+  var slides = document.querySelectorAll("#carView .car-slide");
+  var dotsWrap = document.getElementById("carDots");
+  var countEl = document.getElementById("carCount");
+  var cur = 0;
+  function showSlide(n){
+    cur = (n + slides.length) % slides.length;
+    for(var s = 0; s < slides.length; s++){
+      slides[s].classList.toggle("on", s === cur);
+    }
+    var dots = dotsWrap ? dotsWrap.querySelectorAll("button") : [];
+    for(var d = 0; d < dots.length; d++){
+      dots[d].classList.toggle("on", d === cur);
+    }
+    if(countEl){ countEl.textContent = (cur + 1) + " / " + slides.length; }
+  }
+  if(dotsWrap){
+    for(var dd = 0; dd < slides.length; dd++){
+      (function(idx){
+        var dot = document.createElement("button");
+        dot.setAttribute("aria-label", "Show image " + (idx + 1));
+        if(idx === 0){ dot.classList.add("on"); }
+        dot.addEventListener("click", function(){ showSlide(idx); });
+        dotsWrap.appendChild(dot);
+      })(dd);
+    }
+  }
+  var prevBtn = document.getElementById("carPrev");
+  var nextBtn = document.getElementById("carNext");
+  if(prevBtn){ prevBtn.addEventListener("click", function(){ showSlide(cur - 1); }); }
+  if(nextBtn){ nextBtn.addEventListener("click", function(){ showSlide(cur + 1); }); }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

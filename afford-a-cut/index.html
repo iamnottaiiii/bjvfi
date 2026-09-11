@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Afford-A-Cut, LLC | Lawn Care & Landscaping in Cincinnati, OH</title>
+<meta name="description" content="Afford-A-Cut, LLC is a local lawn care and landscaping company serving eastern Cincinnati, including Clermont and Hamilton counties. Call (513) 409-3288.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#2f7d3a; --green-dark:#1f5c28; --green-light:#e9f4ea;
+    --lime:#a3c93f; --cream:#faf8f2; --ink:#22301f; --muted:#5c6b5a;
+    --card:#ffffff; --line:#dfe7dd; --radius:14px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:"Inter",system-ui,sans-serif;color:var(--ink);background:var(--cream);line-height:1.65}
+  h1,h2,h3{font-family:"Fraunces",serif;line-height:1.2;color:var(--green-dark)}
+  img{max-width:100%}
+  a{color:var(--green)}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 22px}
+
+  /* ---------- nav: centered logo ---------- */
+  header.site{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:50}
+  .brand-row{text-align:center;padding:14px 0 4px}
+  .brand{font-family:"Fraunces",serif;font-size:1.7rem;font-weight:700;color:var(--green-dark);text-decoration:none}
+  .brand span{color:var(--lime)}
+  .tagline{font-size:.8rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+  nav.main{position:relative}
+  nav.main ul{display:flex;justify-content:center;gap:6px;list-style:none;padding:8px 0 12px;flex-wrap:wrap}
+  nav.main a{text-decoration:none;color:var(--ink);font-weight:600;font-size:.95rem;padding:8px 14px;border-radius:999px}
+  nav.main a:hover{background:var(--green-light)}
+  nav.main a.active{background:var(--green);color:#fff}
+  #burger{display:none}
+  @media(max-width:680px){
+    #burger{display:block;position:absolute;right:16px;top:-46px;background:var(--green);color:#fff;border:0;border-radius:10px;padding:10px 14px;font-size:1.1rem;cursor:pointer}
+    nav.main ul{display:none;flex-direction:column;align-items:stretch;padding:10px 16px 16px}
+    nav.main.open ul{display:flex}
+    nav.main a{display:block;text-align:center}
+  }
+
+  /* ---------- pages / router ---------- */
+  .page{display:none}
+  .page.active{display:block;animation:fadeIn .35s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  /* ---------- hero: full bleed ---------- */
+  .hero{position:relative;overflow:hidden;color:#fff;
+    background:linear-gradient(135deg,#1f5c28 0%,#2f7d3a 55%,#3f9b45 100%)}
+  .hero svg.grass{position:absolute;left:0;right:0;bottom:-6px;width:100%;height:120px;display:block}
+  .hero-inner{position:relative;z-index:2;padding:84px 22px 130px;text-align:center;max-width:860px;margin:0 auto}
+  .hero h1{font-size:clamp(2.2rem,5.5vw,3.6rem);color:#fff;margin-bottom:14px}
+  .hero p{font-size:1.12rem;max-width:640px;margin:0 auto 26px;color:#f2f7f0}
+  .btn{display:inline-block;text-decoration:none;font-weight:700;border-radius:999px;padding:13px 28px;margin:6px;transition:transform .15s ease}
+  .btn:hover{transform:translateY(-2px)}
+  .btn-solid{background:#fff;color:var(--green-dark)}
+  .btn-lime{background:var(--lime);color:#1e2a1c}
+  .btn-ghost{border:2px solid #fff;color:#fff}
+  .pill{display:inline-block;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.4);
+    border-radius:999px;padding:7px 18px;font-size:.88rem;margin-bottom:18px;color:#fff}
+
+  /* ---------- alternating bands ---------- */
+  section.band{padding:64px 0}
+  section.band.alt{background:var(--green-light)}
+  section.band.white{background:#fff}
+  .band-grid{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center}
+  @media(max-width:760px){.band-grid{grid-template-columns:1fr}}
+  .band h2{font-size:clamp(1.6rem,3.4vw,2.2rem);margin-bottom:14px}
+  .band p{color:var(--muted);margin-bottom:14px}
+  .check{list-style:none;margin:18px 0}
+  .check li{padding:8px 0 8px 34px;position:relative;font-weight:500}
+  .check li::before{content:"\2714";position:absolute;left:0;top:8px;color:var(--green);font-weight:700}
+  .art-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:26px;text-align:center}
+  .art-card svg{width:100%;height:auto;border-radius:10px}
+  .badge{display:inline-block;background:var(--green);color:#fff;font-size:.75rem;font-weight:700;
+    letter-spacing:.08em;text-transform:uppercase;border-radius:6px;padding:4px 10px;margin-bottom:10px}
+
+  /* ---------- services cards ---------- */
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px;margin-top:28px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:24px;transition:transform .15s ease, box-shadow .15s ease}
+  .card:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(31,92,40,.12)}
+  .card .icon{font-size:1.9rem;margin-bottom:10px}
+  .card h3{font-size:1.12rem;margin-bottom:8px}
+  .card p{font-size:.93rem;color:var(--muted)}
+
+  /* ---------- gallery: horizontal strip ---------- */
+  .strip{display:flex;gap:16px;overflow-x:auto;padding:10px 4px 20px;scroll-snap-type:x mandatory}
+  .tile{flex:0 0 260px;scroll-snap-align:start;background:var(--card);border:1px solid var(--line);
+    border-radius:var(--radius);overflow:hidden}
+  .tile .art{height:180px;position:relative}
+  .tile .art svg{width:100%;height:100%;display:block}
+  .tile .cap{padding:14px 16px;font-size:.9rem}
+  .soon{position:absolute;top:10px;left:10px;background:#fff;border:1px dashed var(--green);
+    color:var(--green-dark);font-size:.72rem;font-weight:700;border-radius:6px;padding:4px 10px}
+  .strip::-webkit-scrollbar{height:10px}
+  .strip::-webkit-scrollbar-thumb{background:var(--green);border-radius:8px}
+
+  /* ---------- reviews ---------- */
+  .rating-big{font-size:3rem;color:var(--green-dark);font-weight:700}
+  .stars{color:#d99a26;font-size:1.4rem;letter-spacing:2px}
+  .quote-card{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--lime);
+    border-radius:var(--radius);padding:22px;margin:14px 0}
+  .quote-card p{font-style:italic}
+  .quote-card .src{font-style:normal;font-size:.85rem;color:var(--muted);margin-top:8px}
+
+  /* ---------- hours table ---------- */
+  .hours{width:100%;border-collapse:collapse;margin:18px 0}
+  .hours th,.hours td{padding:10px 14px;border-bottom:1px solid var(--line);text-align:left}
+  .hours th{background:var(--green-light);color:var(--green-dark)}
+  .note{background:#fffbe8;border:1px solid #e8d98a;border-radius:10px;padding:14px 18px;font-size:.92rem;margin:16px 0}
+
+  /* ---------- contact ---------- */
+  .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:26px}
+  @media(max-width:760px){.contact-grid{grid-template-columns:1fr}}
+  .contact-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:28px}
+  .big-phone{font-family:"Fraunces",serif;font-size:1.9rem;color:var(--green-dark);text-decoration:none;font-weight:700}
+
+  /* ---------- footer: big type ---------- */
+  footer.site{background:var(--green-dark);color:#eaf3ea;margin-top:0}
+  .foot-big{padding:60px 22px 30px;text-align:center}
+  .foot-big .fname{font-family:"Fraunces",serif;font-size:clamp(2rem,6vw,3.4rem);color:#fff;font-weight:700}
+  .foot-big .flinks{margin:22px 0}
+  .foot-big .flinks a{color:#cfe3cf;text-decoration:none;margin:0 12px;font-weight:600}
+  .foot-big .flinks a:hover{color:#fff;text-decoration:underline}
+  .foot-contact{font-size:.95rem;color:#cfe3cf}
+  .foot-contact a{color:#fff}
+  .copy{border-top:1px solid rgba(255,255,255,.18);padding:18px 22px;text-align:center;font-size:.9rem;color:#cfe3cf}
+
+  .reveal{opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}
+  .reveal.in{opacity:1;transform:none}
+  .center{text-align:center}
+  .mt{margin-top:26px}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="brand-row">
+    <a class="brand" href="#home" data-page="home" aria-label="Afford-A-Cut, LLC home">Afford-A-Cut<span>, LLC</span></a>
+    <div class="tagline">Lawn Care &amp; Landscaping</div>
+  </div>
+  <nav class="main" id="mainNav" aria-label="Main navigation">
+    <button id="burger" aria-label="Open menu" aria-expanded="false">&#9776;</button>
+    <ul>
+      <li><a href="#home" data-page="home" class="active" aria-current="page">Home</a></li>
+      <li><a href="#services" data-page="services">Services</a></li>
+      <li><a href="#about" data-page="about">About</a></li>
+      <li><a href="#gallery" data-page="gallery">Gallery</a></li>
+      <li><a href="#reviews" data-page="reviews">Reviews</a></li>
+      <li><a href="#contact" data-page="contact">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-inner">
+      <span class="pill">Serving eastern Cincinnati, Clermont &amp; Hamilton counties</span>
+      <h1>A great-looking lawn at a price you can afford</h1>
+      <p>Afford-A-Cut, LLC is a local landscaping company offering affordable pricing for cutting grass and full yard care. One yard at a time, we go the extra mile.</p>
+      <a class="btn btn-lime" href="tel:+15134093288">Call (513) 409-3288</a>
+      <a class="btn btn-ghost" href="#services" data-page="services">See Services</a>
+    </div>
+    <svg class="grass" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0,70 Q120,40 240,65 T480,60 T720,68 T960,55 T1200,66 T1440,58 L1440,120 L0,120 Z" fill="#faf8f2"/>
+      <path d="M0,90 Q160,60 320,82 T640,78 T960,88 T1280,76 T1440,84 L1440,120 L0,120 Z" fill="#a3c93f" opacity=".55"/>
+    </svg>
+  </div>
+
+  <section class="band white">
+    <div class="wrap band-grid">
+      <div class="reveal">
+        <h2>Fast, reliable lawn care near you</h2>
+        <p>Afford-A-Cut, LLC provides professional lawn mowing and yard maintenance at affordable prices, while maintaining fast, reliable service. Based in greater Cincinnati, our friendly, customer-focused team handles everything from weekly mowing to full landscape projects.</p>
+        <ul class="check">
+          <li>Weekly lawn mowing and yard maintenance</li>
+          <li>Cleanups, mulching, and leaf removal</li>
+          <li>Shrub trimming and landscape design</li>
+          <li>Snow removal and pressure washing</li>
+        </ul>
+        <a class="btn btn-solid" style="background:var(--green);color:#fff" href="#services" data-page="services">Browse all services</a>
+      </div>
+      <div class="art-card reveal">
+        <span class="badge">Photo soon</span>
+        <svg viewBox="0 0 400 240" role="img" aria-label="Illustration of a freshly mowed lawn">
+          <rect width="400" height="240" fill="#e9f4ea"/>
+          <rect y="150" width="400" height="90" fill="#7cbf5f"/>
+          <g fill="#5ea344" opacity=".6">
+            <rect x="0" y="150" width="40" height="90"/><rect x="80" y="150" width="40" height="90"/>
+            <rect x="160" y="150" width="40" height="90"/><rect x="240" y="150" width="40" height="90"/>
+            <rect x="320" y="150" width="40" height="90"/>
+          </g>
+          <circle cx="330" cy="55" r="28" fill="#ffd964"/>
+          <ellipse cx="200" cy="120" rx="70" ry="34" fill="#2f7d3a"/>
+          <rect x="186" y="60" width="28" height="70" rx="4" fill="#8a5a3b"/>
+          <polygon points="200,20 160,60 240,60" fill="#2f7d3a"/>
+          <polygon points="200,45 172,75 228,75" fill="#3f9b45"/>
+        </svg>
+        <p style="margin-top:10px;color:var(--muted);font-size:.9rem">Real project photos coming soon.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="band alt">
+    <div class="wrap center">
+      <h2 class="reveal">Rated by local customers</h2>
+      <div class="rating-big reveal">3.9 / 5</div>
+      <div class="stars reveal" aria-label="3.9 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9734;</div>
+      <p class="reveal" style="color:var(--muted)">Based on 18 Google reviews</p>
+      <a class="btn btn-solid mt reveal" style="background:var(--green);color:#fff" href="#reviews" data-page="reviews">Read the reviews</a>
+    </div>
+  </section>
+
+  <section class="band white">
+    <div class="wrap center">
+      <h2 class="reveal">Get your yard on the schedule</h2>
+      <p class="reveal" style="color:var(--muted);max-width:600px;margin:0 auto">Call for pricing on weekly mowing, seasonal cleanups, mulch, and more. Afford-A-Cut serves Cincinnati, OH 45245 and the surrounding east-side communities.</p>
+      <p class="mt reveal"><a class="btn btn-lime" href="tel:+15134093288">Call (513) 409-3288</a>
+      <a class="btn btn-solid" style="background:var(--green);color:#fff" href="#contact" data-page="contact">Contact &amp; Hours</a></p>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-services">
+  <section class="band white">
+    <div class="wrap">
+      <h2 class="center">Services</h2>
+      <p class="center" style="color:var(--muted);max-width:640px;margin:0 auto">From weekly mowing to patios and lighting, here is what the Afford-A-Cut crew does. Call <a href="tel:+15134093288">(513) 409-3288</a> for pricing on your project.</p>
+      <div class="cards">
+        <div class="card reveal"><div class="icon">&#127795;</div><h3>Weekly Lawn Mowing</h3><p>Regular mowing to keep your grass healthy and neat all season.</p></div>
+        <div class="card reveal"><div class="icon">&#129529;</div><h3>Yard Cleanups</h3><p>Spring and fall cleanups that clear debris, sticks, and overgrowth.</p></div>
+        <div class="card reveal"><div class="icon">&#9986;</div><h3>Shrub Trimming</h3><p>Shaping and trimming to keep bushes healthy and tidy.</p></div>
+        <div class="card reveal"><div class="icon">&#127808;</div><h3>Landscape Mulching</h3><p>Fresh mulch beds that look great and protect your plants.</p></div>
+        <div class="card reveal"><div class="icon">&#127809;</div><h3>Leaf Removal</h3><p>Fall leaf cleanup so your lawn can breathe going into winter.</p></div>
+        <div class="card reveal"><div class="icon">&#10052;</div><h3>Snow Removal</h3><p>Winter snow clearing to keep your driveway and walks safe.</p></div>
+        <div class="card reveal"><div class="icon">&#128166;</div><h3>Pressure Washing</h3><p>Wash away dirt and grime from driveways, patios, and siding.</p></div>
+        <div class="card reveal"><div class="icon">&#129521;</div><h3>Retaining Walls</h3><p>Walls that control erosion and add structure to your yard.</p></div>
+        <div class="card reveal"><div class="icon">&#127960;</div><h3>Patios</h3><p>Paver, stone, or concrete patios for outdoor living space.</p></div>
+        <div class="card reveal"><div class="icon">&#128161;</div><h3>Landscape Lighting</h3><p>Lighting design that shows off your yard after dark.</p></div>
+        <div class="card reveal"><div class="icon">&#127876;</div><h3>Christmas Light Installation</h3><p>Holiday lighting installed and taken down for you.</p></div>
+        <div class="card reveal"><div class="icon">&#128167;</div><h3>Drainage &amp; Creek Rock</h3><p>Drainage pipe installation and creek rock to move water where it belongs.</p></div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-about">
+  <section class="band white">
+    <div class="wrap band-grid">
+      <div class="reveal">
+        <h2>About Afford-A-Cut, LLC</h2>
+        <p>Afford-A-Cut, LLC is a local landscaping company with affordable pricing for cutting grass and landscaping. Based in greater Cincinnati, we service all of eastern Cincinnati including Clermont and Hamilton counties.</p>
+        <p>We provide complete services, from lawn maintenance to cleanups to landscape design and installation. Allow Afford-A-Cut's friendly and customer-focused team of lawn care professionals to go to work for you. We go the extra mile, one yard at a time.</p>
+        <ul class="check">
+          <li>Locally based at 893 Surrey Trail, Cincinnati, OH 45245</li>
+          <li>Affordable, budget-friendly pricing</li>
+          <li>Fast, reliable service</li>
+        </ul>
+      </div>
+      <div class="art-card reveal">
+        <span class="badge">Photo soon</span>
+        <svg viewBox="0 0 400 240" role="img" aria-label="Illustration of landscaping work">
+          <rect width="400" height="240" fill="#e9f4ea"/>
+          <rect y="170" width="400" height="70" fill="#7cbf5f"/>
+          <rect x="60" y="90" width="18" height="80" rx="6" fill="#8a5a3b"/>
+          <polygon points="69,40 30,95 108,95" fill="#2f7d3a"/>
+          <rect x="300" y="120" width="60" height="50" rx="6" fill="#b08968"/>
+          <rect x="312" y="100" width="36" height="24" rx="4" fill="#8a5a3b"/>
+          <circle cx="200" cy="60" r="24" fill="#ffd964"/>
+        </svg>
+        <p style="margin-top:10px;color:var(--muted);font-size:.9rem">Team and equipment photos coming soon.</p>
+      </div>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-gallery">
+  <section class="band white">
+    <div class="wrap">
+      <h2 class="center">Gallery</h2>
+      <p class="center" style="color:var(--muted)">A look at the kind of work we do. Real project photos coming soon.</p>
+      <div class="strip">
+        <div class="tile"><div class="art"><span class="soon">Photo soon</span><svg viewBox="0 0 260 180"><rect width="260" height="180" fill="#dcebd9"/><rect y="120" width="260" height="60" fill="#7cbf5f"/><g fill="#5ea344" opacity=".6"><rect x="0" y="120" width="26" height="60"/><rect x="52" y="120" width="26" height="60"/><rect x="104" y="120" width="26" height="60"/><rect x="156" y="120" width="26" height="60"/><rect x="208" y="120" width="26" height="60"/></g></svg></div><div class="cap">Freshly mowed lawn</div></div>
+        <div class="tile"><div class="art"><span class="soon">Photo soon</span><svg viewBox="0 0 260 180"><rect width="260" height="180" fill="#e8f0e6"/><ellipse cx="130" cy="120" rx="90" ry="30" fill="#8a5a3b"/><ellipse cx="130" cy="105" rx="90" ry="26" fill="#5c3d26"/><circle cx="100" cy="88" r="10" fill="#2f7d3a"/><circle cx="160" cy="82" r="12" fill="#3f9b45"/><circle cx="130" cy="70" r="9" fill="#2f7d3a"/></svg></div><div class="cap">Mulch bed refresh</div></div>
+        <div class="tile"><div class="art"><span class="soon">Photo soon</span><svg viewBox="0 0 260 180"><rect width="260" height="180" fill="#dcebd9"/><rect y="110" width="260" height="70" fill="#7cbf5f"/><rect x="40" y="60" width="14" height="55" rx="5" fill="#8a5a3b"/><polygon points="47,25 18,62 76,62" fill="#2f7d3a"/><rect x="180" y="70" width="14" height="45" rx="5" fill="#8a5a3b"/><polygon points="187,35 158,72 216,72" fill="#3f9b45"/></svg></div><div class="cap">Shrub trimming</div></div>
+        <div class="tile"><div class="art"><span class="soon">Photo soon</span><svg viewBox="0 0 260 180"><rect width="260" height="180" fill="#e8f0e6"/><rect x="30" y="100" width="200" height="60" rx="6" fill="#c9b391"/><g stroke="#a98f6d" stroke-width="3"><line x1="30" y1="120" x2="230" y2="120"/><line x1="30" y1="140" x2="230" y2="140"/><line x1="80" y1="100" x2="80" y2="160"/><line x1="130" y1="100" x2="130" y2="160"/><line x1="180" y1="100" x2="180" y2="160"/></g></svg></div><div class="cap">Paver patio work</div></div>
+        <div class="tile"><div class="art"><span class="soon">Photo soon</span><svg viewBox="0 0 260 180"><rect width="260" height="180" fill="#22301f"/><rect y="120" width="260" height="60" fill="#1f5c28"/><circle cx="60" cy="60" r="8" fill="#ffd964"/><circle cx="130" cy="80" r="8" fill="#ffd964"/><circle cx="200" cy="55" r="8" fill="#ffd964"/><rect x="56" y="68" width="8" height="52" fill="#8a5a3b"/><rect x="126" y="88" width="8" height="32" fill="#8a5a3b"/><rect x="196" y="63" width="8" height="57" fill="#8a5a3b"/></svg></div><div class="cap">Landscape lighting</div></div>
+        <div class="tile"><div class="art"><span class="soon">Photo soon</span><svg viewBox="0 0 260 180"><rect width="260" height="180" fill="#dcebd9"/><rect y="120" width="260" height="60" fill="#a9c9e8"/><g fill="#fff"><circle cx="70" cy="60" r="12"/><circle cx="95" cy="55" r="14"/><circle cx="120" cy="60" r="12"/></g><rect y="120" width="260" height="14" fill="#7cbf5f"/></svg></div><div class="cap">Snow removal</div></div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-reviews">
+  <section class="band white">
+    <div class="wrap" style="max-width:760px">
+      <h2 class="center">Reviews</h2>
+      <div class="center">
+        <div class="rating-big">3.9 / 5</div>
+        <div class="stars" aria-label="3.9 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9734;</div>
+        <p style="color:var(--muted)">Based on 18 Google reviews</p>
+        <p class="mt"><a class="btn btn-solid" style="background:var(--green);color:#fff" href="https://www.google.com/maps/place/?q=place_id:ChIJp7HKLKEAQYgR_BM1QX4J7ls">See reviews on Google</a>
+        <a class="btn btn-ghost" style="border-color:var(--green);color:var(--green-dark)" href="https://reviews.birdeye.com/afford-a-cut-llc-156226964258521">Read reviews on Birdeye</a></p>
+      </div>
+      <div class="quote-card reveal">
+        <p>Customers say their lawns look great after a visit, and that the crew handles special requests with care.</p>
+        <div class="src">Paraphrased from public Google and directory reviews. <a href="https://www.google.com/maps/place/?q=place_id:ChIJp7HKLKEAQYgR_BM1QX4J7ls">Read them on Google</a>.</div>
+      </div>
+      <div class="quote-card reveal">
+        <p>Reviewers describe the team as friendly and kind, with several noting consistently good mowing work.</p>
+        <div class="src">Paraphrased from public Google and directory reviews. <a href="https://www.google.com/maps/place/?q=place_id:ChIJp7HKLKEAQYgR_BM1QX4J7ls">Read them on Google</a>.</div>
+      </div>
+      <p class="note">Ratings shown are from public listings and may change. Had work done by Afford-A-Cut? Leave a review on Google to help neighbors choose.</p>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-contact">
+  <section class="band white">
+    <div class="wrap" style="max-width:860px">
+      <h2 class="center">Contact &amp; Hours</h2>
+      <div class="contact-grid">
+        <div class="contact-card reveal">
+          <h3>Get in touch</h3>
+          <p><a class="big-phone" href="tel:+15134093288">(513) 409-3288</a></p>
+          <p style="margin-top:12px">Afford-A-Cut, LLC<br>893 Surrey Trail<br>Cincinnati, OH 45245</p>
+          <p class="mt"><a class="btn btn-solid" style="background:var(--green);color:#fff" href="https://www.google.com/maps/place/?q=place_id:ChIJp7HKLKEAQYgR_BM1QX4J7ls">Get Directions</a></p>
+        </div>
+        <div class="contact-card reveal">
+          <h3>Hours</h3>
+          <table class="hours">
+            <tr><th>Day</th><th>Hours</th></tr>
+            <tr><td>Monday</td><td>7:00 AM - 7:00 PM</td></tr>
+            <tr><td>Tuesday</td><td>7:00 AM - 7:00 PM</td></tr>
+            <tr><td>Wednesday</td><td>7:00 AM - 7:00 PM</td></tr>
+            <tr><td>Thursday</td><td>7:00 AM - 7:00 PM</td></tr>
+            <tr><td>Friday</td><td>7:00 AM - 7:00 PM</td></tr>
+            <tr><td>Saturday</td><td>7:00 AM - 7:00 PM</td></tr>
+            <tr><td>Sunday</td><td>Closed</td></tr>
+          </table>
+          <p class="note">Public listings differ on Sunday and holiday hours, so please call to confirm before visiting.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+</main>
+
+<footer class="site">
+  <div class="foot-big">
+    <div class="fname">Afford-A-Cut, LLC</div>
+    <div class="flinks">
+      <a href="#home" data-page="home">Home</a>
+      <a href="#services" data-page="services">Services</a>
+      <a href="#gallery" data-page="gallery">Gallery</a>
+      <a href="#reviews" data-page="reviews">Reviews</a>
+      <a href="#contact" data-page="contact">Contact</a>
+    </div>
+    <p class="foot-contact">893 Surrey Trail, Cincinnati, OH 45245 &nbsp;|&nbsp; <a href="tel:+15134093288">(513) 409-3288</a> &nbsp;|&nbsp; <a href="https://www.google.com/maps/place/?q=place_id:ChIJp7HKLKEAQYgR_BM1QX4J7ls">Directions</a></p>
+  </div>
+  <div class="copy">© Afford-A-Cut, LLC</div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "contact"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
