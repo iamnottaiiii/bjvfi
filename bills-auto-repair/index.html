@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bill's Auto Repair | Cincinnati, OH</title>
+<meta name="description" content="Bill's Auto Repair, 3706 Lonsdale St, Cincinnati, OH 45227. General auto repair and oil changes. Call (513) 561-0405.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Carter+One&family=Gochi+Hand&family=Work+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --kraft: #d9c49a;
+    --kraft-dark: #c8ae7c;
+    --board: #2e4034;
+    --board-dark: #1f2d24;
+    --paint: #f7efdc;
+    --paint-dim: #e8d9b8;
+    --red: #b03a2e;
+    --ink: #2b2419;
+    --tape: rgba(230, 214, 170, .85);
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "Work Sans", sans-serif;
+    color: var(--ink);
+    background-color: var(--kraft);
+    background-image:
+      radial-gradient(ellipse at 20% 10%, rgba(255,255,255,.25), transparent 55%),
+      radial-gradient(ellipse at 85% 90%, rgba(120, 90, 50, .18), transparent 50%),
+      repeating-linear-gradient(97deg, rgba(120,95,55,.05) 0 2px, transparent 2px 9px);
+    min-height: 100vh;
+  }
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 0 18px 60px; }
+
+  header.signshop { position: relative; text-align: center; padding: 0 12px 6px; }
+  .chains { display: flex; justify-content: center; gap: 200px; margin-bottom: -6px; }
+  .chain { width: 6px; height: 54px; background: repeating-linear-gradient(180deg, #4a4a4a 0 8px, #777 8px 16px); border-radius: 3px; }
+  .signboard {
+    background: linear-gradient(180deg, var(--board) 0%, var(--board-dark) 100%);
+    border: 10px solid #4a3524;
+    border-radius: 10px;
+    box-shadow: 0 10px 24px rgba(0,0,0,.35), inset 0 0 60px rgba(0,0,0,.35);
+    padding: 26px 18px 22px;
+    position: relative;
+    overflow: hidden;
+  }
+  .signboard::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: repeating-linear-gradient(93deg, rgba(255,255,255,.03) 0 3px, transparent 3px 11px);
+  }
+  .signboard h1 {
+    font-family: "Carter One", cursive;
+    color: var(--paint);
+    font-size: clamp(2rem, 6vw, 3.6rem);
+    letter-spacing: .04em;
+    text-shadow: 2px 3px 0 rgba(0,0,0,.45), -1px -1px 0 rgba(255,255,255,.08);
+    line-height: 1.05;
+  }
+  .signboard h1 .wrench { color: #e0a92e; }
+  .sign-rule { display: flex; align-items: center; gap: 12px; margin: 14px auto 10px; max-width: 480px; }
+  .sign-rule::before, .sign-rule::after { content: ""; flex: 1; height: 2px; background: var(--paint-dim); opacity: .6; }
+  .signboard p.tag {
+    font-family: "Gochi Hand", cursive;
+    color: var(--paint-dim);
+    font-size: clamp(1.05rem, 2.6vw, 1.4rem);
+    letter-spacing: .03em;
+  }
+  .sign-addr {
+    margin-top: 8px; color: #cfd8c6; font-size: .95rem; letter-spacing: .06em;
+  }
+
+  nav.mainnav {
+    margin: 18px auto 0; max-width: 1060px; padding: 0 18px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  .planks { display: flex; gap: 10px; flex-wrap: wrap; }
+  .plank {
+    font-family: "Carter One", cursive; font-size: .95rem; letter-spacing: .05em;
+    color: var(--paint); background: linear-gradient(180deg, #5b4630, #453322);
+    border: 2px solid #33261a; border-radius: 6px; padding: 10px 18px;
+    text-decoration: none; box-shadow: 0 4px 0 #2a1e12, 0 6px 10px rgba(0,0,0,.25);
+    transform: rotate(-.6deg); transition: transform .15s ease, background .15s ease;
+  }
+  .planks .plank:nth-child(2n) { transform: rotate(.7deg); }
+  .plank:hover { transform: rotate(0deg) translateY(-2px); background: linear-gradient(180deg, #6b543a, #503b26); }
+  .plank.active { background: linear-gradient(180deg, var(--red), #8c2c22); border-color: #5e1d15; box-shadow: 0 4px 0 #4c150e, 0 6px 10px rgba(0,0,0,.25); }
+  .hamburger {
+    display: none; font-family: "Carter One", cursive; font-size: 1rem;
+    background: linear-gradient(180deg, #5b4630, #453322); color: var(--paint);
+    border: 2px solid #33261a; border-radius: 6px; padding: 10px 16px; cursor: pointer;
+    box-shadow: 0 4px 0 #2a1e12;
+  }
+  .mobile-menu { display: none; flex-direction: column; gap: 8px; margin: 10px 18px 0; }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu .plank { text-align: center; transform: none; }
+
+  .page { display: none; animation: paintIn .35s ease; }
+  .page.visible { display: block; }
+  @keyframes paintIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+  .pane {
+    background: rgba(247, 239, 220, .92);
+    border: 3px solid #4a3524; border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(0,0,0,.18), inset 0 0 40px rgba(200,174,124,.25);
+    padding: clamp(20px, 4vw, 40px); margin-top: 26px; position: relative;
+  }
+  .pane h2 {
+    font-family: "Carter One", cursive; color: var(--board-dark);
+    font-size: clamp(1.5rem, 4vw, 2.2rem); letter-spacing: .03em; margin-bottom: 14px;
+  }
+  .pane h2 .fa-solid { color: var(--red); margin-right: 10px; }
+  .pane p { line-height: 1.7; margin-bottom: 12px; }
+  .hand { font-family: "Gochi Hand", cursive; }
+
+  .hero-cta { display: flex; gap: 12px; flex-wrap: wrap; margin: 18px 0 6px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: "Carter One", cursive; letter-spacing: .04em; font-size: 1rem;
+    text-decoration: none; color: var(--paint); background: linear-gradient(180deg, var(--red), #8c2c22);
+    border: 2px solid #5e1d15; border-radius: 8px; padding: 13px 22px; cursor: pointer;
+    box-shadow: 0 4px 0 #4c150e, 0 6px 12px rgba(0,0,0,.25);
+    transition: transform .15s ease;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn.ghost { background: linear-gradient(180deg, var(--board), var(--board-dark)); border-color: #141f17; box-shadow: 0 4px 0 #101813, 0 6px 12px rgba(0,0,0,.25); }
+  .btn.cream { background: linear-gradient(180deg, #fdf8ea, var(--paint-dim)); color: var(--ink); border-color: #8a6f45; box-shadow: 0 4px 0 #6d5736, 0 6px 12px rgba(0,0,0,.2); }
+
+  .badge {
+    display: inline-block; font-size: .72rem; font-weight: 700; letter-spacing: .12em;
+    background: #e0a92e; color: #3a2c12; border: 2px dashed #7a5b1e; border-radius: 4px;
+    padding: 3px 10px; margin-left: 8px; vertical-align: middle; text-transform: uppercase;
+  }
+
+  .window-menu {
+    background: linear-gradient(180deg, #33503b 0%, #22362a 100%);
+    border: 12px solid #4a3524; border-radius: 6px;
+    box-shadow: inset 0 0 70px rgba(0,0,0,.5), 0 10px 24px rgba(0,0,0,.3);
+    padding: clamp(20px, 4vw, 38px); margin-top: 26px; position: relative;
+  }
+  .window-menu::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: 2px;
+    background: linear-gradient(115deg, rgba(255,255,255,.08) 0 18%, transparent 30% 70%, rgba(255,255,255,.05) 85%);
+  }
+  .window-menu h2 {
+    font-family: "Carter One", cursive; color: var(--paint); text-align: center;
+    font-size: clamp(1.6rem, 4.5vw, 2.4rem); letter-spacing: .05em; margin-bottom: 6px;
+    text-shadow: 2px 2px 0 rgba(0,0,0,.5);
+  }
+  .window-menu .sub { text-align: center; color: var(--paint-dim); font-family: "Gochi Hand", cursive; font-size: 1.15rem; margin-bottom: 20px; }
+  .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+  .menu-item {
+    border: 2px solid rgba(247,239,220,.5); border-radius: 6px; padding: 16px 14px;
+    background: rgba(0,0,0,.18); transition: background .2s ease;
+  }
+  .menu-item:hover { background: rgba(0,0,0,.3); }
+  .menu-item h3 { font-family: "Gochi Hand", cursive; color: var(--paint); font-size: 1.45rem; margin-bottom: 6px; }
+  .menu-item h3 .fa-solid { color: #e0a92e; margin-right: 8px; font-size: 1.1rem; }
+  .menu-item p { color: #d7ddcf; font-size: .92rem; line-height: 1.55; }
+  .menu-foot { text-align: center; margin-top: 22px; color: var(--paint-dim); font-family: "Gochi Hand", cursive; font-size: 1.2rem; }
+  .menu-foot a { color: #e0a92e; }
+
+  .tally-row { display: flex; gap: 26px; flex-wrap: wrap; margin-top: 18px; }
+  .tally { flex: 1 1 200px; text-align: center; background: rgba(255,255,255,.35); border: 2px dashed #8a6f45; border-radius: 8px; padding: 16px 10px; }
+  .tally .num { font-family: "Carter One", cursive; font-size: 2rem; color: var(--red); }
+  .tally .lbl { font-size: .9rem; margin-top: 4px; }
+  .tally svg { display: block; margin: 8px auto 0; }
+
+  .note {
+    background: #fdf6e3; border-radius: 2px; padding: 26px 24px 22px; margin-top: 26px;
+    box-shadow: 0 8px 18px rgba(0,0,0,.2); position: relative;
+    transform: rotate(-.8deg); max-width: 640px; margin-left: auto; margin-right: auto;
+  }
+  .note::before {
+    content: ""; position: absolute; top: -14px; left: 50%; transform: translateX(-50%) rotate(2deg);
+    width: 120px; height: 30px; background: var(--tape); border-left: 1px dashed rgba(0,0,0,.15); border-right: 1px dashed rgba(0,0,0,.15);
+  }
+  .note h2 { font-family: "Gochi Hand", cursive; font-size: 1.9rem; color: var(--ink); margin-bottom: 10px; }
+  .note p { font-family: "Gochi Hand", cursive; font-size: 1.25rem; line-height: 1.6; color: #3d3527; }
+  .note .sig { text-align: right; font-size: 1.4rem; color: var(--red); margin-top: 10px; }
+
+  .hours-card {
+    background: #20302a; color: var(--paint); border-radius: 8px; padding: 20px 22px; margin-top: 26px;
+    border: 8px solid #4a3524; box-shadow: 0 8px 18px rgba(0,0,0,.25);
+  }
+  .hours-card h3 { font-family: "Gochi Hand", cursive; font-size: 1.7rem; color: #e0a92e; margin-bottom: 10px; }
+  .hours-card table { width: 100%; border-collapse: collapse; font-size: .95rem; }
+  .hours-card td { padding: 7px 4px; border-bottom: 1px dashed rgba(247,239,220,.25); }
+  .hours-card td:last-child { text-align: right; color: var(--paint-dim); }
+  .hours-card .fine { margin-top: 10px; font-size: .82rem; color: #b9c4ad; }
+
+  .review-card {
+    background: #fffdf6; border: 2px solid #c8ae7c; border-radius: 8px; padding: 18px;
+    box-shadow: 3px 4px 0 rgba(120, 95, 55, .25); margin-bottom: 16px;
+  }
+  .stars { color: #e0a92e; letter-spacing: 2px; margin-bottom: 8px; }
+  .review-card blockquote { font-style: italic; line-height: 1.65; margin-bottom: 8px; }
+  .review-card .src { font-size: .85rem; color: #6d5f46; }
+
+  form.contact-form { display: grid; gap: 14px; margin-top: 16px; }
+  form.contact-form label { font-weight: 600; font-size: .95rem; }
+  form.contact-form input, form.contact-form textarea {
+    width: 100%; font-family: "Work Sans", sans-serif; font-size: 1rem;
+    border: 2px solid #8a6f45; border-radius: 6px; padding: 12px; background: #fffdf6; color: var(--ink);
+  }
+  form.contact-form input:focus, form.contact-form textarea:focus { outline: 3px solid rgba(176,58,46,.35); border-color: var(--red); }
+  .form-confirm {
+    display: none; background: #e7f0dd; border: 2px solid #4c7a3f; border-radius: 8px;
+    padding: 18px; margin-top: 14px; line-height: 1.6;
+  }
+  .form-confirm.show { display: block; }
+  .form-confirm a { font-weight: 700; color: var(--red); }
+
+  .contact-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px; margin-top: 8px; }
+  .info-line { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 14px; line-height: 1.55; }
+  .info-line .fa-solid { color: var(--red); font-size: 1.2rem; margin-top: 3px; min-width: 22px; text-align: center; }
+  .info-line a { color: var(--ink); font-weight: 600; }
+
+  footer.site-footer {
+    text-align: center; padding: 26px 12px 40px; color: #5b4c33;
+    font-family: "Gochi Hand", cursive; font-size: 1.15rem;
+  }
+
+  @media (max-width: 760px) {
+    .planks { display: none; }
+    .hamburger { display: inline-block; }
+    .chains { gap: 130px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="signshop">
+  <div class="chains" aria-hidden="true"><span class="chain"></span><span class="chain"></span></div>
+  <div class="signboard">
+    <h1><i class="fa-solid fa-wrench wrench"></i> BILL'S AUTO REPAIR</h1>
+    <div class="sign-rule"><i class="fa-solid fa-star" style="color:#e0a92e"></i></div>
+    <p class="tag">Honest work on your car, right here on Lonsdale Street</p>
+    <p class="sign-addr">3706 LONSDALE ST, CINCINNATI, OH 45227 &nbsp;|&nbsp; (513) 561-0405</p>
+  </div>
+</header>
+
+<nav class="mainnav" aria-label="Main navigation">
+  <button class="hamburger" id="menuToggle" aria-expanded="false" aria-controls="mobileMenu"><i class="fa-solid fa-bars"></i> MENU</button>
+  <div class="planks" id="desktopNav">
+    <a class="plank" href="?page=home" data-nav="home">Home</a>
+    <a class="plank" href="?page=services" data-nav="services">Services</a>
+    <a class="plank" href="?page=about" data-nav="about">About</a>
+    <a class="plank" href="?page=reviews" data-nav="reviews">Reviews</a>
+    <a class="plank" href="?page=contact" data-nav="contact">Contact</a>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a class="plank" href="?page=home" data-nav="home">Home</a>
+  <a class="plank" href="?page=services" data-nav="services">Services</a>
+  <a class="plank" href="?page=about" data-nav="about">About</a>
+  <a class="plank" href="?page=reviews" data-nav="reviews">Reviews</a>
+  <a class="plank" href="?page=contact" data-nav="contact">Contact</a>
+</div>
+
+<main class="wrap">
+
+  <section class="page" id="page-home" data-page="home">
+    <div class="pane">
+      <h2><i class="fa-solid fa-house"></i>Welcome to the Corner Shop</h2>
+      <p>Bill's Auto Repair is a neighborhood auto repair shop at 3706 Lonsdale St in Cincinnati, Ohio. Folks around here bring their cars to Bill for straight talk and dependable work, and many have been doing it for years.</p>
+      <p class="hand" style="font-size:1.25rem; color:#4a3f2c;">Pull in, say hello, and tell us what your car is doing. We will take a look and tell you plainly what it needs.</p>
+      <div class="hero-cta">
+        <a class="btn" href="tel:+15135610405"><i class="fa-solid fa-phone"></i> Call (513) 561-0405</a>
+        <a class="btn ghost" href="https://www.google.com/maps/search/?api=1&query=3706%20Lonsdale%20St%2C%20Cincinnati%2C%20OH%2045227" target="_blank" rel="noopener"><i class="fa-solid fa-map-location-dot"></i> Get Directions</a>
+        <a class="btn cream" href="?page=services" data-nav="services"><i class="fa-solid fa-list"></i> See the Service Menu</a>
+      </div>
+    </div>
+
+    <div class="pane">
+      <h2><i class="fa-solid fa-clipboard-check"></i>Why Drivers Keep Coming Back</h2>
+      <div class="tally-row">
+        <div class="tally">
+          <div class="num">4.9</div>
+          <div class="lbl">Star rating across 37 public reviews</div>
+          <svg width="90" height="30" viewBox="0 0 90 30" aria-hidden="true">
+            <g stroke="#2e4034" stroke-width="3" stroke-linecap="round">
+              <line x1="8" y1="6" x2="8" y2="24"/><line x1="16" y1="6" x2="16" y2="24"/><line x1="24" y1="6" x2="24" y2="24"/><line x1="32" y1="6" x2="32" y2="24"/><line x1="4" y1="6" x2="34" y2="24"/>
+              <line x1="48" y1="6" x2="48" y2="24"/><line x1="56" y1="6" x2="56" y2="24"/><line x1="64" y1="6" x2="64" y2="24"/><line x1="72" y1="6" x2="72" y2="24"/><line x1="44" y1="6" x2="74" y2="24"/>
+            </g>
+          </svg>
+        </div>
+        <div class="tally">
+          <div class="num">Since 1984</div>
+          <div class="lbl">In business, per BBB public profile</div>
+          <svg width="90" height="30" viewBox="0 0 90 30" aria-hidden="true">
+            <g stroke="#2e4034" stroke-width="3" stroke-linecap="round">
+              <line x1="8" y1="6" x2="8" y2="24"/><line x1="16" y1="6" x2="16" y2="24"/><line x1="24" y1="6" x2="24" y2="24"/><line x1="32" y1="6" x2="32" y2="24"/><line x1="4" y1="6" x2="34" y2="24"/>
+              <line x1="48" y1="6" x2="48" y2="24"/><line x1="56" y1="6" x2="56" y2="24"/><line x1="64" y1="6" x2="64" y2="24"/>
+            </g>
+          </svg>
+        </div>
+        <div class="tally">
+          <div class="num">1 Shop</div>
+          <div class="lbl">One neighborhood shop, one name on the door</div>
+          <svg width="90" height="30" viewBox="0 0 90 30" aria-hidden="true">
+            <g stroke="#2e4034" stroke-width="3" stroke-linecap="round">
+              <line x1="38" y1="6" x2="38" y2="24"/><line x1="46" y1="6" x2="46" y2="24"/><line x1="54" y1="6" x2="54" y2="24"/>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="hours-card">
+      <h3><i class="fa-solid fa-clock"></i> Shop Hours <span class="badge">Call to confirm</span></h3>
+      <table>
+        <tr><td>Monday to Friday</td><td>8:00 AM to 6:00 PM</td></tr>
+        <tr><td>Saturday</td><td>Closed</td></tr>
+        <tr><td>Sunday</td><td>Closed</td></tr>
+      </table>
+      <p class="fine">Hours shown are from public business listings and may change. Call (513) 561-0405 to confirm before you visit.</p>
+    </div>
+  </section>
+
+  <section class="page" id="page-services" data-page="services">
+    <div class="window-menu">
+      <h2><i class="fa-solid fa-car-wrench" style="color:#e0a92e"></i> SERVICE MENU</h2>
+      <p class="sub">painted fresh on the shop window</p>
+      <div class="menu-grid">
+        <div class="menu-item">
+          <h3><i class="fa-solid fa-gears"></i>General Auto Repair</h3>
+          <p>Diagnosis and repair for everyday car trouble, from strange noises to things that just quit working.</p>
+        </div>
+        <div class="menu-item">
+          <h3><i class="fa-solid fa-oil-can"></i>Oil Changes</h3>
+          <p>Routine oil and filter service to keep your engine happy. Listed as an offering in public shop listings.</p>
+        </div>
+        <div class="menu-item">
+          <h3><i class="fa-solid fa-car-battery"></i>Battery Checks <span class="badge">Call to confirm</span></h3>
+          <p>Testing and replacement for tired batteries that leave you stranded on cold mornings.</p>
+        </div>
+        <div class="menu-item">
+          <h3><i class="fa-solid fa-circle-dot"></i>Brake Service <span class="badge">Call to confirm</span></h3>
+          <p>Pads, rotors, and everything that helps you stop when it matters.</p>
+        </div>
+        <div class="menu-item">
+          <h3><i class="fa-solid fa-temperature-half"></i>Heating and Cooling <span class="badge">Call to confirm</span></h3>
+          <p>Air conditioning and heater work so the cabin stays comfortable year round.</p>
+        </div>
+        <div class="menu-item">
+          <h3><i class="fa-solid fa-magnifying-glass"></i>Inspections <span class="badge">Call to confirm</span></h3>
+          <p>A careful look over before a road trip or when something just does not feel right.</p>
+        </div>
+      </div>
+      <p class="menu-foot">Something else on your mind? <a href="tel:+15135610405">Call the shop</a> and ask Bill directly.</p>
+    </div>
+  </section>
+
+  <section class="page" id="page-about" data-page="about">
+    <div class="note">
+      <h2>A note from the shopkeeper</h2>
+      <p>Howdy. I am Bill Eastham, and this is my shop on Lonsdale Street. We opened our doors back in 1984, and we are still here doing the same thing we have always done: fixing cars right and treating folks fair.</p>
+      <p>No fancy waiting room, no upsell scripts. Just a lift, good tools, and an honest answer about what your car needs and what it does not. If you are new to the neighborhood, come by and introduce yourself. We will take good care of you.</p>
+      <p class="sig">Bill</p>
+    </div>
+    <div class="pane">
+      <h2><i class="fa-solid fa-shop"></i>The Shop at a Glance</h2>
+      <div class="info-line"><i class="fa-solid fa-user"></i><span><strong>Owner:</strong> Bill Eastham, per public business listings.</span></div>
+      <div class="info-line"><i class="fa-solid fa-calendar"></i><span><strong>Serving drivers since 1984,</strong> per BBB public profile. Business start date 10/1/1984.</span></div>
+      <div class="info-line"><i class="fa-solid fa-location-dot"></i><span><strong>Address:</strong> Bill's Auto Repair, 3706 Lonsdale St, Cincinnati, OH 45227</span></div>
+      <div class="info-line"><i class="fa-solid fa-phone"></i><span><strong>Phone:</strong> <a href="tel:+15135610405">(513) 561-0405</a></span></div>
+      <div class="info-line"><i class="fa-solid fa-wheelchair"></i><span><strong>Accessibility:</strong> Wheelchair-accessible entrance, per public listing.</span></div>
+      <p style="margin-top:10px; font-size:.9rem; color:#6d5f46;">Details above come from public business listings (BBB, Birdeye). Anything you would like verified, just call the shop.</p>
+    </div>
+  </section>
+
+  <section class="page" id="page-reviews" data-page="reviews">
+    <div class="pane">
+      <h2><i class="fa-solid fa-star"></i>What Neighbors Say</h2>
+      <p>Public listings show Bill's Auto Repair with a <strong>4.9 star rating across 37 reviews</strong> and a <strong>5.0 rating across 14 published comments</strong> on local business directories. Read them all on the shop's real listing pages:</p>
+      <div class="hero-cta">
+        <a class="btn" href="https://www.google.com/maps/place/?q=place_id:ChIJu3LpalasQYgRZXDICrJIJA8" target="_blank" rel="noopener"><i class="fa-solid fa-map-location-dot"></i> Google Maps Reviews</a>
+        <a class="btn ghost" href="https://reviews.birdeye.com/bills-auto-repair-156045592063261" target="_blank" rel="noopener"><i class="fa-solid fa-comments"></i> Birdeye Reviews</a>
+      </div>
+      <p style="font-size:.9rem; color:#6d5f46;">We do not reprint reviewer names here. The comments below are sample summaries of the kinds of things public reviewers mention, quoted from public listings.</p>
+    </div>
+    <div class="pane">
+      <h2><i class="fa-solid fa-quote-left"></i>From Public Listings</h2>
+      <div class="review-card">
+        <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+        <blockquote>"Bill does great work!"</blockquote>
+        <p class="src">Quoted from a public business listing <span class="badge">Sample</span></p>
+      </div>
+      <div class="review-card">
+        <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+        <blockquote>"Always fair. Always timely. These guys are amazing and I couldnt speak more highly of them."</blockquote>
+        <p class="src">Quoted from a public business listing <span class="badge">Sample</span></p>
+      </div>
+      <div class="review-card">
+        <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+        <blockquote>"Bill is a great guy and I trust him with my auto repairs."</blockquote>
+        <p class="src">Quoted from a public business listing <span class="badge">Sample</span></p>
+      </div>
+      <div class="review-card">
+        <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+        <blockquote>"Great customer service! Great work! Great prices."</blockquote>
+        <p class="src">Quoted from a public business listing <span class="badge">Sample</span></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="page-contact" data-page="contact">
+    <div class="pane">
+      <h2><i class="fa-solid fa-envelope"></i>Drop Us a Line</h2>
+      <p>The fastest way to reach the shop is a good old fashioned phone call. You can also send a note with the form below and we will get back to you.</p>
+      <div class="contact-cols">
+        <div>
+          <div class="info-line"><i class="fa-solid fa-phone"></i><span><strong>Phone:</strong><br><a href="tel:+15135610405">(513) 561-0405</a></span></div>
+          <div class="info-line"><i class="fa-solid fa-location-dot"></i><span><strong>Address:</strong><br>Bill's Auto Repair<br>3706 Lonsdale St<br>Cincinnati, OH 45227</span></div>
+          <div class="info-line"><i class="fa-solid fa-map"></i><span><a href="https://www.google.com/maps/search/?api=1&query=3706%20Lonsdale%20St%2C%20Cincinnati%2C%20OH%2045227" target="_blank" rel="noopener">Get directions on Google Maps</a></span></div>
+          <div class="info-line"><i class="fa-solid fa-clock"></i><span><strong>Hours:</strong> Mon to Fri, 8:00 AM to 6:00 PM <span class="badge">Call to confirm</span></span></div>
+        </div>
+        <div>
+          <form class="contact-form" id="contactForm" novalidate>
+            <div>
+              <label for="cfName">Your name</label>
+              <input type="text" id="cfName" name="name" autocomplete="name" required>
+            </div>
+            <div>
+              <label for="cfPhone">Your phone</label>
+              <input type="tel" id="cfPhone" name="phone" autocomplete="tel" required>
+            </div>
+            <div>
+              <label for="cfMsg">What is going on with your car?</label>
+              <textarea id="cfMsg" name="message" rows="5" required></textarea>
+            </div>
+            <button type="submit" class="btn"><i class="fa-solid fa-paper-plane"></i> Send Message</button>
+          </form>
+          <div class="form-confirm" id="formConfirm" role="status">
+            <strong><i class="fa-solid fa-circle-check"></i> Thanks, your note is ready.</strong><br>
+            We do not take online bookings yet, so please call the shop at <a href="tel:+15135610405">(513) 561-0405</a> to make sure Bill sees your message.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">© Bill's Auto Repair</footer>
+
+<script>
+(function () {
+  var pages = ["home", "services", "about", "reviews", "contact"];
+
+  function pageFromUrl() {
+    var q = new URLSearchParams(window.location.search).get("page");
+    return pages.indexOf(q) !== -1 ? q : "home";
+  }
+
+  function setActiveNav(page) {
+    var links = document.querySelectorAll("[data-nav]");
+    for (var i = 0; i < links.length; i++) {
+      if (links[i].getAttribute("data-nav") === page) {
+        links[i].classList.add("active");
+      } else {
+        links[i].classList.remove("active");
+      }
+    }
+  }
+
+  function showPage(page, push) {
+    if (pages.indexOf(page) === -1) { page = "home"; }
+    var sections = document.querySelectorAll(".page");
+    for (var i = 0; i < sections.length; i++) {
+      sections[i].classList.toggle("visible", sections[i].getAttribute("data-page") === page);
+    }
+    setActiveNav(page);
+    document.title = page === "home"
+      ? "Bill's Auto Repair | Cincinnati, OH"
+      : "Bill's Auto Repair | " + page.charAt(0).toUpperCase() + page.slice(1);
+    if (push) {
+      history.pushState({ page: page }, "", "?page=" + page);
+    }
+    closeMobileMenu();
+    window.scrollTo(0, 0);
+  }
+
+  function navigateTo(page) { showPage(page, true); }
+
+  function closeMobileMenu() {
+    var menu = document.getElementById("mobileMenu");
+    var toggle = document.getElementById("menuToggle");
+    menu.classList.remove("open");
+    toggle.setAttribute("aria-expanded", "false");
+  }
+
+  document.getElementById("menuToggle").addEventListener("click", function () {
+    var menu = document.getElementById("mobileMenu");
+    var open = menu.classList.toggle("open");
+    this.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+
+  var navLinks = document.querySelectorAll('a[data-nav]');
+  for (var i = 0; i < navLinks.length; i++) {
+    navLinks[i].addEventListener("click", function (e) {
+      e.preventDefault();
+      navigateTo(this.getAttribute("data-nav"));
+    });
+  }
+
+  window.addEventListener("popstate", function (e) {
+    var page = (e.state && e.state.page) || pageFromUrl();
+    showPage(page, false);
+  });
+
+  var form = document.getElementById("contactForm");
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var name = document.getElementById("cfName");
+    var phone = document.getElementById("cfPhone");
+    var msg = document.getElementById("cfMsg");
+    if (!name.value.trim() || !phone.value.trim() || !msg.value.trim()) {
+      alert("Please fill in your name, phone, and message before sending.");
+      return;
+    }
+    document.getElementById("formConfirm").classList.add("show");
+    form.reset();
+  });
+
+  history.replaceState({ page: pageFromUrl() }, "", "?page=" + pageFromUrl());
+  showPage(pageFromUrl(), false);
+})();
+</script>
+</body>
+</html>

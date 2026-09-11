@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Performance Diesel | Dyno Lab | Elsmere, KY</title>
+<meta name="description" content="Performance Diesel is an auto repair shop at 519 Ash St, Elsmere, KY 41018. Diesel truck repair and fuel system service. Call (859) 727-4366.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{
+  --bg:#050807;
+  --panel:#0a100c;
+  --panel2:#0d1510;
+  --line:#1e2f25;
+  --line2:#2c4433;
+  --grn:#3dff73;
+  --grn-dim:#1e7a43;
+  --amber:#ffb02e;
+  --red:#ff453a;
+  --txt:#cfe3d4;
+  --dim:#7d9684;
+  --faint:#4a5f52;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--bg);
+  background-image:radial-gradient(ellipse 80% 60% at 50% -10%, rgba(61,255,115,.06), transparent 60%);
+  color:var(--txt);
+  font-family:'JetBrains Mono', ui-monospace, monospace;
+  font-size:15px;
+  line-height:1.6;
+  min-height:100vh;
+}
+body::after{
+  content:"";
+  position:fixed; inset:0;
+  background:repeating-linear-gradient(0deg, rgba(0,0,0,.20) 0 1px, transparent 1px 3px);
+  pointer-events:none;
+  z-index:2000;
+}
+a{color:var(--grn)}
+::selection{background:var(--grn); color:#04120a}
+.console-top{
+  position:sticky; top:0; z-index:1000;
+  background:rgba(6,10,8,.96);
+  border-bottom:1px solid var(--line2);
+  box-shadow:0 2px 18px rgba(0,0,0,.6);
+}
+.console-top-inner{
+  max-width:1240px; margin:0 auto;
+  display:flex; align-items:center; gap:16px;
+  padding:12px 16px;
+}
+.brand{
+  text-decoration:none; color:var(--txt);
+  display:flex; flex-direction:column; line-height:1.2;
+  margin-right:auto;
+}
+.brand b{color:var(--grn); font-weight:800; letter-spacing:2px; font-size:17px}
+.brand span{color:var(--faint); font-size:10px; letter-spacing:4px}
+.nav-keys{display:flex; gap:8px; align-items:center}
+.key{
+  text-decoration:none; color:var(--dim);
+  border:1px solid var(--line2); background:var(--panel2);
+  padding:9px 14px; border-radius:3px;
+  font-size:11px; font-weight:700; letter-spacing:2px;
+  transition:all .15s ease; white-space:nowrap;
+}
+.key:hover{color:var(--grn); border-color:var(--grn-dim); box-shadow:0 0 10px rgba(61,255,115,.25)}
+.key.active{
+  background:var(--grn); color:#04120a; border-color:var(--grn);
+  box-shadow:0 0 14px rgba(61,255,115,.55);
+}
+.sys-leds{display:flex; gap:12px; align-items:center; font-size:10px; letter-spacing:1px; color:var(--faint)}
+.led{display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--grn); box-shadow:0 0 8px var(--grn); margin-right:5px; animation:blink 2.4s infinite}
+.led.amber{background:var(--amber); box-shadow:0 0 8px var(--amber)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.45}}
+#menuToggle{
+  display:none; background:var(--panel2); color:var(--grn);
+  border:1px solid var(--line2); border-radius:3px;
+  font-size:18px; padding:8px 12px; cursor:pointer;
+}
+.ticker{
+  border-bottom:1px solid var(--line);
+  background:#070c09; overflow:hidden; white-space:nowrap;
+}
+.ticker-inner{
+  display:inline-block; padding:8px 0;
+  font-size:11px; letter-spacing:2px; color:var(--grn-dim);
+  animation:tick 28s linear infinite;
+}
+.ticker-inner b{color:var(--amber); font-weight:700}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+main.console{max-width:1240px; margin:0 auto; padding:28px 16px 72px}
+.page{display:none}
+.page.active{display:block; animation:pagein .25s ease}
+@keyframes pagein{from{opacity:0; transform:translateY(6px)}to{opacity:1; transform:none}}
+.panel{
+  position:relative;
+  background:linear-gradient(180deg, var(--panel), #070c09);
+  border:1px solid var(--line);
+  border-radius:6px;
+  margin-bottom:22px;
+  box-shadow:inset 0 1px 0 rgba(61,255,115,.05), 0 4px 24px rgba(0,0,0,.5);
+}
+.panel::before,.panel::after{
+  content:""; position:absolute; top:8px;
+  width:7px; height:7px; border-radius:50%;
+  background:#233026; box-shadow:inset 0 1px 2px #000;
+}
+.panel::before{left:8px}
+.panel::after{right:8px}
+.panel-head{
+  display:flex; align-items:center; gap:10px;
+  border-bottom:1px solid var(--line);
+  padding:12px 18px 12px 26px;
+  font-size:12px; font-weight:700; letter-spacing:3px; color:var(--grn);
+}
+.panel-head .dot{width:8px; height:8px; border-radius:50%; background:var(--grn); box-shadow:0 0 8px var(--grn)}
+.panel-head .tag{margin-left:auto; font-size:10px; color:var(--faint); letter-spacing:2px}
+.panel-body{padding:22px 26px}
+h1,h2{margin:0 0 12px; letter-spacing:2px; color:var(--txt)}
+h1{font-size:clamp(24px,4vw,40px); font-weight:800; line-height:1.2}
+h1 .g{color:var(--grn)}
+h2{font-size:18px; color:var(--grn)}
+p{margin:0 0 14px; color:var(--txt)}
+.dim{color:var(--dim)}
+.small{font-size:12px}
+.boot{font-size:13px; color:var(--grn-dim); line-height:2}
+.boot b{color:var(--grn)}
+.boot .warn{color:var(--amber)}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:22px}
+.grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:18px}
+.gauge-wrap{text-align:center}
+.gauge{width:100%; max-width:260px; height:auto}
+.gauge-label{font-size:11px; letter-spacing:3px; color:var(--dim); margin-top:4px}
+.gauge-demo{font-size:10px; letter-spacing:2px; color:var(--faint)}
+.dyno{width:100%; height:auto; display:block}
+.legend{display:flex; gap:22px; font-size:11px; letter-spacing:2px; color:var(--dim); margin-top:10px; flex-wrap:wrap}
+.swatch{display:inline-block; width:22px; height:4px; vertical-align:middle; margin-right:8px}
+.cmd-row{display:flex; gap:12px; flex-wrap:wrap; margin-top:18px}
+.btn{
+  display:inline-flex; align-items:center; gap:10px;
+  text-decoration:none; cursor:pointer;
+  font-family:inherit; font-size:12px; font-weight:700; letter-spacing:2px;
+  padding:13px 22px; border-radius:3px;
+  border:1px solid var(--grn); background:rgba(61,255,115,.08); color:var(--grn);
+  transition:all .15s ease;
+}
+.btn:hover{background:var(--grn); color:#04120a; box-shadow:0 0 16px rgba(61,255,115,.5)}
+.btn.amber{border-color:var(--amber); color:var(--amber); background:rgba(255,176,46,.08)}
+.btn.amber:hover{background:var(--amber); color:#1a1000; box-shadow:0 0 16px rgba(255,176,46,.5)}
+.btn.ghost{border-color:var(--line2); color:var(--dim); background:transparent}
+.btn.ghost:hover{border-color:var(--grn); color:var(--grn); background:rgba(61,255,115,.06); box-shadow:none}
+.badge{
+  display:inline-block; font-size:10px; font-weight:700; letter-spacing:2px;
+  padding:3px 10px; border-radius:2px; vertical-align:middle; white-space:nowrap;
+}
+.b-sample{background:var(--amber); color:#1a1000}
+.b-call{border:1px solid var(--amber); color:var(--amber)}
+.b-photo{border:1px dashed var(--faint); color:var(--dim)}
+.b-ok{border:1px solid var(--grn-dim); color:var(--grn)}
+.svc{border:1px solid var(--line); border-radius:4px; padding:18px 20px; margin-bottom:14px; background:rgba(13,21,16,.6)}
+.svc-top{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:8px}
+.svc-code{font-size:11px; color:var(--faint); letter-spacing:2px}
+.svc-name{font-size:16px; font-weight:700; color:var(--txt); letter-spacing:1px}
+.svc p{margin:0; font-size:13px; color:var(--dim)}
+.kv{display:grid; grid-template-columns:150px 1fr; gap:8px 16px; font-size:13px}
+.kv dt{color:var(--faint); letter-spacing:1px}
+.kv dd{margin:0; color:var(--txt)}
+.hours{width:100%; border-collapse:collapse; font-size:13px}
+.hours td{padding:8px 4px; border-bottom:1px dashed var(--line)}
+.hours td:last-child{text-align:right; color:var(--grn)}
+.photo-ph{
+  border:1px dashed var(--line2); border-radius:4px;
+  min-height:220px; display:flex; flex-direction:column; gap:10px;
+  align-items:center; justify-content:center; color:var(--faint);
+  font-size:12px; letter-spacing:3px; background:rgba(0,0,0,.25);
+}
+.photo-ph i{font-size:34px}
+.rev{border:1px solid var(--line); border-radius:4px; padding:18px 20px; margin-bottom:14px; background:rgba(13,21,16,.6)}
+.rev-head{display:flex; align-items:center; gap:12px; margin-bottom:8px; flex-wrap:wrap}
+.stars{color:var(--amber); letter-spacing:3px; font-size:13px}
+.rev p{margin:0; font-size:13px; color:var(--dim)}
+.rating-strip{
+  display:flex; gap:26px; align-items:center; flex-wrap:wrap;
+  border:1px solid var(--line2); border-radius:4px; padding:18px 22px; margin-bottom:18px;
+  background:rgba(61,255,115,.03);
+}
+.rating-num{font-size:44px; font-weight:800; color:var(--amber); line-height:1}
+.form-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+.field{display:flex; flex-direction:column; gap:6px}
+.field.full{grid-column:1 / -1}
+.field label{font-size:11px; letter-spacing:2px; color:var(--dim)}
+.field input,.field select,.field textarea{
+  font-family:inherit; font-size:14px; color:var(--txt);
+  background:#070c09; border:1px solid var(--line2); border-radius:3px;
+  padding:12px 14px; outline:none; width:100%;
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--grn); box-shadow:0 0 10px rgba(61,255,115,.2)}
+.field textarea{min-height:120px; resize:vertical}
+.form-err{display:none; color:var(--red); font-size:12px; letter-spacing:1px; margin-top:12px}
+#formDone{display:none; text-align:center; padding:30px 10px}
+#formDone .big{font-size:20px; color:var(--grn); font-weight:800; letter-spacing:2px; margin:14px 0}
+#formDone .ref{font-size:13px; color:var(--amber); letter-spacing:2px}
+footer{
+  border-top:1px solid var(--line2);
+  text-align:center; padding:22px 16px;
+  color:var(--faint); font-size:12px; letter-spacing:2px;
+  background:#060a08;
+}
+@media(max-width:960px){
+  .grid2{grid-template-columns:1fr}
+  .grid3{grid-template-columns:1fr 1fr}
+  .sys-leds{display:none}
+}
+@media(max-width:860px){
+  #menuToggle{display:block}
+  .nav-keys{
+    display:none; position:absolute; top:100%; left:0; right:0;
+    flex-direction:column; align-items:stretch; gap:0;
+    background:#060a08; border-bottom:1px solid var(--line2); padding:8px;
+  }
+  .nav-keys.open{display:flex}
+  .nav-keys .key{border:none; border-bottom:1px solid var(--line); border-radius:0; padding:14px 12px}
+  .console-top-inner{position:relative}
+}
+@media(max-width:620px){
+  .grid3{grid-template-columns:1fr}
+  .form-grid{grid-template-columns:1fr}
+  .kv{grid-template-columns:1fr}
+  .panel-body{padding:18px 16px}
+}
+</style>
+</head>
+<body>
+
+<header class="console-top">
+  <div class="console-top-inner">
+    <a class="brand" href="?page=home" data-page-link="home"><b>PERFORMANCE DIESEL</b><span>DYNO PERFORMANCE LAB</span></a>
+    <button id="menuToggle" aria-label="Toggle navigation menu" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
+    <nav class="nav-keys" id="mainNav" aria-label="Main navigation">
+      <a class="key" href="?page=home" data-page-link="home">Home</a>
+      <a class="key" href="?page=services" data-page-link="services">Services</a>
+      <a class="key" href="?page=about" data-page-link="about">About</a>
+      <a class="key" href="?page=reviews" data-page-link="reviews">Reviews</a>
+      <a class="key" href="?page=contact" data-page-link="contact">Contact</a>
+    </nav>
+    <div class="sys-leds">
+      <span><i class="led"></i>PWR</span>
+      <span><i class="led"></i>DYNO</span>
+      <span><i class="led amber"></i>NET</span>
+    </div>
+  </div>
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-inner" id="tickerInner"></div>
+  </div>
+</header>
+
+<main class="console">
+
+<section class="page" id="page-home" data-page="home">
+  <div class="panel">
+    <div class="panel-head"><span class="dot"></span>SYSTEM BOOT<span class="tag">CONSOLE 01</span></div>
+    <div class="panel-body">
+      <div class="boot" id="bootLines"></div>
+      <h1 style="margin-top:18px">PERFORMANCE DIESEL <span class="g">//</span> DYNO LAB</h1>
+      <p class="dim">Auto repair shop at 519 Ash St, Elsmere, KY 41018. Diesel truck repair with a performance mindset. Call <a href="tel:+18597274366">(859) 727-4366</a>.</p>
+      <div class="cmd-row">
+        <a class="btn" href="tel:+18597274366"><i class="fa-solid fa-phone"></i>CALL NOW</a>
+        <a class="btn amber" href="https://www.google.com/maps/search/?api=1&amp;query=Performance%20Diesel%2C%20519%20Ash%20St%2C%20Elsmere%2C%20KY%2041018" target="_blank" rel="noopener"><i class="fa-solid fa-diamond-turn-right"></i>DIRECTIONS</a>
+        <a class="btn ghost" href="?page=services" data-page-link="services"><i class="fa-solid fa-wrench"></i>VIEW SERVICES</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><span class="dot"></span>GAUGE CLUSTER<span class="tag">LIVE DEMO READOUT</span></div>
+    <div class="panel-body">
+      <div class="grid3">
+        <div class="gauge-wrap">
+          <svg class="gauge" id="gaugeBoost" viewBox="0 0 200 155" data-min="0" data-max="40" data-value="16" data-unit="PSI" data-red="30" role="img" aria-label="Boost gauge demo"></svg>
+          <div class="gauge-label">BOOST</div><div class="gauge-demo">DEMO</div>
+        </div>
+        <div class="gauge-wrap">
+          <svg class="gauge" id="gaugeEgt" viewBox="0 0 200 155" data-min="0" data-max="1600" data-value="950" data-unit="F" data-red="1350" role="img" aria-label="Exhaust temperature gauge demo"></svg>
+          <div class="gauge-label">EXHAUST TEMP</div><div class="gauge-demo">DEMO</div>
+        </div>
+        <div class="gauge-wrap">
+          <svg class="gauge" id="gaugeRpm" viewBox="0 0 200 155" data-min="0" data-max="6" data-value="2.4" data-unit="K RPM" data-red="5" role="img" aria-label="RPM gauge demo"></svg>
+          <div class="gauge-label">ENGINE SPEED</div><div class="gauge-demo">DEMO</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><span class="dot"></span>DYNOMOMETER PLOT<span class="tag">SAMPLE DATA</span></div>
+    <div class="panel-body">
+      <svg class="dyno" id="dynoChart" viewBox="0 0 640 340" role="img" aria-label="Sample dyno chart showing horsepower and torque curves"></svg>
+      <div class="legend">
+        <span><span class="swatch" style="background:var(--grn)"></span>TORQUE LB-FT</span>
+        <span><span class="swatch" style="background:var(--amber)"></span>HORSEPOWER</span>
+        <span class="badge b-sample">SAMPLE</span>
+      </div>
+      <p class="small dim">Sample plot for display only. Real dyno figures come from your truck on the rollers. <span class="badge b-call">CALL TO CONFIRM</span></p>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><span class="dot"></span>SIGNAL MONITOR<span class="tag">SCOPE</span></div>
+    <div class="panel-body">
+      <svg class="dyno" id="scopeSvg" viewBox="0 0 640 90" style="height:90px" role="img" aria-label="Oscilloscope style signal decoration"></svg>
+      <div class="grid2" style="margin-top:18px">
+        <dl class="kv">
+          <dt>ADDRESS</dt><dd>519 Ash St, Elsmere, KY 41018</dd>
+          <dt>PHONE</dt><dd><a href="tel:+18597274366">(859) 727-4366</a></dd>
+          <dt>HOURS (LISTED)</dt><dd>Mon-Fri 8:00 AM - 6:00 PM <span class="badge b-call">CALL TO CONFIRM</span></dd>
+        </dl>
+        <div>
+          <p class="small dim">Diesel-focused auto repair. Public customer feedback references Duramax truck work, fuel system components, and oil leak repair at this shop.</p>
+          <div class="cmd-row">
+            <a class="btn ghost" href="?page=about" data-page-link="about"><i class="fa-solid fa-circle-info"></i>ABOUT THE SHOP</a>
+            <a class="btn ghost" href="?page=contact" data-page-link="contact"><i class="fa-solid fa-paper-plane"></i>CONTACT</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services" data-page="services">
+  <div class="panel">
+    <div class="panel-head"><span class="dot"></span>SERVICE MODULES<span class="tag">04 LOADED</span></div>
+    <div class="panel-body">
+      <h2>WHAT THE SHOP WORKS ON</h2>
+      <p class="dim small">Service details below are drawn from the shop name, its auto repair listing, and public customer feedback. Exact offerings change, so every module is marked accordingly.</p>
+
+      <div class="svc">
+        <div class="svc-top"><span class="svc-code">SVC-01</span><span class="svc-name"><i class="fa-solid fa-truck-pickup" style="color:var(--grn)"></i> DIESEL ENGINE REPAIR</span><span class="badge b-call">CALL TO CONFIRM</span></div>
+        <p>Engine diagnostics and repair for diesel-powered trucks. The shop name and public customer feedback point to diesel truck work, including Duramax platforms.</p>
+      </div>
+
+      <div class="svc">
+        <div class="svc-top"><span class="svc-code">SVC-02</span><span class="svc-name"><i class="fa-solid fa-gauge-high" style="color:var(--grn)"></i> FUEL SYSTEM SERVICE</span><span class="badge b-call">CALL TO CONFIRM</span></div>
+        <p>Fuel system diagnosis and component service. Public reviews reference lift pump and CP3 pump work plus full fuel system cleaning at this shop.</p>
+      </div>
+
+      <div class="svc">
+        <div class="svc-top"><span class="svc-code">SVC-03</span><span class="svc-name"><i class="fa-solid fa-oil-can" style="color:var(--grn)"></i> OIL LEAK DIAGNOSIS</span><span class="badge b-call">CALL TO CONFIRM</span></div>
+        <p>Oil leak tracing and repair. A public review notes a truck oil leak fixed right the first time here after other shops missed it.</p>
+      </div>
+
+      <div class="svc">
+        <div class="svc-top"><span class="svc-code">SVC-04</span><span class="svc-name"><i class="fa-solid fa-wrench" style="color:var(--grn)"></i> GENERAL AUTO REPAIR</span><span class="badge b-call">CALL TO CONFIRM</span></div>
+        <p>Listed as an auto repair shop serving Elsmere, KY and the surrounding area. Call to ask about your specific vehicle and repair.</p>
+      </div>
+
+      <div class="cmd-row">
+        <a class="btn" href="tel:+18597274366"><i class="fa-solid fa-phone"></i>CALL (859) 727-4366</a>
+        <a class="btn ghost" href="?page=contact" data-page-link="contact"><i class="fa-solid fa-paper-plane"></i>REQUEST SERVICE</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-about" data-page="about">
+  <div class="panel">
+    <div class="panel-head"><span class="dot"></span>SHOP DOSSIER<span class="tag">VERIFIED FIELDS ONLY</span></div>
+    <div class="panel-body">
+      <div class="grid2">
+        <div>
+          <h2>PERFORMANCE DIESEL</h2>
+          <p>Performance Diesel is an auto repair shop located at 519 Ash St, Elsmere, KY 41018. Public listings and customer feedback point to diesel truck repair work, including fuel system components such as lift pumps and CP3 pumps, plus oil leak diagnosis.</p>
+          <p class="dim small">Details such as founding year, owner names, certifications, and pricing are not published in public listings we could verify, so they are not listed here. <span class="badge b-call">CALL TO CONFIRM</span></p>
+          <dl class="kv" style="margin-top:16px">
+            <dt>ADDRESS</dt><dd>519 Ash St, Elsmere, KY 41018</dd>
+            <dt>PHONE</dt><dd><a href="tel:+18597274366">(859) 727-4366</a></dd>
+            <dt>CATEGORY</dt><dd>Auto repair shop</dd>
+          </dl>
+          <div class="cmd-row">
+            <a class="btn amber" href="https://www.google.com/maps/search/?api=1&amp;query=Performance%20Diesel%2C%20519%20Ash%20St%2C%20Elsmere%2C%20KY%2041018" target="_blank" rel="noopener"><i class="fa-solid fa-diamond-turn-right"></i>GET DIRECTIONS</a>
+          </div>
+        </div>
+        <div class="photo-ph">
+          <i class="fa-solid fa-image"></i>
+          <span>SHOP PHOTO</span>
+          <span class="badge b-photo">PHOTO COMING SOON</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><span class="dot"></span>OPERATING HOURS<span class="tag">LISTED</span></div>
+    <div class="panel-body">
+      <table class="hours">
+        <tr><td>Monday</td><td>8:00 AM - 6:00 PM</td></tr>
+        <tr><td>Tuesday</td><td>8:00 AM - 6:00 PM</td></tr>
+        <tr><td>Wednesday</td><td>8:00 AM - 6:00 PM</td></tr>
+        <tr><td>Thursday</td><td>8:00 AM - 6:00 PM</td></tr>
+        <tr><td>Friday</td><td>8:00 AM - 6:00 PM</td></tr>
+        <tr><td>Saturday</td><td>Closed</td></tr>
+        <tr><td>Sunday</td><td>Closed</td></tr>
+      </table>
+      <p class="small dim" style="margin-top:12px">Hours from a public business listing. Hours change, so <span class="badge b-call">CALL TO CONFIRM</span> before you drive over.</p>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews" data-page="reviews">
+  <div class="panel">
+    <div class="panel-head"><span class="dot"></span>CUSTOMER FEEDBACK<span class="tag">READOUT</span></div>
+    <div class="panel-body">
+      <h2>REVIEWS</h2>
+      <p class="dim">We do not publish customer reviews on this demo site, and no verified review text is on file here. What follows is public third-party data plus clearly marked sample placeholders.</p>
+      <div class="rating-strip">
+        <div class="rating-num">3.5<span style="font-size:18px;color:var(--dim)">/5</span></div>
+        <div>
+          <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i><i class="fa-regular fa-star"></i></div>
+          <div class="small dim">13 reviews reported on a third-party listing (Birdeye). Ratings change over time.</div>
+        </div>
+        <span class="badge b-call">CALL TO CONFIRM</span>
+      </div>
+      <div class="cmd-row" style="margin-top:0">
+        <a class="btn ghost" href="https://reviews.birdeye.com/performance-diesel-167515210256833" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i>THIRD-PARTY LISTING</a>
+        <a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Performance%20Diesel%2C%20519%20Ash%20St%2C%20Elsmere%2C%20KY%2041018" target="_blank" rel="noopener"><i class="fa-solid fa-diamond-turn-right"></i>FIND ON MAPS</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><span class="dot"></span>REVIEW FEED<span class="tag">PLACEHOLDERS</span></div>
+    <div class="panel-body">
+      <div class="rev">
+        <div class="rev-head">
+          <span class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></span>
+          <span class="badge b-sample">SAMPLE</span>
+        </div>
+        <p>Sample placeholder. Real customer review content will appear here once connected to a verified source. No reviewer name or review text has been invented for this demo.</p>
+      </div>
+      <div class="rev">
+        <div class="rev-head">
+          <span class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star"></i></span>
+          <span class="badge b-sample">SAMPLE</span>
+        </div>
+        <p>Sample placeholder. Real customer review content will appear here once connected to a verified source. No reviewer name or review text has been invented for this demo.</p>
+      </div>
+      <p class="small dim">Had work done at Performance Diesel? Tell the shop directly at <a href="tel:+18597274366">(859) 727-4366</a>.</p>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-contact" data-page="contact">
+  <div class="panel">
+    <div class="panel-head"><span class="dot"></span>COMMS UPLINK<span class="tag">CONTACT</span></div>
+    <div class="panel-body">
+      <div class="grid2">
+        <div>
+          <h2>REACH THE SHOP</h2>
+          <dl class="kv">
+            <dt>ADDRESS</dt><dd>519 Ash St, Elsmere, KY 41018</dd>
+            <dt>PHONE</dt><dd><a href="tel:+18597274366">(859) 727-4366</a></dd>
+            <dt>HOURS (LISTED)</dt><dd>Mon-Fri 8:00 AM - 6:00 PM, Sat-Sun Closed <span class="badge b-call">CALL TO CONFIRM</span></dd>
+          </dl>
+          <div class="cmd-row">
+            <a class="btn" href="tel:+18597274366"><i class="fa-solid fa-phone"></i>CALL NOW</a>
+            <a class="btn amber" href="https://www.google.com/maps/search/?api=1&amp;query=Performance%20Diesel%2C%20519%20Ash%20St%2C%20Elsmere%2C%20KY%2041018" target="_blank" rel="noopener"><i class="fa-solid fa-diamond-turn-right"></i>DIRECTIONS</a>
+          </div>
+          <p class="small dim" style="margin-top:14px">No email address is published for this shop, so this page uses an on-screen request form instead of email.</p>
+        </div>
+        <div>
+          <h2>REQUEST SERVICE</h2>
+          <form id="contactForm" novalidate>
+            <div class="form-grid">
+              <div class="field">
+                <label for="fName">NAME *</label>
+                <input id="fName" name="name" type="text" required autocomplete="name" placeholder="Your name">
+              </div>
+              <div class="field">
+                <label for="fPhone">PHONE *</label>
+                <input id="fPhone" name="phone" type="tel" required autocomplete="tel" placeholder="(859) 555-0100">
+              </div>
+              <div class="field full">
+                <label for="fVehicle">VEHICLE</label>
+                <input id="fVehicle" name="vehicle" type="text" placeholder="Year / Make / Model, e.g. 2015 Chevy Silverado 2500">
+              </div>
+              <div class="field full">
+                <label for="fService">SERVICE NEEDED</label>
+                <select id="fService" name="service">
+                  <option>Diesel engine repair</option>
+                  <option>Fuel system service</option>
+                  <option>Oil leak diagnosis</option>
+                  <option>General auto repair</option>
+                  <option>Something else</option>
+                </select>
+              </div>
+              <div class="field full">
+                <label for="fMsg">MESSAGE *</label>
+                <textarea id="fMsg" name="message" required placeholder="Describe the issue or the work you need"></textarea>
+              </div>
+            </div>
+            <div class="form-err" id="formErr">PLEASE FILL IN NAME, PHONE, AND MESSAGE.</div>
+            <div class="cmd-row">
+              <button class="btn" type="submit"><i class="fa-solid fa-paper-plane"></i>TRANSMIT REQUEST</button>
+            </div>
+          </form>
+          <div id="formDone">
+            <i class="fa-solid fa-circle-check" style="font-size:44px;color:var(--grn)"></i>
+            <div class="big">REQUEST LOGGED</div>
+            <div class="ref" id="formRef"></div>
+            <p class="small dim" style="margin-top:14px">This form confirms instantly on screen. For the fastest response, call <a href="tel:+18597274366">(859) 727-4366</a>.</p>
+            <div class="cmd-row" style="justify-content:center">
+              <button class="btn ghost" type="button" id="formAgain"><i class="fa-solid fa-rotate-left"></i>NEW REQUEST</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>© Performance Diesel</footer>
+
+<script>
+(function(){
+  var PAGES = ['home','services','about','reviews','contact'];
+  var TITLES = {
+    home:'Performance Diesel | Dyno Lab | Elsmere, KY',
+    services:'Services | Performance Diesel',
+    about:'About | Performance Diesel',
+    reviews:'Reviews | Performance Diesel',
+    contact:'Contact | Performance Diesel'
+  };
+
+  function pageFromURL(){
+    try{
+      var p = new URLSearchParams(window.location.search).get('page');
+      return PAGES.indexOf(p) > -1 ? p : 'home';
+    }catch(e){ return 'home'; }
+  }
+
+  function showPage(page){
+    PAGES.forEach(function(p){
+      var sec = document.getElementById('page-' + p);
+      if(sec) sec.classList.toggle('active', p === page);
+    });
+    var keys = document.querySelectorAll('.nav-keys .key');
+    keys.forEach(function(k){
+      k.classList.toggle('active', k.getAttribute('data-page-link') === page);
+    });
+    document.title = TITLES[page] || TITLES.home;
+    var nav = document.getElementById('mainNav');
+    var toggle = document.getElementById('menuToggle');
+    if(nav && nav.classList.contains('open')){
+      nav.classList.remove('open');
+      if(toggle){ toggle.setAttribute('aria-expanded','false'); toggle.innerHTML = '<i class="fa-solid fa-bars"></i>'; }
+    }
+  }
+
+  function navigateTo(page){
+    if(PAGES.indexOf(page) === -1) page = 'home';
+    showPage(page);
+    try{
+      history.pushState({page:page}, '', '?page=' + page);
+    }catch(e){}
+    window.scrollTo(0,0);
+  }
+
+  document.addEventListener('click', function(e){
+    var a = e.target.closest ? e.target.closest('a[data-page-link]') : null;
+    if(a){
+      e.preventDefault();
+      navigateTo(a.getAttribute('data-page-link'));
+    }
+  });
+
+  window.addEventListener('popstate', function(e){
+    var p = (e.state && e.state.page) ? e.state.page : pageFromURL();
+    showPage(p);
+  });
+
+  var initial = pageFromURL();
+  showPage(initial);
+  try{ history.replaceState({page:initial}, '', '?page=' + initial); }catch(e){}
+
+  var toggle = document.getElementById('menuToggle');
+  var nav = document.getElementById('mainNav');
+  if(toggle && nav){
+    toggle.addEventListener('click', function(){
+      var open = nav.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      toggle.innerHTML = open ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
+    });
+  }
+
+  var tickMsg = 'PERFORMANCE DIESEL <b>//</b> 519 ASH ST, ELSMERE KY 41018 <b>//</b> (859) 727-4366 <b>//</b> MON-FRI 8:00A-6:00P <b>//</b> DIESEL REPAIR <b>//</b> FUEL SYSTEM SERVICE <b>//</b> ';
+  var ticker = document.getElementById('tickerInner');
+  if(ticker){ ticker.innerHTML = tickMsg + tickMsg + tickMsg + tickMsg; }
+
+  var bootLines = [
+    '> DYNO LAB INTERFACE v1.0 ............ <b>ONLINE</b>',
+    '> SHOP LINK: 519 ASH ST, ELSMERE KY ... <b>LOCKED</b>',
+    '> COMMS: (859) 727-4366 .............. <b>READY</b>',
+    '> <span class="warn">NOTE: GAUGES + DYNO PLOT ARE DEMO DISPLAYS</span>'
+  ];
+  var boot = document.getElementById('bootLines');
+  if(boot){ boot.innerHTML = bootLines.join('<br>'); }
+
+  var NS = 'http://www.w3.org/2000/svg';
+  function el(n, attrs){
+    var e = document.createElementNS(NS, n);
+    for(var k in attrs){ e.setAttribute(k, attrs[k]); }
+    return e;
+  }
+  function polar(cx, cy, r, deg){
+    var a = deg * Math.PI / 180;
+    return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+  }
+  function fmt(n, max){
+    return max >= 100 ? Math.round(n).toString() : (Math.round(n*10)/10).toString();
+  }
+
+  var gauges = [];
+  function buildGauge(svg){
+    var min = parseFloat(svg.getAttribute('data-min'));
+    var max = parseFloat(svg.getAttribute('data-max'));
+    var base = parseFloat(svg.getAttribute('data-value'));
+    var unit = svg.getAttribute('data-unit');
+    var red = parseFloat(svg.getAttribute('data-red') || 'Infinity');
+    var cx = 100, cy = 108, r = 80, a0 = 135, a1 = 405, sweep = a1 - a0;
+    var val2ang = function(v){ return a0 + (v - min) / (max - min) * sweep; };
+
+    var s = polar(cx, cy, r, a0), e2 = polar(cx, cy, r, a1);
+    svg.appendChild(el('path', {d:'M '+s[0].toFixed(1)+' '+s[1].toFixed(1)+' A '+r+' '+r+' 0 1 1 '+e2[0].toFixed(1)+' '+e2[1].toFixed(1), fill:'none', stroke:'#1e2f25', 'stroke-width':12, 'stroke-linecap':'round'}));
+    if(red < max){
+      var ra = val2ang(red);
+      var rs = polar(cx, cy, r, ra);
+      svg.appendChild(el('path', {d:'M '+rs[0].toFixed(1)+' '+rs[1].toFixed(1)+' A '+r+' '+r+' 0 0 1 '+e2[0].toFixed(1)+' '+e2[1].toFixed(1), fill:'none', stroke:'#ff453a', 'stroke-width':12}));
+    }
+    var i, a, p1, p2;
+    for(i = 0; i <= 30; i++){
+      a = a0 + i/30*sweep;
+      var major = (i % 5 === 0);
+      p1 = polar(cx, cy, r - (major ? 16 : 10), a);
+      p2 = polar(cx, cy, r - 4, a);
+      svg.appendChild(el('line', {x1:p1[0].toFixed(1), y1:p1[1].toFixed(1), x2:p2[0].toFixed(1), y2:p2[1].toFixed(1), stroke: major ? '#3dff73' : '#2c4433', 'stroke-width': major ? 2 : 1}));
+    }
+    [min, (min+max)/2, max].forEach(function(v){
+      a = val2ang(v);
+      var p = polar(cx, cy, r - 26, a);
+      var t = el('text', {x:p[0].toFixed(1), y:(p[1]+4).toFixed(1), fill:'#7d9684', 'font-size':'10', 'text-anchor':'middle', 'font-family':'JetBrains Mono, monospace'});
+      t.textContent = fmt(v, max);
+      svg.appendChild(t);
+    });
+    var needle = el('line', {x1:cx, y1:cy, x2:cx, y2:cy, stroke:'#ffb02e', 'stroke-width':3, 'stroke-linecap':'round'});
+    svg.appendChild(needle);
+    svg.appendChild(el('circle', {cx:cx, cy:cy, r:7, fill:'#0d1510', stroke:'#3dff73', 'stroke-width':2}));
+    var readout = el('text', {x:cx, y:148, fill:'#3dff73', 'font-size':'13', 'font-weight':'700', 'text-anchor':'middle', 'font-family':'JetBrains Mono, monospace'});
+    svg.appendChild(readout);
+    gauges.push({needle:needle, readout:readout, cx:cx, cy:cy, r:r, base:base, min:min, max:max, unit:unit, phase:Math.random()*6.28, speed:0.6+Math.random()*0.8, amp:(max-min)*0.03, val2ang:val2ang});
+  }
+
+  document.querySelectorAll('svg.gauge').forEach(buildGauge);
+
+  var start = null;
+  function tick(t){
+    if(!start) start = t;
+    var s = (t - start) / 1000;
+    gauges.forEach(function(g){
+      var v = g.base + Math.sin(s * g.speed + g.phase) * g.amp;
+      var a = g.val2ang(v);
+      var tip = polar(g.cx, g.cy, g.r - 20, a);
+      g.needle.setAttribute('x2', tip[0].toFixed(1));
+      g.needle.setAttribute('y2', tip[1].toFixed(1));
+      g.readout.textContent = fmt(v, g.max) + ' ' + g.unit;
+    });
+    requestAnimationFrame(tick);
+  }
+  if(gauges.length) requestAnimationFrame(tick);
+
+  function smoothPath(pts){
+    var d = 'M ' + pts[0][0].toFixed(1) + ' ' + pts[0][1].toFixed(1);
+    var i, p0, p1, p2, p3, c1x, c1y, c2x, c2y;
+    for(i = 0; i < pts.length - 1; i++){
+      p0 = pts[Math.max(0, i-1)]; p1 = pts[i]; p2 = pts[i+1]; p3 = pts[Math.min(pts.length-1, i+2)];
+      c1x = p1[0] + (p2[0]-p0[0])/6; c1y = p1[1] + (p2[1]-p0[1])/6;
+      c2x = p2[0] - (p3[0]-p1[0])/6; c2y = p2[1] - (p3[1]-p1[1])/6;
+      d += ' C ' + c1x.toFixed(1) + ' ' + c1y.toFixed(1) + ' ' + c2x.toFixed(1) + ' ' + c2y.toFixed(1) + ' ' + p2[0].toFixed(1) + ' ' + p2[1].toFixed(1);
+    }
+    return d;
+  }
+
+  (function buildDyno(){
+    var svg = document.getElementById('dynoChart');
+    if(!svg) return;
+    var L=56, R=620, T=24, B=292;
+    var rpmMin=1000, rpmMax=3600, hpMax=520, tqMax=1000;
+    var X = function(rpm){ return L + (rpm-rpmMin)/(rpmMax-rpmMin)*(R-L); };
+    var Yhp = function(hp){ return B - hp/hpMax*(B-T); };
+    var Ytq = function(tq){ return B - tq/tqMax*(B-T); };
+    var rpm, x, y;
+    for(rpm = 1000; rpm <= 3500; rpm += 500){
+      x = X(rpm);
+      svg.appendChild(el('line', {x1:x, y1:T, x2:x, y2:B, stroke:'#14201a', 'stroke-width':1}));
+      var lt = el('text', {x:x, y:B+18, fill:'#4a5f52', 'font-size':'10', 'text-anchor':'middle', 'font-family':'JetBrains Mono, monospace'});
+      lt.textContent = (rpm/1000) + 'K';
+      svg.appendChild(lt);
+    }
+    var xl = el('text', {x:(L+R)/2, y:B+36, fill:'#4a5f52', 'font-size':'10', 'text-anchor':'middle', 'letter-spacing':'3', 'font-family':'JetBrains Mono, monospace'});
+    xl.textContent = 'ENGINE SPEED RPM';
+    svg.appendChild(xl);
+    var hp;
+    for(hp = 0; hp <= 500; hp += 100){
+      y = Yhp(hp);
+      svg.appendChild(el('line', {x1:L, y1:y, x2:R, y2:y, stroke:'#14201a', 'stroke-width':1}));
+      var ly = el('text', {x:L-8, y:y+4, fill:'#4a5f52', 'font-size':'10', 'text-anchor':'end', 'font-family':'JetBrains Mono, monospace'});
+      ly.textContent = hp;
+      svg.appendChild(ly);
+    }
+    var yl = el('text', {x:14, y:(T+B)/2, fill:'#4a5f52', 'font-size':'10', 'text-anchor':'middle', 'letter-spacing':'3', 'font-family':'JetBrains Mono, monospace', transform:'rotate(-90 14 ' + ((T+B)/2) + ')'});
+    yl.textContent = 'POWER';
+    svg.appendChild(yl);
+
+    var TQ = [[1000,620],[1400,800],[1800,900],[2200,880],[2600,800],[3000,720],[3400,640]];
+    var HP = [[1000,118],[1400,210],[1800,310],[2200,390],[2600,440],[3000,470],[3400,478]];
+    var tqPts = TQ.map(function(p){ return [X(p[0]), Ytq(p[1])]; });
+    var hpPts = HP.map(function(p){ return [X(p[0]), Yhp(p[1])]; });
+    svg.appendChild(el('path', {d:smoothPath(tqPts), fill:'none', stroke:'#3dff73', 'stroke-width':3}));
+    svg.appendChild(el('path', {d:smoothPath(hpPts), fill:'none', stroke:'#ffb02e', 'stroke-width':3}));
+    var pkT = [X(1800), Ytq(900)];
+    svg.appendChild(el('circle', {cx:pkT[0], cy:pkT[1], r:5, fill:'#3dff73'}));
+    var t1 = el('text', {x:pkT[0]+10, y:pkT[1]-8, fill:'#3dff73', 'font-size':'11', 'font-family':'JetBrains Mono, monospace'});
+    t1.textContent = 'PK TQ 900';
+    svg.appendChild(t1);
+    var pkH = [X(3400), Yhp(478)];
+    svg.appendChild(el('circle', {cx:pkH[0], cy:pkH[1], r:5, fill:'#ffb02e'}));
+    var t2 = el('text', {x:pkH[0]-92, y:pkH[1]-10, fill:'#ffb02e', 'font-size':'11', 'font-family':'JetBrains Mono, monospace'});
+    t2.textContent = 'PK HP 478';
+    svg.appendChild(t2);
+    var wm = el('text', {x:(L+R)/2, y:(T+B)/2, fill:'rgba(61,255,115,0.10)', 'font-size':'34', 'font-weight':'800', 'text-anchor':'middle', 'letter-spacing':'6', 'font-family':'JetBrains Mono, monospace'});
+    wm.textContent = 'SAMPLE PLOT';
+    svg.appendChild(wm);
+  })();
+
+  (function buildScope(){
+    var svg = document.getElementById('scopeSvg');
+    if(!svg) return;
+    var N = 120, W = 640, H = 90;
+    var line = el('polyline', {fill:'none', stroke:'#3dff73', 'stroke-width':2, points:''});
+    svg.appendChild(line);
+    var t0 = Date.now();
+    setInterval(function(){
+      var t = (Date.now() - t0) / 1000;
+      var pts = [];
+      for(var i = 0; i <= N; i++){
+        var x = i / N * W;
+        var y = H/2 + Math.sin(i*0.35 + t*3) * 18 * Math.sin(t*0.7 + i*0.02) + Math.sin(i*1.7 + t*7) * 4;
+        pts.push(x.toFixed(1) + ',' + y.toFixed(1));
+      }
+      line.setAttribute('points', pts.join(' '));
+    }, 120);
+  })();
+
+  var form = document.getElementById('contactForm');
+  var done = document.getElementById('formDone');
+  var err = document.getElementById('formErr');
+  if(form){
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      var name = document.getElementById('fName');
+      var phone = document.getElementById('fPhone');
+      var msg = document.getElementById('fMsg');
+      var ok = name.value.trim() !== '' && phone.value.trim() !== '' && msg.value.trim() !== '';
+      if(!ok){
+        if(err) err.style.display = 'block';
+        return;
+      }
+      if(err) err.style.display = 'none';
+      var ref = 'PD-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+      var refEl = document.getElementById('formRef');
+      if(refEl) refEl.textContent = 'REF: ' + ref;
+      form.style.display = 'none';
+      if(done){
+        done.style.display = 'block';
+        done.scrollIntoView({behavior:'smooth', block:'center'});
+      }
+    });
+    var again = document.getElementById('formAgain');
+    if(again){
+      again.addEventListener('click', function(){
+        form.reset();
+        form.style.display = 'block';
+        if(done) done.style.display = 'none';
+      });
+    }
+  }
+})();
+</script>
+</body>
+</html>

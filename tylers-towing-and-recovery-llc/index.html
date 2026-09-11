@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tyler's Towing and Recovery LLC | Night Shift Dispatch</title>
+<meta name="description" content="Tyler's Towing and Recovery LLC, towing service at 9295 Alexandria Pike, Alexandria, KY 41001. Call (859) 308-8276.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{
+  --night:#040a1a;
+  --deep:#071126;
+  --panel:#0b1730;
+  --panel2:#0e1c3a;
+  --line:#1e2f5c;
+  --amber:#ffb02e;
+  --amber-dim:#8a5f16;
+  --red:#ff453a;
+  --green:#3ddc84;
+  --text:#dbe6ff;
+  --muted:#8ba0c9;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --disp:'Anton',Impact,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--night);
+  color:var(--text);
+  font-family:var(--mono);
+  font-size:15px;
+  line-height:1.6;
+  background-image:
+    radial-gradient(1200px 600px at 80% -10%, rgba(255,176,46,.06), transparent 60%),
+    radial-gradient(900px 500px at 10% 0%, rgba(30,80,200,.12), transparent 60%);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+a{color:var(--amber);text-decoration:none}
+a:hover{color:#ffd27a}
+::selection{background:var(--amber);color:#1a1200}
+
+/* ============ CONSOLE HEADER ============ */
+.console{
+  position:sticky;top:0;z-index:100;
+  background:linear-gradient(180deg,#0c1732,#081229);
+  border-bottom:2px solid var(--amber);
+  box-shadow:0 2px 24px rgba(255,176,46,.12);
+}
+.console-inner{
+  max-width:1200px;margin:0 auto;padding:10px 20px;
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.beacon-mini{
+  width:34px;height:34px;border-radius:50%;flex:0 0 34px;position:relative;
+  background:radial-gradient(circle at 50% 40%, #3a2a10, #120c04 70%);
+  border:1px solid var(--amber-dim);overflow:hidden;
+}
+.beacon-mini::before{
+  content:'';position:absolute;inset:-40%;
+  background:conic-gradient(from 0deg, rgba(255,69,58,.95), transparent 30%, transparent 55%, rgba(255,176,46,.95) 80%, transparent);
+  animation:spin 2.2s linear infinite;
+}
+.beacon-mini::after{
+  content:'';position:absolute;inset:9px;border-radius:50%;
+  background:radial-gradient(circle at 50% 35%, #ffdf9e, #b06a00 65%, #3a2503);
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.brand-name{font-family:var(--disp);font-size:19px;letter-spacing:1.5px;color:#fff;line-height:1.1}
+.brand-name small{display:block;font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--amber)}
+.status-pill{
+  margin-left:auto;display:flex;align-items:center;gap:8px;
+  border:1px solid var(--line);background:#060d20;border-radius:4px;
+  padding:6px 12px;font-size:11px;letter-spacing:2px;color:var(--green);
+}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.35}}
+.clock{font-size:11px;color:var(--muted);letter-spacing:1px}
+nav.mainnav{display:flex;gap:2px;flex-basis:100%;order:3;border-top:1px solid var(--line);padding-top:8px}
+nav.mainnav a{
+  padding:8px 14px;font-size:12px;letter-spacing:2px;color:var(--muted);
+  border:1px solid transparent;border-radius:3px;text-transform:uppercase;white-space:nowrap;
+}
+nav.mainnav a:hover{color:#fff;background:#12224a}
+nav.mainnav a.active{color:#0a0f1e;background:var(--amber);font-weight:700}
+#menuBtn{
+  display:none;background:none;border:1px solid var(--line);color:var(--amber);
+  font-size:18px;padding:8px 12px;border-radius:4px;cursor:pointer;margin-left:auto;
+}
+
+/* ============ LAYOUT ============ */
+main{flex:1;width:100%;max-width:1200px;margin:0 auto;padding:28px 20px 60px}
+.page{display:none}
+.page.active{display:block;animation:fadein .3s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.section-title{
+  font-family:var(--disp);font-size:clamp(30px,5vw,52px);letter-spacing:2px;color:#fff;
+  text-transform:uppercase;margin:6px 0 4px;line-height:1.05;
+}
+.section-title .amber{color:var(--amber)}
+.kicker{font-size:11px;letter-spacing:4px;color:var(--amber);text-transform:uppercase;margin-bottom:8px}
+.lede{color:var(--muted);max-width:640px;margin-bottom:26px}
+.badge{
+  display:inline-block;font-size:10px;letter-spacing:2px;font-weight:700;
+  padding:3px 10px;border-radius:3px;text-transform:uppercase;
+}
+.badge.sample{background:transparent;border:1px dashed var(--amber);color:var(--amber)}
+.badge.confirm{background:rgba(255,176,46,.12);border:1px solid var(--amber);color:var(--amber)}
+.badge.verified{background:rgba(61,220,132,.12);border:1px solid var(--green);color:var(--green)}
+.grid{display:grid;gap:18px}
+.grid.two{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.grid.three{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+
+/* ============ HERO / DISPATCH QUEUE ============ */
+.hero{display:grid;grid-template-columns:1.15fr .85fr;gap:26px;align-items:stretch;margin-bottom:34px}
+@media(max-width:900px){.hero{grid-template-columns:1fr}}
+.hero-left{
+  border:1px solid var(--line);border-radius:8px;padding:34px 30px;
+  background:linear-gradient(135deg,#0c1732 0%,#081229 70%);
+  position:relative;overflow:hidden;
+}
+.hero-left::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:repeating-linear-gradient(90deg,var(--amber) 0 26px,var(--red) 26px 52px);
+  animation:barber 3s linear infinite;
+}
+@keyframes barber{to{background-position:104px 0}}
+.hero-left h1{
+  font-family:var(--disp);font-size:clamp(38px,6vw,64px);line-height:1.02;
+  letter-spacing:1px;color:#fff;text-transform:uppercase;margin:10px 0 14px;
+}
+.hero-left h1 .amber{color:var(--amber);text-shadow:0 0 26px rgba(255,176,46,.45)}
+.hero-sub{color:var(--muted);margin-bottom:22px;max-width:480px}
+.cta-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:var(--mono);font-weight:700;font-size:14px;letter-spacing:1px;
+  padding:14px 22px;border-radius:4px;border:1px solid var(--amber);
+  cursor:pointer;text-transform:uppercase;transition:transform .08s ease;
+}
+.btn:active{transform:translateY(2px)}
+.btn.call{background:var(--amber);color:#131000}
+.btn.call:hover{background:#ffc65e;color:#131000}
+.btn.ghost{background:transparent;color:var(--amber)}
+.btn.ghost:hover{background:rgba(255,176,46,.1)}
+.fineprint{font-size:11px;color:var(--muted);letter-spacing:.5px}
+
+.queue{
+  border:1px solid var(--line);border-radius:8px;background:#060d20;
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.queue-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px;background:#0a142c;border-bottom:1px solid var(--line);
+  font-size:11px;letter-spacing:3px;color:var(--amber);text-transform:uppercase;
+}
+.qrow{
+  display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;
+  padding:12px 16px;border-bottom:1px solid #101d3d;font-size:12px;
+}
+.qrow:last-child{border-bottom:none}
+.qid{font-weight:800;color:var(--amber)}
+.qmeta{color:var(--muted)}
+.qpri{font-size:10px;letter-spacing:1px;padding:3px 8px;border-radius:3px;font-weight:700}
+.pri1{background:rgba(255,69,58,.15);border:1px solid var(--red);color:var(--red)}
+.pri2{background:rgba(255,176,46,.12);border:1px solid var(--amber);color:var(--amber)}
+.pri3{background:rgba(61,220,132,.1);border:1px solid var(--green);color:var(--green)}
+
+/* radio log ticker */
+.logwrap{
+  border:1px solid var(--line);border-radius:8px;background:#040910;
+  overflow:hidden;margin-bottom:34px;
+}
+.logbar{
+  display:flex;align-items:center;gap:10px;padding:9px 16px;
+  background:#0a142c;border-bottom:1px solid var(--line);
+  font-size:11px;letter-spacing:3px;color:var(--green);text-transform:uppercase;
+}
+.logview{height:132px;overflow:hidden;position:relative;
+  -webkit-mask-image:linear-gradient(180deg,transparent,#000 12%,#000 88%,transparent);
+  mask-image:linear-gradient(180deg,transparent,#000 12%,#000 88%,transparent);}
+.log-track{animation:logscroll 26s linear infinite;padding:10px 16px}
+.logview:hover .log-track{animation-play-state:paused}
+@keyframes logscroll{from{transform:translateY(0)}to{transform:translateY(-50%)}}
+.logline{font-size:12px;padding:4px 0;color:#9fd8b4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.logline .t{color:var(--muted)}
+.logline .amber-t{color:var(--amber)}
+
+/* ============ TICKET CARDS ============ */
+.ticket{
+  border:1px solid var(--line);border-radius:6px;background:var(--panel);
+  border-left:5px solid var(--amber);overflow:hidden;
+  transition:border-color .15s ease, transform .15s ease;
+}
+.ticket:hover{border-color:var(--amber);transform:translateY(-3px)}
+.ticket.red{border-left-color:var(--red)}
+.ticket.green{border-left-color:var(--green)}
+.ticket-head{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:10px 16px;background:#0a142c;border-bottom:1px dashed var(--line);
+  font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;
+}
+.ticket-body{padding:18px 16px}
+.ticket-body h3{font-family:var(--disp);font-size:21px;letter-spacing:1px;color:#fff;text-transform:uppercase;margin:8px 0 8px}
+.ticket-body p{font-size:13px;color:var(--muted);margin-bottom:14px}
+.ticket-foot{padding:0 16px 18px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.link-btn{
+  display:inline-flex;align-items:center;gap:8px;font-size:12px;letter-spacing:1px;font-weight:700;
+  padding:9px 16px;border-radius:3px;border:1px solid var(--amber);color:var(--amber);text-transform:uppercase;
+}
+.link-btn:hover{background:rgba(255,176,46,.12);color:var(--amber)}
+.link-btn.solid{background:var(--amber);color:#131000}
+.link-btn.solid:hover{background:#ffc65e;color:#131000}
+
+/* ============ INFO PANELS ============ */
+.panel{
+  border:1px solid var(--line);border-radius:6px;background:var(--panel);padding:22px;
+}
+.panel h3{font-family:var(--disp);letter-spacing:1px;font-size:19px;color:#fff;text-transform:uppercase;margin-bottom:10px}
+.panel h3 i{color:var(--amber);margin-right:10px}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:6px 12px;font-size:13px;margin-top:12px}
+.kv dt{color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-size:11px;padding-top:2px}
+.kv dd{color:var(--text)}
+.review-note{border-left:4px solid var(--line);padding:12px 16px;margin:14px 0;background:#081128;border-radius:0 6px 6px 0}
+.review-note.pos{border-left-color:var(--green)}
+.review-note.mix{border-left-color:var(--amber)}
+.review-note.neg{border-left-color:var(--red)}
+.review-note h4{font-size:12px;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.review-note.pos h4{color:var(--green)}
+.review-note.mix h4{color:var(--amber)}
+.review-note.neg h4{color:var(--red)}
+.review-note p{font-size:13px;color:var(--muted)}
+
+/* ============ FORM ============ */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:640px){.form-grid{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:6px}
+.field.full{grid-column:1 / -1}
+.field label{font-size:11px;letter-spacing:2px;color:var(--amber);text-transform:uppercase}
+.field input,.field select,.field textarea{
+  background:#060d20;border:1px solid var(--line);border-radius:4px;color:var(--text);
+  font-family:var(--mono);font-size:14px;padding:12px;
+}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--amber);box-shadow:0 0 0 2px rgba(255,176,46,.2)}
+.field textarea{min-height:110px;resize:vertical}
+#dispatchConfirm{display:none;border:1px solid var(--green);border-radius:6px;background:rgba(61,220,132,.06);padding:24px}
+#dispatchConfirm h3{color:var(--green);font-family:var(--disp);letter-spacing:1px;font-size:24px;text-transform:uppercase;margin-bottom:10px}
+#dispatchConfirm .tno{font-size:13px;color:var(--amber);letter-spacing:2px;margin-bottom:12px}
+#confirmDetails{font-size:13px;color:var(--muted);margin-bottom:16px;white-space:pre-line}
+
+footer{
+  border-top:2px solid var(--amber);background:#060c1e;
+  text-align:center;padding:22px 16px;color:var(--muted);
+  font-size:13px;letter-spacing:1px;
+}
+@media(max-width:860px){
+  #menuBtn{display:block}
+  nav.mainnav{display:none;flex-direction:column;order:4;width:100%;border-top:none}
+  nav.mainnav.open{display:flex}
+  nav.mainnav a{padding:12px 8px;border-bottom:1px solid var(--line);border-radius:0}
+  .status-pill{margin-left:0}
+}
+</style>
+</head>
+<body>
+
+<header class="console">
+  <div class="console-inner">
+    <div class="brand">
+      <div class="beacon-mini" aria-hidden="true"></div>
+      <div class="brand-name">Tyler's Towing and Recovery<small>Night Shift Dispatch</small></div>
+    </div>
+    <div class="status-pill"><span class="dot" aria-hidden="true"></span>ON DUTY</div>
+    <span class="clock" id="clock">--:--:--</span>
+    <button id="menuBtn" aria-label="Open menu" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
+    <nav class="mainnav" id="mainnav" aria-label="Main navigation">
+      <a href="?page=home" data-page="home">Home</a>
+      <a href="?page=services" data-page="services">Services</a>
+      <a href="?page=about" data-page="about">About</a>
+      <a href="?page=reviews" data-page="reviews">Reviews</a>
+      <a href="?page=contact" data-page="contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section class="page" id="page-home" data-page="home">
+  <div class="hero">
+    <div class="hero-left">
+      <div class="kicker"><i class="fa-solid fa-tower-broadcast"></i> Dispatch Console Live</div>
+      <h1>Night Shift<br><span class="amber">Tow Dispatch</span></h1>
+      <p class="hero-sub">Tyler's Towing and Recovery LLC is a towing service based at 9295 Alexandria Pike, Alexandria, KY 41001. One call puts your request on the board.</p>
+      <div class="cta-row">
+        <a class="btn call" href="tel:+18593088276"><i class="fa-solid fa-phone-volume"></i> (859) 308-8276</a>
+        <a class="btn ghost" href="?page=contact" data-page="contact"><i class="fa-solid fa-clipboard-list"></i> Log a Request</a>
+      </div>
+      <p class="fineprint"><i class="fa-solid fa-circle-info"></i> Hours vary by source. Call to confirm current availability.</p>
+    </div>
+    <div class="queue" aria-label="Sample dispatch queue">
+      <div class="queue-head"><span><i class="fa-solid fa-list-check"></i> Active Queue</span><span class="badge sample">Sample</span></div>
+      <div class="qrow"><span class="qid">Q-101</span><span class="qmeta">Vehicle tow, Alexandria Pike</span><span class="qpri pri1">P1</span></div>
+      <div class="qrow"><span class="qid">Q-102</span><span class="qmeta">Roadside assist, pending pickup</span><span class="qpri pri2">P2</span></div>
+      <div class="qrow"><span class="qid">Q-103</span><span class="qmeta">Recovery, staging for unit</span><span class="qpri pri2">P2</span></div>
+      <div class="qrow"><span class="qid">Q-104</span><span class="qmeta">Transport, scheduled</span><span class="qpri pri3">P3</span></div>
+      <div class="qrow"><span class="qid">Q-105</span><span class="qmeta">Line open, next caller</span><span class="qpri pri3">OPEN</span></div>
+    </div>
+  </div>
+
+  <div class="logwrap">
+    <div class="logbar"><i class="fa-solid fa-radio"></i> Radio Log <span class="badge sample" style="margin-left:auto">Illustrative feed</span></div>
+    <div class="logview"><div class="log-track" id="logTrack">
+      <div class="logline"><span class="t">22:14:03</span> CH-2: UNIT 4 CLEAR, ROLLING BACK TO YARD</div>
+      <div class="logline"><span class="t">22:31:47</span> <span class="amber-t">DISPATCH: CALL LOGGED, ALEXANDRIA PIKE AREA</span></div>
+      <div class="logline"><span class="t">23:02:19</span> CH-2: UNIT 2 ON SCENE, HOOKING UP</div>
+      <div class="logline"><span class="t">23:20:44</span> CH-2: UNIT 2 LOADED, EN ROUTE TO DROP</div>
+      <div class="logline"><span class="t">23:45:51</span> <span class="amber-t">DISPATCH: ALL UNITS STATUS CHECK</span></div>
+      <div class="logline"><span class="t">00:07:12</span> CH-2: UNIT 4 10-8, AVAILABLE</div>
+      <div class="logline"><span class="t">22:14:03</span> CH-2: UNIT 4 CLEAR, ROLLING BACK TO YARD</div>
+      <div class="logline"><span class="t">22:31:47</span> <span class="amber-t">DISPATCH: CALL LOGGED, ALEXANDRIA PIKE AREA</span></div>
+      <div class="logline"><span class="t">23:02:19</span> CH-2: UNIT 2 ON SCENE, HOOKING UP</div>
+      <div class="logline"><span class="t">23:20:44</span> CH-2: UNIT 2 LOADED, EN ROUTE TO DROP</div>
+      <div class="logline"><span class="t">23:45:51</span> <span class="amber-t">DISPATCH: ALL UNITS STATUS CHECK</span></div>
+      <div class="logline"><span class="t">00:07:12</span> CH-2: UNIT 4 10-8, AVAILABLE</div>
+    </div></div>
+  </div>
+
+  <div class="kicker"><i class="fa-solid fa-truck-pickup"></i> Tonight's Ticket Board</div>
+  <h2 class="section-title" style="font-size:clamp(26px,4vw,40px)">Incident <span class="amber">Tickets</span></h2>
+  <p class="lede">Example service tickets of the kind this shop handles. Service details are <span class="badge sample">Sample</span> for this demo. Call to confirm what is offered.</p>
+  <div class="grid three">
+    <article class="ticket">
+      <div class="ticket-head"><span>Ticket #T-01</span><span class="badge sample">Sample</span></div>
+      <div class="ticket-body">
+        <h3>Vehicle Towing</h3>
+        <p>Hookup and transport for cars, trucks, and SUVs that cannot be driven.</p>
+      </div>
+      <div class="ticket-foot"><a class="link-btn" href="?page=services" data-page="services">Open ticket <i class="fa-solid fa-arrow-right"></i></a></div>
+    </article>
+    <article class="ticket red">
+      <div class="ticket-head"><span>Ticket #T-02</span><span class="badge sample">Sample</span></div>
+      <div class="ticket-body">
+        <h3>Accident Recovery</h3>
+        <p>Scene recovery and clearance after a collision, coordinated by phone.</p>
+      </div>
+      <div class="ticket-foot"><a class="link-btn" href="?page=services" data-page="services">Open ticket <i class="fa-solid fa-arrow-right"></i></a></div>
+    </article>
+    <article class="ticket green">
+      <div class="ticket-head"><span>Ticket #T-03</span><span class="badge sample">Sample</span></div>
+      <div class="ticket-body">
+        <h3>Roadside Assistance</h3>
+        <p>Jump starts, lockouts, tire changes, and fuel delivery style calls.</p>
+      </div>
+      <div class="ticket-foot"><a class="link-btn" href="?page=services" data-page="services">Open ticket <i class="fa-solid fa-arrow-right"></i></a></div>
+    </article>
+  </div>
+
+  <div class="grid two" style="margin-top:26px">
+    <div class="panel">
+      <h3><i class="fa-solid fa-location-dot"></i> Base of Operations</h3>
+      <p style="font-size:13px;color:var(--muted)">9295 Alexandria Pike<br>Alexandria, KY 41001</p>
+      <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+        <a class="link-btn solid" href="https://www.google.com/maps/search/?api=1&query=Tyler%27s%20Towing%20and%20Recovery%20LLC%2C%209295%20Alexandria%20Pike%2C%20Alexandria%2C%20KY%2041001" target="_blank" rel="noopener"><i class="fa-solid fa-diamond-turn-right"></i> Get Directions</a>
+        <a class="link-btn" href="tel:+18593088276"><i class="fa-solid fa-phone"></i> Call</a>
+      </div>
+    </div>
+    <div class="panel">
+      <h3><i class="fa-solid fa-clock"></i> Shift Hours</h3>
+      <p style="font-size:13px;color:var(--muted)">Some public directories list 24-hour daily service for this business. Hours are not verified for this demo.</p>
+      <p style="margin-top:10px"><span class="badge confirm">Call to confirm</span></p>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services" data-page="services">
+  <div class="kicker"><i class="fa-solid fa-clipboard-list"></i> Service Board</div>
+  <h2 class="section-title">Incident <span class="amber">Tickets</span></h2>
+  <p class="lede">The ticket list below is <span class="badge sample">Sample</span> and was created for this demo site. Real service offerings are not published by the business online, so call <a href="tel:+18593088276">(859) 308-8276</a> to confirm what is available before you need it.</p>
+  <div class="grid three">
+    <article class="ticket">
+      <div class="ticket-head"><span>Ticket #S-01</span><span class="badge sample">Sample</span></div>
+      <div class="ticket-body"><h3>Light-Duty Towing</h3><p>Tow service for standard cars, crossovers, and light trucks.</p></div>
+      <div class="ticket-foot"><a class="link-btn" href="tel:+18593088276"><i class="fa-solid fa-phone"></i> Call to confirm</a></div>
+    </article>
+    <article class="ticket red">
+      <div class="ticket-head"><span>Ticket #S-02</span><span class="badge sample">Sample</span></div>
+      <div class="ticket-body"><h3>Accident Recovery</h3><p>Recovery and transport after a collision or breakdown on scene.</p></div>
+      <div class="ticket-foot"><a class="link-btn" href="tel:+18593088276"><i class="fa-solid fa-phone"></i> Call to confirm</a></div>
+    </article>
+    <article class="ticket green">
+      <div class="ticket-head"><span>Ticket #S-03</span><span class="badge sample">Sample</span></div>
+      <div class="ticket-body"><h3>Roadside Assistance</h3><p>Jump starts, lockouts, flat tires, and out-of-fuel calls.</p></div>
+      <div class="ticket-foot"><a class="link-btn" href="tel:+18593088276"><i class="fa-solid fa-phone"></i> Call to confirm</a></div>
+    </article>
+    <article class="ticket">
+      <div class="ticket-head"><span>Ticket #S-04</span><span class="badge sample">Sample</span></div>
+      <div class="ticket-body"><h3>Winch-Out Service</h3><p>Pulling vehicles stuck in mud, snow, or ditches back to the road.</p></div>
+      <div class="ticket-foot"><a class="link-btn" href="tel:+18593088276"><i class="fa-solid fa-phone"></i> Call to confirm</a></div>
+    </article>
+    <article class="ticket red">
+      <div class="ticket-head"><span>Ticket #S-05</span><span class="badge sample">Sample</span></div>
+      <div class="ticket-body"><h3>Local Vehicle Transport</h3><p>Short-haul transport of drivable or non-drivable vehicles.</p></div>
+      <div class="ticket-foot"><a class="link-btn" href="tel:+18593088276"><i class="fa-solid fa-phone"></i> Call to confirm</a></div>
+    </article>
+    <article class="ticket green">
+      <div class="ticket-head"><span>Ticket #S-06</span><span class="badge sample">Sample</span></div>
+      <div class="ticket-body"><h3>After-Hours Pickup</h3><p>Tow requests outside normal business hours, availability by phone.</p></div>
+      <div class="ticket-foot"><a class="link-btn" href="tel:+18593088276"><i class="fa-solid fa-phone"></i> Call to confirm</a></div>
+    </article>
+  </div>
+  <div class="panel" style="margin-top:26px">
+    <h3><i class="fa-solid fa-triangle-exclamation"></i> Before the Hook Drops</h3>
+    <p style="font-size:13px;color:var(--muted)">No prices are published by this business. When you call, confirm the pickup location, the drop-off address, your vehicle type, and the total price before authorizing the tow. <span class="badge confirm">Call to confirm</span></p>
+    <div style="margin-top:14px"><a class="btn call" href="tel:+18593088276"><i class="fa-solid fa-phone-volume"></i> (859) 308-8276</a></div>
+  </div>
+</section>
+
+<section class="page" id="page-about" data-page="about">
+  <div class="kicker"><i class="fa-solid fa-id-card"></i> Unit File</div>
+  <h2 class="section-title">About <span class="amber">The Company</span></h2>
+  <p class="lede">Verified public-record facts about Tyler's Towing and Recovery LLC. Anything beyond these records is marked <span class="badge confirm">Call to confirm</span>.</p>
+  <div class="grid two">
+    <div class="panel">
+      <h3><i class="fa-solid fa-building"></i> Business Record</h3>
+      <dl class="kv">
+        <dt>Legal name</dt><dd>Tyler's Towing and Recovery LLC</dd>
+        <dt>Category</dt><dd>Towing Company</dd>
+        <dt>Address</dt><dd>9295 Alexandria Pike, Alexandria, KY 41001</dd>
+        <dt>Phone</dt><dd><a href="tel:+18593088276">(859) 308-8276</a></dd>
+        <dt>Formed</dt><dd>October 19, 2015, Kentucky <span class="badge verified">Verified</span></dd>
+      </dl>
+      <p style="font-size:12px;color:var(--muted);margin-top:12px">Formation date from the <a href="https://web.sos.ky.gov/corpscans/80/0934880-06-99999-20160915-ARA-6641213-PU.pdf" target="_blank" rel="noopener">Kentucky Secretary of State public filing</a>.</p>
+    </div>
+    <div class="panel">
+      <h3><i class="fa-solid fa-award"></i> Public Listings</h3>
+      <dl class="kv">
+        <dt>BBB profile</dt><dd>Towing Company, rated A+ <span class="badge verified">Verified</span></dd>
+        <dt>Accreditation</dt><dd>Not BBB accredited (per BBB profile)</dd>
+        <dt>Directories</dt><dd>Listed on Manta and other public directories</dd>
+      </dl>
+      <p style="font-size:12px;color:var(--muted);margin-top:12px">Ratings from the <a href="https://www.bbb.org/us/ky/alexandria/profile/towing-company/tylers-towing-and-recoveryllc-0292-90037644" target="_blank" rel="noopener">BBB business profile</a> and the <a href="https://www.manta.com/c/mkxcn8t/tyler-s-towing" target="_blank" rel="noopener">Manta listing</a>.</p>
+      <p style="margin-top:10px"><span class="badge confirm">Call to confirm</span> <span style="font-size:12px;color:var(--muted)">fleet size, service area, and staffing</span></p>
+    </div>
+  </div>
+  <div class="panel" style="margin-top:18px">
+    <h3><i class="fa-solid fa-moon"></i> The Night-Shift Way</h3>
+    <p style="font-size:13px;color:var(--muted)">This demo site is styled like the dispatch console the company runs from: amber beacons, a live radio log, and an incident ticket board. The design is illustrative. For facts about the business itself, use the verified records above or call dispatch directly at <a href="tel:+18593088276">(859) 308-8276</a>.</p>
+  </div>
+</section>
+
+<section class="page" id="page-reviews" data-page="reviews">
+  <div class="kicker"><i class="fa-solid fa-star"></i> Radio Check</div>
+  <h2 class="section-title">Customer <span class="amber">Reviews</span></h2>
+  <p class="lede">Honest signal check: no verified customer reviews for Tyler's Towing and Recovery LLC were found on the public sources checked for this demo. Several business directories list the company with zero published reviews.</p>
+  <div class="panel">
+    <h3><i class="fa-solid fa-magnifying-glass"></i> What We Found</h3>
+    <p style="font-size:13px;color:var(--muted)">Public carrier and business directories show this listing with no published customer reviews. Because no review text or reviewer names could be verified, none are shown here. This page will not invent reviews.</p>
+    <p style="margin-top:12px"><span class="badge confirm">Call to confirm</span> <span style="font-size:12px;color:var(--muted)">Ask the company directly for references or recent customer feedback.</span></p>
+    <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+      <a class="link-btn solid" href="https://www.google.com/maps/place/?q=place_id:ChIJEeUnq6OlQYgRPXLXKToj2Ss" target="_blank" rel="noopener"><i class="fa-brands fa-google"></i> Open Google Maps Listing</a>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin-top:10px">Used this service? The Google Maps listing above is the direct place to leave a review.</p>
+  </div>
+  <h3 style="font-family:var(--disp);letter-spacing:1px;font-size:20px;color:#fff;text-transform:uppercase;margin:26px 0 6px">How To Read Any Towing Review</h3>
+  <p class="lede" style="margin-bottom:14px">General guidance for evaluating tow companies. Not customer reviews of this business.</p>
+  <div class="review-note pos">
+    <h4><i class="fa-solid fa-thumbs-up"></i> Positive signals</h4>
+    <p>Fast arrival, a firm price quoted before the hook, the truck number and driver name given over the phone, and no damage at drop-off.</p>
+  </div>
+  <div class="review-note mix">
+    <h4><i class="fa-solid fa-scale-balanced"></i> Mixed signals</h4>
+    <p>Good work but slow arrival, or a price that changed from the quote. Response times often depend on call volume and distance, so ask for an ETA and a written total.</p>
+  </div>
+  <div class="review-note neg">
+    <h4><i class="fa-solid fa-thumbs-down"></i> Negative signals</h4>
+    <p>Refusal to quote a price upfront, pressure to sign blank paperwork, or new damage discovered after the tow. Photograph your vehicle before and after.</p>
+  </div>
+</section>
+
+<section class="page" id="page-contact" data-page="contact">
+  <div class="kicker"><i class="fa-solid fa-headset"></i> Open Channel</div>
+  <h2 class="section-title">Contact <span class="amber">Dispatch</span></h2>
+  <p class="lede">Fastest way through is the phone. The form below logs a demo request on this page only. It does not send email. Call <a href="tel:+18593088276">(859) 308-8276</a> to confirm any request.</p>
+  <div class="grid two">
+    <div>
+      <div class="panel" style="margin-bottom:18px">
+        <h3><i class="fa-solid fa-phone"></i> Call Dispatch</h3>
+        <p style="margin-bottom:14px"><a class="btn call" href="tel:+18593088276"><i class="fa-solid fa-phone-volume"></i> (859) 308-8276</a></p>
+        <p class="fineprint">Tap to call from your device.</p>
+      </div>
+      <div class="panel" style="margin-bottom:18px">
+        <h3><i class="fa-solid fa-location-dot"></i> Find The Yard</h3>
+        <p style="font-size:13px;color:var(--muted)">Tyler's Towing and Recovery LLC<br>9295 Alexandria Pike<br>Alexandria, KY 41001</p>
+        <div style="margin-top:14px">
+          <a class="link-btn solid" href="https://www.google.com/maps/search/?api=1&query=Tyler%27s%20Towing%20and%20Recovery%20LLC%2C%209295%20Alexandria%20Pike%2C%20Alexandria%2C%20KY%2041001" target="_blank" rel="noopener"><i class="fa-solid fa-diamond-turn-right"></i> Get Directions</a>
+        </div>
+      </div>
+      <div class="panel">
+        <h3><i class="fa-solid fa-clock"></i> Hours</h3>
+        <p style="font-size:13px;color:var(--muted)">Hours are not verified for this demo. <a href="https://www.manta.com/c/mkxcn8t/tyler-s-towing" target="_blank" rel="noopener">Manta</a> lists 24-hour daily service, but directory data can be wrong.</p>
+        <p style="margin-top:10px"><span class="badge confirm">Call to confirm</span></p>
+      </div>
+    </div>
+    <div class="panel">
+      <h3><i class="fa-solid fa-clipboard-list"></i> Log A Dispatch Request</h3>
+      <p class="fineprint" style="margin-bottom:14px">Demo form. Entries stay on this page and are not emailed anywhere.</p>
+      <form id="dispatchForm" novalidate>
+        <div class="form-grid">
+          <div class="field"><label for="fName">Your name</label><input id="fName" name="name" type="text" autocomplete="name" required></div>
+          <div class="field"><label for="fPhone">Callback number</label><input id="fPhone" name="phone" type="tel" autocomplete="tel" required></div>
+          <div class="field full"><label for="fLoc">Pickup location</label><input id="fLoc" name="location" type="text" placeholder="Street, lot, or mile marker" required></div>
+          <div class="field"><label for="fVeh">Vehicle</label><input id="fVeh" name="vehicle" type="text" placeholder="Year, make, model"></div>
+          <div class="field"><label for="fType">Request type</label>
+            <select id="fType" name="type">
+              <option>Tow needed</option>
+              <option>Accident recovery</option>
+              <option>Roadside assistance</option>
+              <option>Winch-out</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="field full"><label for="fNotes">Notes for dispatch</label><textarea id="fNotes" name="notes" placeholder="What happened, where the vehicle is, any hazards"></textarea></div>
+        </div>
+        <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+          <button type="submit" class="btn call"><i class="fa-solid fa-paper-plane"></i> Log Request</button>
+          <a class="btn ghost" href="tel:+18593088276"><i class="fa-solid fa-phone"></i> Or just call</a>
+        </div>
+      </form>
+      <div id="dispatchConfirm" role="status">
+        <h3><i class="fa-solid fa-circle-check"></i> Request Logged</h3>
+        <div class="tno" id="confirmNo"></div>
+        <div id="confirmDetails"></div>
+        <p class="fineprint" style="margin-bottom:14px">This demo log does not reach the company. Call <a href="tel:+18593088276">(859) 308-8276</a> now to confirm pickup.</p>
+        <button type="button" class="btn ghost" id="logAnother"><i class="fa-solid fa-rotate-left"></i> Log another request</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>© Tyler's Towing and Recovery LLC</footer>
+
+<script>
+(function(){
+  var PAGES = ['home','services','about','reviews','contact'];
+  var TITLES = {
+    home: "Tyler's Towing and Recovery LLC | Night Shift Dispatch",
+    services: "Services | Tyler's Towing and Recovery LLC",
+    about: "About | Tyler's Towing and Recovery LLC",
+    reviews: "Reviews | Tyler's Towing and Recovery LLC",
+    contact: "Contact | Tyler's Towing and Recovery LLC"
+  };
+
+  function pageFromUrl(){
+    try{
+      var p = new URLSearchParams(window.location.search).get('page');
+      return PAGES.indexOf(p) > -1 ? p : 'home';
+    }catch(e){ return 'home'; }
+  }
+
+  function showPage(page){
+    if(PAGES.indexOf(page) < 0) page = 'home';
+    var sections = document.querySelectorAll('.page');
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle('active', sections[i].getAttribute('data-page') === page);
+    }
+    var links = document.querySelectorAll('nav.mainnav a[data-page]');
+    for(var j = 0; j < links.length; j++){
+      links[j].classList.toggle('active', links[j].getAttribute('data-page') === page);
+    }
+    document.title = TITLES[page];
+    window.scrollTo(0, 0);
+    closeMenu();
+  }
+
+  function navigateTo(page){
+    if(PAGES.indexOf(page) < 0) page = 'home';
+    showPage(page);
+    try{
+      history.pushState({page: page}, '', '?page=' + page);
+    }catch(e){}
+  }
+
+  window.addEventListener('popstate', function(e){
+    var p = (e.state && e.state.page) ? e.state.page : pageFromUrl();
+    showPage(p);
+  });
+
+  document.addEventListener('click', function(e){
+    var link = e.target.closest('a[data-page]');
+    if(link){
+      e.preventDefault();
+      navigateTo(link.getAttribute('data-page'));
+    }
+  });
+
+  var menuBtn = document.getElementById('menuBtn');
+  var mainnav = document.getElementById('mainnav');
+  function closeMenu(){
+    if(mainnav.classList.contains('open')){
+      mainnav.classList.remove('open');
+      menuBtn.setAttribute('aria-expanded', 'false');
+      menuBtn.innerHTML = '<i class="fa-solid fa-bars"></i>';
+    }
+  }
+  menuBtn.addEventListener('click', function(){
+    var open = mainnav.classList.toggle('open');
+    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    menuBtn.innerHTML = open ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
+  });
+
+  function tick(){
+    var el = document.getElementById('clock');
+    if(!el) return;
+    var d = new Date();
+    function pad(n){ return (n < 10 ? '0' : '') + n; }
+    el.textContent = pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()) + ' LOCAL';
+  }
+  tick();
+  setInterval(tick, 1000);
+
+  var form = document.getElementById('dispatchForm');
+  var confirmBox = document.getElementById('dispatchConfirm');
+  if(form){
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      var name = document.getElementById('fName');
+      var phone = document.getElementById('fPhone');
+      var loc = document.getElementById('fLoc');
+      var ok = true;
+      [name, phone, loc].forEach(function(f){
+        if(!f.value.trim()){ f.style.borderColor = '#ff453a'; ok = false; }
+        else { f.style.borderColor = ''; }
+      });
+      if(!ok) return;
+      var tno = 'TQ-' + Date.now().toString(36).toUpperCase().slice(-6);
+      document.getElementById('confirmNo').textContent = 'DEMO TICKET ' + tno;
+      var lines = [
+        'Name: ' + name.value.trim(),
+        'Callback: ' + phone.value.trim(),
+        'Pickup: ' + loc.value.trim(),
+        'Vehicle: ' + (document.getElementById('fVeh').value.trim() || 'Not given'),
+        'Type: ' + document.getElementById('fType').value,
+        'Notes: ' + (document.getElementById('fNotes').value.trim() || 'None')
+      ];
+      document.getElementById('confirmDetails').textContent = lines.join('\n');
+      form.style.display = 'none';
+      confirmBox.style.display = 'block';
+      confirmBox.scrollIntoView({behavior:'smooth', block:'center'});
+    });
+    document.getElementById('logAnother').addEventListener('click', function(){
+      form.reset();
+      form.style.display = 'block';
+      confirmBox.style.display = 'none';
+    });
+  }
+
+  showPage(pageFromUrl());
+  try{
+    history.replaceState({page: pageFromUrl()}, '', '?page=' + pageFromUrl());
+  }catch(e){}
+})();
+</script>
+</body>
+</html>

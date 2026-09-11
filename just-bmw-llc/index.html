@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Just BMW LLC | Technical Dossier</title>
+<meta name="description" content="Just BMW LLC, independent BMW auto repair at 1328 Ohio Pike, Amelia, OH 45102. Call (513) 271-5878.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{
+  --paper:#f5f5f3; --ink:#141414; --gray:#6f6f6f; --line:#d9d9d7;
+  --blue:#154889; --blue-bright:#1f66c1; --dark:#0f1318; --dark-2:#161c23;
+  --grid:rgba(21,72,137,.07); --grid-strong:rgba(21,72,137,.13);
+  --rail-w:148px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Archivo',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh}
+.mono{font-family:'IBM Plex Mono',monospace}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+button{font-family:inherit;cursor:pointer}
+
+/* ---------- margin rail ---------- */
+.rail{position:fixed;inset:0 auto 0 0;width:var(--rail-w);background:var(--dark);color:#fff;z-index:60;display:flex;flex-direction:column;border-right:3px solid var(--blue)}
+.rail::after{content:"";position:absolute;top:0;bottom:0;right:10px;width:1px;background:repeating-linear-gradient(to bottom,#3a4552 0 1px,transparent 1px 12px)}
+.rail-brand{padding:22px 14px 16px;border-bottom:1px solid #2a3441}
+.rail-brand .doc-tag{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;color:#8fa3bd}
+.rail-brand .doc-no{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:#fff;margin-top:6px}
+.rail-brand .rev{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8fa3bd;margin-top:4px}
+.rail-nav{flex:1;display:flex;flex-direction:column;padding:14px 10px;gap:6px;overflow-y:auto}
+.sheet-btn{display:flex;align-items:center;gap:10px;background:transparent;border:1px solid #2a3441;color:#cfd8e3;padding:10px 10px;text-align:left;transition:all .18s ease;width:100%}
+.sheet-btn .sn{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:var(--blue-bright);min-width:26px}
+.sheet-btn .sl{font-size:12px;font-weight:600;letter-spacing:1.5px}
+.sheet-btn:hover{border-color:var(--blue-bright);background:#151d27}
+.sheet-btn.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.sheet-btn.on .sn{color:#fff}
+.rail-foot{padding:14px;border-top:1px solid #2a3441;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8fa3bd;line-height:1.7}
+.rail-foot strong{color:#fff}
+.menu-toggle{display:none}
+
+/* ---------- shell ---------- */
+.shell{margin-left:var(--rail-w);min-height:100vh;display:flex;flex-direction:column}
+.blueprint{background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px),linear-gradient(var(--grid-strong) 1px,transparent 1px),linear-gradient(90deg,var(--grid-strong) 1px,transparent 1px);background-size:24px 24px,24px 24px,120px 120px,120px 120px}
+
+/* ---------- title block ---------- */
+.titleblock{background:#fff;border-bottom:3px solid var(--ink);display:grid;grid-template-columns:1fr auto auto auto}
+.tb-cell{padding:16px 22px;border-right:1px solid var(--line);display:flex;flex-direction:column;justify-content:center;min-width:0}
+.tb-cell:last-child{border-right:none}
+.tb-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--gray)}
+.tb-value{font-weight:800;font-size:15px;letter-spacing:.5px;margin-top:4px;white-space:nowrap}
+.tb-sub{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--blue);margin-top:4px;font-weight:600}
+.tb-sheet .tb-value{font-size:26px;color:var(--blue)}
+.status-dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#1d9e4b;margin-right:6px;vertical-align:1px}
+
+/* ---------- pages ---------- */
+main{flex:1;position:relative}
+.page{display:none;padding:44px clamp(18px,4vw,64px) 70px;max-width:1180px}
+.page.active{display:block;animation:sheetIn .28s ease}
+@keyframes sheetIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.kicker{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--blue);font-weight:600;margin-bottom:12px}
+h1.display{font-size:clamp(40px,6vw,84px);font-weight:900;line-height:.98;letter-spacing:-1.5px;text-transform:uppercase}
+h1.display .thin{font-weight:400}
+h2.sec{font-size:clamp(26px,3.4vw,40px);font-weight:800;letter-spacing:-.5px;text-transform:uppercase;margin:0 0 6px}
+.sec-rule{height:4px;background:var(--ink);width:72px;margin:14px 0 26px;position:relative}
+.sec-rule::after{content:"";position:absolute;left:80px;top:0;height:4px;width:200px;background:var(--blue)}
+.lede{font-size:17px;line-height:1.65;color:#333;max-width:62ch;margin-bottom:8px}
+
+/* ---------- DIN spec tables ---------- */
+.spec{width:100%;border-collapse:collapse;margin:22px 0 30px;background:#fff;font-size:14px}
+.spec th{background:var(--dark);color:#fff;text-align:left;padding:12px 16px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:2px;font-weight:600;border:1px solid var(--dark)}
+.spec td{padding:13px 16px;border:1px solid var(--line);vertical-align:top}
+.spec tr:nth-child(even) td{background:#fafaf9}
+.spec .code{font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--blue);white-space:nowrap}
+.spec .field{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:1px;color:var(--gray);font-weight:600;white-space:nowrap}
+
+/* ---------- stamps and badges ---------- */
+.stamp{display:inline-block;border:3px solid var(--blue);color:var(--blue);font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:12px;letter-spacing:2px;padding:8px 16px;transform:rotate(-3deg);text-transform:uppercase;background:rgba(21,72,137,.06)}
+.stamp.warn{border-color:#b3541e;color:#b3541e;background:rgba(179,84,30,.06);transform:rotate(2deg)}
+.stamp-row{display:flex;gap:14px;flex-wrap:wrap;margin:18px 0 6px}
+.badge{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:1.5px;padding:4px 10px;border:1px solid var(--blue);color:var(--blue);text-transform:uppercase;background:#fff}
+.badge.gray{border-color:#9a9a9a;color:#666}
+.badge.dark{background:var(--dark);border-color:var(--dark);color:#fff}
+
+/* ---------- figure / schematic ---------- */
+.fig{background:#fff;border:1px solid var(--line);margin:26px 0}
+.fig-head{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--gray)}
+.fig svg{display:block;width:100%;height:auto}
+.fig-cap{padding:12px 16px;border-top:1px solid var(--line);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:1px;color:var(--gray)}
+
+/* ---------- cards / steps ---------- */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin:24px 0}
+.card{background:#fff;border:1px solid var(--line);border-top:5px solid var(--blue);padding:26px;position:relative}
+.card .idx{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--blue);font-weight:600}
+.card h3{font-size:20px;font-weight:800;margin:8px 0 10px;text-transform:uppercase;letter-spacing:.3px}
+.card p{font-size:14.5px;line-height:1.65;color:#3c3c3c}
+.steps{counter-reset:step;list-style:none;margin:22px 0;display:grid;gap:0;border:1px solid var(--line);background:#fff}
+.steps li{counter-increment:step;display:flex;gap:18px;padding:20px 22px;border-bottom:1px solid var(--line);align-items:flex-start}
+.steps li:last-child{border-bottom:none}
+.steps li::before{content:"0" counter(step);font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:22px;color:var(--blue);min-width:44px}
+.steps h4{font-size:15px;font-weight:800;text-transform:uppercase;margin-bottom:6px}
+.steps p{font-size:14px;line-height:1.6;color:#3c3c3c}
+
+/* ---------- dark panel ---------- */
+.panel-dark{background:var(--dark);color:#eef2f7;padding:38px clamp(20px,4vw,48px);margin:34px 0;position:relative;overflow:hidden}
+.panel-dark::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:28px 28px}
+.panel-dark>*{position:relative}
+.panel-dark h2{color:#fff}
+.panel-dark .sec-rule{background:#fff}
+.panel-dark p{color:#c6d0dd;line-height:1.7;font-size:15px;max-width:64ch}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;gap:10px;background:var(--blue);color:#fff;border:none;padding:15px 26px;font-weight:700;font-size:14px;letter-spacing:1.2px;text-transform:uppercase;transition:all .18s ease}
+.btn:hover{background:var(--dark);text-decoration:none;color:#fff}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--ink)}
+.btn.ghost:hover{background:var(--ink);color:#fff}
+.btn.light{background:#fff;color:var(--dark)}
+.btn.light:hover{background:var(--blue);color:#fff}
+.btn-row{display:flex;gap:14px;flex-wrap:wrap;margin:26px 0 10px}
+.btn i{font-size:15px}
+
+/* ---------- form ---------- */
+form.dossier{background:#fff;border:1px solid var(--line);border-top:5px solid var(--ink);padding:30px;margin:24px 0;max-width:720px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.fgroup{display:flex;flex-direction:column;gap:7px}
+.fgroup.full{grid-column:1/-1}
+.fgroup label{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:1.5px;font-weight:600;color:var(--gray);text-transform:uppercase}
+.fgroup input,.fgroup textarea,.fgroup select{font-family:'Archivo',sans-serif;font-size:15px;padding:12px 14px;border:1px solid var(--line);background:#fbfbfa;color:var(--ink);width:100%}
+.fgroup input:focus,.fgroup textarea:focus{outline:2px solid var(--blue);border-color:var(--blue)}
+.fgroup textarea{min-height:130px;resize:vertical}
+.form-note{margin-top:14px;font-size:13.5px;line-height:1.6;color:#3c3c3c;background:#f2f5fa;border:1px dashed var(--blue);padding:14px 16px}
+#form-sent{display:none;margin-top:16px;border:2px solid #1d9e4b;color:#146c34;background:#eef9f1;padding:16px 18px;font-size:14px;line-height:1.6}
+
+/* ---------- photo placeholder ---------- */
+.photo-ph{background:#e9e9e7;border:1px dashed #9a9a9a;min-height:210px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#8a8a8a;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:2px}
+.photo-ph i{font-size:30px}
+
+/* ---------- corner marks ---------- */
+.corner{position:fixed;width:22px;height:22px;z-index:55;pointer-events:none;opacity:.55}
+.corner.tl{top:10px;left:calc(var(--rail-w) + 10px);border-top:2px solid var(--ink);border-left:2px solid var(--ink)}
+.corner.tr{top:10px;right:10px;border-top:2px solid var(--ink);border-right:2px solid var(--ink)}
+.corner.bl{bottom:10px;left:calc(var(--rail-w) + 10px);border-bottom:2px solid var(--ink);border-left:2px solid var(--ink)}
+.corner.br{bottom:10px;right:10px;border-bottom:2px solid var(--ink);border-right:2px solid var(--ink)}
+
+footer{background:var(--dark);color:#8fa3bd;text-align:center;padding:20px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:1px}
+
+.notice{border-left:5px solid var(--blue);background:#fff;padding:18px 22px;margin:22px 0;font-size:14.5px;line-height:1.7;color:#333}
+.notice strong{display:block;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--blue);margin-bottom:8px;text-transform:uppercase}
+.hours-chip{font-family:'IBM Plex Mono',monospace;font-size:12px;background:var(--dark);color:#fff;padding:6px 12px;display:inline-block;letter-spacing:1px;margin:2px 4px 2px 0}
+
+@media(max-width:920px){
+  .rail{width:100%;height:auto;position:fixed;inset:0 0 auto 0;border-right:none;border-bottom:3px solid var(--blue)}
+  .rail::after{display:none}
+  .rail-top{display:flex;align-items:center;justify-content:space-between}
+  .rail-brand{border-bottom:none;padding:14px}
+  .menu-toggle{display:block;background:transparent;border:1px solid #2a3441;color:#fff;padding:10px 14px;font-size:16px;margin-right:14px}
+  .rail-nav,.rail-foot{display:none}
+  body.menu-open .rail-nav{display:flex}
+  body.menu-open .rail-foot{display:block}
+  .shell{margin-left:0;padding-top:74px}
+  .corner.tl{left:10px}.corner.bl{left:10px}
+  .titleblock{grid-template-columns:1fr 1fr}
+  .tb-cell{padding:12px 16px}
+  .grid2,.frow{grid-template-columns:1fr}
+  .page{padding:30px 18px 56px}
+}
+</style>
+</head>
+<body>
+
+<nav class="rail" aria-label="Dossier sheets">
+  <div class="rail-top">
+    <div class="rail-brand">
+      <div class="doc-tag">TECHNICAL DOSSIER</div>
+      <div class="doc-no">JB-2026-001</div>
+      <div class="rev">REV A / SHEET INDEX</div>
+    </div>
+    <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
+  </div>
+  <div class="rail-nav" id="rail-nav">
+    <button class="sheet-btn on" data-nav="home"><span class="sn">01</span><span class="sl">HOME</span></button>
+    <button class="sheet-btn" data-nav="services"><span class="sn">02</span><span class="sl">SERVICES</span></button>
+    <button class="sheet-btn" data-nav="about"><span class="sn">03</span><span class="sl">ABOUT</span></button>
+    <button class="sheet-btn" data-nav="reviews"><span class="sn">04</span><span class="sl">REVIEWS</span></button>
+    <button class="sheet-btn" data-nav="contact"><span class="sn">05</span><span class="sl">CONTACT</span></button>
+  </div>
+  <div class="rail-foot">
+    <strong>JUST BMW LLC</strong><br>
+    1328 Ohio Pike<br>
+    Amelia, OH 45102<br>
+    (513) 271-5878
+  </div>
+</nav>
+
+<div class="shell">
+  <header class="titleblock">
+    <div class="tb-cell">
+      <span class="tb-label">TITLE</span>
+      <span class="tb-value">JUST BMW LLC</span>
+      <span class="tb-sub">INDEPENDENT BMW SERVICE DOSSIER</span>
+    </div>
+    <div class="tb-cell">
+      <span class="tb-label">STATUS</span>
+      <span class="tb-value" style="font-size:14px"><span class="status-dot"></span>ACTIVE LISTING</span>
+      <span class="tb-sub">PER PUBLIC RECORD</span>
+    </div>
+    <div class="tb-cell tb-sheet">
+      <span class="tb-label">SHEET</span>
+      <span class="tb-value"><span id="sheet-num">01</span> / 05</span>
+    </div>
+    <div class="tb-cell">
+      <span class="tb-label">DRAWN</span>
+      <span class="tb-value" style="font-size:14px">2026-09-11</span>
+      <span class="tb-sub">REV A</span>
+    </div>
+  </header>
+
+  <main class="blueprint">
+  <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+
+  <section class="page active" id="page-home" data-page="home">
+    <div class="kicker">SHEET 01 / COVER AND GENERAL DATA</div>
+    <h1 class="display">JUST BMW <span class="thin">LLC</span></h1>
+    <div class="sec-rule"></div>
+    <p class="lede">Independent BMW auto repair facility in Amelia, Ohio. This dossier compiles the publicly listed facts for the shop: location, contact line, and stated hours. Anything not verified in a public record is stamped, not stated.</p>
+    <div class="stamp-row">
+      <span class="stamp">Verified: name / address / phone</span>
+      <span class="stamp warn">Unverified items stamped SAMPLE</span>
+    </div>
+
+    <table class="spec">
+      <tr><th style="width:34%">FIELD</th><th>VALUE</th></tr>
+      <tr><td class="field">BUSINESS NAME</td><td><strong>Just BMW LLC</strong></td></tr>
+      <tr><td class="field">CATEGORY</td><td>Automotive repair <span class="badge gray">per public listing</span></td></tr>
+      <tr><td class="field">ADDRESS</td><td>1328 Ohio Pike, Amelia, OH 45102</td></tr>
+      <tr><td class="field">PHONE</td><td><a href="tel:+15132715878" style="font-weight:700">(513) 271-5878</a></td></tr>
+      <tr><td class="field">HOURS</td><td>
+        <span class="hours-chip">MON 9:00 AM to 5:00 PM</span>
+        <span class="hours-chip">TUE 9:00 AM to 5:00 PM</span>
+        <span class="hours-chip">WED 9:00 AM to 5:00 PM</span>
+        <span class="hours-chip">THU 9:00 AM to 5:00 PM</span>
+        <span class="hours-chip">FRI 9:00 AM to 5:00 PM</span><br>
+        <span class="badge gray" style="margin-top:8px">per public listing / call to confirm</span>
+      </td></tr>
+    </table>
+
+    <div class="fig">
+      <div class="fig-head"><span>FIG. 01</span><span>SCHEMATIC, ILLUSTRATIVE</span></div>
+      <svg viewBox="0 0 800 360" role="img" aria-label="Illustrative engine piston schematic">
+        <rect x="0" y="0" width="800" height="360" fill="#fbfbfa"/>
+        <g stroke="#141414" stroke-width="2" fill="none">
+          <rect x="330" y="40" width="140" height="70"/>
+          <line x1="330" y1="62" x2="470" y2="62" stroke-width="1"/>
+          <line x1="330" y1="88" x2="470" y2="88" stroke-width="1"/>
+          <rect x="386" y="110" width="28" height="60"/>
+          <line x1="400" y1="170" x2="400" y2="290"/>
+          <line x1="392" y1="170" x2="392" y2="290" stroke-width="1"/>
+          <circle cx="400" cy="305" r="22"/>
+          <circle cx="400" cy="305" r="6" fill="#141414" stroke="none"/>
+          <line x1="120" y1="40" x2="120" y2="330"/>
+          <line x1="680" y1="40" x2="680" y2="330" stroke="#154889" stroke-dasharray="8 6"/>
+          <line x1="250" y1="300" x2="550" y2="300" stroke="#154889" stroke-width="1"/>
+        </g>
+        <g font-family="IBM Plex Mono, monospace" font-size="13" fill="#141414">
+          <text x="500" y="70">PISTON, ILLUSTRATIVE</text>
+          <text x="500" y="150" fill="#154889">TDC DATUM</text>
+          <text x="500" y="310">CRANK CENTERLINE</text>
+          <text x="120" y="30">A</text>
+          <text x="672" y="30" fill="#154889">B</text>
+        </g>
+        <g stroke="#154889" stroke-width="1">
+          <line x1="470" y1="66" x2="496" y2="66"/><circle cx="498" cy="66" r="2" fill="#154889" stroke="none"/>
+          <line x1="470" y1="146" x2="496" y2="146"/><circle cx="498" cy="146" r="2" fill="#154889" stroke="none"/>
+          <line x1="424" y1="305" x2="496" y2="305"/><circle cx="498" cy="305" r="2" fill="#154889" stroke="none"/>
+        </g>
+      </svg>
+      <div class="fig-cap">FIG. 01, PISTON AND ROD ASSEMBLY. ILLUSTRATIVE SCHEMATIC ONLY, NOT TO SCALE, NOT A CLAIM ABOUT SHOP EQUIPMENT.</div>
+    </div>
+
+    <div class="btn-row">
+      <a class="btn" href="tel:+15132715878"><i class="fa-solid fa-phone"></i>Call (513) 271-5878</a>
+      <a class="btn ghost" href="https://www.google.com/maps/search/?api=1&query=1328%20Ohio%20Pike%2C%20Amelia%2C%20OH%2045102" target="_blank" rel="noopener"><i class="fa-solid fa-location-dot"></i>Get directions</a>
+      <button class="btn ghost" data-nav="contact"><i class="fa-solid fa-clipboard-list"></i>Request service</button>
+    </div>
+  </section>
+
+  <section class="page" id="page-services" data-page="services">
+    <div class="kicker">SHEET 02 / SERVICE SCHEDULE</div>
+    <h2 class="sec">Service Schedule</h2>
+    <div class="sec-rule"></div>
+    <p class="lede">The table below lists typical service categories for a BMW-focused repair shop. The shop has not published a verified service menu in any public record found, so every row is stamped accordingly.</p>
+    <div class="stamp-row">
+      <span class="stamp">SAMPLE, CALL TO CONFIRM</span>
+    </div>
+
+    <table class="spec">
+      <tr><th style="width:14%">CODE</th><th style="width:36%">SERVICE CATEGORY</th><th>STATUS</th></tr>
+      <tr><td class="code">SVC-01</td><td><strong>Diagnostic scan and fault tracing</strong></td><td><span class="badge">Sample, call to confirm</span></td></tr>
+      <tr><td class="code">SVC-02</td><td><strong>Oil service and fluid exchange</strong></td><td><span class="badge">Sample, call to confirm</span></td></tr>
+      <tr><td class="code">SVC-03</td><td><strong>Brake system inspection and service</strong></td><td><span class="badge">Sample, call to confirm</span></td></tr>
+      <tr><td class="code">SVC-04</td><td><strong>Suspension and steering service</strong></td><td><span class="badge">Sample, call to confirm</span></td></tr>
+      <tr><td class="code">SVC-05</td><td><strong>Cooling system service</strong></td><td><span class="badge">Sample, call to confirm</span></td></tr>
+      <tr><td class="code">SVC-06</td><td><strong>Electrical system diagnosis</strong></td><td><span class="badge">Sample, call to confirm</span></td></tr>
+      <tr><td class="code">SVC-07</td><td><strong>Pre-purchase inspection</strong></td><td><span class="badge">Sample, call to confirm</span></td></tr>
+      <tr><td class="code">SVC-08</td><td><strong>Scheduled maintenance intervals</strong></td><td><span class="badge">Sample, call to confirm</span></td></tr>
+    </table>
+
+    <div class="notice">
+      <strong><i class="fa-solid fa-triangle-exclamation"></i> Honesty note</strong>
+      No prices are published here. No hourly rate, no menu pricing, and no service guarantees appear in any public record found for this business, so none are stated. Call <a href="tel:+15132715878" style="font-weight:700">(513) 271-5878</a> for current offerings and pricing.
+    </div>
+
+    <h2 class="sec" style="margin-top:34px">Intake Procedure</h2>
+    <div class="sec-rule"></div>
+    <ol class="steps">
+      <li><div><h4>Describe the symptom <span class="badge gray">sample step</span></h4><p>Note warning lights, noises, and when the issue occurs. Bring service history if you have it.</p></div></li>
+      <li><div><h4>Call to book <span class="badge gray">sample step</span></h4><p>Reach the shop at <a href="tel:+15132715878" style="font-weight:700">(513) 271-5878</a> during listed hours, Monday to Friday, 9:00 AM to 5:00 PM.</p></div></li>
+      <li><div><h4>Diagnosis and estimate <span class="badge gray">sample step</span></h4><p>Ask for a written diagnosis and an estimate before authorizing work.</p></div></li>
+      <li><div><h4>Confirm before pickup <span class="badge gray">sample step</span></h4><p>Review the completed work order against the estimate when you collect the vehicle.</p></div></li>
+    </ol>
+
+    <div class="btn-row">
+      <a class="btn" href="tel:+15132715878"><i class="fa-solid fa-phone"></i>Call to confirm services</a>
+      <button class="btn ghost" data-nav="contact"><i class="fa-solid fa-envelope"></i>Send a service request</button>
+    </div>
+  </section>
+
+  <section class="page" id="page-about" data-page="about">
+    <div class="kicker">SHEET 03 / COMPANY RECORD</div>
+    <h2 class="sec">Company Record</h2>
+    <div class="sec-rule"></div>
+    <p class="lede">Only facts found in public records are entered below. Where the record is silent, the dossier says so.</p>
+
+    <table class="spec">
+      <tr><th style="width:34%">FIELD</th><th>VALUE</th></tr>
+      <tr><td class="field">TRADING NAME</td><td><strong>Just BMW LLC</strong></td></tr>
+      <tr><td class="field">ALSO LISTED AS</td><td>Just BlauMitWeiss <span class="badge gray">same address and phone, per public listings</span></td></tr>
+      <tr><td class="field">CATEGORY</td><td>Automotive repair <span class="badge gray">per public listing</span></td></tr>
+      <tr><td class="field">ADDRESS</td><td>1328 Ohio Pike, Amelia, OH 45102</td></tr>
+      <tr><td class="field">COORDINATES</td><td class="mono">39.040777, -84.235998 <span class="badge gray">per public listing</span></td></tr>
+      <tr><td class="field">PHONE</td><td><a href="tel:+15132715878" style="font-weight:700">(513) 271-5878</a></td></tr>
+      <tr><td class="field">HOURS</td><td>Monday to Friday, 9:00 AM to 5:00 PM <span class="badge gray">per public listing / call to confirm</span></td></tr>
+      <tr><td class="field">FOUNDED</td><td><span class="badge">Not published, no claim made</span></td></tr>
+      <tr><td class="field">CERTIFICATIONS</td><td><span class="badge">Not published, no claim made</span></td></tr>
+    </table>
+
+    <div class="notice">
+      <strong><i class="fa-solid fa-circle-info"></i> What this dossier does not claim</strong>
+      No founding year, no ownership history, no technician certifications, and no awards are stated here because none appear in the public records found. Anything of that kind would need to come from the shop directly.
+    </div>
+
+    <h2 class="sec" style="margin-top:34px">Facility Views</h2>
+    <div class="sec-rule"></div>
+    <div class="grid2">
+      <div class="photo-ph"><i class="fa-solid fa-camera"></i>PHOTO COMING SOON</div>
+      <div class="photo-ph"><i class="fa-solid fa-camera"></i>PHOTO COMING SOON</div>
+    </div>
+
+    <div class="btn-row">
+      <a class="btn" href="https://www.google.com/maps/search/?api=1&query=1328%20Ohio%20Pike%2C%20Amelia%2C%20OH%2045102" target="_blank" rel="noopener"><i class="fa-solid fa-location-dot"></i>Find the shop</a>
+      <button class="btn ghost" data-nav="reviews"><i class="fa-solid fa-star"></i>Read customer feedback</button>
+    </div>
+  </section>
+
+  <section class="page" id="page-reviews" data-page="reviews">
+    <div class="kicker">SHEET 04 / CUSTOMER FEEDBACK RECORD</div>
+    <h2 class="sec">Customer Feedback</h2>
+    <div class="sec-rule"></div>
+    <p class="lede">This page publishes no invented reviews and no reviewer names. Customer feedback for this business lives on its public listing pages. The source of record is linked below.</p>
+
+    <div class="panel-dark">
+      <div class="kicker" style="color:#8fb4e8">SOURCE OF RECORD</div>
+      <h2 class="sec">Read every review at the source</h2>
+      <div class="sec-rule"></div>
+      <p>Public listings for this shop show a mixed rating profile, with both positive and critical customer reports on file. Before you decide, read the full set of reviews on the official listing, including the critical ones.</p>
+      <div class="btn-row">
+        <a class="btn light" href="https://www.google.com/maps/place/?q=place_id:ChIJFR2Ud1kHQYgRCS7b-tlKtbM" target="_blank" rel="noopener"><i class="fa-solid fa-star"></i>Reviews on Google Maps</a>
+      </div>
+    </div>
+
+    <table class="spec">
+      <tr><th style="width:34%">FIELD</th><th>VALUE</th></tr>
+      <tr><td class="field">REVIEW SOURCE</td><td><a href="https://www.google.com/maps/place/?q=place_id:ChIJFR2Ud1kHQYgRCS7b-tlKtbM" target="_blank" rel="noopener" style="font-weight:700">Google Maps listing, Just BMW LLC</a></td></tr>
+      <tr><td class="field">RATING PROFILE</td><td>Mixed, per third-party public listings <span class="badge gray">read the source page in full</span></td></tr>
+      <tr><td class="field">REVIEWS QUOTED HERE</td><td><span class="badge">None, by policy</span></td></tr>
+      <tr><td class="field">REVIEWER NAMES</td><td><span class="badge">Never invented</span></td></tr>
+    </table>
+
+    <div class="notice">
+      <strong><i class="fa-solid fa-clipboard-check"></i> Review policy</strong>
+      This dossier quotes no customer reviews and invents no reviewer names. Star counts and written reviews change over time, so the only honest presentation is a direct link to the live listing. If you are a customer, the most useful thing you can do is leave your own honest review at the source link above.
+    </div>
+
+    <div class="btn-row">
+      <a class="btn" href="https://www.google.com/maps/place/?q=place_id:ChIJFR2Ud1kHQYgRCS7b-tlKtbM" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i>Open the Maps listing</a>
+      <a class="btn ghost" href="tel:+15132715878"><i class="fa-solid fa-phone"></i>Ask the shop directly</a>
+    </div>
+  </section>
+
+  <section class="page" id="page-contact" data-page="contact">
+    <div class="kicker">SHEET 05 / CONTACT AND SERVICE REQUEST</div>
+    <h2 class="sec">Contact</h2>
+    <div class="sec-rule"></div>
+    <p class="lede">Call during listed hours for the fastest response. The form below prepares a service request draft in your own email app.</p>
+
+    <table class="spec">
+      <tr><th style="width:34%">CHANNEL</th><th>DETAIL</th></tr>
+      <tr><td class="field">PHONE</td><td><a href="tel:+15132715878" style="font-weight:700;font-size:17px">(513) 271-5878</a></td></tr>
+      <tr><td class="field">ADDRESS</td><td>1328 Ohio Pike, Amelia, OH 45102<br><a href="https://www.google.com/maps/search/?api=1&query=1328%20Ohio%20Pike%2C%20Amelia%2C%20OH%2045102" target="_blank" rel="noopener" style="font-weight:700">Get directions <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:12px"></i></a></td></tr>
+      <tr><td class="field">HOURS</td><td>Monday to Friday, 9:00 AM to 5:00 PM <span class="badge gray">per public listing / call to confirm</span></td></tr>
+      <tr><td class="field">EMAIL</td><td><span class="badge">No public email listed</span></td></tr>
+    </table>
+
+    <h2 class="sec" style="margin-top:30px">Service Request Form</h2>
+    <div class="sec-rule"></div>
+    <form class="dossier" id="service-form" novalidate>
+      <div class="frow">
+        <div class="fgroup">
+          <label for="f-name">Full name</label>
+          <input id="f-name" name="name" type="text" autocomplete="name" required>
+        </div>
+        <div class="fgroup">
+          <label for="f-phone">Phone</label>
+          <input id="f-phone" name="phone" type="tel" autocomplete="tel" required>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fgroup full">
+          <label for="f-vehicle">Vehicle, year and model</label>
+          <input id="f-vehicle" name="vehicle" type="text" placeholder="Example: 2018 BMW 330i" required>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fgroup full">
+          <label for="f-message">Describe the issue or service needed</label>
+          <textarea id="f-message" name="message" required></textarea>
+        </div>
+      </div>
+      <button class="btn" type="submit"><i class="fa-solid fa-paper-plane"></i>Prepare email draft</button>
+      <div class="form-note">This form opens your email app with a prefilled service request draft. The shop publishes no public email address, so add the recipient address they give you, or call <a href="tel:+15132715878" style="font-weight:700">(513) 271-5878</a> to confirm receipt.</div>
+      <div id="form-sent" role="status"><strong>Draft prepared.</strong> Your email app should now be open with the request prefilled. If nothing opened, call the shop directly at <a href="tel:+15132715878" style="font-weight:700">(513) 271-5878</a>.</div>
+    </form>
+
+    <div class="btn-row">
+      <a class="btn" href="tel:+15132715878"><i class="fa-solid fa-phone"></i>Call (513) 271-5878</a>
+      <a class="btn ghost" href="https://www.google.com/maps/search/?api=1&query=1328%20Ohio%20Pike%2C%20Amelia%2C%20OH%2045102" target="_blank" rel="noopener"><i class="fa-solid fa-location-dot"></i>Directions</a>
+    </div>
+  </section>
+
+  </main>
+
+  <footer>© Just BMW LLC</footer>
+</div>
+
+<script>
+(function(){
+  var order = ['home','services','about','reviews','contact'];
+  var titles = {home:'Home',services:'Services',about:'About',reviews:'Reviews',contact:'Contact'};
+  var railNav = document.getElementById('rail-nav');
+  var menuToggle = document.getElementById('menu-toggle');
+  var sheetNum = document.getElementById('sheet-num');
+
+  function currentFromURL(){
+    try{
+      var p = new URLSearchParams(window.location.search).get('page');
+      if(p && order.indexOf(p) > -1) return p;
+    }catch(e){}
+    return 'home';
+  }
+
+  function navigateTo(page, push){
+    if(order.indexOf(page) === -1) page = 'home';
+    var pages = document.querySelectorAll('.page');
+    for(var i=0;i<pages.length;i++){
+      pages[i].classList.toggle('active', pages[i].getAttribute('data-page') === page);
+    }
+    var btns = railNav.querySelectorAll('.sheet-btn');
+    for(var j=0;j<btns.length;j++){
+      btns[j].classList.toggle('on', btns[j].getAttribute('data-nav') === page);
+    }
+    var n = order.indexOf(page) + 1;
+    sheetNum.textContent = (n < 10 ? '0' : '') + n;
+    document.title = 'Just BMW LLC | ' + titles[page];
+    if(push !== false){
+      var url = '?page=' + page;
+      if(window.location.search !== url){
+        history.pushState({page:page}, '', url);
+      }
+    }
+    document.body.classList.remove('menu-open');
+    menuToggle.setAttribute('aria-expanded','false');
+    window.scrollTo(0,0);
+  }
+
+  document.addEventListener('click', function(e){
+    var t = e.target.closest('[data-nav]');
+    if(t){
+      e.preventDefault();
+      navigateTo(t.getAttribute('data-nav'));
+    }
+  });
+
+  menuToggle.addEventListener('click', function(){
+    var open = document.body.classList.toggle('menu-open');
+    menuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+
+  window.addEventListener('popstate', function(e){
+    var page = (e.state && e.state.page) ? e.state.page : currentFromURL();
+    navigateTo(page, false);
+  });
+
+  navigateTo(currentFromURL(), false);
+  history.replaceState({page: currentFromURL()}, '', '?page=' + currentFromURL());
+
+  var form = document.getElementById('service-form');
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    if(!form.checkValidity()){ form.reportValidity(); return; }
+    var v = function(id){ return document.getElementById(id).value.trim(); };
+    var subject = encodeURIComponent('Service request via website, Just BMW LLC');
+    var body = encodeURIComponent(
+      'Name: ' + v('f-name') + '\n' +
+      'Phone: ' + v('f-phone') + '\n' +
+      'Vehicle: ' + v('f-vehicle') + '\n\n' +
+      'Request:\n' + v('f-message')
+    );
+    window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
+    document.getElementById('form-sent').style.display = 'block';
+  });
+})();
+</script>
+</body>
+</html>

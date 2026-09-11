@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bob's Auto Repair | 6690 Salem Rd, Cincinnati, OH</title>
+<meta name="description" content="Bob's Auto Repair, 6690 Salem Rd, Cincinnati, OH 45230. Family owned auto repair. Call (513) 232-4091.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Special+Elite&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root{
+  --paper:#f6f1e2;
+  --paper-dim:#efe8d3;
+  --ink:#211d16;
+  --ink-soft:#5b544a;
+  --stamp:#b03a2a;
+  --bg:#14110c;
+  --amber:#ffb63d;
+  --line:#c9bfa4;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg);
+  background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.015) 0 2px,transparent 2px 6px);
+  font-family:'Courier Prime',monospace;
+  color:var(--ink);
+  min-height:100vh;
+}
+.register-bar{
+  position:sticky;top:0;z-index:50;
+  background:#0b0906;
+  border-bottom:2px solid #2c251a;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 16px;
+}
+.register-bar .brand{
+  font-family:'Special Elite',monospace;
+  color:var(--amber);
+  font-size:18px;letter-spacing:2px;
+  text-shadow:0 0 8px rgba(255,182,61,.45);
+  text-decoration:none;
+}
+.register-bar .brand i{margin-right:8px}
+.menu-btn{
+  background:transparent;border:2px solid var(--amber);color:var(--amber);
+  font-family:'Courier Prime',monospace;font-weight:700;font-size:14px;letter-spacing:2px;
+  padding:8px 14px;cursor:pointer;border-radius:2px;
+}
+.menu-btn:hover{background:var(--amber);color:#0b0906}
+.nav-panel{
+  display:none;background:var(--paper);border-bottom:3px dashed var(--ink-soft);
+}
+.nav-panel.open{display:block}
+@media(min-width:760px){.nav-panel{display:block}.menu-btn{display:none}}
+.nav-list{list-style:none;max-width:480px;margin:0 auto;padding:14px 22px 18px}
+.nav-list a{
+  display:flex;align-items:baseline;gap:8px;text-decoration:none;color:var(--ink);
+  padding:9px 2px;font-weight:700;letter-spacing:1px;font-size:15px;
+}
+.nav-list a .num{color:var(--ink-soft);font-size:13px}
+.nav-list a .dots{flex:1;border-bottom:2px dotted #a89e83;transform:translateY(-4px)}
+.nav-list a .arr{color:var(--stamp)}
+.nav-list a.active{background:var(--ink);color:var(--paper);padding-left:8px;padding-right:8px}
+.nav-list a.active .num,.nav-list a.active .arr{color:var(--amber)}
+.wrap{display:flex;justify-content:center;padding:28px 12px 60px}
+.receipt{
+  position:relative;background:var(--paper);width:100%;max-width:480px;
+  padding:34px 30px 30px;
+  box-shadow:0 18px 50px rgba(0,0,0,.6);
+}
+.perf{position:absolute;top:0;bottom:0;width:16px;pointer-events:none;
+  background-image:radial-gradient(circle 7px at 8px 10px, var(--bg) 96%, transparent 100%);
+  background-size:16px 22px;background-repeat:repeat-y;
+}
+.perf-l{left:0}.perf-r{right:0}
+.rhead{text-align:center}
+.rhead .stars{color:var(--stamp);letter-spacing:6px;font-size:13px;margin-bottom:8px}
+.rhead h1{font-family:'Special Elite',monospace;font-size:30px;letter-spacing:3px;line-height:1.15}
+.rhead .sub{font-weight:700;letter-spacing:4px;font-size:13px;margin-top:6px}
+.rhead address{font-style:normal;font-size:13.5px;line-height:1.7;margin-top:10px}
+.rhead address a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--ink-soft)}
+.barcode{height:46px;margin:14px auto 4px;max-width:280px;
+  background:repeating-linear-gradient(90deg,var(--ink) 0 2px,transparent 2px 5px,var(--ink) 5px 6px,transparent 6px 11px,var(--ink) 11px 14px,transparent 14px 17px,var(--ink) 17px 18px,transparent 18px 22px);}
+.barcode-num{text-align:center;font-size:12px;letter-spacing:8px;color:var(--ink-soft)}
+.tear{border:none;border-top:3px dashed var(--ink-soft);margin:22px -30px}
+.tear-thin{border:none;border-top:2px dashed var(--line);margin:16px 0}
+.page{display:none}
+.page.active{display:block;animation:fadein .25s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.page-title{text-align:center;font-family:'Special Elite',monospace;font-size:22px;letter-spacing:3px;margin-bottom:4px}
+.page-sub{text-align:center;font-size:12.5px;color:var(--ink-soft);letter-spacing:1px;margin-bottom:14px}
+.stamp{
+  display:inline-block;border:3px double var(--stamp);color:var(--stamp);
+  font-family:'Special Elite',monospace;font-size:15px;letter-spacing:2px;
+  padding:8px 14px;transform:rotate(-7deg);text-transform:uppercase;
+  margin:10px auto;opacity:.92;
+}
+.stamp-wrap{text-align:center}
+.badge{
+  display:inline-block;border:1.5px solid var(--ink-soft);color:var(--ink-soft);
+  font-size:10.5px;letter-spacing:1.5px;padding:2px 7px;vertical-align:middle;white-space:nowrap;
+}
+.badge.red{border-color:var(--stamp);color:var(--stamp)}
+.item{display:flex;align-items:baseline;gap:8px;margin:13px 0 2px;font-size:14.5px}
+.item .sku{color:var(--ink-soft);font-size:12.5px;min-width:30px}
+.item .name{font-weight:700;letter-spacing:.5px}
+.item .dots{flex:1;border-bottom:2px dotted #a89e83;transform:translateY(-4px);min-width:18px}
+.item .price{font-weight:700;white-space:nowrap;font-size:13px}
+.item .price i{color:var(--stamp);margin-right:5px}
+.desc{font-size:13px;color:var(--ink-soft);line-height:1.6;margin:0 0 4px 38px}
+p.body{font-size:14px;line-height:1.75;margin:12px 0}
+.hours{width:100%;border-collapse:collapse;font-size:14px;margin:10px 0}
+.hours td{padding:7px 2px;border-bottom:1px dotted #a89e83}
+.hours td:last-child{text-align:right;font-weight:700}
+.hours tr.closed td{color:var(--ink-soft)}
+.btn{
+  display:block;text-align:center;text-decoration:none;cursor:pointer;
+  background:var(--ink);color:var(--paper);font-family:'Courier Prime',monospace;
+  font-weight:700;letter-spacing:2px;font-size:14px;padding:13px 16px;margin:10px 0;
+  border:2px solid var(--ink);
+}
+.btn:hover{background:transparent;color:var(--ink)}
+.btn.alt{background:transparent;color:var(--ink)}
+.btn.alt:hover{background:var(--ink);color:var(--paper)}
+.btn i{margin-right:8px}
+.review-links{margin:14px 0}
+.note{font-size:12.5px;color:var(--ink-soft);line-height:1.7;border:1.5px dashed var(--line);padding:10px 12px;margin:14px 0;background:rgba(255,255,255,.35)}
+.rating-big{text-align:center;margin:8px 0 4px}
+.rating-big .num{font-family:'Special Elite',monospace;font-size:52px;color:var(--ink)}
+.rating-big .of{font-size:14px;color:var(--ink-soft)}
+.rating-big .stars{color:var(--stamp);font-size:18px;letter-spacing:4px;margin-top:4px}
+.photo-box{
+  border:2px dashed var(--ink-soft);min-height:150px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:8px;color:var(--ink-soft);
+  margin:14px 0;background:rgba(255,255,255,.3);text-align:center;padding:20px;
+}
+.photo-box i{font-size:30px}
+label.flabel{display:block;font-size:12.5px;font-weight:700;letter-spacing:1.5px;margin:14px 0 5px}
+input.fin,textarea.fin{
+  width:100%;font-family:'Courier Prime',monospace;font-size:14px;color:var(--ink);
+  background:rgba(255,255,255,.5);border:2px solid var(--ink);padding:10px 12px;border-radius:0;
+}
+textarea.fin{min-height:110px;resize:vertical}
+input.fin:focus,textarea.fin:focus{outline:2px solid var(--stamp);outline-offset:1px}
+.form-ok{display:none;background:var(--ink);color:var(--paper);padding:12px;margin-top:12px;font-size:13.5px;line-height:1.6}
+.rfoot{text-align:center;margin-top:6px}
+.rfoot .thanks{font-family:'Special Elite',monospace;letter-spacing:3px;font-size:16px;margin:10px 0}
+.rfoot .fine{font-size:11.5px;color:var(--ink-soft);line-height:1.7}
+footer{background:#0b0906;color:#8f8674;text-align:center;font-size:12.5px;letter-spacing:2px;padding:14px;font-family:'Courier Prime',monospace}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+<div class="register-bar">
+  <a class="brand" href="?page=home" data-nav="home"><i class="fa-solid fa-receipt"></i>BOB'S AUTO</a>
+  <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="navPanel"><i class="fa-solid fa-bars"></i> MENU</button>
+</div>
+<nav class="nav-panel" id="navPanel" aria-label="Site">
+  <ul class="nav-list">
+    <li><a href="?page=home" data-nav="home"><span class="num">01</span> HOME <span class="dots"></span> <span class="arr"><i class="fa-solid fa-chevron-right"></i></span></a></li>
+    <li><a href="?page=services" data-nav="services"><span class="num">02</span> SERVICES <span class="dots"></span> <span class="arr"><i class="fa-solid fa-chevron-right"></i></span></a></li>
+    <li><a href="?page=about" data-nav="about"><span class="num">03</span> ABOUT <span class="dots"></span> <span class="arr"><i class="fa-solid fa-chevron-right"></i></span></a></li>
+    <li><a href="?page=reviews" data-nav="reviews"><span class="num">04</span> REVIEWS <span class="dots"></span> <span class="arr"><i class="fa-solid fa-chevron-right"></i></span></a></li>
+    <li><a href="?page=contact" data-nav="contact"><span class="num">05</span> CONTACT <span class="dots"></span> <span class="arr"><i class="fa-solid fa-chevron-right"></i></span></a></li>
+  </ul>
+</nav>
+<div class="wrap">
+  <div class="receipt">
+    <div class="perf perf-l"></div>
+    <div class="perf perf-r"></div>
+    <header class="rhead">
+      <div class="stars">* * * * *</div>
+      <h1>BOB'S AUTO<br>REPAIR</h1>
+      <div class="sub">ANDERSON TWP, OHIO</div>
+      <address>
+        6690 Salem Rd<br>
+        Cincinnati, OH 45230<br>
+        <a href="tel:+15132324091">(513) 232-4091</a>
+      </address>
+      <div class="barcode" role="img" aria-label="Decorative barcode"></div>
+      <div class="barcode-num">6690 45230</div>
+    </header>
+    <hr class="tear">
+    <main>
+      <section class="page" id="page-home" data-page="home" aria-label="Home">
+        <h2 class="page-title">*** CUSTOMER COPY ***</h2>
+        <p class="page-sub">RECEIPT NO. 0001 : WELCOME</p>
+        <div class="stamp-wrap"><span class="stamp">4.9 Star Rated</span></div>
+        <p class="body">Family owned and operated by the same family for over 35 years. Real shop, real people, right here in Anderson Township. We fix what needs fixing, and we tell you straight about the rest.</p>
+        <div class="item"><span class="sku">A1</span><span class="name">GOOGLE RATING</span><span class="dots"></span><span class="price">4.9 / 5</span></div>
+        <p class="desc">Based on 180+ Google reviews, via Birdeye.</p>
+        <div class="item"><span class="sku">A2</span><span class="name">HONEST PRICING</span><span class="dots"></span><span class="price">INCLUDED</span></div>
+        <p class="desc">Fair, reasonable prices. Fix only what needs fixing.</p>
+        <div class="item"><span class="sku">A3</span><span class="name">FAMILY RUN</span><span class="dots"></span><span class="price">35+ YRS</span></div>
+        <p class="desc">Same family behind the counter for over three decades.</p>
+        <hr class="tear-thin">
+        <a class="btn" href="tel:+15132324091"><i class="fa-solid fa-phone"></i>CALL (513) 232-4091</a>
+        <a class="btn alt" href="https://www.google.com/maps/search/?api=1&amp;query=Bob%27s%20Auto%2C%206690%20Salem%20Rd%2C%20Cincinnati%2C%20OH%2045230" target="_blank" rel="noopener"><i class="fa-solid fa-diamond-turn-right"></i>GET DIRECTIONS</a>
+        <a class="btn alt" href="?page=services" data-nav="services"><i class="fa-solid fa-wrench"></i>VIEW SERVICES</a>
+        <hr class="tear-thin">
+        <h2 class="page-title" style="font-size:17px">HOURS OF OPERATION</h2>
+        <table class="hours">
+          <tr><td>Mon to Fri</td><td>8:00 AM to 5:00 PM</td></tr>
+          <tr class="closed"><td>Saturday</td><td>CLOSED</td></tr>
+          <tr class="closed"><td>Sunday</td><td>CLOSED</td></tr>
+        </table>
+        <p class="note">Hours per public listings. Holiday hours may differ: call to confirm.</p>
+      </section>
+      <section class="page" id="page-services" data-page="services" aria-label="Services">
+        <h2 class="page-title">*** SERVICES ***</h2>
+        <p class="page-sub">RECEIPT NO. 0002 : PARTS COUNTER MENU</p>
+        <p class="note">Service list confirmed from public business listings. Prices vary by vehicle, so every line below is priced the old fashioned way: <strong>call to confirm</strong> at <a href="tel:+15132324091" style="color:var(--ink)">(513) 232-4091</a>.</p>
+        <div class="item"><span class="sku">101</span><span class="name"><i class="fa-solid fa-gear"></i> ENGINE REPAIR</span><span class="dots"></span><span class="price"><span class="badge">CALL FOR PRICE</span></span></div>
+        <p class="desc">Diagnostics and engine work, done right the first time.</p>
+        <div class="item"><span class="sku">102</span><span class="name"><i class="fa-solid fa-circle-dot"></i> BRAKE SERVICE</span><span class="dots"></span><span class="price"><span class="badge">CALL FOR PRICE</span></span></div>
+        <p class="desc">Pads, rotors, and full brake system checks.</p>
+        <div class="item"><span class="sku">103</span><span class="name"><i class="fa-solid fa-temperature-high"></i> RADIATOR AND COOLING</span><span class="dots"></span><span class="price"><span class="badge">CALL FOR PRICE</span></span></div>
+        <p class="desc">Radiator repair and cooling system service.</p>
+        <div class="item"><span class="sku">104</span><span class="name"><i class="fa-solid fa-bolt"></i> ELECTRICAL SERVICE</span><span class="dots"></span><span class="price"><span class="badge">CALL FOR PRICE</span></span></div>
+        <p class="desc">Electrical troubleshooting and repair.</p>
+        <div class="item"><span class="sku">105</span><span class="name"><i class="fa-solid fa-car-battery"></i> BATTERY REPLACEMENT</span><span class="dots"></span><span class="price"><span class="badge">CALL FOR PRICE</span></span></div>
+        <p class="desc">Testing and replacement to keep you starting strong.</p>
+        <div class="item"><span class="sku">106</span><span class="name"><i class="fa-solid fa-wrench"></i> GENERAL MAINTENANCE</span><span class="dots"></span><span class="price"><span class="badge">CALL FOR PRICE</span></span></div>
+        <p class="desc">General repairs and maintenance for all makes.</p>
+        <hr class="tear-thin">
+        <p class="body">Something else rattling, leaking, or blinking? <span class="badge red">SAMPLE</span> Ask at the counter, we will tell you straight whether we can handle it.</p>
+        <a class="btn" href="?page=contact" data-nav="contact"><i class="fa-solid fa-pen-to-square"></i>REQUEST SERVICE</a>
+        <a class="btn alt" href="tel:+15132324091"><i class="fa-solid fa-phone"></i>CALL FOR PRICING</a>
+      </section>
+      <section class="page" id="page-about" data-page="about" aria-label="About">
+        <h2 class="page-title">*** ABOUT ***</h2>
+        <p class="page-sub">RECEIPT NO. 0003 : OUR STORY</p>
+        <div class="stamp-wrap"><span class="stamp">Family Owned</span></div>
+        <p class="body">Bob's Auto Repair is a family owned and operated shop in Anderson Township, run by the same family for over 35 years. That is not a slogan, it is how the shop describes itself: the business is about relationships with clients and the community, not just the almighty dollar.</p>
+        <p class="body">Customers around Cincinnati's east side know the shop for honest, friendly, professional service, fair and reasonable prices, and work done in a timely manner, often sooner than expected.</p>
+        <div class="item"><span class="sku">B1</span><span class="name">LOCATION</span><span class="dots"></span><span class="price">SALEM RD</span></div>
+        <p class="desc">6690 Salem Rd, Cincinnati, OH 45230, in Anderson Township.</p>
+        <div class="item"><span class="sku">B2</span><span class="name">PHONE</span><span class="dots"></span><span class="price"><a href="tel:+15132324091" style="color:var(--ink)">(513) 232-4091</a></span></div>
+        <p class="desc">Call the counter directly. Real people answer.</p>
+        <div class="item"><span class="sku">B3</span><span class="name">RATING</span><span class="dots"></span><span class="price">4.9 / 5</span></div>
+        <p class="desc">180+ Google reviews, via Birdeye.</p>
+        <div class="photo-box">
+          <i class="fa-solid fa-camera"></i>
+          <span><span class="badge">PHOTO COMING SOON</span></span>
+          <span style="font-size:12px">Shop photos to be added.</span>
+        </div>
+        <a class="btn alt" href="?page=reviews" data-nav="reviews"><i class="fa-solid fa-star"></i>READ REVIEWS</a>
+      </section>
+      <section class="page" id="page-reviews" data-page="reviews" aria-label="Reviews">
+        <h2 class="page-title">*** REVIEWS ***</h2>
+        <p class="page-sub">RECEIPT NO. 0004 : CUSTOMER LEDGER</p>
+        <div class="rating-big">
+          <div class="num">4.9</div>
+          <div class="of">OUT OF 5</div>
+          <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+        </div>
+        <p class="body" style="text-align:center">Based on 180+ Google reviews, via Birdeye. We link the real review pages below so you can read every word yourself, unfiltered.</p>
+        <div class="review-links">
+          <a class="btn" href="https://www.google.com/maps/place/?q=place_id:ChIJ6UYO0OmuQYgRvHtabMHUoks" target="_blank" rel="noopener"><i class="fa-brands fa-google"></i>READ REVIEWS ON GOOGLE MAPS</a>
+          <a class="btn alt" href="https://reviews.birdeye.com/bobs-auto-repair-149671340531208" target="_blank" rel="noopener"><i class="fa-solid fa-comments"></i>READ REVIEWS ON BIRDEYE</a>
+        </div>
+        <p class="note"><strong>Our promise, in plain type:</strong> nobody is perfect, including us. If a visit ever falls short of what these reviews describe, call <a href="tel:+15132324091" style="color:var(--ink)">(513) 232-4091</a> and give us the chance to make it right. We do not write our own reviews, and we never will.</p>
+      </section>
+      <section class="page" id="page-contact" data-page="contact" aria-label="Contact">
+        <h2 class="page-title">*** CONTACT ***</h2>
+        <p class="page-sub">RECEIPT NO. 0005 : GET IN TOUCH</p>
+        <div class="item"><span class="sku">C1</span><span class="name"><i class="fa-solid fa-location-dot"></i> ADDRESS</span><span class="dots"></span><span class="price">SEE BELOW</span></div>
+        <p class="desc">Bob's Auto, 6690 Salem Rd, Cincinnati, OH 45230</p>
+        <div class="item"><span class="sku">C2</span><span class="name"><i class="fa-solid fa-phone"></i> PHONE</span><span class="dots"></span><span class="price"><a href="tel:+15132324091" style="color:var(--ink)">(513) 232-4091</a></span></div>
+        <p class="desc">Fastest way to reach the counter.</p>
+        <div class="item"><span class="sku">C3</span><span class="name"><i class="fa-solid fa-clock"></i> HOURS</span><span class="dots"></span><span class="price">MON TO FRI</span></div>
+        <table class="hours">
+          <tr><td>Mon to Fri</td><td>8:00 AM to 5:00 PM</td></tr>
+          <tr class="closed"><td>Saturday</td><td>CLOSED</td></tr>
+          <tr class="closed"><td>Sunday</td><td>CLOSED</td></tr>
+        </table>
+        <p class="note">Hours per public listings. Holiday hours may differ: call to confirm.</p>
+        <a class="btn" href="tel:+15132324091"><i class="fa-solid fa-phone"></i>CALL NOW</a>
+        <a class="btn alt" href="https://www.google.com/maps/search/?api=1&amp;query=Bob%27s%20Auto%2C%206690%20Salem%20Rd%2C%20Cincinnati%2C%20OH%2045230" target="_blank" rel="noopener"><i class="fa-solid fa-diamond-turn-right"></i>GET DIRECTIONS</a>
+        <hr class="tear-thin">
+        <h2 class="page-title" style="font-size:17px">SERVICE REQUEST FORM</h2>
+        <p class="page-sub">FILLS OUT A DRAFT IN YOUR EMAIL APP</p>
+        <form id="contactForm" novalidate>
+          <label class="flabel" for="fName">YOUR NAME *</label>
+          <input class="fin" id="fName" name="name" type="text" required autocomplete="name">
+          <label class="flabel" for="fPhone">PHONE *</label>
+          <input class="fin" id="fPhone" name="phone" type="tel" required autocomplete="tel">
+          <label class="flabel" for="fVehicle">VEHICLE (YEAR / MAKE / MODEL)</label>
+          <input class="fin" id="fVehicle" name="vehicle" type="text" autocomplete="off">
+          <label class="flabel" for="fMsg">WHAT'S GOING ON? *</label>
+          <textarea class="fin" id="fMsg" name="message" required></textarea>
+          <button class="btn" type="submit" style="width:100%"><i class="fa-solid fa-paper-plane"></i>SEND REQUEST</button>
+        </form>
+        <div class="form-ok" id="formOk" role="status">Draft opened in your email app. No email address is published for the shop, so just address it or, faster still, call <a href="tel:+15132324091" style="color:var(--amber)">(513) 232-4091</a>.</div>
+        <p class="note">This form opens a pre addressed email draft on your device. Prefer talking? Call <a href="tel:+15132324091" style="color:var(--ink)">(513) 232-4091</a>.</p>
+      </section>
+    </main>
+    <hr class="tear">
+    <div class="rfoot">
+      <div class="thanks">*** THANK YOU ***</div>
+      <p class="fine">PLEASE COME AGAIN<br>BOB'S AUTO REPAIR<br>6690 SALEM RD, CINCINNATI, OH 45230</p>
+      <div class="barcode" role="img" aria-label="Decorative barcode"></div>
+      <div class="barcode-num">* 2324091 *</div>
+    </div>
+  </div>
+</div>
+<footer>© Bob's Auto</footer>
+<script>
+(function(){
+  var order=['home','services','about','reviews','contact'];
+  var pages={};
+  order.forEach(function(p){ pages[p]=document.getElementById('page-'+p); });
+  var navLinks=Array.prototype.slice.call(document.querySelectorAll('[data-nav]'));
+  var panel=document.getElementById('navPanel');
+  var menuBtn=document.getElementById('menuBtn');
+  function pageFromURL(){
+    try{
+      var q=new URLSearchParams(window.location.search).get('page');
+      if(order.indexOf(q)>-1) return q;
+    }catch(e){}
+    return 'home';
+  }
+  function navigateTo(page,push){
+    if(order.indexOf(page)<0) page='home';
+    order.forEach(function(p){
+      pages[p].classList.toggle('active',p===page);
+    });
+    navLinks.forEach(function(a){
+      var on=a.getAttribute('data-nav')===page && a.closest('.nav-list');
+      a.classList.toggle('active',!!on);
+    });
+    document.title="Bob's Auto Repair | "+page.charAt(0).toUpperCase()+page.slice(1);
+    if(push!==false){
+      try{ window.history.pushState({page:page},'', '?page='+page); }catch(e){}
+    }
+    panel.classList.remove('open');
+    menuBtn.setAttribute('aria-expanded','false');
+    window.scrollTo(0,0);
+  }
+  navLinks.forEach(function(a){
+    a.addEventListener('click',function(e){
+      e.preventDefault();
+      navigateTo(a.getAttribute('data-nav'),true);
+    });
+  });
+  menuBtn.addEventListener('click',function(){
+    var open=panel.classList.toggle('open');
+    menuBtn.setAttribute('aria-expanded',open?'true':'false');
+  });
+  window.addEventListener('popstate',function(e){
+    var p=(e.state&&e.state.page)||pageFromURL();
+    navigateTo(p,false);
+  });
+  navigateTo(pageFromURL(),false);
+  var form=document.getElementById('contactForm');
+  var ok=document.getElementById('formOk');
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    var name=document.getElementById('fName').value.trim();
+    var phone=document.getElementById('fPhone').value.trim();
+    var vehicle=document.getElementById('fVehicle').value.trim();
+    var msg=document.getElementById('fMsg').value.trim();
+    if(!name||!phone||!msg){
+      ok.style.display='block';
+      ok.innerHTML='Please fill in your name, phone, and a short description so the shop can reach you.';
+      return;
+    }
+    var subject='Service request from '+name;
+    var body='Name: '+name+'\nPhone: '+phone+'\nVehicle: '+(vehicle||'not provided')+'\n\n'+msg;
+    window.location.href='mailto:?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+    ok.style.display='block';
+    ok.innerHTML='Draft opened in your email app. No email address is published for the shop, so just address it or, faster still, call <a href="tel:+15132324091" style="color:#ffb63d">(513) 232-4091</a>.';
+  });
+})();
+</script>
+</body>
+</html>

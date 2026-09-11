@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chuck Cummins Auto Services | Home</title>
+<meta name="description" content="Chuck Cummins Auto Services, auto repair shop at 4112 Harrison Ave, Cincinnati, OH 45211. Call (513) 661-1231.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@400;600;700;900&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{
+  --parchment:#f2e8d0;
+  --parchment-deep:#e7d9b8;
+  --ink:#2b2117;
+  --ink-soft:#4a3d2c;
+  --route-red:#b23a28;
+  --route-blue:#1f4e79;
+  --forest:#4c6b3c;
+  --gold:#c99a2e;
+  --gold-pale:#e8cf8f;
+  --line:#c9b98f;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Source Sans 3',Arial,sans-serif;
+  color:var(--ink);
+  background-color:var(--parchment);
+  background-image:
+    repeating-linear-gradient(0deg, rgba(43,33,23,.045) 0 1px, transparent 1px 56px),
+    repeating-linear-gradient(90deg, rgba(43,33,23,.045) 0 1px, transparent 1px 56px),
+    radial-gradient(ellipse at 20% 10%, rgba(201,154,46,.10), transparent 55%),
+    radial-gradient(ellipse at 85% 90%, rgba(31,78,121,.08), transparent 50%);
+  min-height:100vh;
+  display:flex;flex-direction:column;
+}
+.atlas-frame{flex:1;display:flex;flex-direction:column;max-width:1180px;width:100%;margin:0 auto;padding:0 14px}
+.cartouche{
+  margin:18px 0 0;
+  border:3px solid var(--ink);
+  outline:1px solid var(--gold);
+  outline-offset:4px;
+  background:linear-gradient(180deg,#33291c 0%, #241c12 100%);
+  color:var(--parchment);
+  padding:16px 20px;
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+}
+.cartouche .brand h1{
+  font-family:'Bitter',serif;font-weight:900;font-size:clamp(1.25rem,3.4vw,2rem);
+  letter-spacing:.5px;color:var(--gold-pale);line-height:1.1;
+}
+.cartouche .brand .sub{
+  font-family:'IBM Plex Mono',monospace;font-size:.72rem;letter-spacing:2.5px;
+  color:var(--gold);text-transform:uppercase;margin-top:6px;
+}
+.cartouche .spacer{flex:1}
+.cartouche .callbtn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--route-red);color:#fff;text-decoration:none;
+  font-weight:700;padding:10px 18px;border:2px solid var(--gold-pale);
+  font-family:'IBM Plex Mono',monospace;font-size:.85rem;letter-spacing:.5px;
+}
+.cartouche .callbtn:hover{background:#8f2d20}
+#menuToggle{
+  display:none;background:none;border:2px solid var(--gold-pale);color:var(--gold-pale);
+  font-size:1.2rem;padding:8px 12px;cursor:pointer;
+}
+.route-tabs{
+  display:flex;gap:0;margin:14px 0 0;border:2px solid var(--ink);background:var(--parchment-deep);
+  overflow-x:auto;
+}
+.route-tabs button{
+  flex:1 1 0;background:none;border:none;border-right:2px solid var(--ink);
+  font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:.8rem;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--ink);padding:13px 10px;cursor:pointer;white-space:nowrap;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.route-tabs button:last-child{border-right:none}
+.route-tabs button:hover{background:rgba(178,58,40,.12)}
+.route-tabs button.active{background:var(--ink);color:var(--gold-pale)}
+.page{display:none;animation:fadein .35s ease}
+.page.active{display:block}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.plate{
+  border:2px solid var(--ink);background:var(--parchment);
+  margin:16px 0 26px;position:relative;
+  box-shadow:0 10px 30px rgba(43,33,23,.18);
+}
+.plate-head{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  border-bottom:2px solid var(--ink);padding:12px 18px;background:var(--parchment-deep);
+}
+.plate-head h2{font-family:'Bitter',serif;font-weight:900;font-size:1.35rem}
+.plate-head .platno{
+  font-family:'IBM Plex Mono',monospace;font-size:.72rem;letter-spacing:2px;
+  background:var(--ink);color:var(--gold-pale);padding:5px 12px;text-transform:uppercase;
+}
+.plate-head .coords{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:.75rem;color:var(--ink-soft)}
+.mapwrap{display:grid;grid-template-columns:1fr 300px;gap:0}
+.mapwrap svg{display:block;width:100%;height:auto;background:#efe3c2}
+.legend{
+  border-left:2px solid var(--ink);padding:18px;background:var(--parchment);
+  display:flex;flex-direction:column;gap:12px;
+}
+.legend h3{font-family:'Bitter',serif;font-size:1.05rem;border-bottom:2px dashed var(--line);padding-bottom:8px}
+.legend .lrow{display:flex;gap:10px;align-items:flex-start;font-size:.92rem}
+.legend .lrow i{color:var(--route-red);margin-top:3px;min-width:18px;text-align:center}
+.legend .mono{font-family:'IBM Plex Mono',monospace;font-size:.8rem}
+.badge{
+  display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:1px;
+  text-transform:uppercase;border:1.5px solid var(--route-blue);color:var(--route-blue);
+  padding:3px 9px;margin-top:6px;
+}
+.badge.sample{border-color:var(--route-red);color:var(--route-red)}
+.btnrow{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:700;
+  padding:11px 18px;font-size:.92rem;cursor:pointer;border:2px solid var(--ink);
+  font-family:'Source Sans 3',sans-serif;
+}
+.btn.primary{background:var(--route-red);color:#fff}
+.btn.primary:hover{background:#8f2d20}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.ghost:hover{background:rgba(43,33,23,.08)}
+.btn.navy{background:var(--route-blue);color:#fff}
+.btn.navy:hover{background:#163a5c}
+.milebar{
+  display:flex;gap:0;border-top:2px solid var(--ink);background:var(--ink);color:var(--gold-pale);
+  overflow-x:auto;
+}
+.milebar .tick{
+  flex:1 1 0;min-width:110px;text-align:center;padding:10px 6px;border-right:1px dashed rgba(232,207,143,.4);
+  font-family:'IBM Plex Mono',monospace;font-size:.72rem;letter-spacing:1px;
+}
+.milebar .tick:last-child{border-right:none}
+.milebar .tick b{display:block;font-size:.95rem;color:#fff}
+.pin{cursor:pointer}
+.pin circle.ring{fill:#fff;stroke:var(--route-red);stroke-width:3}
+.pin text{font-family:'IBM Plex Mono',monospace;font-weight:600;fill:var(--route-red)}
+.pin .flag{fill:var(--ink)}
+.pin:hover circle.ring{fill:var(--gold-pale)}
+.route-anim{stroke-dasharray:14 10;animation:dashmove 2.4s linear infinite}
+@keyframes dashmove{to{stroke-dashoffset:-48}}
+.stops{position:relative;margin:8px 0 0;padding:10px 0 6px}
+.stops::before{
+  content:"";position:absolute;left:39px;top:24px;bottom:24px;width:6px;
+  background:repeating-linear-gradient(180deg,var(--route-red) 0 14px, var(--parchment) 14px 24px);
+  border-left:2px solid var(--route-red);border-right:2px solid var(--route-red);
+}
+.stop{
+  position:relative;display:grid;grid-template-columns:80px 1fr;gap:18px;
+  padding:16px 18px;margin:0 0 4px;align-items:start;
+}
+.stop .shield{
+  width:64px;height:64px;border-radius:50%;background:var(--route-blue);color:#fff;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+  border:3px solid var(--ink);box-shadow:0 4px 0 rgba(43,33,23,.25);
+  font-family:'IBM Plex Mono',monospace;z-index:1;
+}
+.stop .shield b{font-size:1.25rem;line-height:1}
+.stop .shield span{font-size:.55rem;letter-spacing:1px}
+.stop .card{
+  border:2px solid var(--ink);background:var(--parchment);padding:14px 16px;
+  box-shadow:4px 4px 0 rgba(43,33,23,.18);
+}
+.stop .card h3{font-family:'Bitter',serif;font-size:1.1rem;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.stop .card h3 i{color:var(--route-blue)}
+.stop .card p{font-size:.92rem;color:var(--ink-soft);margin-top:6px}
+.survey{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:20px}
+.survey .fact{
+  border:2px solid var(--ink);background:var(--parchment-deep);padding:16px;
+}
+.survey .fact h4{
+  font-family:'IBM Plex Mono',monospace;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;
+  color:var(--route-blue);margin-bottom:8px;
+}
+.survey .fact p{font-size:.95rem}
+.survey .fact .big{font-family:'Bitter',serif;font-size:1.15rem;font-weight:700}
+.logbook{padding:20px;display:grid;gap:16px}
+.logentry{
+  border:2px solid var(--ink);background:var(--parchment);padding:18px;
+  box-shadow:4px 4px 0 rgba(43,33,23,.15);
+}
+.logentry h3{font-family:'Bitter',serif;font-size:1.15rem;margin-bottom:8px}
+.logentry p{font-size:.95rem;color:var(--ink-soft)}
+.logentry .stars{color:var(--gold);letter-spacing:3px;font-size:1.1rem}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:20px}
+.formgrid .full{grid-column:1/-1}
+.field label{
+  display:block;font-family:'IBM Plex Mono',monospace;font-size:.72rem;letter-spacing:1.5px;
+  text-transform:uppercase;margin-bottom:6px;color:var(--ink-soft);
+}
+.field input,.field textarea,.field select{
+  width:100%;border:2px solid var(--ink);background:#fffdf6;padding:11px 12px;
+  font-family:'Source Sans 3',sans-serif;font-size:.95rem;color:var(--ink);
+}
+.field input:focus,.field textarea:focus,.field select:focus{outline:3px solid rgba(201,154,46,.5)}
+.field textarea{min-height:120px;resize:vertical}
+.formnote{font-size:.85rem;color:var(--ink-soft);padding:0 20px 20px}
+footer{
+  border-top:3px solid var(--ink);background:#241c12;color:var(--gold-pale);
+  text-align:center;padding:18px 12px;font-family:'IBM Plex Mono',monospace;
+  font-size:.82rem;letter-spacing:1px;margin-top:auto;
+}
+.hours-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:.9rem}
+.hours-table td{border-bottom:1px dashed var(--line);padding:7px 4px}
+.hours-table td:last-child{text-align:right;font-family:'IBM Plex Mono',monospace;font-size:.82rem}
+.compass-spin{transform-origin:center;animation:spin 60s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:860px){
+  .mapwrap{grid-template-columns:1fr}
+  .legend{border-left:none;border-top:2px solid var(--ink)}
+  .survey{grid-template-columns:1fr}
+  .formgrid{grid-template-columns:1fr}
+  #menuToggle{display:block}
+  .route-tabs{display:none;flex-direction:column}
+  .route-tabs.open{display:flex}
+  .route-tabs button{border-right:none;border-bottom:2px solid var(--ink);justify-content:flex-start}
+  .stops::before{left:31px}
+  .stop{grid-template-columns:64px 1fr;gap:12px;padding:14px 10px}
+  .stop .shield{width:52px;height:52px}
+}
+@media(prefers-reduced-motion:reduce){
+  .route-anim,.compass-spin{animation:none}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+<div class="atlas-frame">
+
+<header class="cartouche">
+  <svg width="54" height="54" viewBox="0 0 54 54" aria-hidden="true">
+    <circle cx="27" cy="27" r="25" fill="none" stroke="#c99a2e" stroke-width="2"/>
+    <circle cx="27" cy="27" r="19" fill="none" stroke="#c99a2e" stroke-width="1" stroke-dasharray="3 3"/>
+    <g class="compass-spin">
+      <polygon points="27,6 31,27 27,48 23,27" fill="#b23a28"/>
+      <polygon points="6,27 27,23 48,27 27,31" fill="#e8cf8f"/>
+    </g>
+    <text x="27" y="16" text-anchor="middle" font-size="8" fill="#e8cf8f" font-family="monospace">N</text>
+  </svg>
+  <div class="brand">
+    <h1>Chuck Cummins Auto Services</h1>
+    <div class="sub">Road Atlas Edition &middot; Cheviot, Ohio</div>
+  </div>
+  <div class="spacer"></div>
+  <a class="callbtn" href="tel:+15136611231"><i class="fa-solid fa-phone"></i> (513) 661-1231</a>
+  <button id="menuToggle" aria-label="Open menu" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
+</header>
+
+<nav class="route-tabs" id="mainNav" aria-label="Site pages">
+  <button type="button" data-nav="home" class="active"><i class="fa-solid fa-map-location-dot"></i> Home</button>
+  <button type="button" data-nav="services"><i class="fa-solid fa-signs-post"></i> Services</button>
+  <button type="button" data-nav="about"><i class="fa-solid fa-compass"></i> About</button>
+  <button type="button" data-nav="reviews"><i class="fa-solid fa-book-open"></i> Reviews</button>
+  <button type="button" data-nav="contact"><i class="fa-solid fa-route"></i> Contact</button>
+</nav>
+
+<main>
+<section class="page active" id="page-home" data-page="home" aria-label="Home">
+  <div class="plate">
+    <div class="plate-head">
+      <span class="platno">Plate No. 1</span>
+      <h2>The Service Route</h2>
+      <span class="coords">39.1597 N, 84.6191 W &middot; Harrison Ave Corridor</span>
+    </div>
+    <div class="mapwrap">
+      <svg viewBox="0 0 800 520" role="img" aria-label="Stylized road map showing the service route to the shop">
+        <rect x="0" y="0" width="800" height="520" fill="#efe3c2"/>
+        <g stroke="#d8c89c" stroke-width="1">
+          <line x1="80" y1="0" x2="80" y2="520"/><line x1="160" y1="0" x2="160" y2="520"/>
+          <line x1="240" y1="0" x2="240" y2="520"/><line x1="320" y1="0" x2="320" y2="520"/>
+          <line x1="400" y1="0" x2="400" y2="520"/><line x1="480" y1="0" x2="480" y2="520"/>
+          <line x1="560" y1="0" x2="560" y2="520"/><line x1="640" y1="0" x2="640" y2="520"/>
+          <line x1="720" y1="0" x2="720" y2="520"/>
+          <line x1="0" y1="80" x2="800" y2="80"/><line x1="0" y1="160" x2="800" y2="160"/>
+          <line x1="0" y1="240" x2="800" y2="240"/><line x1="0" y1="320" x2="800" y2="320"/>
+          <line x1="0" y1="400" x2="800" y2="400"/><line x1="0" y1="480" x2="800" y2="480"/>
+        </g>
+        <g fill="none" stroke="#c9b98f" stroke-width="1.5" opacity=".7">
+          <path d="M60,420 C140,400 120,330 200,320 C280,310 300,360 380,340"/>
+          <path d="M90,440 C170,425 150,360 230,350 C310,340 330,385 405,368"/>
+          <path d="M560,140 C620,120 640,180 700,165 C740,156 750,180 790,172"/>
+        </g>
+        <g>
+          <path d="M-10,430 C120,420 180,380 260,390 C360,402 420,340 520,345 C620,350 660,300 700,300" fill="none" stroke="#8a7a55" stroke-width="14"/>
+          <path d="M-10,430 C120,420 180,380 260,390 C360,402 420,340 520,345 C620,350 660,300 700,300" fill="none" stroke="#f2e8d0" stroke-width="10"/>
+          <path d="M-10,430 C120,420 180,380 260,390 C360,402 420,340 520,345 C620,350 660,300 700,300" fill="none" stroke="#8a7a55" stroke-width="1.5" stroke-dasharray="12 10"/>
+          <text x="70" y="415" font-family="IBM Plex Mono, monospace" font-size="13" fill="#4a3d2c" letter-spacing="3" transform="rotate(-4 70 415)">HARRISON AVE</text>
+        </g>
+        <path class="route-anim" d="M40,470 C160,450 220,470 300,430 C380,390 420,430 500,390 C580,350 640,360 690,310" fill="none" stroke="#b23a28" stroke-width="5"/>
+        <text x="600" y="120" font-family="Bitter, serif" font-size="26" font-weight="700" fill="#4a3d2c" letter-spacing="4">CHEVIOT</text>
+        <text x="600" y="142" font-family="IBM Plex Mono, monospace" font-size="11" fill="#4a3d2c" letter-spacing="2">CINCINNATI, OHIO</text>
+        <g class="pin" data-goto="services" tabindex="0" role="button" aria-label="Go to Services, stop 1">
+          <circle class="ring" cx="150" cy="452" r="17"/><text x="150" y="459" text-anchor="middle" font-size="16">1</text>
+        </g>
+        <g class="pin" data-goto="services" tabindex="0" role="button" aria-label="Go to Services, stop 2">
+          <circle class="ring" cx="265" cy="448" r="17"/><text x="265" y="455" text-anchor="middle" font-size="16">2</text>
+        </g>
+        <g class="pin" data-goto="services" tabindex="0" role="button" aria-label="Go to Services, stop 3">
+          <circle class="ring" cx="390" cy="408" r="17"/><text x="390" y="415" text-anchor="middle" font-size="16">3</text>
+        </g>
+        <g class="pin" data-goto="services" tabindex="0" role="button" aria-label="Go to Services, stop 4">
+          <circle class="ring" cx="520" cy="382" r="17"/><text x="520" y="389" text-anchor="middle" font-size="16">4</text>
+        </g>
+        <g class="pin" data-goto="services" tabindex="0" role="button" aria-label="Go to Services, stop 5">
+          <circle class="ring" cx="630" cy="348" r="17"/><text x="630" y="355" text-anchor="middle" font-size="16">5</text>
+        </g>
+        <g>
+          <path class="flag" d="M690,310 c-14,-8 -30,-8 -40,2 c10,2 14,6 16,12 l-16,4 c10,8 26,8 40,0 z"/>
+          <rect x="684" y="252" width="12" height="60" fill="#2b2117"/>
+          <circle cx="690" cy="252" r="7" fill="#b23a28" stroke="#2b2117" stroke-width="2"/>
+          <text x="690" y="340" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600" fill="#2b2117">THE SHOP</text>
+          <text x="690" y="356" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#4a3d2c">4112 HARRISON AVE</text>
+        </g>
+        <g transform="translate(716,60)">
+          <circle cx="0" cy="0" r="42" fill="#f2e8d0" stroke="#2b2117" stroke-width="2"/>
+          <circle cx="0" cy="0" r="34" fill="none" stroke="#2b2117" stroke-width="1" stroke-dasharray="4 4"/>
+          <polygon points="0,-32 6,0 0,32 -6,0" fill="#b23a28"/>
+          <polygon points="-32,0 0,-6 32,0 0,6" fill="#1f4e79"/>
+          <text x="0" y="-38" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="#2b2117">N</text>
+          <text x="0" y="52" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#4a3d2c">COMPASS</text>
+        </g>
+        <g transform="translate(36,478)">
+          <rect x="0" y="0" width="120" height="8" fill="#2b2117"/>
+          <rect x="0" y="0" width="60" height="8" fill="#f2e8d0" stroke="#2b2117" stroke-width="1"/>
+          <rect x="60" y="0" width="60" height="8" fill="#2b2117"/>
+          <text x="0" y="-6" font-family="IBM Plex Mono, monospace" font-size="10" fill="#2b2117">0</text>
+          <text x="112" y="-6" font-family="IBM Plex Mono, monospace" font-size="10" fill="#2b2117">2 MI</text>
+        </g>
+        <text x="36" y="40" font-family="IBM Plex Mono, monospace" font-size="10" letter-spacing="2" fill="#4a3d2c">SURVEYED FROM PUBLIC LISTINGS</text>
+      </svg>
+      <aside class="legend">
+        <h3><i class="fa-solid fa-book-atlas"></i> Route Legend</h3>
+        <div class="lrow"><i class="fa-solid fa-location-dot"></i><div><b>Chuck Cummins Auto Services</b><br>4112 Harrison Ave<br>Cincinnati, OH 45211</div></div>
+        <div class="lrow"><i class="fa-solid fa-phone"></i><div><a href="tel:+15136611231" style="color:var(--ink);font-weight:700">(513) 661-1231</a><br><span class="mono">Tap pins 1 to 5 for service stops</span></div></div>
+        <div class="lrow"><i class="fa-solid fa-clock"></i><div>Open daily<br><span class="mono">9:00 AM to 6:00 PM</span><br><span class="badge">Call to confirm hours</span></div></div>
+        <div class="btnrow">
+          <button type="button" class="btn primary" data-nav="services"><i class="fa-solid fa-signs-post"></i> Follow the Route</button>
+          <a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Chuck%20Cummins%20Auto%20Services%2C%204112%20Harrison%20Ave%2C%20Cincinnati%2C%20OH%2045211" target="_blank" rel="noopener"><i class="fa-solid fa-diamond-turn-right"></i> Directions</a>
+        </div>
+      </aside>
+    </div>
+    <div class="milebar" aria-label="Mileage markers">
+      <div class="tick"><b>MILE 0.0</b>YOUR DRIVEWAY</div>
+      <div class="tick"><b>MILE 1.2</b>BRAKES CHECKED</div>
+      <div class="tick"><b>MILE 2.6</b>OIL FRESH</div>
+      <div class="tick"><b>MILE 4.1</b>ENGINE TUNED</div>
+      <div class="tick"><b>MILE 5.8</b>BACK ON ROUTE</div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services" data-page="services" aria-label="Services">
+  <div class="plate">
+    <div class="plate-head">
+      <span class="platno">Plate No. 2</span>
+      <h2>Service Stops Along the Route</h2>
+      <span class="coords">NUMBERED IN ROUTE ORDER</span>
+    </div>
+    <div class="stops">
+      <div class="stop">
+        <div class="shield"><b>1</b><span>STOP</span></div>
+        <div class="card"><h3><i class="fa-solid fa-circle-stop"></i> Brake Repair</h3><p>Pads, rotors, calipers and full brake system work.</p><span class="badge">Call to confirm availability</span></div>
+      </div>
+      <div class="stop">
+        <div class="shield"><b>2</b><span>STOP</span></div>
+        <div class="card"><h3><i class="fa-solid fa-oil-can"></i> Oil Change and Lube</h3><p>Routine oil changes and chassis lubrication service.</p><span class="badge">Call to confirm availability</span></div>
+      </div>
+      <div class="stop">
+        <div class="shield"><b>3</b><span>STOP</span></div>
+        <div class="card"><h3><i class="fa-solid fa-snowflake"></i> Air Conditioning Service</h3><p>Automobile air conditioning equipment service and repair.</p><span class="badge">Call to confirm availability</span></div>
+      </div>
+      <div class="stop">
+        <div class="shield"><b>4</b><span>STOP</span></div>
+        <div class="card"><h3><i class="fa-solid fa-magnifying-glass-chart"></i> Engine Diagnostics and Check Engine Light</h3><p>Diagnostic service to track down warning lights and faults.</p><span class="badge">Call to confirm availability</span></div>
+      </div>
+      <div class="stop">
+        <div class="shield"><b>5</b><span>STOP</span></div>
+        <div class="card"><h3><i class="fa-solid fa-bolt"></i> Electrical, Alternators and Starters</h3><p>Automobile electric service, alternators, generators and starter systems.</p><span class="badge">Call to confirm availability</span></div>
+      </div>
+      <div class="stop">
+        <div class="shield"><b>6</b><span>STOP</span></div>
+        <div class="card"><h3><i class="fa-solid fa-gears"></i> Engine Repair and Rebuilding</h3><p>Engine repair, rebuilding and exchange service.</p><span class="badge">Call to confirm availability</span></div>
+      </div>
+      <div class="stop">
+        <div class="shield"><b>7</b><span>STOP</span></div>
+        <div class="card"><h3><i class="fa-solid fa-wind"></i> Mufflers and Exhaust</h3><p>Muffler and full exhaust system service.</p><span class="badge">Call to confirm availability</span></div>
+      </div>
+      <div class="stop">
+        <div class="shield"><b>8</b><span>STOP</span></div>
+        <div class="card"><h3><i class="fa-solid fa-temperature-half"></i> Cooling System and Radiators</h3><p>Radiator sales and service plus cooling system work.</p><span class="badge">Call to confirm availability</span></div>
+      </div>
+      <div class="stop">
+        <div class="shield"><b>9</b><span>STOP</span></div>
+        <div class="card"><h3><i class="fa-solid fa-arrows-up-down"></i> Suspension, Steering and Alignment</h3><p>Springs, suspension, steering systems and wheel alignment.</p><span class="badge">Call to confirm availability</span></div>
+      </div>
+      <div class="stop">
+        <div class="shield"><b>10</b><span>STOP</span></div>
+        <div class="card"><h3><i class="fa-solid fa-wrench"></i> Tune Ups and More</h3><p>Automotive tune up service, belts, hoses, batteries and wiper blades.</p><span class="badge">Call to confirm availability</span></div>
+      </div>
+    </div>
+    <div style="padding:0 20px 22px">
+      <p style="font-size:.88rem;color:var(--ink-soft)"><i class="fa-solid fa-circle-info"></i> Service list compiled from public business directories. Anything not listed here may still be offered.</p>
+      <div class="btnrow" style="margin-top:12px">
+        <a class="btn primary" href="tel:+15136611231"><i class="fa-solid fa-phone"></i> Call (513) 661-1231</a>
+        <button type="button" class="btn ghost" data-nav="contact"><i class="fa-solid fa-route"></i> Plan Your Visit</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-about" data-page="about" aria-label="About">
+  <div class="plate">
+    <div class="plate-head">
+      <span class="platno">Plate No. 3</span>
+      <h2>Survey Notes</h2>
+      <span class="coords">FIELD RECORD &middot; AUTO REPAIR SHOP</span>
+    </div>
+    <div class="survey">
+      <div class="fact">
+        <h4>Landmark</h4>
+        <p class="big">Chuck Cummins Auto Services</p>
+        <p>Auto repair shop serving the Harrison Avenue corridor in Cheviot, on the west side of Cincinnati, Ohio.</p>
+      </div>
+      <div class="fact">
+        <h4>Position Fix</h4>
+        <p class="big">4112 Harrison Ave<br>Cincinnati, OH 45211</p>
+        <p class="mono" style="font-family:'IBM Plex Mono',monospace;font-size:.8rem">39.1597 N, 84.6191 W</p>
+        <div class="btnrow" style="margin-top:10px">
+          <a class="btn navy" href="https://www.google.com/maps/search/?api=1&amp;query=Chuck%20Cummins%20Auto%20Services%2C%204112%20Harrison%20Ave%2C%20Cincinnati%2C%20OH%2045211" target="_blank" rel="noopener"><i class="fa-solid fa-diamond-turn-right"></i> Get Directions</a>
+        </div>
+      </div>
+      <div class="fact">
+        <h4>Signal Frequency</h4>
+        <p class="big"><a href="tel:+15136611231" style="color:var(--ink)">(513) 661-1231</a></p>
+        <p>Call ahead to schedule. One local directory notes this is a small shop where appointments are scheduled.</p>
+        <span class="badge">Call to confirm</span>
+      </div>
+      <div class="fact">
+        <h4>Hours of Operation</h4>
+        <table class="hours-table">
+          <tr><td>Monday to Sunday</td><td>9:00 AM to 6:00 PM</td></tr>
+        </table>
+        <p style="margin-top:8px;font-size:.85rem">Hours as listed in public directories.</p>
+        <span class="badge">Call to confirm hours</span>
+      </div>
+      <div class="fact">
+        <h4>Charted Services</h4>
+        <p>Brakes, oil and lube, air conditioning, diagnostics, electrical, engine rebuilding, exhaust, radiators and cooling, suspension and alignment, tune ups.</p>
+        <div class="btnrow" style="margin-top:10px">
+          <button type="button" class="btn ghost" data-nav="services"><i class="fa-solid fa-signs-post"></i> Full Service Route</button>
+        </div>
+      </div>
+      <div class="fact">
+        <h4>Traveler Reports</h4>
+        <p>Public directories show customer reviews for this shop. Read the latest traveler reports on Google Maps.</p>
+        <div class="btnrow" style="margin-top:10px">
+          <button type="button" class="btn ghost" data-nav="reviews"><i class="fa-solid fa-book-open"></i> Open the Logbook</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews" data-page="reviews" aria-label="Reviews">
+  <div class="plate">
+    <div class="plate-head">
+      <span class="platno">Plate No. 4</span>
+      <h2>Traveler Logbook</h2>
+      <span class="coords">FIELD REPORTS FROM THE ROAD</span>
+    </div>
+    <div class="logbook">
+      <div class="logentry">
+        <h3><i class="fa-solid fa-map-location-dot"></i> Read Real Reviews on Google Maps</h3>
+        <p>Customer reviews for Chuck Cummins Auto Services live on its Google Maps listing. We do not reprint or invent reviews here, so what you read there is the genuine traveler record.</p>
+        <div class="btnrow" style="margin-top:14px">
+          <a class="btn primary" href="https://www.google.com/maps/place/?q=place_id:ChIJsxmWKInKQYgR7PCnS4N-myE" target="_blank" rel="noopener"><i class="fa-brands fa-google"></i> Open Google Maps Reviews</a>
+        </div>
+      </div>
+      <div class="logentry">
+        <h3><i class="fa-solid fa-pen-to-square"></i> Add Your Own Entry</h3>
+        <p>Had work done at the shop? Leave your own review on the Google Maps listing to help fellow travelers pick a good route.</p>
+        <div class="btnrow" style="margin-top:14px">
+          <a class="btn navy" href="https://www.google.com/maps/place/?q=place_id:ChIJsxmWKInKQYgR7PCnS4N-myE" target="_blank" rel="noopener"><i class="fa-solid fa-star"></i> Write a Review</a>
+          <a class="btn ghost" href="tel:+15136611231"><i class="fa-solid fa-phone"></i> (513) 661-1231</a>
+        </div>
+      </div>
+      <div class="logentry">
+        <h3><i class="fa-solid fa-triangle-exclamation"></i> A Note on Ratings</h3>
+        <p>Star ratings differ from one directory to another and change over time, so we do not quote a fixed score here. The Google Maps listing above always shows the current count. <span class="badge sample">Sample free zone: no invented reviews</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-contact" data-page="contact" aria-label="Contact">
+  <div class="plate">
+    <div class="plate-head">
+      <span class="platno">Plate No. 5</span>
+      <h2>Plot Your Course</h2>
+      <span class="coords">FINAL STOP &middot; 4112 HARRISON AVE</span>
+    </div>
+    <div class="survey">
+      <div class="fact">
+        <h4>Destination</h4>
+        <p class="big">Chuck Cummins Auto Services<br>4112 Harrison Ave<br>Cincinnati, OH 45211</p>
+        <div class="btnrow" style="margin-top:10px">
+          <a class="btn navy" href="https://www.google.com/maps/search/?api=1&amp;query=Chuck%20Cummins%20Auto%20Services%2C%204112%20Harrison%20Ave%2C%20Cincinnati%2C%20OH%2045211" target="_blank" rel="noopener"><i class="fa-solid fa-diamond-turn-right"></i> Directions</a>
+        </div>
+      </div>
+      <div class="fact">
+        <h4>Radio Ahead</h4>
+        <p class="big"><a href="tel:+15136611231" style="color:var(--ink)">(513) 661-1231</a></p>
+        <p>Open daily 9:00 AM to 6:00 PM per public listings.</p>
+        <span class="badge">Call to confirm hours</span>
+      </div>
+    </div>
+    <form id="contactForm" class="formgrid" novalidate>
+      <div class="full"><h3 style="font-family:'Bitter',serif">Send a Service Request</h3>
+      <p style="font-size:.88rem;color:var(--ink-soft)">Fill in the field notes below. Submitting opens your email app with a ready to send draft addressed by you, since the shop has no public email on file.</p></div>
+      <div class="field"><label for="fName">Your name</label><input id="fName" name="name" type="text" autocomplete="name" required></div>
+      <div class="field"><label for="fPhone">Your phone</label><input id="fPhone" name="phone" type="tel" autocomplete="tel" required></div>
+      <div class="field"><label for="fVehicle">Vehicle (year, make, model)</label><input id="fVehicle" name="vehicle" type="text" placeholder="Sample: 2015 Honda Civic"></div>
+      <div class="field"><label for="fService">Service stop needed</label>
+        <select id="fService" name="service">
+          <option>Brake Repair</option><option>Oil Change and Lube</option>
+          <option>Air Conditioning Service</option><option>Engine Diagnostics</option>
+          <option>Electrical / Alternator / Starter</option><option>Engine Repair</option>
+          <option>Exhaust / Muffler</option><option>Cooling / Radiator</option>
+          <option>Suspension / Alignment</option><option>Tune Up</option><option>Something else</option>
+        </select>
+      </div>
+      <div class="field full"><label for="fMsg">Describe the trouble</label><textarea id="fMsg" name="message" required></textarea></div>
+      <div class="full"><button type="submit" class="btn primary"><i class="fa-solid fa-paper-plane"></i> Draft My Request</button></div>
+    </form>
+    <p class="formnote"><i class="fa-solid fa-circle-info"></i> No email address is published for the shop, so the draft opens without a recipient. Add their address if you have it, or simply call <a href="tel:+15136611231" style="color:var(--ink);font-weight:700">(513) 661-1231</a>.</p>
+  </div>
+</section>
+</main>
+
+<footer>© Chuck Cummins Auto Services</footer>
+</div>
+
+<script>
+(function(){
+  var pages = ['home','services','about','reviews','contact'];
+  var titles = {
+    home:'Chuck Cummins Auto Services | Home',
+    services:'Chuck Cummins Auto Services | Services',
+    about:'Chuck Cummins Auto Services | About',
+    reviews:'Chuck Cummins Auto Services | Reviews',
+    contact:'Chuck Cummins Auto Services | Contact'
+  };
+  var nav = document.getElementById('mainNav');
+  var menuToggle = document.getElementById('menuToggle');
+
+  function navigateTo(page, push){
+    if(pages.indexOf(page) === -1){ page = 'home'; }
+    var sections = document.querySelectorAll('.page');
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle('active', sections[i].getAttribute('data-page') === page);
+    }
+    var buttons = nav.querySelectorAll('button[data-nav]');
+    for(var j = 0; j < buttons.length; j++){
+      buttons[j].classList.toggle('active', buttons[j].getAttribute('data-nav') === page);
+    }
+    document.title = titles[page];
+    nav.classList.remove('open');
+    menuToggle.setAttribute('aria-expanded','false');
+    window.scrollTo(0,0);
+    if(push !== false){
+      try{ history.pushState({page:page}, titles[page], '?page=' + page); }
+      catch(e){ /* history unavailable */ }
+    }
+  }
+
+  function pageFromUrl(){
+    try{
+      var q = new URLSearchParams(window.location.search).get('page');
+      return pages.indexOf(q) === -1 ? 'home' : q;
+    }catch(e){ return 'home'; }
+  }
+
+  document.addEventListener('click', function(ev){
+    var navBtn = ev.target.closest ? ev.target.closest('[data-nav]') : null;
+    if(navBtn){
+      navigateTo(navBtn.getAttribute('data-nav'));
+      return;
+    }
+    var pin = ev.target.closest ? ev.target.closest('.pin[data-goto]') : null;
+    if(pin){ navigateTo(pin.getAttribute('data-goto')); }
+  });
+
+  document.addEventListener('keydown', function(ev){
+    if((ev.key === 'Enter' || ev.key === ' ') && ev.target.classList && ev.target.classList.contains('pin')){
+      ev.preventDefault();
+      navigateTo(ev.target.getAttribute('data-goto'));
+    }
+  });
+
+  menuToggle.addEventListener('click', function(){
+    var open = nav.classList.toggle('open');
+    menuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+
+  window.addEventListener('popstate', function(ev){
+    var p = (ev.state && ev.state.page) ? ev.state.page : pageFromUrl();
+    navigateTo(p, false);
+  });
+
+  var form = document.getElementById('contactForm');
+  form.addEventListener('submit', function(ev){
+    ev.preventDefault();
+    if(!form.checkValidity()){ form.reportValidity(); return; }
+    var name = document.getElementById('fName').value.trim();
+    var phone = document.getElementById('fPhone').value.trim();
+    var vehicle = document.getElementById('fVehicle').value.trim();
+    var service = document.getElementById('fService').value;
+    var msg = document.getElementById('fMsg').value.trim();
+    var body = 'Name: ' + name + '\nPhone: ' + phone + '\nVehicle: ' + vehicle +
+      '\nService needed: ' + service + '\n\nDetails:\n' + msg +
+      '\n\nSent from the Chuck Cummins Auto Services website route map.';
+    var href = 'mailto:?subject=' + encodeURIComponent('Service request for Chuck Cummins Auto Services') +
+      '&body=' + encodeURIComponent(body);
+    window.location.href = href;
+  });
+
+  navigateTo(pageFromUrl(), false);
+  try{ history.replaceState({page:pageFromUrl()}, document.title, '?page=' + pageFromUrl()); }
+  catch(e){ /* history unavailable */ }
+})();
+</script>
+</body>
+</html>

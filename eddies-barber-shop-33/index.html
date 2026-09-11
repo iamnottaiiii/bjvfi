@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eddie's Barber Shop 33 | Barber Shop on Colerain Ave, Cincinnati</title>
+<meta name="description" content="Eddie's Barber Shop 33, a barber shop at 2801 Colerain Ave, Cincinnati, OH 45225. Call (513) 281-2239.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{
+  --paper:#f3e9cf;
+  --paper-deep:#e9d9b4;
+  --card:#f9f3e0;
+  --ink:#241a0d;
+  --ink-soft:#4d3f28;
+  --brass:#a87f2e;
+  --brass-light:#d9b45c;
+  --brass-dark:#7c5c1c;
+  --stamp:#9c3d2c;
+  --board:#1e150a;
+  --line:#3a2c16;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Lora',Georgia,serif;
+  color:var(--ink);
+  background-color:var(--paper);
+  background-image:repeating-linear-gradient(0deg, rgba(120,90,30,.045) 0 1px, transparent 1px 7px);
+  line-height:1.65;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+h1,h2,h3,.sign{font-family:'Playfair Display',Georgia,serif}
+a{color:var(--stamp)}
+img{max-width:100%}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+main{flex:1}
+
+.signboard{
+  background:var(--board);
+  border-bottom:6px double var(--brass);
+  color:#f6ecd2;
+  padding:26px 0 18px;
+  text-align:center;
+  position:relative;
+}
+.signboard::after{
+  content:"";
+  position:absolute;left:12px;right:12px;top:8px;bottom:8px;
+  border:1px solid rgba(217,180,92,.45);
+  pointer-events:none;
+}
+.station-line{
+  font-family:'Courier Prime',monospace;
+  letter-spacing:.45em;
+  text-transform:uppercase;
+  font-size:.72rem;
+  color:var(--brass-light);
+}
+.signboard h1{
+  font-size:clamp(1.7rem,4.6vw,2.9rem);
+  letter-spacing:.06em;
+  margin:.35em 0 .2em;
+  color:#fbf3da;
+  text-shadow:0 2px 0 rgba(0,0,0,.55);
+}
+.station-sub{
+  font-family:'Courier Prime',monospace;
+  font-size:.78rem;
+  letter-spacing:.28em;
+  text-transform:uppercase;
+  color:#cdb578;
+}
+
+.counter-bar{
+  background:#2a1f0f;
+  border-bottom:3px solid var(--brass-dark);
+  position:sticky;
+  top:0;
+  z-index:50;
+}
+.counter-inner{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.brand-mini{
+  font-family:'Playfair Display',serif;
+  color:#f6ecd2;
+  font-weight:700;
+  letter-spacing:.08em;
+  font-size:.95rem;
+  padding:14px 0;
+  white-space:nowrap;
+}
+nav.tickets{display:flex;gap:10px;align-items:center}
+nav.tickets a{
+  font-family:'Courier Prime',monospace;
+  text-transform:uppercase;
+  letter-spacing:.14em;
+  font-size:.74rem;
+  color:#241a0d;
+  background:linear-gradient(180deg,#f7efdb,#e7d6ab);
+  border:2px solid var(--brass-dark);
+  border-radius:3px;
+  padding:8px 14px;
+  text-decoration:none;
+  box-shadow:2px 2px 0 rgba(0,0,0,.45);
+  transition:transform .12s ease, background .12s ease;
+}
+nav.tickets a:hover{transform:translateY(-2px);background:#fff8e2}
+nav.tickets a.active{
+  background:var(--brass-light);
+  color:#1e150a;
+  box-shadow:inset 0 0 0 1px #6d5016, 2px 2px 0 rgba(0,0,0,.45);
+}
+.menu-btn{
+  display:none;
+  background:var(--brass-light);
+  border:2px solid var(--brass-dark);
+  border-radius:4px;
+  color:#1e150a;
+  font-size:1.15rem;
+  padding:8px 12px;
+  cursor:pointer;
+}
+
+section.page{display:none;padding:44px 0 60px}
+section.page.active{display:block;animation:fadein .35s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.ticket{
+  position:relative;
+  background:var(--card);
+  border:2px solid var(--line);
+  border-radius:4px;
+  box-shadow:5px 5px 0 rgba(36,26,13,.18);
+  padding:26px 28px;
+  margin-bottom:26px;
+  overflow:hidden;
+}
+.ticket .notch{
+  position:absolute;
+  top:50%;
+  width:26px;height:26px;
+  border-radius:50%;
+  background:var(--paper);
+  border:2px solid var(--line);
+  transform:translateY(-50%);
+}
+.ticket .notch.left{left:-15px}
+.ticket .notch.right{right:-15px}
+.perf{border-top:2px dashed var(--brass);margin:20px -28px;padding:0 28px}
+.ticket-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:10px;
+}
+.ticket-no{
+  font-family:'Courier Prime',monospace;
+  font-size:.75rem;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--stamp);
+  border:1px solid var(--stamp);
+  padding:3px 10px;
+  border-radius:3px;
+  transform:rotate(-2deg);
+  display:inline-block;
+}
+h2.page-title{
+  font-size:clamp(1.5rem,3.4vw,2.2rem);
+  letter-spacing:.04em;
+  margin-bottom:6px;
+}
+.lede{color:var(--ink-soft);font-style:italic;margin-bottom:8px}
+
+.badge{
+  display:inline-block;
+  font-family:'Courier Prime',monospace;
+  font-size:.68rem;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  padding:3px 10px;
+  border-radius:3px;
+  margin:4px 6px 4px 0;
+}
+.badge.sample{background:#f3e2b8;border:1px dashed var(--brass-dark);color:#6d5016}
+.badge.confirm{background:#e8d9ef;border:1px dashed #5f3f7d;color:#4a2f63}
+.badge.verified{background:#dfe9d4;border:1px solid #4d6b35;color:#33491f}
+
+.btn-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}
+.btn{
+  display:inline-flex;
+  align-items:center;
+  gap:9px;
+  font-family:'Courier Prime',monospace;
+  text-transform:uppercase;
+  letter-spacing:.12em;
+  font-size:.8rem;
+  text-decoration:none;
+  padding:13px 20px;
+  border:2px solid var(--line);
+  border-radius:3px;
+  cursor:pointer;
+  box-shadow:3px 3px 0 rgba(36,26,13,.35);
+  transition:transform .12s ease, box-shadow .12s ease;
+}
+.btn:hover{transform:translateY(-2px);box-shadow:4px 5px 0 rgba(36,26,13,.35)}
+.btn-brass{background:linear-gradient(180deg,var(--brass-light),var(--brass));color:#1e150a}
+.btn-ink{background:#241a0d;color:#f6ecd2}
+.btn-paper{background:var(--card);color:var(--ink)}
+
+.hours-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:.95rem}
+.hours-table th,.hours-table td{
+  border:1px solid var(--brass-dark);
+  padding:9px 12px;
+  text-align:left;
+}
+.hours-table th{
+  background:#2a1f0f;color:#f0dfb2;
+  font-family:'Courier Prime',monospace;
+  text-transform:uppercase;
+  letter-spacing:.16em;
+  font-size:.72rem;
+}
+.hours-table tr:nth-child(even) td{background:rgba(168,127,46,.1)}
+
+.grid{display:grid;gap:22px}
+.grid.two{grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
+
+.service-stub{display:flex;flex-direction:column;gap:8px}
+.service-stub h3{font-size:1.25rem;letter-spacing:.03em}
+.stamp{
+  font-family:'Courier Prime',monospace;
+  color:var(--stamp);
+  border:2px solid var(--stamp);
+  border-radius:4px;
+  padding:6px 12px;
+  display:inline-block;
+  transform:rotate(-3deg);
+  text-transform:uppercase;
+  letter-spacing:.22em;
+  font-size:.72rem;
+  margin-top:8px;
+}
+
+.photo-frame{
+  border:6px solid #2a1f0f;
+  outline:2px solid var(--brass);
+  background:var(--paper-deep);
+  aspect-ratio:4/3;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  gap:10px;
+  color:var(--ink-soft);
+  text-align:center;
+  padding:20px;
+}
+.photo-frame i{font-size:2.4rem;color:var(--brass-dark)}
+
+.review-link{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:14px;
+  text-decoration:none;
+  color:var(--ink);
+}
+.review-link .go{
+  font-family:'Courier Prime',monospace;
+  text-transform:uppercase;
+  letter-spacing:.14em;
+  font-size:.75rem;
+  background:var(--stamp);
+  color:#fdf6e3;
+  padding:10px 16px;
+  border-radius:3px;
+  white-space:nowrap;
+  border:2px solid #6f2a1f;
+}
+.meta{font-family:'Courier Prime',monospace;font-size:.75rem;color:var(--ink-soft);letter-spacing:.06em}
+
+form.contact-form{display:grid;gap:14px;margin-top:14px}
+form.contact-form label{
+  font-family:'Courier Prime',monospace;
+  text-transform:uppercase;
+  letter-spacing:.16em;
+  font-size:.72rem;
+  color:var(--ink-soft);
+}
+form.contact-form input,form.contact-form textarea{
+  font-family:'Lora',serif;
+  font-size:1rem;
+  padding:12px 14px;
+  border:2px solid var(--line);
+  border-radius:3px;
+  background:#fffdf4;
+  color:var(--ink);
+  width:100%;
+}
+form.contact-form input:focus,form.contact-form textarea:focus{
+  outline:2px solid var(--brass);
+  border-color:var(--brass-dark);
+}
+.form-note{font-size:.85rem;color:var(--ink-soft);font-style:italic}
+
+footer{
+  background:var(--board);
+  color:#f6ecd2;
+  text-align:center;
+  padding:22px 16px;
+  border-top:6px double var(--brass);
+  font-family:'Playfair Display',serif;
+  letter-spacing:.08em;
+}
+
+@media (max-width:720px){
+  .menu-btn{display:block}
+  nav.tickets{
+    display:none;
+    position:absolute;
+    top:100%;left:0;right:0;
+    background:#2a1f0f;
+    flex-direction:column;
+    align-items:stretch;
+    padding:12px 20px 18px;
+    gap:10px;
+    border-bottom:3px solid var(--brass-dark);
+  }
+  nav.tickets.open{display:flex}
+  nav.tickets a{text-align:center}
+  .counter-bar{position:relative}
+  .ticket{padding:20px}
+  .perf{margin:16px -20px}
+}
+</style>
+</head>
+<body>
+
+<header class="signboard">
+  <div class="wrap">
+    <div class="station-line">Colerain Ave Station</div>
+    <h1>Eddie's Barber Shop 33</h1>
+    <div class="station-sub">Barber Shop &middot; Cincinnati, Ohio</div>
+  </div>
+</header>
+
+<div class="counter-bar">
+  <div class="wrap counter-inner">
+    <div class="brand-mini"><i class="fa-solid fa-scissors"></i>&nbsp; Ticket Counter</div>
+    <button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
+    <nav class="tickets" id="mainNav" aria-label="Main navigation">
+      <a href="?p=home" data-page="home">Home</a>
+      <a href="?p=services" data-page="services">Services</a>
+      <a href="?p=about" data-page="about">About</a>
+      <a href="?p=reviews" data-page="reviews">Reviews</a>
+      <a href="?p=contact" data-page="contact">Contact</a>
+    </nav>
+  </div>
+</div>
+
+<main class="wrap">
+
+<section class="page active" id="page-home" data-page="home" aria-label="Home">
+  <div class="ticket">
+    <span class="notch left"></span><span class="notch right"></span>
+    <div class="ticket-head">
+      <span class="ticket-no">Ticket No. 33</span>
+      <span class="badge verified">Address verified</span>
+    </div>
+    <h2 class="page-title">Step Up to the Counter</h2>
+    <p class="lede">A neighborhood barber shop on Colerain Ave in Cincinnati.</p>
+    <div class="perf"></div>
+    <p><i class="fa-solid fa-location-dot"></i>&nbsp; 2801 Colerain Ave, Cincinnati, OH 45225</p>
+    <p><i class="fa-solid fa-phone"></i>&nbsp; <a href="tel:+15132812239">(513) 281-2239</a></p>
+    <div class="btn-row">
+      <a class="btn btn-brass" href="tel:+15132812239"><i class="fa-solid fa-phone"></i> Call the Shop</a>
+      <a class="btn btn-ink" href="https://www.google.com/maps/search/?api=1&query=Eddie%27s%20Barber%20Shop%2033%2C%202801%20Colerain%20Ave%2C%20Cincinnati%2C%20OH%2045225" target="_blank" rel="noopener"><i class="fa-solid fa-diamond-turn-right"></i> Get Directions</a>
+      <a class="btn btn-paper" href="?p=services" data-page="services"><i class="fa-solid fa-ticket"></i> View Services</a>
+    </div>
+  </div>
+
+  <div class="grid two">
+    <div class="ticket">
+      <span class="notch left"></span><span class="notch right"></span>
+      <h2 class="page-title">Counter Hours</h2>
+      <span class="badge sample">Hours as listed online</span>
+      <span class="badge confirm">Call to confirm</span>
+      <table class="hours-table">
+        <tr><th>Day</th><th>Hours</th></tr>
+        <tr><td>Monday</td><td>Closed</td></tr>
+        <tr><td>Tuesday</td><td>9:00 AM to 5:00 PM</td></tr>
+        <tr><td>Wednesday</td><td>9:00 AM to 5:00 PM</td></tr>
+        <tr><td>Thursday</td><td>9:00 AM to 5:00 PM</td></tr>
+        <tr><td>Friday</td><td>8:30 AM to 5:00 PM</td></tr>
+        <tr><td>Saturday</td><td>7:30 AM to 5:00 PM</td></tr>
+        <tr><td>Sunday</td><td>Closed</td></tr>
+      </table>
+    </div>
+    <div class="ticket">
+      <span class="notch left"></span><span class="notch right"></span>
+      <h2 class="page-title">Good to Know</h2>
+      <p class="lede">Verified details only. Everything else is badged below.</p>
+      <p><i class="fa-solid fa-circle-check"></i>&nbsp; Listed category: barber shop</p>
+      <p><i class="fa-solid fa-circle-check"></i>&nbsp; Phone: <a href="tel:+15132812239">(513) 281-2239</a></p>
+      <div class="perf"></div>
+      <p><span class="badge confirm">Call to confirm</span> Walk-in policy, wait times, and pricing are not published. Please call ahead.</p>
+      <div class="btn-row">
+        <a class="btn btn-brass" href="?p=contact" data-page="contact"><i class="fa-solid fa-envelope"></i> Contact Us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services" data-page="services" aria-label="Services">
+  <div class="ticket">
+    <span class="notch left"></span><span class="notch right"></span>
+    <div class="ticket-head">
+      <span class="ticket-no">Service Window</span>
+    </div>
+    <h2 class="page-title">Services on the Board</h2>
+    <p class="lede">Only services confirmed by public listings appear here. For the full menu, call the counter.</p>
+    <div class="perf"></div>
+    <div class="grid two">
+      <div class="ticket service-stub">
+        <h3><i class="fa-solid fa-scissors"></i>&nbsp; Men's Haircut</h3>
+        <p>Haircut services are listed for this shop on public booking directories.</p>
+        <span class="badge verified">Listed on Fresha</span>
+        <span class="stamp">Call for price</span>
+      </div>
+      <div class="ticket service-stub">
+        <h3><i class="fa-solid fa-circle-question"></i>&nbsp; More Services?</h3>
+        <p>Additional grooming services may be offered. This page will only list what the shop confirms.</p>
+        <span class="badge confirm">Call to confirm</span>
+        <div class="btn-row">
+          <a class="btn btn-brass" href="tel:+15132812239"><i class="fa-solid fa-phone"></i> (513) 281-2239</a>
+        </div>
+      </div>
+    </div>
+    <div class="perf"></div>
+    <p class="meta">Prices and service details are not published online. Call the shop to confirm before you visit.</p>
+  </div>
+</section>
+
+<section class="page" id="page-about" data-page="about" aria-label="About">
+  <div class="ticket">
+    <span class="notch left"></span><span class="notch right"></span>
+    <div class="ticket-head">
+      <span class="ticket-no">Station Record</span>
+      <span class="badge verified">Facts only</span>
+    </div>
+    <h2 class="page-title">About the Shop</h2>
+    <p class="lede">What public records confirm about Eddie's Barber Shop 33.</p>
+    <div class="perf"></div>
+    <div class="grid two">
+      <div>
+        <p><strong>Business name:</strong> Eddie's Barber Shop 33</p>
+        <p><strong>Category:</strong> Barber shop</p>
+        <p><strong>Address:</strong> 2801 Colerain Ave, Cincinnati, OH 45225</p>
+        <p><strong>Phone:</strong> <a href="tel:+15132812239">(513) 281-2239</a></p>
+        <p class="meta">Also listed under barber, hair salon, and hair stylist categories in directory data.</p>
+        <div class="perf"></div>
+        <p><span class="badge confirm">Call to confirm</span> History, ownership, staff, and specialties are not published. Please call the shop for details.</p>
+      </div>
+      <div class="photo-frame">
+        <i class="fa-solid fa-camera"></i>
+        <p class="meta">Photo coming soon</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews" data-page="reviews" aria-label="Reviews">
+  <div class="ticket">
+    <span class="notch left"></span><span class="notch right"></span>
+    <div class="ticket-head">
+      <span class="ticket-no">Passenger Comments</span>
+    </div>
+    <h2 class="page-title">Reviews</h2>
+    <p class="lede">We do not publish review text or reviewer names here. Read real reviews at the sources below.</p>
+    <div class="perf"></div>
+    <div class="grid two">
+      <a class="ticket review-link" href="https://www.google.com/maps/place/?q=place_id:ChIJdeUp3nK0QYgRoE4dEDER4Qw" target="_blank" rel="noopener">
+        <span>
+          <h3><i class="fa-brands fa-google"></i>&nbsp; Google Maps</h3>
+          <p class="meta">Official place listing for this exact business</p>
+        </span>
+        <span class="go">Read reviews</span>
+      </a>
+      <a class="ticket review-link" href="https://www.bestprosintown.com/oh/cincinnati/eddies-barber-shop-33-/" target="_blank" rel="noopener">
+        <span>
+          <h3><i class="fa-solid fa-star"></i>&nbsp; BestProsInTown</h3>
+          <p class="meta">Customer reviews and photos listing</p>
+        </span>
+        <span class="go">Read reviews</span>
+      </a>
+    </div>
+    <div class="perf"></div>
+    <p class="meta">Links open the live review pages in a new tab. Review content there belongs to its authors and the listing sites.</p>
+  </div>
+</section>
+
+<section class="page" id="page-contact" data-page="contact" aria-label="Contact">
+  <div class="ticket">
+    <span class="notch left"></span><span class="notch right"></span>
+    <div class="ticket-head">
+      <span class="ticket-no">Telegraph Office</span>
+    </div>
+    <h2 class="page-title">Contact the Counter</h2>
+    <p class="lede">Reach the shop directly. Details below are the verified public listings.</p>
+    <div class="perf"></div>
+    <div class="grid two">
+      <div>
+        <p><i class="fa-solid fa-location-dot"></i>&nbsp; <strong>Address</strong><br>2801 Colerain Ave<br>Cincinnati, OH 45225</p>
+        <p style="margin-top:10px"><i class="fa-solid fa-phone"></i>&nbsp; <strong>Phone</strong><br><a href="tel:+15132812239">(513) 281-2239</a></p>
+        <div class="btn-row">
+          <a class="btn btn-brass" href="tel:+15132812239"><i class="fa-solid fa-phone"></i> Call Now</a>
+          <a class="btn btn-ink" href="https://www.google.com/maps/search/?api=1&query=Eddie%27s%20Barber%20Shop%2033%2C%202801%20Colerain%20Ave%2C%20Cincinnati%2C%20OH%2045225" target="_blank" rel="noopener"><i class="fa-solid fa-diamond-turn-right"></i> Directions</a>
+        </div>
+      </div>
+      <div>
+        <h3>Send a Message</h3>
+        <p class="form-note">This opens a draft in your email app addressed for the shop. No email address is published for this business, so please call <a href="tel:+15132812239">(513) 281-2239</a> to reach them directly.</p>
+        <form class="contact-form" id="contactForm">
+          <div>
+            <label for="cfName">Your name</label>
+            <input type="text" id="cfName" name="name" required autocomplete="name">
+          </div>
+          <div>
+            <label for="cfPhone">Your phone</label>
+            <input type="tel" id="cfPhone" name="phone" autocomplete="tel">
+          </div>
+          <div>
+            <label for="cfMsg">Message</label>
+            <textarea id="cfMsg" name="message" rows="4" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-brass"><i class="fa-solid fa-paper-plane"></i> Draft Email</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>© Eddie's Barber Shop 33</footer>
+
+<script>
+(function(){
+  var pages = ["home","services","about","reviews","contact"];
+
+  function getPageFromURL(){
+    try{
+      var m = new RegExp("[?&]p=([^&#]*)").exec(window.location.search);
+      if(m && pages.indexOf(decodeURIComponent(m[1])) !== -1){ return decodeURIComponent(m[1]); }
+    }catch(e){}
+    return "home";
+  }
+
+  function showPage(page){
+    if(pages.indexOf(page) === -1){ page = "home"; }
+    var sections = document.querySelectorAll("section.page");
+    for(var i=0;i<sections.length;i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-"+page);
+    }
+    var links = document.querySelectorAll("[data-page]");
+    for(var j=0;j<links.length;j++){
+      if(links[j].tagName === "A" && links[j].closest("nav")){
+        links[j].classList.toggle("active", links[j].getAttribute("data-page") === page);
+      }
+    }
+    document.getElementById("mainNav").classList.remove("open");
+    document.getElementById("menuBtn").setAttribute("aria-expanded","false");
+    window.scrollTo(0,0);
+  }
+
+  function navigateTo(page){
+    if(pages.indexOf(page) === -1){ page = "home"; }
+    showPage(page);
+    try{
+      history.pushState({page:page}, "", "?p="+page);
+    }catch(e){}
+  }
+
+  window.addEventListener("popstate", function(e){
+    var p = (e.state && e.state.page) ? e.state.page : getPageFromURL();
+    showPage(p);
+  });
+
+  var triggers = document.querySelectorAll("[data-page]");
+  for(var k=0;k<triggers.length;k++){
+    triggers[k].addEventListener("click", function(ev){
+      ev.preventDefault();
+      navigateTo(this.getAttribute("data-page"));
+    });
+  }
+
+  var menuBtn = document.getElementById("menuBtn");
+  menuBtn.addEventListener("click", function(){
+    var nav = document.getElementById("mainNav");
+    var open = nav.classList.toggle("open");
+    menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+
+  document.getElementById("contactForm").addEventListener("submit", function(ev){
+    ev.preventDefault();
+    var name = document.getElementById("cfName").value.trim();
+    var phone = document.getElementById("cfPhone").value.trim();
+    var msg = document.getElementById("cfMsg").value.trim();
+    var subject = encodeURIComponent("Message for Eddie's Barber Shop 33 from " + name);
+    var body = encodeURIComponent("Name: " + name + "\nPhone: " + phone + "\n\n" + msg);
+    window.location.href = "mailto:?subject=" + subject + "&body=" + body;
+  });
+
+  showPage(getPageFromURL());
+})();
+</script>
+</body>
+</html>

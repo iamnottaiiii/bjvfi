@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ken's Auto Solutions | Diagnostic Report - New Richmond, OH</title>
+<meta name="description" content="Ken's Auto Solutions, 608 Market St, New Richmond, OH 45157. Diagnostic-grade auto repair and maintenance. Call (513) 508-3818.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{
+  --paper:#ffffff;
+  --paper2:#f6f9fd;
+  --lab:#0b4f9c;
+  --lab-deep:#083a73;
+  --ink:#10233c;
+  --mute:#5b6b82;
+  --line:#c9d7e8;
+  --line-soft:#e2ebf5;
+  --ok:#0e8a4d;
+  --ok-bg:#e3f6ec;
+  --warn:#b7791f;
+  --warn-bg:#fdf1dc;
+  --scan:repeating-linear-gradient(0deg, rgba(11,79,156,.045) 0 1px, transparent 1px 4px);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'IBM Plex Mono',monospace;color:var(--ink);background:var(--paper2);}
+body::before{content:"";position:fixed;inset:0;background:var(--scan);pointer-events:none;z-index:0}
+h1,h2,h3,.display{font-family:'Space Grotesk',sans-serif}
+a{color:var(--lab)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px;position:relative;z-index:1}
+.page{display:none}
+.page.active{display:block;animation:fade .35s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ---------- report header ---------- */
+.topbar{background:var(--lab-deep);color:#fff;position:sticky;top:0;z-index:50}
+.topbar .wrap{display:flex;align-items:center;justify-content:space-between;min-height:64px}
+.brand{display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none}
+.brand .flask{width:38px;height:38px;border:2px solid #fff;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.brand strong{font-family:'Space Grotesk',sans-serif;font-size:17px;letter-spacing:.5px;display:block;line-height:1.1}
+.brand small{font-size:10px;letter-spacing:3px;opacity:.85}
+.nav{display:flex;gap:4px}
+.nav a{color:#fff;text-decoration:none;font-size:12px;letter-spacing:1.5px;padding:10px 14px;border:1px solid transparent;border-radius:4px}
+.nav a:hover,.nav a.on{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.4)}
+.burger{display:none;background:none;border:1px solid rgba(255,255,255,.5);color:#fff;border-radius:4px;padding:8px 11px;font-size:16px;cursor:pointer}
+.mmenu{display:none;background:var(--lab-deep);border-top:1px solid rgba(255,255,255,.2)}
+.mmenu.open{display:block}
+.mmenu a{display:block;color:#fff;text-decoration:none;padding:14px 24px;font-size:13px;letter-spacing:1.5px;border-bottom:1px solid rgba(255,255,255,.12)}
+.mmenu a.on{background:rgba(255,255,255,.12)}
+
+.reporthead{background:var(--paper);border-bottom:2px solid var(--lab);padding:34px 0 26px}
+.kicker{font-size:11px;letter-spacing:4px;color:var(--lab);font-weight:600;margin-bottom:10px}
+.reporthead h1{font-size:clamp(28px,5vw,52px);letter-spacing:-1px;line-height:1.02;color:var(--lab-deep)}
+.specimen{margin-top:22px;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.spec-grid{display:grid;grid-template-columns:repeat(4,1fr);background:var(--paper2)}
+.spec-cell{padding:14px 18px;border-right:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft)}
+.spec-cell:last-child{border-right:none}
+.spec-cell .lab{font-size:10px;letter-spacing:2px;color:var(--mute);margin-bottom:5px}
+.spec-cell .val{font-size:14px;font-weight:600;color:var(--ink)}
+.spec-cell .val a{color:var(--ink);text-decoration:none;border-bottom:1px dashed var(--lab)}
+
+/* ---------- generic report modules ---------- */
+.section{padding:44px 0}
+.mod{background:var(--paper);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.mod-head{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--lab-deep);color:#fff;padding:13px 20px}
+.mod-head h2,.mod-head h3{font-size:14px;letter-spacing:3px;font-weight:600}
+.mod-head .code{font-size:11px;letter-spacing:2px;opacity:.8}
+.mod-body{padding:24px 22px}
+.scanline{height:1px;background:repeating-linear-gradient(90deg,var(--line) 0 8px,transparent 8px 14px);margin:26px 0}
+p.lead{font-size:14px;line-height:1.8;color:var(--mute)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+
+.badge{display:inline-block;font-size:10px;letter-spacing:1.5px;font-weight:600;padding:4px 10px;border-radius:3px;text-transform:uppercase}
+.badge.sample{background:var(--warn-bg);color:var(--warn);border:1px solid #ecd9ac}
+.badge.confirm{background:#e7eefc;color:var(--lab);border:1px solid #bcd2f5}
+.badge.photo{background:var(--line-soft);color:var(--mute);border:1px solid var(--line)}
+.pill{display:inline-block;font-size:10px;letter-spacing:1.5px;font-weight:700;padding:4px 10px;border-radius:20px}
+.pill.ok{background:var(--ok-bg);color:var(--ok)}
+.pill.warn{background:var(--warn-bg);color:var(--warn)}
+.pill.info{background:#e7eefc;color:var(--lab)}
+
+.btn{display:inline-flex;align-items:center;gap:10px;background:var(--lab);color:#fff;text-decoration:none;padding:14px 26px;font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:1.5px;font-weight:600;border:1px solid var(--lab);border-radius:4px;cursor:pointer}
+.btn:hover{background:var(--lab-deep);border-color:var(--lab-deep)}
+.btn.ghost{background:transparent;color:var(--lab)}
+.btn.ghost:hover{background:var(--lab);color:#fff}
+
+/* ---------- service report cards ---------- */
+.diag-card{border:1px solid var(--line);border-radius:6px;background:var(--paper);overflow:hidden;display:flex;flex-direction:column}
+.diag-card .d-head{background:var(--paper2);border-bottom:1px solid var(--line-soft);padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
+.d-no{font-size:11px;letter-spacing:2px;color:var(--lab);font-weight:700}
+.diag-card h3{font-size:18px;padding:16px 16px 4px;color:var(--lab-deep)}
+.d-rows{padding:10px 16px 16px;flex:1}
+.d-row{display:grid;grid-template-columns:88px 1fr;gap:10px;padding:7px 0;border-bottom:1px dotted var(--line-soft);font-size:12.5px}
+.d-row .k{font-size:10px;letter-spacing:1.5px;color:var(--mute);padding-top:2px}
+.d-foot{padding:14px 16px;border-top:1px solid var(--line-soft);display:flex;justify-content:space-between;align-items:center;gap:10px;background:#fbfdfe}
+
+/* ---------- tables ---------- */
+table.rt{width:100%;border-collapse:collapse;font-size:13px}
+table.rt th{font-size:10px;letter-spacing:2px;text-align:left;color:var(--mute);padding:10px 14px;border-bottom:2px solid var(--line);background:var(--paper2)}
+table.rt td{padding:12px 14px;border-bottom:1px solid var(--line-soft)}
+table.rt tr:last-child td{border-bottom:none}
+
+/* ---------- review rows ---------- */
+.rev{border:1px solid var(--line);border-radius:6px;padding:18px;margin-bottom:14px;background:var(--paper)}
+.rev .meta{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.rev .stars{color:#e5a50a;letter-spacing:2px;font-size:13px}
+.rev p{font-size:13.5px;line-height:1.75;color:var(--mute)}
+.src-list{list-style:none}
+.src-list li{padding:12px 0;border-bottom:1px solid var(--line-soft);font-size:13px}
+.src-list li:last-child{border-bottom:none}
+.src-list a{font-weight:600}
+
+/* ---------- form ---------- */
+form .frow{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+form label{display:block;font-size:10px;letter-spacing:2px;color:var(--mute);margin-bottom:7px}
+form input,form select,form textarea{width:100%;font-family:'IBM Plex Mono',monospace;font-size:14px;padding:12px 14px;border:1px solid var(--line);border-radius:4px;background:var(--paper2);color:var(--ink)}
+form input:focus,form select:focus,form textarea:focus{outline:2px solid var(--lab);background:#fff}
+form textarea{min-height:120px;resize:vertical}
+.ticket{display:none;border:2px solid var(--ok);border-radius:6px;background:var(--ok-bg);padding:22px;margin-top:18px}
+.ticket.show{display:block}
+.ticket h3{color:var(--ok);letter-spacing:2px;font-size:14px;margin-bottom:10px}
+.ticket p{font-size:13px;line-height:1.7}
+
+footer{background:var(--lab-deep);color:#fff;text-align:center;padding:26px 10px;font-size:13px;letter-spacing:1px}
+
+@media(max-width:860px){
+  .nav{display:none}
+  .burger{display:block}
+  .spec-grid{grid-template-columns:1fr 1fr}
+  .grid2,.grid3{grid-template-columns:1fr}
+  form .frow{grid-template-columns:1fr}
+  .d-row{grid-template-columns:70px 1fr}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="?page=home" data-nav="home" aria-label="Ken's Auto Solutions home">
+      <span class="flask"><i class="fa-solid fa-stethoscope"></i></span>
+      <span><strong>KEN'S AUTO SOLUTIONS</strong><small>VEHICLE DIAGNOSTIC LAB</small></span>
+    </a>
+    <nav class="nav" aria-label="Primary">
+      <a href="?page=home" data-nav="home" class="on">HOME</a>
+      <a href="?page=services" data-nav="services">SERVICES</a>
+      <a href="?page=about" data-nav="about">ABOUT</a>
+      <a href="?page=reviews" data-nav="reviews">REVIEWS</a>
+      <a href="?page=contact" data-nav="contact">CONTACT</a>
+    </nav>
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
+  </div>
+  <nav class="mmenu" id="mmenu" aria-label="Mobile">
+    <a href="?page=home" data-nav="home" class="on">HOME</a>
+    <a href="?page=services" data-nav="services">SERVICES</a>
+    <a href="?page=about" data-nav="about">ABOUT</a>
+    <a href="?page=reviews" data-nav="reviews">REVIEWS</a>
+    <a href="?page=contact" data-nav="contact">CONTACT</a>
+  </nav>
+</header>
+
+<main>
+
+<section class="page active" id="page-home" data-page="home">
+  <div class="reporthead">
+    <div class="wrap">
+      <div class="kicker">LAB REPORT NO. KAS-001 // PATIENT: YOUR VEHICLE</div>
+      <h1>Every Vehicle<br>Gets a Full Diagnosis.</h1>
+      <p class="lead" style="margin-top:14px;max-width:640px">Expert automobile repair and maintenance service. Fast service and great prices. Only 10 minutes from Riverbend. Call to confirm details of your visit.</p>
+      <div class="specimen">
+        <div class="spec-grid">
+          <div class="spec-cell"><div class="lab">LAB / SHOP</div><div class="val">Ken's Auto Solutions</div></div>
+          <div class="spec-cell"><div class="lab">SPECIMEN SITE</div><div class="val">608 Market St, New Richmond, OH 45157</div></div>
+          <div class="spec-cell"><div class="lab">HOTLINE</div><div class="val"><a href="tel:+15135083818">(513) 508-3818</a></div></div>
+          <div class="spec-cell"><div class="lab">LAB STATUS</div><div class="val"><span class="pill ok">ACCEPTING PATIENTS</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="section">
+      <div class="mod">
+        <div class="mod-head"><h2>TRIAGE PROTOCOL</h2><span class="code">DOC KAS-H01</span></div>
+        <div class="mod-body">
+          <div class="grid3">
+            <div>
+              <i class="fa-solid fa-microscope" style="font-size:26px;color:var(--lab)"></i>
+              <h3 style="margin:12px 0 8px;font-size:16px;letter-spacing:1px">STEP 01: INTAKE</h3>
+              <p class="lead" style="font-size:13px">Bring your vehicle in or call <a href="tel:+15135083818">(513) 508-3818</a>. Describe the symptom and the lab logs the case.</p>
+            </div>
+            <div>
+              <i class="fa-solid fa-vial-circle-check" style="font-size:26px;color:var(--lab)"></i>
+              <h3 style="margin:12px 0 8px;font-size:16px;letter-spacing:1px">STEP 02: DIAGNOSIS</h3>
+              <p class="lead" style="font-size:13px">A realistic, honest assessment of the problem. No chains, no upsells, just the finding.</p>
+            </div>
+            <div>
+              <i class="fa-solid fa-clipboard-check" style="font-size:26px;color:var(--lab)"></i>
+              <h3 style="margin:12px 0 8px;font-size:16px;letter-spacing:1px">STEP 03: TREATMENT</h3>
+              <p class="lead" style="font-size:13px">Efficient, high quality repair work that leaves the vehicle feeling brand new. <span class="badge confirm">Call to confirm</span></p>
+            </div>
+          </div>
+          <div class="scanline"></div>
+          <div style="display:flex;gap:14px;flex-wrap:wrap">
+            <a class="btn" href="?page=services" data-nav="services"><i class="fa-solid fa-file-waveform"></i> VIEW DIAGNOSTIC MENU</a>
+            <a class="btn ghost" href="https://www.google.com/maps/search/?api=1&query=Ken%27s%20Auto%20Solutions%2C%20608%20Market%20St%2C%20New%20Richmond%2C%20OH%2045157" target="_blank" rel="noopener"><i class="fa-solid fa-location-dot"></i> GET DIRECTIONS</a>
+          </div>
+        </div>
+      </div>
+      <div class="scanline"></div>
+      <div class="grid2">
+        <div class="mod">
+          <div class="mod-head"><h2>LAB HOURS</h2><span class="code">SCH-KAS</span></div>
+          <div class="mod-body" style="padding:0">
+            <table class="rt">
+              <tr><th>Day</th><th>Window</th><th>Status</th></tr>
+              <tr><td>Mon - Fri</td><td>8:00 AM - 5:00 PM</td><td><span class="pill ok">OPEN</span></td></tr>
+              <tr><td>Saturday</td><td>Closed</td><td><span class="pill warn">CLOSED</span></td></tr>
+              <tr><td>Sunday</td><td>Closed</td><td><span class="pill warn">CLOSED</span></td></tr>
+            </table>
+          </div>
+        </div>
+        <div class="mod">
+          <div class="mod-head"><h2>QUICK READOUT</h2><span class="code">SUM-KAS</span></div>
+          <div class="mod-body">
+            <p class="lead">Aggregate public ratings sit near 5.0 stars across hundreds of listed reviews. See the full breakdown on the <a href="?page=reviews" data-nav="reviews">Reviews</a> page.</p>
+            <div class="scanline"></div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <span class="badge confirm">Hours: call to confirm</span>
+              <span class="badge photo">Photo coming soon</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services" data-page="services">
+  <div class="reporthead">
+    <div class="wrap">
+      <div class="kicker">LAB REPORT NO. KAS-002 // RESULTS TABLE</div>
+      <h1>Diagnostic<br>Service Results.</h1>
+      <p class="lead" style="margin-top:14px;max-width:640px">Each service below is logged like a lab result: system, symptom, action, status. Scope and pricing are not listed. Call <a href="tel:+15135083818">(513) 508-3818</a> to confirm what your vehicle needs.</p>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="section">
+      <div class="grid3">
+        <div class="diag-card">
+          <div class="d-head"><span class="d-no">REPORT 001</span><span class="pill ok">IN LAB</span></div>
+          <h3>Brake Service</h3>
+          <div class="d-rows">
+            <div class="d-row"><span class="k">SYSTEM</span><span>Braking system incl. pads and rotors</span></div>
+            <div class="d-row"><span class="k">SYMPTOM</span><span>Squeal, grind, vibration, soft pedal</span></div>
+            <div class="d-row"><span class="k">ACTION</span><span>Brake and rotor repair and replacement</span></div>
+            <div class="d-row"><span class="k">PRICE</span><span><span class="badge sample">SAMPLE</span> call to confirm</span></div>
+          </div>
+          <div class="d-foot"><span style="font-size:11px;color:var(--mute)">REF: BRK-KAS</span><a class="btn ghost" style="padding:9px 16px;font-size:11px" href="tel:+15135083818"><i class="fa-solid fa-phone"></i> CALL</a></div>
+        </div>
+        <div class="diag-card">
+          <div class="d-head"><span class="d-no">REPORT 002</span><span class="pill ok">IN LAB</span></div>
+          <h3>Tire Service</h3>
+          <div class="d-rows">
+            <div class="d-row"><span class="k">SYSTEM</span><span>Wheels and tires</span></div>
+            <div class="d-row"><span class="k">SYMPTOM</span><span>Uneven wear, vibration, low tread</span></div>
+            <div class="d-row"><span class="k">ACTION</span><span>Tire replacement and fitment</span></div>
+            <div class="d-row"><span class="k">PRICE</span><span><span class="badge sample">SAMPLE</span> call to confirm</span></div>
+          </div>
+          <div class="d-foot"><span style="font-size:11px;color:var(--mute)">REF: TIR-KAS</span><a class="btn ghost" style="padding:9px 16px;font-size:11px" href="tel:+15135083818"><i class="fa-solid fa-phone"></i> CALL</a></div>
+        </div>
+        <div class="diag-card">
+          <div class="d-head"><span class="d-no">REPORT 003</span><span class="pill ok">IN LAB</span></div>
+          <h3>Electrical Diagnostics</h3>
+          <div class="d-rows">
+            <div class="d-row"><span class="k">SYSTEM</span><span>Electrical: battery, wiring, circuits</span></div>
+            <div class="d-row"><span class="k">SYMPTOM</span><span>Warning lights, no start, drains</span></div>
+            <div class="d-row"><span class="k">ACTION</span><span>Electrical system diagnosis and repair</span></div>
+            <div class="d-row"><span class="k">PRICE</span><span><span class="badge sample">SAMPLE</span> call to confirm</span></div>
+          </div>
+          <div class="d-foot"><span style="font-size:11px;color:var(--mute)">REF: ELC-KAS</span><a class="btn ghost" style="padding:9px 16px;font-size:11px" href="tel:+15135083818"><i class="fa-solid fa-phone"></i> CALL</a></div>
+        </div>
+        <div class="diag-card">
+          <div class="d-head"><span class="d-no">REPORT 004</span><span class="pill ok">IN LAB</span></div>
+          <h3>Maintenance Service</h3>
+          <div class="d-rows">
+            <div class="d-row"><span class="k">SYSTEM</span><span>General vehicle health</span></div>
+            <div class="d-row"><span class="k">SYMPTOM</span><span>Due or overdue factory service</span></div>
+            <div class="d-row"><span class="k">ACTION</span><span>Routine maintenance and inspections</span></div>
+            <div class="d-row"><span class="k">PRICE</span><span><span class="badge sample">SAMPLE</span> call to confirm</span></div>
+          </div>
+          <div class="d-foot"><span style="font-size:11px;color:var(--mute)">REF: MNT-KAS</span><a class="btn ghost" style="padding:9px 16px;font-size:11px" href="tel:+15135083818"><i class="fa-solid fa-phone"></i> CALL</a></div>
+        </div>
+        <div class="diag-card">
+          <div class="d-head"><span class="d-no">REPORT 005</span><span class="pill info">ON REQUEST</span></div>
+          <h3>General Auto Repair</h3>
+          <div class="d-rows">
+            <div class="d-row"><span class="k">SYSTEM</span><span>Full vehicle</span></div>
+            <div class="d-row"><span class="k">SYMPTOM</span><span>Any drivability or noise concern</span></div>
+            <div class="d-row"><span class="k">ACTION</span><span>Expert repair after honest assessment</span></div>
+            <div class="d-row"><span class="k">PRICE</span><span><span class="badge sample">SAMPLE</span> call to confirm</span></div>
+          </div>
+          <div class="d-foot"><span style="font-size:11px;color:var(--mute)">REF: GEN-KAS</span><a class="btn ghost" style="padding:9px 16px;font-size:11px" href="tel:+15135083818"><i class="fa-solid fa-phone"></i> CALL</a></div>
+        </div>
+        <div class="diag-card">
+          <div class="d-head"><span class="d-no">REPORT 006</span><span class="pill info">ON REQUEST</span></div>
+          <h3>Pre-Trip Safety Check</h3>
+          <div class="d-rows">
+            <div class="d-row"><span class="k">SYSTEM</span><span>Safety-critical systems</span></div>
+            <div class="d-row"><span class="k">SYMPTOM</span><span>Long drive planned, unknown condition</span></div>
+            <div class="d-row"><span class="k">ACTION</span><span>Inspection and safe-to-drive verdict</span></div>
+            <div class="d-row"><span class="k">PRICE</span><span><span class="badge sample">SAMPLE</span> call to confirm</span></div>
+          </div>
+          <div class="d-foot"><span style="font-size:11px;color:var(--mute)">REF: SFT-KAS</span><a class="btn ghost" style="padding:9px 16px;font-size:11px" href="tel:+15135083818"><i class="fa-solid fa-phone"></i> CALL</a></div>
+        </div>
+      </div>
+      <div class="scanline"></div>
+      <div class="mod">
+        <div class="mod-head"><h2>LAB NOTE</h2><span class="code">NTE-KAS</span></div>
+        <div class="mod-body">
+          <p class="lead">Services listed above reflect what public business profiles describe (brakes, tires, rotors, electrical, maintenance). Exact offerings, turnaround times and pricing are not verified and are <span class="badge confirm">Call to confirm</span> items. No invented pricing appears anywhere on this report.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-about" data-page="about">
+  <div class="reporthead">
+    <div class="wrap">
+      <div class="kicker">LAB REPORT NO. KAS-003 // LAB PROFILE</div>
+      <h1>About<br>the Laboratory.</h1>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="section">
+      <div class="grid2">
+        <div class="mod">
+          <div class="mod-head"><h2>PROFILE</h2><span class="code">PRF-KAS</span></div>
+          <div class="mod-body">
+            <p class="lead">Ken's Auto Solutions is an auto repair shop at 608 Market St in New Richmond, Ohio. Public listings describe it as expert automobile repair and maintenance service with fast service and great prices, located about 10 minutes from Riverbend.</p>
+            <div class="scanline"></div>
+            <p class="lead">Unlike larger chain stores, the shop is known for realistic assessments of car problems, a focus on trust and affordability, and efficient work of high quality. <span class="badge sample">SAMPLE</span> History details beyond this public profile are not verified. Call to confirm.</p>
+            <div class="scanline"></div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <span class="pill info">INDEPENDENT SHOP</span>
+              <span class="pill info">NEW RICHMOND, OH</span>
+              <span class="pill ok">RATED ~5.0 PUBLICLY</span>
+            </div>
+          </div>
+        </div>
+        <div class="mod">
+          <div class="mod-head"><h2>SPECIMEN DATA</h2><span class="code">DAT-KAS</span></div>
+          <div class="mod-body" style="padding:0">
+            <table class="rt">
+              <tr><th>Field</th><th>Value</th></tr>
+              <tr><td>Business name</td><td>Ken's Auto Solutions</td></tr>
+              <tr><td>Category</td><td>Auto repair shop</td></tr>
+              <tr><td>Address</td><td>608 Market St, New Richmond, OH 45157</td></tr>
+              <tr><td>Phone</td><td><a href="tel:+15135083818">(513) 508-3818</a></td></tr>
+              <tr><td>Hours</td><td>Mon-Fri 8:00 AM - 5:00 PM <span class="badge confirm">Call to confirm</span></td></tr>
+              <tr><td>Website</td><td>No public website found <span class="badge photo">None on record</span></td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="scanline"></div>
+      <div class="mod">
+        <div class="mod-head"><h2>OPERATING PRINCIPLE</h2><span class="code">PRI-KAS</span></div>
+        <div class="mod-body">
+          <p class="lead" style="font-size:16px;color:var(--ink)">"Honest and fair repair services at competitive prices."</p>
+          <p class="lead" style="margin-top:10px">That is how public review sites summarize the shop: realistic assessments, comfortable customers, and vehicles leaving feeling brand new. The lab treats every vehicle like a patient and every invoice like a result you can read.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews" data-page="reviews">
+  <div class="reporthead">
+    <div class="wrap">
+      <div class="kicker">LAB REPORT NO. KAS-004 // PEER REVIEW ANALYSIS</div>
+      <h1>Peer<br>Review Analysis.</h1>
+      <p class="lead" style="margin-top:14px;max-width:640px">No reviewer names or review text are invented here. The analysis below summarizes publicly listed aggregate ratings only. Individual reviews are not reproduced on this page. <span class="badge confirm">Call to confirm</span></p>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="section">
+      <div class="grid3">
+        <div class="mod">
+          <div class="mod-head"><h2>POSITIVE</h2><span class="code">POS</span></div>
+          <div class="mod-body">
+            <div class="stars" style="color:#e5a50a;letter-spacing:2px;margin-bottom:10px">★★★★★</div>
+            <p class="lead">The overwhelming pattern across public listings is five-star feedback: customers describe honest, trustworthy service with fair and reasonable pricing, often saying they would recommend the shop to others.</p>
+          </div>
+        </div>
+        <div class="mod">
+          <div class="mod-head"><h2>MIXED</h2><span class="code">MIX</span></div>
+          <div class="mod-body">
+            <div class="stars" style="color:#e5a50a;letter-spacing:2px;margin-bottom:10px">★★★★☆</div>
+            <p class="lead">Aggregate scores slightly below a perfect 5.0 on some directories indicate a small number of less-than-perfect experiences, but no verified negative review text with an attributed name was available to quote.</p>
+          </div>
+        </div>
+        <div class="mod">
+          <div class="mod-head"><h2>NEGATIVE</h2><span class="code">NEG</span></div>
+          <div class="mod-body">
+            <div class="stars" style="color:#e5a50a;letter-spacing:2px;margin-bottom:10px">★★☆☆☆</div>
+            <p class="lead">No verified negative review with an attributed reviewer name was found in public sources during this research. One directory noted a case where a problem could not be fully fixed on a tight out-of-town schedule, though the vehicle was made safe to drive home.</p>
+          </div>
+        </div>
+      </div>
+      <div class="scanline"></div>
+      <div class="mod">
+        <div class="mod-head"><h2>AGGREGATE READOUT</h2><span class="code">AGG-KAS</span></div>
+        <div class="mod-body" style="padding:0">
+          <table class="rt">
+            <tr><th>Source</th><th>Listed rating</th><th>Review count</th></tr>
+            <tr><td>CARFAX</td><td>5.0</td><td>30 verified reviews</td></tr>
+            <tr><td>Birdeye</td><td>5 stars</td><td>70 reviews</td></tr>
+            <tr><td>Yably (3 sources)</td><td>4.96 / 5</td><td>129 reviews</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="scanline"></div>
+      <div class="mod">
+        <div class="mod-head"><h2>READ THE SOURCE REPORTS</h2><span class="code">SRC-KAS</span></div>
+        <div class="mod-body">
+          <ul class="src-list">
+            <li><a href="https://www.google.com/maps/place/?q=place_id:ChIJNfa_GWmnQYgRn3wjCI8skW4" target="_blank" rel="noopener">Google Maps listing: Ken's Auto Solutions</a><br><span style="color:var(--mute)">Exact business listing with reviews. Recommended source.</span></li>
+            <li><a href="https://www.carfax.com/Reviews-Kens-Auto-Solutions-LLC-New-Richmond-OH_0ZG4WPX98Y" target="_blank" rel="noopener">CARFAX reviews: Ken's Auto Solutions LLC</a><br><span style="color:var(--mute)">5.0 from 30 verified service reviews.</span></li>
+            <li><a href="https://reviews.birdeye.com/kens-auto-solutions-165970308335542" target="_blank" rel="noopener">Birdeye reviews: Ken's Auto Solutions</a><br><span style="color:var(--mute)">5 star rating with 70 reviews.</span></li>
+            <li><a href="https://www.loc8nearme.com/ohio/new-richmond/kens-auto-solutions/4601910/" target="_blank" rel="noopener">Loc8NearMe profile</a><br><span style="color:var(--mute)">Hours, directions, and public review summaries.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-contact" data-page="contact">
+  <div class="reporthead">
+    <div class="wrap">
+      <div class="kicker">LAB REPORT NO. KAS-005 // INTAKE FORM</div>
+      <h1>Submit<br>Your Vehicle.</h1>
+      <p class="lead" style="margin-top:14px;max-width:640px">File a diagnostic intake request below. This form does not send email; it generates an intake ticket on this page, which you confirm by calling <a href="tel:+15135083818">(513) 508-3818</a>. <span class="badge confirm">Call to confirm</span></p>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="section">
+      <div class="grid2">
+        <div class="mod">
+          <div class="mod-head"><h2>INTAKE REQUEST</h2><span class="code">FRM-KAS</span></div>
+          <div class="mod-body">
+            <form id="intakeForm" novalidate>
+              <div class="frow">
+                <div><label for="f-name">FULL NAME</label><input id="f-name" name="name" type="text" autocomplete="name" placeholder="Jane Driver"></div>
+                <div><label for="f-phone">PHONE</label><input id="f-phone" name="phone" type="tel" autocomplete="tel" placeholder="(513) 555-0100"></div>
+              </div>
+              <div class="frow">
+                <div><label for="f-vehicle">VEHICLE (YEAR / MAKE / MODEL)</label><input id="f-vehicle" name="vehicle" type="text" placeholder="2018 Honda Civic"></div>
+                <div><label for="f-service">SERVICE REQUESTED</label>
+                  <select id="f-service" name="service">
+                    <option>Brake service</option>
+                    <option>Tire service</option>
+                    <option>Electrical diagnostics</option>
+                    <option>Maintenance service</option>
+                    <option>General auto repair</option>
+                    <option>Pre-trip safety check</option>
+                    <option>Not sure, needs diagnosis</option>
+                  </select>
+                </div>
+              </div>
+              <div><label for="f-notes">SYMPTOMS / NOTES</label><textarea id="f-notes" name="notes" placeholder="Describe the noise, light, or behavior..."></textarea></div>
+              <div style="margin-top:16px"><button type="submit" class="btn"><i class="fa-solid fa-flask-vial"></i> GENERATE INTAKE TICKET</button></div>
+            </form>
+            <div class="ticket" id="ticket" role="status">
+              <h3><i class="fa-solid fa-circle-check"></i> INTAKE TICKET LOGGED</h3>
+              <p id="ticketBody"></p>
+              <p style="margin-top:10px">To book this visit, call <a href="tel:+15135083818">(513) 508-3818</a> and reference your intake ticket. <span class="badge confirm">Call to confirm</span></p>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="mod" style="margin-bottom:20px">
+            <div class="mod-head"><h2>LAB COORDINATES</h2><span class="code">LOC-KAS</span></div>
+            <div class="mod-body" style="padding:0">
+              <table class="rt">
+                <tr><th>Field</th><th>Value</th></tr>
+                <tr><td>Address</td><td>Ken's Auto Solutions, 608 Market St, New Richmond, OH 45157</td></tr>
+                <tr><td>Phone</td><td><a href="tel:+15135083818">(513) 508-3818</a></td></tr>
+                <tr><td>Hours</td><td>Mon-Fri 8:00 AM - 5:00 PM; Sat-Sun closed <span class="badge confirm">Call to confirm</span></td></tr>
+              </table>
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <a class="btn" href="tel:+15135083818"><i class="fa-solid fa-phone"></i> CALL NOW</a>
+            <a class="btn ghost" href="https://www.google.com/maps/search/?api=1&query=Ken%27s%20Auto%20Solutions%2C%20608%20Market%20St%2C%20New%20Richmond%2C%20OH%2045157" target="_blank" rel="noopener"><i class="fa-solid fa-location-dot"></i> DIRECTIONS</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>© Ken's Auto Solutions</footer>
+
+<script>
+(function(){
+  var PAGES = ['home','services','about','reviews','contact'];
+  var menu = document.getElementById('mmenu');
+  var burger = document.getElementById('burger');
+
+  function currentFromURL(){
+    try{
+      var p = new URLSearchParams(window.location.search).get('page');
+      return PAGES.indexOf(p) > -1 ? p : 'home';
+    }catch(e){ return 'home'; }
+  }
+
+  function navigateTo(page, push){
+    if(PAGES.indexOf(page) === -1) page = 'home';
+    document.querySelectorAll('.page').forEach(function(s){
+      s.classList.toggle('active', s.getAttribute('data-page') === page);
+    });
+    document.querySelectorAll('[data-nav]').forEach(function(a){
+      a.classList.toggle('on', a.getAttribute('data-nav') === page);
+    });
+    if(push !== false){
+      try{ window.history.pushState({page:page}, '', '?page=' + page); }catch(e){}
+    }
+    closeMenu();
+    window.scrollTo(0,0);
+  }
+
+  function closeMenu(){
+    menu.classList.remove('open');
+    burger.setAttribute('aria-expanded','false');
+  }
+
+  document.addEventListener('click', function(e){
+    var link = e.target.closest('[data-nav]');
+    if(link){
+      e.preventDefault();
+      navigateTo(link.getAttribute('data-nav'), true);
+    }
+  });
+
+  burger.addEventListener('click', function(){
+    var open = menu.classList.toggle('open');
+    burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+
+  window.addEventListener('popstate', function(e){
+    var page = (e.state && e.state.page) ? e.state.page : currentFromURL();
+    navigateTo(page, false);
+  });
+
+  navigateTo(currentFromURL(), false);
+
+  var form = document.getElementById('intakeForm');
+  var ticket = document.getElementById('ticket');
+  var ticketBody = document.getElementById('ticketBody');
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var name = document.getElementById('f-name').value.trim() || 'Not provided';
+    var phone = document.getElementById('f-phone').value.trim() || 'Not provided';
+    var vehicle = document.getElementById('f-vehicle').value.trim() || 'Not provided';
+    var service = document.getElementById('f-service').value;
+    var notes = document.getElementById('f-notes').value.trim() || 'None';
+    var id = 'KAS-' + Date.now().toString(36).toUpperCase();
+    ticketBody.innerHTML = '';
+    var rows = [
+      ['Ticket ID', id],
+      ['Name', name],
+      ['Phone', phone],
+      ['Vehicle', vehicle],
+      ['Service', service],
+      ['Notes', notes]
+    ];
+    rows.forEach(function(r){
+      var d = document.createElement('div');
+      d.style.cssText = 'display:grid;grid-template-columns:110px 1fr;gap:8px;padding:5px 0;border-bottom:1px dotted #9fd3ac;font-size:12.5px';
+      var k = document.createElement('strong');
+      k.textContent = r[0].toUpperCase();
+      k.style.fontSize = '10px';
+      k.style.letterSpacing = '1.5px';
+      var v = document.createElement('span');
+      v.textContent = r[1];
+      d.appendChild(k); d.appendChild(v);
+      ticketBody.appendChild(d);
+    });
+    ticket.classList.add('show');
+    ticket.scrollIntoView({behavior:'smooth', block:'nearest'});
+  });
+})();
+</script>
+</body>
+</html>

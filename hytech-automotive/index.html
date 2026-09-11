@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hytech Automotive | Auto Repair in Amelia, OH</title>
+<meta name="description" content="Hytech Automotive, 1184 Ohio Pike, Amelia, OH 45102. Auto repair, diagnostics, tires, brakes, oil changes. Call (513) 732-0400.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{
+  --navy:#030b18;
+  --navy2:#061426;
+  --panel:#081c33;
+  --panel2:#0a2340;
+  --line:#123a63;
+  --blue:#00c8ff;
+  --cyan:#8ef3ff;
+  --amber:#ffb020;
+  --red:#ff5d6c;
+  --green:#3df59a;
+  --text:#d7ecff;
+  --dim:#7fa3c7;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--navy);color:var(--text);font-family:'JetBrains Mono',monospace;overflow-x:hidden;min-height:100vh;display:flex;flex-direction:column}
+::selection{background:var(--blue);color:#02101f}
+main{flex:1}
+a{color:var(--blue);text-decoration:none}
+a:hover{color:var(--cyan)}
+h1,h2,h3,.display{font-family:'Orbitron',sans-serif;letter-spacing:.06em}
+.badge{display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;border:1px solid var(--amber);color:var(--amber);padding:.28rem .6rem;border-radius:3px;background:rgba(255,176,32,.08)}
+.badge.blue{border-color:var(--blue);color:var(--cyan);background:rgba(0,200,255,.08)}
+.pcb-bg{position:fixed;inset:0;z-index:-2;opacity:.5;pointer-events:none}
+.scanline{position:fixed;inset:0;z-index:-1;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(0,200,255,.025) 3px 4px)}
+.topbar{background:#020812;border-bottom:1px solid var(--line);font-size:.72rem;color:var(--dim);padding:.45rem 1rem;display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;letter-spacing:.08em}
+.topbar a{color:var(--cyan)}
+header.site{position:sticky;top:0;z-index:100;background:rgba(3,11,24,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.navwrap{max-width:1200px;margin:0 auto;padding:.7rem 1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.logo{display:flex;align-items:center;gap:.7rem}
+.logo .chip{width:44px;height:44px;border:1px solid var(--blue);border-radius:6px;display:grid;place-items:center;color:var(--blue);font-size:1.3rem;background:radial-gradient(circle at 30% 30%,rgba(0,200,255,.25),transparent 70%);box-shadow:0 0 18px rgba(0,200,255,.35)}
+.logo .name{font-family:'Orbitron',sans-serif;font-weight:800;font-size:1.05rem;letter-spacing:.1em;color:#fff}
+.logo .name span{color:var(--blue)}
+.logo .sub{font-size:.62rem;color:var(--dim);letter-spacing:.28em}
+nav.desk{display:flex;gap:.25rem}
+nav.desk a{padding:.65rem 1rem;font-size:.78rem;font-weight:700;letter-spacing:.16em;color:var(--dim);border:1px solid transparent;border-radius:4px;transition:.2s}
+nav.desk a:hover{color:var(--cyan);border-color:var(--line);background:rgba(0,200,255,.06)}
+nav.desk a.active{color:#02101f;background:var(--blue);box-shadow:0 0 16px rgba(0,200,255,.5)}
+.callbtn{display:inline-flex;align-items:center;gap:.5rem;background:var(--blue);color:#02101f;font-weight:700;font-size:.78rem;letter-spacing:.12em;padding:.7rem 1.1rem;border-radius:4px;transition:.2s}
+.callbtn:hover{background:var(--cyan);color:#02101f;box-shadow:0 0 18px rgba(0,200,255,.55)}
+.burger{display:none;background:none;border:1px solid var(--line);color:var(--cyan);font-size:1.2rem;padding:.5rem .7rem;border-radius:4px;cursor:pointer}
+nav.mob{display:none;flex-direction:column;background:#020812;border-bottom:1px solid var(--line)}
+nav.mob a{padding:.95rem 1.2rem;color:var(--dim);font-size:.85rem;font-weight:700;letter-spacing:.16em;border-top:1px solid rgba(18,58,99,.5)}
+nav.mob a.active{color:var(--cyan);background:rgba(0,200,255,.06)}
+nav.mob.open{display:flex}
+.wrap{max-width:1200px;margin:0 auto;padding:3rem 1rem}
+.sec-title{font-size:clamp(1.4rem,3vw,2.1rem);color:#fff;margin-bottom:.4rem}
+.sec-title .prompt{color:var(--blue)}
+.sec-sub{color:var(--dim);margin-bottom:2rem;font-size:.9rem}
+.page{display:none}
+.page.active{display:block;animation:fadein .35s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.term{background:#02060f;border:1px solid var(--line);border-radius:8px;overflow:hidden;box-shadow:0 0 40px rgba(0,200,255,.12),inset 0 0 60px rgba(0,60,120,.15)}
+.term-bar{display:flex;align-items:center;gap:.5rem;padding:.6rem .9rem;background:#051120;border-bottom:1px solid var(--line);font-size:.7rem;color:var(--dim);letter-spacing:.14em}
+.dot{width:10px;height:10px;border-radius:50%}
+.dot.r{background:var(--red)}.dot.y{background:var(--amber)}.dot.g{background:var(--green)}
+.term-body{padding:1.4rem;min-height:280px;font-size:.86rem;line-height:1.75;color:#bfe6ff}
+.term-body .ok{color:var(--green)}
+.term-body .warn{color:var(--amber)}
+.term-body .sys{color:var(--blue)}
+.term-body .dim2{color:#4d6f92}
+.cursor{display:inline-block;width:9px;height:1.1em;background:var(--blue);vertical-align:text-bottom;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:2rem;align-items:start}
+.hero-copy h1{font-size:clamp(1.9rem,4.5vw,3rem);color:#fff;line-height:1.25;margin:.9rem 0 1rem}
+.hero-copy h1 .hl{color:var(--blue);text-shadow:0 0 22px rgba(0,200,255,.6)}
+.hero-copy p{color:var(--dim);font-size:.95rem;line-height:1.8;margin-bottom:1.6rem}
+.cta-row{display:flex;gap:.8rem;flex-wrap:wrap;margin-bottom:2rem}
+.btn-ghost{display:inline-flex;align-items:center;gap:.5rem;border:1px solid var(--blue);color:var(--cyan);font-weight:700;font-size:.78rem;letter-spacing:.12em;padding:.7rem 1.1rem;border-radius:4px;transition:.2s}
+.btn-ghost:hover{background:rgba(0,200,255,.1);box-shadow:0 0 16px rgba(0,200,255,.35)}
+.stat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.stat{background:var(--navy2);padding:1.1rem .8rem;text-align:center}
+.stat .n{font-family:'Orbitron',sans-serif;font-size:1.5rem;color:var(--blue);font-weight:800}
+.stat .l{font-size:.62rem;color:var(--dim);letter-spacing:.14em;margin-top:.3rem}
+.panel{background:linear-gradient(180deg,var(--panel),var(--navy2));border:1px solid var(--line);border-radius:8px;padding:1.6rem;position:relative;overflow:hidden}
+.panel h3{color:#fff;font-size:1rem;margin-bottom:.7rem;letter-spacing:.08em}
+.panel p{color:var(--dim);font-size:.85rem;line-height:1.75}
+.panel .node{position:absolute;top:14px;right:14px;width:12px;height:12px;border-radius:50%;background:var(--blue);box-shadow:0 0 12px var(--blue)}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:1.2rem}
+.svc-list{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-top:1.5rem}
+.svc{border:1px solid var(--line);border-radius:8px;background:linear-gradient(180deg,rgba(8,28,51,.9),rgba(4,14,28,.9));padding:1.5rem;transition:.25s;position:relative}
+.svc:hover{border-color:var(--blue);box-shadow:0 0 24px rgba(0,200,255,.22);transform:translateY(-3px)}
+.svc .ic{font-size:1.6rem;color:var(--blue);margin-bottom:.8rem}
+.svc h3{color:#fff;font-size:.95rem;margin-bottom:.5rem}
+.svc p{color:var(--dim);font-size:.8rem;line-height:1.7}
+.circuit-map{position:relative;border:1px solid var(--line);border-radius:8px;background:#02060f;padding:2rem;margin-top:1.5rem;overflow:hidden}
+.circuit-map svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.nodes{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;position:relative;z-index:1}
+.node-card{background:rgba(8,28,51,.95);border:1px solid var(--blue);border-radius:8px;padding:1.2rem;text-align:center;box-shadow:0 0 20px rgba(0,200,255,.18)}
+.node-card .nk{width:14px;height:14px;border-radius:50%;background:var(--cyan);margin:0 auto .7rem;box-shadow:0 0 14px var(--cyan);animation:pulse 2s infinite}
+@keyframes pulse{50%{opacity:.4}}
+.node-card h4{color:#fff;font-size:.85rem;margin-bottom:.4rem;letter-spacing:.06em}
+.node-card p{color:var(--dim);font-size:.74rem;line-height:1.6}
+.rev-card{border:1px solid var(--line);border-radius:8px;background:linear-gradient(180deg,var(--panel),var(--navy2));padding:1.6rem;margin-bottom:1.2rem}
+.rev-card h3{color:#fff;font-size:1rem;margin-bottom:.4rem}
+.stars{color:var(--amber);letter-spacing:.15em;margin-bottom:.6rem}
+.rev-card p{color:var(--dim);font-size:.86rem;line-height:1.8}
+.src-links{display:flex;gap:.7rem;flex-wrap:wrap;margin-top:1rem}
+.hours-table{width:100%;border-collapse:collapse;font-size:.86rem;margin-top:1rem}
+.hours-table td{padding:.65rem .4rem;border-bottom:1px solid rgba(18,58,99,.6);color:var(--dim)}
+.hours-table td:first-child{color:var(--cyan);font-weight:700;letter-spacing:.08em}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.field{display:flex;flex-direction:column;gap:.4rem}
+.field.full{grid-column:1/-1}
+.field label{font-size:.7rem;font-weight:700;letter-spacing:.16em;color:var(--cyan)}
+.field input,.field select,.field textarea{background:#02060f;border:1px solid var(--line);border-radius:4px;color:var(--text);padding:.75rem;font-family:'JetBrains Mono',monospace;font-size:.85rem;width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 12px rgba(0,200,255,.3)}
+textarea{resize:vertical;min-height:110px}
+.submit-btn{background:var(--blue);color:#02101f;border:none;font-family:'Orbitron',sans-serif;font-weight:800;letter-spacing:.14em;font-size:.85rem;padding:.9rem 1.6rem;border-radius:4px;cursor:pointer;transition:.2s;margin-top:1rem;width:100%}
+.submit-btn:hover{background:var(--cyan);box-shadow:0 0 22px rgba(0,200,255,.5)}
+.form-confirm{display:none;border:1px solid var(--green);background:rgba(61,245,154,.07);border-radius:8px;padding:1.6rem;margin-top:1.2rem}
+.form-confirm.show{display:block}
+.form-confirm h3{color:var(--green);margin-bottom:.6rem}
+.form-confirm p{color:var(--dim);font-size:.86rem;line-height:1.7;margin-bottom:1rem}
+.info-row{display:flex;gap:1rem;align-items:flex-start;padding:1rem 0;border-bottom:1px solid rgba(18,58,99,.6);font-size:.88rem}
+.info-row i{color:var(--blue);font-size:1.1rem;margin-top:.2rem;width:24px;text-align:center}
+.info-row .k{color:var(--dim);font-size:.68rem;letter-spacing:.16em;margin-bottom:.2rem}
+footer{background:#020812;border-top:1px solid var(--line);padding:1.4rem;text-align:center;color:var(--dim);font-size:.8rem;letter-spacing:.06em}
+@media(max-width:900px){
+  .hero-grid{grid-template-columns:1fr}
+  .grid3,.grid2,.svc-list,.nodes{grid-template-columns:1fr}
+  .form-grid{grid-template-columns:1fr}
+  .stat-strip{grid-template-columns:repeat(2,1fr)}
+  nav.desk,.callbtn.top{display:none}
+  .burger{display:block}
+}
+</style>
+</head>
+<body>
+<svg class="pcb-bg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <g stroke="#0e3a66" stroke-width="1.5" fill="none">
+    <path d="M0,120 H300 L360,180 H620 L700,260 H1000 L1080,180 H1440"/>
+    <path d="M0,420 H220 L300,500 H560 L640,420 H900"/>
+    <path d="M1440,700 H1150 L1090,640 H820 L760,700 H420 L360,760 H0"/>
+    <path d="M120,900 V760 L200,680 V520 L260,460"/>
+    <path d="M1330,0 V140 L1250,220 V380 L1310,440 V900"/>
+    <path d="M500,900 V800 L560,740 H760 L820,680 V560"/>
+  </g>
+  <g fill="#00c8ff" opacity=".7">
+    <circle cx="360" cy="180" r="5"/><circle cx="700" cy="260" r="5"/><circle cx="1080" cy="180" r="5"/>
+    <circle cx="300" cy="500" r="5"/><circle cx="640" cy="420" r="5"/><circle cx="1090" cy="640" r="5"/>
+    <circle cx="760" cy="700" r="5"/><circle cx="200" cy="680" r="5"/><circle cx="1250" cy="220" r="5"/>
+    <circle cx="1310" cy="440" r="5"/><circle cx="560" cy="740" r="5"/><circle cx="820" cy="680" r="5"/>
+  </g>
+  <g fill="none" stroke="#00c8ff" stroke-width="1" opacity=".25">
+    <circle cx="360" cy="180" r="12"/><circle cx="700" cy="260" r="12"/><circle cx="1080" cy="180" r="12"/>
+    <circle cx="300" cy="500" r="12"/><circle cx="1090" cy="640" r="12"/>
+  </g>
+</svg>
+<div class="scanline"></div>
+<div class="topbar">
+  <div><i class="fa-solid fa-location-dot"></i> 1184 Ohio Pike, Amelia, OH 45102</div>
+  <div><a href="tel:+15137320400"><i class="fa-solid fa-phone"></i> (513) 732-0400</a></div>
+</div>
+<header class="site">
+  <div class="navwrap">
+    <a class="logo" href="?page=home" data-page="home">
+      <span class="chip"><i class="fa-solid fa-microchip"></i></span>
+      <span><span class="name">HY<span>TECH</span></span><br><span class="sub">AUTOMOTIVE</span></span>
+    </a>
+    <nav class="desk" aria-label="Main navigation">
+      <a href="?page=home" data-page="home" class="active">HOME</a>
+      <a href="?page=services" data-page="services">SERVICES</a>
+      <a href="?page=about" data-page="about">ABOUT</a>
+      <a href="?page=reviews" data-page="reviews">REVIEWS</a>
+      <a href="?page=contact" data-page="contact">CONTACT</a>
+    </nav>
+    <a class="callbtn top" href="tel:+15137320400"><i class="fa-solid fa-phone"></i> CALL NOW</a>
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
+  </div>
+  <nav class="mob" id="mobnav" aria-label="Mobile navigation">
+    <a href="?page=home" data-page="home" class="active">HOME</a>
+    <a href="?page=services" data-page="services">SERVICES</a>
+    <a href="?page=about" data-page="about">ABOUT</a>
+    <a href="?page=reviews" data-page="reviews">REVIEWS</a>
+    <a href="?page=contact" data-page="contact">CONTACT</a>
+  </nav>
+</header>
+<main>
+<section class="page active" id="page-home" data-page="home">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <span class="badge blue"><i class="fa-solid fa-wrench"></i> AUTO REPAIR SHOP, AMELIA OH</span>
+        <h1>DIAGNOSTICS AT <span class="hl">FULL VOLTAGE</span>. REPAIRS YOU CAN TRUST.</h1>
+        <p>Hytech Automotive is a family operated auto repair shop on Ohio Pike in Amelia, Ohio. From check engine diagnostics to tires and brakes, the shop is built around honest communication and high tech service at a fair rate. <span class="badge">Call to confirm</span></p>
+        <div class="cta-row">
+          <a class="callbtn" href="tel:+15137320400"><i class="fa-solid fa-phone"></i> (513) 732-0400</a>
+          <a class="btn-ghost" href="?page=services" data-page="services"><i class="fa-solid fa-diagram-project"></i> VIEW SERVICE MAP</a>
+          <a class="btn-ghost" href="https://www.google.com/maps/search/?api=1&query=Hytech%20Automotive%2C%201184%20Ohio%20Pike%2C%20Amelia%2C%20OH%2045102"><i class="fa-solid fa-location-arrow"></i> GET DIRECTIONS</a>
+        </div>
+        <div class="stat-strip">
+          <div class="stat"><div class="n">4</div><div class="l">SERVICE BAYS</div></div>
+          <div class="stat"><div class="n">2004</div><div class="l">ESTABLISHED</div></div>
+          <div class="stat"><div class="n">ASE</div><div class="l">CERTIFIED TECHS</div></div>
+          <div class="stat"><div class="n">45102</div><div class="l">AMELIA OH</div></div>
+        </div>
+      </div>
+      <div class="term" aria-label="Diagnostic terminal">
+        <div class="term-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>&nbsp;HYTECH_DIAG v4.3, SYSTEM BOOT</div>
+        <div class="term-body" id="termbody"></div>
+      </div>
+    </div>
+  </div>
+  <div class="wrap" style="padding-top:0">
+    <h2 class="sec-title"><span class="prompt">&gt;</span> CORE CIRCUITS</h2>
+    <p class="sec-sub">Primary service channels. Services below are reported on third-party business listings.</p>
+    <div class="svc-list">
+      <div class="svc"><div class="ic"><i class="fa-solid fa-gauge-high"></i></div><h3>ENGINE DIAGNOSTICS</h3><p>Computer based fault tracing for check engine lights and drivability problems. Reported on third party listings.</p></div>
+      <div class="svc"><div class="ic"><i class="fa-solid fa-circle-dot"></i></div><h3>TIRES</h3><p>Tire sales and service. Third party reviews mention competitive tire pricing.</p></div>
+      <div class="svc"><div class="ic"><i class="fa-solid fa-oil-can"></i></div><h3>OIL CHANGES</h3><p>Quick maintenance visits. Mentioned in customer reviews on third party sites.</p></div>
+      <div class="svc"><div class="ic"><i class="fa-solid fa-wind"></i></div><h3>EXHAUST REPAIR</h3><p>Exhaust leak repair noted in customer reviews on third party sites.</p></div>
+      <div class="svc"><div class="ic"><i class="fa-solid fa-truck-moving"></i></div><h3>U-HAUL RENTALS</h3><p>U-Haul rental service reported on third party business listings.</p></div>
+      <div class="svc"><div class="ic"><i class="fa-solid fa-car-side"></i></div><h3>VEHICLE SALES</h3><p>Used vehicle sales listed under the shop's service and sales name.</p></div>
+    </div>
+    <p style="margin-top:1rem"><span class="badge">Call to confirm</span> <span style="color:var(--dim);font-size:.8rem">Service details, availability and pricing are reported by third party directories and are subject to change.</span></p>
+  </div>
+</section>
+<section class="page" id="page-services" data-page="services">
+  <div class="wrap">
+    <h2 class="sec-title"><span class="prompt">&gt;</span> SERVICE MAP</h2>
+    <p class="sec-sub">Every circuit on this board is a service channel. Services listed below come from third-party business listings and the shop's own published description. <span class="badge">Call to confirm</span></p>
+    <div class="circuit-map">
+      <svg viewBox="0 0 800 420" preserveAspectRatio="none" aria-hidden="true">
+        <g stroke="#0e3a66" stroke-width="2" fill="none">
+          <path d="M400,40 V110 M140,180 H260 M540,180 H660 M140,300 H260 M540,300 H660"/>
+          <path d="M200,110 V180 M600,110 V180 M200,180 V300 M600,180 V300"/>
+        </g>
+        <g fill="#00c8ff" opacity=".8">
+          <circle cx="400" cy="40" r="6"/><circle cx="140" cy="180" r="6"/><circle cx="660" cy="180" r="6"/>
+          <circle cx="140" cy="300" r="6"/><circle cx="660" cy="300" r="6"/><circle cx="400" cy="380" r="6"/>
+        </g>
+        <g stroke="#00c8ff" stroke-width="2" fill="none" opacity=".5">
+          <path d="M200,180 H600 M200,300 H600 M400,110 V40"/>
+        </g>
+      </svg>
+      <div class="nodes">
+        <div class="node-card"><div class="nk"></div><h4>ENGINE DIAGNOSTICS</h4><p>Computer based fault tracing. One reviewer on a third party site says the shop solved a problem a dealership could not.</p></div>
+        <div class="node-card"><div class="nk"></div><h4>GENERAL REPAIR</h4><p>Full service repair per the shop's own published description.</p></div>
+        <div class="node-card"><div class="nk"></div><h4>BRAKE SERVICE</h4><p>Brake work including brake flush, noted on third party listings.</p></div>
+        <div class="node-card"><div class="nk"></div><h4>OIL CHANGES</h4><p>Routine oil changes mentioned in customer reviews on third party sites.</p></div>
+        <div class="node-card"><div class="nk"></div><h4>TIRES</h4><p>Tire sales and service. Reviewers mention fair tire pricing.</p></div>
+        <div class="node-card"><div class="nk"></div><h4>EXHAUST REPAIR</h4><p>Exhaust leak repair noted in customer reviews on third party sites.</p></div>
+        <div class="node-card"><div class="nk"></div><h4>FLEET SERVICES</h4><p>Special services for fleets of 1 to 20 vehicles, per the shop's own published description.</p></div>
+        <div class="node-card"><div class="nk"></div><h4>PICKUP AND DELIVERY</h4><p>Vehicle pickup and delivery offered, per the shop's own published description. Early bird drop off and night owl pick up area.</p></div>
+        <div class="node-card"><div class="nk"></div><h4>U-HAUL RENTALS</h4><p>Rental service reported on third party business listings.</p></div>
+      </div>
+    </div>
+    <div class="grid2" style="margin-top:1.5rem">
+      <div class="panel"><span class="node"></span><h3><i class="fa-solid fa-certificate" style="color:var(--blue)"></i> ASE CERTIFIED</h3><p>The shop's published description states it staffs Automotive Service Excellence (ASE) board certified technicians. Call to confirm current staffing.</p></div>
+      <div class="panel"><span class="node"></span><h3><i class="fa-solid fa-tags" style="color:var(--blue)"></i> PRICING</h3><p>Prices are not published online. Call (513) 732-0400 for a quote before booking. No prices are listed here because none could be verified.</p></div>
+    </div>
+  </div>
+</section>
+<section class="page" id="page-about" data-page="about">
+  <div class="wrap">
+    <h2 class="sec-title"><span class="prompt">&gt;</span> SYSTEM PROFILE</h2>
+    <p class="sec-sub">Who Hytech Automotive is, based on public business records and published descriptions. <span class="badge">Call to confirm</span></p>
+    <div class="grid2">
+      <div class="panel"><span class="node"></span><h3><i class="fa-solid fa-building" style="color:var(--blue)"></i> THE SHOP</h3><p>Hytech Automotive operates at 1184 Ohio Pike in Amelia, Ohio, listed as Hytech Automotive Service and Sales. Third party profiles describe a family owned and operated four bay garage established in 2004, built from a business that began in the owner's mother's garage. These details come from third party business profiles and have not been verified directly with the shop.</p></div>
+      <div class="panel"><span class="node"></span><h3><i class="fa-solid fa-handshake" style="color:var(--blue)"></i> HOW THEY WORK</h3><p>The shop's own published description says customer service is the cornerstone of the business, with honest and open communication as the goal, and customers' needs placed as the highest priority of the day. Their published description also mentions pickup and delivery, early bird drop off and night owl pick up, and services for fleets of 1 to 20 vehicles.</p></div>
+    </div>
+    <div class="grid2" style="margin-top:1.2rem">
+      <div class="panel"><span class="node"></span><h3><i class="fa-solid fa-clipboard-list" style="color:var(--blue)"></i> RECORDED SPECS</h3>
+        <table class="hours-table">
+          <tr><td>LOCATION</td><td>1184 Ohio Pike, Amelia, OH 45102</td></tr>
+          <tr><td>PHONE</td><td><a href="tel:+15137320400">(513) 732-0400</a></td></tr>
+          <tr><td>CATEGORY</td><td>Auto repair shop</td></tr>
+          <tr><td>YEAR LISTED</td><td>2004 (third party profile, call to confirm)</td></tr>
+          <tr><td>CERTIFICATION CLAIM</td><td>ASE board certified techs (shop's own description)</td></tr>
+        </table>
+      </div>
+      <div class="panel"><span class="node"></span><h3><i class="fa-solid fa-clock" style="color:var(--blue)"></i> HOURS <span class="badge">Call to confirm</span></h3>
+        <table class="hours-table">
+          <tr><td>MONDAY</td><td>9:00 AM to 6:00 PM</td></tr>
+          <tr><td>TUESDAY</td><td>9:00 AM to 6:00 PM</td></tr>
+          <tr><td>WEDNESDAY</td><td>9:00 AM to 6:00 PM</td></tr>
+          <tr><td>THURSDAY</td><td>9:00 AM to 6:00 PM</td></tr>
+          <tr><td>FRIDAY</td><td>9:00 AM to 6:00 PM</td></tr>
+          <tr><td>SATURDAY</td><td>8:00 AM to 1:00 PM</td></tr>
+          <tr><td>SUNDAY</td><td>Closed</td></tr>
+        </table>
+        <p style="margin-top:.8rem;font-size:.76rem">Hours compiled from third party directory listings. Sources disagree on some details, so call ahead to confirm.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="page" id="page-reviews" data-page="reviews">
+  <div class="wrap">
+    <h2 class="sec-title"><span class="prompt">&gt;</span> SIGNAL REPORT</h2>
+    <p class="sec-sub">Public ratings for Hytech Automotive from third party sources. No review text is quoted and no reviewer names are listed here. Read full reviews at the source links below.</p>
+    <div class="rev-card">
+      <h3><i class="fa-brands fa-google" style="color:var(--blue)"></i> GOOGLE MAPS LISTING</h3>
+      <p>The shop's Google Maps listing is the most direct source for current reviews. We do not have a verified aggregate rating from the Maps listing in this build, so check the live listing.</p>
+      <div class="src-links">
+        <a class="btn-ghost" href="https://www.google.com/maps/place/?q=place_id:ChIJ16rIvOMHQYgR3BG6M_dYrss"><i class="fa-solid fa-arrow-up-right-from-square"></i> VIEW GOOGLE MAPS REVIEWS</a>
+      </div>
+    </div>
+    <div class="rev-card">
+      <h3>THIRD PARTY RATING SNAPSHOT <span class="badge">Call to confirm</span></h3>
+      <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star"></i></div>
+      <p><strong style="color:#fff">POSITIVE SIGNAL:</strong> Several directory aggregators show ratings around 4.0 to 4.4 out of 5 from dozens of reviews. Common positive themes reported on third party sites include honest communication, fair and affordable pricing, successful diagnostics that a dealership could not solve, and friendly family run service.</p>
+      <p style="margin-top:.7rem"><strong style="color:#fff">MIXED AND NEGATIVE SIGNAL:</strong> Other listings show lower scores (one aggregator shows 3.0 out of 5 from a small sample). Negative themes reported on third party sites include pricing disputes between quoted and final cost, overcharging claims, and complaints about repeat visits. Review volume and recency vary by platform.</p>
+      <p style="margin-top:.7rem;font-size:.78rem">Aggregate figures above are compiled from public third party directory pages and may be outdated. For the most current picture, read the reviews directly on Google Maps.</p>
+      <div class="src-links">
+        <a class="btn-ghost" href="https://www.google.com/maps/place/?q=place_id:ChIJ16rIvOMHQYgR3BG6M_dYrss"><i class="fa-solid fa-arrow-up-right-from-square"></i> GOOGLE MAPS</a>
+        <a class="btn-ghost" href="https://www.google.com/maps/search/?api=1&query=Hytech%20Automotive%2C%201184%20Ohio%20Pike%2C%20Amelia%2C%20OH%2045102"><i class="fa-solid fa-location-arrow"></i> DIRECTIONS</a>
+      </div>
+    </div>
+    <div class="rev-card">
+      <h3>LEAVE YOUR OWN REVIEW</h3>
+      <p>Had work done at Hytech Automotive? Post your experience on their Google Maps listing so other drivers in Amelia get an honest signal.</p>
+      <div class="src-links">
+        <a class="btn-ghost" href="https://www.google.com/maps/place/?q=place_id:ChIJ16rIvOMHQYgR3BG6M_dYrss"><i class="fa-solid fa-pen-to-square"></i> REVIEW ON GOOGLE MAPS</a>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="page" id="page-contact" data-page="contact">
+  <div class="wrap">
+    <h2 class="sec-title"><span class="prompt">&gt;</span> OPEN CHANNEL</h2>
+    <p class="sec-sub">Call, get directions, or send a service request. This form does not send email; it prepares a request summary you can read out when you call. <span class="badge blue">No email on file</span></p>
+    <div class="grid2">
+      <div class="panel"><span class="node"></span>
+        <h3><i class="fa-solid fa-satellite-dish" style="color:var(--blue)"></i> DIRECT LINES</h3>
+        <div class="info-row"><i class="fa-solid fa-phone"></i><div><div class="k">PHONE</div><a href="tel:+15137320400" style="font-size:1.1rem;font-weight:700">(513) 732-0400</a></div></div>
+        <div class="info-row"><i class="fa-solid fa-location-dot"></i><div><div class="k">ADDRESS</div>Hytech Automotive, 1184 Ohio Pike, Amelia, OH 45102</div></div>
+        <div class="info-row"><i class="fa-solid fa-location-arrow"></i><div><div class="k">DIRECTIONS</div><a href="https://www.google.com/maps/search/?api=1&query=Hytech%20Automotive%2C%201184%20Ohio%20Pike%2C%20Amelia%2C%20OH%2045102">Open in Google Maps</a></div></div>
+        <div class="info-row" style="border-bottom:none"><i class="fa-solid fa-clock"></i><div><div class="k">HOURS <span class="badge">Call to confirm</span></div>Mon to Fri 9:00 AM to 6:00 PM. Sat 8:00 AM to 1:00 PM. Sun closed.</div></div>
+      </div>
+      <div class="panel"><span class="node"></span>
+        <h3><i class="fa-solid fa-terminal" style="color:var(--blue)"></i> SERVICE REQUEST <span class="badge">Sample form</span></h3>
+        <form id="reqform" novalidate>
+          <div class="form-grid">
+            <div class="field"><label for="fname">NAME</label><input id="fname" name="name" type="text" placeholder="Your name" required></div>
+            <div class="field"><label for="fphone">PHONE</label><input id="fphone" name="phone" type="tel" placeholder="(513) 000-0000" required></div>
+            <div class="field"><label for="fveh">VEHICLE</label><input id="fveh" name="vehicle" type="text" placeholder="Year, make, model"></div>
+            <div class="field"><label for="fsvc">SERVICE NEEDED</label><select id="fsvc" name="service"><option>Diagnostics</option><option>Oil change</option><option>Brakes</option><option>Tires</option><option>Exhaust</option><option>Other repair</option><option>U-Haul rental</option></select></div>
+            <div class="field full"><label for="fmsg">DESCRIBE THE ISSUE</label><textarea id="fmsg" name="message" placeholder="Symptoms, noises, warning lights, when it started"></textarea></div>
+          </div>
+          <button class="submit-btn" type="submit"><i class="fa-solid fa-paper-plane"></i> PREPARE REQUEST</button>
+        </form>
+        <div class="form-confirm" id="formconfirm" role="status">
+          <h3><i class="fa-solid fa-check-circle"></i> REQUEST READY</h3>
+          <p id="conftext">Your request summary is ready.</p>
+          <a class="callbtn" href="tel:+15137320400"><i class="fa-solid fa-phone"></i> CALL (513) 732-0400 TO BOOK</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+<footer>© Hytech Automotive</footer>
+<script>
+(function(){
+  var pages=['home','services','about','reviews','contact'];
+  var burger=document.getElementById('burger');
+  var mobnav=document.getElementById('mobnav');
+  function currentFromURL(){
+    var m=/[?&]page=([a-z]+)/i.exec(window.location.search);
+    var p=m?m[1].toLowerCase():null;
+    return pages.indexOf(p)>=0?p:'home';
+  }
+  function setActive(p){
+    pages.forEach(function(k){
+      var sec=document.getElementById('page-'+k);
+      if(sec) sec.classList.toggle('active',k===p);
+    });
+    document.querySelectorAll('a[data-page]').forEach(function(a){
+      a.classList.toggle('active',a.getAttribute('data-page')===p);
+    });
+  }
+  function navigateTo(p, push){
+    if(pages.indexOf(p)<0) p='home';
+    if(push!==false){
+      try{ history.pushState({page:p},'', '?page='+p); }catch(e){}
+    }
+    setActive(p);
+    closeMenu();
+    window.scrollTo(0,0);
+    if(p==='home') bootTerm();
+  }
+  function closeMenu(){
+    mobnav.classList.remove('open');
+    burger.setAttribute('aria-expanded','false');
+  }
+  document.querySelectorAll('a[data-page]').forEach(function(a){
+    a.addEventListener('click',function(e){
+      e.preventDefault();
+      navigateTo(a.getAttribute('data-page'));
+    });
+  });
+  burger.addEventListener('click',function(){
+    var open=mobnav.classList.toggle('open');
+    burger.setAttribute('aria-expanded',open?'true':'false');
+  });
+  document.addEventListener('click',function(e){
+    if(mobnav.classList.contains('open') && !mobnav.contains(e.target) && !burger.contains(e.target)) closeMenu();
+  });
+  window.addEventListener('popstate',function(){
+    setActive(currentFromURL());
+    window.scrollTo(0,0);
+  });
+  setActive(currentFromURL());
+  var booted=false;
+  var lines=[
+    ['sys','HYTECH_DIAG v4.3 ... initializing'],
+    ['dim2','checking lift bay 01 ............ <span class="ok">ONLINE</span>'],
+    ['dim2','checking lift bay 02 ............ <span class="ok">ONLINE</span>'],
+    ['dim2','checking lift bay 03 ............ <span class="ok">ONLINE</span>'],
+    ['dim2','checking lift bay 04 ............ <span class="ok">ONLINE</span>'],
+    ['dim2','scanning OBD-II bus ............. <span class="ok">READY</span>'],
+    ['sys','> welcome to HYTECH AUTOMOTIVE'],
+    ['','1184 Ohio Pike, Amelia OH 45102'],
+    ['','call <span class="ok">(513) 732-0400</span> for a live tech'],
+    ['warn','status: family owned, ASE certified techs'],
+    ['ok','all systems nominal. how can we help? <span class="cursor"></span>']
+  ];
+  function bootTerm(){
+    if(booted) return;
+    var body=document.getElementById('termbody');
+    if(!body) return;
+    booted=true;
+    var i=0;
+    function next(){
+      if(i>=lines.length) return;
+      var cls=lines[i][0], txt=lines[i][1];
+      var div=document.createElement('div');
+      if(cls) div.className=cls;
+      div.innerHTML='<span class="dim2">'+String(i).padStart(2,'0')+':</span> '+txt;
+      body.appendChild(div);
+      i++;
+      setTimeout(next, 260);
+    }
+    next();
+  }
+  bootTerm();
+  var form=document.getElementById('reqform');
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    var name=document.getElementById('fname').value.trim();
+    var phone=document.getElementById('fphone').value.trim();
+    var veh=document.getElementById('fveh').value.trim();
+    var svc=document.getElementById('fsvc').value;
+    var msg=document.getElementById('fmsg').value.trim();
+    if(!name||!phone){
+      alert('Please enter your name and phone number.');
+      return;
+    }
+    var summary='Name: '+name+'. Phone: '+phone+'.';
+    if(veh) summary+=' Vehicle: '+veh+'.';
+    summary+=' Service: '+svc+'.';
+    if(msg) summary+=' Issue: '+msg;
+    document.getElementById('conftext').textContent='Request summary: '+summary+' No email is on file for the shop, so call (513) 732-0400 to complete your booking.';
+    document.getElementById('formconfirm').classList.add('show');
+  });
+})();
+</script>
+</body>
+</html>

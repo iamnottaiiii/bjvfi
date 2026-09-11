@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>All City Roofing &amp; Construction Inc. | Roof Geometry Lab | North Royalton, OH</title>
+<meta name="description" content="All City Roofing & Construction Inc., family owned roofing and construction company in North Royalton, OH. Roofing, siding, gutters, carpentry, and emergency services. Call (216) 533-9810.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{
+  --ink:#0c121d;
+  --slate:#141d2c;
+  --panel:#1b2638;
+  --panel2:#222f45;
+  --red:#e2453b;
+  --red-deep:#b93228;
+  --paper:#f5f2ea;
+  --mut:#93a1b8;
+  --line:#2c3a52;
+  --grid:rgba(120,150,200,.08);
+  --disp:'Space Grotesk',sans-serif;
+  --body:'Inter',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--body);
+  background:var(--ink);
+  color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:34px 34px;
+  min-height:100vh;
+  display:flex;
+}
+::selection{background:var(--red);color:#fff}
+a{color:inherit}
+.wrap{display:flex;width:100%;min-height:100vh}
+aside.side{
+  width:288px;flex:0 0 288px;
+  background:linear-gradient(180deg,#101827 0%,#0b1120 100%);
+  border-right:1px solid var(--line);
+  position:sticky;top:0;height:100vh;
+  display:flex;flex-direction:column;
+  z-index:50;
+}
+.brand{padding:26px 24px 20px;border-bottom:1px solid var(--line)}
+.brand .tag{font-family:var(--mono);font-size:11px;letter-spacing:3px;color:var(--red);text-transform:uppercase}
+.brand h1{font-family:var(--disp);font-size:21px;line-height:1.25;margin-top:8px;font-weight:700}
+.brand h1 a{text-decoration:none}
+.brand .sub{font-size:12px;color:var(--mut);margin-top:6px}
+nav.mod{padding:14px 12px;flex:1;overflow:auto}
+nav.mod a{
+  display:flex;align-items:center;gap:12px;
+  padding:13px 14px;margin-bottom:6px;border-radius:10px;
+  text-decoration:none;color:var(--paper);
+  border:1px solid transparent;
+  transition:background .18s,border-color .18s,transform .18s;
+}
+nav.mod a .num{font-family:var(--mono);font-size:11px;color:var(--red);width:26px}
+nav.mod a .lbl{font-family:var(--disp);font-weight:600;font-size:15px;letter-spacing:.4px}
+nav.mod a .dsc{font-size:11px;color:var(--mut);display:block;font-family:var(--body);font-weight:400}
+nav.mod a:hover{background:var(--panel);border-color:var(--line);transform:translateX(3px)}
+nav.mod a.active-page{background:var(--panel);border-color:var(--red);box-shadow:inset 3px 0 0 var(--red)}
+nav.mod a.active-page .dsc{color:var(--paper)}
+.side-cta{padding:18px 20px 22px;border-top:1px solid var(--line)}
+.side-cta .ph{font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--mut);text-transform:uppercase;margin-bottom:8px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;justify-content:center;
+  font-family:var(--disp);font-weight:600;font-size:15px;
+  padding:14px 22px;border-radius:10px;text-decoration:none;cursor:pointer;border:none;
+  transition:transform .15s,box-shadow .15s,background .15s;
+}
+.btn-red{background:linear-gradient(180deg,var(--red),var(--red-deep));color:#fff;box-shadow:0 6px 20px rgba(226,69,59,.35)}
+.btn-red:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(226,69,59,.45)}
+.btn-ghost{background:transparent;border:1px solid var(--line);color:var(--paper)}
+.btn-ghost:hover{border-color:var(--red);background:rgba(226,69,59,.08)}
+.btn-block{width:100%}
+.topbar{display:none}
+main.stage{flex:1;min-width:0;display:flex;flex-direction:column}
+section.page{display:none;animation:fadein .35s ease}
+section.page.active{display:block}
+@keyframes fadein{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.hero{position:relative;overflow:hidden;padding:64px 48px 0;border-bottom:1px solid var(--line)}
+.hero-kicker{font-family:var(--mono);font-size:12px;letter-spacing:4px;color:var(--red);text-transform:uppercase;margin-bottom:16px}
+.hero h2{font-family:var(--disp);font-size:clamp(34px,5vw,62px);line-height:1.04;font-weight:700;max-width:760px}
+.hero h2 .hl{color:var(--red)}
+.hero p.lead{color:var(--mut);font-size:17px;max-width:620px;margin-top:18px;line-height:1.65}
+.hero-ctas{display:flex;gap:14px;flex-wrap:wrap;margin:28px 0 0}
+.skyline{margin-top:40px;display:block;width:100%;height:auto}
+.pad{padding:48px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.panel{
+  background:linear-gradient(180deg,var(--panel),var(--slate));
+  border:1px solid var(--line);border-radius:16px;padding:28px;
+  position:relative;overflow:hidden;
+}
+.panel .ptag{position:absolute;top:0;left:28px;background:var(--red);color:#fff;font-family:var(--mono);font-size:10px;letter-spacing:2px;padding:5px 12px;border-radius:0 0 8px 8px;text-transform:uppercase}
+.panel h3{font-family:var(--disp);font-size:22px;margin:18px 0 8px}
+.panel p{color:var(--mut);font-size:14.5px;line-height:1.65}
+.sec-head{margin:0 0 26px}
+.sec-head .kick{font-family:var(--mono);font-size:11px;letter-spacing:3px;color:var(--red);text-transform:uppercase}
+.sec-head h2{font-family:var(--disp);font-size:clamp(26px,3.4vw,38px);margin-top:8px}
+.sec-head p{color:var(--mut);margin-top:10px;max-width:640px;line-height:1.6}
+.badge{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;border:1px dashed var(--red);color:var(--red);border-radius:20px;padding:5px 12px;margin-top:12px}
+.lab{border:1px solid var(--line);border-radius:16px;background:#0e1524;padding:30px}
+.lab-title{font-family:var(--mono);font-size:12px;letter-spacing:3px;color:var(--mut);text-transform:uppercase;margin-bottom:6px}
+.readouts{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:22px 0}
+.readout{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 14px;text-align:center}
+.readout .v{font-family:var(--mono);font-size:24px;font-weight:600;color:#fff}
+.readout .v.red{color:var(--red)}
+.readout .k{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--mut);text-transform:uppercase;margin-top:6px}
+input[type=range]{width:100%;appearance:none;-webkit-appearance:none;height:8px;border-radius:6px;background:linear-gradient(90deg,var(--red) var(--fill,50%),#2c3a52 var(--fill,50%));outline:none;margin:18px 0 6px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:#fff;border:5px solid var(--red);cursor:pointer;box-shadow:0 2px 10px rgba(226,69,59,.5)}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:5px solid var(--red);cursor:pointer}
+.tickrow{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--mut)}
+#triWrap{display:flex;justify-content:center;padding:10px 0}
+.explode-btn{margin-top:6px}
+.layers{position:relative;margin-top:26px;display:flex;flex-direction:column;align-items:center;gap:0;min-height:430px;justify-content:center}
+.layer{
+  width:min(560px,92%);border-radius:8px;padding:10px 16px;cursor:pointer;
+  display:flex;align-items:center;gap:14px;
+  border:1px solid var(--line);
+  transition:transform .5s cubic-bezier(.2,.8,.2,1),box-shadow .3s,border-color .3s;
+  position:relative;
+}
+.layer .chip{font-family:var(--mono);font-size:10px;letter-spacing:1.5px;background:rgba(0,0,0,.35);padding:4px 10px;border-radius:6px;color:#fff;white-space:nowrap}
+.layer .nm{font-family:var(--disp);font-weight:600;font-size:14.5px}
+.layer.sel{border-color:var(--red);box-shadow:0 0 0 1px var(--red),0 8px 24px rgba(226,69,59,.25)}
+.layer.l1{background:linear-gradient(180deg,#8a2f28,#5f201c)}
+.layer.l2{background:linear-gradient(180deg,#3a4a63,#2b3750)}
+.layer.l3{background:linear-gradient(180deg,#6b4a2f,#4c331f)}
+.layer.l4{background:linear-gradient(180deg,#4a5a70,#354354)}
+.layer.l5{background:linear-gradient(180deg,#7a6a4a,#57492f)}
+.layer.l6{background:linear-gradient(180deg,#2f3a4c,#232d3e)}
+.lab.exploded .layer.l1{transform:translateY(-86px)}
+.lab.exploded .layer.l2{transform:translateY(-52px)}
+.lab.exploded .layer.l3{transform:translateY(-18px)}
+.lab.exploded .layer.l4{transform:translateY(16px)}
+.lab.exploded .layer.l5{transform:translateY(50px)}
+.lab.exploded .layer.l6{transform:translateY(84px)}
+.layer-note{margin-top:24px;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--red);border-radius:0 12px 12px 0;padding:18px 20px;min-height:96px}
+.layer-note h4{font-family:var(--disp);font-size:17px;margin-bottom:6px}
+.layer-note p{color:var(--mut);font-size:14px;line-height:1.6}
+.check-list{display:flex;flex-direction:column;gap:12px;margin-top:20px}
+.check{display:flex;gap:14px;align-items:flex-start;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;cursor:pointer;transition:border-color .2s,background .2s}
+.check:hover{border-color:#3d4f6d}
+.check input{width:20px;height:20px;margin-top:2px;accent-color:var(--red);cursor:pointer;flex:0 0 20px}
+.check .ct{font-weight:600;font-size:15px}
+.check .cd{font-size:13px;color:var(--mut);margin-top:3px;line-height:1.5}
+.check.hit{border-color:var(--red);background:rgba(226,69,59,.07)}
+.scorebar{margin-top:22px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px}
+.scorebar .meter{height:12px;background:#0b1120;border-radius:8px;overflow:hidden;margin:12px 0}
+.scorebar .fill{height:100%;width:0;background:linear-gradient(90deg,#f0a13a,var(--red));border-radius:8px;transition:width .4s}
+.scorebar .verdict{font-family:var(--disp);font-size:17px;font-weight:600}
+.scorebar .verdict small{display:block;font-family:var(--body);font-weight:400;color:var(--mut);font-size:13px;margin-top:6px;line-height:1.55}
+.svc{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.svc-card{background:linear-gradient(180deg,var(--panel),var(--slate));border:1px solid var(--line);border-radius:14px;padding:24px;transition:transform .18s,border-color .18s,box-shadow .18s}
+.svc-card:hover{transform:translateY(-4px);border-color:var(--red);box-shadow:0 14px 30px rgba(0,0,0,.35)}
+.svc-card i{font-size:26px;color:var(--red);margin-bottom:14px}
+.svc-card h3{font-family:var(--disp);font-size:17px;margin-bottom:8px}
+.svc-card p{font-size:13.5px;color:var(--mut);line-height:1.6}
+.tline{position:relative;margin-top:10px;padding-left:34px}
+.tline::before{content:"";position:absolute;left:10px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.tevent{position:relative;padding:0 0 30px}
+.tevent::before{content:"";position:absolute;left:-30px;top:4px;width:14px;height:14px;border-radius:50%;background:var(--red);box-shadow:0 0 0 4px rgba(226,69,59,.2)}
+.tevent .yr{font-family:var(--mono);font-size:13px;color:var(--red);letter-spacing:2px}
+.tevent h3{font-family:var(--disp);font-size:19px;margin:6px 0}
+.tevent p{color:var(--mut);font-size:14.5px;line-height:1.65}
+.statband{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:30px}
+.stat{background:#0e1524;border:1px solid var(--line);border-radius:14px;padding:24px;text-align:center}
+.stat .n{font-family:var(--disp);font-size:34px;font-weight:700;color:var(--red)}
+.stat .l{font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--mut);text-transform:uppercase;margin-top:8px;line-height:1.5}
+.src-note{font-size:12.5px;color:var(--mut);margin-top:14px;line-height:1.6}
+.rev-card{background:linear-gradient(180deg,var(--panel),var(--slate));border:1px solid var(--line);border-radius:16px;padding:30px;display:flex;flex-direction:column;gap:12px}
+.rev-card .stars{color:var(--red);letter-spacing:4px;font-size:18px}
+.rev-card h3{font-family:var(--disp);font-size:21px}
+.rev-card p{color:var(--mut);font-size:14px;line-height:1.65}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.field{margin-bottom:18px}
+.field.full{grid-column:1/-1}
+.field label{display:block;font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--mut);margin-bottom:8px}
+.field input,.field select,.field textarea{
+  width:100%;background:#0e1524;border:1px solid var(--line);border-radius:10px;
+  color:var(--paper);padding:14px 16px;font-size:15px;font-family:var(--body);outline:none;transition:border-color .2s;
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--red)}
+.field .err{display:none;color:var(--red);font-size:12.5px;margin-top:6px}
+.field.bad input,.field.bad select,.field.bad textarea{border-color:var(--red)}
+.field.bad .err{display:block}
+textarea{min-height:130px;resize:vertical}
+.contact-cols{display:grid;grid-template-columns:1fr 1.15fr;gap:28px;align-items:start}
+.info-row{display:flex;gap:16px;align-items:flex-start;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:14px}
+.info-row i{color:var(--red);font-size:20px;margin-top:2px;width:26px;text-align:center}
+.info-row .t{font-family:var(--mono);font-size:10.5px;letter-spacing:2px;text-transform:uppercase;color:var(--mut);margin-bottom:5px}
+.info-row .v{font-size:16px;font-weight:600}
+.info-row .v a{text-decoration:none}
+.info-row .v a:hover{color:var(--red)}
+.success{display:none;background:rgba(46,160,90,.1);border:1px solid #2ea05a;border-radius:14px;padding:30px;text-align:center}
+.success.show{display:block}
+.success i{font-size:44px;color:#2ea05a;margin-bottom:14px}
+.success h3{font-family:var(--disp);font-size:22px;margin-bottom:10px}
+.success p{color:var(--mut);font-size:14.5px;line-height:1.65}
+.acc{border:1px solid var(--line);border-radius:12px;margin-bottom:12px;overflow:hidden;background:var(--panel)}
+.acc button.q{width:100%;background:none;border:none;color:var(--paper);font-family:var(--disp);font-weight:600;font-size:16px;text-align:left;padding:18px 20px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.acc button.q i{color:var(--red);transition:transform .25s}
+.acc.open button.q i{transform:rotate(180deg)}
+.acc .a{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.acc .a div{padding:0 20px 20px;color:var(--mut);font-size:14px;line-height:1.65}
+.foot-pad{padding:26px 48px 40px}
+footer{background:#080d16;border-top:1px solid var(--line);padding:22px;text-align:center;font-size:13.5px;color:var(--mut)}
+@media(max-width:1060px){
+  .grid3,.svc{grid-template-columns:1fr 1fr}
+  .grid4,.statband{grid-template-columns:1fr 1fr}
+  .readouts{grid-template-columns:1fr 1fr}
+  .contact-cols{grid-template-columns:1fr}
+}
+@media(max-width:860px){
+  body{display:block}
+  aside.side{position:fixed;left:0;top:0;bottom:0;transform:translateX(-100%);transition:transform .3s ease;width:288px;height:100dvh}
+  body.menu-open aside.side{transform:none}
+  .scrim{position:fixed;inset:0;background:rgba(0,0,0,.6);opacity:0;pointer-events:none;transition:opacity .3s;z-index:40}
+  body.menu-open .scrim{opacity:1;pointer-events:auto}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:#0b1120;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30}
+  .topbar .tb-brand{font-family:var(--disp);font-weight:700;font-size:15px}
+  .topbar .tb-brand span{color:var(--red);font-family:var(--mono);font-size:10px;letter-spacing:2px;display:block}
+  .burger{background:none;border:1px solid var(--line);color:var(--paper);border-radius:8px;width:44px;height:44px;font-size:18px;cursor:pointer}
+  .hero{padding:40px 22px 0}
+  .pad{padding:30px 22px}
+  .foot-pad{padding:20px 22px 30px}
+  .grid2,.svc,.form-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="scrim" id="scrim"></div>
+<div class="topbar">
+  <div class="tb-brand"><span>ROOF GEOMETRY LAB</span>All City Roofing &amp; Construction</div>
+  <button class="burger" id="burger" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+</div>
+<div class="wrap">
+<aside class="side" id="side">
+  <div class="brand">
+    <div class="tag">Roof Geometry Lab</div>
+    <h1><a href="?page=home" data-nav="home">All City Roofing &amp; Construction Inc.</a></h1>
+    <div class="sub">North Royalton, Ohio</div>
+  </div>
+  <nav class="mod" aria-label="Site">
+    <a href="?page=home" data-nav="home"><span class="num">01</span><span><span class="lbl">Home</span><span class="dsc">Lab console and pitch explorer</span></span></a>
+    <a href="?page=services" data-nav="services"><span class="num">02</span><span><span class="lbl">Services</span><span class="dsc">Roof anatomy and materials bench</span></span></a>
+    <a href="?page=about" data-nav="about"><span class="num">03</span><span><span class="lbl">About</span><span class="dsc">Family owned since 1980</span></span></a>
+    <a href="?page=reviews" data-nav="reviews"><span class="num">04</span><span><span class="lbl">Reviews</span><span class="dsc">Verified review sources</span></span></a>
+    <a href="?page=contact" data-nav="contact"><span class="num">05</span><span><span class="lbl">Contact</span><span class="dsc">Free estimates, emergency service</span></span></a>
+  </nav>
+  <div class="side-cta">
+    <div class="ph">Talk to a roofer</div>
+    <a class="btn btn-red btn-block" href="tel:+12165339810"><i class="fa-solid fa-phone"></i>(216) 533-9810</a>
+  </div>
+</aside>
+<main class="stage">
+
+<section class="page" id="page-home" data-page="home">
+  <div class="hero">
+    <div class="hero-kicker">Roof Geometry Lab, Module 01</div>
+    <h2>Every skyline stands on <span class="hl">roof geometry</span>. We build the roofs that hold it up.</h2>
+    <p class="lead">All City Roofing &amp; Construction Inc. is a family owned and operated roofing and construction company in North Royalton, Ohio, serving the greater Cleveland area. Drag the pitch explorer below to see how roof slope is measured, then call us for a free estimate.</p>
+    <div class="hero-ctas">
+      <a class="btn btn-red" href="tel:+12165339810"><i class="fa-solid fa-phone"></i>Call (216) 533-9810</a>
+      <a class="btn btn-ghost" href="?page=contact" data-nav="contact"><i class="fa-solid fa-clipboard-list"></i>Request Free Estimate</a>
+    </div>
+    <svg class="skyline" viewBox="0 0 1200 190" preserveAspectRatio="xMidYMax meet" role="img" aria-label="City skyline with different roof shapes">
+      <rect x="0" y="0" width="1200" height="190" fill="transparent"/>
+      <g fill="#1b2638" stroke="#2c3a52" stroke-width="2">
+        <rect x="20" y="90" width="120" height="100"/>
+        <polygon points="20,90 80,40 140,90"/>
+        <rect x="160" y="110" width="100" height="80"/>
+        <polygon points="160,110 210,70 260,110"/>
+        <rect x="280" y="60" width="90" height="130"/>
+        <rect x="390" y="100" width="130" height="90"/>
+        <polygon points="390,100 455,55 520,100"/>
+        <rect x="540" y="40" width="80" height="150"/>
+        <polygon points="540,40 580,10 620,40"/>
+        <rect x="640" y="110" width="110" height="80"/>
+        <rect x="770" y="80" width="100" height="110"/>
+        <polygon points="770,80 820,35 870,80"/>
+        <rect x="890" y="120" width="120" height="70"/>
+        <polygon points="890,120 950,85 1010,120"/>
+        <rect x="1030" y="70" width="90" height="120"/>
+        <polygon points="1030,70 1075,30 1120,70"/>
+      </g>
+      <g fill="#e2453b" opacity="0.85">
+        <rect x="42" y="112" width="12" height="12"/><rect x="66" y="112" width="12" height="12"/><rect x="90" y="112" width="12" height="12"/>
+        <rect x="42" y="136" width="12" height="12"/><rect x="66" y="136" width="12" height="12"/>
+        <rect x="302" y="84" width="12" height="12"/><rect x="326" y="84" width="12" height="12"/>
+        <rect x="302" y="110" width="12" height="12"/><rect x="326" y="110" width="12" height="12"/>
+        <rect x="302" y="136" width="12" height="12"/><rect x="326" y="136" width="12" height="12"/>
+        <rect x="412" y="122" width="12" height="12"/><rect x="436" y="122" width="12" height="12"/><rect x="460" y="122" width="12" height="12"/>
+        <rect x="562" y="64" width="12" height="12"/><rect x="562" y="90" width="12" height="12"/><rect x="562" y="116" width="12" height="12"/>
+        <rect x="792" y="102" width="12" height="12"/><rect x="816" y="102" width="12" height="12"/>
+        <rect x="792" y="128" width="12" height="12"/><rect x="816" y="128" width="12" height="12"/>
+        <rect x="1052" y="94" width="12" height="12"/><rect x="1052" y="120" width="12" height="12"/>
+      </g>
+      <rect x="0" y="186" width="1200" height="4" fill="#e2453b"/>
+    </svg>
+  </div>
+  <div class="pad">
+    <div class="sec-head">
+      <div class="kick">Interactive Instrument</div>
+      <h2>The Pitch Triangle Explorer</h2>
+      <p>Roof pitch is written as rise over a 12 inch run. Move the slider to change the rise and watch the geometry update. This is the same math we use when we measure your roof for an estimate.</p>
+    </div>
+    <div class="lab" id="pitchLab">
+      <div class="lab-title">Instrument P-01: Pitch Triangle</div>
+      <div id="triWrap">
+        <svg id="triSvg" viewBox="0 0 560 300" width="560" height="300" role="img" aria-label="Roof pitch triangle diagram">
+          <line x1="40" y1="270" x2="520" y2="270" stroke="#2c3a52" stroke-width="2"/>
+          <g id="triFig">
+            <polygon id="triPoly" points="" fill="rgba(226,69,59,.18)" stroke="#e2453b" stroke-width="3"/>
+            <line id="riseLine" x1="0" y1="0" x2="0" y2="0" stroke="#e2453b" stroke-width="2" stroke-dasharray="7 5"/>
+            <line id="runLine" x1="0" y1="0" x2="0" y2="0" stroke="#93a1b8" stroke-width="2" stroke-dasharray="7 5"/>
+            <text id="riseLbl" x="0" y="0" fill="#e2453b" font-family="IBM Plex Mono, monospace" font-size="13"></text>
+            <text id="runLbl" x="0" y="0" fill="#93a1b8" font-family="IBM Plex Mono, monospace" font-size="13"></text>
+            <text id="angLbl" x="0" y="0" fill="#f5f2ea" font-family="IBM Plex Mono, monospace" font-size="13"></text>
+          </g>
+          <rect x="40" y="270" width="120" height="16" fill="#222f45" stroke="#2c3a52"/>
+          <rect x="70" y="286" width="60" height="14" fill="#1b2638"/>
+        </svg>
+      </div>
+      <div class="readouts">
+        <div class="readout"><div class="v red" id="roPitch">4/12</div><div class="k">Pitch</div></div>
+        <div class="readout"><div class="v" id="roAngle">18.4&deg;</div><div class="k">Slope Angle</div></div>
+        <div class="readout"><div class="v" id="roRafter">12.6 in</div><div class="k">Rafter per ft of run</div></div>
+        <div class="readout"><div class="v" id="roClass">Conventional</div><div class="k">Slope Class</div></div>
+      </div>
+      <input type="range" id="pitchSlider" min="0" max="12" step="0.5" value="4" aria-label="Roof pitch rise in inches over a 12 inch run">
+      <div class="tickrow"><span>0/12 flat</span><span>4/12</span><span>8/12</span><span>12/12 steep</span></div>
+      <span class="badge">Educational demo, not a measurement quote</span>
+    </div>
+
+    <div class="sec-head" style="margin-top:56px">
+      <div class="kick">Field Instrument</div>
+      <h2>Storm Damage Self Check</h2>
+      <p>After high winds or hail, walk your property and check what you can see from the ground. Never climb onto a damaged roof. Tick what you notice and the meter will tell you whether to call.</p>
+    </div>
+    <div class="lab">
+      <div class="lab-title">Instrument S-02: Damage Triage</div>
+      <div class="check-list" id="stormList">
+        <label class="check"><input type="checkbox"><span><span class="ct">Missing or lifted shingles</span><span class="cd">Bare spots or shingle tabs flapping in the wind after a storm.</span></span></label>
+        <label class="check"><input type="checkbox"><span><span class="ct">Cracked, curled, or bruised shingles</span><span class="cd">Edges turning up, cracks, or soft spots that suggest hail impact.</span></span></label>
+        <label class="check"><input type="checkbox"><span><span class="ct">Granules in gutters or downspouts</span><span class="cd">Piles of sand-like grit mean the shingle surface is wearing off.</span></span></label>
+        <label class="check"><input type="checkbox"><span><span class="ct">Water stains on ceilings or walls</span><span class="cd">Brown rings or bubbling paint inside usually mean an active leak.</span></span></label>
+        <label class="check"><input type="checkbox"><span><span class="ct">Dented, loose, or overflowing gutters</span><span class="cd">Gutters pulling away from the fascia or spilling over in rain.</span></span></label>
+        <label class="check"><input type="checkbox"><span><span class="ct">Damaged flashing around chimneys and vents</span><span class="cd">Bent, rusted, or missing metal where the roof meets walls and pipes.</span></span></label>
+        <label class="check"><input type="checkbox"><span><span class="ct">Sagging or soft spots on the roof deck</span><span class="cd">Dips between rafters can signal trapped moisture or rot.</span></span></label>
+        <label class="check"><input type="checkbox"><span><span class="ct">Moss, algae, or dark streaking</span><span class="cd">Growth holds moisture against shingles and shortens their life.</span></span></label>
+      </div>
+      <div class="scorebar">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-family:var(--mono);font-size:12px;letter-spacing:2px;color:var(--mut)">ISSUES FLAGGED</span>
+          <span style="font-family:var(--mono);font-size:20px;color:var(--red)" id="stormCount">0 / 8</span>
+        </div>
+        <div class="meter"><div class="fill" id="stormFill"></div></div>
+        <div class="verdict" id="stormVerdict">No issues flagged yet.<small>Walk the checklist above. If anything looks wrong, emergency services are listed on our public profile, so call (216) 533-9810 and we can take a look.</small></div>
+      </div>
+    </div>
+
+    <div class="grid2" style="margin-top:56px">
+      <div class="panel">
+        <div class="ptag">Why us</div>
+        <h3>Family owned, on the roof since 1980</h3>
+        <p>Four decades and change of roofing and construction work across North Royalton and the Cleveland area. Free project estimates, and emergency services when a storm does not wait for business hours.</p>
+        <div style="margin-top:18px"><a class="btn btn-ghost" href="?page=about" data-nav="about">Our story <i class="fa-solid fa-arrow-right"></i></a></div>
+      </div>
+      <div class="panel">
+        <div class="ptag">Next step</div>
+        <h3>Free estimates, honest answers</h3>
+        <p>Tell us what your roof is doing and we will tell you what it needs. No pressure, no mystery line items. Call (216) 533-9810 or send the request form and we will get back to you.</p>
+        <div style="margin-top:18px"><a class="btn btn-red" href="?page=contact" data-nav="contact">Request estimate <i class="fa-solid fa-arrow-right"></i></a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services" data-page="services">
+  <div class="pad">
+    <div class="sec-head">
+      <div class="kick">Module 02, Materials Bench</div>
+      <h2>Services and roof anatomy</h2>
+      <p>Services below are as listed on the company's public Angi profile. Before the list, take apart a roof with our exploded anatomy diagram. Tap any layer to see what it does.</p>
+    </div>
+    <div class="lab" id="anatomyLab">
+      <div class="lab-title">Instrument A-03: Exploded Roof Anatomy</div>
+      <button class="btn btn-red explode-btn" id="explodeBtn"><i class="fa-solid fa-layer-group"></i><span id="explodeLbl">Explode the roof</span></button>
+      <div class="layers" id="layers">
+        <div class="layer l1" data-t="Shingles" data-d="The weather skin of the roof. Shingles shed water, block UV, and take the beating from wind and hail so the layers below stay dry."><span class="chip">L1</span><span class="nm">Shingles</span></div>
+        <div class="layer l2" data-t="Underlayment" data-d="A water resistant barrier rolled over the deck before shingles go on. It is the backup plan that catches water driven under the shingles."><span class="chip">L2</span><span class="nm">Underlayment</span></div>
+        <div class="layer l3" data-t="Roof deck" data-d="Plywood or OSB sheathing nailed to the rafters. Everything above fastens to this, so a soft or rotted deck has to be replaced first."><span class="chip">L3</span><span class="nm">Roof deck</span></div>
+        <div class="layer l4" data-t="Rafters and framing" data-d="The structural skeleton that carries the whole assembly. Spacing and span decide how much load the roof can hold."><span class="chip">L4</span><span class="nm">Rafters and framing</span></div>
+        <div class="layer l5" data-t="Insulation and ventilation" data-d="Insulation slows heat loss, and ridge and soffit vents move air through the attic so moisture and ice dams do not build up."><span class="chip">L5</span><span class="nm">Insulation and ventilation</span></div>
+        <div class="layer l6" data-t="Ceiling and interior finish" data-d="Drywall and paint on the inside. When this layer shows stains, the leak started several layers above it."><span class="chip">L6</span><span class="nm">Ceiling and interior finish</span></div>
+      </div>
+      <div class="layer-note" id="layerNote">
+        <h4>Tap a layer to inspect it</h4>
+        <p>Each layer of a roof has one job. Select any layer above to read what it does and why it matters during a replacement.</p>
+      </div>
+      <span class="badge">General roofing education, not a quote for your home</span>
+    </div>
+
+    <div class="sec-head" style="margin-top:56px">
+      <div class="kick">Service Lineup</div>
+      <h2>What we do</h2>
+      <p>As listed on the company's public Angi profile. Ask for details on anything not shown here.</p>
+    </div>
+    <div class="svc">
+      <div class="svc-card"><i class="fa-solid fa-house-chimney"></i><h3>Roofing</h3><p>Residential and commercial roof work, from repairs to full replacements.</p></div>
+      <div class="svc-card"><i class="fa-solid fa-layer-group"></i><h3>Siding</h3><p>Siding installation and repair to protect and refresh the exterior.</p></div>
+      <div class="svc-card"><i class="fa-solid fa-hammer"></i><h3>Carpentry</h3><p>Rough and finish carpentry for repairs, framing, and remodels.</p></div>
+      <div class="svc-card"><i class="fa-solid fa-water"></i><h3>Gutters</h3><p>Gutter work that moves water off the roof and away from the foundation.</p></div>
+      <div class="svc-card"><i class="fa-solid fa-paint-roller"></i><h3>Painting</h3><p>Interior and exterior painting to finish the job right.</p></div>
+      <div class="svc-card"><i class="fa-solid fa-border-all"></i><h3>Drywall</h3><p>Drywall installation and repair, including water damage fixes.</p></div>
+      <div class="svc-card"><i class="fa-solid fa-sun"></i><h3>Skylights</h3><p>Skylight installation and leak repair.</p></div>
+      <div class="svc-card"><i class="fa-solid fa-table-cells"></i><h3>Acoustic Ceilings</h3><p>Drop and acoustic ceiling work for finished interiors.</p></div>
+      <div class="svc-card"><i class="fa-solid fa-solar-panel"></i><h3>Solar Energy</h3><p>Solar energy related work. Call to confirm current offerings.</p></div>
+      <div class="svc-card"><i class="fa-solid fa-tree"></i><h3>Landscaping</h3><p>Landscaping services. Call to confirm current offerings.</p></div>
+      <div class="svc-card"><i class="fa-solid fa-fan"></i><h3>Wind Generators</h3><p>Wind generator related work. Call to confirm current offerings.</p></div>
+      <div class="svc-card"><i class="fa-solid fa-truck-medical"></i><h3>Emergency Services</h3><p>Emergency services offered for urgent roofing problems.</p></div>
+    </div>
+    <p class="src-note">Service list source: the company's public profile on Angi, which also notes free project estimates and that credit cards are accepted. Specific scope, scheduling, and pricing are confirmed by phone at (216) 533-9810.</p>
+
+    <div class="sec-head" style="margin-top:56px">
+      <div class="kick">Good to know</div>
+      <h2>Common questions</h2>
+    </div>
+    <div class="acc" data-acc>
+      <button class="q" type="button">Do you offer free estimates? <i class="fa-solid fa-chevron-down"></i></button>
+      <div class="a"><div>Yes. The company's public Angi profile states that free project estimates are offered. Call (216) 533-9810 to schedule one.</div></div>
+    </div>
+    <div class="acc" data-acc>
+      <button class="q" type="button">Do you handle emergency roof problems? <i class="fa-solid fa-chevron-down"></i></button>
+      <div class="a"><div>Yes. Emergency services are listed as offered on the company's public Angi profile. For an active leak, call (216) 533-9810 right away.</div></div>
+    </div>
+    <div class="acc" data-acc>
+      <button class="q" type="button">What forms of payment do you take? <i class="fa-solid fa-chevron-down"></i></button>
+      <div class="a"><div>The public Angi profile notes that credit cards are accepted. Confirm payment details when you book.</div></div>
+    </div>
+    <div class="acc" data-acc>
+      <button class="q" type="button">Which areas do you serve? <i class="fa-solid fa-chevron-down"></i></button>
+      <div class="a"><div>The company is based at 7967 Tilby Rd in North Royalton, OH, and public listings note it serves the North Royalton region and greater Cleveland area. Call to confirm your address is in range.</div></div>
+    </div>
+  </div>
+</section>
+<section class="page" id="page-about" data-page="about">
+  <div class="pad">
+    <div class="sec-head">
+      <div class="kick">Module 03, Company Record</div>
+      <h2>About All City Roofing &amp; Construction</h2>
+      <p>A family owned and operated roofing and construction company based in North Royalton, Ohio. The facts below come from the company's public profiles and a public company presentation.</p>
+    </div>
+    <div class="tline">
+      <div class="tevent">
+        <div class="yr">1980</div>
+        <h3>Founded in North Royalton</h3>
+        <p>Public business listings record 1980 as the year the company began serving the community, out of 7967 Tilby Rd in North Royalton, OH.</p>
+      </div>
+      <div class="tevent">
+        <div class="yr">FAMILY OWNED</div>
+        <h3>Built around one family</h3>
+        <p>The company describes itself as family owned and operated, with a stated goal of 100 percent customer satisfaction on every job, per its public presentation.</p>
+      </div>
+      <div class="tevent">
+        <div class="yr">LEADERSHIP</div>
+        <h3>Charles K. Goble, CEO and President</h3>
+        <p>Public company materials name Charles K. Goble as CEO and President. One customer review notes that the owner, Chuck, personally came out to find and fix a roof leak.</p>
+      </div>
+      <div class="tevent">
+        <div class="yr">TODAY</div>
+        <h3>46 years of experience and counting</h3>
+        <p>The company's public Angi profile cites 46 years of experience, covering roofing, siding, carpentry, gutters, and more, with free estimates and emergency services offered.</p>
+      </div>
+    </div>
+    <div class="statband">
+      <div class="stat"><div class="n">1980</div><div class="l">Year founded<br>(public listing)</div></div>
+      <div class="stat"><div class="n">46</div><div class="l">Years of experience<br>(Angi profile)</div></div>
+      <div class="stat"><div class="n">5.0</div><div class="l">Rating on Birdeye<br>(2 reviews)</div></div>
+      <div class="stat"><div class="n">12+</div><div class="l">Services listed<br>(Angi profile)</div></div>
+    </div>
+    <p class="src-note">Sources: public business listings, the company's public Angi profile, its Birdeye review profile, and a public company slide presentation. Anything not listed here is unconfirmed, so call (216) 533-9810 to verify.</p>
+    <div class="grid2" style="margin-top:40px">
+      <div class="panel">
+        <div class="ptag">How we work</div>
+        <h3>Tarps, trucks, no debris left behind</h3>
+        <p>Per the company's public presentation: tarps and trucks are provided on every job so no debris is scattered about. Clean sites, straight answers, family accountability.</p>
+      </div>
+      <div class="panel">
+        <div class="ptag">Senior discount</div>
+        <h3>20 percent senior discount listed</h3>
+        <p>A public business listing notes a 20 percent senior discount. This is self reported in the listing, so call to confirm it applies to your project.</p>
+        <span class="badge">Call to confirm</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews" data-page="reviews">
+  <div class="pad">
+    <div class="sec-head">
+      <div class="kick">Module 04, Verification Desk</div>
+      <h2>Reviews</h2>
+      <p>We do not write our own reviews or invent customer quotes. Below are the real, independently hosted places where this business is reviewed. Click through to read what customers actually said.</p>
+    </div>
+    <div class="grid3">
+      <div class="rev-card">
+        <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+        <h3>Birdeye</h3>
+        <p>Public profile shows a 5.0 rating from 2 reviews, including notes about a leak repair and a roof and siding job. Read the full, unedited reviews on Birdeye.</p>
+        <a class="btn btn-red" href="https://reviews.birdeye.com/all-city-roofing-construction-inc-165441291412702" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i>Read on Birdeye</a>
+      </div>
+      <div class="rev-card">
+        <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+        <h3>Angi</h3>
+        <p>The company's Angi profile lists services, free estimates, and emergency services, with customer reviews on the platform. Read them on Angi.</p>
+        <a class="btn btn-red" href="https://www.angi.com/companylist/us/oh/north-royalton/all-city-roofing-and-construction%2C-inc-reviews-2638408.htm" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i>Read on Angi</a>
+      </div>
+      <div class="rev-card">
+        <div class="stars"><i class="fa-solid fa-building-shield"></i></div>
+        <h3>Better Business Bureau</h3>
+        <p>The BBB hosts a business profile for All City Roofing &amp; Construction Inc. with contact details. Check the profile on BBB.org.</p>
+        <a class="btn btn-red" href="https://www.bbb.org/us/oh/north-royalton/profile/roofing-contractors/all-city-roofing-construction-inc-0312-331" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i>View BBB profile</a>
+      </div>
+    </div>
+    <p class="src-note">We link only real, independently hosted review sources. The Google Maps place link from the lead data is not linked here because it has not been independently verified as this exact business.</p>
+    <div class="panel" style="margin-top:40px">
+      <div class="ptag">Had work done?</div>
+      <h3>Your review helps neighbors choose</h3>
+      <p>If we worked on your roof, the most useful thing you can do is leave an honest review on one of the platforms above. Real reviews keep us honest and help the next homeowner decide with confidence.</p>
+      <div style="margin-top:18px"><a class="btn btn-ghost" href="https://reviews.birdeye.com/all-city-roofing-construction-inc-165441291412702" target="_blank" rel="noopener"><i class="fa-solid fa-pen"></i>Leave a review on Birdeye</a></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-contact" data-page="contact">
+  <div class="pad">
+    <div class="sec-head">
+      <div class="kick">Module 05, Dispatch</div>
+      <h2>Contact and free estimates</h2>
+      <p>Call, get directions, or send the form below. Free project estimates are offered, and emergency services are listed for urgent roofing problems.</p>
+    </div>
+    <div class="contact-cols">
+      <div>
+        <div class="info-row">
+          <i class="fa-solid fa-phone"></i>
+          <div><div class="t">Phone</div><div class="v"><a href="tel:+12165339810">(216) 533-9810</a></div></div>
+        </div>
+        <div class="info-row">
+          <i class="fa-solid fa-location-dot"></i>
+          <div><div class="t">Address</div><div class="v">7967 Tilby Rd<br>North Royalton, OH 44133</div></div>
+        </div>
+        <div class="info-row">
+          <i class="fa-solid fa-route"></i>
+          <div><div class="t">Directions</div><div class="v"><a href="https://www.google.com/maps/search/?api=1&query=7967%20Tilby%20Rd%2C%20North%20Royalton%2C%20OH%2044133" target="_blank" rel="noopener">Get directions <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:13px"></i></a></div></div>
+        </div>
+        <div class="info-row">
+          <i class="fa-solid fa-truck-medical"></i>
+          <div><div class="t">Urgent roof problem?</div><div class="v">Emergency services listed.<br>Call <a href="tel:+12165339810">(216) 533-9810</a> now.</div></div>
+        </div>
+        <span class="badge">No public email found, call or use the form</span>
+      </div>
+      <div class="lab">
+        <div class="lab-title">Estimate request form</div>
+        <form id="estForm" novalidate>
+          <div class="form-grid">
+            <div class="field" data-f="name">
+              <label for="fName">Full name</label>
+              <input type="text" id="fName" name="name" autocomplete="name" placeholder="Jane Smith">
+              <div class="err">Please enter your name.</div>
+            </div>
+            <div class="field" data-f="phone">
+              <label for="fPhone">Phone</label>
+              <input type="tel" id="fPhone" name="phone" autocomplete="tel" placeholder="(216) 555-0123">
+              <div class="err">Please enter a valid phone number.</div>
+            </div>
+            <div class="field full" data-f="email">
+              <label for="fEmail">Email (optional)</label>
+              <input type="email" id="fEmail" name="email" autocomplete="email" placeholder="you@example.com">
+              <div class="err">That email address does not look valid.</div>
+            </div>
+            <div class="field full" data-f="service">
+              <label for="fService">Service needed</label>
+              <select id="fService" name="service">
+                <option value="">Choose a service</option>
+                <option>Roof repair</option>
+                <option>Full roof replacement</option>
+                <option>Siding</option>
+                <option>Gutters</option>
+                <option>Carpentry</option>
+                <option>Painting</option>
+                <option>Drywall</option>
+                <option>Skylights</option>
+                <option>Emergency / storm damage</option>
+                <option>Something else</option>
+              </select>
+              <div class="err">Please choose a service.</div>
+            </div>
+            <div class="field full" data-f="msg">
+              <label for="fMsg">Project details</label>
+              <textarea id="fMsg" name="message" placeholder="Tell us what is going on with your roof or project."></textarea>
+              <div class="err">Please add a few words about your project (at least 10 characters).</div>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-red btn-block"><i class="fa-solid fa-paper-plane"></i>Send estimate request</button>
+          <p class="src-note" style="text-align:center">Submitting shows a confirmation on screen. No email address for the business is published, so the fastest response is a call to (216) 533-9810.</p>
+        </form>
+        <div class="success" id="formSuccess" role="status">
+          <i class="fa-solid fa-circle-check"></i>
+          <h3>Request received</h3>
+          <p id="successText">Thanks. Your estimate request is ready.</p>
+          <p style="margin-top:10px">For the fastest response, call <a href="tel:+12165339810" style="color:var(--red);font-weight:600">(216) 533-9810</a> and mention your request.</p>
+          <div style="margin-top:18px"><a class="btn btn-ghost" id="mailDraft" href="mailto:?subject=Estimate%20request"><i class="fa-solid fa-envelope-open-text"></i>Open as email draft</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="foot-pad">
+  <div class="lab" style="text-align:center">
+    <div class="lab-title">Still deciding?</div>
+    <h3 style="font-family:var(--disp);font-size:24px;margin-bottom:10px">One call gets you a free estimate.</h3>
+    <p style="color:var(--mut);margin-bottom:20px">Family owned since 1980. No pressure, just straight answers about your roof.</p>
+    <a class="btn btn-red" href="tel:+12165339810"><i class="fa-solid fa-phone"></i>Call (216) 533-9810</a>
+  </div>
+</div>
+
+<footer>© All City Roofing &amp; Construction Inc.</footer>
+</main>
+</div>
+<script>
+(function(){
+  var pages=["home","services","about","reviews","contact"];
+  var titles={
+    home:"All City Roofing & Construction Inc. | Roof Geometry Lab | North Royalton, OH",
+    services:"Services | All City Roofing & Construction Inc.",
+    about:"About | All City Roofing & Construction Inc.",
+    reviews:"Reviews | All City Roofing & Construction Inc.",
+    contact:"Contact | All City Roofing & Construction Inc."
+  };
+  function pageFromUrl(){
+    try{
+      var q=new URLSearchParams(window.location.search).get("page");
+      if(pages.indexOf(q)>-1)return q;
+    }catch(e){}
+    return "home";
+  }
+  function navigateTo(page,push){
+    if(pages.indexOf(page)<0)page="home";
+    var secs=document.querySelectorAll("section.page");
+    for(var i=0;i<secs.length;i++)secs[i].classList.remove("active");
+    var el=document.getElementById("page-"+page);
+    if(el)el.classList.add("active");
+    var links=document.querySelectorAll("[data-nav]");
+    for(var j=0;j<links.length;j++){
+      if(links[j].getAttribute("data-nav")===page)links[j].classList.add("active-page");
+      else links[j].classList.remove("active-page");
+    }
+    document.title=titles[page];
+    document.body.classList.remove("menu-open");
+    window.scrollTo(0,0);
+    if(push!==false){
+      var url="?page="+page;
+      if(window.location.search!==url){
+        try{history.pushState({page:page},"",url);}catch(e){}
+      }
+    }
+  }
+  window.navigateTo=navigateTo;
+  document.addEventListener("click",function(e){
+    var a=e.target.closest("[data-nav]");
+    if(a){
+      e.preventDefault();
+      navigateTo(a.getAttribute("data-nav"),true);
+    }
+  });
+  window.addEventListener("popstate",function(e){
+    var p=(e.state&&e.state.page)||pageFromUrl();
+    navigateTo(p,false);
+  });
+  var burger=document.getElementById("burger");
+  var scrim=document.getElementById("scrim");
+  if(burger)burger.addEventListener("click",function(){document.body.classList.toggle("menu-open");});
+  if(scrim)scrim.addEventListener("click",function(){document.body.classList.remove("menu-open");});
+
+  var slider=document.getElementById("pitchSlider");
+  function fmt(n,d){return n.toFixed(d);}
+  function drawPitch(){
+    var rise=parseFloat(slider.value);
+    var run=12;
+    var ang=Math.atan(rise/run)*180/Math.PI;
+    var rafter=Math.sqrt(run*run+rise*rise);
+    var cls="Flat";
+    if(rise>=2&&rise<4)cls="Low slope";
+    else if(rise>=4&&rise<=9)cls="Conventional";
+    else if(rise>9)cls="Steep";
+    document.getElementById("roPitch").textContent=fmt(rise,rise%1?1:0)+"/12";
+    document.getElementById("roAngle").innerHTML=fmt(ang,1)+"&deg;";
+    document.getElementById("roRafter").textContent=fmt(rafter,1)+" in";
+    document.getElementById("roClass").textContent=cls;
+    slider.style.setProperty("--fill",(rise/12*100)+"%");
+    var x0=60,yb=270,w=440;
+    var h=Math.max(6,rise/12*190);
+    var pts=x0+","+yb+" "+(x0+w)+","+yb+" "+(x0+w)+","+(yb-h);
+    document.getElementById("triPoly").setAttribute("points",pts);
+    var rl=document.getElementById("riseLine");
+    rl.setAttribute("x1",x0+w+12);rl.setAttribute("y1",yb);
+    rl.setAttribute("x2",x0+w+12);rl.setAttribute("y2",yb-h);
+    var rnl=document.getElementById("runLine");
+    rnl.setAttribute("x1",x0);rnl.setAttribute("y1",yb+14);
+    rnl.setAttribute("x2",x0+w);rnl.setAttribute("y2",yb+14);
+    var rlb=document.getElementById("riseLbl");
+    rlb.setAttribute("x",x0+w+22);rlb.setAttribute("y",yb-h/2+4);
+    rlb.textContent=fmt(rise,rise%1?1:0)+'" rise';
+    var rnlb=document.getElementById("runLbl");
+    rnlb.setAttribute("x",x0+w/2-30);rnlb.setAttribute("y",yb+32);
+    rnlb.textContent='12" run';
+    var alb=document.getElementById("angLbl");
+    alb.setAttribute("x",x0+18);alb.setAttribute("y",yb-14);
+    alb.textContent=fmt(ang,1)+" deg";
+  }
+  if(slider){slider.addEventListener("input",drawPitch);drawPitch();}
+
+  var exBtn=document.getElementById("explodeBtn");
+  var lab=document.getElementById("anatomyLab");
+  var exLbl=document.getElementById("explodeLbl");
+  if(exBtn)exBtn.addEventListener("click",function(){
+    var on=lab.classList.toggle("exploded");
+    exLbl.textContent=on?"Reassemble the roof":"Explode the roof";
+  });
+  var note=document.getElementById("layerNote");
+  var layerEls=document.querySelectorAll("#layers .layer");
+  for(var k=0;k<layerEls.length;k++){
+    layerEls[k].addEventListener("click",function(){
+      for(var m=0;m<layerEls.length;m++)layerEls[m].classList.remove("sel");
+      this.classList.add("sel");
+      note.innerHTML="<h4>"+this.getAttribute("data-t")+"</h4><p>"+this.getAttribute("data-d")+"</p>";
+    });
+  }
+
+  var stormList=document.getElementById("stormList");
+  function stormUpdate(){
+    var boxes=stormList.querySelectorAll('input[type="checkbox"]');
+    var n=0;
+    for(var i=0;i<boxes.length;i++){
+      var lab2=boxes[i].closest(".check");
+      if(boxes[i].checked){n++;lab2.classList.add("hit");}
+      else lab2.classList.remove("hit");
+    }
+    document.getElementById("stormCount").textContent=n+" / "+boxes.length;
+    document.getElementById("stormFill").style.width=(n/boxes.length*100)+"%";
+    var v=document.getElementById("stormVerdict");
+    if(n===0)v.innerHTML='No issues flagged yet.<small>Walk the checklist above. If anything looks wrong, call (216) 533-9810 and we can take a look.</small>';
+    else if(n<=2)v.innerHTML='Minor wear spotted.<small>You flagged '+n+' item'+(n>1?'s':'')+'. Worth keeping an eye on. A quick call to (216) 533-9810 can confirm whether it needs attention now or later.</small>';
+    else v.innerHTML='Storm damage likely. Call now.<small>You flagged '+n+' items. Do not climb on the roof. Call (216) 533-9810 for an inspection. Emergency services are listed on our public profile.</small>';
+  }
+  if(stormList){stormList.addEventListener("change",stormUpdate);stormUpdate();}
+
+  var accs=document.querySelectorAll("[data-acc]");
+  for(var a=0;a<accs.length;a++){
+    (function(acc){
+      var q=acc.querySelector(".q");
+      var ans=acc.querySelector(".a");
+      q.addEventListener("click",function(){
+        var open=acc.classList.toggle("open");
+        ans.style.maxHeight=open?ans.scrollHeight+"px":"0px";
+      });
+    })(accs[a]);
+  }
+
+  var form=document.getElementById("estForm");
+  if(form)form.addEventListener("submit",function(e){
+    e.preventDefault();
+    var ok=true;
+    function setBad(key,bad){
+      var f=form.querySelector('[data-f="'+key+'"]');
+      if(bad){f.classList.add("bad");ok=false;}
+      else f.classList.remove("bad");
+    }
+    var name=document.getElementById("fName").value.trim();
+    var phone=document.getElementById("fPhone").value.trim();
+    var email=document.getElementById("fEmail").value.trim();
+    var service=document.getElementById("fService").value;
+    var msg=document.getElementById("fMsg").value.trim();
+    setBad("name",name.length<2);
+    setBad("phone",phone.replace(/\D/g,"").length<7);
+    setBad("email",email.length>0&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
+    setBad("service",service==="");
+    setBad("msg",msg.length<10);
+    if(!ok){
+      var first=form.querySelector(".field.bad input,.field.bad select,.field.bad textarea");
+      if(first)first.focus();
+      return;
+    }
+    form.style.display="none";
+    var s=document.getElementById("formSuccess");
+    s.classList.add("show");
+    document.getElementById("successText").textContent="Thanks "+name+". Your "+service.toLowerCase()+" request is ready. We will reach you at "+phone+".";
+    var body="Name: "+name+"%0D%0APhone: "+phone+"%0D%0AEmail: "+(email||"not provided")+"%0D%0AService: "+service+"%0D%0ADetails: "+msg;
+    document.getElementById("mailDraft").setAttribute("href","mailto:?subject="+encodeURIComponent("Estimate request from "+name)+"&body="+body.replace(/ /g,"%20"));
+    s.scrollIntoView({behavior:"smooth",block:"center"});
+  });
+
+  navigateTo(pageFromUrl(),false);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Express Carpet Cleaning And Janitorial Services | Erlanger, KY</title>
+<meta name="description" content="Express Carpet Cleaning And Janitorial Services, carpet cleaning service in Erlanger, KY. 440 Commonwealth Ave. Call (859) 360-4718.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{
+  --ink:#0a1c38;
+  --ink-deep:#061224;
+  --board:#040b16;
+  --signal:#ffd100;
+  --signal-soft:#ffdf4d;
+  --amber:#ffb000;
+  --paper:#f5f2e9;
+  --card:#ffffff;
+  --muted:#5d6b82;
+  --line:#d8d2c0;
+  --red:#c8321e;
+  --radius:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'IBM Plex Mono',ui-monospace,monospace;
+  background:var(--paper);
+  color:var(--ink);
+  line-height:1.6;
+}
+.display{font-family:'Archivo',sans-serif;letter-spacing:.02em}
+a{color:inherit}
+img{max-width:100%}
+.page{display:none}
+.page.active{display:block;animation:pageIn .35s ease}
+@keyframes pageIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.wrap{max-width:1160px;margin:0 auto;padding:0 20px}
+
+/* ---------- top utility strip ---------- */
+.topstrip{background:var(--ink-deep);color:var(--signal);font-size:12px;letter-spacing:.14em}
+.topstrip .wrap{display:flex;justify-content:space-between;align-items:center;padding-top:8px;padding-bottom:8px;gap:12px;flex-wrap:wrap}
+.topstrip a{color:var(--signal);text-decoration:none}
+.topstrip a:hover{color:#fff}
+
+/* ---------- station sign ---------- */
+.station-sign{background:var(--signal);border-bottom:6px solid var(--ink-deep)}
+.station-sign .wrap{padding-top:26px;padding-bottom:24px;text-align:center}
+.sign-code{display:inline-block;background:var(--ink-deep);color:var(--signal);font-size:12px;letter-spacing:.3em;padding:6px 14px;border-radius:4px;margin-bottom:14px}
+.station-sign h1{font-family:'Archivo',sans-serif;font-weight:900;font-size:clamp(26px,5vw,52px);line-height:1.05;color:var(--ink-deep);text-transform:uppercase}
+.station-sign .sub{margin-top:10px;font-size:13px;letter-spacing:.22em;color:var(--ink-deep);text-transform:uppercase}
+
+/* ---------- nav ---------- */
+.navbar{background:var(--ink);position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.35)}
+.navbar .wrap{display:flex;align-items:center;justify-content:space-between}
+.nav-toggle{display:none;background:none;border:2px solid var(--signal);color:var(--signal);font-size:20px;padding:8px 12px;border-radius:6px;cursor:pointer;margin:10px 0}
+.nav-links{list-style:none;display:flex;gap:4px;flex-wrap:wrap}
+.nav-links a{display:block;color:#dfe6f2;text-decoration:none;font-size:13px;letter-spacing:.14em;padding:16px 18px;border-bottom:4px solid transparent;text-transform:uppercase}
+.nav-links a:hover{color:var(--signal)}
+.nav-links a.active{color:var(--signal);border-bottom-color:var(--signal);background:rgba(255,209,0,.06)}
+.nav-cta{background:var(--signal);color:var(--ink-deep);font-weight:700;font-size:13px;letter-spacing:.1em;text-decoration:none;padding:10px 18px;border-radius:6px;white-space:nowrap}
+.nav-cta:hover{background:#fff}
+
+/* ---------- hero: departure board ---------- */
+.hero{background:var(--ink-deep);padding:52px 0 44px}
+.hero-kicker{color:var(--signal);font-size:12px;letter-spacing:.3em;margin-bottom:14px}
+.hero h2{font-family:'Archivo',sans-serif;color:#fff;font-weight:900;font-size:clamp(28px,4.6vw,48px);line-height:1.1;margin-bottom:10px}
+.hero h2 .hl{color:var(--signal)}
+.hero p.lede{color:#b9c4d8;max-width:640px;margin-bottom:26px}
+.board{background:var(--board);border:2px solid #1d2c46;border-radius:var(--radius);overflow:hidden;box-shadow:0 18px 40px rgba(0,0,0,.5)}
+.board-head{display:flex;justify-content:space-between;align-items:center;background:#0b1730;padding:12px 18px;border-bottom:2px solid #1d2c46;flex-wrap:wrap;gap:8px}
+.board-head .bh-title{color:var(--signal);font-size:13px;letter-spacing:.28em}
+.board-head .bh-clock{color:var(--amber);font-size:13px;letter-spacing:.18em}
+.board-row{display:grid;grid-template-columns:86px 1fr 110px 150px;gap:10px;align-items:center;padding:14px 18px;border-bottom:1px solid #101f3a;font-size:13px}
+.board-row:last-child{border-bottom:none}
+.b-time{color:var(--amber)}
+.b-dest{color:#f2f5fa;letter-spacing:.06em;font-weight:600}
+.b-dest small{display:block;color:#7e8ba3;font-weight:400;letter-spacing:.1em}
+.b-track{color:var(--signal);letter-spacing:.2em;text-align:center}
+.b-status{text-align:right;font-weight:700;letter-spacing:.16em}
+.st-go{color:#37d67a}
+.st-warn{color:var(--signal)}
+.st-info{color:#6db3ff}
+.board-note{padding:10px 18px;color:#5f6c87;font-size:11px;letter-spacing:.1em;border-top:2px solid #1d2c46}
+.hero-ctas{display:flex;gap:14px;margin-top:26px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;font-size:14px;letter-spacing:.08em;padding:15px 26px;border-radius:6px;cursor:pointer;border:2px solid transparent}
+.btn-signal{background:var(--signal);color:var(--ink-deep)}
+.btn-signal:hover{background:#fff}
+.btn-ghost{background:transparent;color:var(--signal);border-color:var(--signal)}
+.btn-ghost:hover{background:rgba(255,209,0,.12)}
+.btn-ink{background:var(--ink);color:#fff}
+.btn-ink:hover{background:var(--ink-deep)}
+
+/* ---------- sections ---------- */
+.section{padding:56px 0}
+.section-head{margin-bottom:30px}
+.kicker{font-size:12px;letter-spacing:.3em;color:var(--muted);margin-bottom:8px;text-transform:uppercase}
+.section-head h2{font-family:'Archivo',sans-serif;font-weight:900;font-size:clamp(24px,3.6vw,38px);text-transform:uppercase}
+.section-head h2 .hl{color:#a67c00}
+.section-head p{color:var(--muted);max-width:680px;margin-top:8px}
+
+/* ---------- ticket stub cards ---------- */
+.tickets{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:26px}
+.ticket{position:relative;display:grid;grid-template-columns:1fr 128px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:0 6px 18px rgba(10,28,56,.08)}
+.ticket-main{padding:22px}
+.ticket-code{display:inline-block;background:var(--ink);color:var(--signal);font-size:11px;letter-spacing:.24em;padding:5px 12px;border-radius:4px;margin-bottom:12px}
+.ticket-main h3{font-family:'Archivo',sans-serif;font-size:19px;font-weight:800;margin-bottom:8px;text-transform:uppercase}
+.ticket-main p{font-size:13px;color:var(--muted);margin-bottom:14px}
+.ticket-route{font-size:12px;letter-spacing:.08em;color:var(--ink);border-top:1px dashed var(--line);padding-top:12px;display:flex;flex-direction:column;gap:4px}
+.ticket-route .fromto{display:flex;justify-content:space-between}
+.ticket-stub{background:var(--ink);color:var(--signal);border-left:2px dashed rgba(255,209,0,.55);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px;padding:18px 10px;text-align:center}
+.ticket-stub .route-no{font-weight:700;font-size:22px;letter-spacing:.1em}
+.ticket-stub a{color:var(--ink-deep);background:var(--signal);text-decoration:none;font-size:11px;font-weight:700;letter-spacing:.14em;padding:9px 10px;border-radius:5px;width:100%}
+.ticket-stub a:hover{background:#fff}
+.ticket::before,.ticket::after{content:"";position:absolute;width:24px;height:24px;background:var(--paper);border:1px solid var(--line);border-radius:50%;left:calc(100% - 128px - 12px)}
+.ticket::before{top:-13px}
+.ticket::after{bottom:-13px}
+.barcode{height:34px;margin-top:14px;background:repeating-linear-gradient(90deg,var(--ink) 0 2px,transparent 2px 5px,var(--ink) 5px 6px,transparent 6px 11px,var(--ink) 11px 14px,transparent 14px 17px)}
+
+/* ---------- badges ---------- */
+.badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.2em;padding:4px 10px;border-radius:4px;text-transform:uppercase}
+.badge-sample{background:var(--ink-deep);color:var(--signal);border:1px solid var(--signal)}
+.badge-confirm{background:#fff8e1;color:#7a5b00;border:1px solid #e6c200}
+.badge-verified{background:#e7f6ec;color:#14632e;border:1px solid #9fd7ae}
+
+/* ---------- info panels ---------- */
+.panel-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:26px}
+.panel h3{font-family:'Archivo',sans-serif;font-size:17px;margin-bottom:10px;text-transform:uppercase}
+.panel h3 i{color:#a67c00;margin-right:8px}
+.panel p{font-size:14px;color:var(--muted)}
+.panel .big{font-size:16px;color:var(--ink);font-weight:600}
+.plaque{background:var(--ink);color:#dfe6f2;border-radius:var(--radius);padding:34px;border-top:8px solid var(--signal)}
+.plaque h2{font-family:'Archivo',sans-serif;color:var(--signal);font-size:clamp(20px,3vw,30px);margin-bottom:18px;text-transform:uppercase}
+.plaque dl{display:grid;grid-template-columns:150px 1fr;gap:10px 18px;font-size:14px}
+.plaque dt{color:#8fa0bd;letter-spacing:.14em;font-size:11px;text-transform:uppercase;padding-top:3px}
+.plaque dd{color:#fff}
+.plaque dd a{color:var(--signal)}
+
+/* ---------- reviews ---------- */
+.review-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:22px}
+.review{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:24px;display:flex;flex-direction:column;gap:12px}
+.review .stars{color:#e0a800;letter-spacing:2px}
+.review .stars .off{color:#cfd4dd}
+.review p{font-size:14px;color:#33405a}
+.review .who{font-size:12px;color:var(--muted);letter-spacing:.08em}
+.review .meta{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:auto}
+.notice{border:2px dashed var(--line);border-radius:var(--radius);padding:22px;background:#fffdf5;font-size:14px;color:var(--muted);margin-bottom:26px}
+.notice strong{color:var(--ink)}
+
+/* ---------- contact / kiosk ---------- */
+.kiosk{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+.kiosk-form{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:30px}
+.kiosk-form h3,.kiosk-info h3{font-family:'Archivo',sans-serif;font-size:19px;margin-bottom:16px;text-transform:uppercase}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;font-family:inherit;font-size:14px;padding:12px 14px;border:2px solid var(--line);border-radius:6px;background:#fff;color:var(--ink)}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--ink)}
+.field textarea{min-height:120px;resize:vertical}
+.form-note{font-size:12px;color:var(--muted);margin-top:12px}
+.confirm{display:none;background:#e7f6ec;border:2px solid #14632e;border-radius:var(--radius);padding:34px;text-align:center}
+.confirm.show{display:block}
+.confirm i{font-size:44px;color:#14632e;margin-bottom:14px}
+.confirm h3{font-family:'Archivo',sans-serif;font-size:22px;margin-bottom:10px;text-transform:uppercase}
+.confirm p{color:#33405a;font-size:14px}
+.kiosk-info{display:flex;flex-direction:column;gap:18px}
+.info-card{background:var(--ink);color:#dfe6f2;border-radius:var(--radius);padding:28px}
+.info-card h3{color:var(--signal)}
+.info-card p{font-size:14px;margin-bottom:8px}
+.info-card a{color:var(--signal);text-decoration:none;font-weight:600}
+.info-card a:hover{color:#fff}
+.info-card .row{display:flex;gap:12px;align-items:flex-start;margin-bottom:14px}
+.info-card .row i{color:var(--signal);margin-top:4px;width:18px;text-align:center}
+
+/* ---------- footer ---------- */
+footer{background:var(--ink-deep);color:var(--signal);text-align:center;padding:22px 16px;font-size:13px;letter-spacing:.1em;border-top:6px solid var(--signal)}
+
+/* ---------- responsive ---------- */
+@media(max-width:860px){
+  .board-row{grid-template-columns:70px 1fr 120px;font-size:12px}
+  .b-track{display:none}
+  .kiosk{grid-template-columns:1fr}
+  .plaque dl{grid-template-columns:1fr;gap:2px 0}
+  .plaque dd{margin-bottom:12px}
+}
+@media(max-width:700px){
+  .nav-toggle{display:block}
+  .nav-links{display:none;width:100%;flex-direction:column;padding-bottom:10px}
+  .nav-links.open{display:flex}
+  .nav-links a{padding:12px 6px;border-bottom:1px solid #1d2c46}
+  .nav-links a.active{border-bottom-color:var(--signal)}
+  .nav-cta{display:none}
+  .ticket{grid-template-columns:1fr}
+  .ticket-stub{border-left:none;border-top:2px dashed rgba(255,209,0,.55);flex-direction:row;justify-content:space-between;padding:14px 20px}
+  .ticket-stub a{width:auto}
+  .ticket::before,.ticket::after{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="topstrip">
+  <div class="wrap">
+    <span><i class="fa-solid fa-train-subway"></i> EXPRESS CLEANING LINE</span>
+    <span><a href="tel:+18593604718"><i class="fa-solid fa-phone"></i> (859) 360-4718</a></span>
+  </div>
+</div>
+
+<header class="station-sign">
+  <div class="wrap">
+    <span class="sign-code">STATION ERL-KY-41018</span>
+    <h1>Express Carpet Cleaning<br>And Janitorial Services</h1>
+    <p class="sub">Carpet Cleaning Service - Erlanger, Kentucky</p>
+  </div>
+</header>
+
+<nav class="navbar" aria-label="Main navigation">
+  <div class="wrap">
+    <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="?page=home" data-nav="home">01 Home</a></li>
+      <li><a href="?page=services" data-nav="services">02 Services</a></li>
+      <li><a href="?page=about" data-nav="about">03 About</a></li>
+      <li><a href="?page=reviews" data-nav="reviews">04 Reviews</a></li>
+      <li><a href="?page=contact" data-nav="contact">05 Contact</a></li>
+    </ul>
+    <a class="nav-cta" href="tel:+18593604718"><i class="fa-solid fa-phone"></i> BOOK NOW</a>
+  </div>
+</nav>
+
+<main>
+
+<section class="page" id="page-home" data-page="home">
+  <div class="hero">
+    <div class="wrap">
+      <p class="hero-kicker">DEPARTURE BOARD - ALL LINES</p>
+      <h2>Your stop for <span class="hl">cleaner carpets</span> and tidier spaces.</h2>
+      <p class="lede">Express Carpet Cleaning And Janitorial Services is a carpet cleaning service based at 440 Commonwealth Ave in Erlanger, KY. Pick a service from the board below and book your appointment.</p>
+
+      <div class="board" role="table" aria-label="Service departure board">
+        <div class="board-head">
+          <span class="bh-title">DEPARTURES</span>
+          <span class="bh-clock"><i class="fa-regular fa-clock"></i> <span id="stationClock">--:--</span></span>
+        </div>
+        <div class="board-row" role="row">
+          <span class="b-time">08:00</span>
+          <span class="b-dest">CARPET CLEANING<small>RESIDENTIAL + COMMERCIAL</small></span>
+          <span class="b-track">TRACK 01</span>
+          <span class="b-status st-go">BOOK NOW</span>
+        </div>
+        <div class="board-row" role="row">
+          <span class="b-time">09:30</span>
+          <span class="b-dest">JANITORIAL SERVICES<small>OFFICES + FACILITIES</small></span>
+          <span class="b-track">TRACK 02</span>
+          <span class="b-status st-go">BOOK NOW</span>
+        </div>
+        <div class="board-row" role="row">
+          <span class="b-time">11:00</span>
+          <span class="b-dest">AREA RUG CLEANING<small>SAMPLE LISTING</small></span>
+          <span class="b-track">TRACK 03</span>
+          <span class="b-status st-warn">SAMPLE</span>
+        </div>
+        <div class="board-row" role="row">
+          <span class="b-time">13:15</span>
+          <span class="b-dest">UPHOLSTERY CLEANING<small>SAMPLE LISTING</small></span>
+          <span class="b-track">TRACK 04</span>
+          <span class="b-status st-warn">SAMPLE</span>
+        </div>
+        <div class="board-row" role="row">
+          <span class="b-time">15:45</span>
+          <span class="b-dest">STAIN + ODOR TREATMENT<small>SAMPLE LISTING</small></span>
+          <span class="b-track">TRACK 05</span>
+          <span class="b-status st-warn">SAMPLE</span>
+        </div>
+        <div class="board-note">TIMETABLE IS A DESIGN MOTIF. TIMES SHOWN ARE NOT REAL APPOINTMENT SLOTS. CALL TO CONFIRM AVAILABILITY.</div>
+      </div>
+
+      <div class="hero-ctas">
+        <a class="btn btn-signal" href="tel:+18593604718"><i class="fa-solid fa-phone"></i> CALL (859) 360-4718</a>
+        <a class="btn btn-ghost" href="https://www.google.com/maps/search/?api=1&query=Express%20Carpet%20Cleaning%20And%20Janitorial%20Services%2C%20440%20Commonwealth%20Ave%2C%20Erlanger%2C%20KY%2041018" target="_blank" rel="noopener"><i class="fa-solid fa-location-arrow"></i> GET DIRECTIONS</a>
+        <a class="btn btn-ghost" href="?page=services" data-nav="services"><i class="fa-solid fa-ticket"></i> VIEW ALL TICKETS</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="kicker">Station information</p>
+        <h2>Find us at <span class="hl">the hall</span></h2>
+      </div>
+      <div class="panel-grid">
+        <div class="panel">
+          <h3><i class="fa-solid fa-location-dot"></i> Address</h3>
+          <p class="big">440 Commonwealth Ave<br>Erlanger, KY 41018</p>
+          <p style="margin-top:10px"><span class="badge badge-verified">Lead record</span></p>
+        </div>
+        <div class="panel">
+          <h3><i class="fa-solid fa-phone"></i> Phone</h3>
+          <p class="big"><a href="tel:+18593604718" style="text-decoration:none">(859) 360-4718</a></p>
+          <p style="margin-top:10px"><span class="badge badge-verified">Lead record</span></p>
+        </div>
+        <div class="panel">
+          <h3><i class="fa-regular fa-clock"></i> Hours</h3>
+          <p class="big">Hours not published</p>
+          <p style="margin-top:10px"><span class="badge badge-confirm">Call to confirm</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services" data-page="services">
+  <div class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="kicker">Ticket office</p>
+        <h2>Service <span class="hl">tickets</span></h2>
+        <p>Each ticket below is a service line. Tickets drawn from the business name and listing category are shown as confirmed; everything else is marked SAMPLE until the business confirms it. Pricing is not published, so every ticket reads "call for quote".</p>
+      </div>
+      <div class="tickets">
+
+        <article class="ticket">
+          <div class="ticket-main">
+            <span class="ticket-code">E-01</span>
+            <h3>Carpet Cleaning</h3>
+            <p>Carpet cleaning service for homes and businesses in the Erlanger area. Deep-clean appointments for everyday dirt, traffic lanes, and refreshes. <span class="badge badge-confirm">Call to confirm</span></p>
+            <div class="ticket-route">
+              <div class="fromto"><span>FROM: DIRTY CARPET</span><span>TO: FRESH CARPET</span></div>
+              <div class="barcode" aria-hidden="true"></div>
+            </div>
+          </div>
+          <div class="ticket-stub">
+            <div><div class="route-no">E-01</div><div style="font-size:10px;letter-spacing:.2em">ADMIT ONE</div></div>
+            <a href="?page=contact" data-nav="contact">BOOK</a>
+          </div>
+        </article>
+
+        <article class="ticket">
+          <div class="ticket-main">
+            <span class="ticket-code">E-02</span>
+            <h3>Janitorial Services</h3>
+            <p>Routine janitorial and facility upkeep for offices and commercial spaces. Scope and scheduling set by phone. <span class="badge badge-confirm">Call to confirm</span></p>
+            <div class="ticket-route">
+              <div class="fromto"><span>FROM: BUSY FACILITY</span><span>TO: TIDY FACILITY</span></div>
+              <div class="barcode" aria-hidden="true"></div>
+            </div>
+          </div>
+          <div class="ticket-stub">
+            <div><div class="route-no">E-02</div><div style="font-size:10px;letter-spacing:.2em">ADMIT ONE</div></div>
+            <a href="?page=contact" data-nav="contact">BOOK</a>
+          </div>
+        </article>
+
+        <article class="ticket">
+          <div class="ticket-main">
+            <span class="ticket-code">E-03</span> <span class="badge badge-sample">Sample</span>
+            <h3>Area Rug Cleaning</h3>
+            <p>Sample listing. Rug cleaning may be offered, but this has not been confirmed with the business. <span class="badge badge-confirm">Call to confirm</span></p>
+            <div class="ticket-route">
+              <div class="fromto"><span>FROM: DUSTY RUG</span><span>TO: BRIGHT RUG</span></div>
+              <div class="barcode" aria-hidden="true"></div>
+            </div>
+          </div>
+          <div class="ticket-stub">
+            <div><div class="route-no">E-03</div><div style="font-size:10px;letter-spacing:.2em">ADMIT ONE</div></div>
+            <a href="?page=contact" data-nav="contact">BOOK</a>
+          </div>
+        </article>
+
+        <article class="ticket">
+          <div class="ticket-main">
+            <span class="ticket-code">E-04</span> <span class="badge badge-sample">Sample</span>
+            <h3>Upholstery Cleaning</h3>
+            <p>Sample listing. Upholstery cleaning may be offered, but this has not been confirmed with the business. <span class="badge badge-confirm">Call to confirm</span></p>
+            <div class="ticket-route">
+              <div class="fromto"><span>FROM: WORN FABRIC</span><span>TO: FRESH FABRIC</span></div>
+              <div class="barcode" aria-hidden="true"></div>
+            </div>
+          </div>
+          <div class="ticket-stub">
+            <div><div class="route-no">E-04</div><div style="font-size:10px;letter-spacing:.2em">ADMIT ONE</div></div>
+            <a href="?page=contact" data-nav="contact">BOOK</a>
+          </div>
+        </article>
+
+        <article class="ticket">
+          <div class="ticket-main">
+            <span class="ticket-code">E-05</span> <span class="badge badge-sample">Sample</span>
+            <h3>Stain and Odor Treatment</h3>
+            <p>Sample listing. Spot and odor treatment may be offered, but this has not been confirmed with the business. <span class="badge badge-confirm">Call to confirm</span></p>
+            <div class="ticket-route">
+              <div class="fromto"><span>FROM: SPOTS</span><span>TO: SPOTLESS</span></div>
+              <div class="barcode" aria-hidden="true"></div>
+            </div>
+          </div>
+          <div class="ticket-stub">
+            <div><div class="route-no">E-05</div><div style="font-size:10px;letter-spacing:.2em">ADMIT ONE</div></div>
+            <a href="?page=contact" data-nav="contact">BOOK</a>
+          </div>
+        </article>
+
+        <article class="ticket">
+          <div class="ticket-main">
+            <span class="ticket-code">E-06</span> <span class="badge badge-sample">Sample</span>
+            <h3>Commercial Floor Care</h3>
+            <p>Sample listing. Ongoing commercial floor programs may be offered, but this has not been confirmed with the business. <span class="badge badge-confirm">Call to confirm</span></p>
+            <div class="ticket-route">
+              <div class="fromto"><span>FROM: TIRED FLOORS</span><span>TO: POLISHED FLOORS</span></div>
+              <div class="barcode" aria-hidden="true"></div>
+            </div>
+          </div>
+          <div class="ticket-stub">
+            <div><div class="route-no">E-06</div><div style="font-size:10px;letter-spacing:.2em">ADMIT ONE</div></div>
+            <a href="?page=contact" data-nav="contact">BOOK</a>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-about" data-page="about">
+  <div class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="kicker">Station plaque</p>
+        <h2>About <span class="hl">this station</span></h2>
+      </div>
+      <div class="plaque">
+        <h2>Express Carpet Cleaning And Janitorial Services</h2>
+        <dl>
+          <dt>Category</dt><dd>Carpet cleaning service <span class="badge badge-verified">Lead record</span></dd>
+          <dt>Address</dt><dd>440 Commonwealth Ave, Erlanger, KY 41018 <span class="badge badge-verified">Lead record</span></dd>
+          <dt>Phone</dt><dd><a href="tel:+18593604718">(859) 360-4718</a> <span class="badge badge-verified">Lead record</span></dd>
+          <dt>Service area</dt><dd>Erlanger and nearby Northern Kentucky communities <span class="badge badge-sample">Sample</span> <span class="badge badge-confirm">Call to confirm</span></dd>
+          <dt>Founded</dt><dd>Not published <span class="badge badge-sample">Sample</span></dd>
+          <dt>Team</dt><dd>Not published <span class="badge badge-sample">Sample</span></dd>
+          <dt>Methods</dt><dd>Not published <span class="badge badge-confirm">Call to confirm</span></dd>
+        </dl>
+      </div>
+      <div class="panel-grid" style="margin-top:26px">
+        <div class="panel">
+          <h3><i class="fa-solid fa-broom"></i> What the name says</h3>
+          <p>The business name covers two tracks: carpet cleaning and janitorial services. Those are the two confirmed service lines. Everything beyond them is a sample listing until confirmed by phone.</p>
+        </div>
+        <div class="panel">
+          <h3><i class="fa-solid fa-circle-info"></i> A note on this demo</h3>
+          <p>This page was built from a public business listing record only. History, team size, pricing, hours, and service details are not published, so they are badged honestly rather than guessed.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews" data-page="reviews">
+  <div class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="kicker">Passenger feedback</p>
+        <h2>Service <span class="hl">comments</span></h2>
+      </div>
+      <div class="notice">
+        <strong>Honest note:</strong> no verified public review profile has been confirmed for Express Carpet Cleaning And Janitorial Services as of this demo build, so no review source is linked. The cards below are <strong>SAMPLE placeholders</strong> showing how real reviews would appear, including a mixed one. No reviewer names are shown because none are known.
+      </div>
+      <div class="review-grid">
+        <article class="review">
+          <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+          <p>"Sample review text. A real five-star review would appear here once the business collects verified feedback."</p>
+          <div class="meta"><span class="who">GUEST PASSENGER - NAME WITHHELD</span><span class="badge badge-sample">Sample</span></div>
+        </article>
+        <article class="review">
+          <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star off"></i></div>
+          <p>"Sample review text. A real four-star review would appear here once the business collects verified feedback."</p>
+          <div class="meta"><span class="who">GUEST PASSENGER - NAME WITHHELD</span><span class="badge badge-sample">Sample</span></div>
+        </article>
+        <article class="review">
+          <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star off"></i><i class="fa-solid fa-star off"></i><i class="fa-solid fa-star off"></i></div>
+          <p>"Sample mixed review. Placeholder only: no real negative feedback has been verified, and this card exists so the layout honestly represents a range of ratings."</p>
+          <div class="meta"><span class="who">GUEST PASSENGER - NAME WITHHELD</span><span class="badge badge-sample">Sample</span></div>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-contact" data-page="contact">
+  <div class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="kicker">Booking kiosk</p>
+        <h2>Reserve <span class="hl">your seat</span></h2>
+        <p>Send a booking request below, or call the ticket window directly. This demo form does not send email; it shows a confirmation on this page.</p>
+      </div>
+      <div class="kiosk">
+        <div class="kiosk-form">
+          <form id="bookingForm" novalidate>
+            <h3>Booking request</h3>
+            <div class="field">
+              <label for="fName">Your name</label>
+              <input type="text" id="fName" name="name" placeholder="Jane Rider" required>
+            </div>
+            <div class="field">
+              <label for="fPhone">Phone number</label>
+              <input type="tel" id="fPhone" name="phone" placeholder="(859) 555-0100" required>
+            </div>
+            <div class="field">
+              <label for="fService">Service line</label>
+              <select id="fService" name="service">
+                <option>Carpet Cleaning (E-01)</option>
+                <option>Janitorial Services (E-02)</option>
+                <option>Area Rug Cleaning (E-03) - sample</option>
+                <option>Upholstery Cleaning (E-04) - sample</option>
+                <option>Stain and Odor Treatment (E-05) - sample</option>
+                <option>Commercial Floor Care (E-06) - sample</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="fMsg">Trip details</label>
+              <textarea id="fMsg" name="message" placeholder="Rooms, square footage, preferred days..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-signal" style="width:100%;justify-content:center"><i class="fa-solid fa-ticket"></i> SUBMIT REQUEST</button>
+            <p class="form-note">Demo form. No email is sent. For a real booking, call <a href="tel:+18593604718">(859) 360-4718</a>.</p>
+          </form>
+          <div class="confirm" id="bookingConfirm" role="status">
+            <i class="fa-solid fa-circle-check"></i>
+            <h3>Request received</h3>
+            <p id="confirmText">Thanks. This is a demo confirmation.</p>
+            <p style="margin-top:10px">For a confirmed booking, call <a href="tel:+18593604718">(859) 360-4718</a>.</p>
+          </div>
+        </div>
+        <div class="kiosk-info">
+          <div class="info-card">
+            <h3>Ticket window</h3>
+            <div class="row"><i class="fa-solid fa-phone"></i><p><a href="tel:+18593604718">(859) 360-4718</a><br><span style="font-size:12px;color:#8fa0bd">Tap to call</span></p></div>
+            <div class="row"><i class="fa-solid fa-location-dot"></i><p>440 Commonwealth Ave<br>Erlanger, KY 41018</p></div>
+            <div class="row"><i class="fa-solid fa-location-arrow"></i><p><a href="https://www.google.com/maps/search/?api=1&query=Express%20Carpet%20Cleaning%20And%20Janitorial%20Services%2C%20440%20Commonwealth%20Ave%2C%20Erlanger%2C%20KY%2041018" target="_blank" rel="noopener">Get directions</a></p></div>
+            <div class="row"><i class="fa-regular fa-clock"></i><p>Hours not published<br><span class="badge badge-confirm">Call to confirm</span></p></div>
+          </div>
+          <div class="info-card">
+            <h3>Photo coming soon</h3>
+            <p>Photos of the team and the station are not available yet. <span class="badge badge-sample">Sample</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>© Express Carpet Cleaning And Janitorial Services</footer>
+
+<script>
+(function(){
+  "use strict";
+  var PAGES = ["home","services","about","reviews","contact"];
+  var TITLES = {
+    home: "Express Carpet Cleaning And Janitorial Services | Erlanger, KY",
+    services: "Services | Express Carpet Cleaning And Janitorial Services",
+    about: "About | Express Carpet Cleaning And Janitorial Services",
+    reviews: "Reviews | Express Carpet Cleaning And Janitorial Services",
+    contact: "Contact | Express Carpet Cleaning And Janitorial Services"
+  };
+
+  function validPage(p){
+    return PAGES.indexOf(p) !== -1 ? p : "home";
+  }
+
+  function navigateTo(page, options){
+    page = validPage(page);
+    var opts = options || {};
+    var sections = document.querySelectorAll("section.page");
+    for (var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].getAttribute("data-page") === page);
+    }
+    var links = document.querySelectorAll("[data-nav]");
+    for (var j = 0; j < links.length; j++){
+      links[j].classList.toggle("active", links[j].getAttribute("data-nav") === page);
+    }
+    document.title = TITLES[page];
+    var url = "?page=" + page;
+    if (opts.push !== false){
+      if (window.location.search !== url){
+        window.history.pushState({page: page}, "", url);
+      }
+    } else {
+      window.history.replaceState({page: page}, "", url);
+    }
+    closeMenu();
+    window.scrollTo(0, 0);
+  }
+
+  window.navigateTo = navigateTo;
+
+  function closeMenu(){
+    var nav = document.getElementById("navLinks");
+    var btn = document.getElementById("navToggle");
+    if (nav && nav.classList.contains("open")){
+      nav.classList.remove("open");
+      btn.setAttribute("aria-expanded", "false");
+    }
+  }
+
+  document.addEventListener("click", function(e){
+    var link = e.target.closest ? e.target.closest("[data-nav]") : null;
+    if (link){
+      e.preventDefault();
+      navigateTo(link.getAttribute("data-nav"));
+    }
+  });
+
+  window.addEventListener("popstate", function(e){
+    var page = (e.state && e.state.page) ? e.state.page : null;
+    if (!page){
+      var params = new URLSearchParams(window.location.search);
+      page = params.get("page");
+    }
+    navigateTo(page, {push: false});
+  });
+
+  var toggle = document.getElementById("navToggle");
+  toggle.addEventListener("click", function(){
+    var nav = document.getElementById("navLinks");
+    var open = nav.classList.toggle("open");
+    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+
+  function tick(){
+    var el = document.getElementById("stationClock");
+    if (!el) return;
+    var d = new Date();
+    var h = d.getHours(), m = d.getMinutes(), s = d.getSeconds();
+    function pad(n){ return (n < 10 ? "0" : "") + n; }
+    el.textContent = pad(h) + ":" + pad(m) + ":" + pad(s);
+  }
+  tick();
+  setInterval(tick, 1000);
+
+  var form = document.getElementById("bookingForm");
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    var name = document.getElementById("fName").value.trim();
+    var phone = document.getElementById("fPhone").value.trim();
+    var service = document.getElementById("fService").value;
+    if (!name || !phone){
+      alert("Please add your name and phone number so we can call you back.");
+      return;
+    }
+    form.style.display = "none";
+    var box = document.getElementById("bookingConfirm");
+    document.getElementById("confirmText").textContent =
+      "Thanks, " + name + ". Your " + service + " request is logged in this demo. We would call you back at " + phone + " to confirm a time.";
+    box.classList.add("show");
+  });
+
+  var start = new URLSearchParams(window.location.search).get("page");
+  navigateTo(start, {push: false});
+})();
+</script>
+</body>
+</html>

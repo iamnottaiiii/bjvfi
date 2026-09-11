@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B &amp; D Services | Auto Repair | Amelia, OH</title>
+<meta name="description" content="B & D Services, auto repair shop at 1914 OH-125, Amelia, OH 45102. Call (513) 797-5466.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{
+  --blue:#0e3a75;
+  --blue-deep:#0a2a5c;
+  --ink:#f2f6ff;
+  --ink-dim:rgba(242,246,255,.72);
+  --ink-faint:rgba(242,246,255,.45);
+  --line:rgba(242,246,255,.85);
+  --accent:#ffb02e;
+  --card:rgba(255,255,255,.045);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'IBM Plex Mono',monospace;
+  color:var(--ink);
+  background-color:var(--blue-deep);
+  background-image:
+    linear-gradient(rgba(242,246,255,.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(242,246,255,.055) 1px, transparent 1px),
+    linear-gradient(rgba(242,246,255,.11) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(242,246,255,.11) 1px, transparent 1px);
+  background-size:24px 24px,24px 24px,120px 120px,120px 120px;
+  min-height:100vh;
+  display:flex;flex-direction:column;
+}
+h1,h2,h3,.display{font-family:'Archivo',sans-serif}
+a{color:inherit}
+.wrap{max-width:1140px;margin:0 auto;padding:0 20px;width:100%}
+
+/* top bar */
+.topbar{border-bottom:2px solid var(--line);background:rgba(10,42,92,.92);position:sticky;top:0;z-index:50}
+.topbar-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+.brand-mark{width:46px;height:46px;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:'Archivo';font-weight:900;font-size:15px;letter-spacing:.02em;background:var(--card)}
+.brand-name{font-family:'Archivo';font-weight:900;font-size:1.15rem;letter-spacing:.06em;line-height:1.1}
+.brand-sub{font-size:.68rem;letter-spacing:.28em;color:var(--ink-dim)}
+.nav{display:flex;gap:4px}
+.navbtn{background:transparent;border:1px solid transparent;color:var(--ink);font-family:'IBM Plex Mono';font-size:.78rem;letter-spacing:.12em;padding:10px 14px;cursor:pointer;text-transform:uppercase;text-decoration:none;display:inline-block}
+.navbtn:hover{border-color:var(--ink-faint)}
+.navbtn.active{border:2px solid var(--ink);background:var(--ink);color:var(--blue-deep);font-weight:700}
+.navbtn:focus-visible,.burger:focus-visible,.btn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.burger{display:none;background:transparent;border:2px solid var(--line);color:var(--ink);font-size:1.2rem;padding:8px 12px;cursor:pointer}
+.mobilemenu{display:none;border-top:1px solid var(--ink-faint);padding:8px 0}
+.mobilemenu.open{display:block}
+.mobilemenu .navbtn{display:block;width:100%;text-align:left;margin:4px 0}
+
+/* title block (drawing sheet header) */
+.titleblock{border:2px solid var(--line);margin:34px 0 8px;background:rgba(14,58,117,.55)}
+.tb-row{display:flex;border-bottom:2px solid var(--line)}
+.tb-row:last-child{border-bottom:none}
+.tb-cell{padding:14px 18px;border-right:2px solid var(--line);flex:1;min-width:0}
+.tb-cell:last-child{border-right:none}
+.tb-label{font-size:.62rem;letter-spacing:.3em;color:var(--ink-dim);text-transform:uppercase;margin-bottom:6px}
+.tb-value{font-size:.92rem;line-height:1.5}
+.tb-title{font-family:'Archivo';font-weight:900;font-size:clamp(2rem,6vw,3.6rem);letter-spacing:.04em;line-height:1.05;text-transform:uppercase}
+.tb-sheet{text-align:right}
+.tb-sheet .bignum{font-family:'Archivo';font-weight:900;font-size:2.6rem;color:var(--accent)}
+.spec-note{font-size:.7rem;letter-spacing:.14em;color:var(--ink-dim);text-transform:uppercase;padding:10px 0}
+
+/* dimension line divider */
+.dimline{display:flex;align-items:center;gap:0;margin:38px 0 22px}
+.dimline .tick{width:2px;height:22px;background:var(--line);flex:none}
+.dimline .rule{flex:1;height:2px;background:repeating-linear-gradient(90deg,var(--line) 0 14px,transparent 14px 22px)}
+.dimline .tag{border:2px solid var(--line);background:var(--blue-deep);padding:6px 16px;font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;white-space:nowrap}
+.dimline .tag i{color:var(--accent);margin-right:8px}
+
+/* pages */
+.page{display:none}
+.page.active{display:block;animation:fadein .28s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.lede{font-size:1.02rem;line-height:1.8;color:var(--ink-dim);max-width:70ch}
+.lede strong{color:var(--ink)}
+
+/* buttons */
+.btn{display:inline-block;font-family:'IBM Plex Mono';font-weight:700;font-size:.82rem;letter-spacing:.14em;text-transform:uppercase;text-decoration:none;cursor:pointer;border:2px solid var(--ink);background:var(--accent);color:var(--blue-deep);padding:15px 26px;margin:6px 10px 6px 0}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn:hover{transform:translateY(-2px)}
+.btn i{margin-right:10px}
+
+/* badge */
+.badge{display:inline-block;font-size:.64rem;letter-spacing:.22em;text-transform:uppercase;border:1.5px dashed var(--accent);color:var(--accent);padding:5px 10px;margin:6px 8px 6px 0;vertical-align:middle}
+
+/* cards */
+.grid{display:grid;gap:18px}
+.grid.c3{grid-template-columns:repeat(3,1fr)}
+.grid.c2{grid-template-columns:repeat(2,1fr)}
+.dwg{border:2px solid var(--line);background:var(--card);padding:22px;position:relative}
+.dwg::before{content:"FIG. " attr(data-fig);position:absolute;top:-13px;left:16px;background:var(--blue-deep);padding:2px 12px;font-size:.66rem;letter-spacing:.24em;border:2px solid var(--line)}
+.dwg h3{font-size:1.05rem;letter-spacing:.05em;text-transform:uppercase;margin:6px 0 10px}
+.dwg h3 i{color:var(--accent);margin-right:10px}
+.dwg p{font-size:.85rem;line-height:1.75;color:var(--ink-dim)}
+.dwg ul{list-style:none;margin-top:10px}
+.dwg ul li{font-size:.82rem;line-height:1.7;color:var(--ink-dim);padding-left:22px;position:relative}
+.dwg ul li::before{content:"+";position:absolute;left:2px;color:var(--accent);font-weight:700}
+.stat{border:2px solid var(--line);background:var(--card);padding:20px;text-align:center}
+.stat .n{font-family:'Archivo';font-weight:900;font-size:2.2rem;color:var(--accent)}
+.stat .t{font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-dim);margin-top:8px}
+
+/* schematic svg */
+.schematic{border:2px solid var(--line);background:rgba(10,42,92,.6);padding:10px;margin:10px 0 26px;position:relative}
+.schematic svg{display:block;width:100%;height:auto}
+.cap{font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-dim);padding:10px 6px 4px}
+
+/* hours table */
+.htable{border:2px solid var(--line);width:100%;border-collapse:collapse;background:var(--card)}
+.htable th,.htable td{border:1px solid var(--ink-faint);padding:11px 14px;font-size:.82rem;text-align:left}
+.htable th{letter-spacing:.22em;text-transform:uppercase;font-size:.66rem;color:var(--ink-dim)}
+
+/* form */
+form.req{border:2px solid var(--line);background:var(--card);padding:26px;display:grid;gap:16px}
+.field label{display:block;font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:8px}
+.field input,.field select,.field textarea{width:100%;background:rgba(10,42,92,.7);border:2px solid var(--ink-faint);color:var(--ink);font-family:'IBM Plex Mono';font-size:.9rem;padding:13px 14px}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);outline:none}
+.field textarea{min-height:130px;resize:vertical}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* contact rows */
+.contactrow{display:flex;align-items:center;gap:16px;border:2px solid var(--line);background:var(--card);padding:18px 20px;margin-bottom:14px;text-decoration:none}
+.contactrow:hover{border-color:var(--accent)}
+.contactrow .ic{width:48px;height:48px;flex:none;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:1.15rem;color:var(--accent)}
+.contactrow .lab{font-size:.64rem;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-dim)}
+.contactrow .val{font-size:1rem;font-weight:700;margin-top:4px}
+
+footer{margin-top:auto;border-top:2px solid var(--line);padding:26px 0;text-align:center;font-size:.85rem;letter-spacing:.08em;background:rgba(10,42,92,.9)}
+
+.revbox{border:2px solid var(--line);background:var(--card);padding:24px;margin-bottom:18px}
+.revbox h3{font-size:1rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.revbox h3 i{color:var(--accent);margin-right:10px}
+.revbox p{font-size:.86rem;line-height:1.75;color:var(--ink-dim)}
+.stars{color:var(--accent);letter-spacing:.3em;margin:8px 0}
+
+@media(max-width:860px){
+  .grid.c3,.grid.c2{grid-template-columns:1fr}
+  .nav{display:none}
+  .burger{display:block}
+  .tb-row{flex-direction:column}
+  .tb-cell{border-right:none;border-bottom:2px solid var(--line)}
+  .tb-cell:last-child{border-bottom:none}
+  .tb-sheet{text-align:left}
+  .two{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="?sheet=01" data-page="home" aria-label="B and D Services home">
+      <span class="brand-mark">B&amp;D</span>
+      <span><span class="brand-name">B &amp; D SERVICES</span><br><span class="brand-sub">AUTO REPAIR - AMELIA OH</span></span>
+    </a>
+    <nav class="nav" aria-label="Primary">
+      <a class="navbtn active" href="?sheet=01" data-page="home">Home</a>
+      <a class="navbtn" href="?sheet=02" data-page="services">Services</a>
+      <a class="navbtn" href="?sheet=03" data-page="about">About</a>
+      <a class="navbtn" href="?sheet=04" data-page="reviews">Reviews</a>
+      <a class="navbtn" href="?sheet=05" data-page="contact">Contact</a>
+    </nav>
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
+  </div>
+  <div class="wrap">
+    <nav class="mobilemenu" id="mobilemenu" aria-label="Mobile">
+      <a class="navbtn active" href="?sheet=01" data-page="home">Home</a>
+      <a class="navbtn" href="?sheet=02" data-page="services">Services</a>
+      <a class="navbtn" href="?sheet=03" data-page="about">About</a>
+      <a class="navbtn" href="?sheet=04" data-page="reviews">Reviews</a>
+      <a class="navbtn" href="?sheet=05" data-page="contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap" style="flex:1">
+
+<section class="page active" id="page-home" data-page="home">
+  <div class="titleblock">
+    <div class="tb-row">
+      <div class="tb-cell"><div class="tb-label">Project</div><div class="tb-value"><strong>B &amp; D Services</strong><br>Auto Repair Shop<br>1914 OH-125, Amelia, OH 45102</div></div>
+      <div class="tb-cell tb-sheet"><div class="tb-label">Sheet No.</div><div class="bignum">01</div><div class="tb-value">OF 05 - SITE PLAN</div></div>
+    </div>
+    <div class="tb-row">
+      <div class="tb-cell"><div class="tb-label">Drawn</div><div class="tb-value">B&amp;D CREW</div></div>
+      <div class="tb-cell"><div class="tb-label">Scale</div><div class="tb-value">NTS</div></div>
+      <div class="tb-cell"><div class="tb-label">Status</div><div class="tb-value">ISSUED FOR SERVICE</div></div>
+    </div>
+    <div class="tb-row">
+      <div class="tb-cell"><h1 class="tb-title">Full-Service<br>Auto Repair<br>in Amelia, Ohio</h1></div>
+    </div>
+  </div>
+  <p class="spec-note">SPEC 001 // INDEPENDENT REPAIR SHOP // PUBLIC LISTING DATA ON FILE</p>
+
+  <div class="schematic">
+    <svg viewBox="0 0 900 340" role="img" aria-label="Schematic line drawing of a car with numbered service callouts">
+      <g stroke="#f2f6ff" stroke-width="2.5" fill="none">
+        <path d="M80 250 L120 250 L170 180 L300 150 L520 150 L610 190 L800 200 L830 230 L830 260 L80 260 Z"/>
+        <circle cx="230" cy="262" r="46"/>
+        <circle cx="230" cy="262" r="20"/>
+        <circle cx="680" cy="262" r="46"/>
+        <circle cx="680" cy="262" r="20"/>
+        <line x1="300" y1="150" x2="300" y2="195"/>
+        <line x1="520" y1="150" x2="520" y2="195"/>
+        <line x1="276" y1="262" x2="634" y2="262"/>
+        <line x1="80" y1="285" x2="830" y2="285" stroke-dasharray="10 8"/>
+      </g>
+      <g stroke="#ffb02e" stroke-width="1.6" stroke-dasharray="6 5">
+        <line x1="230" y1="216" x2="230" y2="120"/>
+        <line x1="410" y1="150" x2="410" y2="60"/>
+        <line x1="680" y1="216" x2="680" y2="120"/>
+      </g>
+      <g fill="#f2f6ff" font-family="IBM Plex Mono, monospace" font-size="17">
+        <circle cx="230" cy="108" r="16" fill="#ffb02e" stroke="#f2f6ff" stroke-width="2"/><text x="223" y="114" fill="#0a2a5c" font-weight="700">1</text>
+        <text x="262" y="100">TIRES + WHEELS</text><text x="262" y="122" font-size="13" fill="#bcd">ROTATION / REPLACEMENT</text>
+        <circle cx="410" cy="48" r="16" fill="#ffb02e" stroke="#f2f6ff" stroke-width="2"/><text x="403" y="54" fill="#0a2a5c" font-weight="700">2</text>
+        <text x="442" y="40">ENGINE + TRANS</text><text x="442" y="62" font-size="13">DIAGNOSTICS + REPAIR</text>
+        <circle cx="680" cy="108" r="16" fill="#ffb02e" stroke="#f2f6ff" stroke-width="2"/><text x="673" y="114" fill="#0a2a5c" font-weight="700">3</text>
+        <text x="560" y="100" text-anchor="end">ROUTINE CARE</text><text x="560" y="122" font-size="13" text-anchor="end">OIL / MAINTENANCE</text>
+      </g>
+      <g fill="#bcd" font-family="IBM Plex Mono, monospace" font-size="13">
+        <text x="80" y="310">DATUM LINE</text>
+        <text x="830" y="310" text-anchor="end">DWG. BD-01</text>
+      </g>
+    </svg>
+    <div class="cap">FIG. A - VEHICLE SERVICE SCHEMATIC - NOT TO SCALE - CALL TO CONFIRM SPECIFIC REPAIRS</div>
+  </div>
+
+  <p class="lede"><strong>B &amp; D Services</strong> is an independent auto repair shop on State Route 125 in Amelia, Ohio. Public listings describe a family-run shop known for honest work, clear communication, and fair pricing, handling everything from routine maintenance to engine and transmission repairs. <span class="badge">CALL TO CONFIRM</span></p>
+
+  <div style="margin:22px 0">
+    <a class="btn" href="tel:+15137975466"><i class="fa-solid fa-phone"></i>Call (513) 797-5466</a>
+    <a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=B%20%26%20D%20Services%2C%201914%20OH-125%2C%20Amelia%2C%20OH%2045102" target="_blank" rel="noopener"><i class="fa-solid fa-diamond-turn-right"></i>Get Directions</a>
+    <a class="btn ghost" href="?sheet=02" data-page="services"><i class="fa-solid fa-wrench"></i>View Services</a>
+  </div>
+
+  <div class="dimline"><span class="tick"></span><span class="rule"></span><span class="tag"><i class="fa-solid fa-ruler-horizontal"></i>DETAIL B - SHOP DATA</span><span class="rule"></span><span class="tick"></span></div>
+
+  <div class="grid c3">
+    <div class="stat"><div class="n">M-F</div><div class="t">9:00 AM - 5:00 PM<br><span class="badge">CALL TO CONFIRM</span></div></div>
+    <div class="stat"><div class="n"><i class="fa-solid fa-location-dot"></i></div><div class="t">1914 OH-125<br>Amelia, OH 45102</div></div>
+    <div class="stat"><div class="n"><i class="fa-solid fa-phone"></i></div><div class="t"><a href="tel:+15137975466" style="text-decoration:none">(513) 797-5466</a></div></div>
+  </div>
+</section>
+
+<section class="page" id="page-services" data-page="services">
+  <div class="titleblock">
+    <div class="tb-row">
+      <div class="tb-cell"><div class="tb-label">Project</div><div class="tb-value"><strong>B &amp; D Services</strong><br>1914 OH-125, Amelia, OH 45102</div></div>
+      <div class="tb-cell tb-sheet"><div class="tb-label">Sheet No.</div><div class="bignum">02</div><div class="tb-value">OF 05 - SERVICE SCHEDULE</div></div>
+    </div>
+    <div class="tb-row">
+      <div class="tb-cell"><h2 class="tb-title">Service<br>Schedule</h2></div>
+    </div>
+  </div>
+  <p class="spec-note">SPEC 002 // SERVICE LIST COMPILED FROM PUBLIC BUSINESS LISTINGS - NO PRICES PUBLISHED - CALL TO CONFIRM</p>
+  <p class="lede">The services below are compiled from <strong>public business listings and customer reviews</strong> of B &amp; D Services. No pricing is published. Call <a href="tel:+15137975466">(513) 797-5466</a> to confirm what the shop handles and to get an estimate. <span class="badge">CALL TO CONFIRM</span></p>
+
+  <div class="dimline"><span class="tick"></span><span class="rule"></span><span class="tag"><i class="fa-solid fa-list-check"></i>DIVISION 1 - MAINTENANCE</span><span class="rule"></span><span class="tick"></span></div>
+  <div class="grid c3">
+    <div class="dwg" data-fig="1"><h3><i class="fa-solid fa-oil-can"></i>Oil Change</h3><p>Routine oil changes as mentioned across public customer reviews.</p><span class="badge">CALL TO CONFIRM</span></div>
+    <div class="dwg" data-fig="2"><h3><i class="fa-solid fa-circle-notch"></i>Tire Rotation</h3><p>Tire rotation listed among routine maintenance services in public listings.</p><span class="badge">CALL TO CONFIRM</span></div>
+    <div class="dwg" data-fig="3"><h3><i class="fa-solid fa-clipboard-check"></i>Routine Maintenance</h3><p>General scheduled maintenance for cars and trucks per public listings.</p><span class="badge">CALL TO CONFIRM</span></div>
+  </div>
+
+  <div class="dimline"><span class="tick"></span><span class="rule"></span><span class="tag"><i class="fa-solid fa-gears"></i>DIVISION 2 - REPAIR</span><span class="rule"></span><span class="tick"></span></div>
+  <div class="grid c3">
+    <div class="dwg" data-fig="4"><h3><i class="fa-solid fa-car-burst"></i>Tire Replacement</h3><p>Tire replacements cited in public customer reviews of the shop.</p><span class="badge">CALL TO CONFIRM</span></div>
+    <div class="dwg" data-fig="5"><h3><i class="fa-solid fa-magnifying-glass"></i>Diagnostics</h3><p>Public listings describe thorough diagnosis of vehicle issues before repair.</p><span class="badge">CALL TO CONFIRM</span></div>
+    <div class="dwg" data-fig="6"><h3><i class="fa-solid fa-engine"></i>Engine Work</h3><p>Engine repair listed in public business descriptions of services offered.</p><span class="badge">CALL TO CONFIRM</span></div>
+  </div>
+
+  <div class="dimline"><span class="tick"></span><span class="rule"></span><span class="tag"><i class="fa-solid fa-truck-pickup"></i>DIVISION 3 - DRIVETRAIN</span><span class="rule"></span><span class="tick"></span></div>
+  <div class="grid c2">
+    <div class="dwg" data-fig="7"><h3><i class="fa-solid fa-cog"></i>Transmission Work</h3><p>Transmission service and repair referenced in public business listings. Public listings state the shop works on all makes and models.</p><span class="badge">CALL TO CONFIRM</span></div>
+    <div class="dwg" data-fig="8"><h3><i class="fa-solid fa-screwdriver-wrench"></i>General Auto Repair</h3><p>Listed as an automotive repair / auto repair shop across public directories.</p><span class="badge">CALL TO CONFIRM</span></div>
+  </div>
+</section>
+
+<section class="page" id="page-about" data-page="about">
+  <div class="titleblock">
+    <div class="tb-row">
+      <div class="tb-cell"><div class="tb-label">Project</div><div class="tb-value"><strong>B &amp; D Services</strong><br>1914 OH-125, Amelia, OH 45102</div></div>
+      <div class="tb-cell tb-sheet"><div class="tb-label">Sheet No.</div><div class="bignum">03</div><div class="tb-value">OF 05 - SHOP RECORD</div></div>
+    </div>
+    <div class="tb-row">
+      <div class="tb-cell"><h2 class="tb-title">Shop<br>Record</h2></div>
+    </div>
+  </div>
+  <p class="spec-note">SPEC 003 // RECORD COMPILED FROM PUBLIC SOURCES ONLY - UNVERIFIED DETAILS ARE BADGED</p>
+
+  <div class="dwg" data-fig="9" style="margin-bottom:22px">
+    <h3><i class="fa-solid fa-file-lines"></i>What Public Records Show</h3>
+    <ul>
+      <li>Independent auto repair shop at 1914 OH-125, Amelia, OH 45102 <span class="badge">PUBLIC LISTING</span></li>
+      <li>Primary category listed as automotive repair <span class="badge">PUBLIC LISTING</span></li>
+      <li>Phone on file: (513) 797-5466 <span class="badge">PUBLIC LISTING</span></li>
+      <li>Listed hours: Mon-Fri 9:00 AM - 5:00 PM <span class="badge">CALL TO CONFIRM</span></li>
+      <li>Described in public listings as a family-owned shop focused on honest, fairly priced repairs <span class="badge">PUBLIC LISTING</span></li>
+    </ul>
+  </div>
+
+  <div class="schematic">
+    <svg viewBox="0 0 900 220" role="img" aria-label="Timeline schematic of shop record">
+      <line x1="60" y1="110" x2="840" y2="110" stroke="#f2f6ff" stroke-width="2.5"/>
+      <g stroke="#f2f6ff" stroke-width="2.5"><line x1="60" y1="96" x2="60" y2="124"/><line x1="840" y1="96" x2="840" y2="124"/></g>
+      <g fill="#f2f6ff" font-family="IBM Plex Mono, monospace" font-size="15">
+        <circle cx="180" cy="110" r="10" fill="none" stroke="#ffb02e" stroke-width="2.5"/>
+        <text x="180" y="80" text-anchor="middle">LISTED AS</text><text x="180" y="160" text-anchor="middle" fill="#bcd">AUTO REPAIR SHOP</text>
+        <circle cx="450" cy="110" r="10" fill="none" stroke="#ffb02e" stroke-width="2.5"/>
+        <text x="450" y="80" text-anchor="middle">SERVING</text><text x="450" y="160" text-anchor="middle" fill="#bcd">AMELIA + CLERMONT CO.</text>
+        <circle cx="720" cy="110" r="10" fill="none" stroke="#ffb02e" stroke-width="2.5"/>
+        <text x="720" y="80" text-anchor="middle">TODAY</text><text x="720" y="160" text-anchor="middle" fill="#bcd">CALL (513) 797-5466</text>
+      </g>
+    </svg>
+    <div class="cap">FIG. B - SHOP RECORD TIMELINE - DATES NOT PUBLISHED - CALL TO CONFIRM HISTORY</div>
+  </div>
+
+  <p class="lede">B &amp; D Services operates as a local, independent repair shop rather than a national chain. Public customer reviews repeatedly mention <strong>honest recommendations</strong>, work done right the first time, and reasonable pricing. This page draws only on public listings. Anything not published, such as the shop's founding date or staff names, is left out rather than guessed. <span class="badge">SAMPLE</span> content below marks any illustrative material.</p>
+</section>
+
+<section class="page" id="page-reviews" data-page="reviews">
+  <div class="titleblock">
+    <div class="tb-row">
+      <div class="tb-cell"><div class="tb-label">Project</div><div class="tb-value"><strong>B &amp; D Services</strong><br>1914 OH-125, Amelia, OH 45102</div></div>
+      <div class="tb-cell tb-sheet"><div class="tb-label">Sheet No.</div><div class="bignum">04</div><div class="tb-value">OF 05 - FIELD REPORTS</div></div>
+    </div>
+    <div class="tb-row">
+      <div class="tb-cell"><h2 class="tb-title">Field<br>Reports</h2></div>
+    </div>
+  </div>
+  <p class="spec-note">SPEC 004 // NO REVIEW TEXT COULD BE INDEPENDENTLY VERIFIED FOR THIS PAGE - NOTHING IS QUOTED OR ATTRIBUTED</p>
+
+  <div class="revbox">
+    <h3><i class="fa-solid fa-circle-exclamation"></i>Our Review Policy</h3>
+    <p>We do not publish reviewer names or quote review text unless we can verify the source directly. Public directories show review activity for this business, including a review count on third-party listing sites, but the individual review text could not be independently verified, so no reviews are quoted here. If you are a customer, the best check is the live listing. <span class="badge">CALL TO CONFIRM</span></p>
+    <div style="margin-top:16px">
+      <a class="btn" href="https://www.google.com/maps/place/?q=place_id:ChIJVimOgcGQYgRuh2pJ0suVjs" target="_blank" rel="noopener"><i class="fa-solid fa-star"></i>Read Reviews on Google Maps</a>
+      <a class="btn ghost" href="https://reviews.birdeye.com/b-d-services-166062781720139" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i>Third-Party Listing (Birdeye)</a>
+    </div>
+  </div>
+
+  <div class="dimline"><span class="tick"></span><span class="rule"></span><span class="tag"><i class="fa-solid fa-scale-balanced"></i>READING REVIEWS FAIRLY</span><span class="rule"></span><span class="tick"></span></div>
+  <div class="grid c3">
+    <div class="dwg" data-fig="10"><h3><i class="fa-solid fa-thumbs-up"></i>Positive Signals</h3><p>Public listing summaries describe customers praising honest, fairly priced work. Treat any summary like this as a starting point, then confirm with a visit or call.</p></div>
+    <div class="dwg" data-fig="11"><h3><i class="fa-solid fa-thumbs-down"></i>Negative Signals</h3><p>No verified negative reviews were found during research. Absence of evidence is not evidence of quality. Check the live Google listing for the full picture.</p></div>
+    <div class="dwg" data-fig="12"><h3><i class="fa-solid fa-circle-half-stroke"></i>Mixed Signals</h3><p>One directory lists differing weekday hours from another source. When public records disagree, the phone call is the tiebreaker: (513) 797-5466.</p></div>
+  </div>
+  <p class="lede" style="margin-top:24px">Star ratings change over time and third-party summaries can be stale. For the current rating and full review text, use the Google Maps link above. <span class="badge">SAMPLE</span> framing only, no review content is reproduced here.</p>
+</section>
+
+<section class="page" id="page-contact" data-page="contact">
+  <div class="titleblock">
+    <div class="tb-row">
+      <div class="tb-cell"><div class="tb-label">Project</div><div class="tb-value"><strong>B &amp; D Services</strong><br>1914 OH-125, Amelia, OH 45102</div></div>
+      <div class="tb-cell tb-sheet"><div class="tb-label">Sheet No.</div><div class="bignum">05</div><div class="tb-value">OF 05 - CONTACT DETAIL</div></div>
+    </div>
+    <div class="tb-row">
+      <div class="tb-cell"><h2 class="tb-title">Contact<br>Detail</h2></div>
+    </div>
+  </div>
+  <p class="spec-note">SPEC 005 // NO EMAIL ADDRESS ON PUBLIC RECORD - FORM OPENS A MAIL DRAFT WITHOUT A RECIPIENT</p>
+
+  <a class="contactrow" href="tel:+15137975466">
+    <span class="ic"><i class="fa-solid fa-phone"></i></span>
+    <span><span class="lab">Phone</span><span class="val">(513) 797-5466</span></span>
+  </a>
+  <a class="contactrow" href="https://www.google.com/maps/search/?api=1&amp;query=B%20%26%20D%20Services%2C%201914%20OH-125%2C%20Amelia%2C%20OH%2045102" target="_blank" rel="noopener">
+    <span class="ic"><i class="fa-solid fa-location-dot"></i></span>
+    <span><span class="lab">Address + Directions</span><span class="val">1914 OH-125, Amelia, OH 45102</span></span>
+  </a>
+  <div class="contactrow" style="cursor:default">
+    <span class="ic"><i class="fa-solid fa-clock"></i></span>
+    <span><span class="lab">Hours</span><span class="val">Mon - Fri: 9:00 AM - 5:00 PM <span class="badge">CALL TO CONFIRM</span></span></span>
+  </div>
+
+  <div class="dimline"><span class="tick"></span><span class="rule"></span><span class="tag"><i class="fa-solid fa-pen-to-paper"></i>SERVICE REQUEST FORM</span><span class="rule"></span><span class="tick"></span></div>
+  <p class="lede" style="margin-bottom:18px">No email address for this shop appears on public record, so this form opens a mail draft on your device (no recipient filled in) with your request details. <span class="badge">CALL TO CONFIRM</span></p>
+
+  <form class="req" id="reqform">
+    <div class="two">
+      <div class="field"><label for="fname">Your Name</label><input id="fname" name="name" type="text" required autocomplete="name" placeholder="Jane Driver"></div>
+      <div class="field"><label for="fphone">Your Phone</label><input id="fphone" name="phone" type="tel" required autocomplete="tel" placeholder="(513) 555-0100"></div>
+    </div>
+    <div class="two">
+      <div class="field"><label for="fvehicle">Vehicle</label><input id="fvehicle" name="vehicle" type="text" placeholder="2018 Honda CR-V"></div>
+      <div class="field"><label for="fservice">Service Needed</label>
+        <select id="fservice" name="service">
+          <option>Oil change</option>
+          <option>Tire rotation / replacement</option>
+          <option>Routine maintenance</option>
+          <option>Diagnostics</option>
+          <option>Engine work</option>
+          <option>Transmission work</option>
+          <option>Other (describe below)</option>
+        </select>
+      </div>
+    </div>
+    <div class="field"><label for="fmsg">Describe the Issue</label><textarea id="fmsg" name="message" placeholder="Noises, warning lights, when it started..."></textarea></div>
+    <div><button class="btn" type="submit"><i class="fa-solid fa-paper-plane"></i>Open Mail Draft</button></div>
+  </form>
+</section>
+
+</main>
+
+<footer>© B &amp; D Services</footer>
+
+<script>
+(function(){
+  var pages = ["home","services","about","reviews","contact"];
+  var sheets = {home:"01",services:"02",about:"03",reviews:"04",contact:"05"};
+  var burger = document.getElementById("burger");
+  var mobilemenu = document.getElementById("mobilemenu");
+
+  function currentFromURL(){
+    var m = /[?&]sheet=0?([1-5])/.exec(location.search);
+    if(m){ return pages[parseInt(m[1],10)-1]; }
+    return "home";
+  }
+
+  function navigateTo(page, push){
+    if(pages.indexOf(page) < 0){ page = "home"; }
+    var secs = document.querySelectorAll(".page");
+    for(var i=0;i<secs.length;i++){ secs[i].classList.toggle("active", secs[i].id === "page-"+page); }
+    var btns = document.querySelectorAll(".navbtn");
+    for(var j=0;j<btns.length;j++){ btns[j].classList.toggle("active", btns[j].getAttribute("data-page") === page); }
+    if(push !== false){
+      try{ history.pushState({page:page}, "", "?sheet="+sheets[page]); }catch(e){}
+    }
+    mobilemenu.classList.remove("open");
+    burger.setAttribute("aria-expanded","false");
+    window.scrollTo(0,0);
+  }
+
+  document.addEventListener("click", function(e){
+    var t = e.target.closest("[data-page]");
+    if(t){
+      e.preventDefault();
+      navigateTo(t.getAttribute("data-page"));
+    }
+  });
+
+  burger.addEventListener("click", function(e){
+    e.stopPropagation();
+    var open = mobilemenu.classList.toggle("open");
+    burger.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+  document.addEventListener("click", function(e){
+    if(mobilemenu.classList.contains("open") && !e.target.closest(".topbar")){ 
+      mobilemenu.classList.remove("open");
+      burger.setAttribute("aria-expanded","false");
+    }
+  });
+
+  window.addEventListener("popstate", function(e){
+    var p = (e.state && e.state.page) ? e.state.page : currentFromURL();
+    navigateTo(p, false);
+  });
+
+  navigateTo(currentFromURL(), false);
+  try{ history.replaceState({page:currentFromURL()}, "", "?sheet="+sheets[currentFromURL()]); }catch(e){}
+
+  var form = document.getElementById("reqform");
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    var name = document.getElementById("fname").value.trim();
+    var phone = document.getElementById("fphone").value.trim();
+    var vehicle = document.getElementById("fvehicle").value.trim();
+    var service = document.getElementById("fservice").value;
+    var msg = document.getElementById("fmsg").value.trim();
+    var subject = "Service request - B and D Services";
+    var body = "Name: " + name + "\nPhone: " + phone + "\nVehicle: " + vehicle + "\nService: " + service + "\nDetails: " + msg + "\n\n(No email address for this shop is on public record; please call (513) 797-5466 to confirm.)";
+    window.location.href = "mailto:?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+  });
+})();
+</script>
+</body>
+</html>
