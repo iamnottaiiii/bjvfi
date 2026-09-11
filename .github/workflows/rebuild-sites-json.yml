@@ -15,23 +15,38 @@ permissions:
 jobs:
   rebuild:
     runs-on: ubuntu-latest
-    # Skip the bot's own catalog commits to avoid loops
-    if: github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, 'chore: rebuild sites.json')
     steps:
+      - name: Skip catalog-only bot commits
+        id: gate
+        run: |
+          msg="${{ github.event.head_commit.message }}"
+          msg="${msg:-}"
+          if [ "${{ github.event_name }}" = "push" ] && printf '%s' "$msg" | grep -q '^chore: rebuild sites.json'; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Skipping catalog rebuild commit"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout
+        if: steps.gate.outputs.skip != 'true'
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python
+        if: steps.gate.outputs.skip != 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
       - name: Rebuild catalog
+        if: steps.gate.outputs.skip != 'true'
         run: python3 scripts/rebuild-sites-json.py
 
       - name: Commit if changed
+        if: steps.gate.outputs.skip != 'true'
         run: |
           if git diff --quiet -- sites.json; then
             echo "No catalog changes"
