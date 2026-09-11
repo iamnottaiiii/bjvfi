@@ -1,24 +1,27 @@
-<style id="biz-fullbleed">
-.wp-site-blocks, .entry-content, .wp-block-post-content,
-.is-layout-constrained, .has-global-padding {
-  max-width: none !important; width: 100% !important;
-  padding-left: 0 !important; padding-right: 0 !important;
-  margin-left: 0 !important; margin-right: 0 !important;
-  box-sizing: border-box !important;
-}
-.wp-block-post-content > *, .is-layout-constrained > * {
-  max-width: none !important; margin-left: 0 !important; margin-right: 0 !important;
-}
-body .wp-site-blocks { padding: 0 !important; }
-.biz-root { width: 100% !important; max-width: none !important; min-height: 100vh; }
-</style>
-<div class="biz-root" id="biz-root">
+[file name]: bjvfi.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>bjvfi</title>
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap");
+
+*{box-sizing:border-box; margin:0; padding:0;}
+html, body { scrollbar-width: none; -ms-overflow-style: none; }
+html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
+
+body {
+  min-height: 100vh;
+  background: #050507;
+  color: #F2F2F5;
+  font-family: "Inter", system-ui, sans-serif;
+}
+
 .bjvfi-void{
   --bg:#050507; --ink:#F2F2F5; --muted:#6B7080; --line:#1C1C24; --soft:#121218; --accent:#7CFFB2;
   min-height:100vh; background:var(--bg); color:var(--ink);
-  font-family:"Inter",system-ui,sans-serif;
   display:flex; flex-direction:column; align-items:center; justify-content:center;
   padding:32px 20px 48px; position:relative; overflow:hidden;
 }
@@ -41,7 +44,7 @@ body .wp-site-blocks { padding: 0 !important; }
 .bjvfi-search{
   width:100%; background:rgba(18,18,24,.9); border:1px solid var(--line); color:var(--ink);
   border-radius:999px; padding:16px 20px; font-size:1.05rem; outline:none;
-  transition:border-color .15s, box-shadow .15s;
+  transition:border-color .15s, box-shadow .15s; font-family:inherit;
 }
 .bjvfi-search::placeholder{color:#555A68;}
 .bjvfi-search:focus{border-color:rgba(124,255,178,.55); box-shadow:0 0 0 4px rgba(124,255,178,.1);}
@@ -62,6 +65,8 @@ body .wp-site-blocks { padding: 0 !important; }
 .bjvfi-status{min-height:1.2em; color:var(--muted); font-size:.85rem; text-align:center;}
 .bjvfi-status.error{color:#ff8f8f;}
 </style>
+</head>
+<body>
 <div class="bjvfi-void">
   <div class="bjvfi-stage">
     <h1 class="bjvfi-mark">bjvfi</h1>
@@ -70,86 +75,416 @@ body .wp-site-blocks { padding: 0 !important; }
       <input class="bjvfi-search" id="bjvfi-search" type="search" placeholder="Type a business name..." autocomplete="off" spellcheck="false">
       <div class="bjvfi-results" id="bjvfi-results" role="listbox" aria-label="Search results"></div>
     </div>
-    <div class="bjvfi-status" id="bjvfi-status"></div>
+    <div class="bjvfi-status" id="bjvfi-status" aria-live="polite"></div>
   </div>
 </div>
+
 <script>
 (function () {
-  var EXCLUDE = {
-    bjvfi: 1, stuff: 1, "privacy-policy": 1, privacy: 1, "sample-page": 1,
-    cart: 1, checkout: 1, "my-account": 1, shop: 1, blog: 1, home: 1,
-    "front-page": 1, "404": 1, "not-found": 1
-  };
-  var sites = null;
-  var loading = null;
-  var input = document.getElementById("bjvfi-search");
-  var results = document.getElementById("bjvfi-results");
-  var statusEl = document.getElementById("bjvfi-status");
+  const GITHUB_USER = "iamnottaiii";
+  const GITHUB_REPO = "bjvfi";
+  const SITES_FOLDER = "Sites";
+  const CLAIMS_API_URL = "https://glonbvrcudwuzjundrii.supabase.co/functions/v1/site-claims";
+  const CLAIMS_API_KEY = "sb_publishable_VZbed_uuOXSE744UrAfHXw_z2xDdYtr";
+
+  // Rearrange to control gallery/search order.
+  // Folders not listed here appear afterward, alphabetically.
+  const SITE_ORDER = [
+    "acl-remodeling-and-more-llc",
+    "affordable-24-7-emergency-sewer-plumbing-heating",
+    "anytime-roofing-remodeling",
+    "beatrice-home-improvement",
+    "bnr-heating-cooling",
+    "building-and-trading-trades",
+    "cincinnati-bath-and-tile",
+    "cincinnati-hvac-systems",
+    "CleaningAndLandscaping",
+    "creative-landscape",
+    "damm-utility-bros-llc",
+    "ddk-construction-inc",
+    "desertforestlandscape",
+    "e-j-electrical-contractor",
+    "elite-concrete-construction",
+    "fence-doctor-of-cincinnati",
+    "fossil-construction",
+    "greenhousewaterheaters",
+    "greiwe-development-group",
+    "handy-mandy-home-repairs",
+    "henry-family-roofing-company",
+    "hube-construction",
+    "j-ii-fire-systems-inc",
+    "j-t-roofing-siding-llc",
+    "jacobs-mechanical-inc",
+    "jansen-electric",
+    "liberty-hvac-llc",
+    "madeira-construction",
+    "majestic-construction-company",
+    "midwest-roofing-chimney-co",
+    "new-shoots-landscaping",
+    "nick-hartman-construction",
+    "perry-st-clair-roofing-co",
+    "pro-services-heating-cooling",
+    "rauck-heating-cooling",
+    "rharrison-construction-llc",
+    "ric-protection-systems-llc",
+    "robersons-painting-home-repair-and-lawn-care",
+    "aerts-woodworking",
+    "1st-vegas-auto-body-shop",
+    "24hr-mobile-tire-service",
+    "alan-auto-repair",
+    "best-choice-collision-center",
+    "llantera-yeyass-auto-services",
+    "mm-muffler-automotive-repair",
+    "window-tinting-of-las-vegas",
+    "abc-discount-upholstery",
+    "b-and-l-shoe-luggage-repair",
+    "gem-interiors",
+    "green-valley-shoe-repair",
+    "impressive-creations-inc",
+    "las-vegas-furniture-repair-art-restoration",
+    "masters-furniture-repair",
+    "muniz-upholstery",
+    "perry-porcelain-refinishing",
+    "saltbox-home-styling",
+    "santa-barbara-upholstery-supplies",
+    "the-eagle-shoe-repair",
+    "tonys-alteration-shoe-care",
+    "mikes-shoe-repair",
+    "alison-alterations",
+    "catherine-tailor",
+    "datas-multiservices",
+    "elite-multiservices",
+    "envirocare",
+    "espinoza-notary-services",
+    "espinozanotary",
+    "exclusive-tailoring",
+    "extra-multiservices",
+    "mays-alterations",
+    "newts-tailoring-alterations",
+    "nordloh-associates",
+    "beauty-nails",
+    "blade-21-barbershop",
+    "calis-nails",
+    "cheyenne-square-barber-shop",
+    "coco-nails-spa",
+    "enchanted-nails-and-spa",
+    "fade-factory-atl",
+    "hannah-nails-beauty-studio",
+    "off-the-hook-barber-shop",
+    "perfection-nail-salon",
+    "slicks-barber-studio",
+    "barber-shop-on-main",
+    "best-one-cleaners",
+    "PremierTaxInsuranceMultiServices",
+    "premier-tax-insurance-multiservices",
+    "reliable-tax-services",
+    "reyes-multiservices",
+    "rony-tax-multiservices",
+    "roses-cleaners",
+    "2-door-tire-shop",
+    "24-hour-tire-shop",
+    "danubis-tireshop",
+    "dos-laredos-tire-shop",
+    "el-jinete-tires",
+    "llantera-nellis",
+    "llantera-tropicana",
+    "mw-texas-tires",
+    "nogalitos-tire-shop",
+    "rodriguez-tire-shop",
+    "sullins-tire-services",
+    "us-llantera",
+    "wheel-fixers-tire-services",
+    "carniceria-el-camino",
+    "carniceria-guadalajara",
+    "carniceria-latina",
+    "carniceria-los-amigos",
+    "carniceria-los-reyes",
+    "catalinas-bakery",
+    "dulceria-la-bendita",
+    "el-gallito-bakery",
+    "el-rico-pan-bakery",
+    "el-pan-dulce-panederia",
+    "el-rey-de-la-pinata",
+    "hilda-s-mexican-bakery",
+    "la-calidad-meat-market",
+    "la-hereford-meat-market",
+    "la-mexicana-bakery-and-deli",
+    "la-mexicana-meat-market",
+    "la-nueva-michoacana-2-meat-pollo-mex",
+    "la-rosca-meat-market",
+    "los-portales-bakery",
+    "los-primos-meat-market",
+    "lupitas-meat-market",
+    "meats-cuts",
+    "mercado-y-carniceria-uruapan",
+    "panaderia-la-buena",
+    "panaderia-la-mixteca-poblana",
+    "panaderia-la-obregonense",
+    "panaderia-la-original",
+    "panaderia-salvadorena",
+    "partysupplydulmex",
+    "pinata-kingdom",
+    "sepulveda-meats-and-provisions",
+    "tacos-al-carbon",
+    "the-butcher-block-carniceria-meat-market",
+    "botanica-ache-2",
+    "botanica-ache-3",
+    "botanica-centro-espiritual",
+    "botanica-cuauhtemoc",
+    "botanica-de-la-nina-blanca",
+    "botanica-el-amanecer",
+    "botanica-el-padrino-ifalaye",
+    "botanica-el-santo-nino",
+    "botanica-el-trebol",
+    "botanica-esoterica",
+    "botanica-la-caridad",
+    "botanica-la-gaviota",
+    "botanica-la-guadalupana",
+    "botanica-los-angeles-del-amor",
+    "botanica-los-misterios",
+    "botanica-manantial-sanjose",
+    "botanica-orichas-eb",
+    "botanica-rosnell-2",
+    "botanica-san-miguel",
+    "botanica-san-miguel-arcangel",
+    "botanica-san-miguel-archangel",
+    "botanica-santa-rosa",
+    "botanica-tienda-naturista-2",
+    "botanica-tienda-naturista-65",
+    "botanica-virgen-de-la-merced",
+    "centro-pai-antonio-de-aruanda",
+    "productos-naturales-bethel",
+    "super-botanica-del-sol",
+    "victoria-la-curandera",
+    "yerberia-botanica-gloria",
+    "favoriteplacetoshop",
+    "shopvezzy",
+    "spaincity",
+    "thrifty-vibes",
+    "un-poko-krazy",
+    "q",
+    "a-1-check-cashing-service",
+    "ace-check-cashing",
+    "ama-check-cashing",
+    "check-cashing-32nd-st",
+    "ez-exchange",
+    "kingshighway-page-currency",
+    "quick-payout-check-cashing",
+    "veterans-currency-exchange-inc",
+    "vazquez-multiservices",
+    "ballard-liquor-store",
+    "arena-liquor",
+    "beer-district-liquor-store",
+    "california-liquor",
+    "eastern-discount-liquors",
+    "key-liquor",
+    "liquor-bin",
+    "liquor-city",
+    "liquor-factory-wine-and-more",
+    "liquors-on-main",
+    "portland-center-liquor",
+    "riverwalk-wines-spirits",
+    "sahara-liquor",
+    "state-road-beverage-deli",
+    "sunset-mini-mart",
+    "the-happy-grape-liquors-baltimore",
+    "tony-s-market-state-liquor-store",
+    "united-mini-mart-deli",
+    "variety-foods-liquor",
+    "vegas-mini-mart",
+    "warren-village-beverage-liquor",
+    "xo-liquor-boulder",
+    "xo-mini-mart-liquor",
+    "XOMiniMart",
+    "anytime-laundry",
+    "bubbles-on-royal",
+    "cedarwash-laundromat",
+    "crafton-ingram-laundromat",
+    "dirty-franky-s-laundromat",
+    "ewald-laundromat",
+    "fairview-laundromat",
+    "friendly-laundry",
+    "galaxy-laundromat",
+    "goodfellow-laundromat",
+    "harbortown-laundromat-24-hours-drop-off-1-lb",
+    "launderland",
+    "laundroplex",
+    "laundry-day-laundromat",
+    "laundry-express",
+    "layton-heights-laundromat",
+    "lee-laundromat",
+    "lobern-laundromat",
+    "meridian-laundromat",
+    "midtown-laundry",
+    "mr-clean-laundromat",
+    "powellhurst-laundromat",
+    "queens-way-food-laundromat",
+    "quickwash-laundry-inc",
+    "rainbow-laundromat",
+    "shadyside-laundromat",
+    "soap-opera-laundromat",
+    "speedy-clean-laundromat",
+    "spin-city-laundromat",
+    "stanford-laundromat",
+    "strother-laundromat",
+    "suds-your-duds-coin-laundries-merrill-park",
+    "sudz-coin-laundromat",
+    "sunshine-laundry",
+    "vip-launderland",
+    "west-end-laundry",
+    "west-market-street-laundromat",
+    "white-center-laundromat",
+    "woodward-coin-laundry-24-hours-1-per-lb-dropoff-and-finishin",
+    "xpress-wash-lavanderia",
+    "xpressway-laundromat",
+    "313-smoke-city",
+    "360-smoke-shop",
+    "a1-smoke-shop",
+    "adams-ave-smoke-shop",
+    "ali-smoke-shop",
+    "bulldog-smoke-shop-and-gifts-store-san-jose",
+    "buzz-smoke-and-vape-shop",
+    "cloud-smoke-shop-unbeatable-prices-vibes-and-selection",
+    "cloud9-smoke-shop-vape-shop",
+    "ds-smoke-shop-and-gift",
+    "eshuayes-smoke-shop",
+    "exclusive-smoke-shop-cbd-and-vape-store-san-diego",
+    "exotic-cloudz-smoke-shop",
+    "exotic-king-smoke-shop",
+    "exotic-puff-smoke-vape-wellness-smoke-shop-near-me-thc-a-dis",
+    "exotic-smoke-shop",
+    "gold-rush-smoke-shop",
+    "GoldRushSmokeShop",
+    "gold-rush-smoke-shop-3",
+    "golden-smoke-house-smoke-shop-vape-s-store",
+    "great-smoke",
+    "houdini-s-smoke-shop",
+    "htown-smoke-shop-and-vapes-3",
+    "king-city-smoke-shop",
+    "live-oak-smoke-shop",
+    "mb-smoke-on-the-east-side",
+    "mega-smoke-shop-2",
+    "midnight-smoke-and-hookah",
+    "neighborhood-vapes-smokes",
+    "og-smoke-shop",
+    "paradise-smoke-vape-shop",
+    "pdx-smoke-shop",
+    "phoenix-smoke-shop",
+    "puff-city-smokeshop",
+    "puff-n-stuff-smoke-shop-raleigh",
+    "puff-n-up-smoke-shop",
+    "puff-stop-smoke-shop",
+    "smiley-smokes",
+    "smoke-and-eve",
+    "smoke-box-dispensary-mlk",
+    "smoke-box-smoke-shop",
+    "smoke-clouds-tobacco-and-vape",
+    "smoke-land",
+    "smoke-oasis",
+    "smoke-shack-smoke-shop-vape-cannabis-shop-pre-roll-kratom-gi",
+    "smoke-shack-smoke-shop-vape-cannabis-shop-pre-roll-kratom-gift-and-mor",
+    "smoke-shop-and-gifts",
+    "smoke-tokez-vape-cigar",
+    "smoke-villa",
+    "smoke-world",
+    "smokeology-smoke-shop",
+    "smoker-s-den-new-ownership",
+    "smokers-choice-smoke-shop",
+    "smokerz-depot-downtown",
+    "smokes-and-vapes",
+    "SMOKEWORLD",
+    "smokin-brady",
+    "smoking-starz-smoke-shop",
+    "south-street-smoke-shop",
+    "spot-smoke-shop",
+    "strip-smoke-shop",
+    "stripsmokeshop",
+    "the-ballard-smoke-shop",
+    "the-city-smoke-shop",
+    "the-den-smoke-shop",
+    "the-stash-smoke-shop",
+    "three-kings-smoke-shop",
+    "tobacco-house-gift-1-inc",
+    "top-smokes",
+    "treetop-smokeshop",
+    "vape-pirates",
+    "VAPEPIRATES",
+    "z-smokes-and-vapes",
+  ];
+
+  const input = document.getElementById("bjvfi-search");
+  const results = document.getElementById("bjvfi-results");
+  const statusEl = document.getElementById("bjvfi-status");
   if (!input || !results) return;
 
-  function decodeTitle(t) {
-    var d = document.createElement("textarea");
-    d.innerHTML = t || "";
-    return String(d.value || "").replace(/\s+/g, " ").trim();
-  }
-  function keepPage(p) {
-    var slug = String(p.slug || "").toLowerCase();
-    if (EXCLUDE[slug] || slug.indexOf("privacy") !== -1) return false;
-    var title = decodeTitle(p.title && p.title.rendered);
-    if (!title) return false;
-    return true;
-  }
-  function fetchPage(page) {
-    var url = "/wp-json/wp/v2/pages?parent=0&per_page=100&page=" + page +
-      "&_fields=id,slug,link,title";
-    return fetch(url, { credentials: "same-origin" }).then(function (res) {
-      if (res.status === 400) return [];
-      if (!res.ok) throw new Error("Could not load sites (" + res.status + ")");
-      return res.json();
-    });
-  }
-  function fetchAllPages() {
-    var all = [];
-    var page = 1;
-    function next() {
-      return fetchPage(page).then(function (data) {
-        if (!data || !data.length) return all;
-        for (var i = 0; i < data.length; i++) {
-          if (keepPage(data[i])) all.push(data[i]);
+  let sites = null;
+  let loading = null;
+  const claimed = new Set();
+
+  async function loadClaimed() {
+    try {
+      const res = await fetch(CLAIMS_API_URL, {
+        headers: {
+          apikey: CLAIMS_API_KEY,
+          Authorization: `Bearer ${CLAIMS_API_KEY}`
         }
-        if (data.length < 100) return all;
-        page += 1;
-        if (page > 50) return all;
-        return next();
       });
-    }
-    return next().then(function (list) {
-      return list.map(function (p) {
+      if (!res.ok) return;
+      const rows = await res.json();
+      rows.forEach(r => r?.sitekey && claimed.add(String(r.sitekey)));
+    } catch (_) { /* registry down — show everything */ }
+  }
+
+  async function fetchAllSites() {
+    const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${SITES_FOLDER}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("Could not load sites (" + res.status + ")");
+    const data = await res.json();
+
+    const discovered = data
+      .filter(item => item.type === "dir")
+      .map(folder => {
+        const title = folder.name
+          .replace(/-/g, " ")
+          .replace(/\b\w/g, c => c.toUpperCase());
         return {
-          title: decodeTitle(p.title && p.title.rendered),
-          slug: p.slug || "",
-          link: p.link || ("/" + (p.slug || "") + "/")
+          title,
+          slug: folder.name,
+          link: `./${SITES_FOLDER}/${encodeURIComponent(folder.name)}/`
         };
       });
-    });
+
+    const orderIndex = new Map(SITE_ORDER.map((p, i) => [p, i]));
+    const listed = discovered
+      .filter(s => orderIndex.has(s.slug))
+      .sort((a, b) => orderIndex.get(a.slug) - orderIndex.get(b.slug));
+    const unlisted = discovered
+      .filter(s => !orderIndex.has(s.slug))
+      .sort((a, b) => a.title.localeCompare(b.title));
+
+    return [...listed, ...unlisted];
   }
+
   function ensureLoaded() {
     if (sites) return Promise.resolve(sites);
     if (loading) return loading;
     statusEl.textContent = "Loading sites...";
     statusEl.classList.remove("error");
-    loading = fetchAllPages().then(function (list) {
-      sites = list;
+    loading = (async () => {
+      await loadClaimed();
+      const list = await fetchAllSites();
+      sites = list.filter(s => !claimed.has(s.slug));
       statusEl.textContent = "";
       return sites;
-    }).catch(function (err) {
+    })().catch(err => {
       loading = null;
-      statusEl.textContent = (err && err.message) ? err.message : "Load failed";
+      statusEl.textContent = err?.message || "Load failed";
       statusEl.classList.add("error");
       throw err;
     });
     return loading;
   }
+
   function render(matches) {
     results.innerHTML = "";
     if (!matches.length) {
@@ -158,58 +493,57 @@ body .wp-site-blocks { padding: 0 !important; }
       return;
     }
     statusEl.textContent = "";
-    var max = Math.min(matches.length, 40);
-    for (var i = 0; i < max; i++) {
-      var s = matches[i];
-      var a = document.createElement("a");
+    matches.slice(0, 60).forEach(s => {
+      const a = document.createElement("a");
       a.className = "bjvfi-hit";
       a.href = s.link;
       a.setAttribute("role", "option");
-      var t = document.createElement("span");
+
+      const t = document.createElement("span");
       t.className = "bjvfi-hit-title";
       t.textContent = s.title;
-      var sl = document.createElement("span");
+
+      const sl = document.createElement("span");
       sl.className = "bjvfi-hit-slug";
       sl.textContent = "/" + s.slug;
-      a.appendChild(t);
-      a.appendChild(sl);
+
+      a.append(t, sl);
       results.appendChild(a);
-    }
+    });
     results.classList.add("open");
   }
+
   function runSearch() {
-    var q = String(input.value || "").trim().toLowerCase();
+    const q = input.value.trim().toLowerCase();
     if (!q) {
       results.classList.remove("open");
       results.innerHTML = "";
       statusEl.textContent = "";
       return;
     }
-    ensureLoaded().then(function (list) {
-      var matches = [];
-      for (var i = 0; i < list.length; i++) {
-        var s = list[i];
-        if (s.title.toLowerCase().indexOf(q) !== -1 || s.slug.toLowerCase().indexOf(q) !== -1) {
-          matches.push(s);
-        }
-      }
+    ensureLoaded().then(list => {
+      const matches = list.filter(s =>
+        s.title.toLowerCase().includes(q) || s.slug.toLowerCase().includes(q)
+      );
       render(matches);
-    }).catch(function () {});
+    }).catch(() => {});
   }
-  var timer = null;
-  input.addEventListener("input", function () {
+
+  let timer = null;
+  input.addEventListener("input", () => {
     clearTimeout(timer);
     timer = setTimeout(runSearch, 100);
   });
-  input.addEventListener("focus", function () {
-    ensureLoaded().catch(function () {});
-    if (String(input.value || "").trim()) runSearch();
+  input.addEventListener("focus", () => {
+    ensureLoaded().catch(() => {});
+    if (input.value.trim()) runSearch();
   });
-  document.addEventListener("click", function (e) {
+  document.addEventListener("click", e => {
     if (!e.target.closest(".bjvfi-search-wrap")) results.classList.remove("open");
   });
-  // warm cache quietly
-  ensureLoaded().catch(function () {});
+
+  ensureLoaded().catch(() => {});
 })();
 </script>
-</div>
+</body>
+</html>
