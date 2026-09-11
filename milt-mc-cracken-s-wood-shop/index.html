@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Milt Mc Cracken's Wood Shop · Woodworker, Covington, KY</title>
+<meta name="description" content="Milt Mc Cracken's Wood Shop, a Covington, KY woodworking shop at 4111 Decoursey Ave. Custom wood furniture and home decor, built by hand. Call (859) 581-7480.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,700&family=Public+Sans:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FAF3E6; --paper:#FFFDF7;
+  --ink:#2E2117; --ink-soft:#6D5945;
+  --wood:#8A5A33; --wood-deep:#5F3B20; --wood-soft:#F0DFC4;
+  --amber:#D9A441; --amber-soft:#F9EBCB;
+  --leaf:#5C7048; --leaf-soft:#E3EAD8;
+  --steel:#3F4750;
+  --radius:18px;
+  --shadow:0 18px 40px -18px rgba(46,33,23,.28);
+  --shadow-sm:0 8px 22px -10px rgba(46,33,23,.22);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Public Sans",system-ui,sans-serif;
+  background:var(--bg);
+  background-image:
+    repeating-linear-gradient(90deg, rgba(138,90,51,.055) 0 2px, transparent 2px 120px),
+    radial-gradient(rgba(138,90,51,.05) 1.2px, transparent 1.3px);
+  background-size:auto,26px 26px;
+  color:var(--ink);
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%}
+a{color:var(--wood-deep)}
+::selection{background:var(--amber);color:var(--ink)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.hand{font-family:"Caveat",cursive}
+
+/* ---------- header + side drawer nav ---------- */
+header.site{
+  position:sticky;top:0;z-index:60;
+  background:rgba(250,243,230,.94);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-bottom:2px solid rgba(138,90,51,.22);
+}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
+.brand svg{width:46px;height:46px;flex:none}
+.brand-name{font-family:"Bitter",serif;font-weight:900;font-size:1.2rem;line-height:1.05;letter-spacing:.2px}
+.brand-name small{display:block;font-family:"Public Sans",sans-serif;font-weight:700;font-size:.62rem;letter-spacing:3px;text-transform:uppercase;color:var(--wood-deep)}
+.burger{display:inline-flex;flex-direction:column;justify-content:center;align-items:center;background:var(--ink);border:0;cursor:pointer;padding:12px 13px;border-radius:12px;gap:5px}
+.burger span{display:block;width:24px;height:3px;border-radius:3px;background:var(--bg);transition:.25s}
+.burger:hover span{background:var(--amber)}
+nav.main{
+  position:fixed;top:0;left:0;bottom:0;z-index:70;
+  width:min(340px,88vw);
+  background:linear-gradient(160deg,#3A2A1B,#241A10);
+  color:#F4E9D4;
+  transform:translateX(-106%);
+  transition:transform .32s cubic-bezier(.22,.8,.3,1);
+  display:flex;flex-direction:column;
+  padding:28px 26px 30px;
+  box-shadow:30px 0 60px -20px rgba(0,0,0,.4);
+}
+nav.main.open{transform:none}
+nav.main .drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px}
+nav.main .drawer-head span{font-family:"Bitter",serif;font-weight:800;font-size:1.1rem;color:#fff}
+nav.main a{
+  text-decoration:none;color:#EAD9BC;font-weight:600;font-size:1.12rem;
+  padding:13px 16px;border-radius:12px;transition:background .2s,color .2s;
+  display:flex;align-items:center;gap:12px;
+}
+nav.main a:hover{background:rgba(217,164,65,.16);color:#fff}
+nav.main a.active,nav.main a[aria-current="page"]{background:var(--amber);color:var(--ink)}
+nav.main a .num{font-family:"Caveat",cursive;font-size:1.2rem;color:var(--amber);min-width:26px}
+nav.main a.active .num,nav.main a[aria-current="page"] .num{color:var(--wood-deep)}
+nav.main .drawer-foot{margin-top:auto;padding-top:20px;border-top:1px solid rgba(255,255,255,.14);font-size:.9rem;color:#B9A37E}
+nav.main .drawer-foot a{font-size:.95rem;padding:6px 0;color:#fff}
+.scrim{position:fixed;inset:0;z-index:65;background:rgba(20,12,6,.5);opacity:0;pointer-events:none;transition:opacity .3s}
+.scrim.show{opacity:1;pointer-events:auto}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- editorial hero ---------- */
+.hero{position:relative;overflow:hidden;padding:84px 0 56px}
+.hero::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(circle at 88% 8%, rgba(217,164,65,.30), transparent 40%),
+    radial-gradient(circle at 6% 92%, rgba(138,90,51,.16), transparent 42%);
+}
+.hero .eyebrow{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:"Caveat",cursive;font-size:1.5rem;color:var(--wood-deep);
+  background:var(--paper);border:2px dashed rgba(138,90,51,.45);
+  padding:6px 18px;border-radius:999px;transform:rotate(-1.5deg);margin-bottom:22px;
+}
+h1{
+  font-family:"Bitter",serif;font-weight:900;
+  font-size:clamp(2.9rem,7.5vw,5.6rem);line-height:.98;letter-spacing:-1px;margin-bottom:20px;
+}
+h1 em{font-style:italic;color:var(--wood-deep)}
+.lede{font-size:1.12rem;color:var(--ink-soft);max-width:36rem;margin-bottom:28px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:28px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;
+  padding:14px 26px;border-radius:999px;font-size:1rem;transition:transform .18s,box-shadow .18s,background .18s;
+}
+.btn-solid{background:var(--wood-deep);color:#fff;box-shadow:var(--shadow-sm)}
+.btn-solid:hover{background:var(--ink);transform:translateY(-2px)}
+.btn-ghost{background:var(--paper);color:var(--ink);border:2px solid rgba(46,33,23,.25)}
+.btn-ghost:hover{border-color:var(--wood);color:var(--wood-deep);transform:translateY(-2px)}
+.hours-pill{
+  display:inline-flex;align-items:center;gap:10px;background:var(--ink);color:var(--bg);
+  padding:10px 20px;border-radius:999px;font-weight:600;font-size:.95rem;box-shadow:var(--shadow-sm);
+}
+.hours-pill .dot{width:10px;height:10px;border-radius:50%;background:#8FCB8F;box-shadow:0 0 0 4px rgba(143,203,143,.25);animation:pulse 2s infinite}
+.hours-pill.closed .dot{background:#E4658F;box-shadow:0 0 0 4px rgba(228,101,143,.25)}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+.hero-saw{
+  position:absolute;right:-110px;bottom:-120px;width:420px;height:420px;opacity:.16;
+  animation:spin 60s linear infinite;pointer-events:none;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- plank divider ---------- */
+.plank{height:26px;margin:6px 0;background:linear-gradient(180deg,#8A5A33,#6B4325 55%,#54341C);border-top:2px solid rgba(255,255,255,.18);border-bottom:3px solid rgba(0,0,0,.25);position:relative}
+.plank::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 90px,rgba(0,0,0,.28) 90px 94px)}
+
+/* ---------- sections ---------- */
+section.block{padding:60px 0}
+.sec-head{max-width:46rem;margin:0 auto 42px;text-align:center}
+.sec-head .hand{font-size:1.6rem;color:var(--wood-deep)}
+h2{font-family:"Bitter",serif;font-weight:900;font-size:clamp(1.9rem,3.6vw,2.7rem);line-height:1.08;margin:6px 0 12px;letter-spacing:-.3px}
+.sec-head p{color:var(--ink-soft)}
+
+/* magazine rhythm: asymmetric editorial rows */
+.mag{display:grid;grid-template-columns:1.15fr .85fr;gap:52px;align-items:center;margin-bottom:64px}
+.mag:last-child{margin-bottom:0}
+.mag.flip{grid-template-columns:.85fr 1.15fr}
+.mag h2{margin-top:6px}
+.mag p{color:var(--ink-soft);margin-bottom:14px}
+.mag .drop{font-family:"Bitter",serif;font-size:3.4rem;font-weight:900;float:left;line-height:.8;margin:8px 10px 0 0;color:var(--wood-deep)}
+.pull{
+  background:var(--ink);color:var(--bg);border-radius:var(--radius);padding:38px 34px;position:relative;box-shadow:var(--shadow);
+  border-left:10px solid var(--amber);
+}
+.pull::before{content:"\201C";position:absolute;top:2px;left:22px;font-family:"Bitter",serif;font-size:4.5rem;color:var(--amber);opacity:.55}
+.pull p{font-family:"Bitter",serif;font-size:1.3rem;line-height:1.5;margin-bottom:12px;position:relative;color:#F1E3C8}
+.pull cite{font-style:normal;font-weight:600;color:var(--amber);font-size:.85rem;letter-spacing:1.5px;text-transform:uppercase}
+.check-list{list-style:none;margin:20px 0;display:grid;gap:12px}
+.check-list li{display:flex;gap:12px;align-items:flex-start;font-weight:500}
+.check-list svg{flex:none;width:24px;height:24px;margin-top:2px}
+.spec-card{background:var(--paper);border-radius:var(--radius);padding:34px 30px;box-shadow:var(--shadow-sm);border:1px solid rgba(138,90,51,.2)}
+.spec-card h3{font-family:"Bitter",serif;font-size:1.4rem;margin-bottom:6px}
+.spec-card .hand{font-size:1.4rem;color:var(--wood-deep)}
+.spec-card ul{list-style:none;margin-top:14px;display:grid;gap:10px}
+.spec-card li{display:flex;align-items:baseline;gap:10px}
+.spec-card li .dots{flex:1;border-bottom:2px dotted rgba(138,90,51,.45);transform:translateY(-4px)}
+.spec-card li .val{font-weight:700;color:var(--wood-deep);white-space:nowrap}
+
+/* services page tabs */
+.tabs{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:30px;justify-content:center}
+.tab{
+  font-family:"Bitter",serif;font-weight:700;font-size:1rem;cursor:pointer;
+  background:var(--paper);color:var(--ink);border:2px solid rgba(46,33,23,.2);
+  padding:12px 22px;border-radius:999px;transition:all .2s;
+}
+.tab:hover{border-color:var(--wood);color:var(--wood-deep)}
+.tab.active{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tab-panel{display:none;background:var(--paper);border-radius:26px;padding:44px 42px;box-shadow:var(--shadow-sm);border:1px solid rgba(138,90,51,.2)}
+.tab-panel.active{display:block;animation:fadeIn .3s ease}
+.tab-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:44px;align-items:start}
+.tab-panel h3{font-family:"Bitter",serif;font-size:1.8rem;font-weight:900;margin-bottom:10px}
+.tab-panel p{color:var(--ink-soft);margin-bottom:16px}
+.mi{padding:12px 2px;border-bottom:1px dashed rgba(46,33,23,.2)}
+.mi-top{display:flex;align-items:baseline;gap:10px}
+.mi-top strong{font-size:1.02rem}
+.mi-top .dots{flex:1;border-bottom:2px dotted rgba(138,90,51,.45);transform:translateY(-4px)}
+.mi-top .price{font-family:"Bitter",serif;font-weight:700;color:var(--wood-deep);white-space:nowrap}
+.mi small{color:var(--ink-soft)}
+.mi .flag{display:inline-block;background:var(--amber-soft);color:#7A5210;font-size:.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 10px;border-radius:999px;margin-left:8px;vertical-align:2px}
+.price-note{background:var(--amber-soft);border:2px dashed rgba(138,90,51,.45);border-radius:var(--radius);padding:18px 24px;margin-top:34px;font-size:.95rem;color:#6B4A1F}
+.price-note strong{color:var(--wood-deep)}
+
+/* gallery: arch tiles */
+.gal-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.arch{
+  border-radius:999px 999px var(--radius) var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);background:var(--paper);
+  transition:transform .2s;position:relative;
+}
+.arch:hover{transform:translateY(-6px)}
+.arch .art{aspect-ratio:3/3.6;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding-top:34px}
+.arch .art svg{width:52%;height:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.2));transition:transform .3s}
+.arch:hover .art svg{transform:scale(1.08) rotate(-3deg)}
+.arch .cap{padding:16px 18px 20px;text-align:center}
+.arch .cap strong{font-family:"Bitter",serif;font-size:1.05rem;display:block}
+.arch .cap small{color:var(--ink-soft)}
+.arch .soon{position:absolute;top:16px;right:14px;background:rgba(255,253,247,.9);font-size:.66rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 12px;border-radius:999px;color:var(--ink-soft)}
+
+/* reviews */
+.rev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.rev{background:var(--paper);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow-sm);position:relative;border:1px solid rgba(138,90,51,.16)}
+.rev .stars{color:var(--amber);font-size:1.15rem;letter-spacing:3px;margin-bottom:12px}
+.rev p{font-size:1.02rem;margin-bottom:14px}
+.rev cite{font-style:normal;font-weight:700;font-size:.85rem;color:var(--wood-deep);letter-spacing:.5px}
+.rev .badge{display:inline-block;background:var(--leaf-soft);color:#3E5229;font-size:.68rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 12px;border-radius:999px;margin-bottom:12px}
+.rev.honest{background:var(--ink);color:#F1E3C8}
+.rev.honest h3{font-family:"Bitter",serif;color:#fff;font-size:1.25rem;margin-bottom:8px}
+.rev.honest p{color:#D9C6A3}
+.rev.honest a{color:var(--amber)}
+.cta-band{background:linear-gradient(120deg,var(--wood-deep),#3A2312);border-radius:26px;color:#fff;padding:48px;text-align:center;margin-top:44px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.cta-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 20%, rgba(217,164,65,.35), transparent 50%)}
+.cta-band h2{color:#fff;position:relative}
+.cta-band p{color:#EAD9BC;position:relative;max-width:36rem;margin:0 auto 24px}
+.cta-band .btn-solid{background:var(--amber);color:var(--ink);position:relative}
+.cta-band .btn-solid:hover{background:#fff}
+
+/* visit */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-bottom:26px}
+.info-card{background:var(--paper);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm);border:1px solid rgba(138,90,51,.16)}
+.info-card h3{font-family:"Bitter",serif;font-size:1.4rem;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.info-card h3 svg{width:28px;height:28px}
+.info-card p{color:var(--ink-soft);margin-bottom:8px}
+.info-card a.big{font-family:"Bitter",serif;font-size:1.5rem;font-weight:700;color:var(--wood-deep);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.hours-table{width:100%;border-collapse:collapse;font-size:.98rem}
+.hours-table td{padding:10px 6px;border-bottom:1px dashed rgba(46,33,23,.2)}
+.hours-table tr.today td{font-weight:800;color:var(--wood-deep)}
+.hours-table tr.today td:first-child::after{content:"\00B7 today";font-family:"Caveat",cursive;font-size:1.1rem;color:var(--wood-deep);margin-left:6px}
+.hours-table td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.map-card{
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:340px;
+  background:
+    linear-gradient(rgba(92,112,72,.1), rgba(92,112,72,.1)),
+    repeating-linear-gradient(0deg, transparent 0 46px, rgba(92,112,72,.2) 46px 48px),
+    repeating-linear-gradient(90deg, transparent 0 46px, rgba(92,112,72,.2) 46px 48px),
+    linear-gradient(140deg,#F3E7CE,#E7D2AC);
+  display:flex;align-items:center;justify-content:center;
+}
+.map-pin{
+  text-align:center;background:var(--paper);padding:26px 34px;border-radius:20px;box-shadow:var(--shadow);
+  max-width:80%;position:relative;
+}
+.map-pin::after{content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);border:14px solid transparent;border-top-color:var(--paper);border-bottom:0}
+.map-pin svg{width:44px;height:44px;margin-bottom:8px}
+.map-pin strong{font-family:"Bitter",serif;font-size:1.15rem;display:block}
+.map-pin small{color:var(--ink-soft)}
+.map-pin .btn{margin-top:14px}
+
+/* page strips */
+.strip{border-radius:26px;padding:56px 48px;color:#fff;position:relative;overflow:hidden;margin-bottom:44px;box-shadow:var(--shadow)}
+.strip::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(255,255,255,.2), transparent 50%)}
+.strip h2{color:#fff;font-size:clamp(2rem,4vw,3rem);position:relative;margin:4px 0 10px}
+.strip p{color:rgba(255,255,255,.9);max-width:36rem;position:relative}
+.strip .hand{font-size:1.6rem;position:relative}
+.strip.s-svc{background:linear-gradient(120deg,#6B4325,#3A2312)}
+.strip.s-story{background:linear-gradient(120deg,#4A5C3A,#2A361F)}
+.strip.s-gal{background:linear-gradient(120deg,#8A5A33,#54341C)}
+.strip.s-rev{background:linear-gradient(120deg,#5A4632,#33271A)}
+.strip.s-visit{background:linear-gradient(120deg,#3F4750,#232A33)}
+
+/* footer: big-type */
+footer{background:#241A10;color:#EAD9BC;margin-top:20px}
+.foot-big{
+  font-family:"Bitter",serif;font-weight:900;line-height:.95;letter-spacing:-1px;
+  font-size:clamp(2.6rem,8vw,5.5rem);color:#fff;padding:52px 0 8px;
+}
+.foot-big em{font-style:italic;color:var(--amber)}
+.foot-grid{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:36px;padding:34px 0 30px}
+.foot-grid h4{font-family:"Bitter",serif;color:#fff;font-size:1.1rem;margin-bottom:14px}
+.foot-grid p,.foot-grid a{color:#B9A37E;font-size:.95rem}
+.foot-grid a{text-decoration:none}.foot-grid a:hover{color:var(--amber)}
+.foot-copy{border-top:1px solid rgba(255,255,255,.12);padding:20px 0 28px;text-align:center;font-size:.9rem;color:#8F7A5C}
+
+/* review source strip */
+.rs-strip{margin:26px auto 34px;max-width:660px;background:#FFFDF8;border:1px solid #F0DFC4;border-radius:14px;padding:20px 22px;text-align:center}
+.rs-note{margin:0 0 14px;font-size:.95rem;color:#6D5945;line-height:1.55}
+.rs-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rs-btn{display:inline-block;background:#5F3B20;color:#FFF9F0;padding:10px 24px;border-radius:999px;font-weight:700;text-decoration:none;font-size:.95rem;line-height:1.2}
+.rs-btn:hover{filter:brightness(1.15)}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:940px){
+  .mag,.tab-grid,.visit-grid{grid-template-columns:1fr}
+  .gal-grid{grid-template-columns:1fr 1fr}
+  .rev-grid{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr}
+  .strip{padding:40px 28px}
+  .tab-panel{padding:32px 24px}
+  .hero-saw{width:300px;height:300px;right:-90px}
+}
+@media(max-width:600px){
+  .gal-grid{grid-template-columns:1fr}
+  .hero{padding:56px 0 40px}
+  .cta-band{padding:36px 24px}
+}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap bar">
+    <a class="brand" href="#home" data-page="home" aria-label="Milt Mc Cracken's Wood Shop, home">
+      <svg viewBox="0 0 64 64" role="img" aria-label="Saw blade logo"><circle cx="32" cy="32" r="26" fill="#8A5A33"/><path d="M32 2l4 7 6-5 2 8 7-3-1 8 8 0-3 7 7 4-6 5 5 6-8 2 3 7-8-1 0 8-7-3-4 7-5-6-6 5-2-8-7 3 1-8-8 0 3-7-7-4 6-5-5-6 8-2-3-7 8 1z" fill="#5F3B20"/><circle cx="32" cy="32" r="12" fill="#FAF3E6"/><circle cx="32" cy="32" r="4" fill="#5F3B20"/></svg>
+      <span class="brand-name">Milt Mc Cracken's<small>Wood Shop · Covington</small></span>
+    </a>
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<nav class="main" id="mainNav" aria-label="Main navigation">
+  <div class="drawer-head"><span>Milt Mc Cracken's</span><span class="hand" style="color:#D9A441;font-size:1.4rem">the shop</span></div>
+  <a href="#home" data-page="home" class="active" aria-current="page"><span class="num">01</span> Home</a>
+  <a href="#services" data-page="services"><span class="num">02</span> Services</a>
+  <a href="#story" data-page="story"><span class="num">03</span> Our Story</a>
+  <a href="#gallery" data-page="gallery"><span class="num">04</span> Gallery</a>
+  <a href="#reviews" data-page="reviews"><span class="num">05</span> Reviews</a>
+  <a href="#visit" data-page="visit"><span class="num">06</span> Visit Us</a>
+  <div class="drawer-foot">
+    4111 Decoursey Ave<br>Covington, KY 41015<br>
+    <a href="tel:+18595817480">(859) 581-7480</a>
+  </div>
+</nav>
+<div class="scrim" id="scrim"></div>
+
+<!-- ==================== HOME ==================== -->
+<section class="page active" id="page-home">
+  <div class="hero">
+    <svg class="hero-saw" viewBox="0 0 200 200" aria-hidden="true"><path d="M100 5l9 16 14-12 5 18 17-7-2 19 19 0-7 17 16 9-12 14 18 5-7 17 19 2 0 19-17 7 9 16-14 12-5 18-17-7-19 2 0 19-17-7-9 16-12-14-18 5 7-17-19-2 0-19 17-7-9-16 14-12 5-18 17 7 19-2 0-19 17 7 9-16 12 14 18-5-7 17 19 2z" fill="#5F3B20"/><circle cx="100" cy="100" r="34" fill="none" stroke="#5F3B20" stroke-width="10"/><circle cx="100" cy="100" r="12" fill="#5F3B20"/></svg>
+    <div class="wrap">
+      <span class="eyebrow">Woodworker · Covington, Kentucky</span>
+      <h1>Wood, worked<br><em>the patient way.</em></h1>
+      <p class="lede">Milt Mc Cracken's Wood Shop is a working wood shop on Decoursey Avenue, custom wood furniture and home decor built by hand, one board at a time. Call ahead, swing by the shop, and talk through your project with the maker himself.</p>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="#services" data-page="services">See Services →</a>
+        <a class="btn btn-ghost" href="tel:+18595817480">Call (859) 581-7480</a>
+      </div>
+      <span class="hours-pill" id="hoursPill"><span class="dot"></span><span id="hoursText">Checking today's hours…</span></span>
+    </div>
+  </div>
+
+  <div class="plank" aria-hidden="true"></div>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="hand">the short of it</span>
+        <h2>One shop, real lumber,<br>honest joinery</h2>
+        <p>Here is what you can expect when you bring a project to a working wood shop instead of a big-box showroom.</p>
+      </div>
+
+      <div class="mag">
+        <div class="reveal">
+          <span class="hand">01 · how we work</span>
+          <h2>Start with the wood,<br>not the catalog</h2>
+          <p><span class="drop">E</span>very piece starts as rough lumber and a conversation. Bring measurements, a photo of the spot it is going in, or just an idea. We will talk through the wood, the finish, and the budget, then build it to fit your home, not someone else's warehouse.</p>
+          <ul class="check-list">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#5C7048" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Custom pieces sized to your space, down to the inch</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#5C7048" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Solid lumber and traditional joinery, not particle board</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#5C7048" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Repairs and refinishing that keep good furniture out of the landfill</li>
+          </ul>
+        </div>
+        <div class="pull reveal">
+          <p>Measure twice, cut once. There is no shortcut around that, and we would not take one if there were.</p>
+          <cite>The shop rule</cite>
+        </div>
+      </div>
+
+      <div class="mag flip">
+        <div class="spec-card reveal">
+          <span class="hand">typical projects</span>
+          <h3>What the shop builds</h3>
+          <ul>
+            <li><span>Dining &amp; farmhouse tables</span><span class="dots"></span><span class="val">from $400</span></li>
+            <li><span>Bookcases &amp; shelving</span><span class="dots"></span><span class="val">from $250</span></li>
+            <li><span>Cutting boards &amp; small goods</span><span class="dots"></span><span class="val">from $35</span></li>
+            <li><span>Furniture repair</span><span class="dots"></span><span class="val">quoted in shop</span></li>
+          </ul>
+          <p style="margin-top:14px;font-size:.9rem"><em>Prices are samples only. Every project is priced from its wood, size, and finish, quoted before any cutting starts.</em></p>
+        </div>
+        <div class="reveal">
+          <span class="hand">02 · the craft</span>
+          <h2>Built to be kept,<br>not replaced</h2>
+          <p>A well-built piece of furniture outlives its maker. The shop builds with that in mind: solid lumber, joints that hold, and finishes you can refresh instead of replace.</p>
+          <p>It also means the shop can usually bring a tired piece back to life. A wobbly chair, a scratched tabletop, a dresser with stuck drawers, repair is part of the craft, and it almost always costs less than buying new.</p>
+          <a class="btn btn-ghost" href="#services" data-page="services">Browse services →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="cta-band reveal">
+      <h2>Have a project in mind?</h2>
+      <p>Call the shop at (859) 581-7480, Monday through Friday, 9 AM to 3 PM. Bring measurements and photos, and we will take it from there.</p>
+      <a class="btn btn-solid" href="tel:+18595817480">Call the shop →</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+<!-- ==================== SERVICES ==================== -->
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-svc">
+      <span class="hand">At the bench</span>
+      <h2>Services, straight<br>from the workbench</h2>
+      <p>Custom builds, repairs, and refinishing from a Covington wood shop. Pick a lane below to see what each one covers.</p>
+    </div>
+
+    <div class="tabs reveal" role="tablist" aria-label="Service categories">
+      <button class="tab active" data-tab="furniture" role="tab" aria-selected="true">Custom Furniture</button>
+      <button class="tab" data-tab="decor" role="tab" aria-selected="false">Home Decor</button>
+      <button class="tab" data-tab="repair" role="tab" aria-selected="false">Repair &amp; Refinishing</button>
+      <button class="tab" data-tab="commissions" role="tab" aria-selected="false">Commissions</button>
+    </div>
+
+    <div class="tab-panel active" id="tab-furniture">
+      <div class="tab-grid">
+        <div>
+          <h3>Custom Furniture</h3>
+          <p>Built from solid lumber to your exact measurements. If it does not fit through the door of your plan, it does not fit the plan. Tables, shelving, seating, and storage, designed around the room they will live in.</p>
+          <p>Bring rough dimensions and a sense of the wood you like. If you are not sure, the shop will show you the difference between oak, pine, poplar, and walnut in person.</p>
+        </div>
+        <div>
+          <div class="mi"><div class="mi-top"><strong>Farmhouse &amp; dining tables <span class="flag">Popular</span></strong><span class="dots"></span><span class="price">from $400</span></div><small>Solid tops, sturdy bases, sized to your room.</small></div>
+          <div class="mi"><div class="mi-top"><strong>Bookcases &amp; shelving</strong><span class="dots"></span><span class="price">from $250</span></div><small>Freestanding or built to the wall.</small></div>
+          <div class="mi"><div class="mi-top"><strong>Benches &amp; entry pieces</strong><span class="dots"></span><span class="price">from $150</span></div><small>Mudroom benches, window seats, porch benches.</small></div>
+          <div class="mi"><div class="mi-top"><strong>Desks &amp; work tables</strong><span class="dots"></span><span class="price">from $300</span></div><small>Built for real daily use, not just looks.</small></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-decor">
+      <div class="tab-grid">
+        <div>
+          <h3>Home Decor</h3>
+          <p>Smaller pieces with the same care as the big ones. Warm, handmade wood goods that make a room feel finished: mantels, frames, and goods for the kitchen that get better with use.</p>
+          <p>A good first project if you have never commissioned woodwork before. Fast turnaround, friendly prices, and a real sense of the shop's craft.</p>
+        </div>
+        <div>
+          <div class="mi"><div class="mi-top"><strong>Cutting boards <span class="flag">Great gift</span></strong><span class="dots"></span><span class="price">from $35</span></div><small>Hardwood, food-safe finish, built to be used daily.</small></div>
+          <div class="mi"><div class="mi-top"><strong>Floating shelves</strong><span class="dots"></span><span class="price">from $60</span></div><small>Hidden-bracket shelves in your choice of wood.</small></div>
+          <div class="mi"><div class="mi-top"><strong>Picture &amp; mirror frames</strong><span class="dots"></span><span class="price">from $45</span></div><small>Custom-milled to your art, not the other way around.</small></div>
+          <div class="mi"><div class="mi-top"><strong>Mantels &amp; beams</strong><span class="dots"></span><span class="price">quoted</span></div><small>A room's whole personality, in one beam.</small></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-repair">
+      <div class="tab-grid">
+        <div>
+          <h3>Repair &amp; Refinishing</h3>
+          <p>Good bones deserve a second life. The shop repairs wobbly joints, broken legs, stuck drawers, and tired finishes, and refinishes pieces that have earned another few decades.</p>
+          <p>Honest assessment first: if a piece is not worth saving, you will hear that before you spend a dollar.</p>
+        </div>
+        <div>
+          <div class="mi"><div class="mi-top"><strong>Joint &amp; leg repair</strong><span class="dots"></span><span class="price">from $40</span></div><small>Re-gluing, bracing, and hardware fixes.</small></div>
+          <div class="mi"><div class="mi-top"><strong>Refinishing &amp; re-staining</strong><span class="dots"></span><span class="price">from $120</span></div><small>Strip, sand, stain, and seal back to beautiful.</small></div>
+          <div class="mi"><div class="mi-top"><strong>Drawer &amp; door fixes</strong><span class="dots"></span><span class="price">from $30</span></div><small>Stuck drawers, loose hinges, proud doors.</small></div>
+          <div class="mi"><div class="mi-top"><strong>Scratch &amp; damage repair</strong><span class="dots"></span><span class="price">quoted</span></div><small>Color-matched touch-ups and fills.</small></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-commissions">
+      <div class="tab-grid">
+        <div>
+          <h3>Commissions</h3>
+          <p>Something one-of-a-kind? Commissioned pieces get the full treatment: a measured consult, a wood and finish plan, progress updates, and a piece with your name on the build list.</p>
+          <p>Typical lead time runs a few weeks depending on the shop schedule. Call early if you are working toward a holiday or a move-in date.</p>
+        </div>
+        <div>
+          <div class="mi"><div class="mi-top"><strong>Consult &amp; measurements</strong><span class="dots"></span><span class="price">free</span></div><small>Talk through the idea at the shop or on the phone.</small></div>
+          <div class="mi"><div class="mi-top"><strong>Heirlooms &amp; keepsakes</strong><span class="dots"></span><span class="price">quoted</span></div><small>Keepsake boxes, rockers, pieces meant to be handed down.</small></div>
+          <div class="mi"><div class="mi-top"><strong>Built-ins &amp; shelving walls</strong><span class="dots"></span><span class="price">quoted</span></div><small>Measured to the inch for the wall they are on.</small></div>
+          <div class="mi"><div class="mi-top"><strong>Porch &amp; outdoor pieces</strong><span class="dots"></span><span class="price">from $180</span></div><small>Weather-ready finishes for swings, planters, and benches.</small></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="price-note reveal">
+      <strong>A note on pricing:</strong> every price above is a sample to give you a starting point. Real quotes come from your wood choice, size, and finish, always before any cutting starts. <strong>No surprises, just sawdust.</strong>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<!-- ==================== STORY ==================== -->
+<section class="page" id="page-story">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-story">
+      <span class="hand">The shop story</span>
+      <h2>A working shop<br>on Decoursey Ave</h2>
+      <p>Milt Mc Cracken's Wood Shop is a Covington woodworking shop, the kind with sawdust on the floor and a bench that has seen some things.</p>
+    </div>
+
+    <div class="mag">
+      <div class="reveal">
+        <span class="hand">the shop</span>
+        <h2>Hand tools, sharp blades,<br>no shortcuts</h2>
+        <p><span class="drop">T</span>here is a particular smell to a real wood shop, cut pine, linseed oil, coffee. At 4111 Decoursey Ave, that smell means someone is building something meant to last.</p>
+        <p>The shop works the way woodworkers have worked for generations: measure carefully, cut once, fit every joint by hand. It is slower than a factory, and that is the entire point. A table that took its time will still be standing when the flat-pack one is long gone.</p>
+        <p>Customers come for custom furniture and home decor, the shop's bread and butter, and stay for repairs and refinishing, because a shop that can build can usually save what someone else built.</p>
+      </div>
+      <div class="pull reveal">
+        <p>Wood remembers how it was treated. So we treat it well.</p>
+        <cite>The shop philosophy</cite>
+      </div>
+    </div>
+
+    <div class="mag flip">
+      <div class="spec-card reveal">
+        <span class="hand">the details</span>
+        <h3>Shop at a glance</h3>
+        <ul>
+          <li><span>Location</span><span class="dots"></span><span class="val">Covington, KY</span></li>
+          <li><span>Trade</span><span class="dots"></span><span class="val">Woodworker</span></li>
+          <li><span>Focus</span><span class="dots"></span><span class="val">Custom furniture &amp; decor</span></li>
+          <li><span>Hours</span><span class="dots"></span><span class="val">Mon - Fri, 9 - 3</span></li>
+        </ul>
+      </div>
+      <div class="reveal">
+        <span class="hand">why custom</span>
+        <h2>Your home is not<br>a showroom floor</h2>
+        <p>Rooms have quirks: the wall that is not quite straight, the nook that is exactly 31 inches wide, the doorway the couch barely cleared. Custom woodwork turns those quirks into features instead of compromises.</p>
+        <p>It also means you choose the wood. Oak for strength, pine for warmth and price, walnut when you want to make a statement. The shop will walk you through the trade-offs in plain language, because an informed customer is a happy one.</p>
+        <a class="btn btn-ghost" href="#visit" data-page="visit">Come see the shop →</a>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <div class="cta-band reveal">
+        <h2>Let's talk wood.</h2>
+        <p>The shop is open Monday through Friday, 9 AM to 3 PM. Call (859) 581-7480 and bring your measurements.</p>
+        <a class="btn btn-solid" href="tel:+18595817480">Call (859) 581-7480</a>
+      </div>
+      <div style="height:56px"></div>
+    </div>
+  </div>
+</section>
+<!-- ==================== GALLERY ==================== -->
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-gal">
+      <span class="hand">Fresh off the bench</span>
+      <h2>A look at the work</h2>
+      <p>Illustrated previews of typical shop projects. Real photos from the shop floor are on the way.</p>
+    </div>
+
+    <div class="gal-grid">
+      <div class="arch reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(150deg,#E8CDA0,#C89B6A)">
+          <svg viewBox="0 0 100 100"><rect x="14" y="34" width="72" height="10" rx="3" fill="#5F3B20"/><rect x="20" y="44" width="7" height="34" fill="#5F3B20"/><rect x="73" y="44" width="7" height="34" fill="#5F3B20"/><rect x="27" y="58" width="46" height="5" fill="#8A5A33"/></svg>
+        </div>
+        <div class="cap"><strong>Farmhouse Tables</strong><small>Built to seat the whole crowd</small></div>
+      </div>
+      <div class="arch reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(150deg,#D9A441,#B07F28)">
+          <svg viewBox="0 0 100 100"><rect x="26" y="14" width="48" height="66" rx="4" fill="#5F3B20"/><rect x="31" y="20" width="38" height="8" fill="#8A5A33"/><rect x="31" y="32" width="38" height="8" fill="#8A5A33"/><rect x="31" y="44" width="38" height="8" fill="#8A5A33"/><rect x="31" y="56" width="38" height="8" fill="#8A5A33"/></svg>
+        </div>
+        <div class="cap"><strong>Bookcases</strong><small>Shelves that do not sag</small></div>
+      </div>
+      <div class="arch reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(150deg,#8A5A33,#5F3B20)">
+          <svg viewBox="0 0 100 100"><rect x="22" y="52" width="56" height="12" rx="6" fill="#E8CDA0"/><path d="M30 64 q-2 14 -8 20 M70 64 q2 14 8 20" stroke="#5F3B20" stroke-width="7" fill="none" stroke-linecap="round"/><circle cx="50" cy="40" r="10" fill="none" stroke="#E8CDA0" stroke-width="5"/></svg>
+        </div>
+        <div class="cap"><strong>Benches</strong><small>Entryways, porches, mudrooms</small></div>
+      </div>
+      <div class="arch reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(150deg,#C9B294,#8A5A33)">
+          <svg viewBox="0 0 100 100"><rect x="18" y="40" width="64" height="12" rx="6" fill="#5F3B20"/><rect x="24" y="24" width="52" height="10" rx="5" fill="#8A5A33"/><circle cx="50" cy="66" r="14" fill="none" stroke="#5F3B20" stroke-width="6"/><path d="M50 60 v12 M44 66 h12" stroke="#5F3B20" stroke-width="4"/></svg>
+        </div>
+        <div class="cap"><strong>Cutting Boards</strong><small>Hardwood, food-safe finish</small></div>
+      </div>
+      <div class="arch reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(150deg,#5C7048,#3E5229)">
+          <svg viewBox="0 0 100 100"><path d="M20 70 L50 24 L80 70 Z" fill="#E8CDA0"/><rect x="42" y="58" width="16" height="12" fill="#5F3B20"/><path d="M50 24 v-8" stroke="#5F3B20" stroke-width="5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>Floating Shelves</strong><small>Hidden brackets, clean lines</small></div>
+      </div>
+      <div class="arch reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(150deg,#A98F6F,#6D5945)">
+          <svg viewBox="0 0 100 100"><rect x="28" y="30" width="44" height="40" rx="3" fill="#E8CDA0"/><rect x="36" y="38" width="28" height="24" fill="#5F3B20"/><rect x="46" y="70" width="8" height="12" fill="#5F3B20"/></svg>
+        </div>
+        <div class="cap"><strong>Frames</strong><small>Milled to fit your art</small></div>
+      </div>
+      <div class="arch reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(150deg,#3F4750,#232A33)">
+          <svg viewBox="0 0 100 100"><rect x="30" y="20" width="40" height="8" rx="4" fill="#E8CDA0"/><path d="M36 28 v30 M64 28 v30 M36 43 h28" stroke="#E8CDA0" stroke-width="6" stroke-linecap="round"/><path d="M28 70 q22 10 44 0" stroke="#5F3B20" stroke-width="8" fill="none" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>Porch Swings</strong><small>Weather-ready finishes</small></div>
+      </div>
+    </div>
+
+    <div class="price-note reveal" style="margin-top:28px">
+      <strong>Coming soon:</strong> real photos from the shop floor. The illustrations above are artistic placeholders showing typical project types. Call the shop and ask to see finished pieces in person.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+<!-- ==================== REVIEWS ==================== -->
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-rev">
+      <span class="hand">Word around the shop</span>
+      <h2>What customers<br>are saying</h2>
+      <p>An honest look at the shop's public reviews, plus the kind of feedback custom wood shops live on.</p>
+    </div>
+
+    <div class="rs-strip">
+      <p class="rs-note">Public review history for this shop is thin: one 1-star review found on Birdeye, with no review text shown. The cards below are <strong>samples</strong> of the feedback a custom wood shop typically earns, not real customer quotes.</p>
+      <div class="rs-links">
+        <a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJTZfISpSwQYgRvl8zZIW9vTc" target="_blank" rel="noopener">See reviews on Google</a>
+        <a class="rs-btn" href="https://reviews.birdeye.com/milt-mc-crackens-wood-shop-170941592053224" target="_blank" rel="noopener">Reviews on Birdeye</a>
+      </div>
+    </div>
+
+    <div class="rev-grid">
+      <div class="rev honest reveal">
+        <h3>An honest note</h3>
+        <p>We found a single public review for this shop (1 star on Birdeye), which makes the sample cards below just that, samples. A real website with real photos and real reviews is exactly how a working shop earns trust. If the shop did good work for you, say so on Google.</p>
+        <a href="https://www.google.com/maps/place/?q=place_id:ChIJTZfISpSwQYgRvl8zZIW9vTc" target="_blank" rel="noopener">Review the shop on Google →</a>
+      </div>
+      <div class="rev reveal">
+        <span class="badge">Sample</span>
+        <div class="stars">★★★★★</div>
+        <p>"The farmhouse table came out better than we pictured it. Solid, level, and it fits the dining room like it was always there."</p>
+        <cite>Sample review</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="badge">Sample</span>
+        <div class="stars">★★★★★</div>
+        <p>"Brought in my grandmother's chair with a broken leg. It came back sturdy and refinished, and I got an honest price up front."</p>
+        <cite>Sample review</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="badge">Sample</span>
+        <div class="stars">★★★★★</div>
+        <p>"Ordered cutting boards as gifts. He walked me through the woods and the finish, and they look like they will outlive me."</p>
+        <cite>Sample review</cite>
+      </div>
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Had work done at the shop?</h2>
+      <p>One honest review does more for a small shop than any ad. Take a minute and tell your neighbors how it went.</p>
+      <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJTZfISpSwQYgRvl8zZIW9vTc" target="_blank" rel="noopener">★ Leave a Google review</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<!-- ==================== VISIT ==================== -->
+<section class="page" id="page-visit">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-visit">
+      <span class="hand">Swing by</span>
+      <h2>Come see the shop</h2>
+      <p>4111 Decoursey Ave in Covington. Open weekdays, mornings to mid-afternoon. Call before you come if you want to talk through a project.</p>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#5F3B20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Find the shop</h3>
+        <p><strong>Milt Mc Cracken's Wood Shop</strong><br>4111 Decoursey Ave<br>Covington, KY 41015</p>
+        <p>Bring measurements and photos of your project, or just the idea. Consults are free.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#5F3B20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg> Call the shop</h3>
+        <p>Quotes, commissions, repairs, and hours:</p>
+        <a class="big" href="tel:+18595817480">(859) 581-7480</a>
+        <p style="margin-top:10px">Best reached during shop hours, <span class="hand" style="font-size:1.3rem;color:var(--wood-deep)">Mon - Fri, 9 to 3</span></p>
+      </div>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#5F3B20" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Hours</h3>
+        <table class="hours-table" id="hoursTable">
+          <tr><td>Monday</td><td>9:00 AM - 3:00 PM</td></tr>
+          <tr><td>Tuesday</td><td>9:00 AM - 3:00 PM</td></tr>
+          <tr><td>Wednesday</td><td>9:00 AM - 3:00 PM</td></tr>
+          <tr><td>Thursday</td><td>9:00 AM - 3:00 PM</td></tr>
+          <tr><td>Friday</td><td>9:00 AM - 3:00 PM</td></tr>
+          <tr><td>Saturday</td><td>Closed</td></tr>
+          <tr><td>Sunday</td><td>Closed</td></tr>
+        </table>
+        <p style="margin-top:12px;font-size:.9rem">Hours shown as listed on the shop's public profiles. When in doubt, call first.</p>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <svg viewBox="0 0 24 24" fill="#5F3B20"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#FFFDF7"/></svg>
+          <strong>4111 Decoursey Ave</strong>
+          <small>Covington, KY 41015</small><br>
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJTZfISpSwQYgRvl8zZIW9vTc" target="_blank" rel="noopener">Get Directions →</a>
+        </div>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-big">Milt Mc Cracken's <em>Wood Shop</em></div>
+    <div class="foot-grid">
+      <div>
+        <h4>The shop</h4>
+        <p>Custom wood furniture and home decor, built by hand in Covington, Kentucky. Solid lumber, honest joinery, fair prices.</p>
+      </div>
+      <div>
+        <h4>Visit</h4>
+        <p>4111 Decoursey Ave<br>Covington, KY 41015<br><a href="tel:+18595817480">(859) 581-7480</a></p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <p><a href="#services" data-page="services">Services</a><br><a href="#gallery" data-page="gallery">Gallery</a><br><a href="#reviews" data-page="reviews">Reviews</a></p>
+      </div>
+    </div>
+    <div class="foot-copy">© Milt Mc Cracken's Wood Shop</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "story", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+  var scrim = document.getElementById("scrim");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+    if(scrim){ scrim.classList.remove("show"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+      if(scrim){ scrim.classList.toggle("show", open); }
+    });
+  }
+  if(scrim){
+    scrim.addEventListener("click", function(){ closeMenu(); });
+  }
+
+  /* ---------- service tabs ---------- */
+  var tabBtns = document.querySelectorAll(".tab");
+  function selectTab(name){
+    for(var i = 0; i < tabBtns.length; i++){
+      var b = tabBtns[i];
+      var on = b.getAttribute("data-tab") === name;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-selected", on ? "true" : "false");
+    }
+    var panels = document.querySelectorAll(".tab-panel");
+    for(var j = 0; j < panels.length; j++){
+      panels[j].classList.toggle("active", panels[j].id === "tab-" + name);
+    }
+  }
+  for(var t = 0; t < tabBtns.length; t++){
+    (function(btn){
+      btn.addEventListener("click", function(){
+        selectTab(btn.getAttribute("data-tab"));
+      });
+    })(tabBtns[t]);
+  }
+
+  /* ---------- live hours (America/New_York) ---------- */
+  var HOURS = {0:null, 1:[9,15], 2:[9,15], 3:[9,15], 4:[9,15], 5:[9,15], 6:null};
+  var DOW = {"Sun":0,"Mon":1,"Tue":2,"Wed":3,"Thu":4,"Fri":5,"Sat":6};
+  var DAYNAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  function fmt(h){
+    var ap = h < 12 ? "AM" : "PM";
+    var hh = h % 12;
+    if(hh === 0){ hh = 12; }
+    return hh + ":00 " + ap;
+  }
+  function nextOpen(day){
+    for(var k = 0; k < 7; k++){
+      var d = (day + k) % 7;
+      if(HOURS[d]){ return {day: d, inDays: k}; }
+    }
+    return null;
+  }
+  try{
+    var parts = new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",weekday:"short",hour:"numeric",hour12:false}).formatToParts(new Date());
+    var wd = "Mon", hr = 12;
+    parts.forEach(function(p){
+      if(p.type === "weekday"){ wd = p.value; }
+      if(p.type === "hour"){ hr = parseInt(p.value, 10) % 24; }
+    });
+    var day = DOW[wd] !== undefined ? DOW[wd] : 1;
+    var pill = document.getElementById("hoursPill");
+    var txt = document.getElementById("hoursText");
+    if(pill && txt){
+      var today = HOURS[day];
+      if(today && hr >= today[0] && hr < today[1]){
+        txt.textContent = "Open now · until " + fmt(today[1]) + " today";
+      } else {
+        pill.classList.add("closed");
+        var nxt = null;
+        if(today && hr < today[0]){ nxt = {day: day, inDays: 0}; }
+        else { nxt = nextOpen((day + 1) % 7); }
+        if(nxt){
+          var label = nxt.inDays === 0 ? "today" : (nxt.inDays === 1 ? "tomorrow" : DAYNAMES[nxt.day]);
+          txt.textContent = "Closed · opens " + label + " at " + fmt(HOURS[nxt.day][0]);
+        } else {
+          txt.textContent = "Call for hours: (859) 581-7480";
+        }
+      }
+    }
+    var rows = document.querySelectorAll("#hoursTable tr");
+    var idx = (day + 6) % 7;
+    if(rows[idx]){ rows[idx].classList.add("today"); }
+  }catch(e){ /* leave default pill text */ }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

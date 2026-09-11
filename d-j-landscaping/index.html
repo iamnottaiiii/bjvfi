@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>D &amp; J Landscaping | Union, KY</title>
+  <meta name="description" content="D & J Landscaping of Union, KY. Lawn care, mulch beds, trimming and seasonal cleanups in Boone County. Call (859) 384-2000." />
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link crossorigin href="https://fonts.gstatic.com" rel="preconnect" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --forest: #1e3a27;
+      --pine: #2c5233;
+      --leaf: #5d8f52;
+      --sage: #b7cfae;
+      --cream: #faf6ec;
+      --paper: #f3eddd;
+      --soil: #6b4f2e;
+      --ink: #22301f;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Inter", Arial, sans-serif;
+      background: var(--cream);
+      color: var(--ink);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; font: inherit; background: none; border: none; color: inherit; }
+
+    /* Floating pill nav */
+    .pill-nav-wrap {
+      position: fixed;
+      top: 16px; left: 0; right: 0;
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      padding: 0 16px;
+      pointer-events: none;
+    }
+    .pill-nav {
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(250, 246, 236, 0.92);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(30, 58, 39, 0.12);
+      border-radius: 999px;
+      padding: 8px 10px 8px 18px;
+      box-shadow: 0 12px 36px rgba(30, 58, 39, 0.16);
+      max-width: 860px;
+      width: 100%;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-right: auto;
+      cursor: pointer;
+      font-family: "Fraunces", serif;
+      font-weight: 700;
+      font-size: 19px;
+      color: var(--forest);
+      white-space: nowrap;
+    }
+    .brand svg { width: 34px; height: 34px; flex: none; }
+    .nav-links { display: flex; align-items: center; gap: 2px; }
+    .nav-links a {
+      padding: 9px 14px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--pine);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.18s ease, color 0.18s ease;
+    }
+    .nav-links a:hover { background: rgba(93, 143, 82, 0.14); }
+    .nav-links a.active { background: var(--forest); color: var(--cream); }
+    .nav-call {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--forest);
+      color: var(--cream);
+      font-weight: 700;
+      font-size: 14px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      margin-left: 6px;
+      white-space: nowrap;
+      transition: background 0.18s ease, transform 0.18s ease;
+    }
+    .nav-call:hover { background: var(--pine); transform: translateY(-1px); }
+    .menu-btn {
+      display: none;
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: rgba(93, 143, 82, 0.12);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      margin-left: 6px;
+    }
+    .menu-btn span { display: block; width: 20px; height: 2px; background: var(--forest); border-radius: 99px; transition: 0.18s ease; }
+    .menu-btn[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .menu-btn[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+    .menu-btn[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    @media (max-width: 820px) {
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: calc(100% + 10px);
+        left: 16px; right: 16px;
+        flex-direction: column;
+        align-items: stretch;
+        background: rgba(250, 246, 236, 0.98);
+        border: 1px solid rgba(30, 58, 39, 0.12);
+        border-radius: 22px;
+        padding: 10px;
+        box-shadow: 0 18px 48px rgba(30, 58, 39, 0.2);
+      }
+      .nav-links.open { display: flex; }
+      .nav-links a { padding: 13px 16px; font-size: 15px; }
+      .menu-btn { display: flex; }
+      .nav-call { display: none; }
+    }
+
+    /* Page router */
+    .page-container { padding-top: 108px; min-height: 100vh; }
+    .page { display: none; padding: 24px max(20px, calc((100vw - 1160px)/2)) 70px; animation: fadeIn 0.3s ease; }
+    .page.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Split hero */
+    .hero-split {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 40px;
+      align-items: center;
+      padding: 30px 0 50px;
+    }
+    .kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--leaf);
+      margin-bottom: 14px;
+    }
+    .kicker::before { content: ""; width: 26px; height: 2px; background: var(--leaf); border-radius: 2px; }
+    .hero-split h1 {
+      font-family: "Fraunces", serif;
+      font-size: clamp(40px, 5.4vw, 66px);
+      line-height: 1.04;
+      letter-spacing: -0.02em;
+      color: var(--forest);
+      margin-bottom: 18px;
+    }
+    .hero-split h1 em { font-style: italic; color: var(--leaf); }
+    .hero-split p.lead {
+      font-size: 17px;
+      line-height: 1.75;
+      color: #4a5a45;
+      margin-bottom: 26px;
+      max-width: 46ch;
+    }
+    .hero-cta { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--forest); color: var(--cream);
+      font-weight: 700; font-size: 15px;
+      padding: 14px 26px; border-radius: 999px;
+      transition: background 0.18s ease, transform 0.18s ease;
+    }
+    .btn-primary:hover { background: var(--pine); transform: translateY(-2px); }
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 10px;
+      border: 2px solid rgba(30, 58, 39, 0.2); color: var(--forest);
+      font-weight: 700; font-size: 15px;
+      padding: 12px 24px; border-radius: 999px;
+      transition: border-color 0.18s ease, background 0.18s ease;
+    }
+    .btn-ghost:hover { border-color: var(--forest); background: rgba(93, 143, 82, 0.08); }
+    .open-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 700;
+      background: rgba(93, 143, 82, 0.14);
+      color: var(--pine);
+      padding: 8px 16px; border-radius: 999px;
+      margin-top: 22px;
+    }
+    .open-pill .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--leaf); }
+    .hero-art {
+      background: linear-gradient(150deg, #e7f0df 0%, #d3e3c6 55%, #c2d8b2 100%);
+      border-radius: 32px;
+      padding: 36px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(30, 58, 39, 0.14);
+    }
+    .hero-art svg { width: 100%; height: auto; display: block; }
+    .hero-art .art-note {
+      position: absolute; bottom: 16px; left: 20px; right: 20px;
+      font-size: 12px; color: rgba(34, 48, 31, 0.6); font-style: italic;
+    }
+    @media (max-width: 860px) { .hero-split { grid-template-columns: 1fr; } }
+
+    /* Section headings */
+    .section-head { text-align: center; max-width: 680px; margin: 0 auto 38px; }
+    .section-head h2 {
+      font-family: "Fraunces", serif;
+      font-size: clamp(32px, 4vw, 48px);
+      color: var(--forest);
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+    .section-head p { color: #4a5a45; font-size: 16px; line-height: 1.7; }
+
+    /* Card wall */
+    .card-wall {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .service-card {
+      background: #fffdf7;
+      border: 1px solid rgba(30, 58, 39, 0.1);
+      border-radius: 24px;
+      padding: 28px 24px;
+      box-shadow: 0 8px 28px rgba(30, 58, 39, 0.07);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .service-card:hover { transform: translateY(-6px); box-shadow: 0 18px 44px rgba(30, 58, 39, 0.14); }
+    .service-card::after {
+      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 5px;
+      background: linear-gradient(90deg, var(--leaf), var(--sage));
+    }
+    .service-icon {
+      width: 52px; height: 52px; border-radius: 16px;
+      background: rgba(93, 143, 82, 0.14);
+      display: grid; place-items: center;
+      font-size: 22px; color: var(--pine);
+      margin-bottom: 16px;
+    }
+    .service-card h3 { font-family: "Fraunces", serif; font-size: 21px; color: var(--forest); margin-bottom: 8px; }
+    .service-card p { font-size: 14.5px; line-height: 1.65; color: #4a5a45; margin-bottom: 14px; }
+    .badge {
+      display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 5px 12px; border-radius: 999px;
+      background: rgba(107, 79, 46, 0.1); color: var(--soil);
+    }
+    @media (max-width: 900px) { .card-wall { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 620px) { .card-wall { grid-template-columns: 1fr; } }
+
+    /* Strip band */
+    .strip-band {
+      margin: 54px 0;
+      background: var(--forest);
+      color: var(--cream);
+      border-radius: 28px;
+      padding: 44px 36px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .strip-band h2 { font-family: "Fraunces", serif; font-size: clamp(28px, 3.4vw, 42px); margin-bottom: 12px; }
+    .strip-band p { color: rgba(250, 246, 236, 0.8); line-height: 1.7; font-size: 15px; }
+    .strip-band ul { list-style: none; display: grid; gap: 12px; }
+    .strip-band li {
+      display: flex; gap: 12px; align-items: flex-start;
+      background: rgba(250, 246, 236, 0.07);
+      border-radius: 14px; padding: 13px 16px; font-size: 14px;
+    }
+    .strip-band li i { color: var(--sage); margin-top: 2px; }
+    @media (max-width: 820px) { .strip-band { grid-template-columns: 1fr; padding: 32px 24px; } }
+
+    /* Before after pairs */
+    .pair-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .pair-card {
+      background: #fffdf7; border: 1px solid rgba(30, 58, 39, 0.1);
+      border-radius: 24px; overflow: hidden;
+      box-shadow: 0 8px 28px rgba(30, 58, 39, 0.07);
+    }
+    .pair-halves { display: grid; grid-template-columns: 1fr 1fr; }
+    .pair-half {
+      min-height: 190px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 10px; padding: 22px; text-align: center;
+    }
+    .pair-half.before { background: repeating-linear-gradient(45deg, #eee5d0, #eee5d0 14px, #e7dcc2 14px, #e7dcc2 28px); }
+    .pair-half.after { background: linear-gradient(150deg, #dcead1, #c4d8b3); }
+    .pair-tag {
+      font-size: 11px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
+      padding: 5px 14px; border-radius: 999px; background: rgba(255,255,255,0.7); color: var(--forest);
+    }
+    .pair-half i { font-size: 30px; color: rgba(30, 58, 39, 0.4); }
+    .pair-half .soon { font-size: 12.5px; color: rgba(34, 48, 31, 0.65); }
+    .pair-body { padding: 20px 22px 24px; }
+    .pair-body h3 { font-family: "Fraunces", serif; font-size: 20px; color: var(--forest); margin-bottom: 6px; }
+    .pair-body p { font-size: 14px; color: #4a5a45; line-height: 1.65; }
+    @media (max-width: 760px) { .pair-grid { grid-template-columns: 1fr; } }
+
+    /* Hours table */
+    .hours-card {
+      max-width: 560px; margin: 0 auto;
+      background: #fffdf7; border: 1px solid rgba(30, 58, 39, 0.1);
+      border-radius: 24px; padding: 30px;
+      box-shadow: 0 8px 28px rgba(30, 58, 39, 0.07);
+    }
+    .hours-card h3 { font-family: "Fraunces", serif; font-size: 24px; color: var(--forest); margin-bottom: 16px; text-align: center; }
+    .hours-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 11px 4px; border-bottom: 1px dashed rgba(30, 58, 39, 0.15);
+      font-size: 15px;
+    }
+    .hours-row:last-of-type { border-bottom: none; }
+    .hours-row .day { font-weight: 600; color: var(--forest); }
+    .hours-row .time { color: #4a5a45; }
+    .hours-note { font-size: 12.5px; color: rgba(74, 90, 69, 0.8); text-align: center; margin-top: 14px; font-style: italic; }
+
+    /* Reviews */
+    .review-notice {
+      max-width: 640px; margin: 0 auto 30px;
+      background: rgba(93, 143, 82, 0.1);
+      border: 1px solid rgba(93, 143, 82, 0.25);
+      border-radius: 20px; padding: 26px 28px; text-align: center;
+    }
+    .review-notice i { font-size: 26px; color: var(--leaf); margin-bottom: 10px; }
+    .review-notice h3 { font-family: "Fraunces", serif; font-size: 22px; color: var(--forest); margin-bottom: 8px; }
+    .review-notice p { font-size: 14.5px; color: #4a5a45; line-height: 1.7; margin-bottom: 18px; }
+
+    /* Contact */
+    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; max-width: 1000px; margin: 0 auto; }
+    .contact-card {
+      background: #fffdf7; border: 1px solid rgba(30, 58, 39, 0.1);
+      border-radius: 24px; padding: 30px;
+      box-shadow: 0 8px 28px rgba(30, 58, 39, 0.07);
+    }
+    .contact-card h3 { font-family: "Fraunces", serif; font-size: 24px; color: var(--forest); margin-bottom: 14px; }
+    .contact-row {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px; border-radius: 14px;
+      background: rgba(93, 143, 82, 0.08);
+      margin-bottom: 12px; font-weight: 600; color: var(--forest);
+      transition: background 0.18s ease;
+    }
+    .contact-row:hover { background: rgba(93, 143, 82, 0.16); }
+    .contact-row .mark {
+      width: 42px; height: 42px; border-radius: 12px; flex: none;
+      background: var(--forest); color: var(--cream);
+      display: grid; place-items: center; font-size: 17px;
+    }
+    .contact-row small { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(34, 48, 31, 0.55); }
+    .field { display: grid; gap: 6px; margin-bottom: 14px; }
+    .field label { font-size: 13px; font-weight: 700; color: var(--forest); }
+    .field input, .field textarea {
+      width: 100%; padding: 12px 14px; border-radius: 12px;
+      border: 1px solid rgba(30, 58, 39, 0.18);
+      background: #fff; font: inherit; font-size: 14px; color: var(--ink);
+    }
+    .field textarea { min-height: 110px; resize: vertical; }
+    .field input:focus, .field textarea:focus { outline: 2px solid var(--leaf); border-color: var(--leaf); }
+    .form-status { font-size: 13px; color: #4a5a45; margin-top: 10px; min-height: 1.4em; }
+    @media (max-width: 820px) { .contact-grid { grid-template-columns: 1fr; } }
+
+    /* Multi column footer */
+    .site-footer {
+      background: var(--forest);
+      color: rgba(250, 246, 236, 0.85);
+      padding: 52px max(20px, calc((100vw - 1160px)/2)) 26px;
+      margin-top: 30px;
+    }
+    .footer-cols { display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; gap: 30px; margin-bottom: 30px; }
+    .footer-cols h4 {
+      font-family: "Fraunces", serif; font-size: 17px; color: var(--cream);
+      margin-bottom: 12px;
+    }
+    .footer-cols p, .footer-cols a { font-size: 14px; line-height: 1.9; color: rgba(250, 246, 236, 0.72); }
+    .footer-cols a { display: block; cursor: pointer; }
+    .footer-cols a:hover { color: var(--cream); }
+    .footer-brand { display: flex; align-items: center; gap: 10px; font-family: "Fraunces", serif; font-size: 20px; color: var(--cream); margin-bottom: 10px; }
+    .footer-brand svg { width: 32px; height: 32px; }
+    .footer-copy { text-align: center; font-size: 14px; color: rgba(250, 246, 236, 0.6); }
+    @media (max-width: 860px) { .footer-cols { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 540px) { .footer-cols { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+  <div class="pill-nav-wrap">
+    <nav class="pill-nav">
+      <a class="brand" data-page="home">
+        <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 36 C10 28 6 18 8 6 C18 8 28 12 32 22 C33 26 32 31 29 35 L20 36 Z" fill="#2c5233"/><path d="M20 34 C20 24 22 14 30 8" stroke="#b7cfae" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M20 27 C15 25 12 21 11 16 C16 17 19 21 20 27 Z" fill="#5d8f52"/></svg>
+        <span>D &amp; J Landscaping</span>
+      </a>
+      <div class="nav-links" id="primary-nav">
+        <a data-page="home" class="active">Home</a>
+        <a data-page="services">Services</a>
+        <a data-page="about">About</a>
+        <a data-page="reviews">Reviews</a>
+        <a data-page="contact">Contact</a>
+      </div>
+      <a class="nav-call" href="tel:+18593842000"><i class="fa-solid fa-phone"></i> (859) 384-2000</a>
+      <button class="menu-btn" type="button" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+  </div>
+
+  <main class="page-container">
+
+    <section class="page active" id="page-home">
+      <div class="hero-split">
+        <div>
+          <span class="kicker">Union, Kentucky</span>
+          <h1>Yards in Boone County, <em>grown the right way.</em></h1>
+          <p class="lead">D &amp; J Landscaping keeps lawns thick, beds tidy, and hedges sharp across Union and the surrounding neighborhoods. One crew, honest work, and a yard you notice from the street.</p>
+          <div class="hero-cta">
+            <a class="btn-primary" href="tel:+18593842000"><i class="fa-solid fa-phone"></i> Call (859) 384-2000</a>
+            <a class="btn-ghost" data-page="services">See Services <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+          <div class="open-pill" id="openPill"><span class="dot"></span><span id="openPillText">Mon-Fri, 9 AM-6 PM</span></div>
+        </div>
+        <div class="hero-art">
+          <svg viewBox="0 0 400 320" aria-hidden="true">
+            <ellipse cx="200" cy="282" rx="150" ry="26" fill="#2c5233" opacity="0.18"/>
+            <path d="M200 280 C190 210 186 150 200 90 C214 150 210 210 200 280 Z" fill="#2c5233"/>
+            <path d="M200 250 C160 235 130 205 118 165 C160 175 190 205 200 250 Z" fill="#5d8f52"/>
+            <path d="M200 250 C240 235 270 205 282 165 C240 175 210 205 200 250 Z" fill="#4a7a40"/>
+            <path d="M200 205 C170 195 148 172 140 140 C172 148 194 172 200 205 Z" fill="#6aa05e"/>
+            <path d="M200 205 C230 195 252 172 260 140 C228 148 206 172 200 205 Z" fill="#5d8f52"/>
+            <path d="M200 160 C178 152 162 134 156 110 C180 116 196 134 200 160 Z" fill="#7cb26e"/>
+            <path d="M200 160 C222 152 238 134 244 110 C220 116 204 134 200 160 Z" fill="#6aa05e"/>
+            <circle cx="200" cy="72" r="10" fill="#b7cfae"/>
+            <path d="M200 280 L200 292 M170 280 L168 294 M230 280 L232 294" stroke="#6b4f2e" stroke-width="5" stroke-linecap="round"/>
+            <circle cx="90" cy="60" r="5" fill="#b7cfae" opacity="0.7"/>
+            <circle cx="320" cy="50" r="7" fill="#5d8f52" opacity="0.5"/>
+            <circle cx="350" cy="220" r="4" fill="#b7cfae" opacity="0.6"/>
+            <path d="M60 240 q10 -18 20 0 q10 -18 20 0" stroke="#5d8f52" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <path d="M300 260 q10 -18 20 0 q10 -18 20 0" stroke="#4a7a40" stroke-width="3" fill="none" stroke-linecap="round"/>
+          </svg>
+          <p class="art-note">Artwork shown. Your yard photos would go here once we have them.</p>
+        </div>
+      </div>
+
+      <div class="section-head">
+        <h2>What we do best</h2>
+        <p>Straightforward outdoor work, done on schedule. Services below are typical for the trade. Call to confirm exactly what is offered.</p>
+      </div>
+      <div class="card-wall">
+        <div class="service-card">
+          <div class="service-icon"><i class="fa-solid fa-scissors"></i></div>
+          <h3>Lawn Mowing &amp; Edging</h3>
+          <p>Regular cuts with clean edges along walks and beds, so the whole property looks finished.</p>
+          <span class="badge">Call to confirm</span>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><i class="fa-solid fa-layer-group"></i></div>
+          <h3>Mulch &amp; Bed Refresh</h3>
+          <p>Fresh mulch, weeded beds, and crisp bed lines that make plantings pop.</p>
+          <span class="badge">Call to confirm</span>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><i class="fa-solid fa-seedling"></i></div>
+          <h3>Hedge &amp; Shrub Trimming</h3>
+          <p>Shaped shrubs and trimmed hedges that stay healthy and keep their form.</p>
+          <span class="badge">Call to confirm</span>
+        </div>
+      </div>
+
+      <div class="strip-band">
+        <div>
+          <h2>A local crew for local yards.</h2>
+          <p>Based right on Longbranch Road in Union, D &amp; J Landscaping is set up to serve Boone County homes without the long drive or the big-company runaround.</p>
+          <div style="margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap;">
+            <a class="btn-primary" data-page="about" style="background: var(--cream); color: var(--forest);">Our Story</a>
+            <a class="btn-ghost" data-page="contact" style="border-color: rgba(250,246,236,0.4); color: var(--cream);">Get in Touch</a>
+          </div>
+        </div>
+        <ul>
+          <li><i class="fa-solid fa-location-dot"></i><span>Based in Union, KY, serving Boone County and nearby neighborhoods.</span></li>
+          <li><i class="fa-solid fa-clock"></i><span>Listed hours: Monday through Friday, 9 AM to 6 PM. Call to confirm.</span></li>
+          <li><i class="fa-solid fa-phone"></i><span>One number reaches the crew directly: (859) 384-2000.</span></li>
+        </ul>
+      </div>
+
+      <div class="hours-card">
+        <h3>Hours</h3>
+        <div class="hours-row"><span class="day">Monday</span><span class="time">9 AM - 6 PM</span></div>
+        <div class="hours-row"><span class="day">Tuesday</span><span class="time">9 AM - 6 PM</span></div>
+        <div class="hours-row"><span class="day">Wednesday</span><span class="time">9 AM - 6 PM</span></div>
+        <div class="hours-row"><span class="day">Thursday</span><span class="time">9 AM - 6 PM</span></div>
+        <div class="hours-row"><span class="day">Friday</span><span class="time">9 AM - 6 PM</span></div>
+        <div class="hours-row"><span class="day">Saturday - Sunday</span><span class="time">Closed</span></div>
+        <p class="hours-note">Hours taken from the public Google listing. Call to confirm before visiting.</p>
+      </div>
+    </section>
+
+    <section class="page" id="page-services">
+      <div class="section-head">
+        <span class="kicker" style="justify-content: center;">Services</span>
+        <h2>Outdoor work, done right</h2>
+        <p>These are the services most landscapers in the area offer. Call (859) 384-2000 to confirm availability and get an exact quote.</p>
+      </div>
+      <div class="card-wall">
+        <div class="service-card">
+          <div class="service-icon"><i class="fa-solid fa-scissors"></i></div>
+          <h3>Lawn Mowing &amp; Edging</h3>
+          <p>Scheduled cuts with trimmed edges along sidewalks, driveways, and garden beds.</p>
+          <span class="badge">Call to confirm</span>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><i class="fa-solid fa-layer-group"></i></div>
+          <h3>Mulch Installation</h3>
+          <p>Fresh mulch laid over weeded beds for a clean look that holds moisture in.</p>
+          <span class="badge">Call to confirm</span>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><i class="fa-solid fa-seedling"></i></div>
+          <h3>Hedge &amp; Shrub Trimming</h3>
+          <p>Shaping and thinning to keep shrubs healthy and properties looking sharp.</p>
+          <span class="badge">Call to confirm</span>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><i class="fa-solid fa-leaf"></i></div>
+          <h3>Seasonal Cleanups</h3>
+          <p>Spring and fall cleanups: debris, sticks, and overgrowth cleared out.</p>
+          <span class="badge">Call to confirm</span>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><i class="fa-solid fa-wind"></i></div>
+          <h3>Leaf Removal</h3>
+          <p>Fall leaf collection so lawns can breathe through the winter.</p>
+          <span class="badge">Call to confirm</span>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><i class="fa-solid fa-spa"></i></div>
+          <h3>Garden Bed Care</h3>
+          <p>Weeding, edging, and refreshing planting beds through the growing season.</p>
+          <span class="badge">Call to confirm</span>
+        </div>
+      </div>
+      <div style="text-align: center; margin-top: 36px;">
+        <a class="btn-primary" href="tel:+18593842000"><i class="fa-solid fa-phone"></i> Call for a Quote: (859) 384-2000</a>
+      </div>
+    </section>
+
+    <section class="page" id="page-about">
+      <div class="section-head">
+        <span class="kicker" style="justify-content: center;">About</span>
+        <h2>Rooted in Union, Kentucky</h2>
+        <p>D &amp; J Landscaping works out of Longbranch Road in Union, right in the heart of Boone County. That means short drive times, quick responses, and a crew that knows how Kentucky lawns grow.</p>
+      </div>
+      <div class="pair-grid">
+        <div class="pair-card">
+          <div class="pair-halves">
+            <div class="pair-half before">
+              <span class="pair-tag">Before</span>
+              <i class="fa-solid fa-image"></i>
+              <span class="soon">Photo coming soon</span>
+            </div>
+            <div class="pair-half after">
+              <span class="pair-tag">After</span>
+              <i class="fa-solid fa-image"></i>
+              <span class="soon">Photo coming soon</span>
+            </div>
+          </div>
+          <div class="pair-body">
+            <h3>The kind of difference we make</h3>
+            <p>Before and after photos of real D &amp; J jobs will go here. Ask about recent work when you call.</p>
+          </div>
+        </div>
+        <div class="pair-card">
+          <div class="pair-halves">
+            <div class="pair-half before">
+              <span class="pair-tag">Before</span>
+              <i class="fa-solid fa-image"></i>
+              <span class="soon">Photo coming soon</span>
+            </div>
+            <div class="pair-half after">
+              <span class="pair-tag">After</span>
+              <i class="fa-solid fa-image"></i>
+              <span class="soon">Photo coming soon</span>
+            </div>
+          </div>
+          <div class="pair-body">
+            <h3>Beds, hedges, and lawns</h3>
+            <p>From weekly mowing routes to one-time bed refreshes, the work speaks through the results.</p>
+          </div>
+        </div>
+      </div>
+      <div class="review-notice" style="margin-top: 36px;">
+        <i class="fa-solid fa-circle-info"></i>
+        <h3>An honest note</h3>
+        <p>Public records for D &amp; J Landscaping are thin: we found the address, phone number, category, and listing hours, but no detailed company history, staff bios, or project photos yet. Everything on this page beyond those basics is presented as typical-for-the-trade until the owner confirms it. That is exactly what this preview site is for: a starting point to polish together.</p>
+      </div>
+    </section>
+
+    <section class="page" id="page-reviews">
+      <div class="section-head">
+        <span class="kicker" style="justify-content: center;">Reviews</span>
+        <h2>What neighbors say</h2>
+      </div>
+      <div class="review-notice">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <h3>No public reviews found yet</h3>
+        <p>We searched Google, Yelp, BBB, and other public directories and could not find published reviews for D &amp; J Landscaping in Union, KY. That is common for small local crews that work by word of mouth. We will not invent reviews. Check the live Google listing below, it is the first place new reviews will appear.</p>
+        <a class="btn-primary" href="https://www.google.com/maps/place/?q=place_id:ChIJi6xnnRfEQYgR2rMm9H85R6E" target="_blank" rel="noopener"><i class="fa-brands fa-google"></i> See reviews on Google</a>
+      </div>
+    </section>
+
+    <section class="page" id="page-contact">
+      <div class="section-head">
+        <span class="kicker" style="justify-content: center;">Contact</span>
+        <h2>Get your yard on the schedule</h2>
+        <p>Call, get directions, or send a message. The fastest way to reach the crew is the phone.</p>
+      </div>
+      <div class="contact-grid">
+        <div class="contact-card">
+          <h3>Reach us directly</h3>
+          <a class="contact-row" href="tel:+18593842000">
+            <span class="mark"><i class="fa-solid fa-phone"></i></span>
+            <span><small>Call</small>(859) 384-2000</span>
+          </a>
+          <a class="contact-row" href="https://www.google.com/maps/search/?api=1&query=2548%20Longbranch%20Rd%2C%20Union%2C%20KY%2041091" target="_blank" rel="noopener">
+            <span class="mark"><i class="fa-solid fa-location-dot"></i></span>
+            <span><small>Get Directions</small>2548 Longbranch Rd, Union, KY 41091</span>
+          </a>
+          <div class="contact-row" style="cursor: default;">
+            <span class="mark"><i class="fa-solid fa-clock"></i></span>
+            <span><small>Hours</small>Mon-Fri, 9 AM - 6 PM. Call to confirm.</span>
+          </div>
+        </div>
+        <div class="contact-card">
+          <h3>Send a message</h3>
+          <form id="contact-form">
+            <div class="field">
+              <label for="cf-name">Your name</label>
+              <input id="cf-name" type="text" name="name" required autocomplete="name" />
+            </div>
+            <div class="field">
+              <label for="cf-phone">Phone number</label>
+              <input id="cf-phone" type="tel" name="phone" autocomplete="tel" />
+            </div>
+            <div class="field">
+              <label for="cf-msg">What do you need done?</label>
+              <textarea id="cf-msg" name="message" required placeholder="Mowing, mulch, trimming..."></textarea>
+            </div>
+            <button class="btn-primary" type="submit"><i class="fa-solid fa-envelope"></i> Open Email Draft</button>
+            <p class="form-status" id="formStatus">This opens your email app with a draft addressed to the business.</p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-copy">&copy; D &amp; J Landscaping</div>
+  </footer>
+
+  <script>
+    (function() {
+      var pageMap = {
+        '': 'home',
+        'home': 'home',
+        'services': 'services',
+        'about': 'about',
+        'reviews': 'reviews',
+        'contact': 'contact'
+      };
+      var pageElements = {
+        home: document.getElementById('page-home'),
+        services: document.getElementById('page-services'),
+        about: document.getElementById('page-about'),
+        reviews: document.getElementById('page-reviews'),
+        contact: document.getElementById('page-contact')
+      };
+      var navLinks = document.querySelectorAll('.nav-links a[data-page]');
+      var brand = document.querySelector('.brand');
+
+      function getPageFromPath() {
+        var path = window.location.pathname.replace(/^\/|\/$/g, '') || '';
+        return pageMap[path] || 'home';
+      }
+
+      function navigateTo(pageId, pushState) {
+        if (pushState === undefined) pushState = true;
+        var keys = Object.keys(pageElements);
+        for (var i = 0; i < keys.length; i++) {
+          pageElements[keys[i]].classList.remove('active');
+        }
+        if (pageElements[pageId]) pageElements[pageId].classList.add('active');
+        for (var j = 0; j < navLinks.length; j++) {
+          var a = navLinks[j];
+          if (a.dataset.page === pageId) { a.classList.add('active'); }
+          else { a.classList.remove('active'); }
+        }
+        var path = pageId === 'home' ? '/' : '/' + pageId;
+        if (pushState && window.location.pathname !== path) {
+          history.pushState({ page: pageId }, '', path);
+        }
+        var nav = document.getElementById('primary-nav');
+        var btn = document.querySelector('.menu-btn');
+        nav.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      function bindPageLinks(scope) {
+        var els = scope.querySelectorAll('[data-page]');
+        for (var i = 0; i < els.length; i++) {
+          (function(el) {
+            el.addEventListener('click', function(e) {
+              e.preventDefault();
+              navigateTo(el.dataset.page);
+            });
+          })(els[i]);
+        }
+      }
+      bindPageLinks(document);
+
+      if (brand) {
+        brand.addEventListener('click', function(e) {
+          e.preventDefault();
+          navigateTo('home');
+        });
+      }
+
+      window.addEventListener('popstate', function(e) {
+        var page = (e.state && e.state.page) || getPageFromPath();
+        if (pageElements[page]) navigateTo(page, false);
+      });
+
+      var initialPage = getPageFromPath();
+      if (pageElements[initialPage]) navigateTo(initialPage, false);
+
+      var menuBtn = document.querySelector('.menu-btn');
+      var primaryNav = document.getElementById('primary-nav');
+      menuBtn.addEventListener('click', function() {
+        var isOpen = primaryNav.classList.toggle('open');
+        menuBtn.setAttribute('aria-expanded', String(isOpen));
+      });
+      document.addEventListener('click', function(e) {
+        if (!primaryNav.contains(e.target) && !menuBtn.contains(e.target)) {
+          primaryNav.classList.remove('open');
+          menuBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+      function syncOpenPill() {
+        var el = document.getElementById('openPillText');
+        if (!el) return;
+        try {
+          var now = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }));
+          var day = now.getDay();
+          var mins = now.getHours() * 60 + now.getMinutes();
+          var open = day >= 1 && day <= 5 && mins >= 540 && mins < 1080;
+          el.textContent = open ? 'Open now. Closes 6 PM' : 'Mon-Fri, 9 AM-6 PM. Call to confirm.';
+        } catch (err) {
+          el.textContent = 'Mon-Fri, 9 AM-6 PM. Call to confirm.';
+        }
+      }
+      syncOpenPill();
+
+      var contactForm = document.getElementById('contact-form');
+      var formStatus = document.getElementById('formStatus');
+      if (contactForm) {
+        contactForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          var fd = new FormData(contactForm);
+          var name = fd.get('name') || '';
+          var phone = fd.get('phone') || '';
+          var message = fd.get('message') || '';
+          var lines = [
+            'Hello D & J Landscaping,',
+            '',
+            'I would like to request landscaping service.',
+            '',
+            'Name: ' + name,
+            phone ? 'Phone: ' + phone : null,
+            '',
+            'Details:',
+            message || '(no details given)'
+          ].filter(Boolean);
+          var subject = 'Service Request from ' + (name || 'Website Visitor');
+          if (formStatus) { formStatus.textContent = 'Opening your email app...'; }
+          window.location.href = 'mailto:' + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(lines.join('\n'));
+          setTimeout(function() {
+            if (formStatus) { formStatus.textContent = 'If the email app did not open, please call (859) 384-2000.'; }
+          }, 3000);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

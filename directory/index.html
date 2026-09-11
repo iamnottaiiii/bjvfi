@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>bjvfi · directory</title>
+<link rel="icon" type="image/png" href="/favicon/favicon-96x96.png?v=20260911" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg?v=20260911" />
+<link rel="shortcut icon" href="/favicon/favicon.ico?v=20260911" />
+<link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png?v=20260911" />
+<meta name="apple-mobile-web-app-title" content="bjvfi" />
+<meta name="description" content="Browse every business site on bjvfi — totals, categories, and card previews." />
+<style>
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap");
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{scrollbar-width:thin;scrollbar-color:#222 transparent;background:#000}
+body{min-height:100vh;background:#000;color:#F2F2F5;font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:400}
+.bjvfi-void{--ink:#F2F2F5;--muted:#6B7080;--line:rgba(255,255,255,.08);min-height:100vh;background:#000;color:var(--ink);position:relative}
+.bjvfi-void::before{content:"";position:fixed;inset:0;background:
+  repeating-conic-gradient(from 0deg at 50% 50%,rgba(255,255,255,.012) 0deg 1deg,transparent 1deg 2deg),
+  repeating-radial-gradient(circle at 50% 50%,rgba(255,255,255,.010) 0px 1px,transparent 1px 4px),
+  radial-gradient(circle at 50% 30%,#000 0%,#050505 18%,#0d0d0d 36%,#161616 55%,#0d0d0d 80%,#030303 100%);
+  pointer-events:none;z-index:0}
+.wrap{position:relative;z-index:1;width:min(1200px,calc(100% - 40px));margin:0 auto;padding:48px 0 80px}
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:28px}
+.brand a{color:inherit;text-decoration:none}
+.brand h1{font-size:clamp(2rem,6vw,3.2rem);letter-spacing:-.09em;font-weight:400;line-height:1}
+.brand p{color:var(--muted);margin-top:8px;font-size:.9rem}
+.nav{display:flex;gap:10px;flex-wrap:wrap}
+.nav a{color:#bbb;text-decoration:none;font-size:.85rem;padding:8px 14px;border:1px solid var(--line);border-radius:999px}
+.nav a:hover{color:#fff;border-color:rgba(255,255,255,.22)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:28px}
+.stat{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+.stat .n{font-size:1.6rem;letter-spacing:-.04em;font-weight:500}
+.stat .l{color:var(--muted);font-size:.75rem;margin-top:4px;text-transform:uppercase;letter-spacing:.08em}
+.cats{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px}
+.cat{appearance:none;background:rgba(255,255,255,.03);border:1px solid var(--line);color:#bbb;border-radius:999px;padding:7px 12px;font:inherit;font-size:.78rem;cursor:pointer}
+.cat:hover{color:#fff}
+.cat.active{color:#fff;border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.08)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.card{display:flex;flex-direction:column;gap:8px;text-decoration:none;color:inherit;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:18px;padding:18px 18px 16px;min-height:148px;transition:background .12s,border-color .12s,transform .12s}
+.card:hover{background:rgba(255,255,255,.055);border-color:rgba(255,255,255,.2);transform:translateY(-1px)}
+.card .name{font-weight:500;font-size:1rem;line-height:1.35;letter-spacing:-.02em}
+.card .slug{color:#777;font-size:.78rem}
+.card .meta{margin-top:auto;display:flex;flex-direction:column;gap:4px;color:#9a9aa3;font-size:.78rem}
+.card .pill{display:inline-block;align-self:flex-start;padding:3px 8px;border-radius:999px;border:1px solid var(--line);color:#cfcfd6;font-size:.72rem;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.status{color:var(--muted);font-size:.85rem;margin:18px 0;text-align:center}
+.more{display:block;margin:28px auto 0;appearance:none;background:transparent;border:1px solid var(--line);color:#ddd;border-radius:999px;padding:12px 22px;font:inherit;cursor:pointer}
+.more:hover{border-color:rgba(255,255,255,.28);color:#fff}
+@media (max-width:560px){.wrap{width:calc(100% - 28px);padding-top:32px}}
+</style>
+</head>
+<body>
+<div class="bjvfi-void">
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <a href="/"><h1>bjvfi</h1></a>
+        <p>directory — every site, card previews + stats</p>
+      </div>
+      <div class="nav">
+        <a href="/">search</a>
+        <a href="/directory/">directory</a>
+      </div>
+    </div>
+
+    <div class="stats" id="stats">
+      <div class="stat"><div class="n" id="stat-total">—</div><div class="l">total sites</div></div>
+      <div class="stat"><div class="n" id="stat-cats">—</div><div class="l">categories</div></div>
+      <div class="stat"><div class="n" id="stat-shown">—</div><div class="l">showing</div></div>
+      <div class="stat"><div class="n" id="stat-top">—</div><div class="l">top category</div></div>
+    </div>
+
+    <div class="cats" id="cats" aria-label="Categories"></div>
+    <div class="status" id="status">Loading catalog…</div>
+    <div class="grid" id="grid"></div>
+    <button class="more" id="more" hidden>Load more</button>
+  </div>
+</div>
+<script>
+(function(){
+  const PAGE = 96;
+  let all = [];
+  let filtered = [];
+  let activeCat = 'All';
+  let shown = 0;
+  const grid = document.getElementById('grid');
+  const status = document.getElementById('status');
+  const more = document.getElementById('more');
+  const catsEl = document.getElementById('cats');
+
+  function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+  function counts(list){
+    const m = new Map();
+    list.forEach(s=>{const k=s.c||'Uncategorized'; m.set(k,(m.get(k)||0)+1);});
+    return [...m.entries()].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]));
+  }
+
+  function updateStats(){
+    const c = counts(all);
+    document.getElementById('stat-total').textContent = all.length.toLocaleString();
+    document.getElementById('stat-cats').textContent = c.length.toLocaleString();
+    document.getElementById('stat-shown').textContent = filtered.length.toLocaleString();
+    document.getElementById('stat-top').textContent = c[0] ? c[0][0] : '—';
+  }
+
+  function renderCats(){
+    const c = counts(all).slice(0,24);
+    const items = [['All', all.length], ...c];
+    catsEl.innerHTML = items.map(([name,n])=>{
+      const active = name===activeCat ? ' active' : '';
+      return `<button type="button" class="cat${active}" data-cat="${esc(name)}">${esc(name)} · ${n}</button>`;
+    }).join('');
+  }
+
+  function applyFilter(){
+    filtered = activeCat==='All' ? all.slice() : all.filter(s=>(s.c||'Uncategorized')===activeCat);
+    shown = 0;
+    grid.innerHTML = '';
+    updateStats();
+    renderCats();
+    paintMore();
+    status.textContent = filtered.length ? '' : 'No sites in this category';
+  }
+
+  function paintMore(){
+    const slice = filtered.slice(shown, shown+PAGE);
+    const frag = document.createDocumentFragment();
+    slice.forEach(s=>{
+      const a = document.createElement('a');
+      a.className = 'card';
+      a.href = '/' + encodeURIComponent(s.s) + '/';
+      const pill = s.c ? `<span class="pill">${esc(s.c)}</span>` : '';
+      const phone = s.p ? `<span>${esc(s.p)}</span>` : '';
+      const addr = s.a ? `<span>${esc(s.a)}</span>` : '';
+      a.innerHTML = `${pill}<div class="name">${esc(s.n||s.s)}</div><div class="slug">/${esc(s.s)}</div><div class="meta">${phone}${addr}</div>`;
+      frag.appendChild(a);
+    });
+    grid.appendChild(frag);
+    shown += slice.length;
+    more.hidden = shown >= filtered.length;
+    if (filtered.length) status.textContent = `Showing ${shown.toLocaleString()} of ${filtered.length.toLocaleString()}`;
+  }
+
+  catsEl.addEventListener('click', e=>{
+    const b = e.target.closest('[data-cat]');
+    if (!b) return;
+    activeCat = b.getAttribute('data-cat');
+    applyFilter();
+  });
+  more.addEventListener('click', paintMore);
+
+  fetch('/sites.json', {cache:'no-store'})
+    .then(r=>{ if(!r.ok) throw new Error('Could not load sites.json ('+r.status+')'); return r.json(); })
+    .then(data=>{
+      all = Array.isArray(data) ? data : [];
+      all.sort((a,b)=>String(a.n||a.s).localeCompare(String(b.n||b.s)));
+      applyFilter();
+    })
+    .catch(err=>{
+      status.textContent = err.message || 'Load failed';
+      status.style.color = '#c8a0a0';
+    });
+})();
+</script>
+</body>
+</html>

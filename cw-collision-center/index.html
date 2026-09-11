@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cw Collision Center | Auto Body Shop in Lockland, OH</title>
+<meta name="description" content="Cw Collision Center, auto body shop at 645 Wayne Ave, Lockland, OH 45215. Collision repair and auto painting. Call (513) 257-8092.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{
+  --blue:#1b4fa0;
+  --blue-deep:#0f2f66;
+  --blue-ink:#12305e;
+  --paper:#ffffff;
+  --paper-soft:#f6f9fd;
+  --grid:rgba(27,79,160,.09);
+  --grid-bold:rgba(27,79,160,.18);
+  --red:#c93a2e;
+  --gray:#5b6b83;
+  --ok:#1e7a3a;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Archivo',sans-serif;
+  color:var(--blue-ink);
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+    linear-gradient(var(--grid-bold) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-bold) 1px, transparent 1px);
+  background-size:22px 22px, 22px 22px, 110px 110px, 110px 110px;
+  min-height:100vh;
+}
+.mono{font-family:'IBM Plex Mono',monospace}
+.wrap{max-width:1180px;margin:0 auto;padding:0 18px}
+/* ---------- title block header ---------- */
+.titleblock{border-bottom:3px solid var(--blue);background:rgba(255,255,255,.92);position:sticky;top:0;z-index:50}
+.tb-inner{display:flex;align-items:stretch;justify-content:space-between;gap:0;max-width:1180px;margin:0 auto}
+.tb-brand{display:flex;align-items:center;gap:14px;padding:12px 18px;border-right:2px solid var(--blue)}
+.tb-logo{width:52px;height:52px;border:2.5px solid var(--blue);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:var(--blue);position:relative;flex:0 0 auto}
+.tb-logo::after{content:"";position:absolute;inset:4px;border:1px dashed var(--blue);pointer-events:none}
+.tb-name{font-weight:900;font-size:20px;letter-spacing:.5px;line-height:1.05}
+.tb-sub{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--gray);letter-spacing:1.5px;margin-top:4px}
+.tb-meta{display:flex;align-items:stretch}
+.tb-cell{display:flex;flex-direction:column;justify-content:center;padding:8px 16px;border-left:1px solid var(--grid-bold);font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.7;color:var(--gray)}
+.tb-cell b{color:var(--blue-ink);font-weight:600}
+.tb-call{display:flex;flex-direction:column;justify-content:center;gap:8px;padding:10px 18px;border-left:2px solid var(--blue)}
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--blue);color:#fff;border:2px solid var(--blue);padding:10px 18px;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;letter-spacing:.5px;text-decoration:none;cursor:pointer;transition:background .15s,color .15s}
+.btn:hover{background:var(--blue-deep);border-color:var(--blue-deep)}
+.btn.ghost{background:transparent;color:var(--blue)}
+.btn.ghost:hover{background:var(--blue);color:#fff}
+.btn.red{background:var(--red);border-color:var(--red)}
+.btn.red:hover{background:#a82e24;border-color:#a82e24}
+.tb-toggle{display:none;border:0;background:transparent;color:var(--blue);font-size:24px;padding:10px 18px;cursor:pointer;border-left:2px solid var(--blue)}
+.mobile-panel{display:none;border-top:2px solid var(--blue);background:#fff}
+.mobile-panel a{display:block;padding:13px 20px;font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--blue-ink);text-decoration:none;border-bottom:1px solid var(--grid-bold);letter-spacing:1px}
+.mobile-panel a.active{background:var(--paper-soft);color:var(--blue);font-weight:600}
+.mobile-panel.open{display:block}
+/* ---------- drawing sheet ---------- */
+.sheet{border:3px solid var(--blue);background:rgba(255,255,255,.94);margin:26px auto 0;position:relative;max-width:1180px}
+.corner{position:absolute;width:26px;height:26px;border:3px solid var(--blue);z-index:2}
+.corner.tl{top:-3px;left:-3px;border-right:0;border-bottom:0}
+.corner.tr{top:-3px;right:-3px;border-left:0;border-bottom:0}
+.corner.bl{bottom:-3px;left:-3px;border-right:0;border-top:0}
+.corner.br{bottom:-3px;right:-3px;border-left:0;border-top:0}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;border-bottom:2px solid var(--blue);font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:1.5px;color:var(--gray);flex-wrap:wrap;gap:6px}
+.sheet-head .sheet-no{color:var(--blue);font-weight:600}
+.page{display:none;padding:34px 34px 46px}
+.page.active{display:block}
+.kicker{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:3px;color:var(--red);text-transform:uppercase;margin-bottom:12px}
+h1{font-size:clamp(34px,5.4vw,62px);font-weight:900;line-height:1.02;letter-spacing:-.5px;margin-bottom:16px}
+h1 .blue{color:var(--blue)}
+h2{font-size:clamp(26px,3.6vw,40px);font-weight:800;letter-spacing:-.3px;margin-bottom:14px}
+h3{font-size:20px;font-weight:800;margin-bottom:10px}
+.lede{font-size:17px;line-height:1.65;color:var(--blue-ink);max-width:640px;margin-bottom:22px}
+.eyebrow-rule{display:flex;align-items:center;gap:12px;margin-bottom:14px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:2px;color:var(--gray)}
+.eyebrow-rule::after{content:"";flex:1;height:2px;background:repeating-linear-gradient(90deg,var(--blue) 0 8px,transparent 8px 14px)}
+/* hero drawing */
+.hero-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:30px;align-items:start;margin:8px 0 30px}
+.drawing-frame{border:2px solid var(--blue);background:#fff;position:relative;padding:8px}
+.drawing-frame svg{display:block;width:100%;height:auto}
+.callouts{display:flex;flex-direction:column;gap:12px}
+.callout{border:2px solid var(--blue);background:#fff;padding:14px 16px;position:relative}
+.callout .tag{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:2px;color:#fff;background:var(--blue);display:inline-block;padding:3px 9px;margin-bottom:8px}
+.callout p{font-size:14px;line-height:1.6}
+.callout .num{font-family:'IBM Plex Mono',monospace;color:var(--red);font-weight:600}
+.cta-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
+/* spec tables */
+.spec-table{width:100%;border-collapse:collapse;margin:18px 0 8px;font-size:14px;background:#fff}
+.spec-table th{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:2px;text-align:left;padding:12px 14px;background:var(--blue);color:#fff;border:1px solid var(--blue)}
+.spec-table td{padding:14px;border:1px solid var(--grid-bold);vertical-align:top;line-height:1.55}
+.spec-table tr:nth-child(even) td{background:var(--paper-soft)}
+.spec-table .code{font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--blue);white-space:nowrap}
+.badge{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:1px;padding:3px 9px;border:1.5px solid var(--gray);color:var(--gray);margin-top:8px}
+.badge.blue{border-color:var(--blue);color:var(--blue)}
+.badge.green{border-color:var(--ok);color:var(--ok)}
+.badge.red{border-color:var(--red);color:var(--red)}
+/* review cards */
+.rev-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:18px 0}
+.rev-card{border:2px solid var(--blue);background:#fff;padding:20px}
+.rev-card .stars{color:var(--blue);font-size:15px;letter-spacing:3px;margin-bottom:10px}
+.rev-card blockquote{font-size:15px;line-height:1.65;font-style:italic;margin-bottom:12px}
+.rev-card .src{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--gray);letter-spacing:.5px}
+.rev-card .src a{color:var(--blue)}
+.agg{display:flex;gap:26px;flex-wrap:wrap;margin:18px 0}
+.agg-item{border:2px solid var(--blue);background:#fff;padding:16px 22px;text-align:center;min-width:170px}
+.agg-item .big{font-size:40px;font-weight:900;color:var(--blue);line-height:1}
+.agg-item .lbl{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--gray);margin-top:8px}
+/* contact */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:6px}
+.info-block{border:2px solid var(--blue);background:#fff;padding:22px}
+.info-block h3{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:2.5px;color:var(--blue);text-transform:uppercase;margin-bottom:12px}
+.info-block p, .info-block li{font-size:15px;line-height:1.7}
+.info-block ul{list-style:none}
+.hours-row{display:flex;justify-content:space-between;border-bottom:1px dashed var(--grid-bold);padding:8px 0;font-size:14px}
+.hours-row:last-child{border-bottom:0}
+form label{display:block;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:1.5px;color:var(--blue-ink);margin:14px 0 6px;text-transform:uppercase}
+form input, form textarea, form select{width:100%;border:2px solid var(--blue);background:#fff;padding:12px;font-family:'Archivo',sans-serif;font-size:15px;color:var(--blue-ink)}
+form input:focus, form textarea:focus{outline:2px solid var(--red);outline-offset:-2px}
+.form-confirm{display:none;margin-top:16px;border:2px solid var(--ok);background:#f0f9f2;padding:14px 16px;font-size:14px;line-height:1.6}
+.form-confirm.show{display:block}
+/* photo placeholder */
+.photo-ph{border:2px dashed var(--blue);background:var(--paper-soft);min-height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--blue);text-align:center;padding:24px}
+.photo-ph i{font-size:38px}
+.photo-ph .mono{font-size:12px;letter-spacing:2px;color:var(--gray)}
+/* about layout */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:6px;align-items:start}
+.fact-list{list-style:none;margin-top:14px}
+.fact-list li{display:flex;gap:12px;padding:12px 0;border-bottom:1px dashed var(--grid-bold);font-size:15px;line-height:1.6}
+.fact-list li:last-child{border-bottom:0}
+.fact-list .mono{color:var(--blue);font-weight:600;min-width:120px;flex:0 0 auto;font-size:12.5px;letter-spacing:1px}
+/* sheet tabs (CAD-style nav at bottom) */
+.sheet-tabs{display:flex;border-top:3px solid var(--blue);background:#fff;overflow-x:auto}
+.sheet-tab{flex:1 0 auto;min-width:130px;text-align:center;padding:14px 10px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;letter-spacing:1.5px;color:var(--gray);text-decoration:none;border-right:2px solid var(--blue);background:repeating-linear-gradient(135deg,#fff,#fff 10px,var(--paper-soft) 10px,var(--paper-soft) 20px);cursor:pointer;white-space:nowrap}
+.sheet-tab .sno{display:block;font-size:10px;letter-spacing:2.5px;color:var(--blue);margin-bottom:3px}
+.sheet-tab.active{background:var(--blue);color:#fff}
+.sheet-tab.active .sno{color:#fff}
+.sheet-tab:hover:not(.active){color:var(--blue)}
+.colophon{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;max-width:1180px;margin:14px auto 8px;padding:0 4px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:1px;color:var(--gray)}
+footer{background:var(--blue-deep);color:#fff;text-align:center;padding:18px;font-size:15px;font-weight:600;letter-spacing:.5px;margin-top:22px}
+.dim-note{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--gray);letter-spacing:1px;margin-top:10px;line-height:1.7}
+@media(max-width:900px){
+  .hero-grid,.contact-grid,.about-grid,.rev-grid{grid-template-columns:1fr}
+  .tb-cell{display:none}
+  .tb-call .btn.ghost{display:none}
+}
+@media(max-width:640px){
+  .page{padding:22px 16px 34px}
+  .tb-brand{padding:10px 12px}
+  .tb-name{font-size:16px}
+  .tb-sub{font-size:9px}
+  .tb-toggle{display:block}
+  .tb-call{padding:8px 0;border-left:0}
+  .tb-call .btn{padding:8px 12px;font-size:12px}
+  .sheet-tab{min-width:104px;font-size:11px;padding:12px 6px}
+}
+</style>
+</head>
+<body>
+
+<header class="titleblock">
+  <div class="tb-inner">
+    <div class="tb-brand">
+      <div class="tb-logo" aria-hidden="true">CW</div>
+      <div>
+        <div class="tb-name">Cw Collision Center</div>
+        <div class="tb-sub">AUTO BODY SHOP - LOCKLAND, OH</div>
+      </div>
+    </div>
+    <div class="tb-meta">
+      <div class="tb-cell"><span>DWG NO.</span><b>CW-45215-A</b></div>
+      <div class="tb-cell"><span>SHEET SET</span><b>5 PAGES</b></div>
+      <div class="tb-cell"><span>SCALE</span><b>AS NOTED</b></div>
+    </div>
+    <div class="tb-call">
+      <a class="btn ghost" href="tel:+15132578092"><i class="fa-solid fa-phone"></i> (513) 257-8092</a>
+      <button class="btn red" type="button" onclick="navigateTo('contact')">GET AN ESTIMATE</button>
+    </div>
+    <button class="tb-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
+  </div>
+  <nav class="mobile-panel" id="mobilePanel" aria-label="Mobile">
+    <a href="#home" data-nav="home">A-101 HOME</a>
+    <a href="#services" data-nav="services">A-102 SERVICES</a>
+    <a href="#about" data-nav="about">A-103 ABOUT</a>
+    <a href="#reviews" data-nav="reviews">A-104 REVIEWS</a>
+    <a href="#contact" data-nav="contact">A-105 CONTACT</a>
+  </nav>
+</header>
+
+<main class="sheet" id="sheet">
+  <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+  <div class="sheet-head">
+    <span class="sheet-no" id="sheetNo">SHEET A-101</span>
+    <span>CW COLLISION CENTER - 645 WAYNE AVE, LOCKLAND, OH 45215</span>
+    <span>REV 09/2026</span>
+  </div>
+
+  
+  <section class="page" id="page-home" data-page="home">
+    <div class="kicker">Sheet A-101 - General Notes</div>
+    <h1>Collision Repair,<br><span class="blue">Drawn to Spec.</span></h1>
+    <p class="lede">Cw Collision Center is an auto body shop in Lockland, Ohio. When your vehicle takes a hit, you need the repair measured, straightened, and refinished right. Call <a href="tel:+15132578092">(513) 257-8092</a> and talk to the shop directly.</p>
+
+    <div class="hero-grid">
+      <div>
+        <div class="drawing-frame" role="img" aria-label="Technical line drawing of a vehicle showing front impact vector and measurement callouts">
+          <svg viewBox="0 0 640 360" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+                <path d="M0,0 L8,3 L0,6 Z" fill="#c93a2e"/>
+              </marker>
+              <marker id="dim" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+                <path d="M0,4 L8,0 L8,8 Z" fill="#1b4fa0"/>
+              </marker>
+            </defs>
+            
+            <line x1="20" y1="300" x2="620" y2="300" stroke="#1b4fa0" stroke-width="2"/>
+            <line x1="20" y1="300" x2="20" y2="20" stroke="#1b4fa0" stroke-width="2"/>
+            <line x1="620" y1="300" x2="620" y2="20" stroke="#1b4fa0" stroke-width="2"/>
+            
+            <line x1="30" y1="210" x2="150" y2="210" stroke="#c93a2e" stroke-width="4" marker-end="url(#arr)"/>
+            <text x="34" y="192" font-family="IBM Plex Mono, monospace" font-size="13" fill="#c93a2e" letter-spacing="2">IMPACT VECTOR</text>
+            
+            <path d="M120 250 L128 210 L160 200 L210 172 L300 165 L380 172 L470 200 L540 212 L560 250 L548 262 L520 262 M160 262 L132 262"
+              fill="none" stroke="#1b4fa0" stroke-width="3"/>
+            <path d="M120 250 L560 250 L548 262 L132 262 Z" fill="rgba(27,79,160,.06)" stroke="#1b4fa0" stroke-width="3"/>
+            
+            <path d="M218 172 L288 168 L288 200 L176 200 Z M300 168 L372 172 L452 200 L300 200 Z"
+              fill="none" stroke="#1b4fa0" stroke-width="2"/>
+            
+            <circle cx="205" cy="262" r="38" fill="#fff" stroke="#1b4fa0" stroke-width="3"/>
+            <circle cx="205" cy="262" r="14" fill="none" stroke="#1b4fa0" stroke-width="2"/>
+            <circle cx="480" cy="262" r="38" fill="#fff" stroke="#1b4fa0" stroke-width="3"/>
+            <circle cx="480" cy="262" r="14" fill="none" stroke="#1b4fa0" stroke-width="2"/>
+            
+            <line x1="120" y1="330" x2="560" y2="330" stroke="#1b4fa0" stroke-width="1.5" marker-start="url(#dim)" marker-end="url(#dim)"/>
+            <line x1="120" y1="322" x2="120" y2="338" stroke="#1b4fa0" stroke-width="1.5"/>
+            <line x1="560" y1="322" x2="560" y2="338" stroke="#1b4fa0" stroke-width="1.5"/>
+            <text x="330" y="324" font-family="IBM Plex Mono, monospace" font-size="12" fill="#1b4fa0" text-anchor="middle" letter-spacing="1">FULL LENGTH</text>
+            
+            <line x1="300" y1="166" x2="300" y2="80" stroke="#1b4fa0" stroke-width="1.5" stroke-dasharray="6 4"/>
+            <circle cx="300" cy="80" r="4" fill="#1b4fa0"/>
+            <text x="312" y="84" font-family="IBM Plex Mono, monospace" font-size="12" fill="#1b4fa0" letter-spacing="1">1. ROOF PANEL - CHECK FOR RIPPLE</text>
+            <line x1="150" y1="215" x2="90" y2="120" stroke="#1b4fa0" stroke-width="1.5" stroke-dasharray="6 4"/>
+            <circle cx="90" cy="120" r="4" fill="#1b4fa0"/>
+            <text x="24" y="112" font-family="IBM Plex Mono, monospace" font-size="12" fill="#1b4fa0" letter-spacing="1">2. CRUMPLE ZONE</text>
+            <line x1="480" y1="300" x2="560" y2="120" stroke="#1b4fa0" stroke-width="1.5" stroke-dasharray="6 4"/>
+            <circle cx="560" cy="120" r="4" fill="#1b4fa0"/>
+            <text x="430" y="112" font-family="IBM Plex Mono, monospace" font-size="12" fill="#1b4fa0" letter-spacing="1">3. FRAME RAIL - MEASURE</text>
+            <text x="20" y="46" font-family="IBM Plex Mono, monospace" font-size="12" fill="#5b6b83" letter-spacing="2">FIG. 1 - POST-IMPACT SURVEY (ILLUSTRATION)</text>
+          </svg>
+        </div>
+        <p class="dim-note">FIG. 1 is a technical illustration, not a photo of this shop's work. Every estimate starts with a hands-on inspection at 645 Wayne Ave.</p>
+      </div>
+      <div class="callouts">
+        <div class="callout">
+          <span class="tag">NOTE 1</span>
+          <p>Auto body repairing and painting. Call <a class="num" href="tel:+15132578092">(513) 257-8092</a> to describe the damage and set up a look.</p>
+        </div>
+        <div class="callout">
+          <span class="tag">NOTE 2</span>
+          <p><span class="num">MON - FRI, 9:00 AM - 5:00 PM.</span> Closed Saturday and Sunday. Hours per public directory listings; call to confirm.</p>
+        </div>
+        <div class="callout">
+          <span class="tag">NOTE 3</span>
+          <p>Find the shop in the Anthony Wayne Industrial Park area of Lockland. <a href="https://www.google.com/maps/search/?api=1&amp;query=Cw%20Collision%20Center%2C%20645%20Wayne%20Ave%2C%20Lockland%2C%20OH%2045215">Get directions</a>.</p>
+        </div>
+        <div class="cta-row">
+          <a class="btn red" href="tel:+15132578092"><i class="fa-solid fa-phone"></i> CALL THE SHOP</a>
+          <button class="btn ghost" type="button" onclick="navigateTo('services')">VIEW SPEC SHEET</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="eyebrow-rule">SHOP SPEC SUMMARY</div>
+    <table class="spec-table">
+      <thead><tr><th>ITEM</th><th>SPECIFICATION</th></tr></thead>
+      <tbody>
+        <tr><td class="code">SHOP</td><td>Cw Collision Center <span class="badge blue">AUTO BODY SHOP</span></td></tr>
+        <tr><td class="code">ADDRESS</td><td>645 Wayne Ave, Lockland, OH 45215</td></tr>
+        <tr><td class="code">PHONE</td><td><a href="tel:+15132578092">(513) 257-8092</a></td></tr>
+        <tr><td class="code">HOURS</td><td>Mon - Fri 9:00 AM - 5:00 PM; Sat - Sun Closed <span class="badge">CALL TO CONFIRM</span></td></tr>
+        <tr><td class="code">TRADE</td><td>Automobile body repairing and painting <span class="badge blue">DIRECTORY LISTING</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  
+  <section class="page" id="page-services" data-page="services">
+    <div class="kicker">Sheet A-102 - Service Spec Table</div>
+    <h2>Service <span class="blue">Specifications</span></h2>
+    <p class="lede">The shop's trade is automobile body repairing and painting. The table below lists the core work an auto body shop of this type handles. Service availability can change, so call <a href="tel:+15132578092">(513) 257-8092</a> to confirm what they take on right now.</p>
+    <table class="spec-table">
+      <thead><tr><th>CODE</th><th>SERVICE</th><th>SPECIFICATION / NOTES</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="code">SVC-01</td>
+          <td><b>Collision Repair</b></td>
+          <td>Body repair after a crash or impact: panel repair or replacement, straightening, and refit. Every job starts with a hands-on inspection of the damage. <span class="badge">CALL TO CONFIRM</span></td>
+        </tr>
+        <tr>
+          <td class="code">SVC-02</td>
+          <td><b>Auto Painting</b></td>
+          <td>Refinishing and repaint work. Past customers mention getting cars painted here. Paint matching and finish quality vary by job, so ask for details when you call. <span class="badge">CALL TO CONFIRM</span></td>
+        </tr>
+        <tr>
+          <td class="code">SVC-03</td>
+          <td><b>Dent and Body Work</b></td>
+          <td>Minor dents, dings, and body panel corrections that do not need full collision repair. <span class="badge">CALL TO CONFIRM</span></td>
+        </tr>
+        <tr>
+          <td class="code">SVC-04</td>
+          <td><b>Estimates</b></td>
+          <td>Bring the vehicle by during shop hours or describe the damage by phone for a repair estimate. <span class="badge green">CALL (513) 257-8092</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="cta-row">
+      <a class="btn red" href="tel:+15132578092"><i class="fa-solid fa-phone"></i> CALL FOR AN ESTIMATE</a>
+      <button class="btn ghost" type="button" onclick="navigateTo('contact')">CONTACT THE SHOP</button>
+    </div>
+  </section>
+
+  
+  <section class="page" id="page-about" data-page="about">
+    <div class="kicker">Sheet A-103 - Shop Record</div>
+    <h2>About <span class="blue">the Shop</span></h2>
+    <div class="about-grid">
+      <div>
+        <p class="lede">Cw Collision Center is an auto body shop on Wayne Avenue in Lockland, Ohio, in the Anthony Wayne Industrial Park area. Public directory listings describe the trade as automobile body repairing and painting, and report the shop has been in business for 22 years.</p>
+        <ul class="fact-list">
+          <li><span class="mono">LOCATION</span><span>645 Wayne Ave, Lockland, OH 45215</span></li>
+          <li><span class="mono">TRADE</span><span>Automobile body repairing and painting</span></li>
+          <li><span class="mono">IN BUSINESS</span><span>22 years, per public directory listings <span class="badge">DIRECTORY DATA</span></span></li>
+          <li><span class="mono">PHONE</span><span><a href="tel:+15132578092">(513) 257-8092</a></span></li>
+          <li><span class="mono">HOURS</span><span>Mon - Fri 9:00 AM - 5:00 PM; Sat - Sun Closed <span class="badge">CALL TO CONFIRM</span></span></li>
+        </ul>
+        <p class="dim-note">This demo site is built from public directory and review listings. For verified details about the shop's history and current services, call the shop directly.</p>
+      </div>
+      <div>
+        <div class="photo-ph">
+          <i class="fa-solid fa-camera"></i>
+          <div class="mono">SHOP PHOTO - COMING SOON</div>
+          <p style="font-size:13px;color:var(--gray);max-width:280px;line-height:1.6">A real photo of the shop at 645 Wayne Ave would go here.</p>
+        </div>
+        <div class="drawing-frame" style="margin-top:18px">
+          <svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="10" y="10" width="380" height="180" fill="none" stroke="#1b4fa0" stroke-width="2" stroke-dasharray="10 6"/>
+            <rect x="60" y="60" width="280" height="100" fill="rgba(27,79,160,.05)" stroke="#1b4fa0" stroke-width="2"/>
+            <line x1="60" y1="95" x2="340" y2="95" stroke="#1b4fa0" stroke-width="1.5"/>
+            <text x="200" y="140" font-family="IBM Plex Mono, monospace" font-size="13" fill="#1b4fa0" text-anchor="middle" letter-spacing="3">SHOP FLOOR PLAN - N.T.S.</text>
+            <circle cx="60" cy="60" r="5" fill="#c93a2e"/>
+            <circle cx="340" cy="60" r="5" fill="#c93a2e"/>
+            <circle cx="60" cy="160" r="5" fill="#c93a2e"/>
+            <circle cx="340" cy="160" r="5" fill="#c93a2e"/>
+          </svg>
+        </div>
+        <p class="dim-note">FIG. 2 is a placeholder illustration, not the actual shop layout.</p>
+      </div>
+    </div>
+  </section>
+
+  
+  <section class="page" id="page-reviews" data-page="reviews">
+    <div class="kicker">Sheet A-104 - Field Reports</div>
+    <h2>Customer <span class="blue">Reviews</span></h2>
+    <p class="lede">Ratings below come from public review listings for Cw Collision Center. They are shown as published; the shop does not control these third-party pages.</p>
+    <div class="agg">
+      <div class="agg-item">
+        <div class="big">5.0</div>
+        <div class="lbl">SUPERPAGES LISTING</div>
+      </div>
+      <div class="agg-item">
+        <div class="big">2.8</div>
+        <div class="lbl">LOC8NEARME - 12 REVIEWS</div>
+      </div>
+    </div>
+    <div class="rev-grid">
+      <div class="rev-card">
+        <div class="stars" aria-label="positive review"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+        <blockquote>"Great place to get your car painted and worked on..."</blockquote>
+        <div class="src">Short excerpt from a public review on <a href="https://www.loc8nearme.com/ohio/lockland/cw-collision-center/5370867/">Loc8NearMe</a>, April 2024. Reviewer name withheld.</div>
+      </div>
+      <div class="rev-card">
+        <div class="stars" aria-label="positive review"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+        <blockquote>"...professional and did a great job and was reasonably priced."</blockquote>
+        <div class="src">Short excerpt from a public review on <a href="https://www.loc8nearme.com/ohio/lockland/cw-collision-center/5370867/">Loc8NearMe</a>, May 2024. Reviewer name withheld.</div>
+      </div>
+    </div>
+    <p class="dim-note">Review excerpts are short fair-use quotes from third-party listings. No reviewer names are invented or published here. The 2.8 aggregate on Loc8NearMe reflects a mix of positive and critical reviews; read the full set on the source pages.</p>
+    <div class="cta-row">
+      <a class="btn" href="https://www.superpages.com/cincinnati-oh/bpp/cw-collision-center-14191452"><i class="fa-solid fa-arrow-up-right-from-square"></i> SUPERPAGES LISTING</a>
+      <a class="btn ghost" href="https://www.loc8nearme.com/ohio/lockland/cw-collision-center/5370867/"><i class="fa-solid fa-arrow-up-right-from-square"></i> LOC8NEARME REVIEWS</a>
+    </div>
+  </section>
+
+  
+  <section class="page" id="page-contact" data-page="contact">
+    <div class="kicker">Sheet A-105 - Contact Schedule</div>
+    <h2>Contact <span class="blue">the Shop</span></h2>
+    <div class="contact-grid">
+      <div>
+        <div class="info-block" style="margin-bottom:18px">
+          <h3>Shop Address</h3>
+          <p>Cw Collision Center<br>645 Wayne Ave<br>Lockland, OH 45215</p>
+          <div class="cta-row">
+            <a class="btn" href="https://www.google.com/maps/search/?api=1&amp;query=Cw%20Collision%20Center%2C%20645%20Wayne%20Ave%2C%20Lockland%2C%20OH%2045215"><i class="fa-solid fa-location-dot"></i> GET DIRECTIONS</a>
+          </div>
+        </div>
+        <div class="info-block" style="margin-bottom:18px">
+          <h3>Phone</h3>
+          <p><a href="tel:+15132578092" style="font-size:20px;font-weight:800;color:var(--blue);text-decoration:none">(513) 257-8092</a></p>
+        </div>
+        <div class="info-block">
+          <h3>Hours of Operation</h3>
+          <div class="hours-row"><span>Monday</span><span class="mono">9:00 AM - 5:00 PM</span></div>
+          <div class="hours-row"><span>Tuesday</span><span class="mono">9:00 AM - 5:00 PM</span></div>
+          <div class="hours-row"><span>Wednesday</span><span class="mono">9:00 AM - 5:00 PM</span></div>
+          <div class="hours-row"><span>Thursday</span><span class="mono">9:00 AM - 5:00 PM</span></div>
+          <div class="hours-row"><span>Friday</span><span class="mono">9:00 AM - 5:00 PM</span></div>
+          <div class="hours-row"><span>Saturday</span><span class="mono">CLOSED</span></div>
+          <div class="hours-row"><span>Sunday</span><span class="mono">CLOSED</span></div>
+          <span class="badge">HOURS FROM PUBLIC LISTINGS - CALL TO CONFIRM</span>
+        </div>
+      </div>
+      <div>
+        <div class="info-block">
+          <h3>Request an Estimate</h3>
+          <p style="font-size:14px;margin-bottom:6px">Fill this out and your email app will open a ready-to-send message draft to the shop.</p>
+          <form id="estimateForm" novalidate>
+            <label for="fName">Your name</label>
+            <input id="fName" name="name" type="text" autocomplete="name" required>
+            <label for="fPhone">Phone</label>
+            <input id="fPhone" name="phone" type="tel" autocomplete="tel" required>
+            <label for="fVehicle">Vehicle (year, make, model)</label>
+            <input id="fVehicle" name="vehicle" type="text" placeholder="e.g. 2019 Honda Accord">
+            <label for="fDamage">Describe the damage</label>
+            <textarea id="fDamage" name="damage" rows="5" required></textarea>
+            <div class="cta-row">
+              <button class="btn red" type="submit"><i class="fa-solid fa-paper-plane"></i> OPEN EMAIL DRAFT</button>
+            </div>
+          </form>
+          <div class="form-confirm" id="formConfirm" role="status">
+            <b>Draft ready.</b> Your email app should have opened with the estimate request filled in. Prefer to talk? Call <a href="tel:+15132578092">(513) 257-8092</a> during shop hours.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+  <nav class="sheet-tabs" aria-label="Site pages">
+    <a class="sheet-tab" href="#home" data-nav="home"><span class="sno">A-101</span>HOME</a>
+    <a class="sheet-tab" href="#services" data-nav="services"><span class="sno">A-102</span>SERVICES</a>
+    <a class="sheet-tab" href="#about" data-nav="about"><span class="sno">A-103</span>ABOUT</a>
+    <a class="sheet-tab" href="#reviews" data-nav="reviews"><span class="sno">A-104</span>REVIEWS</a>
+    <a class="sheet-tab" href="#contact" data-nav="contact"><span class="sno">A-105</span>CONTACT</a>
+  </nav>
+</main>
+
+<div class="colophon">
+  <span>PLOT: CW-45215-A</span>
+  <span>CHECKED: DEMO SITE - PUBLIC DATA ONLY</span>
+  <span>DO NOT SCALE DRAWING</span>
+</div>
+
+<footer>© Cw Collision Center</footer>
+
+<script>
+var PAGES = ['home','services','about','reviews','contact'];
+var SHEETNOS = {home:'A-101',services:'A-102',about:'A-103',reviews:'A-104',contact:'A-105'};
+function navigateTo(page){
+  if(PAGES.indexOf(page) === -1) page = 'home';
+  var sections = document.querySelectorAll('.page');
+  for(var i=0;i<sections.length;i++){
+    sections[i].classList.toggle('active', sections[i].getAttribute('data-page') === page);
+  }
+  var tabs = document.querySelectorAll('[data-nav]');
+  for(var j=0;j<tabs.length;j++){
+    tabs[j].classList.toggle('active', tabs[j].getAttribute('data-nav') === page);
+  }
+  document.getElementById('sheetNo').textContent = 'SHEET ' + SHEETNOS[page];
+  if(location.hash !== '#'+page){
+    history.pushState({page:page}, '', '#'+page);
+  }
+  document.getElementById('sheet').scrollIntoView({behavior:'smooth', block:'start'});
+  var panel = document.getElementById('mobilePanel');
+  if(panel.classList.contains('open')){
+    panel.classList.remove('open');
+    document.getElementById('menuToggle').setAttribute('aria-expanded','false');
+  }
+}
+window.addEventListener('popstate', function(e){
+  var page = (e.state && e.state.page) ? e.state.page : location.hash.replace('#','');
+  navigateTo(page);
+});
+document.getElementById('menuToggle').addEventListener('click', function(){
+  var panel = document.getElementById('mobilePanel');
+  var open = panel.classList.toggle('open');
+  this.setAttribute('aria-expanded', open ? 'true' : 'false');
+});
+var tabLinks = document.querySelectorAll('a[data-nav]');
+for(var k=0;k<tabLinks.length;k++){
+  tabLinks[k].addEventListener('click', function(ev){
+    ev.preventDefault();
+    navigateTo(this.getAttribute('data-nav'));
+  });
+}
+document.getElementById('estimateForm').addEventListener('submit', function(ev){
+  ev.preventDefault();
+  var name = document.getElementById('fName').value.trim();
+  var phone = document.getElementById('fPhone').value.trim();
+  var vehicle = document.getElementById('fVehicle').value.trim();
+  var damage = document.getElementById('fDamage').value.trim();
+  if(!name || !phone || !damage){
+    document.getElementById('formConfirm').classList.remove('show');
+    alert('Please fill in your name, phone, and a description of the damage.');
+    return;
+  }
+  var subject = 'Estimate request - ' + name;
+  var body = 'Name: ' + name + '\nPhone: ' + phone + '\nVehicle: ' + vehicle + '\n\nDamage description:\n' + damage;
+  window.location.href = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+  document.getElementById('formConfirm').classList.add('show');
+});
+(function init(){
+  var start = location.hash.replace('#','');
+  navigateTo(PAGES.indexOf(start) === -1 ? 'home' : start);
+})();
+</script>
+</body>
+</html>

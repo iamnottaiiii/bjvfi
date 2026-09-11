@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Axis Construction Inc.</title>
+<meta name="description" content="Axis Construction Inc. is a construction company in Burbank, CA. Call (747) 334-3242 for a free consultation.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1b1f24;
+  --ink-soft:#4a5057;
+  --paper:#faf7f1;
+  --card:#ffffff;
+  --line:#e4dccb;
+  --brand:#c8871a;
+  --brand-deep:#8a5c0e;
+  --dark:#14181d;
+  --dark-2:#1e242c;
+  --ok:#1e7b3c;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:auto}
+body{font-family:"Archivo",system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.6;padding-top:64px}
+h1,h2,h3,.display{font-family:"Oswald",sans-serif;letter-spacing:.02em;line-height:1.15}
+a{color:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+.page{display:none}
+.page.active{display:block;animation:fadeIn .45s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* ---------- top bar + side drawer ---------- */
+.topbar{position:fixed;top:0;left:0;right:0;height:64px;background:var(--dark);color:#f5f2ea;z-index:60;display:flex;align-items:center;gap:14px;padding:0 16px}
+.burger{background:none;border:1px solid #3a4149;color:#f5f2ea;width:44px;height:44px;border-radius:8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+.burger span{display:block;width:20px;height:2px;background:#f5f2ea;transition:transform .3s,opacity .3s}
+.topbar .brand{font-family:"Oswald",sans-serif;font-size:1.15rem;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar .brand small{color:var(--brand);font-weight:600}
+.topbar .call{margin-left:auto;background:var(--brand);color:#141414;font-weight:700;text-decoration:none;padding:10px 18px;border-radius:999px;font-size:.9rem;white-space:nowrap}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:300px;max-width:84vw;background:var(--dark-2);color:#f5f2ea;z-index:70;transform:translateX(-105%);transition:transform .35s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;padding:84px 0 24px}
+.drawer.open{transform:none}
+.drawer nav.main{display:flex;flex-direction:column}
+.drawer nav.main a{display:block;padding:15px 28px;text-decoration:none;font-family:"Oswald",sans-serif;text-transform:uppercase;letter-spacing:.08em;font-size:1.02rem;border-left:4px solid transparent}
+.drawer nav.main a:hover{background:#2a313a}
+.drawer nav.main a.active{background:#2a313a;border-left-color:var(--brand);color:var(--brand)}
+.drawer .dfoot{margin-top:auto;padding:18px 28px;font-size:.85rem;color:#aeb4bc;border-top:1px solid #333b44}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:65;opacity:0;pointer-events:none;transition:opacity .3s}
+.scrim.on{opacity:1;pointer-events:auto}
+
+/* ---------- split hero ---------- */
+.hero-split{background:linear-gradient(120deg,var(--dark) 55%,#232a33 55%);color:#f5f2ea;padding:64px 0 72px}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:44px;align-items:center}
+.kicker{display:inline-block;background:var(--brand);color:#141414;font-weight:800;font-size:.75rem;letter-spacing:.18em;text-transform:uppercase;padding:7px 14px;border-radius:4px;margin-bottom:20px}
+.hero-split h1{font-size:clamp(2.4rem,5vw,4rem);text-transform:uppercase;margin-bottom:18px}
+.hero-split h1 em{font-style:normal;color:var(--brand)}
+.hero-split p.lede{color:#c9cfd6;font-size:1.08rem;max-width:46ch;margin-bottom:28px}
+.btnrow{display:flex;gap:14px;flex-wrap:wrap}
+.btn{display:inline-block;text-decoration:none;font-weight:700;padding:14px 28px;border-radius:999px;font-size:1rem;cursor:pointer;border:2px solid transparent}
+.btn-solid{background:var(--brand);color:#141414}
+.btn-ghost{border-color:#6b7280;color:#f5f2ea}
+.hero-art{background:#0e1216;border:1px solid #2c343d;border-radius:14px;min-height:380px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.hero-art svg{width:88%;height:auto;opacity:.95}
+.hero-art .tag{position:absolute;bottom:14px;left:14px;right:14px;background:rgba(20,24,29,.8);border:1px dashed #565e68;color:#c9cfd6;font-size:.78rem;padding:10px 14px;border-radius:8px}
+.badgebadge{display:inline-block;background:#565e68;color:#fff;font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:4px 10px;border-radius:4px;margin-right:8px}
+
+/* ---------- sections ---------- */
+.section{padding:70px 0}
+.sec-head{max-width:720px;margin-bottom:40px}
+.sec-head h2{font-size:clamp(1.8rem,3.4vw,2.6rem);text-transform:uppercase;margin-bottom:12px}
+.sec-head h2 .accent{color:var(--brand-deep)}
+.sec-head p{color:var(--ink-soft)}
+.alt{background:#f1ebdd}
+
+/* card wall rhythm */
+.cardwall{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:22px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px;box-shadow:0 2px 10px rgba(30,25,10,.05)}
+.card .n{font-family:"Oswald",sans-serif;font-size:.85rem;color:var(--brand-deep);letter-spacing:.14em;margin-bottom:8px}
+.card h3{font-size:1.25rem;margin-bottom:10px;text-transform:uppercase}
+.card p{color:var(--ink-soft);font-size:.96rem}
+.card .ico{font-size:1.9rem;margin-bottom:12px}
+
+/* offerings as leaders */
+.leaders{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 34px;box-shadow:0 2px 10px rgba(30,25,10,.05)}
+.leader-row{display:flex;align-items:baseline;gap:12px;padding:20px 0;border-bottom:1px dashed var(--line)}
+.leader-row:last-child{border-bottom:none}
+.leader-row h3{font-size:1.12rem;text-transform:uppercase;white-space:nowrap}
+.leader-row .dots{flex:1;border-bottom:2px dotted #b9ad8f;transform:translateY(-4px);min-width:30px}
+.leader-row .blurb{max-width:44ch;color:var(--ink-soft);font-size:.92rem;text-align:right}
+.note{font-size:.82rem;color:var(--ink-soft);margin-top:18px;font-style:italic}
+
+/* masonry gallery */
+.masonry{columns:3 260px;column-gap:20px}
+.tile{break-inside:avoid;margin-bottom:20px;background:var(--dark-2);border-radius:12px;min-height:200px;display:flex;flex-direction:column;justify-content:flex-end;color:#e9e4d8;position:relative;overflow:hidden}
+.tile svg{width:100%;height:auto;display:block}
+.tile .cap{padding:14px 16px;font-size:.85rem;background:linear-gradient(transparent,rgba(10,12,15,.85))}
+.tile.tall{min-height:280px}
+.badge{display:inline-block;background:var(--brand);color:#141414;font-size:.68rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:5px 11px;border-radius:4px;margin-bottom:10px}
+
+/* reviews */
+.rev-banner{background:var(--dark);color:#f5f2ea;border-radius:14px;padding:38px;display:flex;flex-wrap:wrap;gap:20px;align-items:center;justify-content:space-between;margin-bottom:28px}
+.rev-banner h3{font-size:1.5rem;margin-bottom:6px}
+.rev-banner p{color:#c9cfd6;max-width:56ch}
+.revcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:30px;max-width:640px}
+.stars{color:var(--brand-deep);font-size:1.2rem;letter-spacing:.15em;margin-bottom:10px}
+
+/* visit */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.visit-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:34px}
+.visit-card h3{font-size:1.3rem;text-transform:uppercase;margin-bottom:16px;color:var(--brand-deep)}
+.visit-card .big{font-size:1.5rem;font-weight:800;text-decoration:none;display:block;margin:8px 0}
+.hoursline{display:flex;justify-content:space-between;border-bottom:1px dashed var(--line);padding:10px 0;font-size:.95rem}
+
+/* footer multi-column */
+footer{background:var(--dark);color:#c9cfd6;margin-top:0}
+.foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:30px;padding:56px 0 36px}
+.foot-grid h4{font-family:"Oswald",sans-serif;color:#fff;text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;font-size:1rem}
+.foot-grid a{display:block;text-decoration:none;padding:6px 0;font-size:.93rem}
+.foot-grid a:hover{color:var(--brand)}
+.foot-grid p{font-size:.93rem}
+.foot-brand{font-family:"Oswald",sans-serif;color:#fff;font-size:1.35rem;text-transform:uppercase;margin-bottom:10px}
+.copyright{border-top:1px solid #2c343d;padding:18px 0;text-align:center;color:#8d949c;font-size:.9rem}
+
+@media(max-width:900px){
+  .hero-grid{grid-template-columns:1fr}
+  .visit-grid{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr 1fr}
+  .leader-row .blurb{text-align:left}
+}
+@media(max-width:560px){
+  .foot-grid{grid-template-columns:1fr}
+  .leader-row{flex-wrap:wrap}
+  .leader-row .dots{display:none}
+  .topbar .call{padding:9px 13px;font-size:.8rem}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <button class="burger" id="burger" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mainNav"><span></span><span></span><span></span></button>
+  <div class="brand">Axis Construction <small>Inc</small></div>
+  <a class="call" href="tel:+17473343242">(747) 334-3242</a>
+</header>
+
+<aside class="drawer" id="drawer">
+  <nav class="main" id="mainNav" aria-label="Main navigation">
+    <a href="#home" data-page="home" class="active" aria-current="page">Home</a>
+    <a href="#services" data-page="services">Services</a>
+    <a href="#story" data-page="story">About</a>
+    <a href="#gallery" data-page="gallery">Gallery</a>
+    <a href="#reviews" data-page="reviews">Reviews</a>
+    <a href="#visit" data-page="visit">Contact</a>
+  </nav>
+  <div class="dfoot">
+    Axis Construction Inc.<br>
+    444 Irving Dr, Burbank, CA 91504<br>
+    <a href="tel:+17473343242" style="color:var(--brand)">(747) 334-3242</a>
+  </div>
+</aside>
+<div class="scrim" id="scrim"></div>
+
+<main>
+<section class="page" id="page-home">
+  <div class="hero-split">
+    <div class="wrap hero-grid">
+      <div class="reveal in">
+        <span class="kicker">Burbank, CA Construction Company</span>
+        <h1>Built Right, <em>From the Ground Up</em></h1>
+        <p class="lede">Axis Construction Inc. is a Burbank-based construction company serving homes and businesses across the San Fernando Valley. Call today and talk through your project with a local builder.</p>
+        <div class="btnrow">
+          <a class="btn btn-solid" href="tel:+17473343242">Call (747) 334-3242</a>
+          <a class="btn btn-ghost" href="#services" data-page="services">View Services</a>
+        </div>
+      </div>
+      <div class="hero-art reveal in" aria-label="Construction site illustration">
+        <svg viewBox="0 0 400 300" role="img" aria-label="Tower crane and building silhouette">
+          <rect x="0" y="0" width="400" height="300" fill="#10141a"/>
+          <g stroke="#3a4450" stroke-width="1">
+            <line x1="0" y1="60" x2="400" y2="60"/><line x1="0" y1="120" x2="400" y2="120"/><line x1="0" y1="180" x2="400" y2="180"/>
+            <line x1="80" y1="0" x2="80" y2="300"/><line x1="160" y1="0" x2="160" y2="300"/><line x1="240" y1="0" x2="240" y2="300"/><line x1="320" y1="0" x2="320" y2="300"/>
+          </g>
+          <g fill="#c8871a">
+            <rect x="120" y="200" width="160" height="100"/>
+            <rect x="140" y="220" width="30" height="30" fill="#10141a"/><rect x="180" y="220" width="30" height="30" fill="#10141a"/><rect x="220" y="220" width="30" height="30" fill="#10141a"/>
+          </g>
+          <g stroke="#c8871a" stroke-width="6" fill="none">
+            <line x1="300" y1="280" x2="300" y2="40"/>
+            <line x1="200" y1="40" x2="380" y2="40"/>
+            <line x1="300" y1="40" x2="300" y2="90"/>
+          </g>
+          <rect x="290" y="90" width="20" height="24" fill="#8a5c0e"/>
+          <line x1="300" y1="114" x2="300" y2="160" stroke="#8a5c0e" stroke-width="3"/>
+          <rect x="285" y="160" width="30" height="20" fill="#8a5c0e"/>
+          <g stroke="#c8871a" stroke-width="3" fill="none" opacity=".6">
+            <line x1="200" y1="40" x2="300" y2="90"/><line x1="380" y1="40" x2="300" y2="90"/>
+          </g>
+        </svg>
+        <div class="tag"><span class="badgebadge">Placeholder</span>Project photo coming soon. Swap this panel with a real job-site photo.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <h2>What We <span class="accent">Build</span></h2>
+        <p>One local crew for the whole project, from first sketch to final walkthrough.</p>
+      </div>
+      <div class="cardwall">
+        <div class="card reveal"><div class="ico">🏗</div><div class="n">01</div><h3>New Construction</h3><p>Ground-up residential and commercial builds managed end to end by one accountable team.</p></div>
+        <div class="card reveal"><div class="ico">🧱</div><div class="n">02</div><h3>Remodeling</h3><p>Kitchens, bathrooms, and whole-home remodels planned around how you actually live and work.</p></div>
+        <div class="card reveal"><div class="ico">➕</div><div class="n">03</div><h3>Room Additions</h3><p>Extra bedrooms, offices, and living space that match the existing structure and style.</p></div>
+        <div class="card reveal"><div class="ico">🏢</div><div class="n">04</div><h3>Tenant Improvements</h3><p>Commercial interiors and build-outs that get your space open for business on schedule.</p></div>
+      </div>
+      <p class="note">Service details are typical for a general construction company. Call (747) 334-3242 to confirm exactly what Axis Construction Inc. offers for your project.</p>
+    </div>
+  </div>
+
+  <div class="section alt">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <h2>Why Call <span class="accent">Axis</span></h2>
+      </div>
+      <div class="cardwall">
+        <div class="card reveal"><div class="n">LOCAL</div><h3>Based in Burbank</h3><p>Right off Irving Drive, minutes from your job site anywhere in the Valley.</p></div>
+        <div class="card reveal"><div class="n">DIRECT</div><h3>One Point of Contact</h3><p>Talk to the builder, not a call center. Estimates and updates come straight from the crew.</p></div>
+        <div class="card reveal"><div class="n">CLEAR</div><h3>Upfront Estimates</h3><p>Written scope and pricing before work starts, so there are no surprises mid-project.</p></div>
+      </div>
+      <div class="btnrow reveal" style="margin-top:30px">
+        <a class="btn btn-solid" href="#visit" data-page="visit" style="background:var(--dark);color:#f5f2ea">Get in Touch</a>
+        <a class="btn btn-ghost" href="#reviews" data-page="reviews" style="color:var(--ink);border-color:var(--ink)">Read Reviews</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="section">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <h2>Our <span class="accent">Services</span></h2>
+        <p>Construction services for residential and commercial projects in Burbank and the greater San Fernando Valley.</p>
+      </div>
+      <div class="leaders reveal">
+        <div class="leader-row"><h3>General Contracting</h3><span class="dots"></span><span class="blurb">Full project management with licensed trades coordinated under one contract.</span></div>
+        <div class="leader-row"><h3>New Home Construction</h3><span class="dots"></span><span class="blurb">Ground-up builds from foundation to finish work.</span></div>
+        <div class="leader-row"><h3>Home Remodeling</h3><span class="dots"></span><span class="blurb">Kitchens, bathrooms, and full interior renovations.</span></div>
+        <div class="leader-row"><h3>Room Additions</h3><span class="dots"></span><span class="blurb">Second stories, extensions, and ADU-style living space.</span></div>
+        <div class="leader-row"><h3>Commercial Build-Outs</h3><span class="dots"></span><span class="blurb">Office and retail interiors, tenant improvements, and repairs.</span></div>
+        <div class="leader-row"><h3>Repairs and Restoration</h3><span class="dots"></span><span class="blurb">Structural fixes and damage repair to bring buildings back to code.</span></div>
+      </div>
+      <p class="note">These are typical construction company services. Availability and licensing details are best confirmed by phone: <a href="tel:+17473343242">(747) 334-3242</a>.</p>
+      <div class="btnrow reveal" style="margin-top:26px">
+        <a class="btn btn-solid" href="tel:+17473343242">Call for a Free Estimate</a>
+        <a class="btn btn-ghost" href="#visit" data-page="visit" style="color:var(--ink);border-color:var(--ink)">Visit Us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-story">
+  <div class="section">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <h2>About <span class="accent">Axis Construction Inc.</span></h2>
+        <p>A Burbank construction company built on showing up, doing the work right, and keeping the job site clean.</p>
+      </div>
+      <div class="cardwall">
+        <div class="card reveal"><div class="n">WHO WE ARE</div><h3>Local Builders</h3><p>Axis Construction Inc. operates out of 444 Irving Drive in Burbank, California, serving homeowners and businesses across the San Fernando Valley.</p></div>
+        <div class="card reveal"><div class="n">HOW WE WORK</div><h3>Straightforward Process</h3><p>Site visit, written estimate, clear schedule, and steady communication until the final walkthrough. No runaround.</p></div>
+        <div class="card reveal"><div class="n">WHAT MATTERS</div><h3>Craft Over Shortcuts</h3><p>Proper permits, solid materials, and finishes that hold up. The kind of work that earns the next referral.</p></div>
+      </div>
+      <p class="note">Company history details have not been publicly published. The facts above come from the business listing: name, Burbank address, and phone number.</p>
+      <div class="btnrow reveal" style="margin-top:26px">
+        <a class="btn btn-solid" href="tel:+17473343242">Talk to the Builder</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="section">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <h2>Project <span class="accent">Gallery</span></h2>
+        <p>A look at the kind of work Axis Construction Inc. does. Real project photos coming soon.</p>
+      </div>
+      <div class="masonry reveal">
+        <div class="tile tall">
+          <svg viewBox="0 0 300 200"><rect width="300" height="200" fill="#232b34"/><rect x="60" y="90" width="180" height="110" fill="#3a4450"/><rect x="80" y="110" width="40" height="40" fill="#14181d"/><rect x="140" y="110" width="40" height="40" fill="#14181d"/><polygon points="60,90 150,40 240,90" fill="#c8871a"/></svg>
+          <div class="cap"><span class="badge">Photo coming soon</span><br>New home construction</div>
+        </div>
+        <div class="tile">
+          <svg viewBox="0 0 300 160"><rect width="300" height="160" fill="#2a313a"/><rect x="40" y="60" width="220" height="100" fill="#3f4852"/><rect x="60" y="80" width="60" height="30" fill="#14181d"/><rect x="180" y="80" width="60" height="30" fill="#14181d"/></svg>
+          <div class="cap"><span class="badge">Photo coming soon</span><br>Kitchen remodel</div>
+        </div>
+        <div class="tile tall">
+          <svg viewBox="0 0 300 220"><rect width="300" height="220" fill="#232b34"/><g stroke="#c8871a" stroke-width="5" fill="none"><line x1="150" y1="220" x2="150" y2="40"/><line x1="80" y1="40" x2="230" y2="40"/></g><rect x="100" y="120" width="100" height="100" fill="#3a4450"/></svg>
+          <div class="cap"><span class="badge">Photo coming soon</span><br>Commercial build-out</div>
+        </div>
+        <div class="tile">
+          <svg viewBox="0 0 300 160"><rect width="300" height="160" fill="#2a313a"/><polygon points="40,160 150,50 260,160" fill="#3f4852"/><rect x="130" y="110" width="40" height="50" fill="#14181d"/></svg>
+          <div class="cap"><span class="badge">Photo coming soon</span><br>Room addition</div>
+        </div>
+        <div class="tile tall">
+          <svg viewBox="0 0 300 220"><rect width="300" height="220" fill="#232b34"/><rect x="50" y="60" width="200" height="160" fill="#3a4450"/><rect x="70" y="80" width="50" height="50" fill="#c8871a"/><rect x="140" y="80" width="90" height="20" fill="#14181d"/><rect x="140" y="110" width="90" height="20" fill="#14181d"/></svg>
+          <div class="cap"><span class="badge">Photo coming soon</span><br>Bathroom renovation</div>
+        </div>
+        <div class="tile">
+          <svg viewBox="0 0 300 160"><rect width="300" height="160" fill="#2a313a"/><rect x="30" y="40" width="240" height="120" fill="#3f4852"/><line x1="30" y1="100" x2="270" y2="100" stroke="#14181d" stroke-width="4"/><rect x="120" y="60" width="60" height="30" fill="#c8871a"/></svg>
+          <div class="cap"><span class="badge">Photo coming soon</span><br>Tenant improvement</div>
+        </div>
+      </div>
+      <p class="note">Gallery images are illustrated placeholders. The owner can swap in real project photos at any time.</p>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="section">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <h2>Customer <span class="accent">Reviews</span></h2>
+        <p>What people are saying about Axis Construction Inc.</p>
+      </div>
+      <div class="rev-banner reveal">
+        <div>
+          <h3>Find us on Google</h3>
+          <p>We could not locate published public reviews for Axis Construction Inc. at the time of writing. If you have worked with this team, your review on Google helps neighbors choose with confidence.</p>
+        </div>
+        <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJ6VYMXReVwoARX7mtPV5H3EU" target="_blank" rel="noopener">See reviews on Google</a>
+      </div>
+      <div class="revcard reveal">
+        <span class="badge">Sample</span>
+        <div class="stars">★★★★★</div>
+        <p><em>This is a sample review card showing the layout. Real customer reviews will appear here once published.</em></p>
+        <p style="margin-top:10px;color:var(--ink-soft);font-size:.9rem">Sample Customer · Sample City</p>
+      </div>
+      <p class="note">No reviewer names were invented. Review themes will be added here only from real, publicly posted reviews.</p>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="section">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <h2>Visit or <span class="accent">Call</span></h2>
+        <p>The fastest way to start your project is a phone call.</p>
+      </div>
+      <div class="visit-grid">
+        <div class="visit-card reveal">
+          <h3>Contact</h3>
+          <a class="big" href="tel:+17473343242">(747) 334-3242</a>
+          <p style="color:var(--ink-soft)">Axis Construction Inc.<br>444 Irving Dr<br>Burbank, CA 91504</p>
+          <div class="btnrow" style="margin-top:20px">
+            <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJ6VYMXReVwoARX7mtPV5H3EU" target="_blank" rel="noopener">Get Directions</a>
+          </div>
+        </div>
+        <div class="visit-card reveal">
+          <h3>Hours</h3>
+          <div class="hoursline"><span>Monday - Friday</span><span>Call for hours</span></div>
+          <div class="hoursline"><span>Saturday</span><span>Call for hours</span></div>
+          <div class="hoursline"><span>Sunday</span><span>Call for hours</span></div>
+          <p class="note">Hours are not published online. Call <a href="tel:+17473343242">(747) 334-3242</a> to confirm availability.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand">Axis Construction Inc.</div>
+        <p>A construction company based in Burbank, California, serving the San Fernando Valley.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <a href="#home" data-page="home">Home</a>
+        <a href="#services" data-page="services">Services</a>
+        <a href="#story" data-page="story">About</a>
+      </div>
+      <div>
+        <h4>More</h4>
+        <a href="#gallery" data-page="gallery">Gallery</a>
+        <a href="#reviews" data-page="reviews">Reviews</a>
+        <a href="#visit" data-page="visit">Contact</a>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <a href="tel:+17473343242">(747) 334-3242</a>
+        <a href="https://www.google.com/maps/place/?q=place_id:ChIJ6VYMXReVwoARX7mtPV5H3EU" target="_blank" rel="noopener">Get Directions</a>
+        <p style="margin-top:8px">444 Irving Dr<br>Burbank, CA 91504</p>
+      </div>
+    </div>
+  </div>
+  <div class="copyright">© Axis Construction Inc.</div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var PAGES = ["home", "services", "story", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+  var drawer = document.getElementById("drawer");
+  var scrim = document.getElementById("scrim");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(drawer){ drawer.classList.remove("open"); }
+    if(scrim){ scrim.classList.remove("on"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && drawer){
+    burger.addEventListener("click", function(){
+      var open = drawer.classList.toggle("open");
+      if(scrim){ scrim.classList.toggle("on", open); }
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+    scrim.addEventListener("click", closeMenu);
+  }
+
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

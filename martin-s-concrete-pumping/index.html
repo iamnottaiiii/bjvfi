@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Martin's Concrete Pumping | Concrete Pumping in Monrovia, CA</title>
+<meta name="description" content="Martin's Concrete Pumping serves Monrovia and the LA 5-county area with boom and line concrete pumping. Call (626) 967-3114 to schedule your pour.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#23231F;
+  --ink2:#2E2E29;
+  --paper:#F4F3EF;
+  --card:#FFFFFF;
+  --line:#D8D6CE;
+  --concrete:#B9B7AF;
+  --safety:#F2A900;
+  --safety-deep:#C78400;
+  --dark:#1E1E1B;
+  --ok:#2F7D4F;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:"Inter",system-ui,sans-serif;
+  background:var(--paper);color:var(--ink);
+  line-height:1.65;font-size:15.5px;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+.mono{font-family:"IBM Plex Mono",monospace}
+.disp{font-family:"Anton",sans-serif;font-weight:400}
+
+/* ---------- utility ribbon ---------- */
+.ribbon{
+  background:var(--dark);color:#EDECE7;
+  font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.14em;
+  text-transform:uppercase;
+}
+.ribbon-inner{max-width:1180px;margin:0 auto;padding:9px 24px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center}
+.ribbon .dot{color:var(--safety)}
+.ribbon a:hover{color:var(--safety)}
+
+/* ---------- sticky top bar ---------- */
+.topbar{position:sticky;top:0;z-index:100;background:rgba(244,243,239,.94);backdrop-filter:blur(8px);border-bottom:2px solid var(--ink)}
+.topbar-inner{max-width:1180px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.brand{display:flex;align-items:center;gap:13px}
+.brand-mark{width:42px;height:42px;background:var(--ink);border-radius:8px;display:flex;align-items:center;justify-content:center;flex:none}
+.brand-name{font-family:"Anton",sans-serif;font-size:19px;letter-spacing:.04em;line-height:1.1}
+.brand-name small{display:block;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.28em;color:#6d6c66;font-weight:400}
+nav.main{display:flex;gap:22px;align-items:center}
+nav.main a{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#55544e;padding:6px 2px;border-bottom:2px solid transparent}
+nav.main a:hover{color:var(--ink)}
+nav.main a.active{color:var(--ink);border-bottom-color:var(--safety)}
+.call-btn{
+  font-family:"IBM Plex Mono",monospace;font-size:12.5px;font-weight:600;letter-spacing:.06em;
+  background:var(--safety);color:#1E1E1B;border:2px solid var(--ink);
+  padding:10px 18px;border-radius:6px;box-shadow:3px 3px 0 var(--ink);white-space:nowrap;
+  transition:transform .15s ease,box-shadow .15s ease;
+}
+.call-btn:hover{transform:translate(1px,1px);box-shadow:2px 2px 0 var(--ink)}
+#burger{display:none;background:none;border:0;cursor:pointer;padding:8px}
+#burger span{display:block;width:24px;height:2.5px;background:var(--ink);margin:5px 0}
+
+/* ---------- pages ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .45s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+
+/* ---------- hero: pump scene ---------- */
+.hero{background:var(--dark);color:#F0EFEA;overflow:hidden;position:relative}
+.hero-inner{max-width:1180px;margin:0 auto;padding:64px 24px 0;display:grid;grid-template-columns:1fr 1.05fr;gap:40px;align-items:end}
+.hero-copy{padding-bottom:64px}
+.ticket-tag{
+  display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.24em;
+  color:var(--safety);border:1px dashed var(--safety);padding:8px 16px;border-radius:4px;margin-bottom:26px;
+}
+.hero-copy h1{font-size:clamp(44px,6.4vw,84px);line-height:1.02;letter-spacing:.01em;text-transform:uppercase}
+.hero-copy h1 .ylw{color:var(--safety)}
+.hero-copy p.lede{color:#B9B8B0;max-width:44ch;margin:24px 0 30px;font-size:16.5px}
+.hero-stats{display:flex;gap:0;border:1px solid #3a3a35;border-radius:8px;overflow:hidden;margin-top:34px;max-width:480px}
+.hstat{flex:1;padding:16px 18px;border-right:1px solid #3a3a35}
+.hstat:last-child{border-right:0}
+.hstat .n{font-family:"Anton",sans-serif;font-size:26px;color:var(--safety)}
+.hstat .l{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#8f8e88;margin-top:4px}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap}
+.btn{
+  display:inline-block;padding:14px 28px;font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;border-radius:6px;cursor:pointer;transition:all .2s ease;
+}
+.btn.solid{background:var(--safety);color:#1E1E1B;border:2px solid var(--safety)}
+.btn.solid:hover{background:#ffc533;border-color:#ffc533}
+.btn.line{background:transparent;color:#F0EFEA;border:2px solid #55554e}
+.btn.line:hover{border-color:var(--safety);color:var(--safety)}
+
+/* animated pump scene */
+.scene{position:relative;height:430px}
+.scene svg{width:100%;height:100%;display:block}
+@keyframes beacon{0%,100%{opacity:1}50%{opacity:.25}}
+.beacon{animation:beacon 1.1s infinite}
+@keyframes churn{0%{transform:translateY(0)}50%{transform:translateY(-4px)}100%{transform:translateY(0)}}
+.churn{animation:churn 2.4s ease-in-out infinite}
+.scene-note{
+  position:absolute;bottom:12px;right:6px;font-family:"IBM Plex Mono",monospace;font-size:10px;
+  letter-spacing:.2em;color:#8f8e88;text-transform:uppercase;
+}
+.stripe-band{height:14px;background:repeating-linear-gradient(-45deg,var(--safety) 0 22px,var(--dark) 22px 44px)}
+
+/* ---------- spec sheet bands ---------- */
+.specband{background:var(--card);border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);margin:0}
+.specband .wrap{padding-top:64px;padding-bottom:64px}
+.stitle .kicker{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--safety-deep);margin-bottom:16px}
+.stitle h2{font-family:"Anton",sans-serif;font-size:clamp(32px,4.6vw,56px);text-transform:uppercase;line-height:1.08;letter-spacing:.01em}
+.stitle p{color:#5b5a54;max-width:60ch;margin-top:16px}
+.specrows{margin-top:38px;border-top:2px solid var(--ink)}
+.specrow{display:grid;grid-template-columns:220px 1fr auto;gap:20px;align-items:center;padding:20px 0;border-bottom:1px solid var(--line)}
+.specrow .k{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#6d6c66}
+.specrow .v{font-weight:500}
+.specrow .tag{font-family:"IBM Plex Mono",monospace;font-size:11px;background:#EFEDE6;border:1px solid var(--line);padding:5px 12px;border-radius:100px;color:#5b5a54;white-space:nowrap}
+
+/* ---------- work order cards ---------- */
+.wo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin:44px 0 70px}
+.wo-card{
+  background:var(--card);border:2px solid var(--ink);border-radius:10px;overflow:hidden;
+  box-shadow:5px 5px 0 rgba(35,35,31,.14);transition:transform .2s ease,box-shadow .2s ease;
+}
+.wo-card:hover{transform:translateY(-4px);box-shadow:8px 8px 0 rgba(35,35,31,.16)}
+.wo-head{background:var(--ink);color:#F0EFEA;padding:12px 18px;display:flex;justify-content:space-between;align-items:center;font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase}
+.wo-head .st{color:var(--safety);border:1px solid var(--safety);padding:3px 10px;border-radius:100px;font-size:10px}
+.wo-body{padding:24px 22px 26px}
+.wo-body h3{font-family:"Anton",sans-serif;font-size:24px;text-transform:uppercase;letter-spacing:.02em;margin-bottom:10px}
+.wo-body p{font-size:14.5px;color:#5b5a54;margin-bottom:16px}
+.wo-check{list-style:none;margin-bottom:20px}
+.wo-check li{font-family:"IBM Plex Mono",monospace;font-size:12.5px;padding:6px 0 6px 26px;position:relative;color:#3c3b36}
+.wo-check li::before{content:"☐";position:absolute;left:0;color:var(--safety-deep);font-size:15px;line-height:1.5}
+.wo-link{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;border-bottom:2px solid var(--safety);padding-bottom:3px}
+.wo-link:hover{color:var(--safety-deep)}
+.illus-note{font-family:"IBM Plex Mono",monospace;font-size:12px;color:#6d6c66;border:1px dashed var(--concrete);border-radius:6px;padding:14px 18px;margin-bottom:70px}
+
+/* ---------- process band ---------- */
+.process{background:var(--dark);color:#F0EFEA}
+.process .wrap{padding-top:70px;padding-bottom:70px}
+.psteps{display:grid;grid-template-columns:repeat(5,1fr);gap:18px;margin-top:44px}
+.pstep{border:1px solid #3a3a35;border-radius:8px;padding:24px 20px}
+.pstep .pn{font-family:"Anton",sans-serif;font-size:34px;color:var(--safety)}
+.pstep h4{font-family:"IBM Plex Mono",monospace;font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;margin:12px 0 8px}
+.pstep p{font-size:13.5px;color:#B9B8B0}
+
+/* ---------- swatch mosaic gallery ---------- */
+.mosaic{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:44px 0 20px}
+.swatch{border-radius:8px;min-height:210px;position:relative;overflow:hidden;display:flex;align-items:flex-end;padding:16px;border:1px solid var(--line)}
+.swatch .ph{position:absolute;top:10px;left:10px;font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;background:rgba(30,30,27,.75);color:#fff;padding:5px 10px;border-radius:100px}
+.swatch .nm{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.55)}
+.s1{background:linear-gradient(150deg,#CFCFCB 0%,#A9A8A1 55%,#8A8982 100%)}
+.s2{background:linear-gradient(150deg,#9B9A94 0%,#76756F 60%,#55544E 100%)}
+.s3{background:radial-gradient(circle at 30% 40%,#D8D6D0 0 8%,transparent 9%),radial-gradient(circle at 70% 60%,#B4B3AC 0 12%,transparent 13%),linear-gradient(150deg,#C2C1BA 0%,#96958E 100%)}
+.s4{background:repeating-linear-gradient(0deg,#B5B4AD 0 10px,#A3A29B 10px 12px)}
+.s5{background:linear-gradient(135deg,#8F8E88 0%,#6E6D67 50%,#4C4B46 100%)}
+.s6{background:linear-gradient(160deg,#DCDAD4 0%,#BCBAB2 60%,#9A988F 100%)}
+.s7{background:radial-gradient(circle at 60% 30%,#E2E0D9 0 6%,transparent 7%),radial-gradient(circle at 25% 70%,#C9C7C0 0 10%,transparent 11%),linear-gradient(150deg,#D3D1CA 0%,#A8A69E 100%)}
+.s8{background:linear-gradient(150deg,#7C7B75 0%,#5B5A54 60%,#3F3E39 100%)}
+.swatch::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(115deg,transparent 0 34px,rgba(255,255,255,.06) 34px 36px);pointer-events:none}
+
+/* ---------- reviews ---------- */
+.review-hero{border:2px solid var(--ink);border-radius:10px;background:var(--card);padding:48px 40px;margin:44px 0;display:grid;grid-template-columns:auto 1fr auto;gap:34px;align-items:center;box-shadow:5px 5px 0 rgba(35,35,31,.14)}
+.bigscore{font-family:"Anton",sans-serif;font-size:84px;line-height:1;color:var(--ink)}
+.bigscore small{font-size:22px;color:#6d6c66}
+.rstars{color:var(--safety-deep);font-size:22px;letter-spacing:6px;margin:8px 0}
+.review-hero p{color:#5b5a54;font-size:15px;max-width:46ch}
+.src-links{display:flex;flex-direction:column;gap:10px}
+.src-links a{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.06em;border:2px solid var(--ink);padding:10px 18px;border-radius:6px;text-align:center;white-space:nowrap}
+.src-links a:hover{background:var(--ink);color:#fff}
+.sample-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin:0 0 70px}
+.sample-card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:28px}
+.sample-card .stars{color:var(--safety-deep);letter-spacing:4px;margin-bottom:12px}
+.sample-card p{font-size:14.5px;font-style:italic;color:#3c3b36}
+.sample-card .who{margin-top:14px;font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#8a897f}
+.badge-illus{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;border:1px dashed var(--safety-deep);color:var(--safety-deep);padding:7px 14px;border-radius:100px;margin:40px 0 20px}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:22px;margin:44px 0 70px}
+.visit-card{background:var(--card);border:2px solid var(--ink);border-radius:10px;padding:40px 36px;box-shadow:5px 5px 0 rgba(35,35,31,.14)}
+.visit-card h3{font-family:"Anton",sans-serif;font-size:28px;text-transform:uppercase;margin-bottom:22px}
+.vline{display:flex;gap:16px;padding:13px 0;border-top:1px solid var(--line);font-size:15px}
+.vline .lab{width:92px;flex:none;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:#8a897f;padding-top:4px}
+.vline a.u{border-bottom:2px solid var(--safety);font-weight:600}
+.area-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.area-pills span{font-family:"IBM Plex Mono",monospace;font-size:11.5px;background:#EFEDE6;border:1px solid var(--line);padding:6px 12px;border-radius:100px}
+
+/* ---------- footer with seal ---------- */
+footer.site{background:var(--dark);color:#B9B8B0}
+footer.site .wrap{padding-top:60px;padding-bottom:40px;text-align:center}
+.seal{
+  width:118px;height:118px;margin:0 auto 26px;border:2px solid var(--safety);border-radius:50%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  font-family:"IBM Plex Mono",monospace;color:var(--safety);transform:rotate(-8deg);
+}
+.seal .s1{font-size:9px;letter-spacing:.24em}
+.seal .s2{font-family:"Anton",sans-serif;font-size:19px;letter-spacing:.04em}
+.seal .s3{font-size:9px;letter-spacing:.24em}
+footer.site .flinks{display:flex;justify-content:center;gap:22px;flex-wrap:wrap;margin:24px 0}
+footer.site .flinks a{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:#8f8e88}
+footer.site .flinks a:hover{color:var(--safety)}
+footer.site .fcontact{font-family:"IBM Plex Mono",monospace;font-size:12.5px;margin-bottom:24px}
+footer.site .fcontact a{color:var(--safety)}
+footer.site .copy{font-size:13px;color:#8f8e88}
+
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:960px){
+  .hero-inner{grid-template-columns:1fr}
+  .scene{height:340px}
+  .wo-grid{grid-template-columns:1fr 1fr}
+  .psteps{grid-template-columns:repeat(2,1fr)}
+  .mosaic{grid-template-columns:repeat(2,1fr)}
+  .sample-grid{grid-template-columns:1fr 1fr}
+  .review-hero{grid-template-columns:1fr;text-align:center;justify-items:center}
+  .visit-grid{grid-template-columns:1fr}
+  .specrow{grid-template-columns:1fr;gap:6px}
+}
+@media(max-width:760px){
+  nav.main{position:fixed;top:0;right:0;bottom:0;width:min(78vw,320px);background:var(--paper);flex-direction:column;align-items:flex-start;justify-content:flex-start;padding:90px 30px;gap:18px;border-left:2px solid var(--ink);transform:translateX(100%);transition:transform .3s ease;z-index:200}
+  nav.main.open{transform:none}
+  nav.main a{font-size:14px}
+  #burger{display:block}
+  .topbar .call-btn{display:none}
+  .wo-grid,.sample-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="ribbon">
+  <div class="ribbon-inner">
+    <span><span class="dot">●</span>&nbsp; Monrovia, CA &nbsp;·&nbsp; Serving the LA 5-county area</span>
+    <span>Hours: call for hours &nbsp;·&nbsp; <a href="tel:+16269673114">(626) 967-3114</a></span>
+  </div>
+</div>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="#home" data-page="home" class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+          <rect x="2" y="16" width="22" height="5" rx="1.5" fill="#F2A900"/>
+          <rect x="4" y="12" width="12" height="4" rx="1" fill="#EDECE7"/>
+          <path d="M16 12 L22 6 L24 8 L18 14 Z" fill="#EDECE7"/>
+          <circle cx="22.5" cy="9.5" r="1.6" fill="#F2A900"/>
+        </svg>
+      </span>
+      <span class="brand-name">MARTIN'S<small>CONCRETE PUMPING</small></span>
+    </a>
+    <nav class="main" id="mainNav" aria-label="Primary">
+      <a href="#home" data-page="home">Home</a>
+      <a href="#services" data-page="services">Services</a>
+      <a href="#about" data-page="about">About</a>
+      <a href="#gallery" data-page="gallery">Gallery</a>
+      <a href="#reviews" data-page="reviews">Reviews</a>
+      <a href="#visit" data-page="visit">Visit</a>
+    </nav>
+    <a class="call-btn" href="tel:+16269673114">CALL (626) 967-3114</a>
+    <button id="burger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ HOME ============ -->
+<section class="page" id="page-home">
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="hero-copy">
+        <span class="ticket-tag">PUMP TICKET · MONROVIA, CA</span>
+        <h1>Concrete,<br>placed <span class="ylw">exactly</span><br>where you need it.</h1>
+        <p class="lede">Martin's Concrete Pumping brings boom and line pumping to residential and commercial pours across the Los Angeles 5-county area. Safety first, on schedule, every pour.</p>
+        <div class="hero-cta">
+          <a class="btn solid" href="tel:+16269673114">Schedule a pour</a>
+          <a class="btn line" href="#services" data-page="services">See services</a>
+        </div>
+        <div class="hero-stats">
+          <div class="hstat"><div class="n">5.0</div><div class="l">Directory rating</div></div>
+          <div class="hstat"><div class="n">5-CTY</div><div class="l">Service area</div></div>
+          <div class="hstat"><div class="n">ACPA</div><div class="l">Member company</div></div>
+        </div>
+      </div>
+      <div class="scene" aria-hidden="true">
+        <svg viewBox="0 0 520 430" preserveAspectRatio="xMidYMax meet">
+          <defs>
+            <path id="boomPath" d="M120 330 L150 300 L300 210 L440 200 L440 330" fill="none"/>
+          </defs>
+          <rect x="0" y="368" width="520" height="62" fill="#2A2A26"/>
+          <rect x="0" y="368" width="520" height="10" fill="#F2A900" opacity=".55"/>
+          <!-- ground slab forming -->
+          <rect x="380" y="352" width="120" height="18" rx="3" fill="#8A8982">
+            <animate attributeName="width" values="20;120" dur="6s" repeatCount="indefinite"/>
+          </rect>
+          <!-- truck -->
+          <g class="churn">
+            <rect x="40" y="300" width="150" height="34" rx="4" fill="#3a3a35"/>
+            <rect x="52" y="272" width="60" height="30" rx="4" fill="#4a4a44"/>
+            <rect x="58" y="278" width="24" height="14" rx="2" fill="#8f8e88"/>
+            <rect x="112" y="266" width="58" height="40" rx="6" fill="#55554e"/>
+            <circle cx="75" cy="342" r="17" fill="#141412"/><circle cx="75" cy="342" r="7" fill="#55554e"/>
+            <circle cx="150" cy="342" r="17" fill="#141412"/><circle cx="150" cy="342" r="7" fill="#55554e"/>
+            <!-- beacon -->
+            <circle class="beacon" cx="140" cy="258" r="7" fill="#F2A900"/>
+            <rect x="134" y="258" width="12" height="8" rx="2" fill="#2A2A26"/>
+          </g>
+          <!-- boom -->
+          <g stroke="#F2A900" stroke-width="10" stroke-linecap="round" fill="none">
+            <path d="M120 300 L165 250 L300 180"/>
+            <path d="M300 180 L445 178" />
+          </g>
+          <g stroke="#1E1E1B" stroke-width="16" stroke-linecap="round" fill="none" opacity=".9">
+            <path d="M120 300 L165 250 L300 180 L445 178"/>
+          </g>
+          <g stroke="#F2A900" stroke-width="9" stroke-linecap="round" fill="none">
+            <path d="M120 300 L165 250 L300 180 L445 178"/>
+          </g>
+          <!-- hose down -->
+          <path d="M445 178 L445 330" stroke="#1E1E1B" stroke-width="12" stroke-linecap="round"/>
+          <!-- concrete flow dots -->
+          <g fill="#EDECE7">
+            <circle r="5"><animateMotion dur="3.2s" repeatCount="indefinite"><mpath href="#boomPath"/></animateMotion></circle>
+            <circle r="5"><animateMotion dur="3.2s" begin="0.8s" repeatCount="indefinite"><mpath href="#boomPath"/></animateMotion></circle>
+            <circle r="5"><animateMotion dur="3.2s" begin="1.6s" repeatCount="indefinite"><mpath href="#boomPath"/></animateMotion></circle>
+            <circle r="5"><animateMotion dur="3.2s" begin="2.4s" repeatCount="indefinite"><mpath href="#boomPath"/></animateMotion></circle>
+          </g>
+          <!-- splash -->
+          <g fill="#B9B7AF">
+            <circle cx="438" cy="336" r="6"><animate attributeName="r" values="4;8;4" dur="1.6s" repeatCount="indefinite"/></circle>
+            <circle cx="452" cy="340" r="4"><animate attributeName="r" values="3;7;3" dur="1.9s" repeatCount="indefinite"/></circle>
+          </g>
+        </svg>
+        <span class="scene-note">Illustration · boom pump at work</span>
+      </div>
+    </div>
+  </div>
+  <div class="stripe-band"></div>
+
+  <div class="specband">
+    <div class="wrap">
+      <div class="stitle">
+        <p class="kicker">Spec sheet</p>
+        <h2>Built for pour day.</h2>
+        <p>Contractors and homeowners across the San Gabriel Valley call us when the concrete has to get somewhere a mixer truck cannot reach.</p>
+      </div>
+      <div class="specrows">
+        <div class="specrow reveal"><span class="k">Pump types</span><span class="v">Boom pumping for reach, line pumping for tight access</span><span class="tag">Core service</span></div>
+        <div class="specrow reveal"><span class="k">Typical jobs</span><span class="v">Foundations, slabs, driveways, patios, footings, flatwork</span><span class="tag">Res + commercial</span></div>
+        <div class="specrow reveal"><span class="k">Safety</span><span class="v">Safety and efficiency are the priority on every job, with training and certification for the crew</span><span class="tag">ACPA member</span></div>
+        <div class="specrow reveal"><span class="k">Coverage</span><span class="v">Monrovia plus the Los Angeles 5-county area</span><span class="tag">Local dispatch</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="process">
+    <div class="wrap">
+      <div class="stitle">
+        <p class="kicker">How a pump day works</p>
+        <h2 style="color:#F0EFEA">From call to cleanup.</h2>
+      </div>
+      <div class="psteps">
+        <div class="pstep reveal"><div class="pn">01</div><h4>Call in</h4><p>Tell us the yardage, access, and schedule. We confirm the right pump for the job.</p></div>
+        <div class="pstep reveal"><div class="pn">02</div><h4>Site setup</h4><p>We arrive early, set outriggers, and run hose or position the boom.</p></div>
+        <div class="pstep reveal"><div class="pn">03</div><h4>The pour</h4><p>Steady, controlled placement exactly where your crew needs it.</p></div>
+        <div class="pstep reveal"><div class="pn">04</div><h4>Finish support</h4><p>We keep pace with your finishers so the slab stays workable.</p></div>
+        <div class="pstep reveal"><div class="pn">05</div><h4>Cleanup</h4><p>Hose washout and site cleanup handled before we roll out.</p></div>
+      </div>
+      <div style="margin-top:44px"><a class="btn solid" href="tel:+16269673114">Call (626) 967-3114</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SERVICES ============ -->
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div class="stitle" style="padding-top:70px">
+      <p class="kicker">Services</p>
+      <h2>Work orders we run.</h2>
+      <p>Typical concrete pumping services. Confirm equipment, rates, and scheduling with our office before pour day.</p>
+    </div>
+    <div class="illus-note">Representative services for a concrete pumping company · confirm details with our office</div>
+    <div class="wo-grid">
+      <div class="wo-card reveal">
+        <div class="wo-head"><span>WO-101</span><span class="st">Most called</span></div>
+        <div class="wo-body">
+          <h3>Boom Pumping</h3>
+          <p>Long-reach placement over structures, walls, and obstacles for foundations and large slabs.</p>
+          <ul class="wo-check"><li>Residential foundations</li><li>Large slab pours</li><li>Hard-to-reach backyards</li></ul>
+          <a class="wo-link" href="tel:+16269673114">Request this service</a>
+        </div>
+      </div>
+      <div class="wo-card reveal">
+        <div class="wo-head"><span>WO-102</span><span class="st">Tight access</span></div>
+        <div class="wo-body">
+          <h3>Line Pumping</h3>
+          <p>Flexible hose runs through gates, side yards, and interiors where a boom cannot go.</p>
+          <ul class="wo-check"><li>Interior slabs</li><li>Narrow side yards</li><li>Patios and remodels</li></ul>
+          <a class="wo-link" href="tel:+16269673114">Request this service</a>
+        </div>
+      </div>
+      <div class="wo-card reveal">
+        <div class="wo-head"><span>WO-103</span><span class="st">Homeowners</span></div>
+        <div class="wo-body">
+          <h3>Residential Pours</h3>
+          <p>Driveways, patios, walkways, and additions poured cleanly with minimal disruption.</p>
+          <ul class="wo-check"><li>Driveways and patios</li><li>Room addition slabs</li><li>Walkways and flatwork</li></ul>
+          <a class="wo-link" href="tel:+16269673114">Request this service</a>
+        </div>
+      </div>
+      <div class="wo-card reveal">
+        <div class="wo-head"><span>WO-104</span><span class="st">Contractors</span></div>
+        <div class="wo-body">
+          <h3>Commercial Flatwork</h3>
+          <p>Scheduled pumping support for commercial slabs, parking areas, and tilt-up work.</p>
+          <ul class="wo-check"><li>Warehouse slabs</li><li>Parking lots</li><li>Repeat scheduling</li></ul>
+          <a class="wo-link" href="tel:+16269673114">Request this service</a>
+        </div>
+      </div>
+      <div class="wo-card reveal">
+        <div class="wo-head"><span>WO-105</span><span class="st">Structural</span></div>
+        <div class="wo-body">
+          <h3>Footings and Foundations</h3>
+          <p>Precise placement for footings, stem walls, and foundation systems.</p>
+          <ul class="wo-check"><li>Spread footings</li><li>Stem walls</li><li>Retaining walls</li></ul>
+          <a class="wo-link" href="tel:+16269673114">Request this service</a>
+        </div>
+      </div>
+      <div class="wo-card reveal">
+        <div class="wo-head"><span>WO-106</span><span class="st">Pro support</span></div>
+        <div class="wo-body">
+          <h3>Contractor Scheduling</h3>
+          <p>Reliable pump scheduling for GCs, with training and certification resources for crews.</p>
+          <ul class="wo-check"><li>Standing pour days</li><li>Multi-truck coordination</li><li>Crew training resources</li></ul>
+          <a class="wo-link" href="tel:+16269673114">Request this service</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ABOUT ============ -->
+<section class="page" id="page-about">
+  <div class="wrap">
+    <div class="stitle" style="padding-top:70px">
+      <p class="kicker">About</p>
+      <h2>Safety is the spec.</h2>
+      <p>Martin's Concrete Pumping is a Monrovia-based concrete pumping company serving contractors and homeowners across the Los Angeles 5-county area, including Glendale, Inglewood, Lancaster, Long Beach, Los Angeles, Monrovia, North Hollywood, and Palmdale.</p>
+    </div>
+    <div class="specrows" style="margin:44px 0 70px">
+      <div class="specrow reveal"><span class="k">Based in</span><span class="v">423 W Maple Ave, Monrovia, CA 91016</span><span class="tag">Local</span></div>
+      <div class="specrow reveal"><span class="k">Industry</span><span class="v">Member of the American Concrete Pumping Association (ACPA)</span><span class="tag">Per directory listing</span></div>
+      <div class="specrow reveal"><span class="k">Focus</span><span class="v">Prioritizing safety and efficiency on every project</span><span class="tag">Core value</span></div>
+      <div class="specrow reveal"><span class="k">For pros</span><span class="v">Training and certification resources for contractor crews</span><span class="tag">Contractor support</span></div>
+    </div>
+    <div style="margin-bottom:70px"><a class="btn solid" href="tel:+16269673114">Call (626) 967-3114</a></div>
+  </div>
+</section>
+
+<!-- ============ GALLERY ============ -->
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div class="stitle" style="padding-top:70px">
+      <p class="kicker">Gallery</p>
+      <h2>Fresh concrete, in swatches.</h2>
+      <p>Job-site photography coming soon. These swatches show the range of finishes a pumped pour can take.</p>
+    </div>
+    <span class="badge-illus">Illustrative finishes · placeholder tiles</span>
+    <div class="mosaic">
+      <div class="swatch s1 reveal"><span class="ph">Placeholder</span><span class="nm">Broom finish</span></div>
+      <div class="swatch s2 reveal"><span class="ph">Placeholder</span><span class="nm">Smooth trowel</span></div>
+      <div class="swatch s3 reveal"><span class="ph">Placeholder</span><span class="nm">Exposed aggregate</span></div>
+      <div class="swatch s4 reveal"><span class="ph">Placeholder</span><span class="nm">Stamped pattern</span></div>
+      <div class="swatch s5 reveal"><span class="ph">Placeholder</span><span class="nm">Dark integral color</span></div>
+      <div class="swatch s6 reveal"><span class="ph">Placeholder</span><span class="nm">Light sand wash</span></div>
+      <div class="swatch s7 reveal"><span class="ph">Placeholder</span><span class="nm">Salt finish</span></div>
+      <div class="swatch s8 reveal"><span class="ph">Placeholder</span><span class="nm">Charcoal stain</span></div>
+    </div>
+    <p class="illus-note">Gallery tiles are placeholders. Real project photos will replace them.</p>
+  </div>
+</section>
+
+<!-- ============ REVIEWS ============ -->
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div class="stitle" style="padding-top:70px">
+      <p class="kicker">Reviews</p>
+      <h2>Rated 5.0 across directory profiles.</h2>
+      <p>Martin's Concrete Pumping holds a 5-star rating from 3 reviews across two independent directory profiles. Review text was not published on those profiles, so only the counts and scores are shown here.</p>
+    </div>
+    <div class="review-hero reveal">
+      <div class="bigscore">5.0<small>/5</small></div>
+      <div>
+        <div class="rstars">★★★★★</div>
+        <p>Based on 3 reviews across two directory profiles. No verified Google reviews were found for this business yet.</p>
+      </div>
+      <div class="src-links">
+        <a href="https://www.oneallratings.com/company/martins-concrete-pumping-ca-monrovia" target="_blank" rel="noopener">ONE AllRatings profile</a>
+        <a href="https://homeservicelookup.com/pro/martins-concrete-pumping-monrovia-ca" target="_blank" rel="noopener">Home Service Lookup</a>
+        <a href="https://www.google.com/maps/place/?q=place_id:ChIJDSBddWbZwoARMDasa2i48DI" target="_blank" rel="noopener">See reviews on Google</a>
+      </div>
+    </div>
+    <span class="badge-illus">Sample reviews</span>
+    <div class="sample-grid">
+      <div class="sample-card reveal">
+        <div class="stars">★★★★★</div>
+        <p>"Pump showed up on time and the pour went exactly as planned. The operator knew exactly where to place the boom."</p>
+        <div class="who">Sample review · name withheld</div>
+      </div>
+      <div class="sample-card reveal">
+        <div class="stars">★★★★★</div>
+        <p>"Tight backyard access and they still got the line in without tearing anything up. Clean work from setup to washout."</p>
+        <div class="who">Sample review · name withheld</div>
+      </div>
+      <div class="sample-card reveal">
+        <div class="stars">★★★★★</div>
+        <p>"We schedule them for our commercial slabs. Reliable, safe, and easy to coordinate with on short notice."</p>
+        <div class="who">Sample review · name withheld</div>
+      </div>
+    </div>
+    <p class="illus-note">Review cards above are samples for layout purposes. No reviewer names or quotes have been invented as real.</p>
+  </div>
+</section>
+
+<!-- ============ VISIT ============ -->
+<section class="page" id="page-visit">
+  <div class="wrap">
+    <div class="stitle" style="padding-top:70px">
+      <p class="kicker">Visit / Contact</p>
+      <h2>Book your pour day.</h2>
+      <p>Call to schedule. Tell us the yardage, the access, and the date, and we will confirm the right pump for the job.</p>
+    </div>
+    <div class="visit-grid">
+      <div class="visit-card reveal">
+        <h3>Dispatch office</h3>
+        <div class="vline"><span class="lab">Address</span><span>Martin's Concrete Pumping<br>423 W Maple Ave<br>Monrovia, CA 91016</span></div>
+        <div class="vline"><span class="lab">Phone</span><span><a class="u" href="tel:+16269673114">(626) 967-3114</a></span></div>
+        <div class="vline"><span class="lab">Hours</span><span>Call for hours</span></div>
+        <div class="vline" style="border-bottom:1px solid var(--line)"><span class="lab">Service area</span>
+          <span><span class="area-pills">
+            <span>Glendale</span><span>Inglewood</span><span>Lancaster</span><span>Long Beach</span><span>Los Angeles</span><span>Monrovia</span><span>North Hollywood</span><span>Palmdale</span><span>+ more</span>
+          </span></span>
+        </div>
+      </div>
+      <div class="visit-card reveal">
+        <h3>Get directions</h3>
+        <p style="color:#5b5a54;margin-bottom:26px">Our yard is on W Maple Ave in Monrovia. Tap below for turn-by-turn directions.</p>
+        <a class="btn solid" href="https://www.google.com/maps/place/?q=place_id:ChIJDSBddWbZwoARMDasa2i48DI" target="_blank" rel="noopener" style="display:block;text-align:center;margin-bottom:14px">Open in Google Maps</a>
+        <a class="btn line" href="tel:+16269673114" style="display:block;text-align:center;border-color:var(--ink);color:var(--ink)">Call (626) 967-3114</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="seal" aria-hidden="true">
+      <span class="s1">SAFETY FIRST</span>
+      <span class="s2">ACPA</span>
+      <span class="s3">MEMBER</span>
+    </div>
+    <div class="flinks">
+      <a href="#home" data-page="home">Home</a>
+      <a href="#services" data-page="services">Services</a>
+      <a href="#about" data-page="about">About</a>
+      <a href="#gallery" data-page="gallery">Gallery</a>
+      <a href="#reviews" data-page="reviews">Reviews</a>
+      <a href="#visit" data-page="visit">Visit</a>
+    </div>
+    <p class="fcontact">423 W Maple Ave, Monrovia, CA 91016 · <a href="tel:+16269673114">(626) 967-3114</a></p>
+    <p class="copy">© Martin's Concrete Pumping</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "visit"];
+
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function observeReveals(){
+    var els = document.querySelectorAll(".reveal:not(.in)");
+    for(var i = 0; i < els.length; i++){
+      (function(el, i){
+        setTimeout(function(){ el.classList.add("in"); }, 60 * i);
+      })(els[i], i);
+    }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

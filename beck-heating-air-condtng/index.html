@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beck Heating &amp; Air Condtng | Milford, OH HVAC</title>
+<meta name="description" content="Beck Heating & Air Condtng, HVAC contractor at 5788 Meadowview Dr, Milford, OH 45150. Call (513) 244-9737.">
+<style>
+  :root{
+    --pine:#1f3a2b;
+    --pine-deep:#152a1f;
+    --copper:#c0783a;
+    --copper-bright:#d9964f;
+    --cream:#f7f2e6;
+    --paper:#fffdf7;
+    --ink:#232a26;
+    --muted:#5d6a62;
+    --stripe: repeating-linear-gradient(135deg, var(--copper) 0 14px, var(--pine) 14px 28px);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;}
+  h1,h2,h3,.display{font-family:Georgia,"Iowan Old Style","Times New Roman",serif;font-weight:700;color:var(--pine-deep);line-height:1.2;}
+  a{color:var(--copper);}
+  img,svg{max-width:100%;}
+
+  /* Header + drawer nav */
+  header.topbar{position:sticky;top:0;z-index:60;background:var(--pine-deep);color:var(--cream);display:flex;align-items:center;justify-content:space-between;padding:0.7rem 1.1rem;box-shadow:0 2px 10px rgba(0,0,0,.25);}
+  .brand{font-family:Georgia,serif;font-size:1.15rem;letter-spacing:.5px;color:var(--cream);text-decoration:none;}
+  .brand small{display:block;font-family:system-ui,sans-serif;font-size:.65rem;letter-spacing:2px;color:var(--copper-bright);text-transform:uppercase;}
+  .burger{background:none;border:2px solid var(--copper-bright);border-radius:8px;width:46px;height:42px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;}
+  .burger span{display:block;width:24px;height:3px;background:var(--cream);border-radius:2px;}
+  #drawer{position:fixed;top:0;right:0;height:100vh;width:min(340px,88vw);background:var(--pine);color:var(--cream);z-index:80;transform:translateX(105%);transition:transform .32s ease;padding:4.5rem 1.6rem 2rem;display:flex;flex-direction:column;gap:.4rem;box-shadow:-6px 0 24px rgba(0,0,0,.35);}
+  #drawer.open{transform:translateX(0);}
+  #drawer a{color:var(--cream);text-decoration:none;font-size:1.25rem;padding:.7rem .8rem;border-radius:10px;font-family:Georgia,serif;}
+  #drawer a:hover,#drawer a.active{background:rgba(255,255,255,.08);color:var(--copper-bright);}
+  #drawer .close{position:absolute;top:1rem;right:1.1rem;background:none;border:none;color:var(--cream);font-size:2rem;cursor:pointer;line-height:1;}
+  #scrim{position:fixed;inset:0;background:rgba(20,25,22,.55);z-index:70;opacity:0;pointer-events:none;transition:opacity .3s;}
+  #scrim.show{opacity:1;pointer-events:auto;}
+  .drawer-call{margin-top:auto;background:var(--copper);color:#fff;text-align:center;font-size:1.1rem;}
+
+  /* Router pages */
+  .page{display:none;}
+  .page.active{display:block;}
+
+  /* Hero: full-bleed band */
+  .hero{background:var(--pine-deep);color:var(--cream);position:relative;overflow:hidden;}
+  .hero .band{height:14px;background:var(--stripe);}
+  .hero-inner{max-width:1100px;margin:0 auto;padding:4rem 1.25rem 3.5rem;position:relative;z-index:2;}
+  .hero h1{color:var(--cream);font-size:clamp(2.2rem,6vw,3.8rem);max-width:16ch;}
+  .hero h1 em{color:var(--copper-bright);font-style:normal;}
+  .hero p.lede{margin:1.1rem 0 1.8rem;max-width:46ch;font-size:1.15rem;color:#e6dfd0;}
+  .hero-art{position:absolute;right:-60px;top:-40px;width:420px;height:420px;border:2px solid rgba(217,150,79,.35);border-radius:50%;z-index:1;}
+  .hero-art::after{content:"";position:absolute;inset:40px;border:1px dashed rgba(217,150,79,.4);border-radius:50%;}
+  .cta-row{display:flex;flex-wrap:wrap;gap:.9rem;}
+  .btn{display:inline-block;padding:.85rem 1.6rem;border-radius:999px;text-decoration:none;font-weight:700;font-size:1.05rem;border:2px solid transparent;cursor:pointer;}
+  .btn-solid{background:var(--copper);color:#fff;}
+  .btn-solid:hover{background:var(--copper-bright);}
+  .btn-ghost{border-color:var(--cream);color:var(--cream);}
+  .btn-ghost:hover{background:rgba(255,255,255,.1);}
+  .badge{display:inline-block;font-size:.75rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;background:var(--copper);color:#fff;padding:.25rem .8rem;border-radius:999px;margin-bottom:1rem;}
+  .badge.sample{background:transparent;border:2px dashed var(--copper);color:var(--copper);}
+
+  main{max-width:1100px;margin:0 auto;padding:0 1.25rem;}
+  .section{padding:3.2rem 0;}
+  .section h2{font-size:clamp(1.7rem,4vw,2.4rem);margin-bottom:.6rem;}
+  .rule{width:84px;height:6px;background:var(--stripe);border-radius:3px;margin:.4rem 0 1.4rem;}
+  .lede2{color:var(--muted);max-width:60ch;margin-bottom:2rem;}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.2rem;}
+  .card{background:var(--paper);border:1px solid #e4dcc8;border-radius:14px;padding:1.4rem;box-shadow:0 3px 10px rgba(31,58,43,.06);}
+  .card h3{margin-bottom:.4rem;}
+  .card p{color:var(--muted);font-size:.95rem;}
+
+  /* Zigzag service rows */
+  .zig{margin:0;}
+  .zig-row{display:grid;grid-template-columns:1fr 1fr;gap:0;background:var(--paper);border:1px solid #e4dcc8;border-radius:18px;overflow:hidden;margin-bottom:1.6rem;box-shadow:0 4px 14px rgba(31,58,43,.07);}
+  .zig-row.flip .zig-art{order:2;}
+  .zig-art{background:var(--pine);min-height:260px;display:flex;align-items:center;justify-content:center;padding:1.5rem;}
+  .zig-art svg{width:70%;max-width:220px;}
+  .zig-body{padding:2rem 2.2rem;display:flex;flex-direction:column;justify-content:center;}
+  .zig-body h3{font-size:1.5rem;margin:.4rem 0 .7rem;}
+  .zig-body p{color:var(--muted);}
+  .zig-body .btn{margin-top:1.1rem;align-self:flex-start;}
+  .tag{font-size:.7rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--copper);}
+
+  /* Alternating-row gallery */
+  .gallery-row{display:flex;gap:1rem;margin-bottom:1rem;}
+  .gallery-row.rev{flex-direction:row-reverse;}
+  .tile{flex:1;background:var(--paper);border:1px solid #e4dcc8;border-radius:12px;min-height:170px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;padding:1rem;color:var(--muted);font-size:.85rem;text-align:center;}
+  .tile svg{width:64px;height:64px;opacity:.5;}
+  .tile.wide{flex:1.6;}
+
+  /* Reviews */
+  .score-card{background:var(--pine-deep);color:var(--cream);border-radius:18px;padding:2rem;display:flex;flex-wrap:wrap;gap:2rem;align-items:center;margin-bottom:2rem;}
+  .score-num{font-family:Georgia,serif;font-size:3.6rem;color:var(--copper-bright);}
+  .quote{background:var(--paper);border-left:6px solid var(--copper);border-radius:0 14px 14px 0;padding:1.4rem 1.6rem;margin-bottom:1.2rem;box-shadow:0 3px 10px rgba(31,58,43,.06);}
+  .quote p{font-family:Georgia,serif;font-size:1.1rem;font-style:italic;}
+  .quote footer{margin-top:.6rem;font-size:.85rem;color:var(--muted);}
+
+  /* Contact */
+  .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.6rem;margin-bottom:2rem;}
+  .panel{background:var(--paper);border:1px solid #e4dcc8;border-radius:14px;padding:1.6rem;}
+  form label{display:block;font-weight:700;margin:.9rem 0 .3rem;}
+  form input,form textarea{width:100%;padding:.7rem;border:1px solid #cfc6ae;border-radius:8px;font:inherit;background:#fff;}
+  form textarea{min-height:120px;resize:vertical;}
+
+  /* Footer with hours table */
+  footer.site{background:var(--pine-deep);color:var(--cream);margin-top:3rem;}
+  footer.site .band{height:10px;background:var(--stripe);}
+  .foot-inner{max-width:1100px;margin:0 auto;padding:2.5rem 1.25rem 1.5rem;}
+  .foot-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:1.6rem;}
+  .hours-table{width:100%;border-collapse:collapse;font-size:.95rem;}
+  .hours-table caption{text-align:left;font-family:Georgia,serif;font-size:1.2rem;margin-bottom:.6rem;color:var(--copper-bright);}
+  .hours-table td{padding:.45rem 0;border-bottom:1px dotted rgba(255,255,255,.18);}
+  .hours-table td:last-child{text-align:right;}
+  .copy{border-top:1px solid rgba(255,255,255,.15);padding-top:1.1rem;text-align:center;font-size:.95rem;color:#e6dfd0;}
+
+  @media (max-width:760px){
+    .zig-row{grid-template-columns:1fr;}
+    .zig-row.flip .zig-art{order:0;}
+    .zig-art{min-height:200px;}
+    .contact-grid,.foot-grid{grid-template-columns:1fr;}
+    .gallery-row{flex-direction:column;}
+    .gallery-row.rev{flex-direction:column;}
+    .tile{min-height:130px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="#" data-page="home">Beck Heating &amp; Air Condtng<small>Milford, Ohio HVAC</small></a>
+  <button class="burger" id="burger" aria-label="Open menu"><span></span><span></span><span></span></button>
+</header>
+
+<nav id="drawer" aria-label="Site menu">
+  <button class="close" id="drawerClose" aria-label="Close menu">&times;</button>
+  <a href="#" data-page="home" class="active">Home</a>
+  <a href="#" data-page="services">Services</a>
+  <a href="#" data-page="about">About</a>
+  <a href="#" data-page="reviews">Reviews</a>
+  <a href="#" data-page="contact">Contact</a>
+  <a class="btn btn-solid drawer-call" href="tel:+15132449737">Call (513) 244-9737</a>
+</nav>
+<div id="scrim"></div>
+
+
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="band"></div>
+    <div class="hero-art"></div>
+    <div class="hero-inner">
+      <span class="badge">HVAC Contractor, Milford OH</span>
+      <h1>Heat in January. <em>Cool in July.</em> Handled.</h1>
+      <p class="lede">Beck Heating &amp; Air Condtng is a local heating and air conditioning contractor serving Milford and the surrounding area. Small shop, straight answers, and equipment that does its job.</p>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="tel:+15132449737">Call (513) 244-9737</a>
+        <a class="btn btn-ghost" href="https://www.google.com/maps/search/?api=1&query=5788%20Meadowview%20Dr%2C%20Milford%2C%20OH%2045150" target="_blank" rel="noopener">Get Directions</a>
+      </div>
+    </div>
+    <div class="band"></div>
+  </div>
+
+  <main>
+    <div class="section">
+      <h2>Why folks call Beck</h2>
+      <div class="rule"></div>
+      <p class="lede2">A one-location shop on Meadowview Drive. Customers describe a quick response, fair pricing, and friendly, efficient work. Call to confirm current services and scheduling.</p>
+      <div class="cards">
+        <div class="card"><h3>Heating</h3><p>Furnace and heating system installation and repair. <span class="tag">Sample, call to confirm</span></p></div>
+        <div class="card"><h3>Cooling</h3><p>Air conditioning installation, repair, and service. <span class="tag">Sample, call to confirm</span></p></div>
+        <div class="card"><h3>Heat Pumps</h3><p>Heat pump systems for year-round comfort. <span class="tag">Sample, call to confirm</span></p></div>
+      </div>
+      <div style="margin-top:1.6rem;"><a class="btn btn-solid" href="#" data-page="services">See All Services</a></div>
+    </div>
+
+    <div class="section">
+      <h2>Shop Gallery</h2>
+      <div class="rule"></div>
+      <p class="lede2">Real photos coming soon. These placeholders show the kind of work a full-service HVAC shop handles.</p>
+      <div class="gallery-row">
+        <div class="tile wide"><svg viewBox="0 0 64 64" fill="none" stroke="#1f3a2b" stroke-width="3"><rect x="10" y="18" width="44" height="28" rx="4"/><circle cx="32" cy="32" r="8"/><path d="M18 18v-6M26 18v-6M38 18v-6M46 18v-6"/></svg><span>Photo coming soon: service truck</span></div>
+        <div class="tile"><svg viewBox="0 0 64 64" fill="none" stroke="#1f3a2b" stroke-width="3"><path d="M20 50V26l12-12 12 12v24z"/><rect x="28" y="36" width="8" height="14"/></svg><span>Photo coming soon: home comfort</span></div>
+      </div>
+      <div class="gallery-row rev">
+        <div class="tile"><svg viewBox="0 0 64 64" fill="none" stroke="#1f3a2b" stroke-width="3"><path d="M32 10v12M32 42v12M10 32h12M42 32h12"/><circle cx="32" cy="32" r="6"/></svg><span>Photo coming soon: tune-up</span></div>
+        <div class="tile wide"><svg viewBox="0 0 64 64" fill="none" stroke="#1f3a2b" stroke-width="3"><rect x="14" y="22" width="36" height="20" rx="3"/><path d="M20 42v8M44 42v8M22 28h20"/></svg><span>Photo coming soon: equipment install</span></div>
+      </div>
+    </div>
+  </main>
+</section>
+
+
+<section class="page" id="page-services">
+  <main>
+    <div class="section">
+      <h2>Services</h2>
+      <div class="rule"></div>
+      <p class="lede2">Typical work for a heating and air conditioning contractor. The Bryant dealer listing for this address mentions air conditioning installation, furnace installation, HVAC system installation, and heat pump installation. <strong>Services below are samples and have not been officially confirmed. Call to confirm.</strong></p>
+
+      <div class="zig">
+        <div class="zig-row">
+          <div class="zig-art"><svg viewBox="0 0 100 100" fill="none" stroke="#d9964f" stroke-width="4"><rect x="20" y="30" width="60" height="40" rx="6"/><circle cx="50" cy="50" r="11"/><path d="M30 30V16M40 30V16M60 30V16M70 30V16"/></svg></div>
+          <div class="zig-body">
+            <span class="badge sample">Sample, call to confirm</span>
+            <h3>Air Conditioning Repair</h3>
+            <p>No-cool calls, weak airflow, strange noises, and full system diagnostics for central air systems.</p>
+            <a class="btn btn-solid" href="tel:+15132449737">Call About AC Repair</a>
+          </div>
+        </div>
+        <div class="zig-row flip">
+          <div class="zig-art"><svg viewBox="0 0 100 100" fill="none" stroke="#d9964f" stroke-width="4"><path d="M50 14c10 14 18 22 18 36a18 18 0 1 1-36 0c0-14 8-22 18-36z"/><path d="M50 44c4 6 7 9 7 14a7 7 0 1 1-14 0c0-5 3-8 7-14z"/></svg></div>
+          <div class="zig-body">
+            <span class="badge sample">Sample, call to confirm</span>
+            <h3>Furnace Installation &amp; Repair</h3>
+            <p>New furnace installs and repairs to keep the house warm through an Ohio winter.</p>
+            <a class="btn btn-solid" href="tel:+15132449737">Call About Furnaces</a>
+          </div>
+        </div>
+        <div class="zig-row">
+          <div class="zig-art"><svg viewBox="0 0 100 100" fill="none" stroke="#d9964f" stroke-width="4"><circle cx="50" cy="50" r="28"/><path d="M50 22v12M50 66v12M22 50h12M66 50h12M30 30l8 8M62 62l8 8M70 30l-8 8M38 62l-8 8"/></svg></div>
+          <div class="zig-body">
+            <span class="badge sample">Sample, call to confirm</span>
+            <h3>Heat Pumps</h3>
+            <p>Efficient heating and cooling in one system, installed and serviced.</p>
+            <a class="btn btn-solid" href="tel:+15132449737">Call About Heat Pumps</a>
+          </div>
+        </div>
+        <div class="zig-row flip">
+          <div class="zig-art"><svg viewBox="0 0 100 100" fill="none" stroke="#d9964f" stroke-width="4"><path d="M28 70V34l22-20 22 20v36"/><rect x="42" y="50" width="16" height="20"/><path d="M36 78h28"/></svg></div>
+          <div class="zig-body">
+            <span class="badge sample">Sample, call to confirm</span>
+            <h3>Maintenance &amp; Tune-Ups</h3>
+            <p>Seasonal checkups to catch small problems before they become expensive ones.</p>
+            <a class="btn btn-solid" href="tel:+15132449737">Call About Tune-Ups</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</section>
+
+
+<section class="page" id="page-about">
+  <main>
+    <div class="section">
+      <h2>About Beck Heating &amp; Air Condtng</h2>
+      <div class="rule"></div>
+      <div class="cards">
+        <div class="card"><h3>Local, Since 1987</h3><p>Business records list an opening date of 1987 and a single location in Milford, Ohio, incorporated in Ohio.</p></div>
+        <div class="card"><h3>Small Crew</h3><p>Records show a staff of about two people. You deal with the people doing the work.</p></div>
+        <div class="card"><h3>Owner</h3><p>Manta lists the owner as Bob Beck. <span class="tag">Per third-party listing</span></p></div>
+      </div>
+      <div style="margin-top:2rem;">
+        <div class="card">
+          <h3>Bryant Dealer Listing</h3>
+          <p>Bryant.com lists a dealer named Beck Heating And Cooling at 5788 Meadowview Dr, Milford OH, offering air conditioning installation, furnace installation, HVAC system installation, and heat pump installation. <span class="tag">Per third-party listing</span></p>
+          <p style="margin-top:.8rem;"><strong>Service area:</strong> Milford and the surrounding Clermont County area, including Amelia, Batavia, Bethel, Cincinnati, and Loveland. <span class="tag">Per third-party listing</span></p>
+        </div>
+      </div>
+      <div style="margin-top:1.6rem;" class="cta-row">
+        <a class="btn btn-solid" href="tel:+15132449737">Call (513) 244-9737</a>
+        <a class="btn btn-ghost" style="border-color:var(--pine);color:var(--pine);" href="#" data-page="contact">Contact Us</a>
+      </div>
+    </div>
+  </main>
+</section>
+
+
+<section class="page" id="page-reviews">
+  <main>
+    <div class="section">
+      <h2>Reviews</h2>
+      <div class="rule"></div>
+      <p class="lede2">Only real, publicly posted review content is shown here. No reviewer names are shown unless the public source itself published them. We were unable to verify the supplied Google Maps link as this exact business listing, so no Google link is included.</p>
+
+      <div class="score-card">
+        <div><div class="score-num">3.6</div><div>out of 5</div></div>
+        <div><strong>Birdeye, 5 reviews</strong><br>Mixed: several customers praise the work while the average reflects some less favorable ratings.</div>
+      </div>
+
+      <div class="quote">
+        <p>Great man who takes care of his customers</p>
+        <footer>Posted on Birdeye, exact date not shown in public listing</footer>
+      </div>
+      <div class="quote">
+        <p>Quick response, solved our problems with the air conditioning and his price was fair. Bonus was he is friendly, efficient and knowledeable.</p>
+        <footer>Posted on Birdeye, exact date not shown in public listing (spelling as posted)</footer>
+      </div>
+      <div class="quote">
+        <p>Excellent knowledgeable. Great to work with and was going above and beyond!</p>
+        <footer>5 out of 5, by Ryan, August 31, 2023, on the Bryant.com dealer listing for this address</footer>
+      </div>
+
+      <div class="cta-row" style="margin-top:1.8rem;">
+        <a class="btn btn-solid" href="https://reviews.birdeye.com/beck-heating-air-condtng-167059877107847" target="_blank" rel="noopener">Read Reviews on Birdeye</a>
+        <a class="btn btn-ghost" style="border-color:var(--pine);color:var(--pine);" href="tel:+15132449737">Call (513) 244-9737</a>
+      </div>
+    </div>
+  </main>
+</section>
+
+
+<section class="page" id="page-contact">
+  <main>
+    <div class="section">
+      <h2>Contact</h2>
+      <div class="rule"></div>
+      <div class="contact-grid">
+        <div class="panel">
+          <h3>Reach the Shop</h3>
+          <p style="margin:.8rem 0;"><strong>Phone:</strong><br><a href="tel:+15132449737">(513) 244-9737</a></p>
+          <p style="margin:.8rem 0;"><strong>Address:</strong><br>Beck Heating &amp; Air Condtng,<br>5788 Meadowview Dr,<br>Milford, OH 45150</p>
+          <p style="margin:.8rem 0;"><a class="btn btn-solid" href="https://www.google.com/maps/search/?api=1&query=5788%20Meadowview%20Dr%2C%20Milford%2C%20OH%2045150" target="_blank" rel="noopener">Get Directions</a></p>
+          <p style="color:var(--muted);font-size:.9rem;">Hours per online listings: Mon-Fri 9:00 AM to 6:00 PM, closed weekends. Call to confirm.</p>
+        </div>
+        <div class="panel">
+          <h3>Send a Message</h3>
+          <p style="color:var(--muted);font-size:.9rem;">This form opens a draft email in your mail app. Add the shop's address as the recipient.</p>
+          <form id="contactForm">
+            <label for="fName">Name</label>
+            <input id="fName" name="name" type="text" required>
+            <label for="fPhone">Phone</label>
+            <input id="fPhone" name="phone" type="tel">
+            <label for="fMsg">Message</label>
+            <textarea id="fMsg" name="message" required></textarea>
+            <button class="btn btn-solid" type="submit" style="margin-top:1rem;">Draft Email</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+</section>
+
+
+<footer class="site">
+  <div class="band"></div>
+  <div class="foot-inner">
+    <div class="foot-grid">
+      <div>
+        <h3 style="color:var(--copper-bright);margin-bottom:.6rem;">Beck Heating &amp; Air Condtng</h3>
+        <p style="font-size:.95rem;color:#e6dfd0;">5788 Meadowview Dr, Milford, OH 45150<br>
+        <a href="tel:+15132449737" style="color:var(--copper-bright);">(513) 244-9737</a><br>
+        <a href="https://www.google.com/maps/search/?api=1&query=5788%20Meadowview%20Dr%2C%20Milford%2C%20OH%2045150" target="_blank" rel="noopener" style="color:var(--copper-bright);">Get Directions</a></p>
+      </div>
+      <div>
+        <table class="hours-table">
+          <caption>Hours</caption>
+          <tr><td>Monday</td><td>9:00 AM to 6:00 PM</td></tr>
+          <tr><td>Tuesday</td><td>9:00 AM to 6:00 PM</td></tr>
+          <tr><td>Wednesday</td><td>9:00 AM to 6:00 PM</td></tr>
+          <tr><td>Thursday</td><td>9:00 AM to 6:00 PM</td></tr>
+          <tr><td>Friday</td><td>9:00 AM to 6:00 PM</td></tr>
+          <tr><td>Saturday</td><td>Closed</td></tr>
+          <tr><td>Sunday</td><td>Closed</td></tr>
+        </table>
+        <p style="font-size:.8rem;color:#b9b2a0;margin-top:.5rem;">Hours per online listings. Call to confirm.</p>
+      </div>
+    </div>
+    <p class="copy">© Beck Heating & Air Condtng</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var pageMap = {
+    home: 'page-home',
+    services: 'page-services',
+    about: 'page-about',
+    reviews: 'page-reviews',
+    contact: 'page-contact'
+  };
+
+  var drawer = document.getElementById('drawer');
+  var scrim = document.getElementById('scrim');
+  var burger = document.getElementById('burger');
+  var drawerClose = document.getElementById('drawerClose');
+
+  function openDrawer(){ drawer.classList.add('open'); scrim.classList.add('show'); }
+  function closeDrawer(){ drawer.classList.remove('open'); scrim.classList.remove('show'); }
+  burger.addEventListener('click', function(e){ e.preventDefault(); openDrawer(); });
+  drawerClose.addEventListener('click', function(){ closeDrawer(); });
+  scrim.addEventListener('click', function(){ closeDrawer(); });
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape'){ closeDrawer(); } });
+
+  function navigateTo(page){
+    if(!pageMap[page]){ page = 'home'; }
+    var pages = document.querySelectorAll('.page');
+    for(var i = 0; i < pages.length; i++){ pages[i].classList.remove('active'); }
+    document.getElementById(pageMap[page]).classList.add('active');
+    var links = document.querySelectorAll('[data-page]');
+    for(var j = 0; j < links.length; j++){
+      if(links[j].classList && links[j].tagName === 'A'){ links[j].classList.toggle('active', links[j].getAttribute('data-page') === page); }
+    }
+    if(('#' + page) !== window.location.hash){ history.pushState({page: page}, '', '#' + page); }
+    closeDrawer();
+    window.scrollTo(0, 0);
+  }
+
+  document.addEventListener('click', function(e){
+    var el = e.target.closest ? e.target.closest('[data-page]') : null;
+    if(el){
+      var href = el.getAttribute('href');
+      if(href === '#' || !href){ e.preventDefault(); }
+      navigateTo(el.getAttribute('data-page'));
+    }
+  });
+
+  window.addEventListener('popstate', function(e){
+    var page = (e.state && e.state.page) || (window.location.hash ? window.location.hash.replace('#','') : 'home');
+    navigateTo(page);
+  });
+
+  var initial = window.location.hash ? window.location.hash.replace('#','') : 'home';
+  if(!pageMap[initial]){ initial = 'home'; }
+  navigateTo(initial);
+
+  var form = document.getElementById('contactForm');
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var name = document.getElementById('fName').value;
+    var phone = document.getElementById('fPhone').value;
+    var msg = document.getElementById('fMsg').value;
+    var subject = 'Website inquiry from ' + name;
+    var body = 'Name: ' + name + '\nPhone: ' + phone + '\n\n' + msg;
+    window.location.href = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EdsLawnCareServices - Lawn Care in Cincinnati, OH</title>
+<meta name="description" content="EdsLawnCareServices: lawn mowing, edging, trimming, mulching and cleanups in Cincinnati, Ohio. Call (513) 808-3144.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+  /* Design tokens drawn from the business itself:
+     deep pine green from the mowing trade, warm paper from the shop, and a river
+     stone accent for Cincinnati. Big confident type, lots of open space. */
+  :root {
+    --pine: #1e3a28;
+    --pine-deep: #142a1e;
+    --moss: #4f7f4a;
+    --paper: #f7f4ec;
+    --paper-warm: #efe9da;
+    --stone: #8a867b;
+    --ink: #20241f;
+    --white: #ffffff;
+    --accent: #d9e021;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.6;
+  }
+  h1, h2, h3, .display {
+    font-family: 'Bricolage Grotesque', 'Inter', sans-serif;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+  }
+  a { color: inherit; }
+
+  /* Minimal text-row nav */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.1rem 2rem;
+    border-bottom: 2px solid var(--pine);
+    background: var(--paper);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-brand {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 1.25rem;
+    text-decoration: none;
+    color: var(--pine);
+  }
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    list-style: none;
+  }
+  .nav-links a {
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--ink);
+    position: relative;
+    padding-bottom: 2px;
+  }
+  .nav-links a.active, .nav-links a:hover { color: var(--pine); }
+  .nav-links a.active::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -4px;
+    height: 3px;
+    background: var(--moss);
+  }
+  .nav-phone {
+    text-decoration: none;
+    font-weight: 700;
+    color: var(--white);
+    background: var(--pine);
+    padding: 0.6rem 1.2rem;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+  .nav-phone:hover { background: var(--pine-deep); }
+  .hamburger {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--pine);
+  }
+
+  /* Pages */
+  .page { display: none; }
+  .page.active { display: block; animation: fadeIn 0.35s ease; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
+
+  /* Centered-card hero */
+  .hero {
+    padding: 5rem 1.5rem;
+    display: flex;
+    justify-content: center;
+    background:
+      repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 26px,
+        rgba(79, 127, 74, 0.06) 26px,
+        rgba(79, 127, 74, 0.06) 52px
+      );
+  }
+  .hero-card {
+    background: var(--white);
+    border: 2px solid var(--pine);
+    border-radius: 18px;
+    padding: 3.5rem 3rem;
+    max-width: 640px;
+    text-align: center;
+    box-shadow: 8px 8px 0 var(--pine);
+  }
+  .hero-eyebrow {
+    display: inline-block;
+    background: var(--pine);
+    color: var(--white);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.35rem 0.9rem;
+    border-radius: 999px;
+    margin-bottom: 1.25rem;
+  }
+  .hero-card h1 { font-size: clamp(2.4rem, 6vw, 3.8rem); font-weight: 800; color: var(--pine); margin-bottom: 1rem; }
+  .hero-card p { font-size: 1.1rem; color: var(--ink); margin-bottom: 2rem; }
+  .btn-row { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+    font-weight: 700;
+    padding: 0.85rem 1.7rem;
+    border-radius: 999px;
+    border: 2px solid var(--pine);
+    cursor: pointer;
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+  }
+  .btn-solid { background: var(--pine); color: var(--white); }
+  .btn-solid:hover { background: var(--pine-deep); }
+  .btn-ghost { background: var(--white); color: var(--pine); }
+  .btn-ghost:hover { background: var(--paper-warm); }
+
+  /* Section headers */
+  .section { padding: 4rem 0; }
+  .section h2 { font-size: clamp(1.9rem, 4vw, 2.6rem); color: var(--pine); margin-bottom: 0.5rem; font-weight: 800; }
+  .section .lede { color: var(--stone); font-size: 1.05rem; margin-bottom: 2rem; max-width: 640px; }
+
+  /* Before and after paired gallery */
+  .pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 1rem;
+  }
+  .pair-card {
+    border: 2px solid var(--pine);
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--white);
+  }
+  .pair-card svg { display: block; width: 100%; height: auto; }
+  .pair-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem 1.25rem;
+    font-weight: 700;
+  }
+  .pair-label.before { background: var(--paper-warm); color: var(--ink); }
+  .pair-label.after { background: var(--pine); color: var(--white); }
+  .pair-label .tag {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.75;
+  }
+
+  /* Info strip */
+  .strip {
+    background: var(--pine);
+    color: var(--white);
+    padding: 2.5rem 0;
+  }
+  .strip .wrap { display: flex; gap: 2.5rem; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+  .strip-item { display: flex; align-items: center; gap: 0.9rem; }
+  .strip-item i { font-size: 1.6rem; color: var(--accent); }
+  .strip-item strong { display: block; font-size: 1.05rem; }
+  .strip-item span { font-size: 0.9rem; opacity: 0.85; }
+  .confirm-badge {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: var(--accent);
+    color: var(--pine-deep);
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+  }
+
+  /* Accordion services */
+  .accordion { border-top: 2px solid var(--pine); }
+  .acc-item { border-bottom: 2px solid var(--pine); background: var(--white); }
+  .acc-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background: none;
+    border: none;
+    padding: 1.4rem 1.5rem;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--pine);
+    cursor: pointer;
+    text-align: left;
+  }
+  .acc-btn i { transition: transform 0.25s ease; color: var(--moss); }
+  .acc-item.open .acc-btn i { transform: rotate(45deg); }
+  .acc-panel { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+  .acc-panel-inner { padding: 0 1.5rem 1.6rem; color: var(--ink); }
+  .acc-panel-inner ul { margin: 0.75rem 0 0 1.2rem; }
+  .acc-panel-inner li { margin-bottom: 0.4rem; }
+
+  /* Sample badge */
+  .sample-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--stone);
+    color: var(--white);
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+    margin-bottom: 0.75rem;
+  }
+
+  /* Review cards */
+  .review-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; }
+  .review-card {
+    background: var(--white);
+    border: 2px solid var(--pine);
+    border-radius: 14px;
+    padding: 1.75rem;
+  }
+  .review-card p { font-size: 0.98rem; }
+  .stars { color: var(--moss); margin-bottom: 0.75rem; letter-spacing: 0.15em; }
+  .notice {
+    background: var(--paper-warm);
+    border: 2px dashed var(--stone);
+    border-radius: 14px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+  .notice h3 { color: var(--pine); margin-bottom: 0.5rem; }
+
+  /* About */
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .about-card {
+    background: var(--white);
+    border: 2px solid var(--pine);
+    border-radius: 14px;
+    padding: 2rem;
+  }
+  .about-card i { font-size: 1.8rem; color: var(--moss); margin-bottom: 0.75rem; }
+  .about-card h3 { color: var(--pine); margin-bottom: 0.5rem; font-size: 1.3rem; }
+
+  /* Contact */
+  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start; }
+  .contact-card {
+    background: var(--white);
+    border: 2px solid var(--pine);
+    border-radius: 14px;
+    padding: 2rem;
+  }
+  .contact-card h3 { color: var(--pine); margin-bottom: 1rem; font-size: 1.4rem; }
+  .field { margin-bottom: 1rem; }
+  .field label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.35rem; }
+  .field input, .field select, .field textarea {
+    width: 100%;
+    padding: 0.75rem 0.9rem;
+    border: 2px solid var(--stone);
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    background: var(--paper);
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: none;
+    border-color: var(--moss);
+  }
+  .contact-line { display: flex; gap: 0.9rem; align-items: center; margin-bottom: 1.1rem; }
+  .contact-line i { font-size: 1.4rem; color: var(--moss); width: 2rem; text-align: center; }
+  .contact-line a { font-weight: 700; text-decoration: none; color: var(--pine); }
+  .contact-line a:hover { text-decoration: underline; }
+  #form-ready {
+    display: none;
+    margin-top: 1rem;
+    background: var(--paper-warm);
+    border: 2px solid var(--pine);
+    border-radius: 10px;
+    padding: 1.25rem;
+  }
+  #form-ready p { font-size: 0.95rem; margin-bottom: 0.75rem; }
+  #draft-text { font-size: 0.9rem; white-space: pre-wrap; }
+
+  /* Big-type footer */
+  .footer {
+    background: var(--pine-deep);
+    color: var(--white);
+    padding: 5rem 1.5rem;
+    text-align: center;
+  }
+  .footer .big {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.8rem, 6vw, 4.2rem);
+    line-height: 1;
+  }
+
+  @media (max-width: 760px) {
+    .nav-links {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--paper);
+      flex-direction: column;
+      gap: 0;
+      border-bottom: 2px solid var(--pine);
+      padding: 0.5rem 0;
+    }
+    .nav-links.open { display: flex; }
+    .nav-links li { width: 100%; text-align: center; }
+    .nav-links a { display: block; padding: 0.85rem; }
+    .nav-links a.active::after { display: none; }
+    .hamburger { display: block; }
+    .nav-phone { display: none; }
+    .pair, .about-grid, .contact-grid { grid-template-columns: 1fr; }
+    .hero-card { padding: 2.25rem 1.5rem; }
+    .section { padding: 3rem 0; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Main navigation">
+  <a class="nav-brand" href="#home" data-page="home">EdsLawnCareServices</a>
+  <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
+    <i class="fa-solid fa-bars"></i>
+  </button>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="#home" data-page="home" class="active">Home</a></li>
+    <li><a href="#services" data-page="services">Services</a></li>
+    <li><a href="#about" data-page="about">About</a></li>
+    <li><a href="#reviews" data-page="reviews">Reviews</a></li>
+    <li><a href="#contact" data-page="contact">Contact</a></li>
+  </ul>
+  <a class="nav-phone" href="tel:+15138083144"><i class="fa-solid fa-phone"></i> (513) 808-3144</a>
+</nav>
+
+<main>
+  
+  <section class="page active" id="page-home">
+    <div class="hero">
+      <div class="hero-card">
+        <span class="hero-eyebrow">Landscaper - Cincinnati, OH</span>
+        <h1>Cincinnati lawns, kept sharp.</h1>
+        <p>EdsLawnCareServices handles mowing, edging, trimming, and yard cleanups from our shop on Hutton St. One call and your yard is off your list.</p>
+        <div class="btn-row">
+          <a class="btn btn-solid" href="tel:+15138083144"><i class="fa-solid fa-phone"></i> (513) 808-3144</a>
+          <a class="btn btn-ghost" href="#contact" data-page="contact">Request a Quote</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="wrap">
+        <h2>Before and after</h2>
+        <p class="lede">Tall, tired, and taking over vs. cut clean with crisp edges. This is the difference a regular visit makes.</p>
+        <div class="pair">
+          <div class="pair-card">
+            <svg viewBox="0 0 400 220" role="img" aria-label="Illustration of an overgrown lawn before service">
+              <rect width="400" height="220" fill="#6b6f5e"/>
+              <rect y="150" width="400" height="70" fill="#7a7e66"/>
+              <g fill="#4e523f">
+                <polygon points="20,160 30,80 40,160"/><polygon points="55,160 63,60 72,160"/>
+                <polygon points="95,160 105,90 114,160"/><polygon points="130,160 138,55 147,160"/>
+                <polygon points="170,160 180,85 190,160"/><polygon points="210,160 218,65 227,160"/>
+                <polygon points="250,160 260,95 270,160"/><polygon points="290,160 298,70 307,160"/>
+                <polygon points="330,160 340,90 350,160"/><polygon points="365,160 373,75 382,160"/>
+              </g>
+              <g fill="#8f7a4a">
+                <circle cx="70" cy="100" r="6"/><circle cx="200" cy="95" r="6"/><circle cx="320" cy="105" r="6"/>
+                <rect x="68" y="106" width="4" height="20" fill="#4e523f"/>
+                <rect x="198" y="101" width="4" height="20" fill="#4e523f"/>
+                <rect x="318" y="111" width="4" height="20" fill="#4e523f"/>
+              </g>
+              <rect x="0" y="0" width="400" height="220" fill="#2c2e26" opacity="0.25"/>
+            </svg>
+            <div class="pair-label before"><span><i class="fa-solid fa-circle-exclamation"></i> Before</span><span class="tag">Illustrative</span></div>
+          </div>
+          <div class="pair-card">
+            <svg viewBox="0 0 400 220" role="img" aria-label="Illustration of a freshly mowed striped lawn after service">
+              <rect width="400" height="220" fill="#e9f0dd"/>
+              <g>
+                <rect y="150" width="400" height="70" fill="#79a25f"/>
+                <rect y="150" width="57" height="70" fill="#6d9455"/><rect y="150" x="114" width="57" height="70" fill="#6d9455"/>
+                <rect y="150" x="228" width="57" height="70" fill="#6d9455"/><rect y="150" x="342" width="58" height="70" fill="#6d9455"/>
+              </g>
+              <rect x="30" y="140" width="340" height="14" fill="#b08d57"/>
+              <rect x="30" y="140" width="340" height="4" fill="#96753f"/>
+              <g fill="#4f7f4a">
+                <ellipse cx="120" cy="120" rx="26" ry="16"/><ellipse cx="280" cy="115" rx="30" ry="18"/>
+                <rect x="116" y="120" width="8" height="18" fill="#5d4630"/><rect x="276" y="115" width="8" height="18" fill="#5d4630"/>
+              </g>
+              <circle cx="330" cy="50" r="26" fill="#f4d35e"/>
+              <g fill="#4f7f4a">
+                <polygon points="60,155 66,130 72,155"/><polygon points="150,155 156,128 162,155"/><polygon points="240,155 246,130 252,155"/>
+              </g>
+            </svg>
+            <div class="pair-label after"><span><i class="fa-solid fa-circle-check"></i> After</span><span class="tag">Illustrative</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="strip">
+      <div class="wrap">
+        <div class="strip-item">
+          <i class="fa-solid fa-clock"></i>
+          <div><strong>Mon - Sat, 8:00 AM - 9:00 PM <span class="confirm-badge">Call to confirm</span></strong><span>Open six days a week for quotes and scheduling.</span></div>
+        </div>
+        <div class="strip-item">
+          <i class="fa-solid fa-location-dot"></i>
+          <div><strong>3777 Hutton St, Cincinnati, OH 45226</strong><span>Serving Cincinnati yards near the Ohio River.</span></div>
+        </div>
+        <div class="strip-item">
+          <i class="fa-solid fa-phone"></i>
+          <div><strong><a href="tel:+15138083144" style="color: var(--white); text-decoration: none;">(513) 808-3144</a></strong><span>Talk to a real person, not a call center.</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+  <section class="page" id="page-services">
+    <div class="section">
+      <div class="wrap">
+        <h2>Services</h2>
+        <p class="lede">Straightforward yard work, priced by the job and done on schedule. Service list below is based on the public business listing. Call to confirm exactly what is offered.</p>
+        <div class="accordion" id="services-accordion">
+          <div class="acc-item">
+            <button class="acc-btn" aria-expanded="false">Weekly Lawn Mowing <i class="fa-solid fa-plus"></i></button>
+            <div class="acc-panel"><div class="acc-panel-inner">
+              <p>Regular mowing to keep your grass at a healthy height all season.</p>
+              <ul>
+                <li>Mow, trim, and blow clippings off walks and drives</li>
+                <li>Weekly or every other week schedules</li>
+                <li>Gate latches closed and yard left tidy</li>
+              </ul>
+            </div></div>
+          </div>
+          <div class="acc-item">
+            <button class="acc-btn" aria-expanded="false">Edging and String Trimming <i class="fa-solid fa-plus"></i></button>
+            <div class="acc-panel"><div class="acc-panel-inner">
+              <p>The detail work that makes a mow look finished.</p>
+              <ul>
+                <li>Crisp edges along sidewalks, driveways, and curbs</li>
+                <li>String trimming around fences, trees, and beds</li>
+                <li>Debris blown clean when done</li>
+              </ul>
+            </div></div>
+          </div>
+          <div class="acc-item">
+            <button class="acc-btn" aria-expanded="false">Mulch and Bed Refresh <i class="fa-solid fa-plus"></i></button>
+            <div class="acc-panel"><div class="acc-panel-inner">
+              <p>Fresh mulch keeps beds neat and helps hold moisture through Cincinnati summers.</p>
+              <ul>
+                <li>Old mulch turned or hauled out</li>
+                <li>New mulch laid at an even depth</li>
+                <li>Bed edges re-cut for a clean line</li>
+              </ul>
+            </div></div>
+          </div>
+          <div class="acc-item">
+            <button class="acc-btn" aria-expanded="false">Hedge and Shrub Trimming <i class="fa-solid fa-plus"></i></button>
+            <div class="acc-panel"><div class="acc-panel-inner">
+              <p>Keep hedges shaped and shrubs off the house and walkways.</p>
+              <ul>
+                <li>Shearing for formal hedges</li>
+                <li>Selective pruning for flowering shrubs</li>
+                <li>Trimmings hauled away</li>
+              </ul>
+            </div></div>
+          </div>
+          <div class="acc-item">
+            <button class="acc-btn" aria-expanded="false">Seasonal Yard Cleanups <i class="fa-solid fa-plus"></i></button>
+            <div class="acc-panel"><div class="acc-panel-inner">
+              <p>Spring and fall cleanups that reset the yard for the season ahead.</p>
+              <ul>
+                <li>Leaf and stick removal</li>
+                <li>Bed and corner cleanout</li>
+                <li>Gutter-line and fence-line clearing</li>
+              </ul>
+            </div></div>
+          </div>
+          <div class="acc-item">
+            <button class="acc-btn" aria-expanded="false">Aeration and Overseeding <i class="fa-solid fa-plus"></i></button>
+            <div class="acc-panel"><div class="acc-panel-inner">
+              <p>Ohio clay compacts fast. Aeration opens the soil so seed and water can get in.</p>
+              <ul>
+                <li>Core aeration in spring or fall</li>
+                <li>Overseeding to thicken thin spots</li>
+                <li>Best scheduled ahead of the rainy season</li>
+              </ul>
+            </div></div>
+          </div>
+        </div>
+        <p style="margin-top: 1.5rem;">Need a free quote? <a href="#contact" data-page="contact" style="font-weight: 700; color: var(--pine);">Head to the contact page</a> or call <a href="tel:+15138083144" style="font-weight: 700; color: var(--pine);">(513) 808-3144</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  
+  <section class="page" id="page-about">
+    <div class="section">
+      <div class="wrap">
+        <h2>About EdsLawnCareServices</h2>
+        <p class="lede">A local Cincinnati landscaping outfit working out of Hutton St, focused on the basics done well.</p>
+        <div class="about-grid">
+          <div class="about-card">
+            <i class="fa-solid fa-house-chimney"></i>
+            <h3>Local to Cincinnati</h3>
+            <p>Based at 3777 Hutton St, Cincinnati, OH 45226, near the Ohio River on the city's east side. This is a neighborhood business, not a franchise route.</p>
+          </div>
+          <div class="about-card">
+            <i class="fa-solid fa-scissors"></i>
+            <h3>Landscaping focus</h3>
+            <p>Listed as a landscaper serving residential yards: mowing, edging, trimming, mulching, and cleanups. If your yard needs steady care, that is the lane we stay in.</p>
+          </div>
+          <div class="about-card">
+            <i class="fa-solid fa-calendar-days"></i>
+            <h3>Six-day availability</h3>
+            <p>Hours listed as Monday through Saturday, 8:00 AM to 9:00 PM. <span class="confirm-badge">Call to confirm</span> before planning a visit.</p>
+          </div>
+          <div class="about-card">
+            <i class="fa-solid fa-phone"></i>
+            <h3>Direct line</h3>
+            <p>No portals, no hold music. Call <a href="tel:+15138083144" style="font-weight: 700; color: var(--pine);">(513) 808-3144</a> and talk to the person who will actually do the work.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+  <section class="page" id="page-reviews">
+    <div class="section">
+      <div class="wrap">
+        <h2>Reviews</h2>
+        <p class="lede">What customers say about EdsLawnCareServices.</p>
+        <div class="notice">
+          <h3>No public reviews found yet</h3>
+          <p>We searched Google, Yelp, and major directories and could not find any published customer reviews for this business. If you have used EdsLawnCareServices, call <a href="tel:+15138083144" style="font-weight: 700; color: var(--pine);">(513) 808-3144</a> and ask how to leave one. The sample cards below show the format real reviews would take once they appear.</p>
+        </div>
+        <div class="review-grid">
+          <div class="review-card">
+            <span class="sample-badge">Sample</span>
+            <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+            <p>"Sample review card. Real customer reviews for EdsLawnCareServices will be shown here once they are published."</p>
+          </div>
+          <div class="review-card">
+            <span class="sample-badge">Sample</span>
+            <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+            <p>"Sample review card. Real customer reviews for EdsLawnCareServices will be shown here once they are published."</p>
+          </div>
+        </div>
+        <p style="margin-top: 1.5rem;">Because we did not verify a real Google listing for this business, we are not linking to a Google reviews page. <a href="https://www.google.com/maps/search/?api=1&query=EdsLawnCareServices%2C%203777%20Hutton%20St%2C%20Cincinnati%2C%20OH%2045226" target="_blank" rel="noopener" style="font-weight: 700; color: var(--pine);">Get directions on Google Maps</a> instead.</p>
+      </div>
+    </div>
+  </section>
+
+  
+  <section class="page" id="page-contact">
+    <div class="section">
+      <div class="wrap">
+        <h2>Contact</h2>
+        <p class="lede">Fill in the form and we will draft your message, then call or text it to us. Or just call directly.</p>
+        <div class="contact-grid">
+          <div class="contact-card">
+            <h3>Request a quote</h3>
+            <form id="quote-form" novalidate>
+              <div class="field">
+                <label for="q-name">Your name</label>
+                <input id="q-name" name="name" type="text" placeholder="Jane Smith" required>
+              </div>
+              <div class="field">
+                <label for="q-phone">Your phone</label>
+                <input id="q-phone" name="phone" type="tel" placeholder="(513) 555-0100">
+              </div>
+              <div class="field">
+                <label for="q-service">Service needed</label>
+                <select id="q-service" name="service">
+                  <option>Weekly Lawn Mowing</option>
+                  <option>Edging and String Trimming</option>
+                  <option>Mulch and Bed Refresh</option>
+                  <option>Hedge and Shrub Trimming</option>
+                  <option>Seasonal Yard Cleanups</option>
+                  <option>Aeration and Overseeding</option>
+                  <option>Something else</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="q-msg">Tell us about your yard</label>
+                <textarea id="q-msg" name="message" rows="4" placeholder="Approx yard size, gate access, anything we should know..."></textarea>
+              </div>
+              <button class="btn btn-solid" type="submit"><i class="fa-solid fa-pen-to-square"></i> Draft my message</button>
+            </form>
+            <div id="form-ready" aria-live="polite">
+              <p><strong>Your message is drafted.</strong> Copy it below, then text or call <a href="tel:+15138083144" style="font-weight: 700; color: var(--pine);">(513) 808-3144</a>:</p>
+              <pre id="draft-text"></pre>
+              <div class="btn-row" style="justify-content: flex-start; margin-top: 1rem;">
+                <button class="btn btn-ghost" type="button" id="copy-btn"><i class="fa-solid fa-copy"></i> Copy text</button>
+                <a class="btn btn-solid" href="tel:+15138083144"><i class="fa-solid fa-phone"></i> Call now</a>
+              </div>
+            </div>
+          </div>
+          <div class="contact-card">
+            <h3>Reach us</h3>
+            <div class="contact-line">
+              <i class="fa-solid fa-phone"></i>
+              <div><a href="tel:+15138083144">(513) 808-3144</a><br><span style="font-size: 0.9rem;">Tap to call</span></div>
+            </div>
+            <div class="contact-line">
+              <i class="fa-solid fa-location-dot"></i>
+              <div>EdsLawnCareServices<br>3777 Hutton St<br>Cincinnati, OH 45226</div>
+            </div>
+            <div class="contact-line">
+              <i class="fa-solid fa-clock"></i>
+              <div>Mon - Sat: 8:00 AM - 9:00 PM<br><span style="font-size: 0.9rem;">Hours listed online <span class="confirm-badge">Call to confirm</span></span></div>
+            </div>
+            <div class="btn-row" style="justify-content: flex-start; margin-top: 1.5rem;">
+              <a class="btn btn-ghost" href="https://www.google.com/maps/search/?api=1&query=EdsLawnCareServices%2C%203777%20Hutton%20St%2C%20Cincinnati%2C%20OH%2045226" target="_blank" rel="noopener"><i class="fa-solid fa-diamond-turn-right"></i> Get Directions</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer"><p class="big">&copy; EdsLawnCareServices</p></footer>
+
+<script>
+  /* Page router: every data-page value matches a section id of the form page-<name>. */
+  const pageMap = {
+    home: 'page-home',
+    services: 'page-services',
+    about: 'page-about',
+    reviews: 'page-reviews',
+    contact: 'page-contact'
+  };
+
+  function navigateTo(page, push) {
+    if (!pageMap[page]) { page = 'home'; }
+    const pages = document.querySelectorAll('.page');
+    pages.forEach(function (p) { p.classList.remove('active'); });
+    const target = document.getElementById(pageMap[page]);
+    if (target) { target.classList.add('active'); }
+    const navAnchors = document.querySelectorAll('.nav-links a');
+    navAnchors.forEach(function (a) {
+      a.classList.toggle('active', a.getAttribute('data-page') === page);
+    });
+    if (push) { history.pushState({ page: page }, '', '#' + page); }
+    window.scrollTo(0, 0);
+    const menu = document.getElementById('nav-links');
+    menu.classList.remove('open');
+    document.getElementById('hamburger').setAttribute('aria-expanded', 'false');
+  }
+
+  document.querySelectorAll('[data-page]').forEach(function (el) {
+    el.addEventListener('click', function (e) {
+      e.preventDefault();
+      navigateTo(el.getAttribute('data-page'), true);
+    });
+  });
+
+  window.addEventListener('popstate', function (e) {
+    const page = (e.state && e.state.page) || (location.hash ? location.hash.slice(1) : 'home');
+    navigateTo(page, false);
+  });
+
+  /* Load the page from the hash on first visit. */
+  (function initFromHash() {
+    const initial = location.hash ? location.hash.slice(1) : 'home';
+    navigateTo(initial, false);
+    if (pageMap[initial]) { history.replaceState({ page: initial }, '', '#' + initial); }
+  })();
+
+  /* Mobile hamburger menu. */
+  document.getElementById('hamburger').addEventListener('click', function () {
+    const menu = document.getElementById('nav-links');
+    const isOpen = menu.classList.toggle('open');
+    this.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  });
+
+  /* Accordion services: only one panel open at a time. */
+  document.querySelectorAll('.acc-item').forEach(function (item) {
+    const btn = item.querySelector('.acc-btn');
+    const panel = item.querySelector('.acc-panel');
+    btn.addEventListener('click', function () {
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.acc-item.open').forEach(function (other) {
+        other.classList.remove('open');
+        other.querySelector('.acc-panel').style.maxHeight = null;
+        other.querySelector('.acc-btn').setAttribute('aria-expanded', 'false');
+      });
+      if (!isOpen) {
+        item.classList.add('open');
+        panel.style.maxHeight = panel.scrollHeight + 'px';
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+
+  /* Quote form: drafts a message the visitor can copy, text, or read over the phone. */
+  document.getElementById('quote-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const name = document.getElementById('q-name').value.trim() || '(no name given)';
+    const phone = document.getElementById('q-phone').value.trim() || '(no phone given)';
+    const service = document.getElementById('q-service').value;
+    const msg = document.getElementById('q-msg').value.trim() || '(no details given)';
+    const draft = 'Quote request for EdsLawnCareServices\n' +
+      'Name: ' + name + '\n' +
+      'Phone: ' + phone + '\n' +
+      'Service: ' + service + '\n' +
+      'Details: ' + msg;
+    document.getElementById('draft-text').textContent = draft;
+    document.getElementById('form-ready').style.display = 'block';
+    document.getElementById('form-ready').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+
+  document.getElementById('copy-btn').addEventListener('click', function () {
+    const text = document.getElementById('draft-text').textContent;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        document.getElementById('copy-btn').innerHTML = '<i class="fa-solid fa-check"></i> Copied';
+      });
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); } catch (err) { /* clipboard unavailable */ }
+      document.body.removeChild(ta);
+      document.getElementById('copy-btn').innerHTML = '<i class="fa-solid fa-check"></i> Copied';
+    }
+  });
+</script>
+</body>
+</html>

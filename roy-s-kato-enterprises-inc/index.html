@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roy S Kato Enterprises Inc · Landscape Designer, Pasadena, CA</title>
+<meta name="description" content="Roy S Kato Enterprises Inc is a Pasadena landscaping and gardening company. Landscape design, planting, irrigation, and garden care. Call (626) 793-9871.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FAF5E9; --paper:#FFFDF6; --line:#E4DCC6;
+  --forest:#1E3A24; --forest-deep:#142719; --sage:#7C8B5F; --sage-soft:#E9EDD8;
+  --terra:#C0663F; --terra-deep:#9A4E2E; --terra-soft:#F6E0D2;
+  --gold:#D9A441; --ink:#22301F;
+  --radius:18px;
+  --shadow:0 20px 44px -22px rgba(20,39,25,.35);
+  --shadow-sm:0 10px 24px -12px rgba(20,39,25,.25);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Inter",system-ui,sans-serif;
+  background:var(--cream);color:var(--ink);line-height:1.7;-webkit-font-smoothing:antialiased;
+}
+a{color:var(--terra-deep)}
+::selection{background:var(--terra);color:#fff}
+.wrap{max-width:1160px;margin:0 auto;padding:0 24px}
+.serif{font-family:"Fraunces",serif}
+
+/* ---------- slim top bar + side drawer ---------- */
+header.site{
+  position:sticky;top:0;z-index:60;
+  background:rgba(250,245,233,.94);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-bottom:2px solid var(--forest);
+}
+.bar{display:flex;align-items:center;gap:16px;padding:10px 0}
+.burger{
+  background:var(--forest);border:0;cursor:pointer;border-radius:12px;
+  width:46px;height:46px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;flex:none;
+}
+.burger span{display:block;width:22px;height:2.6px;border-radius:3px;background:#FAF5E9;transition:.25s}
+.burger[aria-expanded="true"] span:nth-child(1){transform:translateY(7.6px) rotate(45deg)}
+.burger[aria-expanded="true"] span:nth-child(2){opacity:0}
+.burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-7.6px) rotate(-45deg)}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--forest)}
+.brand svg{width:44px;height:44px;flex:none}
+.brand-name{font-family:"Fraunces",serif;font-weight:700;font-size:1.12rem;line-height:1.1}
+.brand-name small{display:block;font-family:"Inter",sans-serif;font-weight:700;font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--terra-deep);margin-top:3px}
+.bar .call-btn{margin-left:auto}
+.call-btn{
+  display:inline-flex;align-items:center;gap:8px;background:var(--terra);color:#fff;text-decoration:none;
+  font-weight:700;padding:11px 20px;border-radius:999px;box-shadow:var(--shadow-sm);white-space:nowrap;
+  transition:transform .18s,background .18s;
+}
+.call-btn:hover{background:var(--terra-deep);transform:translateY(-2px)}
+
+.drawer{
+  position:fixed;top:0;left:0;bottom:0;width:min(360px,86vw);z-index:80;
+  background:var(--forest);color:#EFEAD8;transform:translateX(-105%);transition:transform .35s cubic-bezier(.22,.8,.3,1);
+  display:flex;flex-direction:column;padding:28px 30px;box-shadow:var(--shadow);
+}
+.drawer.open{transform:none}
+.drawer .d-brand{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.drawer .d-brand svg{width:46px;height:46px}
+.drawer .d-brand span{font-family:"Fraunces",serif;font-weight:700;font-size:1.15rem;color:#fff;line-height:1.15}
+.drawer .d-note{font-size:.85rem;color:#B9C4A8;margin-bottom:26px}
+nav.main{display:flex;flex-direction:column;gap:4px}
+nav.main a{
+  text-decoration:none;color:#EFEAD8;font-family:"Fraunces",serif;font-size:1.35rem;font-weight:600;
+  padding:10px 14px;border-radius:12px;transition:background .2s,color .2s;display:flex;justify-content:space-between;align-items:center;
+}
+nav.main a small{font-family:"Inter",sans-serif;font-size:.68rem;letter-spacing:2px;color:#B9C4A8;font-weight:600}
+nav.main a:hover{background:rgba(255,255,255,.08)}
+nav.main a.active{background:var(--terra);color:#fff}
+nav.main a.active small{color:#FFE3CF}
+.drawer .d-foot{margin-top:auto;border-top:1px solid rgba(255,255,255,.15);padding-top:20px;font-size:.88rem;color:#B9C4A8}
+.drawer .d-foot a{color:#fff;font-weight:700;text-decoration:none;font-size:1.05rem}
+.scrim{
+  position:fixed;inset:0;background:rgba(20,39,25,.5);z-index:70;opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.scrim.show{opacity:1;pointer-events:auto}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- full-bleed garden hero ---------- */
+.hero{position:relative;overflow:hidden;background:linear-gradient(180deg,#BFD9A8 0%,#E9EDD8 46%,#FAF5E9 100%)}
+.hero-scene{position:absolute;inset:0;pointer-events:none}
+.hero-scene svg{width:100%;height:100%;display:block}
+.hero-inner{position:relative;z-index:2;padding:96px 0 84px;text-align:center}
+.kicker{
+  display:inline-flex;align-items:center;gap:10px;
+  font-size:.74rem;letter-spacing:3.5px;text-transform:uppercase;font-weight:700;color:var(--forest);
+  background:rgba(255,253,246,.85);border:1.5px solid var(--forest);
+  padding:9px 22px;border-radius:999px;margin-bottom:22px;
+}
+h1{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(2.7rem,6vw,4.6rem);line-height:1.02;letter-spacing:-.5px;color:var(--forest-deep);margin-bottom:18px}
+h1 em{font-style:italic;color:var(--terra-deep)}
+.lede{font-size:1.12rem;color:#3E4C39;max-width:36rem;margin:0 auto 30px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;justify-content:center}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;
+  padding:14px 28px;border-radius:999px;font-size:1rem;transition:transform .18s,box-shadow .18s,background .18s;
+}
+.btn-solid{background:var(--forest);color:#fff;box-shadow:var(--shadow-sm)}
+.btn-solid:hover{background:var(--forest-deep);transform:translateY(-2px)}
+.btn-terra{background:var(--terra);color:#fff;box-shadow:var(--shadow-sm)}
+.btn-terra:hover{background:var(--terra-deep);transform:translateY(-2px)}
+.btn-ghost{background:rgba(255,253,246,.9);color:var(--forest);border:2px solid var(--forest)}
+.btn-ghost:hover{background:var(--forest);color:#fff;transform:translateY(-2px)}
+.hours-pill{
+  display:inline-flex;align-items:center;gap:10px;background:rgba(30,58,36,.92);color:#FAF5E9;
+  padding:10px 22px;border-radius:999px;font-weight:600;font-size:.95rem;margin-top:26px;box-shadow:var(--shadow-sm);
+}
+
+/* ---------- magazine chapters ---------- */
+section.block{padding:68px 0}
+.chapter{margin-bottom:64px}
+.chapter:last-child{margin-bottom:0}
+.ch-no{
+  font-family:"Fraunces",serif;font-style:italic;font-size:1.15rem;color:var(--terra-deep);
+  border-bottom:2px solid var(--line);padding-bottom:10px;margin-bottom:26px;display:block;letter-spacing:.5px;
+}
+.ch-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.ch-grid.flip .ch-copy{order:2}
+h2{font-family:"Fraunces",serif;font-weight:800;font-size:clamp(1.9rem,3.6vw,2.7rem);line-height:1.1;letter-spacing:-.3px;margin-bottom:14px;color:var(--forest-deep)}
+.ch-copy p{color:#4A5644;margin-bottom:12px}
+.dropcap::first-letter{
+  font-family:"Fraunces",serif;font-weight:900;font-size:3.4em;float:left;line-height:.85;
+  padding:6px 12px 0 0;color:var(--terra-deep);
+}
+.ch-art{
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);min-height:300px;
+  display:flex;align-items:center;justify-content:center;position:relative;
+}
+.ch-art svg{width:52%;height:auto}
+.ch-art .tag{
+  position:absolute;bottom:14px;left:14px;background:rgba(255,253,246,.92);
+  font-size:.68rem;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;color:var(--forest);
+  padding:6px 14px;border-radius:999px;
+}
+.quote{
+  background:var(--forest);color:#EFEAD8;border-radius:var(--radius);padding:52px 48px;position:relative;overflow:hidden;box-shadow:var(--shadow);
+}
+.quote::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(217,164,65,.25), transparent 55%)}
+.quote p{font-family:"Fraunces",serif;font-size:clamp(1.4rem,2.6vw,1.9rem);line-height:1.45;position:relative;margin-bottom:16px}
+.quote cite{font-style:normal;font-weight:700;font-size:.82rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);position:relative}
+
+/* ---------- dotted-leader services ---------- */
+.leaders{list-style:none;margin-top:8px}
+.leaders li{padding:22px 4px;border-bottom:1px dashed rgba(30,58,36,.3)}
+.leaders .row{display:flex;align-items:baseline;gap:14px}
+.leaders .row strong{font-family:"Fraunces",serif;font-size:1.35rem;color:var(--forest-deep);white-space:nowrap}
+.leaders .dots{flex:1;border-bottom:3px dotted var(--sage);transform:translateY(-5px);min-width:30px}
+.leaders .flag{
+  font-size:.66rem;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;white-space:nowrap;
+  background:var(--sage-soft);color:var(--forest);padding:6px 14px;border-radius:999px;
+}
+.leaders small{display:block;color:#5A6653;margin-top:6px;max-width:46rem}
+.svc-note{
+  margin-top:22px;background:var(--terra-soft);border:2px dashed var(--terra);
+  border-radius:var(--radius);padding:20px 26px;font-size:.96rem;color:#6E3A20;
+}
+.svc-note strong{color:var(--terra-deep)}
+
+/* ---------- arch-tile gallery ---------- */
+.arch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+.arch{
+  background:var(--paper);border:1px solid var(--line);border-radius:999px 999px var(--radius) var(--radius);
+  overflow:hidden;box-shadow:var(--shadow-sm);transition:transform .25s;position:relative;text-align:center;
+}
+.arch:hover{transform:translateY(-8px)}
+.arch .art{aspect-ratio:1/1.06;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:999px 999px 0 0}
+.arch .art svg{width:50%;height:auto}
+.arch .cap{padding:18px 20px 24px}
+.arch .cap strong{font-family:"Fraunces",serif;font-size:1.12rem;display:block;color:var(--forest-deep)}
+.arch .cap small{color:#5A6653}
+.arch .soon{
+  position:absolute;top:18px;left:50%;transform:translateX(-50%);
+  background:rgba(255,253,246,.92);font-size:.64rem;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;
+  padding:5px 14px;border-radius:999px;color:var(--forest);white-space:nowrap;
+}
+
+/* ---------- strips ---------- */
+.strip{border-radius:var(--radius);padding:56px 48px;color:#fff;position:relative;overflow:hidden;margin-bottom:40px;box-shadow:var(--shadow)}
+.strip h2{color:#fff;font-size:clamp(2rem,4vw,2.9rem);margin:6px 0 10px}
+.strip p{color:rgba(255,255,255,.88);max-width:38rem}
+.strip .ch-no{color:var(--gold);border-bottom-color:rgba(255,255,255,.25)}
+.strip.s-svc{background:linear-gradient(120deg,#1E3A24,#142719)}
+.strip.s-about{background:linear-gradient(120deg,#9A4E2E,#5E2F1B)}
+.strip.s-gal{background:linear-gradient(120deg,#3E5A2B,#223318)}
+.strip.s-rev{background:linear-gradient(120deg,#5C6B45,#33402A)}
+.strip.s-visit{background:linear-gradient(120deg,#142719,#0D1A11)}
+
+/* ---------- reviews ---------- */
+.rev-state{
+  background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+  padding:46px 42px;box-shadow:var(--shadow-sm);text-align:center;margin-bottom:26px;
+}
+.rev-state h3{font-family:"Fraunces",serif;font-size:1.7rem;margin-bottom:10px;color:var(--forest-deep)}
+.rev-state p{color:#5A6653;max-width:40rem;margin:0 auto 22px}
+.rs-strip{margin:0 auto;max-width:560px;background:#FFFDF6;border:1px solid #E9EDD8;border-radius:14px;padding:18px 22px;text-align:center}
+.rs-note{margin:0 0 12px;font-size:.95rem;color:#4A5644;line-height:1.55}
+.rs-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rs-btn{display:inline-block;background:#1E3A24;color:#FAF5E9;padding:10px 24px;border-radius:999px;font-weight:700;text-decoration:none;font-size:.95rem;line-height:1.2}
+.rs-btn:hover{background:#C0663F;color:#fff}
+.cta-band{background:var(--forest);border-radius:var(--radius);color:#fff;padding:52px 40px;text-align:center;margin-top:40px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.cta-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 20%, rgba(217,164,65,.3), transparent 55%)}
+.cta-band h2{color:#fff;position:relative}
+.cta-band p{color:#C9D2B6;max-width:36rem;margin:0 auto 26px;position:relative}
+.cta-band .btn-terra{position:relative}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
+.info-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm)}
+.info-card h3{font-family:"Fraunces",serif;font-size:1.4rem;margin-bottom:12px;display:flex;align-items:center;gap:12px;color:var(--forest-deep)}
+.info-card h3 svg{width:26px;height:26px}
+.info-card p{color:#5A6653;margin-bottom:8px}
+.info-card a.big{font-family:"Fraunces",serif;font-size:1.6rem;font-weight:700;color:var(--terra-deep);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.map-card{
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:320px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 42px, rgba(30,58,36,.10) 42px 44px),
+    repeating-linear-gradient(90deg, transparent 0 42px, rgba(30,58,36,.10) 42px 44px),
+    linear-gradient(140deg,#E9EDD8,#D5DBBC);
+  display:flex;align-items:center;justify-content:center;
+}
+.map-pin{text-align:center;background:var(--paper);padding:26px 34px;border-radius:var(--radius);box-shadow:var(--shadow);max-width:80%;border-top:5px solid var(--terra)}
+.map-pin svg{width:40px;height:40px;margin-bottom:8px}
+.map-pin strong{font-family:"Fraunces",serif;font-size:1.15rem;display:block;color:var(--forest-deep)}
+.map-pin small{color:#5A6653}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- multi-column footer ---------- */
+footer{background:var(--forest-deep);color:#C9D2B6;margin-top:20px;border-top:5px solid var(--terra)}
+.foot-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:40px;padding:56px 0 32px}
+.foot-grid h4{font-family:"Fraunces",serif;color:#fff;font-size:1.12rem;margin-bottom:14px}
+.foot-grid p,.foot-grid a{color:#A9B695;font-size:.94rem}
+.foot-grid a{text-decoration:none;display:block;margin-bottom:8px}
+.foot-grid a:hover{color:var(--gold)}
+.foot-brand{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.foot-brand svg{width:44px;height:44px}
+.foot-brand span{font-family:"Fraunces",serif;font-weight:700;color:#fff;font-size:1.2rem;line-height:1.2}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.12);padding:18px 0 24px;text-align:center;font-size:.88rem;color:#8FA07E}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:940px){
+  .ch-grid{grid-template-columns:1fr}
+  .ch-grid.flip .ch-copy{order:0}
+  .visit-grid{grid-template-columns:1fr}
+  .arch-grid{grid-template-columns:1fr 1fr}
+  .foot-grid{grid-template-columns:1fr}
+  .strip{padding:40px 28px}
+  .bar .call-btn{display:none}
+}
+@media(max-width:600px){
+  .arch-grid{grid-template-columns:1fr}
+  .hero-inner{padding:70px 0 64px}
+  .quote{padding:38px 28px}
+  .cta-band{padding:38px 24px}
+}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap bar">
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    <a class="brand" href="#home" data-page="home" aria-label="Roy S Kato Enterprises Inc, home">
+      <svg viewBox="0 0 48 48" role="img" aria-label="Leaf logo"><circle cx="24" cy="24" r="21" fill="#1E3A24"/><path d="M24 38 C14 32 12 22 16 12 C26 16 30 26 24 38 Z" fill="#7C8B5F"/><path d="M24 38 C34 32 36 22 32 12 C22 16 18 26 24 38 Z" fill="#D9A441" opacity=".85"/><path d="M24 36 L24 16" stroke="#FAF5E9" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span class="brand-name">Roy S Kato Enterprises<small>Landscape · Pasadena, CA</small></span>
+    </a>
+    <a class="call-btn" href="tel:+16267939871">(626) 793-9871</a>
+  </div>
+</header>
+
+<aside class="drawer" id="drawer" aria-label="Site menu">
+  <div class="d-brand">
+    <svg viewBox="0 0 48 48" role="img" aria-label="Leaf logo"><circle cx="24" cy="24" r="21" fill="#FAF5E9"/><path d="M24 38 C14 32 12 22 16 12 C26 16 30 26 24 38 Z" fill="#7C8B5F"/><path d="M24 38 C34 32 36 22 32 12 C22 16 18 26 24 38 Z" fill="#D9A441" opacity=".85"/></svg>
+    <span>Roy S Kato<br>Enterprises Inc</span>
+  </div>
+  <p class="d-note">Landscaping and gardening in Pasadena, California.</p>
+  <nav class="main" id="mainNav" aria-label="Main navigation">
+    <a href="#home" data-page="home" class="active" aria-current="page">Home <small>01</small></a>
+    <a href="#services" data-page="services">Services <small>02</small></a>
+    <a href="#about" data-page="about">About <small>03</small></a>
+    <a href="#gallery" data-page="gallery">Gallery <small>04</small></a>
+    <a href="#reviews" data-page="reviews">Reviews <small>05</small></a>
+    <a href="#visit" data-page="visit">Visit <small>06</small></a>
+  </nav>
+  <div class="d-foot">
+    Questions or a project in mind?<br>
+    <a href="tel:+16267939871">(626) 793-9871</a>
+  </div>
+</aside>
+<div class="scrim" id="scrim"></div>
+
+<!-- ==================== HOME ==================== -->
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-scene" aria-hidden="true">
+      <svg viewBox="0 0 1440 520" preserveAspectRatio="xMidYMax slice">
+        <circle cx="1150" cy="110" r="62" fill="#F2C14E" opacity=".9"/>
+        <circle cx="1150" cy="110" r="88" fill="#F2C14E" opacity=".18"/>
+        <ellipse cx="300" cy="90" rx="120" ry="34" fill="#fff" opacity=".55"/>
+        <ellipse cx="700" cy="60" rx="150" ry="38" fill="#fff" opacity=".45"/>
+        <path d="M0 380 Q 360 300 720 370 T 1440 350 V 520 H 0 Z" fill="#9DB87F"/>
+        <path d="M0 430 Q 400 370 800 425 T 1440 415 V 520 H 0 Z" fill="#7C8B5F"/>
+        <path d="M0 480 Q 480 430 960 475 T 1440 465 V 520 H 0 Z" fill="#5C6B45"/>
+        <g stroke="#2E4630" stroke-width="7" stroke-linecap="round">
+          <path d="M180 470 C 178 420 176 400 170 380 M170 380 C 160 360 148 352 138 350 M170 380 C 180 362 192 356 202 354"/>
+          <path d="M1260 465 C 1258 420 1256 402 1250 384 M1250 384 C 1240 366 1228 358 1218 356 M1250 384 C 1260 368 1272 362 1282 360"/>
+        </g>
+        <g fill="#3E5A2B">
+          <ellipse cx="140" cy="352" rx="26" ry="14"/><ellipse cx="200" cy="356" rx="24" ry="13"/>
+          <ellipse cx="1220" cy="358" rx="26" ry="14"/><ellipse cx="1280" cy="362" rx="24" ry="13"/>
+        </g>
+        <g fill="#C0663F">
+          <ellipse cx="520" cy="470" rx="34" ry="18"/><ellipse cx="580" cy="478" rx="28" ry="15"/>
+          <ellipse cx="900" cy="472" rx="32" ry="17"/>
+        </g>
+        <g stroke="#3E5A2B" stroke-width="4" stroke-linecap="round">
+          <path d="M520 470 C 516 446 514 436 508 424 M508 424 C 500 414 492 412 486 412"/>
+          <path d="M580 478 C 578 456 576 448 572 438 M572 438 C 566 430 560 428 554 428"/>
+          <path d="M900 472 C 898 448 896 438 890 428 M890 428 C 882 418 874 416 868 416"/>
+        </g>
+        <g fill="#3E5A2B"><ellipse cx="488" cy="412" rx="14" ry="8"/><ellipse cx="556" cy="428" rx="13" ry="7"/><ellipse cx="870" cy="416" rx="14" ry="8"/></g>
+        <path d="M660 520 L 720 400 Q 720 380 740 380 Q 760 380 760 400 L 820 520" fill="none" stroke="#6E3A20" stroke-width="10" stroke-linecap="round"/>
+        <g fill="#8FA07E" opacity=".8">
+          <path d="M200 130 q 14 -16 28 0 q -14 6 -28 0" />
+          <path d="M980 90 q 14 -16 28 0 q -14 6 -28 0" />
+          <path d="M620 150 q 14 -16 28 0 q -14 6 -28 0" />
+        </g>
+      </svg>
+    </div>
+    <div class="wrap hero-inner">
+      <span class="kicker">Landscape Designer · Pasadena, CA</span>
+      <h1>Gardens with <em>roots</em><br>in Pasadena.</h1>
+      <p class="lede">Roy S Kato Enterprises Inc is a Pasadena landscaping and gardening company. We design, plant, and care for outdoor spaces that fit the way Southern California lives.</p>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="tel:+16267939871">Call (626) 793-9871</a>
+        <a class="btn btn-ghost" href="#services" data-page="services">Our Services</a>
+      </div>
+      <br>
+      <span class="hours-pill">Call for hours · estimates by phone</span>
+    </div>
+  </div>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="chapter reveal">
+        <span class="ch-no">Chapter 01 · Design</span>
+        <div class="ch-grid">
+          <div class="ch-copy">
+            <h2>Designed for how you live outside</h2>
+            <p class="dropcap">A good garden starts with listening. How much sun does the yard get? Where do you drink your morning coffee? What should bloom in April, and what should stay green through August?</p>
+            <p>Landscape design is the craft of answering those questions with plants, paths, and open space, so the finished garden feels inevitable, like it was always meant to be there.</p>
+            <a class="btn btn-terra" href="#services" data-page="services">See the services</a>
+          </div>
+          <div class="ch-art" style="background:linear-gradient(150deg,#E9EDD8,#C9D2B6)">
+            <svg viewBox="0 0 100 100" fill="none" stroke="#1E3A24" stroke-width="2.6" stroke-linecap="round"><rect x="18" y="22" width="64" height="48" rx="4"/><path d="M18 40 H82 M18 55 H82 M44 22 V70 M64 22 V70" stroke-width="1.6"/><circle cx="32" cy="32" r="6" fill="#C0663F" stroke="none"/><circle cx="72" cy="62" r="6" fill="#7C8B5F" stroke="none"/><path d="M10 84 H90" stroke-width="3"/></svg>
+            <span class="tag">Design sketch</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="chapter reveal">
+        <span class="ch-no">Chapter 02 · Craft</span>
+        <div class="ch-grid flip">
+          <div class="ch-copy">
+            <h2>Planted with a gardener's hands</h2>
+            <p>Soil preparation, proper planting depth, smart irrigation, and clean edging. The unglamorous details are what make a new landscape survive its first summer and thrive for decades.</p>
+            <p>From fresh plantings to full garden makeovers, we bring the care of people who genuinely like being outside.</p>
+            <a class="btn btn-ghost" href="#gallery" data-page="gallery">Browse the gallery</a>
+          </div>
+          <div class="ch-art" style="background:linear-gradient(150deg,#F6E0D2,#EFC9AC)">
+            <svg viewBox="0 0 100 100" fill="none" stroke="#9A4E2E" stroke-width="2.6" stroke-linecap="round"><path d="M50 88 V52"/><path d="M50 52 C50 38 60 34 64 24 C54 26 48 34 48 44"/><path d="M50 64 C50 52 42 48 38 40 C46 42 52 48 52 56" stroke="#5C6B45"/><ellipse cx="50" cy="90" rx="26" ry="5" fill="#5C6B45" stroke="none"/><circle cx="64" cy="22" r="7" fill="#C0663F" stroke="none"/></svg>
+            <span class="tag">New planting</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="chapter reveal">
+        <span class="ch-no">Chapter 03 · Care</span>
+        <div class="ch-grid">
+          <div class="ch-copy">
+            <h2>Kept beautiful, season after season</h2>
+            <p>Gardens are living things. Regular pruning, feeding, mulching, and irrigation checkups keep them healthy and keep small issues from becoming expensive ones.</p>
+            <p>Ask about ongoing garden care when you call. One visit or a regular schedule, we keep it simple.</p>
+            <a class="btn btn-solid" href="tel:+16267939871">Call (626) 793-9871</a>
+          </div>
+          <div class="ch-art" style="background:linear-gradient(150deg,#DCE4C8,#B9C79B)">
+            <svg viewBox="0 0 100 100" fill="none" stroke="#1E3A24" stroke-width="2.6" stroke-linecap="round"><path d="M30 78 C 30 60 40 52 52 50 C 64 48 72 40 72 28"/><path d="M52 50 C 48 58 40 62 32 62 C 40 66 50 62 54 54" stroke="#7C8B5F"/><circle cx="72" cy="24" r="8" fill="#D9A441" stroke="none"/><path d="M20 86 H80" stroke-width="3"/></svg>
+            <span class="tag">Seasonal care</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="quote reveal">
+        <p>A garden is never finished, it just gets more interesting. Our job is to start yours off right and keep it thriving.</p>
+        <cite>Roy S Kato Enterprises Inc · Pasadena</cite>
+      </div>
+    </div>
+  </section>
+</section>
+<!-- ==================== SERVICES ==================== -->
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-svc">
+      <span class="ch-no">Chapter 02 · Services</span>
+      <h2>What we do in the garden</h2>
+      <p>Design, installation, and care for residential outdoor spaces in Pasadena and nearby neighborhoods.</p>
+    </div>
+    <ul class="leaders">
+      <li class="reveal">
+        <div class="row"><strong>Landscape design</strong><span class="dots"></span><span class="flag">Call to confirm</span></div>
+        <small>Planting plans and layout concepts shaped around your sun, soil, and how you use the yard.</small>
+      </li>
+      <li class="reveal">
+        <div class="row"><strong>Garden installation</strong><span class="dots"></span><span class="flag">Call to confirm</span></div>
+        <small>Soil prep, planting, mulch, and edging for new beds, borders, and full garden makeovers.</small>
+      </li>
+      <li class="reveal">
+        <div class="row"><strong>Trees, shrubs &amp; color</strong><span class="dots"></span><span class="flag">Call to confirm</span></div>
+        <small>Selecting and placing plants that thrive in Pasadena, with seasonal color where it counts.</small>
+      </li>
+      <li class="reveal">
+        <div class="row"><strong>Irrigation &amp; watering</strong><span class="dots"></span><span class="flag">Call to confirm</span></div>
+        <small>Efficient watering setups and checkups so plants get what they need and not a drop more.</small>
+      </li>
+      <li class="reveal">
+        <div class="row"><strong>Garden cleanup</strong><span class="dots"></span><span class="flag">Call to confirm</span></div>
+        <small>One-time cleanups for overgrown yards, plus pruning, weeding, and green-waste hauling.</small>
+      </li>
+      <li class="reveal">
+        <div class="row"><strong>Ongoing garden care</strong><span class="dots"></span><span class="flag">Call to confirm</span></div>
+        <small>Regular visits for pruning, feeding, mulching, and keeping everything healthy year round.</small>
+      </li>
+    </ul>
+    <div class="svc-note reveal"><strong>Good to know:</strong> this list describes typical landscaping and gardening services. For exact services, availability, and estimates, please call <a href="tel:+16267939871">(626) 793-9871</a> and describe your project.</div>
+    <div class="cta-band reveal">
+      <h2>Ready to love your yard again?</h2>
+      <p>Call and tell us about your garden. We will talk through what it needs and set up a time to see it.</p>
+      <a class="btn btn-terra" href="tel:+16267939871">Call (626) 793-9871</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<!-- ==================== ABOUT ==================== -->
+<section class="page" id="page-about">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-about">
+      <span class="ch-no">Chapter 03 · About</span>
+      <h2>Rooted in Pasadena</h2>
+      <p>Roy S Kato Enterprises Inc is a landscaping and gardening company based in Pasadena, California.</p>
+    </div>
+    <div class="ch-grid reveal" style="margin-bottom:48px">
+      <div class="ch-copy">
+        <h2>A local name in local gardens</h2>
+        <p class="dropcap">Roy S Kato Enterprises Inc serves Pasadena from its office at 338 S Rosemead Blvd #4953. Listed as a landscaping and gardening business, the company works on the outdoor spaces of homes and properties across the area.</p>
+        <p>Like many small trade businesses, most of its story lives in its work rather than on the web. The surest way to learn about current services and availability is a direct call.</p>
+        <a class="btn btn-solid" href="tel:+16267939871">Call (626) 793-9871</a>
+      </div>
+      <div class="ch-art" style="background:linear-gradient(150deg,#E9EDD8,#C9D2B6)">
+        <svg viewBox="0 0 100 100" fill="none" stroke="#1E3A24" stroke-width="2.6" stroke-linecap="round"><path d="M50 88 V46"/><path d="M50 46 C50 34 58 30 62 22 C54 24 48 30 47 38"/><path d="M50 58 C50 48 44 44 40 38 C46 40 52 44 52 50" stroke="#7C8B5F"/><ellipse cx="50" cy="90" rx="28" ry="5" fill="#5C6B45" stroke="none"/><circle cx="62" cy="20" r="7" fill="#C0663F" stroke="none"/><circle cx="40" cy="36" r="5" fill="#D9A441" stroke="none"/></svg>
+        <span class="tag">Pasadena grown</span>
+      </div>
+    </div>
+    <div class="quote reveal">
+      <p>Every yard has potential. Sometimes it just needs someone who knows what to cut, what to keep, and what to plant.</p>
+      <cite>Roy S Kato Enterprises Inc</cite>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<!-- ==================== GALLERY ==================== -->
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-gal">
+      <span class="ch-no">Chapter 04 · Gallery</span>
+      <h2>From the garden arch</h2>
+      <p>Artistic previews of garden themes we work with. Real project photos are on the way.</p>
+    </div>
+    <div class="arch-grid">
+      <div class="arch reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(160deg,#DCE4C8,#A9BC8B)">
+          <svg viewBox="0 0 100 100" fill="none" stroke="#1E3A24" stroke-width="2.6" stroke-linecap="round"><path d="M50 88 V50"/><path d="M50 50 C40 44 36 34 38 26 C46 30 50 38 50 46"/><path d="M50 62 C58 56 62 48 60 40 C54 44 50 50 50 58" stroke="#5C6B45"/><circle cx="38" cy="24" r="6" fill="#C0663F" stroke="none"/><circle cx="60" cy="38" r="5" fill="#D9A441" stroke="none"/></svg>
+        </div>
+        <div class="cap"><strong>Flowering borders</strong><small>Seasonal color, layered planting</small></div>
+      </div>
+      <div class="arch reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(160deg,#E9EDD8,#C2D0A4)">
+          <svg viewBox="0 0 100 100" fill="none" stroke="#2E4630" stroke-width="2.6" stroke-linecap="round"><path d="M50 88 V40"/><path d="M50 40 C42 30 30 28 22 30 C30 36 40 38 48 40"/><path d="M50 52 C58 42 70 40 78 42 C70 48 60 50 52 52" stroke="#5C6B45"/><ellipse cx="50" cy="90" rx="24" ry="5" fill="#5C6B45" stroke="none"/></svg>
+        </div>
+        <div class="cap"><strong>Trees &amp; shrubs</strong><small>Structure for every season</small></div>
+      </div>
+      <div class="arch reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(160deg,#F6E0D2,#E8B98F)">
+          <svg viewBox="0 0 100 100" fill="none" stroke="#9A4E2E" stroke-width="2.6" stroke-linecap="round"><path d="M20 78 H80 M32 78 V54 Q50 44 68 54 V78"/><path d="M44 54 V78 M56 54 V78" stroke-width="1.8"/><circle cx="50" cy="40" r="9" fill="#7C8B5F" stroke="none"/><path d="M50 31 V20" stroke="#5C6B45"/></svg>
+        </div>
+        <div class="cap"><strong>Garden structures</strong><small>Arbors, trellises &amp; gates</small></div>
+      </div>
+      <div class="arch reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(160deg,#D5E4EE,#A9C6DA)">
+          <svg viewBox="0 0 100 100" fill="none" stroke="#1F6FA8" stroke-width="2.6" stroke-linecap="round"><path d="M50 22 V78 M28 34 Q50 28 72 34 M32 50 Q50 44 68 50 M36 66 Q50 60 64 66"/><circle cx="50" cy="82" r="7" fill="#1F6FA8" stroke="none" opacity=".4"/></svg>
+        </div>
+        <div class="cap"><strong>Irrigation</strong><small>Water where it matters</small></div>
+      </div>
+      <div class="arch reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(160deg,#EAD9B8,#CFA96F)">
+          <svg viewBox="0 0 100 100" fill="none" stroke="#6E4E1E" stroke-width="2.6" stroke-linecap="round"><path d="M24 78 C 30 60 44 54 50 54 C 56 54 70 60 76 78"/><path d="M34 78 C 38 68 44 64 48 64 M66 78 C 62 68 56 64 52 64" stroke-width="1.8"/><circle cx="50" cy="46" r="7" fill="#7C8B5F" stroke="none"/></svg>
+        </div>
+        <div class="cap"><strong>Mulch &amp; soil</strong><small>Healthy ground, healthy plants</small></div>
+      </div>
+      <div class="arch reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(160deg,#E4DCC6,#C4B88F)">
+          <svg viewBox="0 0 100 100" fill="none" stroke="#5C4B1E" stroke-width="2.6" stroke-linecap="round"><path d="M30 70 L50 30 L70 70"/><path d="M38 70 L50 46 L62 70" stroke-width="1.8"/><path d="M24 78 H76" stroke-width="3"/><circle cx="50" cy="24" r="5" fill="#C0663F" stroke="none"/></svg>
+        </div>
+        <div class="cap"><strong>Clean lines</strong><small>Edging, pruning &amp; detail</small></div>
+      </div>
+    </div>
+    <div class="svc-note reveal" style="margin-top:40px"><strong>Coming soon:</strong> real photos of our work around Pasadena. The illustrations above are artistic previews only. Call <a href="tel:+16267939871">(626) 793-9871</a> to see recent projects in person.</div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<!-- ==================== REVIEWS ==================== -->
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-rev">
+      <span class="ch-no">Chapter 05 · Reviews</span>
+      <h2>Word from the neighborhood</h2>
+      <p>We searched public sources for reviews of Roy S Kato Enterprises Inc. Here is what we found.</p>
+    </div>
+    <div class="rev-state reveal">
+      <h3>No public reviews found yet</h3>
+      <p>As of our latest check, there are no published Google reviews for Roy S Kato Enterprises Inc. That is common for small trade businesses whose work comes mostly through word of mouth and repeat clients.</p>
+      <div class="rs-strip">
+        <p class="rs-note">The most current ratings and reviews, if any, live on the business Google listing.</p>
+        <div class="rs-links"><a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJUW1gmHDbwoARi7M_EqkR-qs" target="_blank" rel="noopener">See reviews on Google</a></div>
+      </div>
+    </div>
+    <div class="cta-band reveal">
+      <h2>Happy with our work?</h2>
+      <p>If we have worked on your garden, a Google review helps neighbors find us. Thank you for spreading the word.</p>
+      <a class="btn btn-terra" href="https://www.google.com/maps/place/?q=place_id:ChIJUW1gmHDbwoARi7M_EqkR-qs" target="_blank" rel="noopener">Review us on Google</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<!-- ==================== VISIT ==================== -->
+<section class="page" id="page-visit">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-visit">
+      <span class="ch-no">Chapter 06 · Visit</span>
+      <h2>Come talk gardens</h2>
+      <p>We are based in Pasadena and work across the surrounding neighborhoods. Call first, we are often out in the field.</p>
+    </div>
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#C0663F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Find us</h3>
+        <p><strong>Roy S Kato Enterprises Inc</strong><br>338 S Rosemead Blvd #4953<br>Pasadena, CA 91107</p>
+        <p>Please call before visiting. We are usually out working in gardens around Pasadena.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#C0663F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg> Call us</h3>
+        <p>Estimates, scheduling, and garden questions:</p>
+        <a class="big" href="tel:+16267939871">(626) 793-9871</a>
+        <p style="margin-top:10px">Tell us about your yard and what you would like to change.</p>
+      </div>
+    </div>
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#C0663F" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Hours</h3>
+        <p><strong>Call for hours.</strong></p>
+        <p>Office hours are not published online. Please call <a href="tel:+16267939871">(626) 793-9871</a> to confirm availability.</p>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <svg viewBox="0 0 24 24" fill="#C0663F"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#FAF5E9"/></svg>
+          <strong>338 S Rosemead Blvd #4953</strong>
+          <small>Pasadena, CA 91107</small><br>
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJUW1gmHDbwoARi7M_EqkR-qs" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand">
+          <svg viewBox="0 0 48 48" role="img" aria-label="Leaf logo"><circle cx="24" cy="24" r="21" fill="#FAF5E9"/><path d="M24 38 C14 32 12 22 16 12 C26 16 30 26 24 38 Z" fill="#7C8B5F"/><path d="M24 38 C34 32 36 22 32 12 C22 16 18 26 24 38 Z" fill="#D9A441" opacity=".85"/></svg>
+          <span>Roy S Kato<br>Enterprises Inc</span>
+        </div>
+        <p>Landscaping and gardening in Pasadena, California. Design, planting, and garden care for Southern California yards.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <a href="#home" data-page="home">Home</a>
+        <a href="#services" data-page="services">Services</a>
+        <a href="#about" data-page="about">About</a>
+        <a href="#gallery" data-page="gallery">Gallery</a>
+        <a href="#reviews" data-page="reviews">Reviews</a>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <p>338 S Rosemead Blvd #4953<br>Pasadena, CA 91107</p>
+        <a href="tel:+16267939871" style="color:#fff;font-weight:700">(626) 793-9871</a>
+        <p style="margin-top:8px">Call for hours</p>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© Roy S Kato Enterprises Inc</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+  var drawer = document.getElementById("drawer");
+  var scrim = document.getElementById("scrim");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(drawer){ drawer.classList.remove("open"); }
+    if(scrim){ scrim.classList.remove("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && drawer){
+    burger.addEventListener("click", function(){
+      var open = drawer.classList.toggle("open");
+      if(scrim){ scrim.classList.toggle("show", open); }
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+  if(scrim){
+    scrim.addEventListener("click", closeMenu);
+  }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Geo The Builder | Handyman in Valley Village, CA | (818) 630-9920</title>
+<meta name="description" content="Geo The Builder is a handyman serving Valley Village, CA. Home repairs, drywall, painting, mounting, plumbing fixes and more. Call (818) 630-9920 for a free estimate.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FAF6EE; --paper-2:#F3EBDB; --card:#FFFDF8;
+  --ink:#20242B; --ink-soft:#5B6069;
+  --orange:#E8641C; --orange-deep:#B84C10; --orange-soft:#FBE3CF;
+  --steel:#2E3A46; --steel-soft:#E3E9EF;
+  --line:rgba(32,36,43,.14);
+  --radius:16px;
+  --shadow:0 20px 44px -20px rgba(32,36,43,.28);
+  --shadow-sm:0 10px 24px -12px rgba(32,36,43,.24);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Inter",system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:var(--orange-deep)}
+::selection{background:var(--orange);color:#fff}
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+.serif{font-family:"Fraunces",serif}
+img{max-width:100%}
+
+/* ---------- top bar ---------- */
+.topbar{position:sticky;top:0;z-index:80;display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:rgba(250,246,238,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:2px solid var(--line)}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
+.brand svg{width:44px;height:44px;flex:none}
+.brand-name{font-family:"Fraunces",serif;font-weight:900;font-size:1.3rem;line-height:1}
+.brand-name small{display:block;font-family:"Inter",sans-serif;font-weight:800;font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--orange-deep);margin-top:3px}
+.bar-call{display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:#fff;text-decoration:none;font-weight:700;padding:10px 20px;border-radius:999px;font-size:.95rem;transition:background .2s,transform .2s}
+.bar-call:hover{background:var(--orange);transform:translateY(-2px)}
+.burger{background:none;border:0;cursor:pointer;padding:10px;display:inline-flex;flex-direction:column;gap:5px;z-index:80;position:relative}
+.burger span{display:block;width:28px;height:3px;border-radius:3px;background:var(--ink);transition:.3s}
+.burger[aria-expanded="true"] span{background:#fff}
+.burger[aria-expanded="true"] span:nth-child(1){transform:translateY(8px) rotate(45deg)}
+.burger[aria-expanded="true"] span:nth-child(2){opacity:0}
+.burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-8px) rotate(-45deg)}
+
+/* ---------- fullscreen overlay nav ---------- */
+.overlay{position:fixed;inset:0;z-index:70;background:var(--ink);display:flex;flex-direction:column;justify-content:center;padding:110px 8vw 48px;opacity:0;visibility:hidden;transition:opacity .35s,visibility .35s}
+.overlay.open{opacity:1;visibility:visible}
+.overlay::before{content:"";position:absolute;inset:0;background-image:repeating-linear-gradient(-45deg,rgba(232,100,28,.10) 0 14px,transparent 14px 28px);pointer-events:none}
+.overlay nav{position:relative;display:flex;flex-direction:column;gap:6px}
+.overlay a.page-link{position:relative;text-decoration:none;color:#fff;font-family:"Fraunces",serif;font-weight:900;font-size:clamp(2rem,6vw,3.4rem);line-height:1.25;padding:8px 0;display:flex;align-items:baseline;gap:18px;transition:color .2s,transform .2s}
+.overlay a.page-link .num{font-family:"Inter",sans-serif;font-size:.8rem;font-weight:700;color:var(--orange);letter-spacing:2px}
+.overlay a.page-link:hover{color:var(--orange);transform:translateX(10px)}
+.overlay a.page-link.active{color:var(--orange)}
+.overlay .ov-foot{position:relative;margin-top:36px;display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+.overlay .ov-foot a.btn{margin:0}
+.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;padding:14px 28px;border-radius:999px;font-size:1rem;transition:transform .18s,background .18s;cursor:pointer;border:0}
+.btn-solid{background:var(--orange);color:#fff}
+.btn-solid:hover{background:var(--orange-deep);transform:translateY(-2px)}
+.btn-dark{background:var(--ink);color:#fff}
+.btn-dark:hover{background:var(--steel);transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:var(--ink);border:2px solid var(--line)}
+.btn-ghost:hover{border-color:var(--orange);color:var(--orange-deep);transform:translateY(-2px)}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- editorial hero ---------- */
+.hero{padding:64px 0 40px;position:relative;overflow:hidden}
+.hero-kicker{display:inline-flex;align-items:center;gap:10px;background:var(--card);border:2px solid var(--line);border-radius:999px;padding:8px 18px;font-weight:700;font-size:.85rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--orange-deep);margin-bottom:22px}
+.hero-kicker .dot{width:9px;height:9px;border-radius:50%;background:var(--orange);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
+.hero h1{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(3rem,8.5vw,6.6rem);line-height:.98;letter-spacing:-1.5px;margin-bottom:6px}
+.hero h1 .rule{display:block}
+.hero h1 .em{color:var(--orange);font-style:italic}
+.hero-sub{max-width:40rem;font-size:1.15rem;color:var(--ink-soft);margin:20px 0 28px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:40px}
+.hero-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0;border:2px solid var(--ink);border-radius:var(--radius);overflow:hidden;background:var(--card);box-shadow:var(--shadow-sm);max-width:760px}
+.hero-meta div{padding:18px 22px;border-right:2px solid var(--line)}
+.hero-meta div:last-child{border-right:0}
+.hero-meta b{display:block;font-family:"Fraunces",serif;font-size:1.5rem;color:var(--ink)}
+.hero-meta span{font-size:.85rem;color:var(--ink-soft);font-weight:600}
+.hero-strip{margin-top:44px;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);padding:14px 0;overflow:hidden;background:var(--ink);color:#fff}
+.hero-strip .track{display:flex;gap:40px;white-space:nowrap;animation:marquee 26s linear infinite;font-weight:700;letter-spacing:2px;text-transform:uppercase;font-size:.85rem}
+.hero-strip .track i{font-style:normal;color:var(--orange)}
+@keyframes marquee{to{transform:translateX(-50%)}}
+
+/* ---------- section scaffolding ---------- */
+.section{padding:72px 0}
+.sec-head{margin-bottom:40px}
+.sec-kicker{font-weight:800;font-size:.8rem;letter-spacing:3px;text-transform:uppercase;color:var(--orange-deep);margin-bottom:10px}
+.sec-title{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(1.9rem,4vw,3rem);line-height:1.08;letter-spacing:-.5px}
+.sec-lede{color:var(--ink-soft);max-width:44rem;margin-top:12px;font-size:1.05rem}
+
+/* ---------- card wall ---------- */
+.card-wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:22px}
+.svc-card{background:var(--card);border:2px solid var(--line);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow-sm);transition:transform .2s,box-shadow .2s,border-color .2s;display:flex;flex-direction:column;gap:12px}
+.svc-card:hover{transform:translateY(-6px);box-shadow:var(--shadow);border-color:var(--orange)}
+.svc-card .icon{width:54px;height:54px;border-radius:14px;background:var(--orange-soft);display:flex;align-items:center;justify-content:center}
+.svc-card .icon svg{width:28px;height:28px;stroke:var(--orange-deep);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.svc-card h3{font-family:"Fraunces",serif;font-size:1.3rem;font-weight:700}
+.svc-card p{color:var(--ink-soft);font-size:.95rem;flex:1}
+.svc-card a.more{font-weight:700;font-size:.9rem;color:var(--orange-deep);text-decoration:none}
+.svc-card a.more:hover{text-decoration:underline}
+
+/* ---------- steps ---------- */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:22px;counter-reset:step}
+.step{background:var(--ink);color:#fff;border-radius:var(--radius);padding:30px 26px;position:relative;overflow:hidden}
+.step::before{content:counter(step,decimal-leading-zero);counter-increment:step;font-family:"Fraunces",serif;font-weight:900;font-size:3.4rem;color:rgba(232,100,28,.9);display:block;margin-bottom:10px}
+.step h3{font-size:1.15rem;margin-bottom:8px}
+.step p{color:#C9CDD4;font-size:.95rem}
+
+/* ---------- price table ---------- */
+.price-wrap{background:var(--card);border:2px solid var(--ink);border-radius:20px;overflow:hidden;box-shadow:var(--shadow)}
+.price-row{display:grid;grid-template-columns:1.4fr 1fr auto;gap:18px;align-items:center;padding:22px 28px;border-bottom:2px solid var(--line);transition:background .2s}
+.price-row:last-child{border-bottom:0}
+.price-row:hover{background:var(--paper-2)}
+.price-row.head{background:var(--ink);color:#fff;font-weight:800;font-size:.8rem;letter-spacing:2px;text-transform:uppercase;padding:16px 28px}
+.price-row h3{font-family:"Fraunces",serif;font-size:1.25rem}
+.price-row p{color:var(--ink-soft);font-size:.92rem}
+.price-tag{background:var(--orange-soft);color:var(--orange-deep);font-weight:800;padding:8px 18px;border-radius:999px;white-space:nowrap;font-size:.95rem}
+.price-note{margin-top:18px;font-size:.88rem;color:var(--ink-soft)}
+.price-note b{color:var(--ink)}
+
+/* ---------- arch tiles gallery ---------- */
+.arch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:26px}
+.arch{background:var(--card);border:2px solid var(--line);border-radius:150px 150px var(--radius) var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);transition:transform .25s,box-shadow .25s}
+.arch:hover{transform:translateY(-8px);box-shadow:var(--shadow)}
+.arch .art{height:230px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.arch .art svg{width:78%;height:auto}
+.arch figcaption{padding:18px 22px 24px;text-align:center}
+.arch figcaption b{font-family:"Fraunces",serif;font-size:1.1rem;display:block;margin-bottom:6px}
+.badge{display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;background:var(--steel-soft);color:var(--steel);padding:5px 12px;border-radius:999px}
+.badge.sample{background:var(--orange-soft);color:var(--orange-deep)}
+
+/* ---------- reviews ---------- */
+.review-hero{background:var(--card);border:2px solid var(--ink);border-radius:20px;padding:40px;box-shadow:var(--shadow);text-align:center;margin-bottom:36px}
+.review-hero .stars{font-size:2rem;letter-spacing:6px;color:var(--orange);margin-bottom:10px}
+.review-wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:22px}
+.review{background:var(--card);border:2px solid var(--line);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;gap:12px}
+.review .stars{color:var(--orange);letter-spacing:3px}
+.review p{color:var(--ink-soft);font-size:.95rem;flex:1}
+.review footer{font-weight:700;font-size:.9rem}
+
+/* ---------- contact ---------- */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.contact-card{background:var(--card);border:2px solid var(--ink);border-radius:20px;padding:36px;box-shadow:var(--shadow)}
+.contact-card h3{font-family:"Fraunces",serif;font-size:1.5rem;margin-bottom:16px}
+.contact-line{display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--line)}
+.contact-line:last-child{border-bottom:0}
+.contact-line .ic{width:42px;height:42px;flex:none;border-radius:12px;background:var(--orange-soft);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--orange-deep)}
+.contact-line b{display:block;font-size:.8rem;letter-spacing:2px;text-transform:uppercase;color:var(--ink-soft);margin-bottom:2px}
+.contact-line a,.contact-line span.val{font-weight:700;color:var(--ink);text-decoration:none;font-size:1.05rem}
+.contact-line a:hover{color:var(--orange-deep)}
+.hours-list{list-style:none;margin-top:6px}
+.hours-list li{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px dashed var(--line);font-size:.95rem}
+.hours-list li:last-child{border-bottom:0}
+.hours-list b{font-weight:700}
+
+/* ---------- CTA band ---------- */
+.cta-band{background:var(--ink);color:#fff;border-radius:24px;padding:56px 48px;text-align:center;margin:72px 0;position:relative;overflow:hidden}
+.cta-band::before{content:"";position:absolute;inset:0;background-image:repeating-linear-gradient(-45deg,rgba(232,100,28,.14) 0 16px,transparent 16px 32px);pointer-events:none}
+.cta-band h2{font-family:"Fraunces",serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:900;margin-bottom:12px;position:relative}
+.cta-band p{color:#C9CDD4;max-width:34rem;margin:0 auto 26px;position:relative}
+.cta-band .cta-row{justify-content:center;margin:0;position:relative}
+
+/* ---------- footer ---------- */
+footer.site{border-top:2px solid var(--ink);padding:44px 0 30px;background:var(--paper)}
+.foot-grid{display:flex;flex-wrap:wrap;gap:32px;justify-content:space-between;align-items:flex-start;margin-bottom:30px}
+.foot-grid .fbrand{max-width:320px}
+.foot-grid h4{font-size:.8rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--orange-deep);margin-bottom:12px}
+.foot-grid ul{list-style:none}
+.foot-grid li{margin-bottom:8px}
+.foot-grid a{color:var(--ink-soft);text-decoration:none;font-weight:600}
+.foot-grid a:hover{color:var(--orange-deep)}
+.foot-grid address{font-style:normal;color:var(--ink-soft)}
+.copy-line{border-top:1px solid var(--line);padding-top:20px;font-size:.92rem;color:var(--ink-soft)}
+
+/* ---------- reveal ---------- */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:none}
+
+@media (max-width:820px){
+  .contact-grid{grid-template-columns:1fr}
+  .story-grid{grid-template-columns:1fr!important}
+  .price-row{grid-template-columns:1fr;gap:8px}
+  .price-row.head{display:none}
+  .cta-band{padding:44px 28px}
+  .hero-meta div{border-right:0;border-bottom:2px solid var(--line)}
+  .hero-meta div:last-child{border-bottom:0}
+  .bar-call span.txt{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="brand" href="#home" data-page="home" aria-label="Geo The Builder home">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="4" y="4" width="40" height="40" rx="10" fill="#20242B"/><path d="M14 30l7-9 5 6 3-3 5 6" stroke="#E8641C" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M27 12l9 9-4 4-9-9z" fill="#FAF6EE"/><rect x="24" y="9" width="5" height="16" rx="2" transform="rotate(45 26.5 17)" fill="#E8641C"/></svg>
+    <span class="brand-name">Geo The Builder<small>Handyman, Valley Village</small></span>
+  </a>
+  <div style="display:flex;gap:10px;align-items:center">
+    <a class="bar-call" href="tel:+18186309920" aria-label="Call Geo The Builder at 818 630 9920">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.13.96.36 1.9.7 2.8a2 2 0 0 1-.45 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.45c.9.34 1.84.57 2.8.7a2 2 0 0 1 1.7 2.05z"/></svg>
+      <span class="txt">(818) 630-9920</span>
+    </a>
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+</div>
+
+<div class="overlay" id="mainNav">
+  <nav class="main" aria-label="Site">
+    <a class="page-link" href="#home" data-page="home"><span class="num">01</span>Home</a>
+    <a class="page-link" href="#services" data-page="services"><span class="num">02</span>Services</a>
+    <a class="page-link" href="#story" data-page="story"><span class="num">03</span>Our Story</a>
+    <a class="page-link" href="#gallery" data-page="gallery"><span class="num">04</span>Gallery</a>
+    <a class="page-link" href="#reviews" data-page="reviews"><span class="num">05</span>Reviews</a>
+    <a class="page-link" href="#visit" data-page="visit"><span class="num">06</span>Contact</a>
+  </nav>
+  <div class="ov-foot">
+    <a class="btn btn-solid" href="tel:+18186309920">Call (818) 630-9920</a>
+    <a class="btn" style="background:#fff;color:#20242B" href="#visit" data-page="visit">Get a Free Estimate</a>
+  </div>
+</div>
+<main>
+
+<section class="page" id="page-home">
+  <div class="hero">
+    <div class="wrap">
+      <span class="hero-kicker reveal"><span class="dot"></span>Handyman, Valley Village CA</span>
+      <h1 class="reveal">
+        <span class="rule">Your to-do list,</span>
+        <span class="rule"><span class="em">handled</span> right.</span>
+      </h1>
+      <p class="hero-sub reveal">Geo The Builder is the handyman Valley Village neighbors call when the list keeps growing: drywall, paint, mounting, minor plumbing and electrical, furniture assembly and all the small jobs that never quite get done.</p>
+      <div class="cta-row reveal">
+        <a class="btn btn-solid" href="tel:+18186309920">Call (818) 630-9920</a>
+        <a class="btn btn-ghost" href="#services" data-page="services">See Services</a>
+      </div>
+      <div class="hero-meta reveal">
+        <div><b>818</b><span>Area code served daily</span></div>
+        <div><b>1 call</b><span>Gets the whole list done</span></div>
+        <div><b>Free</b><span>Estimates, no obligation</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-strip" aria-hidden="true">
+    <div class="track" id="stripTrack">
+      <span>Drywall Repair</span><i>//</i><span>Interior Painting</span><i>//</i><span>TV Mounting</span><i>//</i><span>Faucet Fixes</span><i>//</i><span>Door Repair</span><i>//</i><span>Furniture Assembly</span><i>//</i><span>Caulking</span><i>//</i><span>Light Fixtures</span><i>//</i>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <p class="sec-kicker">What gets done</p>
+        <h2 class="sec-title">One call covers the whole list</h2>
+        <p class="sec-lede">No job too small, no list too long. If it is broken, loose, crooked or unfinished, Geo can fix it.</p>
+      </div>
+      <div class="card-wall">
+        <article class="svc-card reveal">
+          <div class="icon"><svg viewBox="0 0 24 24"><path d="M3 12l9-8 9 8M5 10v10h14V10"/></svg></div>
+          <h3>Drywall and Paint</h3>
+          <p>Holes patched, cracks repaired, rooms repainted. Walls that look like the damage never happened.</p>
+          <a class="more" href="#services" data-page="services">See pricing</a>
+        </article>
+        <article class="svc-card reveal">
+          <div class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8"/></svg></div>
+          <h3>Mounting and Hanging</h3>
+          <p>TVs, mirrors, shelves, artwork and curtains, mounted straight and anchored to hold.</p>
+          <a class="more" href="#services" data-page="services">See pricing</a>
+        </article>
+        <article class="svc-card reveal">
+          <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 2v6m0 0l-4 9a3 3 0 0 0 6 0l-2-9"/><path d="M5 8h14"/></svg></div>
+          <h3>Minor Plumbing</h3>
+          <p>Leaky faucets, running toilets, caulk and grout touch-ups, garbage disposal swaps.</p>
+          <a class="more" href="#services" data-page="services">See pricing</a>
+        </article>
+        <article class="svc-card reveal">
+          <div class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10l2 2M19 5l-2 2M7 17l-2 2"/></svg></div>
+          <h3>Minor Electrical</h3>
+          <p>Light fixtures, ceiling fans, switches, dimmers and outlets replaced safely and neatly.</p>
+          <a class="more" href="#services" data-page="services">See pricing</a>
+        </article>
+        <article class="svc-card reveal">
+          <div class="icon"><svg viewBox="0 0 24 24"><path d="M4 20V9l8-5 8 5v11"/><path d="M9 20v-6h6v6"/></svg></div>
+          <h3>Doors and Trim</h3>
+          <p>Sticking doors, broken handles, baseboards and trim repaired or replaced.</p>
+          <a class="more" href="#services" data-page="services">See pricing</a>
+        </article>
+        <article class="svc-card reveal">
+          <div class="icon"><svg viewBox="0 0 24 24"><path d="M4 12h16M6 12V6h12v6M6 12v6h12v-6"/></svg></div>
+          <h3>Assembly and Odd Jobs</h3>
+          <p>Furniture assembly, baby-proofing, weatherstripping and the miscellaneous list nobody else wants.</p>
+          <a class="more" href="#services" data-page="services">See pricing</a>
+        </article>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <p class="sec-kicker">How it works</p>
+        <h2 class="sec-title">Simple from first call to final walkthrough</h2>
+      </div>
+      <div class="steps">
+        <div class="step reveal"><h3>Call or text</h3><p>Describe the job or send photos. You get a straight answer on whether it is a fit.</p></div>
+        <div class="step reveal"><h3>Free estimate</h3><p>Clear pricing up front. No surprise add-ons, no hourly meter anxiety.</p></div>
+        <div class="step reveal"><h3>One visit, done right</h3><p>Most jobs finished in a single visit, with shoe covers and a clean sweep after.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="cta-band reveal">
+      <h2>Stop staring at the list.</h2>
+      <p>Call today and most small jobs can be scheduled within days. Free estimates across Valley Village and nearby neighborhoods.</p>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="tel:+18186309920">Call (818) 630-9920</a>
+        <a class="btn" style="background:#fff;color:#20242B" href="#visit" data-page="visit">Find Us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="section">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <p class="sec-kicker">Services and rates</p>
+        <h2 class="sec-title">Straightforward pricing, honest work</h2>
+        <p class="sec-lede">Every job starts with a free estimate. Below are sample starting rates so you know roughly what to expect before you call.</p>
+      </div>
+      <div class="price-wrap reveal">
+        <div class="price-row head"><span>Service</span><span>What is included</span><span>Starts at</span></div>
+        <div class="price-row">
+          <h3>Small Repairs</h3>
+          <p>Caulking, touch-up paint, door adjustments, hinge and handle fixes.</p>
+          <span class="price-tag">Sample: $85</span>
+        </div>
+        <div class="price-row">
+          <h3>Drywall Patch and Paint</h3>
+          <p>Holes up to 12 inches patched, sanded and painted to blend.</p>
+          <span class="price-tag">Sample: $150</span>
+        </div>
+        <div class="price-row">
+          <h3>TV and Shelf Mounting</h3>
+          <p>Mount supplied by you or sourced by us, anchored into studs, cables tidied.</p>
+          <span class="price-tag">Sample: $120</span>
+        </div>
+        <div class="price-row">
+          <h3>Faucet and Toilet Fixes</h3>
+          <p>Leaky faucets, running toilets, new supply lines and wax rings.</p>
+          <span class="price-tag">Sample: $140</span>
+        </div>
+        <div class="price-row">
+          <h3>Light Fixture and Fan Install</h3>
+          <p>Replace or install fixtures, ceiling fans, switches and dimmers.</p>
+          <span class="price-tag">Sample: $130</span>
+        </div>
+        <div class="price-row">
+          <h3>Room Painting</h3>
+          <p>One standard bedroom, two coats, prep and cleanup included. Paint extra.</p>
+          <span class="price-tag">Sample: $450</span>
+        </div>
+        <div class="price-row">
+          <h3>Half-Day Handyman Block</h3>
+          <p>Four hours of whatever is on your list. The most popular option.</p>
+          <span class="price-tag">Sample: $320</span>
+        </div>
+        <div class="price-row">
+          <h3>Full-Day Handyman Block</h3>
+          <p>Eight hours. Whole punch lists, move-in touch-ups, rental turnovers.</p>
+          <span class="price-tag">Sample: $600</span>
+        </div>
+      </div>
+      <p class="price-note reveal"><b>Please note:</b> all rates above are <b>sample starting points</b>, not quotes. Final pricing depends on the job, materials and access. Call <a href="tel:+18186309920"><b>(818) 630-9920</b></a> for a free, no-pressure estimate.</p>
+
+      <div class="sec-head reveal" style="margin-top:56px">
+        <p class="sec-kicker">Good to know</p>
+        <h2 class="sec-title">The fine print, minus the fine print</h2>
+      </div>
+      <div class="card-wall">
+        <article class="svc-card reveal"><h3>Licensed trade work</h3><p>Jobs that require a licensed plumber or electrician get referred out, never faked. Safety first, always.</p></article>
+        <article class="svc-card reveal"><h3>You supply or we supply</h3><p>Bring your own fixtures and materials, or Geo sources quality parts at cost with receipts.</p></article>
+        <article class="svc-card reveal"><h3>Clean in, clean out</h3><p>Shoe covers on arrival, drop cloths during, and a full cleanup before the final walkthrough.</p></article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-story">
+  <div class="section">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <p class="sec-kicker">Our story</p>
+        <h2 class="sec-title">A Valley Village handyman built on word of mouth</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:start" class="story-grid">
+        <div class="reveal">
+          <p style="font-size:1.1rem;margin-bottom:16px">Geo started fixing things the way most handymen do: for family, then for neighbors, then for neighbors of neighbors. The name on the truck stayed the same because the work did too.</p>
+          <p style="color:var(--ink-soft);margin-bottom:16px">Based on Chandler Blvd in Valley Village, Geo The Builder handles the jobs that fall between the cracks: too small for a general contractor, too annoying to live with. Drywall dings before a move-out, a faucet that will not stop dripping, the TV that has sat in its box for a month.</p>
+          <p style="color:var(--ink-soft);margin-bottom:16px">The approach is simple. Show up when promised. Price it straight. Do it like it is your own place. Clean up like you were never there.</p>
+          <p style="color:var(--ink-soft)">Valley Village homeowners, renters and property managers all get the same deal: one reliable number to call when something needs fixing.</p>
+          <div class="cta-row" style="margin-top:28px">
+            <a class="btn btn-solid" href="tel:+18186309920">Call (818) 630-9920</a>
+          </div>
+        </div>
+        <div class="reveal">
+          <div style="background:var(--ink);color:#fff;border-radius:20px;padding:36px;box-shadow:var(--shadow)">
+            <p class="sec-kicker" style="color:var(--orange)">Why neighbors call</p>
+            <ul style="list-style:none;display:grid;gap:16px;margin-top:14px">
+              <li style="display:flex;gap:12px"><span style="color:var(--orange);font-weight:900">01</span><span>One person from estimate to finish. No handoffs, no strangers in your home.</span></li>
+              <li style="display:flex;gap:12px"><span style="color:var(--orange);font-weight:900">02</span><span>Upfront pricing before any work starts, confirmed in writing.</span></li>
+              <li style="display:flex;gap:12px"><span style="color:var(--orange);font-weight:900">03</span><span>Small jobs treated like big ones, because to you they are.</span></li>
+              <li style="display:flex;gap:12px"><span style="color:var(--orange);font-weight:900">04</span><span>Valley Village local. Short drive means fast scheduling and fair trip charges.</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="cta-band reveal">
+      <h2>Meet Geo on your next to-do list.</h2>
+      <p>Free estimates, straight answers, and work you do not have to babysit.</p>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="tel:+18186309920">Call (818) 630-9920</a>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="page" id="page-gallery">
+  <div class="section">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <p class="sec-kicker">Gallery</p>
+        <h2 class="sec-title">Recent work around Valley Village</h2>
+        <p class="sec-lede">A rotating look at the kinds of jobs Geo handles every week. Real project photos are on the way.</p>
+      </div>
+      <div class="arch-grid">
+        <figure class="arch reveal">
+          <div class="art" style="background:linear-gradient(160deg,#FBE3CF,#F5C48F)">
+            <svg viewBox="0 0 120 120"><rect x="25" y="30" width="70" height="60" rx="6" fill="#FFFDF8" stroke="#B84C10" stroke-width="4"/><path d="M25 52h70M60 52v38" stroke="#B84C10" stroke-width="4"/><circle cx="88" cy="42" r="6" fill="#E8641C"/></svg>
+          </div>
+          <figcaption><b>Drywall Patch and Paint</b><span class="badge">Photo coming soon</span></figcaption>
+        </figure>
+        <figure class="arch reveal">
+          <div class="art" style="background:linear-gradient(160deg,#E3E9EF,#B9C6D2)">
+            <svg viewBox="0 0 120 120"><rect x="30" y="25" width="60" height="38" rx="5" fill="#20242B"/><rect x="36" y="31" width="48" height="26" rx="3" fill="#7FB3D5"/><rect x="52" y="63" width="16" height="30" fill="#5B6069"/><path d="M40 100h40" stroke="#20242B" stroke-width="5" stroke-linecap="round"/></svg>
+          </div>
+          <figcaption><b>TV Mounting</b><span class="badge">Photo coming soon</span></figcaption>
+        </figure>
+        <figure class="arch reveal">
+          <div class="art" style="background:linear-gradient(160deg,#DFF0E4,#A9D4B8)">
+            <svg viewBox="0 0 120 120"><path d="M35 95V55a25 25 0 0 1 50 0v40" fill="none" stroke="#2E7D4F" stroke-width="7"/><rect x="28" y="90" width="64" height="10" rx="5" fill="#2E7D4F"/><circle cx="60" cy="40" r="8" fill="#2E7D4F"/></svg>
+          </div>
+          <figcaption><b>Faucet Replacement</b><span class="badge">Photo coming soon</span></figcaption>
+        </figure>
+        <figure class="arch reveal">
+          <div class="art" style="background:linear-gradient(160deg,#FFF3D6,#F2D488)">
+            <svg viewBox="0 0 120 120"><circle cx="60" cy="48" r="22" fill="#FFFDF8" stroke="#B84C10" stroke-width="4"/><path d="M60 40v8l6 6" stroke="#B84C10" stroke-width="4" stroke-linecap="round" fill="none"/><rect x="42" y="78" width="36" height="8" rx="4" fill="#B84C10"/><path d="M50 86v12m20-12v12" stroke="#B84C10" stroke-width="5" stroke-linecap="round"/></svg>
+          </div>
+          <figcaption><b>Ceiling Fan Install</b><span class="badge">Photo coming soon</span></figcaption>
+        </figure>
+        <figure class="arch reveal">
+          <div class="art" style="background:linear-gradient(160deg,#EADCF5,#C3A6DE)">
+            <svg viewBox="0 0 120 120"><rect x="28" y="35" width="64" height="50" rx="4" fill="none" stroke="#6A3FA0" stroke-width="5"/><path d="M36 50h48M36 62h48M36 74h30" stroke="#6A3FA0" stroke-width="4" stroke-linecap="round"/></svg>
+          </div>
+          <figcaption><b>Shelf and Storage</b><span class="badge">Photo coming soon</span></figcaption>
+        </figure>
+        <figure class="arch reveal">
+          <div class="art" style="background:linear-gradient(160deg,#F6D9CE,#E8A98F)">
+            <svg viewBox="0 0 120 120"><rect x="40" y="25" width="40" height="70" rx="6" fill="#FFFDF8" stroke="#B84C10" stroke-width="4"/><circle cx="72" cy="60" r="4" fill="#B84C10"/><path d="M40 45h40" stroke="#B84C10" stroke-width="3"/></svg>
+          </div>
+          <figcaption><b>Door Repair</b><span class="badge">Photo coming soon</span></figcaption>
+        </figure>
+      </div>
+      <div class="cta-band reveal" style="margin:56px 0 0">
+        <h2>Have a project in mind?</h2>
+        <p>Send photos by text and get a ballpark before anyone drives out.</p>
+        <div class="cta-row">
+          <a class="btn btn-solid" href="tel:+18186309920">Call (818) 630-9920</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="section">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <p class="sec-kicker">Reviews</p>
+        <h2 class="sec-title">What neighbors say</h2>
+        <p class="sec-lede">Most of Geo's work comes from repeat customers and referrals. Check the live Google listing for the latest reviews.</p>
+      </div>
+      <div class="review-hero reveal">
+        <div class="stars" aria-hidden="true">★★★★★</div>
+        <h3 class="serif" style="font-size:1.6rem;margin-bottom:8px">Rated by Valley Village neighbors on Google</h3>
+        <p style="color:var(--ink-soft);margin-bottom:22px">See every review, photo and rating on the live Google business profile.</p>
+        <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJITZQ9UGVwoARx3M_qzEQrSo" target="_blank" rel="noopener">See reviews on Google</a>
+      </div>
+      <div class="review-wall">
+        <article class="review reveal">
+          <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <p>"Geo patched three holes, repainted the wall and fixed a sticking door in one visit. You genuinely cannot tell where the damage was."</p>
+          <footer>Valley Village homeowner <span class="badge sample" style="margin-left:8px">Sample</span></footer>
+        </article>
+        <article class="review reveal">
+          <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <p>"Finally, a handyman who shows up on time and charges what he quoted. He mounted two TVs and assembled a whole bedroom set."</p>
+          <footer>Valley Village renter <span class="badge sample" style="margin-left:8px">Sample</span></footer>
+        </article>
+        <article class="review reveal">
+          <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <p>"Called about a running toilet and ended up handing him a whole list. Everything done in an afternoon, and he cleaned up after himself."</p>
+          <footer>Property manager, 91601 <span class="badge sample" style="margin-left:8px">Sample</span></footer>
+        </article>
+      </div>
+      <p class="price-note reveal" style="text-align:center;margin-top:28px">Had work done by Geo? <a href="https://www.google.com/maps/place/?q=place_id:ChIJITZQ9UGVwoARx3M_qzEQrSo" target="_blank" rel="noopener"><b>Leave a review on Google</b></a> and help other Valley Village neighbors find reliable help.</p>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="section">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <p class="sec-kicker">Contact</p>
+        <h2 class="sec-title">Get your free estimate</h2>
+        <p class="sec-lede">Call or text with a description of the job. Photos help: snap the damage, the fixture or the furniture and send it over.</p>
+      </div>
+      <div class="contact-grid">
+        <div class="contact-card reveal">
+          <h3>Reach Geo directly</h3>
+          <div class="contact-line">
+            <div class="ic">C</div>
+            <div><b>Phone</b><a href="tel:+18186309920">(818) 630-9920</a></div>
+          </div>
+          <div class="contact-line">
+            <div class="ic">A</div>
+            <div><b>Address</b><span class="val">11659 Chandler Blvd, Valley Village, CA 91601</span></div>
+          </div>
+          <div class="contact-line">
+            <div class="ic">D</div>
+            <div><b>Directions</b><a href="https://www.google.com/maps/place/?q=place_id:ChIJITZQ9UGVwoARx3M_qzEQrSo" target="_blank" rel="noopener">Open in Google Maps</a></div>
+          </div>
+          <div class="contact-line">
+            <div class="ic">R</div>
+            <div><b>Service area</b><span class="val">Valley Village, North Hollywood, Glendale and nearby</span></div>
+          </div>
+          <div class="cta-row" style="margin-top:22px;margin-bottom:0">
+            <a class="btn btn-solid" href="tel:+18186309920">Call Now</a>
+            <a class="btn btn-dark" href="https://www.google.com/maps/place/?q=place_id:ChIJITZQ9UGVwoARx3M_qzEQrSo" target="_blank" rel="noopener">Get Directions</a>
+          </div>
+        </div>
+        <div class="contact-card reveal">
+          <h3>Hours</h3>
+          <ul class="hours-list">
+            <li><b>Monday to Friday</b><span>Call for hours</span></li>
+            <li><b>Saturday</b><span>Call for hours</span></li>
+            <li><b>Sunday</b><span>Call for hours</span></li>
+          </ul>
+          <p style="color:var(--ink-soft);font-size:.95rem;margin-top:16px">Hours vary by job schedule. Call <a href="tel:+18186309920"><b>(818) 630-9920</b></a> and Geo will find a time that works.</p>
+          <h3 style="margin-top:28px">Before you call</h3>
+          <ul style="list-style:none;display:grid;gap:10px;color:var(--ink-soft)">
+            <li>1. Make a quick list of everything that needs fixing.</li>
+            <li>2. Take photos of the damage or the items to install.</li>
+            <li>3. Note any materials you already bought.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="fbrand">
+        <a class="brand" href="#home" data-page="home" style="margin-bottom:12px">
+          <svg viewBox="0 0 48 48" aria-hidden="true" style="width:38px;height:38px"><rect x="4" y="4" width="40" height="40" rx="10" fill="#20242B"/><path d="M14 30l7-9 5 6 3-3 5 6" stroke="#E8641C" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M27 12l9 9-4 4-9-9z" fill="#FAF6EE"/><rect x="24" y="9" width="5" height="16" rx="2" transform="rotate(45 26.5 17)" fill="#E8641C"/></svg>
+          <span class="brand-name" style="font-size:1.1rem">Geo The Builder<small>Handyman, Valley Village</small></span>
+        </a>
+        <p style="color:var(--ink-soft);font-size:.95rem">One call for the whole to-do list. Serving Valley Village and nearby neighborhoods.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="#home" data-page="home">Home</a></li>
+          <li><a href="#services" data-page="services">Services</a></li>
+          <li><a href="#story" data-page="story">Our Story</a></li>
+          <li><a href="#gallery" data-page="gallery">Gallery</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="tel:+18186309920">(818) 630-9920</a></li>
+          <li><a href="https://www.google.com/maps/place/?q=place_id:ChIJITZQ9UGVwoARx3M_qzEQrSo" target="_blank" rel="noopener">See reviews on Google</a></li>
+          <li><a href="#visit" data-page="visit">Get Directions</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Visit</h4>
+        <address>11659 Chandler Blvd<br>Valley Village, CA 91601</address>
+      </div>
+    </div>
+    <div class="copy-line">© Geo The Builder</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "story", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+
+  function observeReveals(){
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    if(!("IntersectionObserver" in window)){
+      for(var i = 0; i < els.length; i++){ els[i].classList.add("in"); }
+      return;
+    }
+    var io = new IntersectionObserver(function(entries){
+      for(var k = 0; k < entries.length; k++){
+        if(entries[k].isIntersecting){
+          entries[k].target.classList.add("in");
+          io.unobserve(entries[k].target);
+        }
+      }
+    }, {threshold: .12});
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  var track = document.getElementById("stripTrack");
+  if(track){ track.innerHTML += track.innerHTML; }
+
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

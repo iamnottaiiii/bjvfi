@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>E &amp; J Electrical Contractor | Electrician in Milford, OH</title>
+<meta name="description" content="E and J Electrical Contractor: electrician serving Milford, OH 45150. Call (513) 831-2608 for electrical service.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{
+  --panel:#141a22;
+  --panel-2:#1b2330;
+  --steel:#2b3648;
+  --line:#3d4b63;
+  --copper:#c67a3a;
+  --copper-hi:#e0954f;
+  --volt:#f2b63c;
+  --ink:#f2ede1;
+  --ink-dim:#b8b2a1;
+  --green:#7fd08c;
+  --red:#d96a5a;
+  --paper:#f6f2e8;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Archivo',sans-serif;background:var(--panel);color:var(--ink);line-height:1.6}
+.mono{font-family:'IBM Plex Mono',monospace}
+a{color:inherit}
+img{max-width:100%}
+
+/* ---------- CIRCUIT-TRACE NAV ---------- */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(20,26,34,.96);border-bottom:2px solid var(--line);backdrop-filter:blur(6px)}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:.8rem 1.2rem;position:relative}
+.brand{display:flex;align-items:center;gap:.7rem;text-decoration:none}
+.brand-bolt{width:42px;height:42px;border:2px solid var(--copper);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--volt);font-size:1.2rem;position:relative;background:var(--panel-2)}
+.brand-bolt::after{content:"";position:absolute;right:-14px;top:50%;width:12px;height:2px;background:var(--copper)}
+.brand-name{font-weight:800;letter-spacing:.5px;font-size:1.05rem}
+.brand-name small{display:block;font-family:'IBM Plex Mono',monospace;font-weight:500;font-size:.62rem;color:var(--copper);letter-spacing:3px}
+.nav-links{display:flex;gap:.25rem;list-style:none;position:relative}
+.nav-links a{display:block;padding:.6rem 1rem;text-decoration:none;font-weight:600;font-size:.92rem;border-radius:6px;position:relative;transition:.2s;color:var(--ink-dim)}
+.nav-links a:hover{color:var(--volt);background:rgba(242,182,60,.07)}
+.nav-links a.active{color:var(--volt);background:rgba(242,182,60,.1)}
+.nav-links a.active::before{content:"";position:absolute;left:8px;top:50%;transform:translateY(-50%);width:6px;height:6px;border-radius:50%;background:var(--volt);box-shadow:0 0 8px var(--volt)}
+.nav-trace{position:absolute;bottom:-2px;left:0;right:0;height:2px;pointer-events:none;overflow:hidden}
+.nav-trace svg{display:block;width:100%;height:100%}
+.call-chip{display:inline-flex;align-items:center;gap:.5rem;background:var(--copper);color:#14100a;font-weight:800;text-decoration:none;padding:.55rem 1.1rem;border-radius:6px;font-size:.9rem;transition:.2s}
+.call-chip:hover{background:var(--copper-hi);transform:translateY(-1px)}
+.burger{display:none;background:none;border:2px solid var(--line);color:var(--ink);font-size:1.3rem;padding:.4rem .7rem;border-radius:8px;cursor:pointer}
+
+/* ---------- PAGES ---------- */
+.page{display:none;padding-top:74px}
+.page.active{display:block;animation:pageIn .35s ease}
+@keyframes pageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.wrap{max-width:1200px;margin:0 auto;padding:3rem 1.2rem}
+
+/* ---------- BREAKER-PANEL HERO ---------- */
+.hero{background:linear-gradient(160deg,#10141b 0%,var(--panel-2) 60%,#202a3a 100%);border-bottom:2px solid var(--line);position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;background:
+  repeating-linear-gradient(90deg,transparent 0 118px,rgba(198,122,58,.08) 118px 120px);
+  pointer-events:none}
+.hero-grid{max-width:1200px;margin:0 auto;padding:4.5rem 1.2rem;display:grid;grid-template-columns:1.15fr .85fr;gap:3rem;align-items:center;position:relative}
+.hero-kicker{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:.78rem;letter-spacing:3px;text-transform:uppercase;display:flex;align-items:center;gap:.6rem;margin-bottom:1rem}
+.hero-kicker .dot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.hero h1{font-size:clamp(2.2rem,5vw,3.6rem);line-height:1.08;font-weight:800;margin-bottom:1.1rem}
+.hero h1 .amp{color:var(--volt)}
+.hero p.lede{color:var(--ink-dim);font-size:1.08rem;max-width:34rem;margin-bottom:1.8rem}
+.hero-ctas{display:flex;gap:.9rem;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:.6rem;text-decoration:none;font-weight:700;padding:.85rem 1.6rem;border-radius:8px;transition:.2s;border:2px solid transparent;cursor:pointer;font-size:1rem}
+.btn-volt{background:var(--volt);color:#171106}
+.btn-volt:hover{background:#ffc95e;transform:translateY(-2px)}
+.btn-ghost{border-color:var(--line);color:var(--ink)}
+.btn-ghost:hover{border-color:var(--copper);color:var(--copper-hi)}
+.hero-facts{display:flex;gap:1.6rem;margin-top:2.2rem;flex-wrap:wrap;font-family:'IBM Plex Mono',monospace;font-size:.78rem;color:var(--ink-dim)}
+.hero-facts span{display:flex;align-items:center;gap:.5rem}
+.hero-facts i{color:var(--copper)}
+/* breaker panel graphic */
+.panel-frame{background:#0d1117;border:3px solid var(--steel);border-radius:14px;padding:1.4rem;position:relative;box-shadow:0 24px 60px rgba(0,0,0,.5), inset 0 0 40px rgba(0,0,0,.5)}
+.panel-frame::before{content:"MAIN PANEL";position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--copper);color:#14100a;font-family:'IBM Plex Mono',monospace;font-size:.65rem;font-weight:600;letter-spacing:3px;padding:.25rem .9rem;border-radius:4px}
+.screw{position:absolute;width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#8a94a6,#3a4254);box-shadow:inset 0 1px 2px #000}
+.screw.tl{top:8px;left:8px}.screw.tr{top:8px;right:8px}.screw.bl{bottom:8px;left:8px}.screw.br{bottom:8px;right:8px}
+.breakers{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-top:.4rem}
+.breaker{background:#161c26;border:2px solid var(--line);border-radius:6px;padding:.7rem .4rem;text-align:center;position:relative;transition:.2s}
+.breaker .sw{width:26px;height:34px;margin:0 auto .5rem;background:#0a0d12;border:2px solid var(--line);border-radius:5px;position:relative;cursor:pointer}
+.breaker .sw::after{content:"";position:absolute;left:50%;top:3px;transform:translateX(-50%);width:12px;height:12px;border-radius:3px;background:var(--green);box-shadow:0 0 8px var(--green);transition:.25s}
+.breaker.off .sw::after{top:19px;background:var(--red);box-shadow:0 0 8px var(--red)}
+.breaker .tag{font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--ink-dim);letter-spacing:1px;line-height:1.5}
+.breaker:hover{border-color:var(--copper)}
+.busbar{margin-top:.8rem;display:flex;align-items:center;gap:.6rem;font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--copper);letter-spacing:2px}
+.busbar .bar{flex:1;height:6px;border-radius:3px;background:linear-gradient(90deg,var(--copper),var(--copper-hi),var(--copper))}
+.hero-note{margin-top:1rem;font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--ink-dim);text-align:center}
+
+/* ---------- SECTION HEADERS ---------- */
+.sec-head{margin-bottom:2.2rem}
+.sec-kicker{font-family:'IBM Plex Mono',monospace;color:var(--copper);font-size:.75rem;letter-spacing:3px;text-transform:uppercase;margin-bottom:.6rem;display:flex;align-items:center;gap:.7rem}
+.sec-kicker::before{content:"";width:34px;height:2px;background:var(--copper)}
+.sec-head h2{font-size:clamp(1.7rem,3.4vw,2.5rem);font-weight:800;line-height:1.15}
+.sec-head p{color:var(--ink-dim);max-width:40rem;margin-top:.7rem}
+
+/* ---------- CIRCUIT-MAP SERVICES ---------- */
+.svc-section{background:var(--panel)}
+.circuit-board{position:relative;background:#0d1219;border:2px solid var(--line);border-radius:14px;padding:2.5rem 2rem;overflow:hidden}
+.circuit-board::before{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(198,122,58,.16) 1.5px,transparent 1.5px);background-size:26px 26px;pointer-events:none}
+.svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.1rem;position:relative;z-index:1}
+.svc-node{background:#131a24;border:2px solid var(--line);border-radius:10px;padding:1.5rem 1.3rem;position:relative;transition:.25s}
+.svc-node::before{content:"";position:absolute;top:-2px;left:24px;width:14px;height:14px;border-radius:50%;background:var(--panel);border:2px solid var(--copper);transform:translateY(-50%)}
+.svc-node:hover{border-color:var(--copper);transform:translateY(-4px);box-shadow:0 14px 30px rgba(0,0,0,.4)}
+.svc-icon{width:52px;height:52px;border-radius:10px;background:rgba(198,122,58,.12);border:1px solid var(--copper);display:flex;align-items:center;justify-content:center;color:var(--volt);font-size:1.4rem;margin-bottom:1rem}
+.svc-node h3{font-size:1.12rem;margin-bottom:.5rem;font-weight:700}
+.svc-node p{font-size:.9rem;color:var(--ink-dim)}
+.badge{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:.62rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;padding:.22rem .6rem;border-radius:4px;margin-top:.9rem}
+.badge.sample{background:rgba(242,182,60,.14);color:var(--volt);border:1px dashed var(--volt)}
+.badge.verified{background:rgba(127,208,140,.12);color:var(--green);border:1px solid var(--green)}
+.svc-cta{margin-top:2rem;text-align:center;position:relative;z-index:1}
+
+/* ---------- PANEL-GRID GALLERY ---------- */
+.gallery-section{background:var(--panel-2);border-top:2px solid var(--line);border-bottom:2px solid var(--line)}
+.gal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.1rem}
+.gal-cell{aspect-ratio:4/3;border:2px solid var(--line);border-radius:10px;position:relative;overflow:hidden;background:#0d1219;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.8rem;text-align:center;padding:1rem;transition:.25s}
+.gal-cell:hover{border-color:var(--copper)}
+.gal-cell i{font-size:2.6rem;color:var(--steel);transition:.25s}
+.gal-cell:hover i{color:var(--copper)}
+.gal-cell .cap{font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--ink-dim);letter-spacing:1px}
+.gal-cell .coming{font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:2px;color:var(--volt);border:1px dashed var(--volt);padding:.25rem .7rem;border-radius:4px;text-transform:uppercase}
+.gal-cell.wirechart{background:linear-gradient(135deg,#0d1219 60%,#141b26)}
+
+/* ---------- HOME EXTRAS ---------- */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
+.about-card{background:#131a24;border:2px solid var(--line);border-radius:12px;padding:2rem}
+.hours-list{list-style:none;font-family:'IBM Plex Mono',monospace;font-size:.88rem}
+.hours-list li{display:flex;justify-content:space-between;padding:.6rem 0;border-bottom:1px dashed var(--line)}
+.hours-list li:last-child{border:none}
+.hours-note{font-size:.8rem;color:var(--ink-dim);margin-top:1rem;font-style:italic}
+
+/* ---------- REVIEWS ---------- */
+.rev-banner{background:#131a24;border:2px solid var(--line);border-radius:12px;padding:2.2rem;margin-bottom:2rem}
+.rev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.1rem}
+.rev-card{background:#0d1219;border:2px solid var(--line);border-radius:10px;padding:1.6rem}
+.rev-card .stars{color:var(--volt);letter-spacing:2px;margin-bottom:.7rem}
+.rev-card p{color:var(--ink-dim);font-size:.95rem}
+.rev-card .who{font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--copper);margin-top:1rem;letter-spacing:1px}
+.honest{border-left:4px solid var(--volt);padding-left:1rem;color:var(--ink-dim);font-size:.95rem}
+
+/* ---------- CONTACT ---------- */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem}
+.contact-card{background:#131a24;border:2px solid var(--line);border-radius:12px;padding:2rem;margin-bottom:1.1rem}
+.contact-card h3{font-size:1.05rem;margin-bottom:.8rem;display:flex;align-items:center;gap:.6rem}
+.contact-card h3 i{color:var(--copper)}
+.contact-card a.tel{font-size:1.35rem;font-weight:800;color:var(--volt);text-decoration:none}
+.contact-card a.tel:hover{text-decoration:underline}
+.form-card{background:#131a24;border:2px solid var(--line);border-radius:12px;padding:2rem}
+.form-card label{display:block;font-weight:600;font-size:.88rem;margin:.9rem 0 .35rem}
+.form-card input,.form-card select,.form-card textarea{width:100%;background:#0d1219;border:2px solid var(--line);border-radius:8px;color:var(--ink);padding:.75rem .9rem;font-family:inherit;font-size:.95rem}
+.form-card input:focus,.form-card select:focus,.form-card textarea:focus{outline:none;border-color:var(--copper)}
+.form-card textarea{min-height:130px;resize:vertical}
+
+/* ---------- MAP-STYLE FOOTER ---------- */
+.footer-zone{background:#0d1219;border-top:2px solid var(--line);position:relative;overflow:hidden}
+.map-motif{height:120px;position:relative;background:
+  linear-gradient(rgba(198,122,58,.05) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(198,122,58,.05) 1px,transparent 1px);
+  background-size:34px 34px}
+.map-motif .pin{position:absolute;left:50%;top:38%;transform:translate(-50%,-100%);color:var(--copper);font-size:2.4rem;text-shadow:0 4px 12px rgba(0,0,0,.6)}
+.map-motif .pin::after{content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);width:34px;height:10px;border-radius:50%;background:rgba(0,0,0,.5)}
+.map-coords{position:absolute;font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--steel);letter-spacing:1px}
+footer{padding:1.4rem;text-align:center}
+footer p{font-family:'IBM Plex Mono',monospace;font-size:.85rem;color:var(--ink-dim);letter-spacing:1px}
+
+/* ---------- RESPONSIVE ---------- */
+@media(max-width:900px){
+  .hero-grid{grid-template-columns:1fr;gap:2.5rem}
+  .svc-grid,.gal-grid,.rev-grid{grid-template-columns:1fr 1fr}
+  .split,.contact-grid{grid-template-columns:1fr;gap:2rem}
+}
+@media(max-width:640px){
+  .burger{display:block}
+  .nav-links{position:absolute;top:100%;left:0;right:0;background:#10151d;flex-direction:column;border-bottom:2px solid var(--line);display:none;padding:.6rem}
+  .nav-links.open{display:flex}
+  .nav-links a.active::before{display:none}
+  .nav .call-chip{display:none}
+  .svc-grid,.gal-grid,.rev-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Main navigation">
+  <div class="nav-inner">
+    <a class="brand" href="#home" data-page="home" aria-label="E and J Electrical Contractor home">
+      <span class="brand-bolt"><i class="fa-solid fa-bolt"></i></span>
+      <span class="brand-name">E &amp; J Electrical<small>CONTRACTOR</small></span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#home" data-page="home" class="active">Home</a></li>
+      <li><a href="#services" data-page="services">Services</a></li>
+      <li><a href="#about" data-page="about">About</a></li>
+      <li><a href="#reviews" data-page="reviews">Reviews</a></li>
+      <li><a href="#contact" data-page="contact">Contact</a></li>
+    </ul>
+    <a class="call-chip" href="tel:+15138312608"><i class="fa-solid fa-phone"></i> (513) 831-2608</a>
+    <button class="burger" id="burger" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+  </div>
+  <div class="nav-trace" aria-hidden="true">
+    <svg preserveAspectRatio="none" viewBox="0 0 1200 2"><path d="M0 1 H420 L440 1 V1 H760 L780 1 V1 H1200" stroke="#c67a3a" stroke-width="2" fill="none"/></svg>
+  </div>
+</nav>
+
+
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-grid">
+      <div>
+        <div class="hero-kicker"><span class="dot"></span> Licensed trade electrician, Milford OH</div>
+        <h1>E &amp; J <span class="amp">Electrical</span> Contractor</h1>
+        <p class="lede">Wired right the first time. Serving Milford and the 45150 area from 5698 W Day Cir, E &amp; J Electrical Contractor handles the electrical work your home depends on, from breaker panels to the last outlet on the circuit.</p>
+        <div class="hero-ctas">
+          <a class="btn btn-volt" href="tel:+15138312608"><i class="fa-solid fa-phone"></i> Call (513) 831-2608</a>
+          <a class="btn btn-ghost" href="#services" data-page="services"><i class="fa-solid fa-plug-circle-bolt"></i> View Services</a>
+        </div>
+        <div class="hero-facts">
+          <span><i class="fa-solid fa-location-dot"></i> 5698 W Day Cir, Milford, OH 45150</span>
+          <span><i class="fa-solid fa-tag"></i> Electrician</span>
+        </div>
+      </div>
+      <div>
+        <div class="panel-frame" aria-label="Decorative breaker panel">
+          <span class="screw tl"></span><span class="screw tr"></span><span class="screw bl"></span><span class="screw br"></span>
+          <div class="breakers" id="breakers"></div>
+          <div class="busbar"><span>MAIN</span><div class="bar"></div><span>200A</span></div>
+        </div>
+        <p class="hero-note">Tap a breaker to flip it. Breaker labels are decorative.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="split">
+      <div>
+        <div class="sec-head">
+          <div class="sec-kicker">On the wall in Milford</div>
+          <h2>A contractor on your street, not a call center</h2>
+          <p>E &amp; J Electrical Contractor is listed as an electrician and major appliance contractor at 5698 W Day Cir in Milford, Ohio, phone (513) 831-2608. Local directories carry the listing; Yellow Pages invites the first review. What that means for you: when you call, you reach the shop, not a queue.</p>
+        </div>
+        <div class="hero-ctas">
+          <a class="btn btn-volt" href="https://www.google.com/maps/search/?api=1&query=5698%20W%20Day%20Cir%2C%20Milford%2C%20OH%2045150" target="_blank" rel="noopener"><i class="fa-solid fa-location-arrow"></i> Get Directions</a>
+          <a class="btn btn-ghost" href="#about" data-page="about">About the Shop</a>
+          <a class="btn btn-ghost" href="#gallery" data-page="gallery"><i class="fa-solid fa-images"></i> Gallery</a>
+        </div>
+      </div>
+      <div class="about-card">
+        <div class="sec-kicker">Shop hours</div>
+        <ul class="hours-list">
+          <li><span>Monday</span><span>7:00 AM - 6:00 PM</span></li>
+          <li><span>Tuesday</span><span>7:00 AM - 6:00 PM</span></li>
+          <li><span>Wednesday</span><span>7:00 AM - 6:00 PM</span></li>
+          <li><span>Thursday</span><span>7:00 AM - 6:00 PM</span></li>
+          <li><span>Friday</span><span>7:00 AM - 6:00 PM</span></li>
+          <li><span>Saturday - Sunday</span><span>Closed</span></li>
+        </ul>
+        <p class="hours-note">Hours per a third-party business listing. Call to confirm before you drive over.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-kicker">Circuit map</div>
+      <h2>Services</h2>
+      <p>Listed trade: electrician, plus major appliances. The work below is typical for a shop like this. Every card marked SAMPLE is our best read of the trade, not a quote from the business. Call (513) 831-2608 to confirm what they take on.</p>
+    </div>
+    <div class="circuit-board">
+      <div class="svc-grid">
+        <div class="svc-node">
+          <div class="svc-icon"><i class="fa-solid fa-plug-circle-bolt"></i></div>
+          <h3>General Electrical Work</h3>
+          <p>Listed category on public business directories: electrician.</p>
+          <span class="badge verified">Verified listing</span>
+        </div>
+        <div class="svc-node">
+          <div class="svc-icon"><i class="fa-solid fa-blender"></i></div>
+          <h3>Major Appliance Circuits</h3>
+          <p>Listed category on public business directories: major appliances.</p>
+          <span class="badge verified">Verified listing</span>
+        </div>
+        <div class="svc-node">
+          <div class="svc-icon"><i class="fa-solid fa-toggle-on"></i></div>
+          <h3>Breaker and Panel Service</h3>
+          <p>Tripping breakers, panel checks, and service upgrades for older homes.</p>
+          <span class="badge sample">Sample, call to confirm</span>
+        </div>
+        <div class="svc-node">
+          <div class="svc-icon"><i class="fa-solid fa-lightbulb"></i></div>
+          <h3>Lighting and Fixtures</h3>
+          <p>Fixture installs, recessed lighting, and dimmer or switch upgrades.</p>
+          <span class="badge sample">Sample, call to confirm</span>
+        </div>
+        <div class="svc-node">
+          <div class="svc-icon"><i class="fa-solid fa-house-chimney"></i></div>
+          <h3>Wiring and Rewiring</h3>
+          <p>New circuits, room additions, and rewiring for remodels.</p>
+          <span class="badge sample">Sample, call to confirm</span>
+        </div>
+        <div class="svc-node">
+          <div class="svc-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+          <h3>Troubleshooting</h3>
+          <p>Dead outlets, flickering lights, and mystery electrical faults traced down.</p>
+          <span class="badge sample">Sample, call to confirm</span>
+        </div>
+      </div>
+      <div class="svc-cta">
+        <a class="btn btn-volt" href="tel:+15138312608"><i class="fa-solid fa-phone"></i> Call (513) 831-2608 for a Quote</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-about">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-kicker">The shop</div>
+      <h2>About E &amp; J Electrical Contractor</h2>
+    </div>
+    <div class="split">
+      <div>
+        <p style="color:var(--ink-dim);margin-bottom:1rem">E &amp; J Electrical Contractor is an electrical contractor based at 5698 W Day Cir, Milford, OH 45150, in the 45150 service area. Public business directories list the trade as electrician, with major appliances as an additional category, and the contact number as (513) 831-2608.</p>
+        <p style="color:var(--ink-dim);margin-bottom:1rem">We found no official company website, no public social media pages, and no published company history during our research. What is on the record is the listing itself: a local shop on Day Circle West in Miami Township, reachable at the number above.</p>
+        <p style="color:var(--ink-dim)">If you have worked with E &amp; J, the most useful thing you can do for the next customer is leave a review on their Google listing or on Yellow Pages, where the business currently has none published.</p>
+        <div class="hero-ctas" style="margin-top:1.6rem">
+          <a class="btn btn-volt" href="tel:+15138312608"><i class="fa-solid fa-phone"></i> Call the Shop</a>
+          <a class="btn btn-ghost" href="#contact" data-page="contact">Contact Page</a>
+        </div>
+      </div>
+      <div class="about-card">
+        <div class="sec-kicker">On record</div>
+        <ul class="hours-list">
+          <li><span>Business name</span><span>E &amp; J Electrical Contractor</span></li>
+          <li><span>Address</span><span>5698 W Day Cir, Milford, OH 45150</span></li>
+          <li><span>Phone</span><span>(513) 831-2608</span></li>
+          <li><span>Trade</span><span>Electrician</span></li>
+          <li><span>Also listed</span><span>Major appliances</span></li>
+          <li><span>Service area</span><span>Milford, 45150</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-kicker">Word on the street</div>
+      <h2>Reviews</h2>
+    </div>
+    <div class="rev-banner">
+      <p class="honest">An honest note: we searched Google, Yelp, Yellow Pages, and contractor directories for reviews of E &amp; J Electrical Contractor and found none published. Yellow Pages currently shows the listing with an invitation to be the first reviewer. Because there are no real reviews to quote, this page shows none. We will not invent reviewer names or sentiments.</p>
+    </div>
+    <div class="rev-grid">
+      <div class="rev-card">
+        <div class="stars"><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i></div>
+        <p>No published Google reviews were found for this business during our research.</p>
+        <div class="who">STATUS: NO REVIEWS FOUND</div>
+      </div>
+      <div class="rev-card">
+        <div class="stars"><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i></div>
+        <p>No published Yelp reviews were found for this business during our research.</p>
+        <div class="who">STATUS: NO REVIEWS FOUND</div>
+      </div>
+    </div>
+    <div class="rev-banner" style="margin-top:2rem">
+      <p class="honest" style="margin-bottom:1.2rem">We could not verify the Google Maps link supplied for this business, so we have left the "See reviews on Google" button off this page rather than link somewhere we cannot confirm. To review or check ratings, search "E &amp; J Electrical Contractor Milford OH" in Google Maps.</p>
+      <a class="btn btn-ghost" href="tel:+15138312608"><i class="fa-solid fa-phone"></i> Ask for References: (513) 831-2608</a>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-contact">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-kicker">Get on the schedule</div>
+      <h2>Contact</h2>
+      <p>Fastest way to reach the shop is the phone. Use the form and your email app will draft a message for you.</p>
+    </div>
+    <div class="contact-grid">
+      <div>
+        <div class="contact-card">
+          <h3><i class="fa-solid fa-phone"></i> Call</h3>
+          <a class="tel" href="tel:+15138312608">(513) 831-2608</a>
+          <p style="color:var(--ink-dim);font-size:.9rem;margin-top:.6rem">Hours per a third-party listing: Mon-Fri 7:00 AM - 6:00 PM. Call to confirm.</p>
+        </div>
+        <div class="contact-card">
+          <h3><i class="fa-solid fa-location-dot"></i> Visit</h3>
+          <p style="margin-bottom:.9rem">E &amp; J Electrical Contractor<br>5698 W Day Cir<br>Milford, OH 45150</p>
+          <a class="btn btn-ghost" href="https://www.google.com/maps/search/?api=1&query=5698%20W%20Day%20Cir%2C%20Milford%2C%20OH%2045150" target="_blank" rel="noopener"><i class="fa-solid fa-location-arrow"></i> Get Directions</a>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="sec-kicker">Request service</div>
+        <form id="contactForm">
+          <label for="fName">Name</label>
+          <input id="fName" name="name" type="text" required autocomplete="name">
+          <label for="fPhone">Phone</label>
+          <input id="fPhone" name="phone" type="tel" required autocomplete="tel">
+          <label for="fService">What do you need?</label>
+          <select id="fService" name="service">
+            <option>General electrical work</option>
+            <option>Breaker or panel issue</option>
+            <option>Lighting or fixtures</option>
+            <option>Wiring or rewiring</option>
+            <option>Major appliance circuit</option>
+            <option>Troubleshooting</option>
+          </select>
+          <label for="fMsg">Details</label>
+          <textarea id="fMsg" name="message" required></textarea>
+          <button class="btn btn-volt" type="submit" style="margin-top:1.2rem;width:100%;justify-content:center"><i class="fa-solid fa-paper-plane"></i> Send Request</button>
+          <p style="font-size:.78rem;color:var(--ink-dim);margin-top:.8rem">No company email is published, so this opens your email app addressed to you with the request drafted. Prefer to talk? Call (513) 831-2608.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-kicker">Panel grid</div>
+      <h2>Gallery</h2>
+      <p>No public photos of this business were found, so each panel below is a labeled placeholder. Real photos are marked "Photo coming soon".</p>
+    </div>
+    <div class="gal-grid">
+      <div class="gal-cell"><i class="fa-solid fa-table-cells-large"></i><span class="cap">BREAKER PANEL</span><span class="coming">Photo coming soon</span></div>
+      <div class="gal-cell"><i class="fa-solid fa-plug"></i><span class="cap">OUTLET INSTALL</span><span class="coming">Photo coming soon</span></div>
+      <div class="gal-cell"><i class="fa-solid fa-lightbulb"></i><span class="cap">FIXTURE WORK</span><span class="coming">Photo coming soon</span></div>
+      <div class="gal-cell wirechart"><i class="fa-solid fa-wave-square"></i><span class="cap">WIRE GAUGE CHART</span><span class="coming">Photo coming soon</span></div>
+      <div class="gal-cell"><i class="fa-solid fa-truck"></i><span class="cap">SERVICE VAN</span><span class="coming">Photo coming soon</span></div>
+      <div class="gal-cell"><i class="fa-solid fa-helmet-safety"></i><span class="cap">ON THE JOB</span><span class="coming">Photo coming soon</span></div>
+    </div>
+    <div style="text-align:center;margin-top:2rem">
+      <a class="btn btn-ghost" href="#home" data-page="home"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
+    </div>
+  </div>
+</section>
+
+
+<div class="footer-zone">
+  <div class="map-motif" aria-hidden="true">
+    <span class="pin"><i class="fa-solid fa-location-dot"></i></span>
+    <span class="map-coords" style="top:10px;left:14px">39.17 N</span>
+    <span class="map-coords" style="top:10px;right:14px">84.22 W</span>
+    <span class="map-coords" style="bottom:10px;left:14px">5698 W DAY CIR</span>
+    <span class="map-coords" style="bottom:10px;right:14px">MILFORD OH 45150</span>
+  </div>
+  <footer>
+    <p>&copy; E &amp; J Electrical Contractor</p>
+  </footer>
+</div>
+
+<script>
+// Multi-page router: one file, five content sections plus a gallery page.
+var pageMap = {
+  home: 'page-home',
+  services: 'page-services',
+  about: 'page-about',
+  reviews: 'page-reviews',
+  contact: 'page-contact',
+  gallery: 'page-gallery'
+};
+
+function setActiveNav(key) {
+  var links = document.querySelectorAll('.nav-links a[data-page]');
+  for (var i = 0; i < links.length; i++) {
+    if (links[i].getAttribute('data-page') === key) {
+      links[i].classList.add('active');
+    } else {
+      links[i].classList.remove('active');
+    }
+  }
+}
+
+function navigateTo(key, push) {
+  if (!pageMap[key]) { key = 'home'; }
+  var pages = document.querySelectorAll('.page');
+  for (var i = 0; i < pages.length; i++) {
+    pages[i].classList.remove('active');
+  }
+  var target = document.getElementById(pageMap[key]);
+  if (target) { target.classList.add('active'); }
+  setActiveNav(key);
+  var links = document.getElementById('navLinks');
+  if (links) { links.classList.remove('open'); }
+  if (push !== false) {
+    try { history.pushState({ page: key }, '', '#' + key); } catch (e) {}
+  }
+  window.scrollTo(0, 0);
+}
+
+// Bind nav anchors only. No click handlers on section elements.
+document.addEventListener('DOMContentLoaded', function () {
+  var anchors = document.querySelectorAll('a[data-page]');
+  for (var i = 0; i < anchors.length; i++) {
+    (function (a) {
+      a.addEventListener('click', function (ev) {
+        ev.preventDefault();
+        navigateTo(a.getAttribute('data-page'), true);
+      });
+    })(anchors[i]);
+  }
+
+  var burger = document.getElementById('burger');
+  var links = document.getElementById('navLinks');
+  if (burger && links) {
+    burger.addEventListener('click', function () {
+      links.classList.toggle('open');
+    });
+  }
+
+  window.addEventListener('popstate', function (ev) {
+    var key = (ev.state && ev.state.page) || window.location.hash.replace('#', '') || 'home';
+    navigateTo(key, false);
+  });
+
+  var initial = window.location.hash.replace('#', '') || 'home';
+  navigateTo(initial, false);
+
+  // Contact form: mailto draft, no invented company email.
+  var form = document.getElementById('contactForm');
+  if (form) {
+    form.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var name = document.getElementById('fName').value;
+      var phone = document.getElementById('fPhone').value;
+      var service = document.getElementById('fService').value;
+      var msg = document.getElementById('fMsg').value;
+      var subject = encodeURIComponent('Service request from ' + name + ' - ' + service);
+      var body = encodeURIComponent('Name: ' + name + '\nPhone: ' + phone + '\nService: ' + service + '\n\nDetails:\n' + msg);
+      window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
+    });
+  }
+
+  // Breaker panel: decorative toggles for the hero graphic.
+  var tags = ['KITCHEN', 'RANGE', 'DRYER', 'HVAC', 'LIGHTS', 'OUTLETS', 'GARAGE', 'WATER HTR'];
+  var box = document.getElementById('breakers');
+  if (box) {
+    for (var b = 0; b < tags.length; b++) {
+      var brk = document.createElement('div');
+      brk.className = 'breaker';
+      brk.innerHTML = '<div class="sw"></div><div class="tag">' + tags[b] + '</div>';
+      (function (el) {
+        el.addEventListener('click', function () { el.classList.toggle('off'); });
+      })(brk);
+      box.appendChild(brk);
+    }
+  }
+});
+</script>
+</body>
+</html>

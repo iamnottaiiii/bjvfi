@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Creative Landscape</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+/* Base tokens, drawn from the designer's sketchbook */
+:root{
+  --paper:#f8f3e4;
+  --paper-deep:#efe6cf;
+  --ink:#2e2a22;
+  --ink-soft:#5b5347;
+  --leaf:#476b4f;
+  --leaf-dark:#334d3a;
+  --moss:#8aa583;
+  --clay:#d0763f;
+  --tape:rgba(208,118,63,.28);
+  --card:#fffdf6;
+  --shadow:0 6px 22px rgba(46,42,34,.12);
+  --radius:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',system-ui,sans-serif;
+  color:var(--ink);
+  background:var(--paper);
+  background-image:
+    radial-gradient(ellipse at 12% 8%, rgba(138,165,131,.10), transparent 55%),
+    radial-gradient(ellipse at 88% 90%, rgba(208,118,63,.10), transparent 55%),
+    repeating-linear-gradient(0deg, transparent 0 34px, rgba(46,42,34,.035) 34px 35px);
+  line-height:1.65;
+}
+h1,h2,h3,.hand{font-family:'Caveat',cursive;line-height:1.12;color:var(--ink)}
+.wrap{max-width:1140px;margin:0 auto;padding:0 22px}
+.badge{
+  display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  background:var(--clay);color:#fff;border-radius:999px;padding:.28rem .8rem;margin-bottom:.6rem;
+}
+.badge.soft{background:var(--leaf);color:#fff}
+/* Sketchbook spiral nav rail */
+.nav-spiral{
+  height:18px;
+  background:
+    radial-gradient(circle at 50% 50%, transparent 5px, var(--ink) 5px, var(--ink) 7px, transparent 7px);
+  background-size:46px 18px;background-repeat:repeat-x;background-position:center;
+  opacity:.85;
+}
+header.site-nav{
+  position:sticky;top:0;z-index:60;background:var(--card);
+  border-bottom:2px dashed rgba(46,42,34,.35);
+  box-shadow:var(--shadow);
+}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.65rem 0}
+.logo{display:flex;align-items:center;gap:.6rem;text-decoration:none;color:var(--ink)}
+.logo .mark{
+  width:44px;height:44px;border-radius:50%;background:var(--leaf);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:1.35rem;
+  border:2px dashed var(--paper);box-shadow:var(--shadow);
+}
+.logo .word{font-family:'Caveat',cursive;font-size:1.9rem;font-weight:700;line-height:1}
+.logo .word small{display:block;font-family:'Inter',sans-serif;font-size:.62rem;letter-spacing:.28em;text-transform:uppercase;color:var(--ink-soft)}
+.nav-links{display:flex;align-items:center;gap:1.15rem;list-style:none}
+.nav-links a{
+  text-decoration:none;color:var(--ink);font-weight:600;font-size:.95rem;position:relative;padding:.2rem 0;
+}
+.nav-links a::after{
+  content:"";position:absolute;left:0;right:100%;bottom:-3px;height:5px;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='6' viewBox='0 0 60 6'%3E%3Cpath d='M0 4 Q 7 1 15 4 T 30 4 T 45 4 T 60 4' fill='none' stroke='%23476b4f' stroke-width='2.5'/%3E%3C/svg%3E") repeat-x left center;
+  transition:right .25s ease;
+}
+.nav-links a:hover::after,.nav-links a.current::after{right:0}
+.call-pill{
+  display:inline-flex;align-items:center;gap:.5rem;background:var(--clay);color:#fff;font-weight:700;
+  text-decoration:none;padding:.55rem 1.1rem;border-radius:999px;border:2px solid var(--ink);
+  box-shadow:3px 3px 0 var(--ink);transition:transform .15s ease,box-shadow .15s ease;
+}
+.call-pill:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink)}
+#menuToggle{display:none;background:none;border:2px solid var(--ink);border-radius:10px;padding:.45rem .65rem;font-size:1.15rem;color:var(--ink);cursor:pointer}
+/* Pages */
+.page{display:none}
+.page.active{display:block;animation:fadein .35s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+/* Hand-sketched hero */
+.hero{position:relative;padding:4.2rem 0 3.4rem;overflow:hidden}
+.hero .tape{
+  position:absolute;width:150px;height:38px;background:var(--tape);top:18px;left:8%;
+  transform:rotate(-8deg);border-left:2px dashed rgba(46,42,34,.25);border-right:2px dashed rgba(46,42,34,.25);
+}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:2.5rem;align-items:center}
+.hero h1{font-size:clamp(2.6rem,5.4vw,4.3rem);margin:.4rem 0 .8rem}
+.hero h1 .accent{color:var(--leaf-dark);text-decoration:underline;text-decoration-style:wavy;text-decoration-color:var(--clay);text-underline-offset:.18em}
+.hero p.lede{font-size:1.12rem;color:var(--ink-soft);max-width:34rem}
+.hero-ctas{display:flex;gap:.9rem;flex-wrap:wrap;margin-top:1.6rem}
+.btn{
+  display:inline-flex;align-items:center;gap:.55rem;font-weight:700;text-decoration:none;cursor:pointer;
+  padding:.8rem 1.5rem;border-radius:12px;border:2px solid var(--ink);
+  box-shadow:3px 3px 0 var(--ink);transition:transform .15s ease,box-shadow .15s ease;font-size:1rem;
+}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink)}
+.btn-primary{background:var(--leaf);color:#fff}
+.btn-clay{background:var(--clay);color:#fff}
+.btn-ghost{background:var(--card);color:var(--ink)}
+.hero-facts{display:flex;gap:1.4rem;flex-wrap:wrap;margin-top:1.8rem;font-size:.92rem;color:var(--ink-soft)}
+.hero-facts i{color:var(--leaf-dark);margin-right:.4rem}
+.sketch-frame{
+  background:var(--card);border:2px solid var(--ink);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:1.1rem;position:relative;transform:rotate(1.4deg);
+}
+.sketch-frame .pin{
+  position:absolute;top:-14px;left:50%;transform:translateX(-50%) rotate(3deg);
+  width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 35% 30%, #e9e2d2, #b8ad93);
+  border:2px solid var(--ink);
+}
+.sketch-frame figcaption{font-family:'Caveat',cursive;font-size:1.35rem;text-align:center;padding-top:.4rem;color:var(--ink-soft)}
+/* Section scaffolding */
+section.block{padding:3.2rem 0}
+.block h2{font-size:clamp(2rem,3.6vw,2.9rem);margin-bottom:.4rem}
+.block .sub{color:var(--ink-soft);max-width:44rem;margin-bottom:2rem}
+/* Sketch-evolution services */
+.evo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1.6rem}
+.evo-card{
+  background:var(--card);border:2px solid var(--ink);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:1.4rem;position:relative;display:flex;flex-direction:column;gap:.7rem;
+}
+.evo-card:nth-child(odd){transform:rotate(-.8deg)}
+.evo-card:nth-child(even){transform:rotate(.8deg)}
+.evo-stages{display:flex;align-items:center;gap:.45rem;font-size:.75rem;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em}
+.evo-stages .dot{width:10px;height:10px;border-radius:50%;background:var(--moss);border:1.5px solid var(--ink)}
+.evo-stages .dot.on{background:var(--clay)}
+.evo-stages .line{flex:1;height:2px;background:repeating-linear-gradient(90deg,var(--ink-soft) 0 6px,transparent 6px 12px);opacity:.5}
+.evo-card h3{font-size:1.7rem}
+.evo-card p{font-size:.96rem;color:var(--ink-soft)}
+.evo-card .ico{
+  width:52px;height:52px;border-radius:50%;background:var(--paper-deep);border:2px dashed var(--ink);
+  display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:var(--leaf-dark);
+}
+/* Sketch-card gallery */
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.6rem}
+.sketch-card{
+  background:var(--card);border:2px solid var(--ink);border-radius:6px 6px var(--radius) var(--radius);
+  box-shadow:var(--shadow);overflow:hidden;transform:rotate(-1deg);
+}
+.sketch-card:nth-child(2n){transform:rotate(1.1deg)}
+.sketch-card:nth-child(3n){transform:rotate(-.5deg)}
+.sketch-card .art{
+  height:190px;display:flex;align-items:center;justify-content:center;
+  background:
+    radial-gradient(circle at 50% 60%, rgba(138,165,131,.25), transparent 70%),
+    repeating-linear-gradient(45deg, transparent 0 14px, rgba(46,42,34,.05) 14px 16px);
+  border-bottom:2px dashed rgba(46,42,34,.4);
+}
+.sketch-card .cap{padding:.9rem 1.1rem 1.2rem}
+.sketch-card .cap .hand{font-size:1.5rem}
+/* Reviews */
+.review-band{background:var(--card);border:2px solid var(--ink);border-radius:var(--radius);box-shadow:var(--shadow);padding:1.8rem;display:grid;grid-template-columns:220px 1fr;gap:2rem;align-items:center;margin-bottom:1.8rem}
+.score{font-family:'Caveat',cursive;font-size:4.2rem;line-height:1;color:var(--leaf-dark);text-align:center}
+.score small{display:block;font-family:'Inter',sans-serif;font-size:.8rem;color:var(--ink-soft);letter-spacing:.06em}
+.stars{color:var(--clay);font-size:1.2rem;letter-spacing:.15em;text-align:center;margin:.3rem 0}
+.review-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:1.4rem}
+.review-card{background:var(--card);border:2px dashed var(--ink);border-radius:var(--radius);padding:1.4rem;box-shadow:var(--shadow)}
+.review-card blockquote{font-family:'Caveat',cursive;font-size:1.45rem;line-height:1.3;margin-bottom:.8rem}
+.review-card .meta{font-size:.82rem;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.honesty-note{margin-top:1.8rem;background:var(--paper-deep);border:2px dashed var(--ink);border-radius:var(--radius);padding:1.3rem 1.5rem;font-size:.95rem;color:var(--ink-soft)}
+.honesty-note i{color:var(--clay);margin-right:.5rem}
+/* About */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:2.2rem;align-items:start}
+.fact-list{list-style:none;display:flex;flex-direction:column;gap:1rem;margin-top:1.2rem}
+.fact-list li{background:var(--card);border:2px solid var(--ink);border-radius:12px;box-shadow:var(--shadow);padding:.95rem 1.2rem;display:flex;gap:.9rem;align-items:flex-start}
+.fact-list i{color:var(--leaf-dark);font-size:1.25rem;margin-top:.2rem}
+/* Contact */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start}
+.contact-card{background:var(--card);border:2px solid var(--ink);border-radius:var(--radius);box-shadow:var(--shadow);padding:1.8rem}
+.contact-card h3{font-size:1.9rem;margin-bottom:1rem}
+.contact-row{display:flex;align-items:center;gap:.9rem;padding:.85rem 0;border-bottom:2px dashed rgba(46,42,34,.25);font-size:1rem}
+.contact-row:last-child{border-bottom:none}
+.contact-row i{width:40px;height:40px;flex:0 0 40px;border-radius:50%;background:var(--leaf);color:#fff;display:flex;align-items:center;justify-content:center}
+.contact-row a{color:var(--ink);font-weight:600;text-decoration:none}
+.contact-row a:hover{text-decoration:underline;text-decoration-color:var(--clay);text-decoration-thickness:2px}
+form.sketch-form{display:flex;flex-direction:column;gap:1rem}
+.sketch-form label{font-weight:700;font-size:.9rem}
+.sketch-form input,.sketch-form textarea,.sketch-form select{
+  font-family:'Inter',sans-serif;font-size:1rem;padding:.8rem 1rem;border-radius:10px;
+  border:2px solid var(--ink);background:var(--paper);color:var(--ink);width:100%;
+}
+.sketch-form input:focus,.sketch-form textarea:focus{outline:3px solid rgba(208,118,63,.45);background:#fff}
+.sketch-form textarea{min-height:130px;resize:vertical}
+.form-note{font-size:.86rem;color:var(--ink-soft)}
+/* Call-first footer zone */
+.call-banner{
+  margin:3.4rem 0 0;background:var(--leaf-dark);color:#fff;border-top:3px dashed rgba(255,255,255,.35);
+  padding:3rem 0;text-align:center;position:relative;overflow:hidden;
+}
+.call-banner h2{color:#fff;font-size:clamp(2rem,4vw,3rem)}
+.call-banner p{opacity:.9;max-width:36rem;margin:.6rem auto 1.6rem}
+footer{background:var(--ink);color:#fff;text-align:center;padding:1.2rem 0}
+footer p{font-size:.95rem;letter-spacing:.02em}
+@media(max-width:880px){
+  .hero-grid,.about-grid,.contact-grid,.review-band{grid-template-columns:1fr}
+  .review-band{grid-template-columns:1fr;text-align:center}
+}
+@media(max-width:760px){
+  #menuToggle{display:block}
+  .nav-links{
+    display:none;position:absolute;top:100%;left:0;right:0;background:var(--card);
+    flex-direction:column;align-items:stretch;padding:1rem 1.4rem 1.4rem;gap:.4rem;
+    border-bottom:2px dashed rgba(46,42,34,.35);box-shadow:var(--shadow);
+  }
+  .nav-links.open{display:flex}
+  .nav-links a{display:block;padding:.6rem .2rem}
+  .nav-inner{position:relative}
+  .nav-links .call-pill{justify-content:center;margin-top:.4rem}
+}
+</style>
+</head>
+<body>
+<div class="nav-spiral" aria-hidden="true"></div>
+<header class="site-nav">
+  <div class="wrap nav-inner">
+    <a class="logo" href="#home" data-page="home" aria-label="Creative Landscape home">
+      <span class="mark"><i class="fa-solid fa-leaf"></i></span>
+      <span class="word">Creative Landscape<small>Landscape Designer</small></span>
+    </a>
+    <button id="menuToggle" aria-label="Open menu" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#home" data-page="home" class="current">Home</a></li>
+      <li><a href="#services" data-page="services">Services</a></li>
+      <li><a href="#about" data-page="about">About</a></li>
+      <li><a href="#reviews" data-page="reviews">Reviews</a></li>
+      <li><a href="#contact" data-page="contact">Contact</a></li>
+      <li class="desktop-only"><a class="call-pill" href="tel:+15135748665"><i class="fa-solid fa-phone"></i>(513) 574-8665</a></li>
+    </ul>
+  </div>
+</header>
+<main>
+
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="tape" aria-hidden="true"></div>
+    <div class="wrap hero-grid">
+      <div>
+        <span class="badge soft"><i class="fa-solid fa-compass-drafting"></i> Landscape designer, Cincinnati OH</span>
+        <h1>Every great yard starts as <span class="accent">a pencil sketch</span>.</h1>
+        <p class="lede">Creative Landscape designs outdoor spaces around the way you actually live: welcoming front entries, shady reading corners, beds that bloom in every season. Talk through the idea, see it drawn, then watch it take root.</p>
+        <div class="hero-ctas">
+          <a class="btn btn-clay" href="tel:+15135748665"><i class="fa-solid fa-phone"></i>Call (513) 574-8665</a>
+          <a class="btn btn-ghost" href="#services" data-page="services"><i class="fa-solid fa-pencil"></i>See services</a>
+        </div>
+        <div class="hero-facts">
+          <span><i class="fa-solid fa-star"></i>5.0 rating on Birdeye (3 reviews)</span>
+          <span><i class="fa-solid fa-location-dot"></i>4568 Hutchinson Rd, Cincinnati, OH 45248</span>
+        </div>
+      </div>
+      <figure class="sketch-frame">
+        <span class="pin" aria-hidden="true"></span>
+        <svg viewBox="0 0 420 300" width="100%" height="auto" role="img" aria-label="Hand-drawn sketch of a garden plan with trees, a path, and planting beds">
+          <rect x="8" y="8" width="404" height="284" rx="10" fill="none" stroke="#2e2a22" stroke-width="3" stroke-dasharray="12 8"/>
+          <path d="M40 250 Q 120 230 180 240 T 380 220" fill="none" stroke="#476b4f" stroke-width="4" stroke-linecap="round" stroke-dasharray="2 10"/>
+          <g stroke="#2e2a22" stroke-width="2.5" fill="none">
+            <ellipse cx="90" cy="120" rx="46" ry="60"/><line x1="90" y1="180" x2="90" y2="252"/>
+            <ellipse cx="200" cy="100" rx="36" ry="48"/><line x1="200" y1="148" x2="200" y2="250"/>
+            <ellipse cx="320" cy="130" rx="52" ry="62"/><line x1="320" y1="192" x2="320" y2="252"/>
+          </g>
+          <g stroke="#8aa583" stroke-width="2.5" fill="none">
+            <path d="M60 210 q10 -18 20 0 q10 -18 20 0 q10 -18 20 0"/>
+            <path d="M270 210 q10 -18 20 0 q10 -18 20 0 q10 -18 20 0"/>
+          </g>
+          <circle cx="360" cy="48" r="22" fill="none" stroke="#d0763f" stroke-width="3"/>
+          <g stroke="#d0763f" stroke-width="3" stroke-linecap="round">
+            <line x1="360" y1="12" x2="360" y2="20"/><line x1="360" y1="76" x2="360" y2="84"/>
+            <line x1="324" y1="48" x2="332" y2="48"/><line x1="388" y1="48" x2="396" y2="48"/>
+          </g>
+          <text x="40" y="285" font-family="Caveat, cursive" font-size="24" fill="#5b5347">the johnson backyard, rough draft</text>
+        </svg>
+        <figcaption>Drawn first, planted second. That is the whole method.</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <section class="block" aria-label="Why a design first approach">
+      <h2>Why we sketch before we plant</h2>
+      <p class="sub">A landscape is a living drawing. It changes with the light, the seasons, and the years. Designing on paper first means fewer surprises and a yard that matures the way you imagined it.</p>
+      <div class="evo-grid">
+        <div class="evo-card">
+          <span class="ico"><i class="fa-solid fa-ear-listen"></i></span>
+          <h3>1. Listen</h3>
+          <p>Walk the property together. Note the sun, the soil, the drainage, and the way your family uses the space today.</p>
+        </div>
+        <div class="evo-card">
+          <span class="ico"><i class="fa-solid fa-pencil"></i></span>
+          <h3>2. Draw</h3>
+          <p>Turn the walk into a plan: bed shapes, plant groupings, and focal points, sketched to scale so you can see it before it is real.</p>
+        </div>
+        <div class="evo-card">
+          <span class="ico"><i class="fa-solid fa-seedling"></i></span>
+          <h3>3. Plant</h3>
+          <p>Install with care for spacing, sunlight, and water, so the garden grows in the direction the sketch pointed it.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</section>
+
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <section class="block">
+      <span class="badge">Sample list, call to confirm</span>
+      <h2>Services, from rough sketch to finished beds</h2>
+      <p class="sub">Each card below follows the evolution: a quick sketch of the idea, a refined plan, and the finished result. The service list reflects typical landscape design work and has not been confirmed with the business, so please call to verify current offerings.</p>
+      <div class="evo-grid">
+        <article class="evo-card">
+          <div class="evo-stages"><span class="dot on"></span><span class="line"></span><span class="dot on"></span><span class="line"></span><span class="dot"></span></div>
+          <span class="ico"><i class="fa-solid fa-compass-drafting"></i></span>
+          <h3>Landscape design</h3>
+          <p>Scaled planting plans and bed layouts drawn around your home, your light, and your soil. Typical projects include new beds, full front-yard refreshes, and foundation plantings.</p>
+        </article>
+        <article class="evo-card">
+          <div class="evo-stages"><span class="dot on"></span><span class="line"></span><span class="dot"></span><span class="line"></span><span class="dot"></span></div>
+          <span class="ico"><i class="fa-solid fa-tree"></i></span>
+          <h3>Trees and shrubs</h3>
+          <p>Selection and placement of ornamental trees and shrubs suited to Cincinnati growing conditions, with spacing planned for their mature size.</p>
+        </article>
+        <article class="evo-card">
+          <div class="evo-stages"><span class="dot on"></span><span class="line"></span><span class="dot on"></span><span class="line"></span><span class="dot on"></span></div>
+          <span class="ico"><i class="fa-solid fa-layer-group"></i></span>
+          <h3>Bed renovation</h3>
+          <p>Reworking tired beds: editing overgrown plants, redefining edges, refreshing mulch, and replanting for a fuller, tidier look.</p>
+        </article>
+        <article class="evo-card">
+          <div class="evo-stages"><span class="dot on"></span><span class="line"></span><span class="dot"></span><span class="line"></span><span class="dot"></span></div>
+          <span class="ico"><i class="fa-solid fa-clipboard-list"></i></span>
+          <h3>Design consultations</h3>
+          <p>A one-visit walkthrough with planting advice you can carry out yourself, or a starting sketch for a project you plan to phase over time.</p>
+        </article>
+      </div>
+      <div class="hero-ctas" style="margin-top:2rem">
+        <a class="btn btn-primary" href="tel:+15135748665"><i class="fa-solid fa-phone"></i>Ask about a project</a>
+      </div>
+    </section>
+
+    <section class="block" aria-label="Project gallery">
+      <h2>The sketch-card gallery</h2>
+      <p class="sub">Project photos have not been provided by the business yet. These sketch cards show the kinds of projects a landscape designer typically takes on.</p>
+      <div class="gallery-grid">
+        <article class="sketch-card">
+          <div class="art">
+            <svg viewBox="0 0 200 150" width="150" height="auto" aria-hidden="true">
+              <g fill="none" stroke="#2e2a22" stroke-width="3">
+                <rect x="20" y="40" width="160" height="80" rx="6"/>
+                <line x1="90" y1="40" x2="90" y2="120"/><line x1="130" y1="40" x2="130" y2="120"/>
+              </g>
+              <g fill="none" stroke="#8aa583" stroke-width="3">
+                <circle cx="55" cy="80" r="16"/><circle cx="160" cy="80" r="16"/><circle cx="110" cy="80" r="12"/>
+              </g>
+            </svg>
+          </div>
+          <div class="cap"><p class="hand">Front entry refresh</p><span class="badge soft">Photo coming soon</span></div>
+        </article>
+        <article class="sketch-card">
+          <div class="art">
+            <svg viewBox="0 0 200 150" width="150" height="auto" aria-hidden="true">
+              <g fill="none" stroke="#2e2a22" stroke-width="3">
+                <path d="M30 120 Q 100 60 170 110"/>
+                <ellipse cx="100" cy="70" rx="22" ry="28"/>
+              </g>
+              <g fill="none" stroke="#476b4f" stroke-width="3">
+                <path d="M50 130 q8 -14 16 0 q8 -14 16 0"/><path d="M120 130 q8 -14 16 0 q8 -14 16 0"/>
+              </g>
+            </svg>
+          </div>
+          <div class="cap"><p class="hand">Curved planting bed</p><span class="badge soft">Photo coming soon</span></div>
+        </article>
+        <article class="sketch-card">
+          <div class="art">
+            <svg viewBox="0 0 200 150" width="150" height="auto" aria-hidden="true">
+              <g fill="none" stroke="#2e2a22" stroke-width="3">
+                <circle cx="100" cy="75" r="34"/>
+                <line x1="100" y1="109" x2="100" y2="130"/>
+                <path d="M40 130 h120"/>
+              </g>
+              <g fill="none" stroke="#d0763f" stroke-width="3">
+                <circle cx="60" cy="60" r="10"/><circle cx="142" cy="58" r="10"/>
+              </g>
+            </svg>
+          </div>
+          <div class="cap"><p class="hand">Specimen tree planting</p><span class="badge soft">Photo coming soon</span></div>
+        </article>
+        <article class="sketch-card">
+          <div class="art">
+            <svg viewBox="0 0 200 150" width="150" height="auto" aria-hidden="true">
+              <g fill="none" stroke="#2e2a22" stroke-width="3">
+                <rect x="45" y="50" width="110" height="70" rx="8"/>
+                <line x1="45" y1="75" x2="155" y2="75"/><line x1="45" y1="100" x2="155" y2="100"/>
+              </g>
+              <g fill="none" stroke="#8aa583" stroke-width="3">
+                <path d="M65 135 q6 -12 12 0"/><path d="M100 135 q6 -12 12 0"/><path d="M135 135 q6 -12 12 0"/>
+              </g>
+            </svg>
+          </div>
+          <div class="cap"><p class="hand">Backyard bed layout</p><span class="badge soft">Photo coming soon</span></div>
+        </article>
+      </div>
+    </section>
+  </div>
+</section>
+
+<section class="page" id="page-about">
+  <div class="wrap">
+    <section class="block">
+      <span class="badge soft"><i class="fa-solid fa-book-open"></i> The studio</span>
+      <h2>A design-first landscape studio</h2>
+      <div class="about-grid">
+        <div>
+          <p class="sub">Creative Landscape is a landscape design business based on Hutchinson Rd in the 45248 area of Cincinnati, Ohio. Public directory listings categorize it as both a landscape designer and a landscape contractor, and its profile shows a 5.0 rating from 3 reviews on Birdeye.</p>
+          <p class="sub">Reviewers describe the owner as a skilled designer who works on both small and large projects, with one long-term client noting they have used the business for many years and recommend it for fair, quick pricing.</p>
+          <div class="hero-ctas">
+            <a class="btn btn-clay" href="tel:+15135748665"><i class="fa-solid fa-phone"></i>Call (513) 574-8665</a>
+          </div>
+        </div>
+        <div>
+          <ul class="fact-list">
+            <li><i class="fa-solid fa-location-dot"></i><span><strong>Studio address</strong><br>Creative Landscape, 4568 Hutchinson Rd, Cincinnati, OH 45248</span></li>
+            <li><i class="fa-solid fa-star"></i><span><strong>Public rating</strong><br>5.0 out of 5, based on 3 reviews on Birdeye</span></li>
+            <li><i class="fa-solid fa-phone"></i><span><strong>Phone</strong><br><a href="tel:+15135748665">(513) 574-8665</a></span></li>
+            <li><i class="fa-solid fa-clock"></i><span><strong>Hours</strong><br>Call to confirm current hours</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </div>
+</section>
+
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <section class="block">
+      <span class="badge soft"><i class="fa-solid fa-comment-dots"></i> What neighbors say</span>
+      <h2>Reviews, in clients own words (paraphrased)</h2>
+      <p class="sub">The sentiments below are paraphrased from the three public reviews shown on the business Birdeye profile. No reviewer names are published here.</p>
+      <div class="review-band">
+        <div>
+          <div class="score">5.0<small>out of 5</small></div>
+          <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+          <p class="meta" style="text-align:center">3 reviews on Birdeye</p>
+        </div>
+        <div>
+          <p>A long-term client writes that the owner is skilled at landscape design, that pricing is fair and turnaround is quick, and that they recommend the business for projects of every size after many years as a customer. Two additional reviewers also left five-star ratings.</p>
+          <div class="hero-ctas" style="margin-top:1.2rem">
+            <a class="btn btn-ghost" href="https://reviews.birdeye.com/creative-landscape-156221314473505" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i>Read reviews on Birdeye</a>
+          </div>
+        </div>
+      </div>
+      <div class="review-cards">
+        <div class="review-card">
+          <blockquote>Skilled design work, fair pricing, and quick turnaround, from someone who has trusted them for years.</blockquote>
+          <p class="meta">Paraphrased, 5 stars, posted about 7 years ago</p>
+        </div>
+        <div class="review-card">
+          <blockquote>Recommended for small and large projects alike.</blockquote>
+          <p class="meta">Paraphrased, 5 stars, posted about 5 years ago</p>
+        </div>
+        <div class="review-card">
+          <blockquote>A five-star review with no written comment.</blockquote>
+          <p class="meta">Paraphrased, 5 stars, posted about 5 years ago</p>
+        </div>
+      </div>
+      <div class="honesty-note">
+        <i class="fa-solid fa-circle-info"></i>
+        Honest note: we were not able to verify a direct Google Maps link for this business from our research, so there is no Google reviews button on this page. The Birdeye link above was confirmed in public search results.
+      </div>
+    </section>
+  </div>
+</section>
+
+
+<section class="page" id="page-contact">
+  <div class="wrap">
+    <section class="block">
+      <span class="badge soft"><i class="fa-solid fa-paper-plane"></i> Say hello</span>
+      <h2>Start with a conversation</h2>
+      <p class="sub">Tell us a little about your yard and we will talk through what a sketch could do for it. Calling is fastest.</p>
+      <div class="contact-grid">
+        <div class="contact-card">
+          <h3>Reach the studio</h3>
+          <div class="contact-row">
+            <i class="fa-solid fa-phone"></i>
+            <span><a href="tel:+15135748665">(513) 574-8665</a><br><small>Call for hours, services, and quotes</small></span>
+          </div>
+          <div class="contact-row">
+            <i class="fa-solid fa-location-dot"></i>
+            <span>Creative Landscape, 4568 Hutchinson Rd,<br>Cincinnati, OH 45248<br><a href="https://www.google.com/maps/search/?api=1&query=Creative%20Landscape%2C%204568%20Hutchinson%20Rd%2C%20Cincinnati%2C%20OH%2045248" target="_blank" rel="noopener">Get Directions</a></span>
+          </div>
+          <div class="contact-row">
+            <i class="fa-solid fa-clock"></i>
+            <span>Hours: call to confirm<br><small>Days and times are not published here</small></span>
+          </div>
+        </div>
+        <div class="contact-card">
+          <h3>Send a note</h3>
+          <form class="sketch-form" id="contactForm">
+            <div>
+              <label for="fName">Your name</label>
+              <input id="fName" name="name" type="text" required autocomplete="name" placeholder="Jane Miller">
+            </div>
+            <div>
+              <label for="fPhone">Phone</label>
+              <input id="fPhone" name="phone" type="tel" autocomplete="tel" placeholder="(513) 555-0100">
+            </div>
+            <div>
+              <label for="fTopic">What are you dreaming about?</label>
+              <select id="fTopic" name="topic">
+                <option>Landscape design plan</option>
+                <option>New planting beds</option>
+                <option>Trees and shrubs</option>
+                <option>Bed renovation</option>
+                <option>Something else</option>
+              </select>
+            </div>
+            <div>
+              <label for="fMsg">Tell us about your yard</label>
+              <textarea id="fMsg" name="message" required placeholder="Roughly how big is the area, what is there now, and what would you love to see?"></textarea>
+            </div>
+            <button class="btn btn-primary" type="submit"><i class="fa-solid fa-paper-plane"></i>Send request</button>
+            <p class="form-note">Submitting opens your email app with the message ready to send, so you can address it to Creative Landscape. Prefer to talk it through? Call <a href="tel:+15135748665">(513) 574-8665</a>.</p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </div>
+</section>
+</main>
+
+<section class="call-banner" aria-label="Call Creative Landscape">
+  <div class="wrap">
+    <h2>Ready to sketch your yard?</h2>
+    <p>One call is all it takes to start the drawing. Talk through your project, get honest advice, and see what your landscape could become.</p>
+    <a class="btn btn-clay" href="tel:+15135748665" style="font-size:1.25rem"><i class="fa-solid fa-phone"></i>Call (513) 574-8665</a>
+  </div>
+</section>
+
+<footer>
+  <p>&copy; Creative Landscape</p>
+</footer>
+
+<script>
+// Single-file multi-page router: every nav anchor carries data-page="home|services|about|reviews|contact"
+// and each value matches a real section id of the form page-<name>.
+var pageMap = {
+  home: 'page-home',
+  services: 'page-services',
+  about: 'page-about',
+  reviews: 'page-reviews',
+  contact: 'page-contact'
+};
+
+function currentPageFromHash() {
+  var h = (location.hash || '').replace('#', '');
+  return pageMap[h] ? h : 'home';
+}
+
+function navigateTo(page, push) {
+  if (!pageMap[page]) { page = 'home'; }
+  var sections = document.querySelectorAll('.page');
+  for (var i = 0; i < sections.length; i++) {
+    sections[i].classList.toggle('active', sections[i].id === pageMap[page]);
+  }
+  var links = document.querySelectorAll('[data-page]');
+  for (var j = 0; j < links.length; j++) {
+    var inNav = links[j].closest('.nav-links');
+    if (inNav) { links[j].classList.toggle('current', links[j].getAttribute('data-page') === page); }
+  }
+  if (push === undefined || push) {
+    history.pushState({ page: page }, '', '#' + page);
+  }
+  window.scrollTo(0, 0);
+  var nav = document.getElementById('navLinks');
+  var toggle = document.getElementById('menuToggle');
+  if (nav && nav.classList.contains('open')) {
+    nav.classList.remove('open');
+    toggle.setAttribute('aria-expanded', 'false');
+  }
+}
+
+// Bind nav clicks only to anchors carrying data-page.
+document.addEventListener('click', function (e) {
+  var a = e.target.closest('a[data-page]');
+  if (!a) { return; }
+  e.preventDefault();
+  navigateTo(a.getAttribute('data-page'));
+});
+
+window.addEventListener('popstate', function (e) {
+  var p = (e.state && e.state.page) ? e.state.page : currentPageFromHash();
+  navigateTo(p, false);
+});
+
+// Mobile hamburger menu
+document.getElementById('menuToggle').addEventListener('click', function () {
+  var nav = document.getElementById('navLinks');
+  var open = nav.classList.toggle('open');
+  this.setAttribute('aria-expanded', open ? 'true' : 'false');
+});
+
+// Contact form: compose a mailto message, no address invented.
+document.getElementById('contactForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var name = document.getElementById('fName').value.trim();
+  var phone = document.getElementById('fPhone').value.trim();
+  var topic = document.getElementById('fTopic').value;
+  var msg = document.getElementById('fMsg').value.trim();
+  var subject = encodeURIComponent('Project inquiry from ' + name + ' - ' + topic);
+  var body = encodeURIComponent('Name: ' + name + '\nPhone: ' + phone + '\nTopic: ' + topic + '\n\n' + msg);
+  window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
+});
+
+// Initial page from URL hash, so shared links land on the right page.
+navigateTo(currentPageFromHash(), false);
+</script>
+</body>
+</html>

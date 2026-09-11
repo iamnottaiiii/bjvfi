@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panaderia Dulce Ilusion | Pan Mexicano Estilo Michoacan, Chicago</title>
+<meta name="description" content="Panaderia Dulce Ilusion on 115th Street in Chicago. Delicioso pan mexicano estilo Michoacan: pan dulce, pasteles, and fresh bolillos, baked every morning.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Italiana&family=Nunito+Sans:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FFF9F0; --paper:#FFFDF9; --plum:#3A2440; --plum-d:#2A1830;
+  --marigold:#E8912D; --amber:#F2B94E; --amber-l:#FBE7C4; --cocoa:#2C1E16;
+  --ink:#33261B; --muted:#6E5B48; --line:#EBDCC2;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Nunito Sans',system-ui,sans-serif;background:var(--cream);color:var(--ink);line-height:1.7;font-size:17px}
+h1,h2,h3{font-family:'Italiana',serif;color:var(--plum);line-height:1.15;font-weight:400;letter-spacing:.02em}
+a{color:var(--plum)}
+.wrap{max-width:1100px;margin:0 auto;padding:0 24px}
+
+/* floating hamburger, no top nav bar */
+.burger{position:fixed;top:18px;left:18px;z-index:80;width:54px;height:54px;border-radius:50%;background:var(--plum);border:none;cursor:pointer;box-shadow:0 8px 22px rgba(42,24,48,.35);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+.burger span{display:block;width:22px;height:3px;background:var(--amber);border-radius:2px;transition:transform .25s,opacity .25s}
+.burger[aria-expanded="true"] span:nth-child(1){transform:translateY(8px) rotate(45deg)}
+.burger[aria-expanded="true"] span:nth-child(2){opacity:0}
+.burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-8px) rotate(-45deg)}
+
+/* side drawer */
+.drawer{position:fixed;top:0;left:0;bottom:0;width:min(340px,86vw);background:var(--plum-d);color:#F5E9D4;z-index:90;transform:translateX(-105%);transition:transform .35s ease;display:flex;flex-direction:column;padding:30px 30px 24px;box-shadow:8px 0 30px rgba(0,0,0,.3)}
+.drawer.open{transform:none}
+.drawer .dbrand{font-family:'Italiana',serif;font-size:1.7rem;color:var(--amber);margin:6px 0 2px}
+.drawer .dsub{font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;color:#C9B79A;font-weight:700}
+.drawer .dlinks{display:flex;flex-direction:column;margin:28px 0;gap:2px}
+.drawer .dlinks a{color:#F5E9D4;text-decoration:none;font-weight:700;font-size:1.15rem;padding:12px 10px;border-radius:10px;display:flex;justify-content:space-between;align-items:center}
+.drawer .dlinks a:hover{background:rgba(242,185,78,.15)}
+.drawer .dlinks a.active{background:rgba(242,185,78,.22);color:var(--amber)}
+.drawer .dlinks a .arr{color:var(--marigold)}
+.drawer .dfoot{margin-top:auto;border-top:1px solid rgba(255,255,255,.15);padding-top:18px;font-size:.92rem}
+.drawer .dfoot a{color:var(--amber);font-weight:800;text-decoration:none}
+.scrim{position:fixed;inset:0;background:rgba(44,30,22,.45);z-index:85;opacity:0;pointer-events:none;transition:opacity .3s}
+.scrim.show{opacity:1;pointer-events:auto}
+
+/* pages */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .45s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* full-bleed band hero */
+.hero{background:linear-gradient(160deg,var(--plum) 0%,var(--plum-d) 70%);color:#F7EDDA;overflow:hidden;position:relative}
+.hero .band{max-width:1100px;margin:0 auto;padding:88px 24px 70px;display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+.hero .eyebrow{display:inline-block;font-size:.75rem;font-weight:800;letter-spacing:.26em;text-transform:uppercase;color:var(--amber);border:1px solid var(--marigold);padding:7px 16px;border-radius:999px;margin-bottom:20px}
+.hero h1{font-size:clamp(2.8rem,7vw,4.6rem);color:#FFF7E8}
+.hero h1 em{font-style:normal;color:var(--amber)}
+.hero p.lede{font-size:1.15rem;color:#E8D6B8;max-width:520px;margin:18px 0 28px}
+.hero .cta-row{display:flex;gap:14px;flex-wrap:wrap}
+.btn{display:inline-block;text-decoration:none;font-weight:800;padding:14px 30px;border-radius:999px;transition:transform .15s}
+.btn.solid{background:var(--marigold);color:var(--plum-d)}
+.btn.solid:hover{background:var(--amber);transform:translateY(-2px)}
+.btn.ghost{border:2px solid var(--amber);color:var(--amber)}
+.btn.ghost:hover{background:rgba(242,185,78,.15);transform:translateY(-2px)}
+.hero .art{position:relative;display:flex;justify-content:center}
+.hero .orbit{position:absolute;inset:-20px;border:2px dashed rgba(242,185,78,.4);border-radius:50%;animation:spin 40s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* magazine columns rhythm */
+.mag{display:grid;grid-template-columns:1fr 1fr;gap:0;margin:70px 0;border-top:3px solid var(--plum);border-bottom:3px solid var(--plum)}
+.mag .col{padding:44px 40px}
+.mag .col + .col{border-left:1px solid var(--line)}
+.mag .kicker{font-size:.72rem;font-weight:800;letter-spacing:.24em;text-transform:uppercase;color:var(--marigold);margin-bottom:14px}
+.mag h2{font-size:2rem;margin-bottom:14px}
+.mag p{color:var(--muted);margin-bottom:14px}
+.mag p.lead::first-letter{font-family:'Italiana',serif;font-size:3.4rem;line-height:.85;float:left;margin:6px 10px 0 0;color:var(--plum)}
+.pull{font-family:'Italiana',serif;font-size:1.5rem;color:var(--plum);border-left:5px solid var(--marigold);padding-left:20px;margin:22px 0;line-height:1.4}
+.mag .fact{background:var(--plum);color:#F3E4C6;border-radius:14px;padding:8px 0}
+.mag .fact h3{color:var(--amber);font-size:1.4rem;margin-bottom:10px}
+.mag .fact .hrow{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,.25);font-weight:600;font-size:.95rem}
+.mag .fact .hrow:last-child{border-bottom:none}
+.mag .fact .note{font-size:.82rem;color:#C9B79A;margin-top:10px}
+
+/* feature strip */
+.sec{padding:20px 0 70px}
+.sec h2.sec-title{font-size:2.2rem;text-align:center;margin-bottom:8px}
+.sec .sec-sub{text-align:center;color:var(--muted);max-width:620px;margin:0 auto 36px}
+.feat3{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:26px}
+.feat{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:30px 26px;text-align:center;box-shadow:0 8px 20px rgba(58,36,64,.07)}
+.feat h3{font-size:1.5rem;margin:16px 0 8px}
+.feat p{color:var(--muted);font-size:.96rem}
+
+/* tabs for offerings */
+.tabs{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:34px 0 8px}
+.tabbtn{font-family:'Nunito Sans',sans-serif;font-weight:800;font-size:1rem;padding:12px 26px;border-radius:999px;border:2px solid var(--plum);background:transparent;color:var(--plum);cursor:pointer;transition:all .2s}
+.tabbtn.on{background:var(--plum);color:var(--amber)}
+.tabpanel{display:none;max-width:720px;margin:26px auto 0;background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:30px 34px;box-shadow:0 8px 20px rgba(58,36,64,.07)}
+.tabpanel.on{display:block;animation:fadeIn .35s ease}
+.trow{display:flex;align-items:baseline;gap:12px;padding:12px 2px;border-bottom:1px dashed var(--line)}
+.trow:last-child{border-bottom:none}
+.trow .tname{font-weight:800;color:var(--plum)}
+.trow .tdesc{display:block;font-size:.88rem;color:var(--muted);font-weight:400}
+.trow .tdots{flex:1;border-bottom:2px dotted var(--marigold);transform:translateY(-4px);min-width:20px}
+.trow .tprice{font-weight:800;color:var(--marigold);white-space:nowrap}
+.badge-sample{display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;background:#FFF3D6;border:1px dashed var(--marigold);color:#8A5A12;padding:5px 14px;border-radius:999px}
+
+/* masonry gallery */
+.masonry{columns:3 240px;column-gap:22px;margin:36px 0 70px}
+.mtile{break-inside:avoid;background:var(--paper);border:1px solid var(--line);border-radius:14px;margin-bottom:22px;overflow:hidden;box-shadow:0 6px 16px rgba(58,36,64,.07)}
+.mtile .pic{display:flex;align-items:center;justify-content:center;position:relative;background:linear-gradient(150deg,var(--amber-l),#F9E3B8)}
+.mtile .pic.tall{min-height:280px}
+.mtile .pic.short{min-height:180px}
+.mtile .pic.mid{min-height:230px}
+.mtile .pic.plum{background:linear-gradient(150deg,#4A2F52,var(--plum-d))}
+.mtile .soon{position:absolute;top:12px;right:12px;background:var(--cocoa);color:#fff;font-size:.66rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:999px}
+.mtile .cap{padding:16px 18px}
+.mtile h3{font-size:1.25rem}
+.mtile p{font-size:.88rem;color:var(--muted)}
+
+/* reviews */
+.revwrap{max-width:760px;margin:36px auto 70px}
+.notice{background:#FFF6E3;border:2px dashed var(--marigold);border-radius:16px;padding:28px 30px;text-align:center}
+.notice h2{font-size:1.8rem;margin-bottom:10px}
+.notice p{color:var(--muted);max-width:560px;margin:0 auto}
+.review-cta{margin-top:22px}
+
+/* visit */
+.visitband{background:var(--plum);color:#F3E4C6;margin:0 0 70px;border-radius:20px;overflow:hidden}
+.visitband .wrap{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.visitband .vcol{padding:44px 40px}
+.visitband .vcol + .vcol{border-left:1px solid rgba(255,255,255,.15)}
+.visitband h2{color:var(--amber);font-size:1.8rem;margin-bottom:16px}
+.visitband address{font-style:normal;font-weight:600;line-height:1.8}
+.bigphone{font-family:'Italiana',serif;font-size:2rem;color:var(--amber);text-decoration:none}
+.bigphone:hover{text-decoration:underline}
+.visitband .hrow{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px dashed rgba(255,255,255,.2);font-weight:600}
+.visitband .hrow:last-child{border-bottom:none}
+.visitband .note{font-size:.85rem;color:#C9B79A;margin-top:14px}
+
+/* page headers for inner pages */
+.pagehead{padding:70px 0 6px;text-align:center}
+.pagehead h1{font-size:clamp(2.2rem,5.5vw,3.4rem)}
+.pagehead .lede{max-width:640px;margin:14px auto 0;color:var(--muted)}
+.pagehead .eyebrow{display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:.26em;text-transform:uppercase;color:var(--marigold);margin-bottom:14px}
+
+/* story magazine */
+.storymag{max-width:900px;margin:40px auto 70px;display:grid;grid-template-columns:1.4fr 1fr;gap:44px;align-items:start}
+.storymag .drop::first-letter{font-family:'Italiana',serif;font-size:3.6rem;float:left;line-height:.85;margin:8px 12px 0 0;color:var(--plum)}
+.storymag p{color:var(--muted);margin-bottom:16px}
+.storyside{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:28px;box-shadow:0 8px 20px rgba(58,36,64,.07)}
+.storyside h3{font-size:1.5rem;margin-bottom:10px}
+.storyside ul{list-style:none}
+.storyside li{padding:10px 0;border-bottom:1px dashed var(--line);font-size:.95rem;color:var(--muted)}
+.storyside li:last-child{border-bottom:none}
+.storyside li b{color:var(--plum)}
+
+/* minimal footer */
+footer{padding:34px 0;text-align:center;color:var(--muted);font-size:.95rem;border-top:1px solid var(--line)}
+
+@media(max-width:860px){
+  .hero .band{grid-template-columns:1fr;padding-top:100px;text-align:center}
+  .hero p.lede{margin-left:auto;margin-right:auto}
+  .hero .cta-row{justify-content:center}
+  .hero .art{order:-1}
+  .mag{grid-template-columns:1fr}
+  .mag .col + .col{border-left:none;border-top:1px solid var(--line)}
+  .visitband .wrap{grid-template-columns:1fr}
+  .visitband .vcol + .vcol{border-left:none;border-top:1px solid rgba(255,255,255,.15)}
+  .storymag{grid-template-columns:1fr}
+}
+.rs-strip{margin:26px auto 10px;max-width:640px;background:#FFFDF9;border:1px solid #EBDCC2;border-radius:14px;padding:18px 22px;text-align:center}
+.rs-note{margin:0 0 12px;font-size:.95rem;color:#6E5B48;line-height:1.55}
+.rs-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rs-btn{display:inline-block;background:#E8912D;color:#2A1830;padding:10px 24px;border-radius:999px;font-weight:700;text-decoration:none;font-size:.95rem;line-height:1.2}
+.rs-btn:hover{filter:brightness(1.08)}
+</style>
+</head>
+<body>
+
+<button class="burger" id="burger" aria-expanded="false" aria-controls="mainNav" aria-label="Open navigation menu">
+  <span></span><span></span><span></span>
+</button>
+<div class="scrim" id="scrim" aria-hidden="true"></div>
+
+<nav class="drawer main" id="mainNav" aria-label="Main navigation">
+  <div>
+    <svg width="54" height="44" viewBox="0 0 220 170" aria-hidden="true"><path d="M108 78 C80 18 30 14 26 52 C23 82 62 96 104 86 Z" fill="#E8912D"/><path d="M112 78 C140 18 190 14 194 52 C197 82 158 96 116 86 Z" fill="#E8912D"/><path d="M104 94 C78 104 64 126 72 146 C86 140 102 118 106 100 Z" fill="#F2B94E"/><path d="M116 94 C142 104 156 126 148 146 C134 140 118 118 114 100 Z" fill="#F2B94E"/><ellipse cx="110" cy="95" rx="7" ry="36" fill="#2C1E16"/></svg>
+    <div class="dbrand">Dulce Ilusion</div>
+    <div class="dsub">Chicago, IL</div>
+  </div>
+  <div class="dlinks" id="drawerLinks">
+    <a href="#home" data-page="home">Home <span class="arr">&rsaquo;</span></a>
+    <a href="#menu" data-page="menu">Menu <span class="arr">&rsaquo;</span></a>
+    <a href="#story" data-page="story">Our Story <span class="arr">&rsaquo;</span></a>
+    <a href="#gallery" data-page="gallery">Gallery <span class="arr">&rsaquo;</span></a>
+    <a href="#reviews" data-page="reviews">Reviews <span class="arr">&rsaquo;</span></a>
+    <a href="#visit" data-page="visit">Visit <span class="arr">&rsaquo;</span></a>
+  </div>
+  <div class="dfoot">
+    <div>313 E 115th St, Chicago, IL 60628</div>
+    <div style="margin-top:8px"><a href="tel:+17737016095">(773) 701-6095</a></div>
+  </div>
+</nav>
+
+<main>
+<!-- HOME -->
+<section class="page" id="page-home" aria-label="Home">
+  <div class="hero">
+    <div class="band">
+      <div>
+        <span class="eyebrow">Roseland, Chicago</span>
+        <h1>Panaderia <em>Dulce Ilusion</em></h1>
+        <p class="lede">Delicioso pan mexicano estilo Michoacan, baked fresh every morning on 115th Street. Sweet breads, celebration cakes, and warm bolillos for the neighborhood.</p>
+        <div class="cta-row">
+          <a class="btn solid" href="#menu" data-page="menu">Explore the Menu</a>
+          <a class="btn ghost" href="https://www.google.com/maps/place/?q=place_id:ChIJVwcKTWcnDogRwzUMeSXnuDE" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+      </div>
+      <div class="art" aria-hidden="true">
+        <div class="orbit"></div>
+        <svg width="300" height="230" viewBox="0 0 220 170">
+          <path d="M100 130 C60 150 30 140 20 110" fill="none" stroke="#F2B94E" stroke-width="3" stroke-dasharray="2 10" stroke-linecap="round"/>
+          <g>
+            <path d="M108 78 C80 18 30 14 26 52 C23 82 62 96 104 86 Z" fill="#E8912D" stroke="#2C1E16" stroke-width="4"/>
+            <path d="M112 78 C140 18 190 14 194 52 C197 82 158 96 116 86 Z" fill="#E8912D" stroke="#2C1E16" stroke-width="4"/>
+            <path d="M104 94 C78 104 64 126 72 146 C86 140 102 118 106 100 Z" fill="#F2B94E" stroke="#2C1E16" stroke-width="4"/>
+            <path d="M116 94 C142 104 156 126 148 146 C134 140 118 118 114 100 Z" fill="#F2B94E" stroke="#2C1E16" stroke-width="4"/>
+            <circle cx="58" cy="52" r="5" fill="#FFF9F0"/><circle cx="80" cy="40" r="5" fill="#FFF9F0"/><circle cx="48" cy="70" r="4" fill="#FFF9F0"/>
+            <circle cx="162" cy="52" r="5" fill="#FFF9F0"/><circle cx="140" cy="40" r="5" fill="#FFF9F0"/><circle cx="172" cy="70" r="4" fill="#FFF9F0"/>
+            <ellipse cx="110" cy="95" rx="7" ry="36" fill="#2C1E16"/>
+            <circle cx="110" cy="58" r="8" fill="#2C1E16"/>
+            <path d="M106 52 C100 40 94 36 88 32" stroke="#2C1E16" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <path d="M114 52 C120 40 126 36 132 32" stroke="#2C1E16" stroke-width="3" fill="none" stroke-linecap="round"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="mag">
+      <div class="col">
+        <div class="kicker">The Bakery</div>
+        <h2>A sweet illusion, baked daily</h2>
+        <p class="lead">Every morning before sunrise, the ovens at Dulce Ilusion warm up on 115th Street. By 6 AM the trays are full: conchas with their sugary shells, golden orejas, soft marranitos, and bolillos with the crackle only a fresh bake gives.</p>
+        <p>The shop describes its style as pan mexicano estilo Michoacan, the baking tradition of Michoacan, Mexico. It is the kind of neighborhood panaderia where a dollar still buys something warm and the staff knows the regulars by name.</p>
+        <div class="pull">"Like the monarchs that return to Michoacan, the good flavors always find their way home."</div>
+        <p><a href="#story" data-page="story" style="font-weight:800">Read our story</a></p>
+      </div>
+      <div class="col fact">
+        <h3>Good to know</h3>
+        <div class="hrow"><span>Monday to Saturday</span><span>6:00 AM - 7:00 PM</span></div>
+        <div class="hrow"><span>Sunday</span><span>6:00 AM - 4:00 PM</span></div>
+        <div class="hrow"><span>Phone</span><span><a href="tel:+17737016095" style="color:var(--amber);font-weight:800;text-decoration:none">(773) 701-6095</a></span></div>
+        <div class="hrow"><span>Address</span><span>313 E 115th St, Chicago</span></div>
+        <p class="note">Hours from the public business listing. Call ahead to confirm, especially on holidays.</p>
+        <div style="margin-top:18px"><a class="btn solid" href="#visit" data-page="visit">Plan your visit</a></div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <h2 class="sec-title">From the oven</h2>
+      <p class="sec-sub">Three reasons to stop by this week. <span class="badge-sample">Sample items</span></p>
+      <div class="feat3">
+        <div class="feat">
+          <svg width="90" height="90" viewBox="0 0 110 110" aria-hidden="true"><circle cx="55" cy="55" r="42" fill="#FBE7C4" stroke="#3A2440" stroke-width="4"/><path d="M22 60 Q38 44 55 60 Q72 76 88 60" fill="none" stroke="#E8912D" stroke-width="5"/><path d="M26 44 Q40 30 55 44 Q70 58 84 44" fill="none" stroke="#E8912D" stroke-width="5"/></svg>
+          <h3>Pan Dulce</h3>
+          <p>Conchas, orejas, cuernos, and polvorones, in the Michoacan style. Best before 10 AM.</p>
+        </div>
+        <div class="feat">
+          <svg width="90" height="90" viewBox="0 0 110 110" aria-hidden="true"><rect x="30" y="46" width="50" height="36" rx="8" fill="#FBE7C4" stroke="#3A2440" stroke-width="4"/><path d="M30 58 h50" stroke="#E8912D" stroke-width="4"/><circle cx="55" cy="32" r="9" fill="#E8912D" stroke="#3A2440" stroke-width="3"/></svg>
+          <h3>Pasteles</h3>
+          <p>Tres leches, chocoflan, and fruit-topped celebration cakes. Order ahead for weekends.</p>
+        </div>
+        <div class="feat">
+          <svg width="90" height="90" viewBox="0 0 110 110" aria-hidden="true"><ellipse cx="55" cy="60" rx="36" ry="24" fill="#FBE7C4" stroke="#3A2440" stroke-width="4"/><path d="M30 52 Q42 44 55 52 Q68 60 80 52" fill="none" stroke="#E8912D" stroke-width="4"/><path d="M32 68 Q44 60 58 68 Q70 74 78 68" fill="none" stroke="#E8912D" stroke-width="4"/></svg>
+          <h3>Pan de Mesa</h3>
+          <p>Bolillos and teleras with real crust, made for tortas and the dinner table.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MENU -->
+<section class="page" id="page-menu" aria-label="Menu">
+  <div class="wrap pagehead">
+    <div class="eyebrow">The Menu</div>
+    <h1>What is in the case</h1>
+    <p class="lede">Typical offerings of a Michoacan-style panaderia. <span class="badge-sample">Sample items and prices</span>, call the shop to confirm the daily case.</p>
+  </div>
+  <div class="wrap">
+    <div class="tabs" role="tablist" aria-label="Menu categories">
+      <button class="tabbtn on" data-tab="t-dulce" role="tab" aria-selected="true">Pan Dulce</button>
+      <button class="tabbtn" data-tab="t-pastel" role="tab" aria-selected="false">Pasteles y Postres</button>
+      <button class="tabbtn" data-tab="t-mesa" role="tab" aria-selected="false">Pan de Mesa</button>
+    </div>
+    <div class="tabpanel on" id="t-dulce" role="tabpanel">
+      <div class="trow"><div><span class="tname">Conchas</span><span class="tdesc">Shell-topped sweet bread, vanilla, chocolate, or strawberry</span></div><span class="tdots"></span><span class="tprice">$1.50</span></div>
+      <div class="trow"><div><span class="tname">Orejas</span><span class="tdesc">Crisp caramelized palmier ears</span></div><span class="tdots"></span><span class="tprice">$1.50</span></div>
+      <div class="trow"><div><span class="tname">Cuernos</span><span class="tdesc">Buttery crescent horns with a sugary top</span></div><span class="tdots"></span><span class="tprice">$1.75</span></div>
+      <div class="trow"><div><span class="tname">Polvorones</span><span class="tdesc">Crumbly shortbread cookies, tri-color or plain</span></div><span class="tdots"></span><span class="tprice">$1.25</span></div>
+      <div class="trow"><div><span class="tname">Marranitos</span><span class="tdesc">Pig-shaped piloncillo cookie bread</span></div><span class="tdots"></span><span class="tprice">$1.75</span></div>
+      <div class="trow"><div><span class="tname">Besos</span><span class="tdesc">Two soft domes joined with sweet filling</span></div><span class="tdots"></span><span class="tprice">$1.75</span></div>
+      <div class="trow"><div><span class="tname">Elotes</span><span class="tdesc">Sweet corn-shaped bread with a sugary crust</span></div><span class="tdots"></span><span class="tprice">$1.50</span></div>
+      <div class="trow"><div><span class="tname">Novias</span><span class="tdesc">Delicate sugar-dusted wedding cookies</span></div><span class="tdots"></span><span class="tprice">$1.25</span></div>
+    </div>
+    <div class="tabpanel" id="t-pastel" role="tabpanel">
+      <div class="trow"><div><span class="tname">Pastel de Tres Leches</span><span class="tdesc">Milk-soaked sponge, whipped cream, fresh fruit</span></div><span class="tdots"></span><span class="tprice">Call for pricing</span></div>
+      <div class="trow"><div><span class="tname">Chocoflan</span><span class="tdesc">Chocolate cake crowned with silky flan</span></div><span class="tdots"></span><span class="tprice">Call for pricing</span></div>
+      <div class="trow"><div><span class="tname">Flan Napolitano</span><span class="tdesc">Classic caramel custard, by the slice</span></div><span class="tdots"></span><span class="tprice">$3.50</span></div>
+      <div class="trow"><div><span class="tname">Gelatinas de Leche</span><span class="tdesc">Creamy milk gelatin cups</span></div><span class="tdots"></span><span class="tprice">$2.50</span></div>
+      <div class="trow"><div><span class="tname">Pastel de Frutas</span><span class="tdesc">Celebration cake topped with fresh fruit</span></div><span class="tdots"></span><span class="tprice">Call for pricing</span></div>
+      <div class="trow"><div><span class="tname">Pay de Queso</span><span class="tdesc">Mexican-style cheesecake slice</span></div><span class="tdots"></span><span class="tprice">$3.50</span></div>
+    </div>
+    <div class="tabpanel" id="t-mesa" role="tabpanel">
+      <div class="trow"><div><span class="tname">Bolillo</span><span class="tdesc">Crusty oval roll, the base of every good torta</span></div><span class="tdots"></span><span class="tprice">$0.85</span></div>
+      <div class="trow"><div><span class="tname">Telera</span><span class="tdesc">Soft flat roll for tortas and sandwiches</span></div><span class="tdots"></span><span class="tprice">$0.85</span></div>
+      <div class="trow"><div><span class="tname">Pan de Caja</span><span class="tdesc">Soft sandwich loaf, baked in-house</span></div><span class="tdots"></span><span class="tprice">$3.00</span></div>
+      <div class="trow"><div><span class="tname">Cuernitos Salados</span><span class="tdesc">Savory crescent rolls</span></div><span class="tdots"></span><span class="tprice">$1.50</span></div>
+    </div>
+    <p style="text-align:center;color:var(--muted);font-size:.9rem;margin:26px 0 70px">The case changes through the day. For the freshest pick, come in the morning or call <a href="tel:+17737016095" style="font-weight:800">(773) 701-6095</a>.</p>
+  </div>
+</section>
+
+<!-- STORY -->
+<section class="page" id="page-story" aria-label="Our Story">
+  <div class="wrap pagehead">
+    <div class="eyebrow">Our Story</div>
+    <h1>Estilo Michoacan, en Roseland</h1>
+    <p class="lede">The shop describes itself with one line: delicioso pan mexicano estilo Michoacan.</p>
+  </div>
+  <div class="wrap">
+    <div class="storymag">
+      <div>
+        <p class="drop">Michoacan is the Mexican state famous for its monarch butterflies, which cross a continent every year to rest in its oyamel forests. It is also famous for its baking: rich, buttery pan dulce with deep roots in colonial convent ovens and generations of family bakeries.</p>
+        <p>Dulce Ilusion brings that tradition to 115th Street in Chicago's Roseland neighborhood. The name means "sweet illusion", and regulars say the illusion is real: a warm concha that tastes like the ones from back home, a tres leches that disappears before the party ends.</p>
+        <div class="pull">"Pan mexicano estilo Michoacan, hecho con amor en Chicago."</div>
+        <p>Like its neighbors on the block, this is a working bakery first. The doors open at 6 AM, the trays fill fast, and by afternoon the most popular pieces are gone. Come early, bring a box, and taste why the neighborhood keeps coming back.</p>
+      </div>
+      <aside class="storyside">
+        <h3>Bakery notes</h3>
+        <ul>
+          <li><b>Style:</b> Pan mexicano estilo Michoacan, per the shop's own description</li>
+          <li><b>Opens:</b> 6:00 AM daily, Monday through Sunday</li>
+          <li><b>Closes:</b> 7:00 PM Mon-Sat, 4:00 PM Sunday</li>
+          <li><b>Find us:</b> 313 E 115th St, Chicago, IL 60628</li>
+          <li><b>Call:</b> <a href="tel:+17737016095" style="font-weight:800;color:var(--plum)">(773) 701-6095</a></li>
+        </ul>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section class="page" id="page-gallery" aria-label="Gallery">
+  <div class="wrap pagehead">
+    <div class="eyebrow">Gallery</div>
+    <h1>Sweet sights</h1>
+    <p class="lede">Illustrated placeholders for now. Real photos of the case coming soon.</p>
+  </div>
+  <div class="wrap">
+    <div class="masonry">
+      <div class="mtile"><div class="pic tall"><span class="soon">Photo soon</span><svg width="110" height="110" viewBox="0 0 110 110"><circle cx="55" cy="55" r="42" fill="#FBE7C4" stroke="#3A2440" stroke-width="4"/><path d="M22 60 Q38 44 55 60 Q72 76 88 60" fill="none" stroke="#E8912D" stroke-width="5"/><path d="M26 44 Q40 30 55 44 Q70 58 84 44" fill="none" stroke="#E8912D" stroke-width="5"/></svg></div><div class="cap"><h3>Morning Conchas</h3><p>Fresh shells, still warm</p></div></div>
+      <div class="mtile"><div class="pic short plum"><span class="soon">Photo soon</span><svg width="100" height="80" viewBox="0 0 220 170"><path d="M108 78 C80 18 30 14 26 52 C23 82 62 96 104 86 Z" fill="#E8912D"/><path d="M112 78 C140 18 190 14 194 52 C197 82 158 96 116 86 Z" fill="#E8912D"/><path d="M104 94 C78 104 64 126 72 146 C86 140 102 118 106 100 Z" fill="#F2B94E"/><path d="M116 94 C142 104 156 126 148 146 C134 140 118 118 114 100 Z" fill="#F2B94E"/><ellipse cx="110" cy="95" rx="7" ry="36" fill="#FFF9F0"/></svg></div><div class="cap"><h3>The Monarch</h3><p>Our Michoacan muse</p></div></div>
+      <div class="mtile"><div class="pic mid"><span class="soon">Photo soon</span><svg width="110" height="110" viewBox="0 0 110 110"><rect x="30" y="46" width="50" height="36" rx="8" fill="#FBE7C4" stroke="#3A2440" stroke-width="4"/><path d="M30 58 h50" stroke="#E8912D" stroke-width="4"/><circle cx="55" cy="32" r="9" fill="#E8912D" stroke="#3A2440" stroke-width="3"/></svg></div><div class="cap"><h3>Tres Leches</h3><p>Soaked and crowned with fruit</p></div></div>
+      <div class="mtile"><div class="pic short"><span class="soon">Photo soon</span><svg width="110" height="110" viewBox="0 0 110 110"><ellipse cx="55" cy="58" rx="38" ry="28" fill="#FBE7C4" stroke="#3A2440" stroke-width="4"/><path d="M32 50 Q44 40 56 50 Q68 60 80 50" fill="none" stroke="#E8912D" stroke-width="4"/></svg></div><div class="cap"><h3>Orejas</h3><p>Crisp, golden, gone by noon</p></div></div>
+      <div class="mtile"><div class="pic tall plum"><span class="soon">Photo soon</span><svg width="110" height="110" viewBox="0 0 110 110"><ellipse cx="55" cy="60" rx="34" ry="24" fill="#FBE7C4" stroke="#3A2440" stroke-width="4"/><path d="M30 52 Q42 44 55 52 Q68 60 80 52" fill="none" stroke="#E8912D" stroke-width="4"/><path d="M32 68 Q44 60 58 68 Q70 74 78 68" fill="none" stroke="#E8912D" stroke-width="4"/></svg></div><div class="cap"><h3>Bolillos</h3><p>Crust you can hear</p></div></div>
+      <div class="mtile"><div class="pic mid"><span class="soon">Photo soon</span><svg width="110" height="110" viewBox="0 0 110 110"><path d="M55 28 C42 42 38 56 55 84 C72 56 68 42 55 28 Z" fill="#FBE7C4" stroke="#3A2440" stroke-width="4"/><path d="M55 38 C49 50 47 60 55 72" fill="none" stroke="#E8912D" stroke-width="4"/></svg></div><div class="cap"><h3>Empanadas</h3><p>Sweet-filled turnovers</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="page" id="page-reviews" aria-label="Reviews">
+  <div class="wrap pagehead">
+    <div class="eyebrow">Reviews</div>
+    <h1>Word on the street</h1>
+  </div>
+    <div class="rs-strip">
+      <p class="rs-note">We could not find published reviews for this shop yet. Its Google listing is the best place to read new reviews, or leave the first one.</p>
+      <div class="rs-links"><a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJVwcKTWcnDogRwzUMeSXnuDE" target="_blank" rel="noopener">See reviews on Google</a></div>
+    </div>
+  <div class="wrap">
+    <div class="revwrap">
+      <div class="notice">
+        <h2>Be the first to share</h2>
+        <p>We could not find published reviews for Panaderia Dulce Ilusion yet, so this page is waiting for its first story. Tried the conchas? Loved the tres leches? Your words belong here.</p>
+        <div class="review-cta">
+          <a class="btn solid" href="https://www.google.com/maps/place/?q=place_id:ChIJVwcKTWcnDogRwzUMeSXnuDE" target="_blank" rel="noopener">Review on Google Maps</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VISIT -->
+<section class="page" id="page-visit" aria-label="Visit">
+  <div class="wrap pagehead">
+    <div class="eyebrow">Visit Us</div>
+    <h1>Come taste the illusion</h1>
+    <p class="lede">On 115th Street in Roseland. Call ahead and we will set aside your favorites.</p>
+  </div>
+  <div class="wrap">
+    <div class="visitband">
+      <div class="wrap">
+        <div class="vcol">
+          <h2>Find us</h2>
+          <address>Panaderia Dulce Ilusion<br>313 E 115th St<br>Chicago, IL 60628</address>
+          <p style="margin:16px 0"><a class="bigphone" href="tel:+17737016095">(773) 701-6095</a></p>
+          <a class="btn solid" href="https://www.google.com/maps/place/?q=place_id:ChIJVwcKTWcnDogRwzUMeSXnuDE" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+        <div class="vcol">
+          <h2>Hours</h2>
+          <div class="hrow"><span>Monday</span><span>6:00 AM - 7:00 PM</span></div>
+          <div class="hrow"><span>Tuesday</span><span>6:00 AM - 7:00 PM</span></div>
+          <div class="hrow"><span>Wednesday</span><span>6:00 AM - 7:00 PM</span></div>
+          <div class="hrow"><span>Thursday</span><span>6:00 AM - 7:00 PM</span></div>
+          <div class="hrow"><span>Friday</span><span>6:00 AM - 7:00 PM</span></div>
+          <div class="hrow"><span>Saturday</span><span>6:00 AM - 7:00 PM</span></div>
+          <div class="hrow"><span>Sunday</span><span>6:00 AM - 4:00 PM</span></div>
+          <p class="note">Hours from the public business listing. Holiday hours may differ, call to confirm.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>&copy; Panaderia Dulce Ilusion</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "menu", "story", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+    var scrim = document.getElementById("scrim");
+    if(scrim){ scrim.classList.remove("show"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+      var scrim = document.getElementById("scrim");
+      if(scrim){ scrim.classList.toggle("show", open); }
+    });
+  }
+
+  var scrimEl = document.getElementById("scrim");
+  if(scrimEl){ scrimEl.addEventListener("click", closeMenu); }
+
+  navigateTo(cleanHash() || "home", false);
+})();
+
+/* menu tabs */
+(function(){
+  "use strict";
+  var btns = document.querySelectorAll(".tabbtn");
+  function show(id){
+    for(var i = 0; i < btns.length; i++){
+      var on = btns[i].getAttribute("data-tab") === id;
+      btns[i].classList.toggle("on", on);
+      btns[i].setAttribute("aria-selected", on ? "true" : "false");
+    }
+    var panels = document.querySelectorAll(".tabpanel");
+    for(var j = 0; j < panels.length; j++){
+      panels[j].classList.toggle("on", panels[j].id === id);
+    }
+  }
+  for(var k = 0; k < btns.length; k++){
+    btns[k].addEventListener("click", function(){
+      show(this.getAttribute("data-tab"));
+    });
+  }
+})();
+</script>
+</body>
+</html>
