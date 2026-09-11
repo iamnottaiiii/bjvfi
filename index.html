@@ -1,0 +1,215 @@
+<style id="biz-fullbleed">
+.wp-site-blocks, .entry-content, .wp-block-post-content,
+.is-layout-constrained, .has-global-padding {
+  max-width: none !important; width: 100% !important;
+  padding-left: 0 !important; padding-right: 0 !important;
+  margin-left: 0 !important; margin-right: 0 !important;
+  box-sizing: border-box !important;
+}
+.wp-block-post-content > *, .is-layout-constrained > * {
+  max-width: none !important; margin-left: 0 !important; margin-right: 0 !important;
+}
+body .wp-site-blocks { padding: 0 !important; }
+.biz-root { width: 100% !important; max-width: none !important; min-height: 100vh; }
+</style>
+<div class="biz-root" id="biz-root">
+<style>
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap");
+.bjvfi-void{
+  --bg:#050507; --ink:#F2F2F5; --muted:#6B7080; --line:#1C1C24; --soft:#121218; --accent:#7CFFB2;
+  min-height:100vh; background:var(--bg); color:var(--ink);
+  font-family:"Inter",system-ui,sans-serif;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:32px 20px 48px; position:relative; overflow:hidden;
+}
+.bjvfi-void *{box-sizing:border-box;}
+.bjvfi-void::before{
+  content:""; position:absolute; inset:-20%;
+  background:
+    radial-gradient(ellipse 50% 35% at 50% 42%, rgba(124,255,178,.07), transparent 60%),
+    radial-gradient(ellipse 40% 30% at 50% 55%, rgba(167,139,250,.05), transparent 55%);
+  pointer-events:none;
+}
+.bjvfi-stage{position:relative; z-index:1; width:min(560px,100%); display:flex; flex-direction:column; align-items:center; gap:28px;}
+.bjvfi-mark{
+  font-family:"Space Grotesk",sans-serif; font-weight:700; font-size:clamp(3rem,10vw,5.2rem);
+  letter-spacing:-.06em; margin:0; line-height:1; color:var(--ink);
+  text-shadow:0 0 80px rgba(124,255,178,.12);
+}
+.bjvfi-sub{margin:0; color:var(--muted); font-size:.95rem; letter-spacing:.02em;}
+.bjvfi-search-wrap{width:100%; position:relative;}
+.bjvfi-search{
+  width:100%; background:rgba(18,18,24,.9); border:1px solid var(--line); color:var(--ink);
+  border-radius:999px; padding:16px 20px; font-size:1.05rem; outline:none;
+  transition:border-color .15s, box-shadow .15s;
+}
+.bjvfi-search::placeholder{color:#555A68;}
+.bjvfi-search:focus{border-color:rgba(124,255,178,.55); box-shadow:0 0 0 4px rgba(124,255,178,.1);}
+.bjvfi-results{
+  display:none; position:absolute; left:0; right:0; top:calc(100% + 10px);
+  background:var(--soft); border:1px solid var(--line); border-radius:18px;
+  max-height:min(52vh,420px); overflow:auto; padding:6px;
+  box-shadow:0 24px 60px rgba(0,0,0,.55);
+}
+.bjvfi-results.open{display:block;}
+.bjvfi-hit{
+  display:flex; flex-direction:column; gap:2px; text-decoration:none; color:inherit;
+  padding:12px 14px; border-radius:12px; transition:background .12s;
+}
+.bjvfi-hit:hover,.bjvfi-hit:focus{background:rgba(124,255,178,.08); outline:none;}
+.bjvfi-hit-title{font-weight:600; line-height:1.3;}
+.bjvfi-hit-slug{color:var(--muted); font-size:.85rem;}
+.bjvfi-status{min-height:1.2em; color:var(--muted); font-size:.85rem; text-align:center;}
+.bjvfi-status.error{color:#ff8f8f;}
+</style>
+<div class="bjvfi-void">
+  <div class="bjvfi-stage">
+    <h1 class="bjvfi-mark">bjvfi</h1>
+    <p class="bjvfi-sub">Search a site</p>
+    <div class="bjvfi-search-wrap">
+      <input class="bjvfi-search" id="bjvfi-search" type="search" placeholder="Type a business name..." autocomplete="off" spellcheck="false">
+      <div class="bjvfi-results" id="bjvfi-results" role="listbox" aria-label="Search results"></div>
+    </div>
+    <div class="bjvfi-status" id="bjvfi-status"></div>
+  </div>
+</div>
+<script>
+(function () {
+  var EXCLUDE = {
+    bjvfi: 1, stuff: 1, "privacy-policy": 1, privacy: 1, "sample-page": 1,
+    cart: 1, checkout: 1, "my-account": 1, shop: 1, blog: 1, home: 1,
+    "front-page": 1, "404": 1, "not-found": 1
+  };
+  var sites = null;
+  var loading = null;
+  var input = document.getElementById("bjvfi-search");
+  var results = document.getElementById("bjvfi-results");
+  var statusEl = document.getElementById("bjvfi-status");
+  if (!input || !results) return;
+
+  function decodeTitle(t) {
+    var d = document.createElement("textarea");
+    d.innerHTML = t || "";
+    return String(d.value || "").replace(/\s+/g, " ").trim();
+  }
+  function keepPage(p) {
+    var slug = String(p.slug || "").toLowerCase();
+    if (EXCLUDE[slug] || slug.indexOf("privacy") !== -1) return false;
+    var title = decodeTitle(p.title && p.title.rendered);
+    if (!title) return false;
+    return true;
+  }
+  function fetchPage(page) {
+    var url = "/wp-json/wp/v2/pages?parent=0&per_page=100&page=" + page +
+      "&_fields=id,slug,link,title";
+    return fetch(url, { credentials: "same-origin" }).then(function (res) {
+      if (res.status === 400) return [];
+      if (!res.ok) throw new Error("Could not load sites (" + res.status + ")");
+      return res.json();
+    });
+  }
+  function fetchAllPages() {
+    var all = [];
+    var page = 1;
+    function next() {
+      return fetchPage(page).then(function (data) {
+        if (!data || !data.length) return all;
+        for (var i = 0; i < data.length; i++) {
+          if (keepPage(data[i])) all.push(data[i]);
+        }
+        if (data.length < 100) return all;
+        page += 1;
+        if (page > 50) return all;
+        return next();
+      });
+    }
+    return next().then(function (list) {
+      return list.map(function (p) {
+        return {
+          title: decodeTitle(p.title && p.title.rendered),
+          slug: p.slug || "",
+          link: p.link || ("/" + (p.slug || "") + "/")
+        };
+      });
+    });
+  }
+  function ensureLoaded() {
+    if (sites) return Promise.resolve(sites);
+    if (loading) return loading;
+    statusEl.textContent = "Loading sites...";
+    statusEl.classList.remove("error");
+    loading = fetchAllPages().then(function (list) {
+      sites = list;
+      statusEl.textContent = "";
+      return sites;
+    }).catch(function (err) {
+      loading = null;
+      statusEl.textContent = (err && err.message) ? err.message : "Load failed";
+      statusEl.classList.add("error");
+      throw err;
+    });
+    return loading;
+  }
+  function render(matches) {
+    results.innerHTML = "";
+    if (!matches.length) {
+      results.classList.remove("open");
+      statusEl.textContent = input.value.trim() ? "No matches" : "";
+      return;
+    }
+    statusEl.textContent = "";
+    var max = Math.min(matches.length, 40);
+    for (var i = 0; i < max; i++) {
+      var s = matches[i];
+      var a = document.createElement("a");
+      a.className = "bjvfi-hit";
+      a.href = s.link;
+      a.setAttribute("role", "option");
+      var t = document.createElement("span");
+      t.className = "bjvfi-hit-title";
+      t.textContent = s.title;
+      var sl = document.createElement("span");
+      sl.className = "bjvfi-hit-slug";
+      sl.textContent = "/" + s.slug;
+      a.appendChild(t);
+      a.appendChild(sl);
+      results.appendChild(a);
+    }
+    results.classList.add("open");
+  }
+  function runSearch() {
+    var q = String(input.value || "").trim().toLowerCase();
+    if (!q) {
+      results.classList.remove("open");
+      results.innerHTML = "";
+      statusEl.textContent = "";
+      return;
+    }
+    ensureLoaded().then(function (list) {
+      var matches = [];
+      for (var i = 0; i < list.length; i++) {
+        var s = list[i];
+        if (s.title.toLowerCase().indexOf(q) !== -1 || s.slug.toLowerCase().indexOf(q) !== -1) {
+          matches.push(s);
+        }
+      }
+      render(matches);
+    }).catch(function () {});
+  }
+  var timer = null;
+  input.addEventListener("input", function () {
+    clearTimeout(timer);
+    timer = setTimeout(runSearch, 100);
+  });
+  input.addEventListener("focus", function () {
+    ensureLoaded().catch(function () {});
+    if (String(input.value || "").trim()) runSearch();
+  });
+  document.addEventListener("click", function (e) {
+    if (!e.target.closest(".bjvfi-search-wrap")) results.classList.remove("open");
+  });
+  // warm cache quietly
+  ensureLoaded().catch(function () {});
+})();
+</script>
+</div>
