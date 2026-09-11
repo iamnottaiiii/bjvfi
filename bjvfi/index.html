@@ -50,36 +50,56 @@ body{min-height:100vh;background:#000;color:#F2F2F5;font-family:"JetBrains Mono"
 .more:hover{border-color:rgba(255,255,255,.28);color:#fff}
 @media (max-width:560px){.wrap{width:calc(100% - 28px);padding-top:32px}}
 
-.gate{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.92);backdrop-filter:blur(8px)}
-.gate[hidden]{display:none!important}
-.gate-box{width:min(420px,calc(100% - 40px));text-align:center}
-.gate-box h2{font-size:1.4rem;letter-spacing:-.06em;font-weight:400;margin-bottom:8px}
-.gate-box p{color:#6B7080;font-size:.85rem;margin-bottom:18px}
-.gate-box input{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:14px 18px;color:#F2F2F5;font:inherit;text-align:center;outline:none}
-.gate-box input:focus{border-color:rgba(255,255,255,.28)}
-.gate-box button{margin-top:12px;appearance:none;background:transparent;border:1px solid rgba(255,255,255,.18);color:#ddd;border-radius:999px;padding:10px 20px;font:inherit;cursor:pointer}
-.gate-box button:hover{border-color:rgba(255,255,255,.35);color:#fff}
-.gate-err{color:#c8a0a0;font-size:.8rem;min-height:1.2em;margin-top:10px}
-.app-locked .wrap{visibility:hidden}
 
+
+/* password gate — matches homepage void */
+.bjvfi-void.app-locked{overflow:hidden}
+.bjvfi-void.app-locked .wrap{display:none}
+.bjvfi-void.app-locked .bjvfi-mark{display:block}
+.bjvfi-void.app-locked .bjvfi-stage{display:flex}
+.bjvfi-mark{
+  position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-50%); z-index:2;
+  font-family:"JetBrains Mono", ui-monospace, monospace;
+  font-weight:400; font-size:clamp(3rem,10vw,5.2rem);
+  letter-spacing:-.09em; margin:0; line-height:1; color:var(--ink);
+  text-shadow:0 0 30px rgba(0,0,0,.9), 0 0 60px rgba(0,0,0,.7);
+  pointer-events:none; display:none;
+}
+.bjvfi-stage{
+  position:absolute; top:calc(50% + 90px); left:50%;
+  transform:translateX(-50%); z-index:2;
+  width:min(560px, calc(100% - 40px));
+  display:none; flex-direction:column; align-items:center; gap:16px;
+}
+.bjvfi-search-wrap{width:100%; position:relative;}
+.bjvfi-search{
+  width:100%; background:transparent; border:0; outline:none;
+  color:var(--ink); border-radius:999px; padding:16px 20px;
+  font-size:1rem; font-family:inherit; font-weight:400;
+  box-shadow:none; text-align:center;
+}
+.bjvfi-search::placeholder{color:#555}
+.bjvfi-search:focus,.bjvfi-search:focus-visible{outline:none;border:0;box-shadow:none;background:transparent}
+.bjvfi-status{min-height:1.2em;color:#888;font-size:.82rem;text-align:center}
+.bjvfi-status.error{color:#c8a0a0}
+@media (max-height:620px){.bjvfi-stage{top:calc(50% + 70px)}}
 </style>
 </head>
 <body>
 <div class="bjvfi-void app-locked">
-
-<div class="gate" id="gate" role="dialog" aria-modal="true" aria-label="Password required">
-  <div class="gate-box">
-    <h2>bjvfi</h2>
-    <p>Private catalog — enter password</p>
-    <form id="gate-form" autocomplete="off">
-      <input id="gate-pass" type="password" name="password" placeholder="password" autofocus />
-      <button type="submit">Enter</button>
-      <div class="gate-err" id="gate-err" aria-live="polite"></div>
-    </form>
+  <h1 class="bjvfi-mark">bjvfi</h1>
+  <div class="bjvfi-stage">
+    <div class="bjvfi-search-wrap">
+      <form id="gate-form" autocomplete="off">
+        <input class="bjvfi-search" id="gate-pass" type="password" name="password" placeholder="password" autofocus spellcheck="false" />
+      </form>
+    </div>
+    <div class="bjvfi-status" id="gate-err" aria-live="polite"></div>
   </div>
-</div>
 
-  <div class="wrap">
+
+<div class="wrap">
     <div class="top">
       <div class="brand">
         <a href="/"><h1>bjvfi</h1></a>
@@ -191,36 +211,34 @@ body{min-height:100vh;background:#000;color:#F2F2F5;font-family:"JetBrains Mono"
 })();
 </script>
 
+
 <script>
 (function(){
   const PASS = "bjvfi.com/bjvfi";
   const KEY = "bjvfi_catalog_ok";
   const root = document.querySelector(".bjvfi-void");
-  const gate = document.getElementById("gate");
   const form = document.getElementById("gate-form");
   const input = document.getElementById("gate-pass");
   const err = document.getElementById("gate-err");
   function unlock(){
     try { sessionStorage.setItem(KEY, "1"); } catch(e) {}
-    if (gate) gate.hidden = true;
     if (root) root.classList.remove("app-locked");
   }
   function locked(){
     try { return sessionStorage.getItem(KEY) === "1"; } catch(e) { return false; }
   }
-  if (locked()) { unlock(); }
-  else if (form) {
-    form.addEventListener("submit", function(e){
-      e.preventDefault();
-      if ((input.value || "") === PASS) {
-        err.textContent = "";
-        unlock();
-      } else {
-        err.textContent = "Wrong password";
-        input.select();
-      }
-    });
-  }
+  if (locked()) { unlock(); return; }
+  if (!form) return;
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    if ((input.value || "") === PASS) {
+      if (err) { err.textContent = ""; err.classList.remove("error"); }
+      unlock();
+    } else {
+      if (err) { err.textContent = "Wrong password"; err.classList.add("error"); }
+      input.select();
+    }
+  });
 })();
 </script>
 
