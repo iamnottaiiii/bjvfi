@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavanderia | Como Laundry / Lavanderia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{
+  --lake:#2C6E91; --lake-dark:#1E4E68; --sand:#F0E6D3; --white:#FFFFFF;
+  --ink:#26323B; --line:#DCE3E1; --good:#3E9B5F; --bad:#8A8F94;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{margin:0; padding:0;}
+body{font-family:'PT Sans',sans-serif; background:var(--sand); color:var(--ink); line-height:1.6;}
+h1,h2,h3,.disp{font-family:'Zilla Slab',serif;}
+a{color:inherit;}
+.site-shell{min-height:100vh; display:flex; flex-direction:column; background:var(--sand);}
+header{background:var(--white); border-bottom:4px solid var(--lake); position:sticky; top:0; z-index:50;}
+.nav-wrap{max-width:1080px; margin:0 auto; padding:13px 20px; display:flex; align-items:center; justify-content:space-between; gap:12px;}
+.brand{display:flex; align-items:center; gap:10px; text-decoration:none;}
+.brand-mark{width:38px; height:38px; border-radius:10px; background:var(--lake); color:#fff; display:flex; align-items:center; justify-content:center; font-size:1.05rem; flex:none;}
+.brand-name{font-family:'Zilla Slab',serif; font-weight:700; font-size:1.08rem; color:var(--lake-dark); line-height:1.1;}
+.brand-name small{display:block; font-family:'PT Sans',sans-serif; font-weight:400; font-size:.7rem; color:var(--ink); letter-spacing:.05em;}
+nav{position:relative;}
+#menu-btn{display:none; background:none; border:2px solid var(--lake); border-radius:8px; width:42px; height:38px; font-size:1.05rem; color:var(--lake-dark); cursor:pointer;}
+.nav-links{display:flex; gap:6px; list-style:none;}
+.nav-links a{display:block; padding:8px 14px; border-radius:8px; text-decoration:none; font-weight:700; font-size:.92rem; color:var(--lake-dark);}
+.nav-links a:hover{background:var(--sand);}
+.nav-links a.active{background:var(--lake); color:#fff;}
+main{flex:1 0 auto;}
+.page{display:none;}
+.page.active{display:block;}
+.wrap{max-width:1080px; margin:0 auto; padding:0 20px;}
+.status-chip{display:inline-flex; align-items:center; gap:8px; padding:7px 16px; border-radius:999px; font-weight:700; font-size:.9rem; background:var(--white); border:1px solid var(--line);}
+.status-chip .dot{width:10px; height:10px; border-radius:50%; background:var(--bad);}
+.status-chip.open .dot{background:var(--good);}
+.hero{padding:52px 0 46px; background:var(--white); border-bottom:1px solid var(--line); position:relative; overflow:hidden;}
+.hero::after{content:""; position:absolute; left:0; right:0; bottom:-1px; height:14px; background:
+  radial-gradient(circle at 10% 0, transparent 9px, var(--sand) 10px) 0 0/44px 14px repeat-x;}
+.hero-grid{display:grid; grid-template-columns:1.2fr .8fr; gap:34px; align-items:center;}
+.kicker{font-size:.78rem; letter-spacing:.2em; text-transform:uppercase; color:var(--lake); font-weight:700; margin-bottom:10px;}
+.hero h1{font-size:2.7rem; line-height:1.08; color:var(--lake-dark); margin-bottom:6px;}
+.hero h1 .lav{color:var(--lake); font-style:italic;}
+.hero .wave-under{width:180px; height:12px; margin:10px 0 16px;}
+.hero p.lede{font-size:1.05rem; max-width:32em;}
+.hero-cta{margin-top:20px; display:flex; flex-wrap:wrap; gap:12px; align-items:center;}
+.washcard{background:linear-gradient(150deg, var(--lake) 0%, var(--lake-dark) 100%); color:#fff; border-radius:16px; padding:24px 22px; max-width:330px; margin:0 auto; box-shadow:0 12px 26px rgba(30,78,104,.28); position:relative;}
+.washcard::before{content:""; width:34px; height:10px; border-radius:999px; background:rgba(255,255,255,.35); position:absolute; top:12px; left:50%; transform:translateX(-50%);}
+.washcard .wc-h{font-family:'Zilla Slab',serif; font-weight:700; font-size:1.2rem; margin:14px 0 4px;}
+.washcard .wc-p{font-family:'Zilla Slab',serif; font-weight:700; font-size:1.45rem; letter-spacing:.02em;}
+.washcard .wc-p a{color:#fff; text-decoration:none;}
+.washcard .wc-s{font-size:.85rem; opacity:.85; margin-top:6px;}
+section.block{padding:46px 0;}
+.block-head{margin-bottom:22px;}
+.block-head h2{font-size:1.75rem; color:var(--lake-dark);}
+.block-head .rule{width:64px; height:4px; background:var(--lake); border-radius:2px; margin-top:10px;}
+.cards3{display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
+.card{background:var(--white); border:1px solid var(--line); border-radius:14px; padding:22px;}
+.card i{font-size:1.4rem; color:var(--lake);}
+.card h3{margin:10px 0 6px; font-size:1.08rem; color:var(--lake-dark);}
+.card p{font-size:.95rem;}
+.tip-line{margin-top:20px; background:var(--white); border:1px dashed var(--lake); border-radius:12px; padding:14px 18px; font-size:.94rem;}
+.quotes{display:grid; gap:16px;}
+.quote-card{background:var(--white); border:1px solid var(--line); border-radius:14px; padding:20px 22px; border-left:5px solid var(--lake);}
+.quote-card .stars{color:#C9A227; font-size:.85rem; letter-spacing:2px; margin-bottom:8px;}
+.quote-card p{font-size:1.02rem; margin-bottom:8px;}
+.quote-card .attr{font-size:.8rem; letter-spacing:.08em; text-transform:uppercase; color:var(--lake); font-weight:700;}
+.rating-summary{margin-top:22px; background:var(--white); border:1px solid var(--line); border-radius:14px; padding:20px 22px; display:flex; flex-wrap:wrap; align-items:center; gap:14px;}
+.rs-score{font-family:'Zilla Slab',serif; font-weight:700; font-size:1.9rem; color:var(--lake-dark);}
+.rs-stars{color:#C9A227; letter-spacing:2px;}
+.rs-note{font-size:.92rem;}
+.review-links{display:grid; gap:12px; margin-top:16px;}
+.review-link{display:flex; align-items:center; gap:12px; background:var(--white); border:1px solid var(--line); border-radius:12px; padding:14px 18px; text-decoration:none; font-weight:700;}
+.review-link i{font-size:1.2rem; color:var(--lake);}
+.review-link span small{display:block; font-weight:400; font-size:.82rem; color:var(--ink);}
+.visit-grid{display:grid; grid-template-columns:1fr 1fr; gap:22px;}
+.vcard{background:var(--white); border:1px solid var(--line); border-radius:14px; padding:22px;}
+.vcard h3{color:var(--lake-dark); margin-bottom:12px;}
+.vcard .row{display:flex; gap:10px; align-items:flex-start; margin-bottom:10px; font-size:.95rem;}
+.vcard .row i{color:var(--lake); margin-top:4px; width:16px;}
+.day-row{display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dashed var(--line); font-size:.94rem;}
+.day-row:last-child{border-bottom:none;}
+.day-row.today{font-weight:700; color:var(--lake-dark); background:var(--sand); border-radius:6px; padding:6px 8px;}
+.map-card{margin-top:14px; display:flex; align-items:center; gap:12px; background:var(--white); border:1px solid var(--line); border-radius:12px; padding:14px 18px; text-decoration:none; font-weight:700;}
+.map-card i{color:#3E9B5F; font-size:1.2rem;}
+.map-card span small{display:block; font-weight:400; font-size:.82rem;}
+.form-card{background:var(--white); border:1px solid var(--line); border-radius:14px; padding:22px; margin-top:18px;}
+.form-card label{display:block; font-size:.8rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; margin:12px 0 5px; color:var(--lake-dark);}
+.form-card input,.form-card textarea{width:100%; border:1px solid var(--line); border-radius:9px; padding:10px 12px; font-family:'PT Sans',sans-serif; font-size:.95rem; background:var(--sand);}
+.form-card button{margin-top:14px; background:var(--lake-dark); color:#fff; border:none; border-radius:9px; padding:12px 22px; font-family:'Zilla Slab',serif; font-weight:700; font-size:1rem; cursor:pointer;}
+.form-card button:hover{background:var(--lake);}
+.form-feedback{margin-top:10px; font-size:.9rem; color:var(--good); font-weight:700; min-height:1.2em;}
+footer{flex-shrink:0; background:var(--lake-dark); color:#D9E6ED; padding:26px 0 22px;}
+.foot-grid{max-width:1080px; margin:0 auto; padding:0 20px; display:flex; flex-wrap:wrap; gap:8px 28px; justify-content:space-between; font-size:.88rem;}
+.foot-grid a{color:#fff; text-decoration:none;}
+.copyright{max-width:1080px; margin:14px auto 0; padding:10px 20px 0; border-top:1px solid rgba(255,255,255,.15); font-size:.85rem; text-align:center;}
+@media (max-width:860px){
+  .hero-grid,.visit-grid{grid-template-columns:1fr;}
+  .cards3{grid-template-columns:1fr;}
+  .hero h1{font-size:2.05rem;}
+}
+@media (max-width:760px){
+  #menu-btn{display:inline-block;}
+  .nav-links{display:none; position:absolute; right:0; top:46px; background:var(--white); border:1px solid var(--line); border-radius:12px; padding:10px; min-width:190px; box-shadow:0 12px 26px rgba(0,0,0,.12); flex-direction:column; z-index:60;}
+  .nav-links.open{display:flex;}
+}
+</style>
+</head>
+<body>
+<div class="site-shell">
+<header>
+  <div class="nav-wrap">
+    <a class="brand" href="#/home" data-page="home">
+      <span class="brand-mark" aria-hidden="true"><i class="fa-solid fa-water"></i></span>
+      <span class="brand-name">Como Laundry / Lavanderia<small>Southeast Minneapolis</small></span>
+    </a>
+    <nav>
+      <button id="menu-btn" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
+      <ul class="nav-links">
+        <li><a href="#/home" data-page="home" class="active">Lavanderia</a></li>
+        <li><a href="#/reviews" data-page="reviews">Reviews</a></li>
+        <li><a href="#/visit" data-page="visit">Visit</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="kicker">Como Ave SE, Minneapolis</div>
+        <h1>Your neighborhood <span class="lav">lavanderia</span>, open every day.</h1>
+        <svg class="wave-under" viewBox="0 0 180 12" aria-hidden="true"><path d="M0 6 Q 11 0 22 6 T 44 6 T 66 6 T 88 6 T 110 6 T 132 6 T 154 6 T 176 6" fill="none" stroke="#2C6E91" stroke-width="3" stroke-linecap="round"/></svg>
+        <p class="lede">A clean, well-stocked self-service laundry near the Como campus corridors. Every machine works, folding tables are ample, and there are a few customer parking spots behind the shop.</p>
+        <p style="margin-top:16px;"><span class="status-chip" id="chip"><span class="dot"></span><span class="chip-label">Checking hours...</span></span></p>
+      </div>
+      <div class="washcard">
+        <div class="wc-h">Front desk line</div>
+        <div class="wc-p"><a href="tel:+16514928090">(651) 492-8090</a></div>
+        <div class="wc-s">Tap to call about machines, or tap Visit for hours and directions.</div>
+      </div>
+    </div>
+  </div>
+  <section class="block">
+    <div class="wrap">
+      <div class="block-head"><h2>Why neighbors keep coming back</h2><div class="rule"></div></div>
+      <div class="cards3">
+        <div class="card"><i class="fa-solid fa-broom"></i><h3>Clean and efficient</h3><p>Reviewers call it clean, efficient and spacious. The space is kept tidy so folding and sorting is easy.</p></div>
+        <div class="card"><i class="fa-solid fa-circle-check"></i><h3>Machines that work</h3><p>Well stocked with washers and dryers that are actually running. If a machine is down, it does not stay that way.</p></div>
+        <div class="card"><i class="fa-solid fa-table-cells-large"></i><h3>Room to fold</h3><p>Ample folding tables mean you are not balancing a basket on a machine lid. Roll out with everything folded.</p></div>
+      </div>
+      <p class="tip-line"><i class="fa-solid fa-square-parking" style="color:#2C6E91;"></i> <strong>Parking tip:</strong> a few spots in the back are marked "for customer use only". Street parking fills up fast on Como Ave.</p>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-reviews">
+  <section class="block">
+    <div class="wrap">
+      <div class="block-head"><h2>Reviews</h2><div class="rule"></div></div>
+      <div class="quotes">
+        <div class="quote-card">
+          <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star"></i></div>
+          <p>"This place is pretty nice: Clean, efficient, spacious."</p>
+          <div class="attr">Google review</div>
+        </div>
+        <div class="quote-card">
+          <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+          <p>"This is by far the nicest laundry I have ever visited. It's clean and well stocked. All the machines work, there's ample tables for folding."</p>
+          <div class="attr">Google review</div>
+        </div>
+      </div>
+      <div class="rating-summary">
+        <span class="rs-score">3.9</span>
+        <span class="rs-stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star"></i></span>
+        <span class="rs-note">3.9 stars on Google with 112 reviews. Solid, honest neighborhood laundry.</span>
+      </div>
+      <div class="review-links">
+        <a class="review-link" href="https://www.google.com/maps/search/?api=1&query=Como%20Laundry%20/%20Lavanderia%2C%201820%20Como%20Ave%20SE%2C%20Minneapolis%2C%20MN%2055414" target="_blank" rel="noopener">
+          <i class="fa-brands fa-google"></i>
+          <span>See every review on Google<small>All 112 reviews, live on Google</small></span>
+        </a>
+      </div>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-visit">
+  <section class="block">
+    <div class="wrap">
+      <div class="block-head"><h2>Visit the shop</h2><div class="rule"></div></div>
+      <div class="visit-grid">
+        <div class="vcard">
+          <h3>Hours</h3>
+          <div id="hours-list">
+            <div class="day-row" data-day="1"><span>Monday</span><span>8:00 AM - 8:00 PM</span></div>
+            <div class="day-row" data-day="2"><span>Tuesday</span><span>8:00 AM - 8:00 PM</span></div>
+            <div class="day-row" data-day="3"><span>Wednesday</span><span>8:00 AM - 8:00 PM</span></div>
+            <div class="day-row" data-day="4"><span>Thursday</span><span>8:00 AM - 8:00 PM</span></div>
+            <div class="day-row" data-day="5"><span>Friday</span><span>8:00 AM - 8:00 PM</span></div>
+            <div class="day-row" data-day="6"><span>Saturday</span><span>8:00 AM - 8:00 PM</span></div>
+            <div class="day-row" data-day="0"><span>Sunday</span><span>8:00 AM - 8:00 PM</span></div>
+          </div>
+          <p style="margin-top:10px; font-size:.88rem;">Same hours every day. Call to confirm holiday hours.</p>
+        </div>
+        <div class="vcard">
+          <h3>Location</h3>
+          <div class="row"><i class="fa-solid fa-location-dot"></i><span>1820 Como Ave SE, Minneapolis, MN 55414</span></div>
+          <div class="row"><i class="fa-solid fa-phone"></i><span>(651) 492-8090</span></div>
+          <div class="map-card" style="cursor:default;">
+            <i class="fa-solid fa-diamond-turn-right"></i>
+            <span>1820 Como Ave SE, Minneapolis, MN 55414<small>A few customer spots in the back, street parking out front</small></span>
+          </div>
+        </div>
+      </div>
+      <div class="form-card">
+        <h3 style="margin-bottom:4px;">Ask a quick question</h3>
+        <form id="qform">
+          <label for="f-name">Your name</label>
+          <input id="f-name" type="text" autocomplete="name" placeholder="First name">
+          <label for="f-phone">Your phone</label>
+          <input id="f-phone" type="tel" autocomplete="tel" placeholder="(555) 555-5555">
+          <label for="f-msg">Message</label>
+          <textarea id="f-msg" rows="3" placeholder="Question about machines or drop-off"></textarea>
+          <button type="submit"><i class="fa-solid fa-paper-plane"></i> Send by text</button>
+          <div class="form-feedback" id="form-feedback"></div>
+        </form>
+      </div>
+    </div>
+  </section>
+</section>
+
+</main>
+<footer>
+  <div class="foot-grid">
+    <span>Como Laundry / Lavanderia</span>
+    <span>1820 Como Ave SE, Minneapolis, MN 55414</span>
+    <span>Open every day 8 AM - 8 PM</span>
+    <a href="tel:+16514928090">(651) 492-8090</a>
+  </div>
+  <div class="copyright">© Como Laundry / Lavanderia · Minneapolis, MN</div>
+</footer>
+</div>
+
+<script>
+var BUSINESS = "Como Laundry / Lavanderia";
+var TITLES = { home: "Lavanderia", reviews: "Reviews", visit: "Visit" };
+var CITY_TZ = "America/Chicago";
+var HOURS = {0:[8,20],1:[8,20],2:[8,20],3:[8,20],4:[8,20],5:[8,20],6:[8,20]};
+var PHONE = "+16514928090";
+var PRETTY = "(651) 492-8090";
+
+function cityNow(){
+  var parts = new Intl.DateTimeFormat("en-US", { timeZone: CITY_TZ,
+    weekday: "short", hour: "numeric", minute: "numeric", hour12: false })
+    .formatToParts(new Date());
+  var o = {}; parts.forEach(function(p){ o[p.type] = p.value; });
+  var days = { Sun:0, Mon:1, Tue:2, Wed:3, Thu:4, Fri:5, Sat:6 };
+  return { day: days[o.weekday], hour: (+o.hour) % 24, minute: +o.minute };
+}
+function fmtH(t){
+  var h = Math.floor(t), m = Math.round((t - h) * 60);
+  var ap = h >= 12 && h < 24 ? "PM" : "AM", hh = h % 12; if (hh === 0) hh = 12;
+  return hh + (m ? ":" + String(m).padStart(2, "0") : ":00") + " " + ap;
+}
+function openState(){
+  var n = cityNow(), t = n.hour + n.minute / 60, today = HOURS[n.day];
+  if (today) {
+    if (today[1] > 24 && t < today[1] - 24) return { open: true, label: "Open now" };
+    if (t >= today[0] && t < (today[1] > 24 ? 24 : today[1])) return { open: true, label: "Open now" };
+  }
+  var names = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  for (var i = 0; i < 7; i++) {
+    var d = (n.day + i) % 7, h = HOURS[d];
+    if (!h) continue;
+    if (i === 0 && t < h[0]) return { open: false, label: "Opens " + fmtH(h[0]) + " today" };
+    if (i > 0) return { open: false, label: "Opens " + names[d] + (h[0] ? " at " + fmtH(h[0]) : "") };
+  }
+  return { open: false, label: "Closed" };
+}
+function renderChip(){
+  var st = openState();
+  var chip = document.getElementById("chip");
+  if (!chip) return;
+  chip.classList.toggle("open", st.open);
+  var lbl = chip.querySelector(".chip-label");
+  if (lbl) lbl.textContent = st.label;
+  var rows = document.querySelectorAll("#hours-list .day-row");
+  rows.forEach(function(r){
+    r.classList.toggle("today", (+r.getAttribute("data-day")) === cityNow().day);
+  });
+}
+
+function getPageFromHash(){
+  var h = (location.hash || "").replace(/^#\/?/, "");
+  return TITLES[h] ? h : "home";
+}
+function navigateTo(id, push){
+  document.querySelectorAll(".page").forEach(function(p){
+    p.classList.toggle("active", p.id === "page-" + id);
+  });
+  if (push) history.pushState({ page: id }, "", "#/" + id);
+  document.title = TITLES[id] + " | " + BUSINESS;
+  window.scrollTo({ top: 0, behavior: "instant" });
+  var mb = document.getElementById("menu-btn");
+  var nl = document.querySelector(".nav-links");
+  if (mb && nl) { mb.classList.remove("open"); nl.classList.remove("open"); }
+}
+document.addEventListener("click", function(e){
+  var t = e.target.closest("[data-page]");
+  if (t) { e.preventDefault(); navigateTo(t.getAttribute("data-page"), true); }
+});
+window.addEventListener("popstate", function(){ navigateTo(getPageFromHash(), false); });
+navigateTo(getPageFromHash(), false);
+
+var mb = document.getElementById("menu-btn");
+if (mb) mb.addEventListener("click", function(e){
+  e.stopPropagation();
+  var nl = document.querySelector(".nav-links");
+  if (nl) nl.classList.toggle("open");
+  mb.classList.toggle("open");
+});
+
+var form = document.getElementById("qform");
+if (form) form.addEventListener("submit", function(ev){
+  ev.preventDefault();
+  var name = (document.getElementById("f-name").value || "").trim();
+  var phone = (document.getElementById("f-phone").value || "").trim();
+  var msg = (document.getElementById("f-msg").value || "").trim();
+  var text = "Hi, this is " + (name || "a customer") + (phone ? " (" + phone + ")" : "") +
+    ". I have a question about Como Laundry / Lavanderia: " + (msg || "no message added");
+  var fb = document.getElementById("form-feedback");
+  if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
+    location.href = "sms:" + PHONE + "?&body=" + encodeURIComponent(text);
+  } else {
+    navigator.clipboard.writeText(text).then(function(){
+      fb.textContent = "Copied. Now paste it in a text to " + PRETTY;
+    });
+  }
+});
+
+renderChip();
+</script>
+</body>
+</html>

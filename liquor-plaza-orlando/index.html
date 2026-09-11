@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Liquor Plaza | Beer, Wine and Spirits on International Dr, Orlando</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,600;6..96,700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{
+  --black:#101418;
+  --black-soft:#181E24;
+  --lime:#C7F464;
+  --white:#FFFFFF;
+  --mist:#B7C0C7;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:'Open Sans',sans-serif;background:var(--black);color:#DCE2E6;line-height:1.65;font-size:17px}
+h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:600;line-height:1.15;margin:0 0 14px;color:var(--white)}
+a{color:var(--lime)}
+.site-shell{min-height:100vh;display:flex;flex-direction:column}
+main{flex:1 0 auto}
+footer{flex-shrink:0}
+.page{display:none}
+.page.active{display:block}
+.wrap{max-width:1060px;margin:0 auto;padding:0 22px}
+
+/* header */
+.site-head{background:var(--black);border-bottom:1px solid #2A323A;position:relative;z-index:40}
+.head-in{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 22px;max-width:1060px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none}
+.brand-mark{width:40px;height:40px;border-radius:50%;border:2px solid var(--lime);display:flex;align-items:center;justify-content:center;color:var(--lime);font-size:1.05rem}
+.brand-name{font-family:'Bodoni Moda',serif;font-weight:700;font-size:1.3rem;letter-spacing:1.5px;color:var(--white)}
+.nav-links{display:flex;align-items:center;gap:24px}
+.nav-links a{font-weight:600;font-size:.92rem;letter-spacing:1.5px;text-transform:uppercase;color:#DCE2E6;text-decoration:none;padding:6px 2px;border-bottom:2px solid transparent}
+.nav-links a:hover{color:var(--lime);border-bottom-color:var(--lime)}
+.menu-btn{display:none;background:none;border:1.5px solid var(--lime);border-radius:10px;padding:9px 10px;cursor:pointer}
+.menu-btn span{display:block;width:20px;height:2px;background:var(--lime);margin:4px 0;transition:transform .2s ease,opacity .2s ease}
+.menu-btn.open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+.menu-btn.open span:nth-child(2){opacity:0}
+.menu-btn.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+
+/* status chip */
+.status-chip{display:inline-flex;align-items:center;gap:9px;padding:8px 18px;border-radius:999px;background:rgba(199,244,100,.08);border:1.5px solid rgba(199,244,100,.5);font-weight:600;font-size:.86rem;letter-spacing:.5px;color:var(--lime)}
+.status-chip .dot{width:9px;height:9px;border-radius:50%;background:#8E979E;flex-shrink:0}
+.status-chip.is-open .dot{background:var(--lime);box-shadow:0 0 10px rgba(199,244,100,.7)}
+.status-chip.is-closed .dot{background:#E07A6A}
+
+/* hero */
+.hero{background:linear-gradient(180deg,var(--black) 0%,var(--black-soft) 100%);padding:84px 0 70px;position:relative;overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:40px;align-items:center}
+.late-badge{display:inline-flex;align-items:center;gap:10px;border:2px solid var(--lime);color:var(--lime);border-radius:6px;padding:9px 18px;font-weight:700;letter-spacing:3px;text-transform:uppercase;font-size:.78rem;margin-bottom:24px;box-shadow:0 0 18px rgba(199,244,100,.18)}
+.hero h1{font-size:clamp(2.6rem,6.5vw,4.2rem);letter-spacing:1px;margin-bottom:14px}
+.hero .tagline{font-size:1.16rem;color:#DCE2E6;margin:0 0 12px;font-weight:600}
+.hero p.lead{color:#AEB8BF;margin:0 0 28px;max-width:540px}
+.hero-chips{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:28px}
+.hero-btns{display:flex;flex-wrap:wrap;gap:14px}
+.lime-btn{display:inline-flex;align-items:center;gap:10px;padding:13px 26px;border-radius:6px;background:var(--lime);color:var(--black);text-decoration:none;font-weight:700;letter-spacing:1px}
+.lime-btn.ghost{background:transparent;border:2px solid #3A444D;color:#DCE2E6}
+.lime-btn.ghost:hover{border-color:var(--lime);color:var(--lime)}
+.lime-btn:hover{background:#D9FA8C}
+.bottle-zone{display:flex;flex-direction:column;align-items:center;gap:6px}
+.bottle-row{display:flex;align-items:flex-end;gap:16px;height:150px}
+.bottle{width:24px;background:var(--lime);border-radius:6px 6px 3px 3px;position:relative;opacity:.92;box-shadow:0 0 16px rgba(199,244,100,.22)}
+.bottle::before{content:"";position:absolute;top:-17px;left:50%;transform:translateX(-50%);width:9px;height:17px;background:var(--lime);border-radius:3px 3px 0 0}
+.bottle.b1{height:64px}.bottle.b2{height:96px}.bottle.b3{height:52px}.bottle.b4{height:120px}.bottle.b5{height:74px}.bottle.b6{height:104px}
+.bottle-caption{font-size:.78rem;letter-spacing:3px;text-transform:uppercase;color:#6E7A82}
+
+/* sections on light */
+.light-zone{background:var(--white);color:#3A434B}
+.light-zone h2,.light-zone h3{color:var(--black)}
+section.block{padding:66px 0}
+.sec-title{text-align:center;font-size:clamp(1.9rem,4.5vw,2.6rem)}
+.sec-sub{text-align:center;max-width:640px;margin:0 auto 38px}
+.lime-dash{width:56px;height:4px;background:var(--lime);border-radius:2px;margin:10px auto 20px}
+
+/* store cards */
+.store-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px}
+.store-card{border:1.5px solid #E1E6EA;border-radius:14px;padding:28px 26px;background:#fff;box-shadow:0 12px 28px rgba(16,20,24,.06)}
+.store-card .sc-ico{width:54px;height:54px;border-radius:12px;background:var(--black);color:var(--lime);display:flex;align-items:center;justify-content:center;font-size:1.35rem;margin-bottom:16px}
+.store-card h3{font-size:1.35rem;margin-bottom:8px}
+.store-card p{margin:0;font-size:.95rem;color:#4E585F}
+
+/* id band */
+.id-band{background:var(--black);color:var(--white);border:2px solid var(--lime);border-radius:12px;padding:22px 28px;display:flex;align-items:center;gap:18px;max-width:860px;margin:0 auto}
+.id-band i{font-size:1.8rem;color:var(--lime);flex-shrink:0}
+.id-band p{margin:0;font-weight:700}
+.id-band small{display:block;font-weight:400;font-size:.88rem;color:#AEB8BF}
+
+/* hours board */
+.hours-board{display:grid;grid-template-columns:repeat(auto-fit,minmax(126px,1fr));gap:12px;max-width:920px;margin:0 auto}
+.hb-tile{border:1.5px solid #2A323A;border-radius:10px;padding:16px 10px;text-align:center;background:var(--black-soft)}
+.hb-tile .hb-day{font-family:'Bodoni Moda',serif;font-size:1rem;letter-spacing:1px;color:var(--white);display:block;margin-bottom:6px}
+.hb-tile .hb-hrs{font-size:.82rem;color:#AEB8BF;font-weight:600}
+.hb-tile.today{border-color:var(--lime);background:rgba(199,244,100,.09);box-shadow:0 0 14px rgba(199,244,100,.14)}
+.hb-tile.today .hb-hrs{color:var(--lime)}
+.hours-note{text-align:center;font-size:.88rem;color:#8E979E;margin:18px auto 0}
+
+/* quotes (no rating) */
+.quote-card{background:var(--black-soft);border:1.5px solid #2A323A;border-radius:14px;padding:32px;position:relative}
+.quote-card .qmark{color:var(--lime);font-size:1.6rem;margin-bottom:10px}
+.quote-card blockquote{margin:0 0 12px;font-size:1.1rem;color:var(--white);font-weight:400;line-height:1.6}
+.quote-card .attrib{font-size:.78rem;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;color:#8E979E}
+.quote-duo{display:grid;grid-template-columns:1fr 1fr;gap:22px;max-width:900px;margin:0 auto}
+.qual-line{text-align:center;font-family:'Bodoni Moda',serif;font-size:clamp(1.3rem,3.6vw,1.8rem);color:var(--white);margin:40px auto 26px;font-style:italic}
+.g-link-card{display:flex;align-items:center;justify-content:center;gap:12px;width:fit-content;margin:0 auto;background:var(--lime);border-radius:6px;padding:16px 30px;font-weight:700;letter-spacing:1px;color:var(--black);text-decoration:none}
+.g-link-card:hover{background:#D9FA8C}
+.g-link-card i{color:var(--black)}
+
+/* bottle-tag contact card */
+.tag-card{position:relative;background:var(--black-soft);border:1.5px solid #2A323A;border-radius:12px;padding:52px 32px 30px;text-align:center;max-width:400px;margin:0 auto;box-shadow:0 18px 40px rgba(0,0,0,.4)}
+.tag-hole{position:absolute;top:16px;left:26px;width:16px;height:16px;border-radius:50%;border:3px solid var(--lime);background:var(--black)}
+.tag-string{position:absolute;top:-26px;left:33px;width:3px;height:28px;background:#3A444D;transform:rotate(18deg);border-radius:2px}
+.tag-card .tc-ico{color:var(--lime);font-size:1.5rem;margin-bottom:8px}
+.tag-card .tc-label{font-size:.78rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;color:#8E979E;margin:0 0 8px}
+.tag-card .tc-phone{font-family:'Bodoni Moda',serif;font-size:1.9rem;color:var(--white);text-decoration:none;display:block}
+.tag-card .tc-phone:hover{color:var(--lime)}
+.tag-card .tc-sub{font-size:.88rem;margin:10px 0 0;color:#AEB8BF}
+
+/* visit layout */
+.visit-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:38px;align-items:start}
+.info-card{background:var(--black-soft);border:1.5px solid #2A323A;border-radius:14px;padding:28px;margin-bottom:22px}
+.info-card h3{display:flex;align-items:center;gap:10px;font-size:1.4rem}
+.info-card h3 i{color:var(--lime)}
+.addr{font-weight:700;font-size:1.06rem;color:var(--white);margin:0 0 6px}
+.info-card p{color:#AEB8BF;margin:0 0 6px}
+
+/* form */
+.form-card{background:var(--white);border-radius:14px;padding:36px;color:#3A434B;max-width:740px;margin:0 auto;box-shadow:0 20px 44px rgba(0,0,0,.35)}
+.form-card h3{color:var(--black);text-align:center;font-size:1.8rem}
+.form-note{text-align:center;font-size:.93rem;margin:0 auto 24px;max-width:520px}
+.f-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.f-field{margin-bottom:16px}
+.f-field label{display:block;font-weight:700;font-size:.85rem;letter-spacing:1px;margin-bottom:6px;color:var(--black)}
+.f-field input,.f-field textarea{width:100%;border:1.5px solid #D7DEE3;border-radius:10px;padding:12px 15px;font-family:'Open Sans',sans-serif;font-size:.98rem;color:var(--black);background:#F7F9FA}
+.f-field input:focus,.f-field textarea:focus{outline:none;border-color:var(--lime)}
+.f-send{display:block;width:100%;border:none;border-radius:8px;padding:15px;background:var(--black);color:var(--lime);font-family:'Open Sans',sans-serif;font-weight:700;font-size:.95rem;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer}
+.f-send:hover{background:#232B33}
+.form-feedback{text-align:center;font-weight:700;min-height:24px;margin:14px 0 0;font-size:.95rem;color:var(--black)}
+.form-feedback.ok{color:#2E7D52}
+.form-feedback.warn{color:#B3543F}
+
+/* footer */
+.site-foot{background:var(--black);color:#AEB8BF;border-top:3px solid var(--lime);margin-top:70px}
+.foot-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:34px;padding:54px 22px 36px;max-width:1060px;margin:0 auto}
+.foot-grid h4{font-family:'Bodoni Moda',serif;font-size:1.25rem;color:var(--white);margin:0 0 12px}
+.foot-grid p{margin:0 0 8px;font-size:.93rem}
+.foot-grid a{color:var(--lime)}
+.copyright{border-top:1px solid #2A323A;text-align:center;padding:18px 22px;font-size:.9rem;letter-spacing:.8px;color:#8E979E}
+
+@media (max-width:900px){
+  .hero-grid{grid-template-columns:1fr}
+  .bottle-zone{order:-1;margin-bottom:10px}
+}
+@media (max-width:820px){
+  .quote-duo{grid-template-columns:1fr}
+}
+@media (max-width:767px){
+  .menu-btn{display:block}
+  .nav-links{display:none;position:absolute;top:100%;left:0;right:0;background:var(--black);border-bottom:1px solid #2A323A;flex-direction:column;align-items:stretch;gap:0;padding:8px 0;box-shadow:0 18px 30px rgba(0,0,0,.5)}
+  .nav-links.open{display:flex}
+  .nav-links a{padding:14px 26px;border-bottom:none}
+  .nav-links a:hover{background:var(--black-soft)}
+  .visit-grid{grid-template-columns:1fr}
+  .f-row{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr;gap:26px;padding-top:42px}
+  .hero{padding:60px 0 56px}
+  section.block{padding:50px 0}
+}
+@media (max-width:380px){
+  .brand-name{font-size:1.05rem}
+  .hero h1{font-size:2.2rem}
+}
+</style>
+</head>
+<body>
+<div class="site-shell">
+
+<header class="site-head">
+  <div class="head-in">
+    <a class="brand" href="#/" data-page="home" aria-label="Liquor Plaza home">
+      <span class="brand-mark"><i class="fa-solid fa-wine-bottle"></i></span>
+      <span class="brand-name">LIQUOR PLAZA</span>
+    </a>
+    <nav class="nav-links" aria-label="Main navigation">
+      <a href="#/store" data-page="store">The Store</a>
+      <a href="#/reviews" data-page="reviews">Reviews</a>
+      <a href="#/visit" data-page="visit">Visit</a>
+    </nav>
+    <button class="menu-btn" id="menu-btn" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main>
+
+<section class="page" id="page-home">
+  <div class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="late-badge"><i class="fa-solid fa-moon"></i> Open till 1 AM, every night</div>
+        <h1>Liquor Plaza</h1>
+        <p class="tagline">Beer, wine and spirits on International Drive.</p>
+        <p class="lead">While the rest of the strip winds down, we are still behind the counter. Open late every single night, ten in the morning until one after midnight, seven days a week.</p>
+        <div class="hero-chips">
+          <span class="status-chip"><span class="dot"></span><span class="chip-label">Checking hours...</span></span>
+          <span class="status-chip">Every day 10 AM - 1 AM</span>
+        </div>
+        <div class="hero-btns">
+          <a class="lime-btn" href="#/store" data-page="store">Browse the store <i class="fa-solid fa-arrow-right"></i></a>
+          <a class="lime-btn ghost" href="#/visit" data-page="visit">Hours and directions</a>
+        </div>
+      </div>
+      <div class="bottle-zone">
+        <div class="bottle-row">
+          <div class="bottle b1"></div><div class="bottle b2"></div><div class="bottle b3"></div><div class="bottle b4"></div><div class="bottle b5"></div><div class="bottle b6"></div>
+        </div>
+        <span class="bottle-caption">Late night, well stocked</span>
+      </div>
+    </div>
+  </div>
+
+  <section class="light-zone block">
+    <div class="wrap">
+      <h2 class="sec-title">One Stop, Whole Shelf</h2>
+      <div class="lime-dash"></div>
+      <p class="sec-sub">From a quick bottle on the way to a friend's place to the full setup for a weekend, the aisles cover it.</p>
+      <div class="store-grid">
+        <div class="store-card">
+          <div class="sc-ico"><i class="fa-solid fa-beer-mug-empty"></i></div>
+          <h3>Beer</h3>
+          <p>Fridge-stacked six packs, tall boys and craft picks, cold and ready to grab.</p>
+        </div>
+        <div class="store-card">
+          <div class="sc-ico"><i class="fa-solid fa-wine-glass"></i></div>
+          <h3>Wine</h3>
+          <p>Reds, whites and bubbles for weeknights and celebrations alike.</p>
+        </div>
+        <div class="store-card">
+          <div class="sc-ico"><i class="fa-solid fa-martini-glass"></i></div>
+          <h3>Spirits</h3>
+          <p>Vodka, whiskey, rum, tequila and liqueurs, from the familiar faces to something new.</p>
+        </div>
+        <div class="store-card">
+          <div class="sc-ico"><i class="fa-solid fa-basket-shopping"></i></div>
+          <h3>Mixers and Snacks</h3>
+          <p>Sodas, juices, ice and snacks, so one stop really is one stop.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" style="padding-top:0;background:var(--white)">
+    <div class="wrap">
+      <div class="id-band">
+        <i class="fa-solid fa-id-card"></i>
+        <p>21 and over, valid ID required.<small>We card at the counter without exception. Drink responsibly.</small></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" style="padding-top:8px;background:var(--white)">
+    <div class="wrap">
+      <div class="quote-card" style="max-width:680px;margin:0 auto">
+        <div class="qmark"><i class="fa-solid fa-quote-left"></i></div>
+        <blockquote>this store was nicely organized and clean. Prices were reasonable.</blockquote>
+        <p class="attrib">Google review</p>
+      </div>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-store">
+  <section class="light-zone block" style="padding-bottom:20px">
+    <div class="wrap">
+      <h1 class="sec-title" style="font-size:clamp(2rem,5vw,2.8rem)">The Store</h1>
+      <div class="lime-dash"></div>
+      <p class="sec-sub">Organized aisles, fair prices and a late close time, on International Drive in the middle of everything.</p>
+      <div class="store-grid">
+        <div class="store-card">
+          <div class="sc-ico"><i class="fa-solid fa-beer-mug-empty"></i></div>
+          <h3>The Cold Wall</h3>
+          <p>Domestic staples, imports and Florida craft, stocked deep in the fridge so the last case of the night is still cold.</p>
+        </div>
+        <div class="store-card">
+          <div class="sc-ico"><i class="fa-solid fa-wine-glass"></i></div>
+          <h3>The Wine Aisle</h3>
+          <p>Everyday pours and dinner-party bottles, arranged by style so choosing takes a minute, not an hour.</p>
+        </div>
+        <div class="store-card">
+          <div class="sc-ico"><i class="fa-solid fa-martini-glass"></i></div>
+          <h3>The Spirits Shelf</h3>
+          <p>The classics everyone knows plus liqueurs and mixers for whatever the night calls for.</p>
+        </div>
+        <div class="store-card">
+          <div class="sc-ico"><i class="fa-solid fa-basket-shopping"></i></div>
+          <h3>Ice, Mixers, Snacks</h3>
+          <p>Bags of ice, chasers, sodas, juices and snacks up front for a fast grab on the way out.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="block" style="padding-top:0">
+    <div class="wrap">
+      <div class="id-band">
+        <i class="fa-solid fa-id-card"></i>
+        <p>21 and over, valid ID required.<small>Alcohol is sold to adults with valid identification only.</small></p>
+      </div>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-reviews">
+  <section class="block" style="padding-bottom:24px">
+    <div class="wrap">
+      <h1 class="sec-title" style="font-size:clamp(2rem,5vw,2.8rem)">Reviews</h1>
+      <div class="lime-dash"></div>
+      <p class="sec-sub">Straight from Google, word for word, nothing added.</p>
+      <div class="quote-duo">
+        <div class="quote-card">
+          <div class="qmark"><i class="fa-solid fa-quote-left"></i></div>
+          <blockquote>The service here is friendly and helpful.</blockquote>
+          <p class="attrib">Google review</p>
+        </div>
+        <div class="quote-card">
+          <div class="qmark"><i class="fa-solid fa-quote-left"></i></div>
+          <blockquote>this store was nicely organized and clean. Prices were reasonable.</blockquote>
+          <p class="attrib">Google review</p>
+        </div>
+      </div>
+      <p class="qual-line">What customers say: friendly service, a clean store and fair prices.</p>
+      <a class="g-link-card" href="https://www.google.com/maps/search/?api=1&query=Liquor%20Plaza%2C%208739%20International%20Dr%2C%20Orlando%2C%20FL%2032819" target="_blank" rel="noopener"><i class="fa-brands fa-google"></i> See every review on Google</a>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-visit">
+  <section class="block" style="padding-bottom:24px">
+    <div class="wrap">
+      <h1 class="sec-title" style="font-size:clamp(2rem,5vw,2.8rem)">Visit Us</h1>
+      <div class="lime-dash"></div>
+      <div class="visit-grid">
+        <div>
+          <div class="info-card">
+            <h3><i class="fa-solid fa-location-dot"></i> Where we pour</h3>
+            <p class="addr">8739 International Dr<br>Orlando, FL 32819</p>
+            <p>On International Drive in the heart of the tourist corridor, with parking right outside.</p>
+          </div>
+          <div class="info-card">
+            <h3><i class="fa-solid fa-clock"></i> The Late Hours</h3>
+            <div class="hours-board">
+              <div class="hb-tile" data-day="0"><span class="hb-day">Sunday</span><span class="hb-hrs">10:00 AM - 1:00 AM</span></div>
+              <div class="hb-tile" data-day="1"><span class="hb-day">Monday</span><span class="hb-hrs">10:00 AM - 1:00 AM</span></div>
+              <div class="hb-tile" data-day="2"><span class="hb-day">Tuesday</span><span class="hb-hrs">10:00 AM - 1:00 AM</span></div>
+              <div class="hb-tile" data-day="3"><span class="hb-day">Wednesday</span><span class="hb-hrs">10:00 AM - 1:00 AM</span></div>
+              <div class="hb-tile" data-day="4"><span class="hb-day">Thursday</span><span class="hb-hrs">10:00 AM - 1:00 AM</span></div>
+              <div class="hb-tile" data-day="5"><span class="hb-day">Friday</span><span class="hb-hrs">10:00 AM - 1:00 AM</span></div>
+              <div class="hb-tile" data-day="6"><span class="hb-day">Saturday</span><span class="hb-hrs">10:00 AM - 1:00 AM</span></div>
+            </div>
+            <p class="hours-note">Open till 1 AM means 1 in the morning. The late shift is real, seven nights a week.</p>
+          </div>
+        </div>
+        <div>
+          <div class="tag-card">
+            <span class="tag-string"></span>
+            <span class="tag-hole"></span>
+            <div class="tc-ico"><i class="fa-solid fa-wine-bottle"></i></div>
+            <p class="tc-label">Call the counter</p>
+            <a class="tc-phone" href="tel:+14072865644">(407) 286-5644</a>
+            <p class="tc-sub">Need something held or a question answered before midnight? Give us a call.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="block" style="padding-top:10px">
+    <div class="wrap">
+      <div class="form-card">
+        <h3>Ask about a bottle</h3>
+        <p class="form-note">Tell us what you need and when. If it is on the shelf, we will set it aside.</p>
+        <form id="quote-form">
+          <div class="f-row">
+            <div class="f-field">
+              <label for="f-name">Your name</label>
+              <input type="text" id="f-name" autocomplete="name" placeholder="First and last">
+            </div>
+            <div class="f-field">
+              <label for="f-phone">Your phone</label>
+              <input type="tel" id="f-phone" autocomplete="tel" placeholder="(407) 555-0100">
+            </div>
+          </div>
+          <div class="f-field">
+            <label for="f-msg">Message</label>
+            <textarea id="f-msg" rows="4" placeholder="Do you have ... ?"></textarea>
+          </div>
+          <button type="submit" class="f-send"><i class="fa-solid fa-paper-plane"></i> Send to the counter</button>
+          <p class="form-feedback" id="form-feedback"></p>
+        </form>
+      </div>
+    </div>
+  </section>
+</section>
+
+</main>
+
+<footer class="site-foot">
+  <div class="foot-grid">
+    <div>
+      <h4>Liquor Plaza</h4>
+      <p>Orlando's late-night bottle stop on International Drive. Cold fridge, fair prices, friendly counter.</p>
+      <p>21 and over, valid ID required.</p>
+    </div>
+    <div>
+      <h4>Find Us</h4>
+      <p>8739 International Dr<br>Orlando, FL 32819</p>
+      <p>Every day<br>10:00 AM - 1:00 AM</p>
+    </div>
+    <div>
+      <h4>Talk To Us</h4>
+      <p>(407) 286-5644</p>
+      <p>Beer, wine, spirits, mixers and snacks.</p>
+    </div>
+  </div>
+  <div class="copyright">© Liquor Plaza · Orlando, FL</div>
+</footer>
+
+</div>
+
+<script>
+var BUSINESS = "Liquor Plaza";
+var TITLES = { home: "Late Night Liquor on International Dr", store: "The Store", reviews: "What Customers Say", visit: "Visit Us" };
+
+function getPageFromHash(){
+  var h = (location.hash || "").replace(/^#\/?/, "");
+  return TITLES[h] ? h : "home";
+}
+function navigateTo(id, push){
+  document.querySelectorAll(".page").forEach(function(p){
+    p.classList.toggle("active", p.id === "page-" + id);
+  });
+  if (push) history.pushState({ page: id }, "", "#/" + id);
+  document.title = TITLES[id] + " | " + BUSINESS;
+  window.scrollTo({ top: 0, behavior: "instant" });
+  var mb = document.getElementById("menu-btn");
+  var nl = document.querySelector(".nav-links");
+  if (mb && nl) { mb.classList.remove("open"); nl.classList.remove("open"); }
+}
+document.addEventListener("click", function(e){
+  var t = e.target.closest("[data-page]");
+  if (t) { e.preventDefault(); navigateTo(t.getAttribute("data-page"), true); }
+});
+window.addEventListener("popstate", function(){ navigateTo(getPageFromHash(), false); });
+navigateTo(getPageFromHash(), false);
+
+var menuBtn = document.getElementById("menu-btn");
+var navLinksEl = document.querySelector(".nav-links");
+if (menuBtn && navLinksEl) {
+  menuBtn.addEventListener("click", function(){
+    menuBtn.classList.toggle("open");
+    navLinksEl.classList.toggle("open");
+  });
+}
+
+var CITY_TZ = "America/New_York";
+var HOURS = { 0:[10,25], 1:[10,25], 2:[10,25], 3:[10,25], 4:[10,25], 5:[10,25], 6:[10,25] };
+
+function cityNow(){
+  var parts = new Intl.DateTimeFormat("en-US", { timeZone: CITY_TZ,
+    weekday: "short", hour: "numeric", minute: "numeric", hour12: false })
+    .formatToParts(new Date());
+  var o = {}; parts.forEach(function(p){ o[p.type] = p.value; });
+  var days = { Sun:0, Mon:1, Tue:2, Wed:3, Thu:4, Fri:5, Sat:6 };
+  return { day: days[o.weekday], hour: (+o.hour) % 24, minute: +o.minute };
+}
+function fmtH(t){
+  var h = Math.floor(t), m = Math.round((t - h) * 60);
+  var ap = h >= 12 && h < 24 ? "PM" : "AM", hh = h % 12; if (hh === 0) hh = 12;
+  return hh + (m ? ":" + String(m).padStart(2, "0") : ":00") + " " + ap;
+}
+function openState(){
+  var n = cityNow(), t = n.hour + n.minute / 60, today = HOURS[n.day];
+  if (today) {
+    if (today[1] > 24 && t < today[1] - 24) return { open: true, label: "Open now" };
+    if (t >= today[0] && t < (today[1] > 24 ? 24 : today[1])) return { open: true, label: "Open now" };
+  }
+  var names = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  for (var i = 0; i < 7; i++) {
+    var d = (n.day + i) % 7, h = HOURS[d];
+    if (!h) continue;
+    if (i === 0 && t < h[0]) return { open: false, label: "Opens " + fmtH(h[0]) + " today" };
+    if (i > 0) return { open: false, label: "Opens " + names[d] + (h[0] ? " at " + fmtH(h[0]) : "") };
+  }
+  return { open: false, label: "Closed" };
+}
+
+(function renderStatus(){
+  var st = openState();
+  document.querySelectorAll(".status-chip").forEach(function(c){
+    c.classList.add(st.open ? "is-open" : "is-closed");
+    var label = c.querySelector(".chip-label");
+    if (label) label.textContent = st.label;
+  });
+  var today = cityNow().day;
+  document.querySelectorAll("[data-day]").forEach(function(row){
+    if (parseInt(row.getAttribute("data-day"), 10) === today) row.classList.add("today");
+  });
+})();
+
+var PHONE = "+14072865644";
+var PRETTY_PHONE = "(407) 286-5644";
+var quoteForm = document.getElementById("quote-form");
+if (quoteForm) {
+  quoteForm.addEventListener("submit", function(e){
+    e.preventDefault();
+    var name = document.getElementById("f-name").value.trim();
+    var fphone = document.getElementById("f-phone").value.trim();
+    var fmsg = document.getElementById("f-msg").value.trim();
+    var feedback = document.getElementById("form-feedback");
+    if (!name || !fmsg) {
+      feedback.textContent = "Add your name and a short message so we know how to help.";
+      feedback.className = "form-feedback warn";
+      return;
+    }
+    var text = "Hi " + BUSINESS + ", this is " + name + (fphone ? " (" + fphone + ")" : "") + ". " + fmsg;
+    var body = encodeURIComponent(text);
+    if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
+      location.href = "sms:" + PHONE + "?&body=" + body;
+    } else {
+      navigator.clipboard.writeText(text).then(function(){
+        feedback.textContent = "Copied. Now paste it in a text to " + PRETTY_PHONE;
+        feedback.className = "form-feedback ok";
+      });
+    }
+  });
+}
+</script>
+</body>
+</html>

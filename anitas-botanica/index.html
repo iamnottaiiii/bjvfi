@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Botanica on Alameda Ave | Anita's Botanica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Leckerli+One&family=Work+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{
+  --marigold:#E8A13D;
+  --marigold-deep:#C77F1E;
+  --marigold-soft:#FBEED3;
+  --sage:#7A8B6F;
+  --sage-deep:#55644B;
+  --sage-soft:#E7ECE1;
+  --cream:#FBF5E9;
+  --ink:#41372A;
+}
+*{ box-sizing:border-box; }
+html,body{ margin:0; padding:0; }
+body{
+  font-family:'Work Sans',sans-serif;
+  background:var(--cream);
+  color:var(--ink);
+  line-height:1.65;
+}
+h1,h2,h3{ line-height:1.15; margin:0 0 .5rem; }
+a{ color:var(--sage-deep); }
+.wrap{ max-width:1080px; margin:0 auto; padding:0 20px; }
+
+/* Footer pinning shell */
+.site-shell{ min-height:100vh; display:flex; flex-direction:column; }
+main{ flex:1 0 auto; }
+footer{ flex-shrink:0; }
+
+/* Header */
+header.site{
+  background:var(--cream);
+  border-bottom:1px solid var(--sage-soft);
+  position:relative;
+  z-index:20;
+}
+.bar{ display:flex; align-items:center; justify-content:space-between; padding:14px 0; }
+.brand{ text-decoration:none; color:var(--sage-deep); display:flex; align-items:center; gap:12px; }
+.brand-flower{ flex:0 0 auto; }
+.brand-name{
+  font-family:'Leckerli One',cursive;
+  font-size:1.5rem;
+  line-height:1.1;
+  display:block;
+  color:var(--marigold-deep);
+}
+.brand-sub{
+  display:block;
+  font-size:.64rem;
+  letter-spacing:.26em;
+  text-transform:uppercase;
+  color:var(--sage);
+  font-weight:700;
+}
+#menu-btn{
+  display:none;
+  background:none;
+  border:2px solid var(--sage);
+  border-radius:10px;
+  width:44px; height:40px;
+  cursor:pointer; padding:0;
+}
+#menu-btn span{ display:block; width:20px; height:2px; background:var(--sage-deep); margin:4px auto; transition:transform .2s ease, opacity .2s ease; }
+#menu-btn.open span:nth-child(1){ transform:translateY(6px) rotate(45deg); }
+#menu-btn.open span:nth-child(2){ opacity:0; }
+#menu-btn.open span:nth-child(3){ transform:translateY(-6px) rotate(-45deg); }
+.nav-links{ display:flex; gap:26px; align-items:center; list-style:none; margin:0; padding:0; }
+.nav-links a{
+  text-decoration:none;
+  font-weight:700;
+  font-size:.82rem;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--sage-deep);
+  padding:6px 2px;
+  border-bottom:3px solid transparent;
+}
+.nav-links a:hover{ border-bottom-color:var(--marigold); }
+
+/* Pages */
+section.page{ display:none; }
+section.page.active{ display:block; }
+
+/* Hero: left text + flower cluster */
+.hero{
+  background:
+    radial-gradient(circle at 12% 20%, var(--marigold-soft) 0 12%, transparent 13%),
+    radial-gradient(circle at 92% 78%, var(--sage-soft) 0 16%, transparent 17%),
+    var(--cream);
+}
+.hero-grid{
+  display:grid; grid-template-columns:1fr; gap:30px;
+  align-items:center;
+  padding:50px 0 54px;
+}
+.hero-copy .kicker{
+  font-size:.72rem;
+  font-weight:700;
+  letter-spacing:.28em;
+  text-transform:uppercase;
+  color:var(--sage);
+  margin:0 0 10px;
+}
+.hero-copy h1{
+  font-family:'Leckerli One',cursive;
+  font-weight:400;
+  font-size:clamp(2.3rem, 6vw, 3.8rem);
+  color:var(--marigold-deep);
+}
+.hero-copy h1 em{ font-style:normal; color:var(--sage-deep); }
+.hero-copy .lead{ font-size:1.04rem; color:#5B5040; max-width:520px; }
+.hero-copy .business-name{
+  display:block;
+  font-weight:700;
+  margin-top:10px;
+  color:var(--sage-deep);
+}
+.hero-actions{ display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-top:20px; }
+.status-chip{
+  display:inline-flex; align-items:center; gap:8px;
+  border-radius:999px;
+  padding:8px 18px;
+  font-weight:700;
+  font-size:.85rem;
+  border:1px solid transparent;
+}
+.status-chip .dot{ width:10px; height:10px; border-radius:50%; }
+.status-chip.open{ background:#E9F0E2; color:#3F5A2E; border-color:#B5C8A4; }
+.status-chip.open .dot{ background:#5E8C3C; }
+.status-chip.closed{ background:#F4EAD6; color:#8A6420; border-color:#E3C891; }
+.status-chip.closed .dot{ background:var(--marigold); }
+.flower-field{ position:relative; height:240px; max-width:340px; margin:0 auto; width:100%; }
+.flower{ position:absolute; }
+.flower svg{ display:block; }
+
+.badges{ display:flex; flex-wrap:wrap; gap:10px; margin-top:20px; }
+.badge{
+  display:inline-flex; align-items:center; gap:8px;
+  background:#fff;
+  border:1px solid var(--sage-soft);
+  border-radius:999px;
+  padding:7px 14px;
+  font-size:.8rem;
+  font-weight:700;
+  color:var(--sage-deep);
+}
+.badge i{ color:var(--marigold-deep); }
+
+/* Blocks */
+.block{ padding:54px 0; }
+.block-alt{ background:var(--sage-soft); }
+.sec-head{ max-width:660px; margin:0 auto 34px; text-align:center; }
+.sec-head h2{
+  font-family:'Leckerli One',cursive;
+  font-weight:400;
+  font-size:clamp(2rem, 4.6vw, 2.9rem);
+  color:var(--sage-deep);
+}
+.sec-head .rule{
+  width:64px; height:4px; background:var(--marigold);
+  margin:12px auto 0; border-radius:4px;
+}
+.sec-head p{ color:#5B5040; margin-top:12px; }
+
+/* Feature trio */
+.trio{ display:grid; grid-template-columns:1fr; gap:18px; }
+.trio-card{
+  background:#fff;
+  border:1px solid var(--sage-soft);
+  border-radius:18px;
+  padding:26px 22px;
+  box-shadow:0 6px 14px rgba(122,139,111,.1);
+}
+.trio-card .ic{
+  width:46px; height:46px; border-radius:50%;
+  background:var(--marigold-soft);
+  color:var(--marigold-deep);
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.15rem; margin-bottom:12px;
+}
+.trio-card h3{ font-size:1.05rem; color:var(--sage-deep); }
+.trio-card p{ margin:0; font-size:.92rem; color:#5B5040; }
+.trio-card.gold{ border-top:5px solid var(--marigold); }
+.trio-card.green{ border-top:5px solid var(--sage); }
+
+/* Candle dressing band */
+.dress-band{
+  background:linear-gradient(115deg, var(--marigold) 0%, #F0B868 100%);
+  border-radius:20px;
+  padding:34px 28px;
+  color:#4A3409;
+  display:grid; grid-template-columns:1fr; gap:14px;
+  align-items:center;
+  box-shadow:0 14px 26px rgba(232,161,61,.3);
+}
+.dress-band h2{ font-family:'Leckerli One',cursive; font-weight:400; font-size:1.9rem; color:#3E2B06; }
+.dress-band p{ margin:0; font-weight:500; }
+
+/* Hours card with flower dots */
+.hours-card{
+  background:#fff;
+  border:1px solid var(--sage-soft);
+  border-radius:18px;
+  overflow:hidden;
+}
+.hours-head{
+  background:var(--sage-deep);
+  color:#fff;
+  padding:14px 22px;
+  font-weight:700;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  font-size:.78rem;
+  display:flex; align-items:center; gap:10px;
+}
+.hours-row{
+  display:flex; justify-content:space-between; align-items:center;
+  gap:10px;
+  padding:12px 22px;
+  border-bottom:1px dashed var(--sage-soft);
+  font-size:.95rem;
+}
+.hours-row:last-child{ border-bottom:none; }
+.hours-row .day{ font-weight:700; color:var(--sage-deep); display:flex; align-items:center; gap:10px; }
+.hours-row .day::before{
+  content:"";
+  width:10px; height:10px;
+  border-radius:50%;
+  background:var(--marigold);
+  flex:0 0 auto;
+}
+.hours-row .time{ color:#5B5040; white-space:nowrap; }
+.hours-row.today{ background:var(--marigold-soft); border-left:5px solid var(--marigold); }
+.hours-row.today .day::after{
+  content:"today";
+  font-size:.62rem;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--marigold-deep);
+  font-weight:700;
+}
+
+/* Visit layout */
+.visit-grid{ display:grid; grid-template-columns:1fr; gap:22px; }
+.info-card{ background:#fff; border:1px solid var(--sage-soft); border-radius:18px; padding:26px; }
+.info-card h3{ color:var(--sage-deep); font-size:1.05rem; text-transform:uppercase; letter-spacing:.08em; }
+.info-card p{ margin:6px 0; color:#5B5040; }
+
+/* Flower wreath contact card */
+.wreath-card{
+  position:relative;
+  background:#fff;
+  border:3px dotted var(--sage);
+  border-radius:50%;
+  width:min(300px, 86%);
+  aspect-ratio:1/1;
+  margin:10px auto 24px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center;
+  padding:20px;
+  box-shadow:0 12px 24px rgba(122,139,111,.16);
+}
+.wreath-card .w-dot{
+  position:absolute;
+  width:18px; height:18px;
+  border-radius:50%;
+  background:var(--marigold);
+  box-shadow:0 0 0 5px var(--marigold-soft);
+}
+.wreath-card .wd-1{ top:-6px; left:50%; margin-left:-9px; }
+.wreath-card .wd-2{ right:8px; top:24%; background:var(--sage); box-shadow:0 0 0 5px var(--sage-soft); }
+.wreath-card .wd-3{ bottom:-4px; left:50%; margin-left:-9px; }
+.wreath-card .wd-4{ left:8px; top:24%; background:var(--sage); box-shadow:0 0 0 5px var(--sage-soft); }
+.wreath-card .label{
+  font-size:.7rem;
+  font-weight:700;
+  letter-spacing:.24em;
+  text-transform:uppercase;
+  color:var(--sage);
+  margin:0 0 6px;
+}
+.wreath-card .phone{
+  font-family:'Leckerli One',cursive;
+  font-size:1.7rem;
+  color:var(--marigold-deep);
+  text-decoration:none;
+  line-height:1.2;
+}
+.wreath-card .sub{ margin:8px 0 0; font-size:.84rem; color:#5B5040; }
+
+/* Form */
+.form-card{ background:#fff; border:1px solid var(--sage-soft); border-radius:18px; padding:26px; }
+.form-card h3{ color:var(--sage-deep); }
+.form-card .hint{ font-size:.88rem; color:#5B5040; margin-top:0; }
+.field{ margin:14px 0; }
+.field label{
+  display:block;
+  font-size:.7rem;
+  font-weight:700;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--sage-deep);
+  margin-bottom:6px;
+}
+.field input, .field textarea{
+  width:100%;
+  border:1px solid #D5DCC9;
+  border-radius:12px;
+  background:var(--cream);
+  padding:11px 13px;
+  font-family:'Work Sans',sans-serif;
+  font-size:.95rem;
+  color:var(--ink);
+}
+.field input:focus, .field textarea:focus{ outline:2px solid var(--marigold); border-color:var(--marigold); }
+.send-btn{
+  display:inline-block;
+  background:var(--marigold-deep);
+  color:#fff;
+  border:none;
+  border-radius:999px;
+  padding:12px 28px;
+  font-family:'Work Sans',sans-serif;
+  font-weight:700;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  font-size:.78rem;
+  cursor:pointer;
+}
+.send-btn:hover{ background:#A96A15; }
+#form-feedback{ margin:12px 0 0; font-weight:700; color:var(--sage-deep); min-height:1.2em; font-size:.9rem; }
+
+/* Reviews */
+.quote-card{
+  background:#fff;
+  border:1px solid var(--sage-soft);
+  border-radius:18px;
+  padding:28px 24px;
+  box-shadow:0 8px 18px rgba(122,139,111,.1);
+  position:relative;
+}
+.quote-card::before{
+  content:"\201C";
+  font-family:'Leckerli One',cursive;
+  font-size:3.4rem;
+  line-height:1;
+  color:var(--marigold);
+  display:block;
+  margin-bottom:-6px;
+}
+.quote-card blockquote{
+  margin:0 0 12px;
+  font-size:1.08rem;
+  color:var(--ink);
+}
+.quote-card .stars{ color:var(--marigold-deep); letter-spacing:4px; margin-bottom:8px; }
+.quote-card .attr{
+  font-size:.72rem;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:var(--sage);
+  font-weight:700;
+}
+.review-grid{ display:grid; grid-template-columns:1fr; gap:18px; }
+.rating-hero{
+  background:var(--sage-deep);
+  color:#fff;
+  border-radius:20px;
+  padding:36px 24px;
+  text-align:center;
+}
+.rating-hero .score{
+  font-family:'Leckerli One',cursive;
+  font-size:3.6rem;
+  line-height:1;
+  color:var(--marigold-soft);
+}
+.rating-hero .stars{ color:var(--marigold-soft); letter-spacing:4px; margin:6px 0 8px; }
+.rating-hero .src{ font-size:.85rem; letter-spacing:.2em; text-transform:uppercase; opacity:.85; }
+.link-cards{ display:grid; grid-template-columns:1fr; gap:16px; margin-top:22px; max-width:560px; margin-left:auto; margin-right:auto; }
+.review-link{
+  display:flex; align-items:center; gap:14px;
+  background:#fff;
+  border:1px solid var(--sage-soft);
+  border-radius:16px;
+  padding:18px 20px;
+  text-decoration:none;
+  color:var(--sage-deep);
+}
+.review-link i{ font-size:1.5rem; color:var(--marigold-deep); }
+.review-link .t{ font-weight:700; }
+.review-link .s{ display:block; font-size:.82rem; color:#5B5040; font-weight:400; }
+.review-link:hover{ border-color:var(--marigold); }
+
+/* Footer */
+footer.site{ background:var(--sage-deep); color:#E9EFE2; margin-top:40px; }
+.foot-grid{ display:grid; grid-template-columns:1fr; gap:24px; padding:38px 0 26px; }
+.foot-brand{ font-family:'Leckerli One',cursive; font-size:1.6rem; color:#fff; }
+.foot-col h4{ font-size:.7rem; letter-spacing:.24em; text-transform:uppercase; color:#BCCBAB; margin:0 0 10px; }
+.foot-col p{ margin:4px 0; font-size:.9rem; }
+.foot-col a{ color:var(--marigold-soft); text-decoration:none; }
+.foot-bottom{
+  border-top:1px solid rgba(255,255,255,.18);
+  padding:16px 0 20px;
+  text-align:center;
+  font-size:.85rem;
+  color:#D6DECC;
+}
+.copyright{ margin:0; }
+
+/* Responsive */
+@media (min-width:768px){
+  .hero-grid{ grid-template-columns:1.1fr .9fr; }
+  .trio{ grid-template-columns:1fr 1fr 1fr; }
+  .visit-grid{ grid-template-columns:1fr 1fr; }
+  .review-grid{ grid-template-columns:1fr 1fr; }
+  .link-cards{ grid-template-columns:1fr 1fr; }
+  .dress-band{ grid-template-columns:1.3fr .7fr; }
+  .foot-grid{ grid-template-columns:1.4fr 1fr 1fr; }
+}
+@media (max-width:767px){
+  #menu-btn{ display:block; }
+  .nav-links{
+    display:none;
+    position:absolute;
+    top:100%; left:0; right:0;
+    background:#fff;
+    border-bottom:4px solid var(--marigold);
+    flex-direction:column;
+    gap:0;
+    padding:8px 0;
+    box-shadow:0 14px 20px rgba(65,55,42,.14);
+  }
+  .nav-links.open{ display:flex; }
+  .nav-links li{ width:100%; text-align:center; }
+  .nav-links a{ display:block; padding:13px 0; border-bottom:none; }
+  .block{ padding:40px 0; }
+  .flower-field{ height:190px; }
+}
+</style>
+</head>
+<body>
+<div class="site-shell">
+
+  <header class="site">
+    <div class="wrap bar">
+      <a class="brand" href="#/home" data-page="home" aria-label="Anita's Botanica home">
+        <span class="brand-flower" aria-hidden="true">
+          <svg width="40" height="40" viewBox="0 0 40 40">
+            <g fill="#E8A13D">
+              <circle cx="20" cy="8" r="4.5"/><circle cx="30" cy="12" r="4.5"/><circle cx="32" cy="22" r="4.5"/>
+              <circle cx="26" cy="30" r="4.5"/><circle cx="14" cy="30" r="4.5"/><circle cx="8" cy="22" r="4.5"/>
+              <circle cx="10" cy="12" r="4.5"/>
+            </g>
+            <circle cx="20" cy="20" r="5" fill="#7A8B6F"/>
+          </svg>
+        </span>
+        <span>
+          <span class="brand-name">Anita's Botanica</span>
+          <span class="brand-sub">Alameda Ave · Socorro, TX</span>
+        </span>
+      </a>
+      <button id="menu-btn" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links">
+        <li><a href="#/botanica" data-page="botanica">La Botanica</a></li>
+        <li><a href="#/reviews" data-page="reviews">Reviews</a></li>
+        <li><a href="#/visit" data-page="visit">Visit</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- HOME -->
+    <section class="page" id="page-home">
+      <div class="hero">
+        <div class="wrap hero-grid">
+          <div class="hero-copy">
+            <p class="kicker">Botanica and spiritual goods</p>
+            <h1>A little shop with <em>almost everything</em></h1>
+            <p class="lead">Anita's Botanica on Alameda Avenue is the kind of place customers describe the same way: clean, helpful, friendly. Candles, yerbas, statues and spiritual goods, with candle dressing done right at the counter.</p>
+            <span class="business-name">9895 Alameda Ave Ste 113, Socorro, TX 79927</span>
+            <div class="hero-actions">
+              <span class="status-chip" data-status><span class="dot"></span>Checking hours</span>
+            </div>
+            <div class="badges">
+              <span class="badge"><i class="fa-solid fa-clock"></i> Mon - Sat 10 AM - 4 PM</span>
+              <span class="badge"><i class="fa-solid fa-fire-flame-curved"></i> Candle dressing available</span>
+              <span class="badge"><i class="fa-solid fa-door-closed"></i> Sundays closed</span>
+            </div>
+          </div>
+          <div class="flower-field" aria-hidden="true">
+            <span class="flower" style="top:6px; left:8%;">
+              <svg width="86" height="86" viewBox="0 0 40 40">
+                <g fill="#E8A13D">
+                  <circle cx="20" cy="8" r="5"/><circle cx="30" cy="12" r="5"/><circle cx="32" cy="22" r="5"/>
+                  <circle cx="26" cy="30" r="5"/><circle cx="14" cy="30" r="5"/><circle cx="8" cy="22" r="5"/>
+                  <circle cx="10" cy="12" r="5"/>
+                </g>
+                <circle cx="20" cy="20" r="5.5" fill="#C77F1E"/>
+              </svg>
+            </span>
+            <span class="flower" style="top:52px; right:2%;">
+              <svg width="62" height="62" viewBox="0 0 40 40">
+                <g fill="#7A8B6F">
+                  <circle cx="20" cy="8" r="5"/><circle cx="30" cy="12" r="5"/><circle cx="32" cy="22" r="5"/>
+                  <circle cx="26" cy="30" r="5"/><circle cx="14" cy="30" r="5"/><circle cx="8" cy="22" r="5"/>
+                  <circle cx="10" cy="12" r="5"/>
+                </g>
+                <circle cx="20" cy="20" r="5.5" fill="#55644B"/>
+              </svg>
+            </span>
+            <span class="flower" style="bottom:0; left:30%;">
+              <svg width="104" height="104" viewBox="0 0 40 40">
+                <g fill="#E8A13D">
+                  <circle cx="20" cy="8" r="5.5"/><circle cx="31" cy="12" r="5.5"/><circle cx="33" cy="23" r="5.5"/>
+                  <circle cx="26" cy="31" r="5.5"/><circle cx="14" cy="31" r="5.5"/><circle cx="7" cy="23" r="5.5"/>
+                  <circle cx="9" cy="12" r="5.5"/>
+                </g>
+                <circle cx="20" cy="20" r="6" fill="#7A8B6F"/>
+              </svg>
+            </span>
+            <span class="flower" style="bottom:44px; right:28%;">
+              <svg width="48" height="48" viewBox="0 0 40 40">
+                <g fill="#F0B868">
+                  <circle cx="20" cy="9" r="5"/><circle cx="29" cy="13" r="5"/><circle cx="31" cy="22" r="5"/>
+                  <circle cx="25" cy="30" r="5"/><circle cx="15" cy="30" r="5"/><circle cx="9" cy="22" r="5"/>
+                  <circle cx="11" cy="13" r="5"/>
+                </g>
+                <circle cx="20" cy="20" r="5" fill="#E8A13D"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="wrap">
+          <div class="sec-head">
+            <h2>What people come for</h2>
+            <div class="rule"></div>
+            <p>Customers say we have almost anything you can think of. Here is where to start looking.</p>
+          </div>
+          <div class="trio">
+            <div class="trio-card gold">
+              <div class="ic"><i class="fa-solid fa-fire-flame-curved"></i></div>
+              <h3>Candles, dressed with care</h3>
+              <p>Pick your veladora and have it dressed right here. It is part of the service that regulars keep coming back for.</p>
+            </div>
+            <div class="trio-card green">
+              <div class="ic"><i class="fa-solid fa-leaf"></i></div>
+              <h3>Yerbas and remedios</h3>
+              <p>The herbs and remedies you know by name, stocked shelf by shelf in a shop that keeps things clean and organized.</p>
+            </div>
+            <div class="trio-card gold">
+              <div class="ic"><i class="fa-solid fa-place-of-worship"></i></div>
+              <h3>Statues and goods</h3>
+              <p>Spiritual items and statues for the home altar, plus the little things you did not know you needed until you see them.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="block block-alt">
+        <div class="wrap">
+          <div class="dress-band">
+            <div>
+              <h2>Bring your candle, leave it dressed</h2>
+              <p>Tell us the intention at the counter and we will prepare your candle for you. Simple, honest and done with care, the way it has been done on Alameda for years.</p>
+            </div>
+            <p style="font-family:'Leckerli One',cursive; font-size:1.5rem; text-align:center;">4.9 stars from 20 reviews</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LA BOTANICA -->
+    <section class="page" id="page-botanica">
+      <div class="block">
+        <div class="wrap">
+          <div class="sec-head">
+            <h2>La Botanica</h2>
+            <div class="rule"></div>
+            <p>A small, well kept botanica serving Socorro and the Alameda corridor. Everything in its place, and someone at the counter who knows the stock.</p>
+          </div>
+          <div class="trio" style="grid-template-columns:1fr;">
+            <div class="trio-card green">
+              <div class="ic"><i class="fa-solid fa-basket-shopping"></i></div>
+              <h3>Stocked with intention</h3>
+              <p>Candles, herbs, oils, soaps and statues, arranged so you can find what you came for. If you do not see it, ask. Customers tell us we have almost anything you can think of.</p>
+            </div>
+            <div class="trio-card gold">
+              <div class="ic"><i class="fa-solid fa-hand-holding-heart"></i></div>
+              <h3>Candle dressing at the counter</h3>
+              <p>Bring or choose a candle and we will dress it for you. It is a real service, not an upsell: one customer noted theirs was dressed for free.</p>
+            </div>
+            <div class="trio-card green">
+              <div class="ic"><i class="fa-solid fa-face-smile"></i></div>
+              <h3>Helpful, friendly, clean</h3>
+              <p>The three words in our reviews, and the three things we work on every day. Ask questions. That is what the counter is for.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- REVIEWS -->
+    <section class="page" id="page-reviews">
+      <div class="block">
+        <div class="wrap">
+          <div class="sec-head">
+            <h2>Words from our customers</h2>
+            <div class="rule"></div>
+          </div>
+          <div class="review-grid">
+            <div class="quote-card">
+              <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+              <blockquote>Clean, helpful, friendly</blockquote>
+              <div class="attr">Google review</div>
+            </div>
+            <div class="quote-card">
+              <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+              <blockquote>They have almost anything you can think of and the dressed my candle for free.</blockquote>
+              <div class="attr">Google review</div>
+            </div>
+          </div>
+          <div class="rating-hero" style="margin-top:26px;">
+            <div class="score">4.9</div>
+            <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+            <div class="src">4.9 stars with 20 reviews on Google</div>
+          </div>
+          <div class="link-cards">
+            <a class="review-link" href="https://www.google.com/maps/search/?api=1&query=Anita%27s%20Botanica%2C%209895%20Alameda%20Ave%20Ste%20113%2C%20Socorro%2C%20TX%2079927" target="_blank" rel="noopener">
+              <i class="fa-brands fa-google"></i>
+              <span><span class="t">See every review on Google</span><span class="s">All ratings and reviews on our Google listing.</span></span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VISIT -->
+    <section class="page" id="page-visit">
+      <div class="block">
+        <div class="wrap">
+          <div class="sec-head">
+            <h2>Visit us on Alameda</h2>
+            <div class="rule"></div>
+            <p>9895 Alameda Ave Ste 113, Socorro, TX 79927. We close at 4 PM, so come by in the morning or early afternoon.</p>
+          </div>
+          <div class="visit-grid">
+            <div>
+              <div class="hours-card">
+                <div class="hours-head"><i class="fa-solid fa-clock"></i> Hours</div>
+                <div class="hours-row" data-day="0"><span class="day">Sunday</span><span class="time">Closed</span></div>
+                <div class="hours-row" data-day="1"><span class="day">Monday</span><span class="time">10:00 AM - 4:00 PM</span></div>
+                <div class="hours-row" data-day="2"><span class="day">Tuesday</span><span class="time">10:00 AM - 4:00 PM</span></div>
+                <div class="hours-row" data-day="3"><span class="day">Wednesday</span><span class="time">10:00 AM - 4:00 PM</span></div>
+                <div class="hours-row" data-day="4"><span class="day">Thursday</span><span class="time">10:00 AM - 4:00 PM</span></div>
+                <div class="hours-row" data-day="5"><span class="day">Friday</span><span class="time">10:00 AM - 4:00 PM</span></div>
+                <div class="hours-row" data-day="6"><span class="day">Saturday</span><span class="time">10:00 AM - 4:00 PM</span></div>
+              </div>
+              <div class="info-card" style="margin-top:18px;">
+                <h3><i class="fa-solid fa-location-dot" style="color:var(--marigold-deep);"></i> Find us</h3>
+                <p>9895 Alameda Ave Ste 113<br>Socorro, TX 79927</p>
+                <p>On Alameda Avenue, suite 113. Easy stop if you are driving between El Paso and the valley.</p>
+              </div>
+            </div>
+            <div>
+              <div class="wreath-card">
+                <span class="w-dot wd-1" aria-hidden="true"></span>
+                <span class="w-dot wd-2" aria-hidden="true"></span>
+                <span class="w-dot wd-3" aria-hidden="true"></span>
+                <span class="w-dot wd-4" aria-hidden="true"></span>
+                <p class="label">Call Anita's</p>
+                <a class="phone" href="tel:+19153000019">(915) 300-0019</a>
+                <p class="sub">Check stock or hours before you head over.</p>
+              </div>
+              <div class="form-card">
+                <h3>Send a note</h3>
+                <p class="hint">Looking for something specific? Write to us and we will check the shelves.</p>
+                <form id="quote-form">
+                  <div class="field">
+                    <label for="f-name">Your name</label>
+                    <input id="f-name" type="text" autocomplete="name" placeholder="Your name">
+                  </div>
+                  <div class="field">
+                    <label for="f-phone">Your phone</label>
+                    <input id="f-phone" type="tel" autocomplete="tel" placeholder="(915) 555-0100">
+                  </div>
+                  <div class="field">
+                    <label for="f-msg">Message</label>
+                    <textarea id="f-msg" rows="4" placeholder="Hola, do you have ruda in stock?"></textarea>
+                  </div>
+                  <button class="send-btn" type="submit"><i class="fa-solid fa-paper-plane"></i> Send note</button>
+                </form>
+                <p id="form-feedback" role="status"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site">
+    <div class="wrap">
+      <div class="foot-grid">
+        <div>
+          <div class="foot-brand">Anita's Botanica</div>
+          <p>Clean, helpful, friendly. A small botanica on Alameda Ave in Socorro.</p>
+        </div>
+        <div class="foot-col">
+          <h4>Visit</h4>
+          <p>9895 Alameda Ave Ste 113<br>Socorro, TX 79927</p>
+          <p style="font-size:.9rem;">Call: <a href="tel:+19153000019">(915) 300-0019</a></p>
+        </div>
+        <div class="foot-col">
+          <h4>Hours</h4>
+          <p>Mon - Sat 10 AM - 4 PM<br>Sun closed</p>
+        </div>
+      </div>
+      <div class="foot-bottom">
+        <p class="copyright">© Anita's Botanica · Socorro, TX</p>
+      </div>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+var BUSINESS = "Anita's Botanica";
+var TITLES = { home: "Botanica on Alameda Ave", botanica: "La Botanica", reviews: "Reviews", visit: "Visit Us" };
+function getPageFromHash(){
+  var h = (location.hash || "").replace(/^#\/?/, "");
+  return TITLES[h] ? h : "home";
+}
+function navigateTo(id, push){
+  document.querySelectorAll(".page").forEach(function(p){
+    p.classList.toggle("active", p.id === "page-" + id);
+  });
+  if (push) history.pushState({ page: id }, "", "#/" + id);
+  document.title = TITLES[id] + " | " + BUSINESS;
+  window.scrollTo({ top: 0, behavior: "instant" });
+  var mb = document.getElementById("menu-btn");
+  var nl = document.querySelector(".nav-links");
+  if (mb && nl) { mb.classList.remove("open"); nl.classList.remove("open"); }
+}
+document.addEventListener("click", function(e){
+  var t = e.target.closest("[data-page]");
+  if (t) { e.preventDefault(); navigateTo(t.getAttribute("data-page"), true); }
+});
+window.addEventListener("popstate", function(){ navigateTo(getPageFromHash(), false); });
+navigateTo(getPageFromHash(), false);
+
+var mb = document.getElementById("menu-btn");
+var nl = document.querySelector(".nav-links");
+mb.addEventListener("click", function(){
+  mb.classList.toggle("open");
+  nl.classList.toggle("open");
+  mb.setAttribute("aria-expanded", mb.classList.contains("open") ? "true" : "false");
+});
+
+var CITY_TZ = "America/Denver";
+var HOURS = { 0: null, 1: [10, 16], 2: [10, 16], 3: [10, 16], 4: [10, 16], 5: [10, 16], 6: [10, 16] };
+function cityNow(){
+  var parts = new Intl.DateTimeFormat("en-US", { timeZone: CITY_TZ,
+    weekday: "short", hour: "numeric", minute: "numeric", hour12: false })
+    .formatToParts(new Date());
+  var o = {}; parts.forEach(function(p){ o[p.type] = p.value; });
+  var days = { Sun:0, Mon:1, Tue:2, Wed:3, Thu:4, Fri:5, Sat:6 };
+  return { day: days[o.weekday], hour: (+o.hour) % 24, minute: +o.minute };
+}
+function fmtH(t){
+  var h = Math.floor(t), m = Math.round((t - h) * 60);
+  var ap = h >= 12 && h < 24 ? "PM" : "AM", hh = h % 12; if (hh === 0) hh = 12;
+  return hh + (m ? ":" + String(m).padStart(2, "0") : ":00") + " " + ap;
+}
+function openState(){
+  var n = cityNow(), t = n.hour + n.minute / 60, today = HOURS[n.day];
+  if (today) {
+    if (today[1] > 24 && t < today[1] - 24) return { open: true, label: "Open now" };
+    if (t >= today[0] && t < (today[1] > 24 ? 24 : today[1])) return { open: true, label: "Open now" };
+  }
+  var names = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  for (var i = 0; i < 7; i++) {
+    var d = (n.day + i) % 7, h = HOURS[d];
+    if (!h) continue;
+    if (i === 0 && t < h[0]) return { open: false, label: "Opens " + fmtH(h[0]) + " today" };
+    if (i > 0) return { open: false, label: "Opens " + names[d] + (h[0] ? " at " + fmtH(h[0]) : "") };
+  }
+  return { open: false, label: "Closed" };
+}
+function renderChips(){
+  var st = openState();
+  document.querySelectorAll(".status-chip").forEach(function(c){
+    c.classList.remove("open", "closed");
+    c.classList.add(st.open ? "open" : "closed");
+    c.innerHTML = '<span class="dot"></span>' + st.label;
+  });
+}
+(function highlightToday(){
+  var d = cityNow().day;
+  document.querySelectorAll("[data-day]").forEach(function(el){
+    if (+el.getAttribute("data-day") === d) el.classList.add("today");
+  });
+})();
+renderChips();
+
+var PHONE = "+19153000019";
+var PRETTY = "(915) 300-0019";
+var form = document.getElementById("quote-form");
+var feedback = document.getElementById("form-feedback");
+if (form) {
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    var name = document.getElementById("f-name").value.trim();
+    var fphone = document.getElementById("f-phone").value.trim();
+    var msg = document.getElementById("f-msg").value.trim();
+    if (!name || !msg) { feedback.textContent = "Please add your name and a short message."; return; }
+    var text = "Hi " + BUSINESS + ", this is " + name + (fphone ? " (" + fphone + ")" : "") + ". " + msg;
+    if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
+      location.href = "sms:" + PHONE + "?&body=" + encodeURIComponent(text);
+    } else {
+      navigator.clipboard.writeText(text).then(function(){
+        feedback.textContent = "Copied. Now paste it in a text to " + PRETTY;
+      });
+    }
+  });
+}
+</script>
+</body>
+</html>

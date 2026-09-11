@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Downtown Nashville Wine and Spirits | Music City Wine &amp; Spirits</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Text&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+/* Music City Stage: whiskey amber, stage black, cream */
+:root{
+  --amber:#B26A2F;
+  --amber-deep:#8F5222;
+  --amber-lift:#D08A4A;
+  --black:#16130F;
+  --black2:#211C15;
+  --cream:#F5EBDC;
+  --cream-dim:#D8C9B2;
+  --muted-c:#B4A48C;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{font-family:'Manrope',sans-serif;background:var(--black);color:var(--cream);line-height:1.6;}
+h1,h2,h3,.display{font-family:'DM Serif Text',serif;font-weight:400;line-height:1.08;}
+a{color:inherit;}
+.site-shell{min-height:100vh;display:flex;flex-direction:column;}
+main{flex:1 0 auto;}
+footer{flex-shrink:0;}
+.page{display:none;}
+.page.active{display:block;}
+.wrap{max-width:1100px;margin:0 auto;padding:0 22px;}
+
+/* Header */
+.topbar{background:var(--black);border-bottom:1px solid rgba(178,106,47,.45);position:relative;z-index:50;}
+.topbar .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;padding-top:14px;padding-bottom:14px;}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;}
+.brand-mark{width:40px;height:44px;flex-shrink:0;}
+.brand-name{font-family:'DM Serif Text',serif;font-size:21px;color:var(--cream);line-height:1.1;}
+.brand-name small{display:block;font-family:'Manrope',sans-serif;font-size:10.5px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:var(--amber-lift);}
+#menu-btn{display:none;background:none;border:1.5px solid var(--amber);color:var(--cream);border-radius:8px;font-size:18px;padding:7px 12px;cursor:pointer;}
+#menu-btn.open{background:var(--amber);color:var(--black);}
+.nav-links{display:flex;align-items:center;gap:6px;}
+.nav-links a{text-decoration:none;font-weight:700;font-size:14.5px;letter-spacing:1.2px;text-transform:uppercase;padding:9px 14px;border-radius:7px;color:var(--cream);}
+.nav-links a:hover{color:var(--amber-lift);}
+.nav-links a[data-page="visit"]{background:var(--amber);color:var(--black);}
+.nav-links a[data-page="visit"]:hover{background:var(--amber-lift);}
+
+/* Hero */
+.hero{background:
+  radial-gradient(ellipse at 80% 10%, rgba(178,106,47,.22), transparent 50%),
+  linear-gradient(180deg, var(--black) 0%, var(--black2) 100%);overflow:hidden;}
+.hero .wrap{display:grid;grid-template-columns:1.15fr .85fr;gap:40px;align-items:center;padding-top:62px;padding-bottom:64px;}
+.kicker{
+  display:inline-block;font-size:12px;font-weight:800;letter-spacing:3px;text-transform:uppercase;
+  color:var(--amber-lift);border:1px solid rgba(178,106,47,.6);border-radius:999px;padding:6px 15px;margin-bottom:18px;
+}
+.hero h1{font-size:52px;margin:0 0 16px;color:var(--cream);}
+.hero h1 em{font-style:normal;color:var(--amber-lift);}
+.hero p.lead{font-size:17.5px;max-width:500px;margin:0 0 24px;color:var(--cream-dim);}
+.hero-ctas{display:flex;gap:12px;flex-wrap:wrap;align-items:center;}
+.btn{display:inline-block;text-decoration:none;font-weight:800;font-size:15px;padding:12px 25px;border-radius:9px;border:none;cursor:pointer;letter-spacing:.3px;}
+.btn-amber{background:var(--amber);color:var(--black);}
+.btn-amber:hover{background:var(--amber-lift);}
+.btn-ghost{border:1.5px solid rgba(245,235,220,.45);color:var(--cream);background:transparent;}
+.btn-ghost:hover{border-color:var(--amber-lift);color:var(--amber-lift);}
+.status-chip{
+  display:inline-flex;align-items:center;gap:9px;background:rgba(245,235,220,.07);
+  border:1px solid rgba(245,235,220,.25);border-radius:999px;padding:8px 17px;
+  font-weight:600;font-size:14.5px;color:var(--cream);
+}
+.status-chip .dot{width:10px;height:10px;border-radius:50%;background:#9aa3a8;}
+.status-chip.open .dot{background:#5FD37A;box-shadow:0 0 0 4px rgba(95,211,122,.22);}
+.rating-line{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:18px;font-size:15px;color:var(--cream-dim);}
+.rating-line strong{color:var(--cream);font-size:16.5px;}
+.stars i{color:var(--amber-lift);font-size:15px;letter-spacing:2px;}
+.pick-stack{display:flex;justify-content:center;}
+.pick-big{filter:drop-shadow(0 14px 30px rgba(0,0,0,.5));}
+
+/* Marquee strip */
+.marquee{background:var(--amber);color:var(--black);}
+.marquee .wrap{display:flex;align-items:center;justify-content:center;gap:26px;padding-top:15px;padding-bottom:15px;flex-wrap:wrap;text-align:center;}
+.marquee span{font-weight:800;font-size:13px;letter-spacing:3px;text-transform:uppercase;}
+.marquee i{font-size:12px;}
+
+/* Sections */
+.sec{padding:56px 0;}
+.sec-stage{background:var(--black2);}
+.sec-head{max-width:640px;margin:0 auto 30px;text-align:center;}
+.sec-head h2{font-size:38px;margin:0 0 10px;color:var(--cream);}
+.sec-head h2 em{font-style:normal;color:var(--amber-lift);}
+.sec-head p{margin:0;color:var(--muted-c);font-size:16.5px;}
+
+/* Shelves grid */
+.shelves{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:940px;margin:0 auto;}
+.shelf{
+  background:rgba(245,235,220,.05);border:1px solid rgba(178,106,47,.45);border-radius:13px;padding:22px 20px;
+}
+.shelf i{color:var(--amber-lift);font-size:21px;}
+.shelf b{display:block;margin-top:10px;font-family:'DM Serif Text',serif;font-weight:400;font-size:20px;color:var(--cream);}
+.shelf span{display:block;font-size:13.5px;color:var(--muted-c);margin-top:5px;}
+
+/* 21+ */
+.age-line{
+  display:flex;gap:12px;align-items:center;justify-content:center;max-width:720px;margin:26px auto 0;
+  background:rgba(178,106,47,.14);border:1px solid var(--amber);border-radius:11px;padding:13px 20px;
+  font-weight:700;font-size:15px;color:var(--cream);text-align:center;
+}
+.age-line i{color:var(--amber-lift);font-size:18px;}
+
+/* Reviews */
+.rev-hero{text-align:center;padding:56px 0 48px;background:linear-gradient(180deg,var(--black),var(--black2));}
+.rev-hero h2{font-size:42px;margin:0 0 8px;color:var(--cream);}
+.rev-hero p{margin:0;color:var(--muted-c);font-size:16.5px;}
+.rev-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:920px;margin:0 auto;}
+.rev-card{
+  background:var(--black);border:1px solid rgba(178,106,47,.5);border-radius:15px;padding:28px 28px 24px;
+  position:relative;box-shadow:0 10px 26px rgba(0,0,0,.35);
+}
+.rev-card::before{
+  content:"\201C";font-family:Georgia,serif;font-size:70px;line-height:1;color:var(--amber-lift);
+  position:absolute;top:10px;right:22px;opacity:.5;
+}
+.rev-card blockquote{margin:0 0 16px;font-size:17px;line-height:1.6;color:var(--cream);}
+.rev-attr{display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:700;color:var(--muted-c);}
+.stars i{font-size:13px;}
+.rev-summary{display:flex;justify-content:center;margin:28px 0 0;}
+.rev-pill{
+  display:inline-flex;align-items:center;gap:12px;background:var(--cream);color:var(--black);
+  border-radius:999px;padding:14px 26px;font-weight:800;font-size:16px;
+}
+.rev-pill i{color:var(--amber-deep);font-size:19px;}
+.link-cards{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:22px;}
+.link-card{
+  display:inline-flex;align-items:center;gap:11px;text-decoration:none;background:var(--amber);color:var(--black);
+  border-radius:9px;padding:16px 26px;font-weight:800;
+}
+.link-card i{font-size:18px;}
+.link-card:hover{background:var(--amber-lift);}
+
+/* Visit */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start;margin-bottom:36px;}
+.visit-block{background:rgba(245,235,220,.05);border:1px solid rgba(178,106,47,.4);border-radius:14px;padding:26px 28px;}
+.visit-block h3{font-size:24px;margin:0 0 14px;color:var(--cream);}
+.visit-line{display:flex;gap:12px;align-items:flex-start;margin:0 0 13px;font-size:15.5px;color:var(--cream-dim);}
+.visit-line i{color:var(--amber-lift);margin-top:4px;width:18px;text-align:center;}
+
+/* Set list hours */
+.setlist{
+  max-width:430px;margin:0 auto;background:var(--cream);color:var(--black);border-radius:10px;
+  padding:26px 28px 22px;position:relative;box-shadow:0 14px 30px rgba(0,0,0,.4);
+  transform:rotate(-1deg);
+}
+.setlist::before{
+  content:"";position:absolute;top:-12px;left:50%;transform:translateX(-50%) rotate(2deg);
+  width:110px;height:24px;background:rgba(208,138,74,.75);border-radius:3px;
+}
+.setlist h4{
+  margin:0 0 14px;text-align:center;font-family:'DM Serif Text',serif;font-weight:400;font-size:24px;
+  letter-spacing:1px;border-bottom:2px solid var(--black);padding-bottom:10px;
+}
+.sl-row{display:flex;justify-content:space-between;align-items:baseline;padding:7px 2px;font-size:15.5px;border-bottom:1px dotted #B4A48C;}
+.sl-row:last-of-type{border-bottom:none;}
+.sl-row span{font-weight:600;}
+.sl-row b{font-weight:800;}
+.sl-row.today{background:rgba(178,106,47,.18);}
+.sl-row.today b{color:var(--amber-deep);}
+.sl-today{display:none;background:var(--black);color:var(--cream);font-size:10px;font-weight:800;letter-spacing:1.5px;border-radius:4px;padding:2px 8px;margin-left:8px;text-transform:uppercase;}
+.sl-row.today .sl-today{display:inline-block;}
+.sl-note{font-size:12.5px;color:#6E5B44;margin-top:12px;text-align:center;font-weight:600;}
+
+/* Backstage pass contact card */
+.pass-card{max-width:380px;margin:0 auto;text-align:center;}
+.pass-hole{
+  width:20px;height:20px;border-radius:50%;background:var(--black);border:2px solid var(--amber);
+  margin:0 auto -2px;position:relative;z-index:2;
+}
+.pass-body{
+  background:linear-gradient(170deg, var(--cream), #EAD9BE);color:var(--black);
+  border-radius:14px;padding:26px 26px 22px;box-shadow:0 16px 34px rgba(0,0,0,.45);
+  border-top:8px solid var(--amber);
+}
+.pass-band{
+  display:inline-block;background:var(--black);color:var(--cream);font-size:11px;font-weight:800;
+  letter-spacing:3.5px;text-transform:uppercase;border-radius:99px;padding:6px 18px;margin-bottom:14px;
+}
+.pass-name{font-family:'DM Serif Text',serif;font-size:22px;line-height:1.15;}
+.pass-sub{font-size:11.5px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:var(--amber-deep);margin:8px 0 16px;}
+.pass-phone{
+  display:block;text-decoration:none;font-size:24px;font-weight:800;letter-spacing:.5px;
+  background:var(--black);color:var(--cream);border-radius:10px;padding:13px 14px;
+}
+.pass-phone:hover{color:var(--amber-lift);}
+.pass-addr{font-size:12px;font-weight:600;color:#6E5B44;margin-top:13px;}
+
+/* Form */
+.form-note{font-size:13.5px;color:var(--muted-c);margin:10px 0 0;}
+.f-field{margin-bottom:13px;}
+.f-field label{display:block;font-weight:800;font-size:12.5px;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px;color:var(--amber-lift);}
+.f-field input,.f-field textarea{
+  width:100%;border:1.5px solid rgba(178,106,47,.5);border-radius:9px;padding:11px 14px;
+  font-family:inherit;font-size:15.5px;background:rgba(245,235,220,.06);color:var(--cream);
+}
+.f-field input:focus,.f-field textarea:focus{outline:none;border-color:var(--amber-lift);}
+.f-field ::placeholder{color:#8A7A62;}
+#form-feedback{font-weight:700;font-size:14.5px;color:var(--amber-lift);margin-top:10px;min-height:20px;}
+
+/* Footer */
+footer{background:var(--black);border-top:1px solid rgba(178,106,47,.4);color:var(--muted-c);}
+.foot-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:28px;padding:44px 0 30px;}
+.foot-name{font-family:'DM Serif Text',serif;font-size:22px;color:var(--cream);margin-bottom:8px;}
+.foot-line{margin:0 0 8px;font-size:14.5px;}
+.foot-line a{color:var(--cream);text-decoration:none;}
+.foot-line a:hover{color:var(--amber-lift);}
+.foot-h{font-size:11px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:var(--amber-lift);margin:0 0 10px;}
+.copyright{border-top:1px solid rgba(245,235,220,.12);margin:0;padding:18px 0 22px;text-align:center;font-size:13.5px;color:#8A7A62;}
+
+/* Responsive */
+@media (max-width:900px){
+  .hero .wrap{grid-template-columns:1fr;padding-top:46px;padding-bottom:52px;}
+  .shelves{grid-template-columns:1fr 1fr;}
+  .rev-grid{grid-template-columns:1fr;}
+  .visit-grid{grid-template-columns:1fr;}
+  .foot-grid{grid-template-columns:1fr 1fr;}
+  .hero h1{font-size:40px;}
+  .pick-big{width:190px;height:210px;}
+}
+@media (max-width:768px){
+  #menu-btn{display:block;}
+  .nav-links{
+    display:none;position:absolute;left:0;right:0;top:100%;z-index:40;
+    background:var(--black2);flex-direction:column;align-items:stretch;gap:0;
+    border-top:1px solid rgba(178,106,47,.5);box-shadow:0 14px 24px rgba(0,0,0,.5);
+  }
+  .nav-links.open{display:flex;}
+  .nav-links a{padding:15px 22px;border-radius:0;border-bottom:1px solid rgba(245,235,220,.08);}
+  .topbar .wrap{position:relative;flex-wrap:wrap;}
+  .sec{padding:42px 0;}
+  .sec-head h2{font-size:30px;}
+  .rev-hero h2{font-size:33px;}
+  .setlist{transform:none;}
+}
+@media (max-width:430px){
+  .shelves{grid-template-columns:1fr;}
+  .foot-grid{grid-template-columns:1fr;}
+  .hero h1{font-size:34px;}
+  .hero-ctas .btn{width:100%;text-align:center;}
+  .rev-card{padding:22px 20px;}
+}
+</style>
+</head>
+<body>
+<div class="site-shell">
+  <header class="topbar">
+    <div class="wrap">
+      <a class="brand" href="#/home" data-page="home">
+        <svg class="brand-mark" viewBox="0 0 40 44" aria-hidden="true">
+          <path d="M4 8 H36 Q40 8 38.6 13 L23.5 38 Q20 43.5 16.5 38 L1.4 13 Q0 8 4 8 Z" fill="#B26A2F"/>
+          <circle cx="20" cy="14" r="4.5" fill="#16130F"/>
+        </svg>
+        <span class="brand-name">Music City Wine &amp; Spirits<small>Downtown Nashville · 2nd Ave N</small></span>
+      </a>
+      <button id="menu-btn" aria-label="Toggle menu"><i class="fa-solid fa-bars"></i></button>
+      <nav class="nav-links">
+        <a href="#/store" data-page="store">The Store</a>
+        <a href="#/reviews" data-page="reviews">Reviews</a>
+        <a href="#/visit" data-page="visit">Visit</a>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <!-- HOME -->
+    <section class="page active" id="page-home">
+      <div class="hero">
+        <div class="wrap">
+          <div>
+            <span class="kicker">Wine · Liquor · Cigars · Downtown</span>
+            <h1>The bottle shop with <em>honky-tonk energy</em></h1>
+            <p class="lead">Music City Wine and Spirits sits on 2nd Ave N in downtown Nashville, stocked for whatever the night calls for: beer, wine, spirits, cigars, mixers and the snacks to go with them. Well organized, clean, and the clerks actually help you pick.</p>
+            <div class="hero-ctas">
+              <a class="btn btn-amber" href="#/store" data-page="store">Down the aisles</a>
+              <a class="btn btn-ghost" href="#/visit" data-page="visit">Hours and address</a>
+              <span class="status-chip"><span class="dot"></span><span class="status-text">Checking hours...</span></span>
+            </div>
+            <div class="rating-line">
+              <span class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></span>
+              <strong>5.0 stars</strong><span>on Google</span>
+            </div>
+          </div>
+          <div class="pick-stack">
+            <svg class="pick-big" width="240" height="264" viewBox="0 0 240 264" aria-hidden="true">
+              <path d="M24 22 H216 Q240 22 232 42 L138 238 Q120 268 102 238 L8 42 Q0 22 24 22 Z" fill="#B26A2F"/>
+              <path d="M44 40 H196 Q212 40 206 54 L134 206 Q120 228 106 206 L34 54 Q28 40 44 40 Z" fill="#16130F"/>
+              <text x="120" y="120" text-anchor="middle" font-family="Georgia, serif" font-size="58" fill="#F5EBDC">MC</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="marquee">
+        <div class="wrap">
+          <span><i class="fa-solid fa-star" style="margin-right:8px;"></i>Beer</span>
+          <span>Wine</span>
+          <span>Spirits</span>
+          <span>Cigars</span>
+          <span>Mixers</span>
+          <span>Snacks<i style="margin-left:8px;" class="fa-solid fa-star"></i></span>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="wrap">
+          <div class="sec-head">
+            <h2>What customers <em>keep saying</em></h2>
+            <p>Great prices, a wide selection, and a store that stays clean and organized.</p>
+          </div>
+          <div class="rev-grid">
+            <div class="rev-card">
+              <blockquote>Tons of liquor in the store that they offer. Great prices, very well organized and clean.</blockquote>
+              <div class="rev-attr">
+                <span class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></span>
+                <span>Google review</span>
+              </div>
+            </div>
+            <div class="rev-card">
+              <blockquote>I really liked this liquor store- the clerks were attentive and friendly. They have a wide selection.</blockquote>
+              <div class="rev-attr">
+                <span class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></span>
+                <span>Google review</span>
+              </div>
+            </div>
+          </div>
+          <div class="link-cards">
+            <a class="link-card" href="#/reviews" data-page="reviews">Read all the reviews</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec sec-stage">
+        <div class="wrap">
+          <div class="sec-head">
+            <h2>Right by the <em>Broadway lights</em></h2>
+            <p>You're downtown, the show's going, and the cooler needs stocking. We're at 201 2nd Ave N with the shelves to handle it.</p>
+          </div>
+          <div class="shelves">
+            <div class="shelf"><i class="fa-solid fa-beer-mug-empty"></i><b>Beer</b><span>Cold six-packs and cases</span></div>
+            <div class="shelf"><i class="fa-solid fa-wine-glass"></i><b>Wine</b><span>Reds, whites and bubbles</span></div>
+            <div class="shelf"><i class="fa-solid fa-bottle-droplet"></i><b>Spirits</b><span>Whiskey, vodka, tequila and more</span></div>
+            <div class="shelf"><i class="fa-solid fa-joint"></i><b>Cigars</b><span>A real cigar selection in store</span></div>
+            <div class="shelf"><i class="fa-solid fa-champagne-glasses"></i><b>Mixers and snacks</b><span>Sodas, ice, chasers, chips</span></div>
+            <div class="shelf"><i class="fa-solid fa-leaf"></i><b>THC drinks and NA beer</b><span>Non-alcoholic options too</span></div>
+          </div>
+          <div class="age-line">
+            <i class="fa-solid fa-id-card"></i>
+            <span>21 and over, valid ID required. We card every customer.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STORE -->
+    <section class="page" id="page-store">
+      <div class="rev-hero">
+        <div class="wrap">
+          <h2>The Store</h2>
+          <p>Beer, wine, spirits and cigars downtown. Organized shelves, honest prices, quick in and out.</p>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="wrap">
+          <div class="shelves">
+            <div class="shelf"><i class="fa-solid fa-beer-mug-empty"></i><b>Beer</b><span>Domestics, imports and cold cases</span></div>
+            <div class="shelf"><i class="fa-solid fa-wine-glass"></i><b>Wine</b><span>Weeknight bottles and gift-worthy ones</span></div>
+            <div class="shelf"><i class="fa-solid fa-bottle-droplet"></i><b>Spirits</b><span>A deep liquor wall, tons to choose from</span></div>
+            <div class="shelf"><i class="fa-solid fa-joint"></i><b>Cigars</b><span>Cigars sold in store</span></div>
+            <div class="shelf"><i class="fa-solid fa-champagne-glasses"></i><b>Mixers and snacks</b><span>Everything for the tonight pile</span></div>
+            <div class="shelf"><i class="fa-solid fa-leaf"></i><b>THC drinks and NA beer</b><span>For the ones not drinking</span></div>
+          </div>
+          <div class="sec-head" style="margin-top:36px;">
+            <h2>Why folks <em>come back</em></h2>
+            <p>Reviewers call out three things: great prices compared to other liquor stores, a wide selection, and clerks who are attentive and friendly.</p>
+            <div style="margin-top:18px;"><a class="btn btn-amber" href="#/visit" data-page="visit">Come by today</a></div>
+          </div>
+          <div class="age-line">
+            <i class="fa-solid fa-id-card"></i>
+            <span>21 and over, valid ID required for all beer, wine, spirits and cigar sales.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- REVIEWS -->
+    <section class="page" id="page-reviews">
+      <div class="rev-hero">
+        <div class="wrap">
+          <h2>Reviews</h2>
+          <p>Every customer quote below is shown in full, exactly as written.</p>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="wrap">
+          <div class="rev-grid">
+            <div class="rev-card">
+              <blockquote>Tons of liquor in the store that they offer. Great prices, very well organized and clean.</blockquote>
+              <div class="rev-attr">
+                <span class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></span>
+                <span>Google review</span>
+              </div>
+            </div>
+            <div class="rev-card">
+              <blockquote>I really liked this liquor store- the clerks were attentive and friendly. They have a wide selection.</blockquote>
+              <div class="rev-attr">
+                <span class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></span>
+                <span>Google review</span>
+              </div>
+            </div>
+          </div>
+          <div class="rev-summary">
+            <span class="rev-pill"><i class="fa-solid fa-star"></i> 5.0 stars on Google</span>
+          </div>
+          <div class="link-cards">
+            <a class="link-card" href="https://www.google.com/maps/search/?api=1&query=Music%20City%20Wine%20%26%20Spirits%2C%20201%202nd%20Ave%20N%2C%20Nashville%2C%20TN%2037201" target="_blank" rel="noopener">
+              <i class="fa-brands fa-google"></i> See every review on Google
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VISIT -->
+    <section class="page" id="page-visit">
+      <div class="rev-hero">
+        <div class="wrap">
+          <h2>Visit</h2>
+          <p>201 2nd Ave N, Nashville, TN 37201. Downtown, steps from the Broadway strip.</p>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="wrap">
+          <div class="visit-grid">
+            <div class="visit-block">
+              <h3><i class="fa-solid fa-location-dot" style="color:var(--amber-lift);margin-right:8px;"></i>Find us</h3>
+              <p class="visit-line"><i class="fa-solid fa-map-pin"></i><span>201 2nd Ave N, Nashville, TN 37201</span></p>
+              <p class="visit-line"><i class="fa-solid fa-guitar"></i><span>Downtown Nashville, a short walk from the honky-tonks on Broadway</span></p>
+              <p class="visit-line"><i class="fa-solid fa-phone"></i><span>Call the counter at (615) 891-4281</span></p>
+              <p class="visit-line"><i class="fa-solid fa-id-card"></i><span>21 and over, valid ID required</span></p>
+            </div>
+            <div class="visit-block">
+              <h3><i class="fa-solid fa-comment-dots" style="color:var(--amber-lift);margin-right:8px;"></i>Ask about a bottle</h3>
+              <p class="visit-line"><i class="fa-solid fa-whiskey-glass"></i><span>Looking for something specific? Write it here and it becomes a text to the store.</span></p>
+              <form id="contact-form" novalidate>
+                <div class="f-field">
+                  <label for="f-name">Your name</label>
+                  <input id="f-name" type="text" autocomplete="name" placeholder="First name is fine">
+                </div>
+                <div class="f-field">
+                  <label for="f-phone">Your phone</label>
+                  <input id="f-phone" type="tel" autocomplete="tel" placeholder="So we can text you back">
+                </div>
+                <div class="f-field">
+                  <label for="f-msg">Message</label>
+                  <textarea id="f-msg" rows="4" placeholder="What are you after?"></textarea>
+                </div>
+                <button class="btn btn-amber" type="submit">Send to the store</button>
+                <p id="form-feedback" role="status"></p>
+              </form>
+              <p class="form-note">On a phone this opens your text app with the message ready. On a computer it copies it for you to paste.</p>
+            </div>
+          </div>
+
+          <div class="setlist">
+            <h4>This Week's Set List</h4>
+            <div class="sl-row" data-day="0"><span>Sunday</span><b>12 PM - 8 PM<span class="sl-today">Today</span></b></div>
+            <div class="sl-row" data-day="1"><span>Monday</span><b>10 AM - 9 PM<span class="sl-today">Today</span></b></div>
+            <div class="sl-row" data-day="2"><span>Tuesday</span><b>10 AM - 9 PM<span class="sl-today">Today</span></b></div>
+            <div class="sl-row" data-day="3"><span>Wednesday</span><b>10 AM - 9 PM<span class="sl-today">Today</span></b></div>
+            <div class="sl-row" data-day="4"><span>Thursday</span><b>10 AM - 9 PM<span class="sl-today">Today</span></b></div>
+            <div class="sl-row" data-day="5"><span>Friday</span><b>10 AM - 9 PM<span class="sl-today">Today</span></b></div>
+            <div class="sl-row" data-day="6"><span>Saturday</span><b>10 AM - 9 PM<span class="sl-today">Today</span></b></div>
+            <div class="sl-note"><i class="fa-solid fa-phone-volume"></i> Hours are estimated, call to confirm, especially around holidays</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <div class="foot-grid">
+        <div>
+          <div class="foot-name">Music City Wine &amp; Spirits</div>
+          <p class="foot-line">201 2nd Ave N, Nashville, TN 37201</p>
+          <p class="foot-line"><a href="tel:+16158914281">(615) 891-4281</a></p>
+        </div>
+        <div>
+          <p class="foot-h">Hours</p>
+          <p class="foot-line">Mon - Sat 10 AM - 9 PM</p>
+          <p class="foot-line">Sun 12 PM - 8 PM (estimated)</p>
+        </div>
+        <div>
+          <p class="foot-h">The shelves</p>
+          <p class="foot-line">Beer · wine · spirits · cigars</p>
+          <p class="foot-line">Mixers, snacks, THC drinks, NA beer</p>
+        </div>
+      </div>
+      <p class="copyright">© Music City Wine & Spirits · Nashville, TN</p>
+    </div>
+  </footer>
+</div>
+
+<script>
+var BUSINESS = "Music City Wine & Spirits";
+var TITLES = { home: "Downtown Nashville Wine and Spirits", store: "The Store", reviews: "Reviews", visit: "Visit" };
+var CITY_TZ = "America/Chicago";
+var HOURS = {0:[12,20],1:[10,21],2:[10,21],3:[10,21],4:[10,21],5:[10,21],6:[10,21]};
+var PHONE = "+16158914281";
+var PRETTY = "(615) 891-4281";
+
+function getPageFromHash(){
+  var h = (location.hash || "").replace(/^#\/?/, "");
+  return TITLES[h] ? h : "home";
+}
+function navigateTo(id, push){
+  document.querySelectorAll(".page").forEach(function(p){
+    p.classList.toggle("active", p.id === "page-" + id);
+  });
+  if (push) history.pushState({ page: id }, "", "#/" + id);
+  document.title = TITLES[id] + " | " + BUSINESS;
+  window.scrollTo({ top: 0, behavior: "instant" });
+  var mb = document.getElementById("menu-btn");
+  var nl = document.querySelector(".nav-links");
+  if (mb && nl) { mb.classList.remove("open"); nl.classList.remove("open"); }
+}
+document.addEventListener("click", function(e){
+  var t = e.target.closest("[data-page]");
+  if (t) { e.preventDefault(); navigateTo(t.getAttribute("data-page"), true); }
+});
+window.addEventListener("popstate", function(){ navigateTo(getPageFromHash(), false); });
+navigateTo(getPageFromHash(), false);
+
+function cityNow(){
+  var parts = new Intl.DateTimeFormat("en-US", { timeZone: CITY_TZ,
+    weekday: "short", hour: "numeric", minute: "numeric", hour12: false })
+    .formatToParts(new Date());
+  var o = {}; parts.forEach(function(p){ o[p.type] = p.value; });
+  var days = { Sun:0, Mon:1, Tue:2, Wed:3, Thu:4, Fri:5, Sat:6 };
+  return { day: days[o.weekday], hour: (+o.hour) % 24, minute: +o.minute };
+}
+function fmtH(t){
+  var h = Math.floor(t), m = Math.round((t - h) * 60);
+  var ap = h >= 12 && h < 24 ? "PM" : "AM", hh = h % 12; if (hh === 0) hh = 12;
+  return hh + (m ? ":" + String(m).padStart(2, "0") : ":00") + " " + ap;
+}
+function openState(){
+  var n = cityNow(), t = n.hour + n.minute / 60, today = HOURS[n.day];
+  if (today) {
+    if (today[1] > 24 && t < today[1] - 24) return { open: true, label: "Open now" };
+    if (t >= today[0] && t < (today[1] > 24 ? 24 : today[1])) return { open: true, label: "Open now" };
+  }
+  var names = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  for (var i = 0; i < 7; i++) {
+    var d = (n.day + i) % 7, h = HOURS[d];
+    if (!h) continue;
+    if (i === 0 && t < h[0]) return { open: false, label: "Opens " + fmtH(h[0]) + " today" };
+    if (i > 0) return { open: false, label: "Opens " + names[d] + (h[0] ? " at " + fmtH(h[0]) : "") };
+  }
+  return { open: false, label: "Closed" };
+}
+function renderStatus(){
+  var s = openState();
+  document.querySelectorAll(".status-chip").forEach(function(c){
+    c.classList.toggle("open", s.open);
+    c.classList.toggle("closed", !s.open);
+    var tx = c.querySelector(".status-text");
+    if (tx) tx.textContent = s.label;
+  });
+}
+function highlightToday(){
+  var d = cityNow().day;
+  document.querySelectorAll("[data-day]").forEach(function(r){
+    r.classList.toggle("today", Number(r.getAttribute("data-day")) === d);
+  });
+}
+renderStatus();
+highlightToday();
+
+var menuBtn = document.getElementById("menu-btn");
+var navLinks = document.querySelector(".nav-links");
+if (menuBtn && navLinks) {
+  menuBtn.addEventListener("click", function(){
+    menuBtn.classList.toggle("open");
+    navLinks.classList.toggle("open");
+  });
+}
+
+var form = document.getElementById("contact-form");
+if (form) {
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    var fb = document.getElementById("form-feedback");
+    var name = document.getElementById("f-name").value.trim();
+    var phone = document.getElementById("f-phone").value.trim();
+    var msg = document.getElementById("f-msg").value.trim();
+    if (!name || !msg) {
+      fb.textContent = "Please add your name and a short message.";
+      return;
+    }
+    var text = "Hi " + BUSINESS + ", this is " + name + (phone ? " (" + phone + ")" : "") + ". " + msg;
+    var body = encodeURIComponent(text);
+    if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
+      location.href = "sms:" + PHONE + "?&body=" + body;
+    } else {
+      navigator.clipboard.writeText(text).then(function(){
+        fb.textContent = "Copied. Now paste it in a text to " + PRETTY + ".";
+      });
+    }
+  });
+}
+</script>
+</body>
+</html>

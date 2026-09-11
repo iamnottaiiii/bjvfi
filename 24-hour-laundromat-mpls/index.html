@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Wash | 24 Hour Laundromat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira:wght@400;600;700&family=Asap:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{
+  --steel:#3A5A7A; --steel-dark:#274060; --mist:#EEF2F5; --white:#FFFFFF;
+  --ink:#22303C; --line:#D5DDE4; --good:#3E9B5F; --bad:#8A8F94;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{margin:0; padding:0;}
+body{font-family:'Asap',sans-serif; background:var(--mist); color:var(--ink); line-height:1.6;}
+h1,h2,h3,.disp{font-family:'Saira',sans-serif; letter-spacing:.01em;}
+a{color:inherit;}
+.site-shell{min-height:100vh; display:flex; flex-direction:column; background:var(--mist);}
+header{background:var(--white); border-bottom:3px solid var(--steel); position:sticky; top:0; z-index:50;}
+.nav-wrap{max-width:1080px; margin:0 auto; padding:14px 20px; display:flex; align-items:center; justify-content:space-between; gap:12px;}
+.brand{display:flex; align-items:center; gap:10px; text-decoration:none;}
+.brand-ring{width:38px; height:38px; border-radius:50%; border:4px solid var(--steel); position:relative; flex:none;}
+.brand-ring::after{content:""; position:absolute; top:-8px; left:50%; width:4px; height:10px; background:var(--steel); transform:translateX(-50%); border-radius:2px;}
+.brand-name{font-family:'Saira',sans-serif; font-weight:700; font-size:1.05rem; color:var(--steel-dark); line-height:1.15;}
+.brand-name small{display:block; font-family:'Asap',sans-serif; font-weight:400; font-size:.7rem; color:var(--ink); letter-spacing:.06em; text-transform:uppercase;}
+nav{position:relative;}
+#menu-btn{display:none; background:none; border:2px solid var(--steel); border-radius:8px; width:42px; height:38px; font-size:1.05rem; color:var(--steel-dark); cursor:pointer;}
+.nav-links{display:flex; gap:6px; list-style:none;}
+.nav-links a{display:block; padding:8px 14px; border-radius:8px; text-decoration:none; font-weight:600; font-size:.92rem; color:var(--steel-dark);}
+.nav-links a:hover{background:var(--mist);}
+.nav-links a.active{background:var(--steel); color:var(--white);}
+main{flex:1 0 auto;}
+.page{display:none;}
+.page.active{display:block;}
+.wrap{max-width:1080px; margin:0 auto; padding:0 20px;}
+.status-chip{display:inline-flex; align-items:center; gap:8px; padding:7px 16px; border-radius:999px; font-weight:600; font-size:.9rem; background:var(--white); border:1px solid var(--line);}
+.status-chip .dot{width:10px; height:10px; border-radius:50%; background:var(--bad);}
+.status-chip.open .dot{background:var(--good);}
+.hero{padding:56px 0 44px; background:linear-gradient(180deg, var(--white) 0%, var(--mist) 100%);}
+.hero-grid{display:grid; grid-template-columns:1.25fr .75fr; gap:36px; align-items:center;}
+.kicker{font-size:.78rem; letter-spacing:.18em; text-transform:uppercase; color:var(--steel); font-weight:600; margin-bottom:10px;}
+.hero h1{font-size:2.6rem; line-height:1.12; color:var(--steel-dark); margin-bottom:14px;}
+.hero p.lede{font-size:1.05rem; max-width:34em;}
+.hero-badges{display:flex; flex-wrap:wrap; gap:10px; margin-top:18px;}
+.badge{display:inline-flex; align-items:center; gap:8px; background:var(--white); border:1px solid var(--line); border-radius:10px; padding:8px 14px; font-weight:600; font-size:.88rem;}
+.badge i{color:var(--steel);}
+.clock-ring{width:230px; height:230px; margin:0 auto; position:relative;}
+.clock-ring svg{width:100%; height:100%; display:block;}
+.clock-center{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;}
+.clock-center .h24{font-family:'Saira',sans-serif; font-weight:700; font-size:2.6rem; color:var(--steel-dark); line-height:1;}
+.clock-center .lbl{font-size:.72rem; letter-spacing:.16em; text-transform:uppercase; color:var(--steel);}
+.clock-wrap{text-align:center;}
+.clock-cap{font-size:.85rem; color:var(--ink); margin-top:8px;}
+section.block{padding:44px 0;}
+.block-head{margin-bottom:22px;}
+.block-head h2{font-size:1.7rem; color:var(--steel-dark);}
+.block-head .rule{width:64px; height:4px; background:var(--steel); border-radius:2px; margin-top:10px;}
+.cards3{display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
+.card{background:var(--white); border:1px solid var(--line); border-radius:14px; padding:22px;}
+.card i{font-size:1.4rem; color:var(--steel);}
+.card h3{margin:10px 0 6px; font-size:1.05rem; color:var(--steel-dark);}
+.card p{font-size:.95rem;}
+.honest-line{background:var(--white); border-left:4px solid var(--steel); border-radius:0 12px 12px 0; padding:16px 20px; font-size:.98rem;}
+.keycard{display:grid; grid-template-columns:.9fr 1.1fr; gap:28px; align-items:center;}
+.kc-card{background:linear-gradient(135deg, var(--steel-dark), var(--steel)); border-radius:16px; color:var(--white); padding:26px 24px; position:relative; box-shadow:0 10px 24px rgba(39,64,96,.25);}
+.kc-card::before{content:""; position:absolute; top:22px; left:0; width:52px; height:26px; background:var(--mist); opacity:.16; border-radius:0 999px 999px 0;}
+.kc-chip{width:44px; height:32px; border-radius:7px; background:repeating-linear-gradient(90deg, #C9A227 0 6px, #B08D57 6px 12px); margin-bottom:18px;}
+.kc-phone{font-family:'Saira',sans-serif; font-weight:700; font-size:1.5rem; letter-spacing:.03em; display:block; margin-bottom:6px;}
+.kc-phone a{color:var(--white); text-decoration:none;}
+.kc-note{font-size:.85rem; opacity:.85;}
+.kc-side h3{font-size:1.35rem; color:var(--steel-dark); margin-bottom:10px;}
+.form-card{background:var(--white); border:1px solid var(--line); border-radius:14px; padding:22px; margin-top:20px;}
+.form-card label{display:block; font-size:.82rem; font-weight:600; letter-spacing:.05em; text-transform:uppercase; margin:12px 0 5px; color:var(--steel-dark);}
+.form-card input,.form-card textarea{width:100%; border:1px solid var(--line); border-radius:9px; padding:10px 12px; font-family:'Asap',sans-serif; font-size:.95rem; background:var(--mist);}
+.form-card button{margin-top:14px; background:var(--steel-dark); color:var(--white); border:none; border-radius:9px; padding:12px 22px; font-family:'Saira',sans-serif; font-weight:600; font-size:.98rem; cursor:pointer;}
+.form-card button:hover{background:var(--steel);}
+.form-feedback{margin-top:10px; font-size:.9rem; color:var(--good); font-weight:600; min-height:1.2em;}
+.quotes{display:grid; gap:16px; margin-top:6px;}
+.quote-card{background:var(--white); border:1px solid var(--line); border-radius:14px; padding:20px 22px;}
+.quote-card .stars{color:#C9A227; font-size:.85rem; letter-spacing:2px; margin-bottom:8px;}
+.quote-card p{font-size:1.02rem; margin-bottom:8px;}
+.quote-card .attr{font-size:.8rem; letter-spacing:.08em; text-transform:uppercase; color:var(--steel); font-weight:600;}
+.rating-summary{margin-top:22px; background:var(--white); border:1px solid var(--line); border-radius:14px; padding:20px 22px; display:flex; flex-wrap:wrap; align-items:center; gap:14px;}
+.rs-score{font-family:'Saira',sans-serif; font-weight:700; font-size:1.9rem; color:var(--steel-dark);}
+.rs-stars{color:#C9A227; letter-spacing:2px;}
+.rs-note{font-size:.92rem; color:var(--ink);}
+.review-links{display:grid; grid-template-columns:1fr; gap:12px; margin-top:16px;}
+.review-link{display:flex; align-items:center; gap:12px; background:var(--white); border:1px solid var(--line); border-radius:12px; padding:14px 18px; text-decoration:none; font-weight:600;}
+.review-link i{font-size:1.2rem; color:var(--steel);}
+.review-link span small{display:block; font-weight:400; font-size:.82rem; color:var(--ink);}
+.visit-grid{display:grid; grid-template-columns:1fr 1fr; gap:22px;}
+.vcard{background:var(--white); border:1px solid var(--line); border-radius:14px; padding:22px;}
+.vcard h3{color:var(--steel-dark); margin-bottom:12px;}
+.vcard .row{display:flex; gap:10px; align-items:flex-start; margin-bottom:10px; font-size:.95rem;}
+.vcard .row i{color:var(--steel); margin-top:4px; width:16px;}
+.hours-line{font-family:'Saira',sans-serif; font-weight:600; font-size:1.05rem; color:var(--steel-dark);}
+.map-card{margin-top:14px; display:flex; align-items:center; gap:12px; background:var(--white); border:1px solid var(--line); border-radius:12px; padding:14px 18px; text-decoration:none; font-weight:600;}
+.map-card i{color:#3E9B5F; font-size:1.2rem;}
+.map-card span small{display:block; font-weight:400; font-size:.82rem;}
+footer{flex-shrink:0; background:var(--steel-dark); color:#D7E0E8; padding:26px 0 22px;}
+.foot-grid{max-width:1080px; margin:0 auto; padding:0 20px; display:flex; flex-wrap:wrap; gap:8px 28px; justify-content:space-between; font-size:.88rem;}
+.foot-grid a{color:#fff; text-decoration:none;}
+.copyright{max-width:1080px; margin:14px auto 0; padding:10px 20px 0; border-top:1px solid rgba(255,255,255,.15); font-size:.85rem; text-align:center;}
+@media (max-width:860px){
+  .hero-grid,.keycard,.visit-grid{grid-template-columns:1fr;}
+  .cards3{grid-template-columns:1fr;}
+  .clock-ring{margin-top:10px;}
+  .hero h1{font-size:2rem;}
+}
+@media (max-width:760px){
+  #menu-btn{display:inline-block;}
+  .nav-links{display:none; position:absolute; right:0; top:46px; background:var(--white); border:1px solid var(--line); border-radius:12px; padding:10px; min-width:190px; box-shadow:0 12px 26px rgba(0,0,0,.12); flex-direction:column; z-index:60;}
+  .nav-links.open{display:flex;}
+}
+</style>
+</head>
+<body>
+<div class="site-shell">
+<header>
+  <div class="nav-wrap">
+    <a class="brand" href="#/home" data-page="home">
+      <span class="brand-ring" aria-hidden="true"></span>
+      <span class="brand-name">24 Hour Laundromat<small>Nicollet Ave, Minneapolis</small></span>
+    </a>
+    <nav>
+      <button id="menu-btn" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
+      <ul class="nav-links">
+        <li><a href="#/home" data-page="home" class="active">The Wash</a></li>
+        <li><a href="#/reviews" data-page="reviews">Reviews</a></li>
+        <li><a href="#/visit" data-page="visit">Visit</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="kicker">Minneapolis, MN</div>
+        <h1>Laundry on your schedule, not ours.</h1>
+        <p class="lede">A clean, self-service laundromat on Nicollet Ave that never closes. Come in at 2 PM or 2 AM, the doors are open and the machines are waiting.</p>
+        <p style="margin-top:16px;"><span class="status-chip" id="chip"><span class="dot"></span><span class="chip-label">Checking hours...</span></span></p>
+        <div class="hero-badges">
+          <span class="badge"><i class="fa-solid fa-clock"></i> Open 24 hours</span>
+          <span class="badge"><i class="fa-solid fa-door-open"></i> Walk in anytime</span>
+          <span class="badge"><i class="fa-solid fa-shirt"></i> Self service</span>
+        </div>
+      </div>
+      <div class="clock-wrap">
+        <div class="clock-ring" aria-hidden="true">
+          <svg viewBox="0 0 200 200">
+            <circle cx="100" cy="100" r="88" fill="none" stroke="#D5DDE4" stroke-width="12"/>
+            <circle cx="100" cy="100" r="88" fill="none" stroke="#3A5A7A" stroke-width="12" stroke-dasharray="553 553" stroke-linecap="round" transform="rotate(-90 100 100)"/>
+            <circle cx="100" cy="12" r="7" fill="#C9A227"/>
+          </svg>
+          <div class="clock-center">
+            <span class="h24">24</span>
+            <span class="lbl">Hours a day</span>
+          </div>
+        </div>
+        <p class="clock-cap">The wheel never stops turning at 3011 Nicollet.</p>
+      </div>
+    </div>
+  </div>
+  <section class="block">
+    <div class="wrap">
+      <div class="block-head"><h2>What you'll find inside</h2><div class="rule"></div></div>
+      <div class="cards3">
+        <div class="card"><i class="fa-solid fa-soap"></i><h3>Self-service washers</h3><p>Load up, add detergent and let the machines do the work. No appointment, no sign-up, no waiting for a front desk.</p></div>
+        <div class="card"><i class="fa-solid fa-temperature-arrow-up"></i><h3>Hot dryers</h3><p>Big dryers that get through comforters and work clothes. Run a second cycle if you like, the door is always open.</p></div>
+        <div class="card"><i class="fa-solid fa-moon"></i><h3>Late-night calm</h3><p>Need to wash after a late shift? That's what a 24 hour laundromat is for. Quiet machines, clean space, any hour.</p></div>
+      </div>
+      <p class="honest-line" style="margin-top:22px;"><strong>Straight talk:</strong> reviewers call this spot a nice, clean facility, and some say it runs a little pricey for the area. We would rather you know both before you visit.</p>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-reviews">
+  <section class="block">
+    <div class="wrap">
+      <div class="block-head"><h2>Reviews</h2><div class="rule"></div></div>
+      <div class="quotes">
+        <div class="quote-card">
+          <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i></div>
+          <p>"Expensive but nice facility. Clean area"</p>
+          <div class="attr">Google review</div>
+        </div>
+      </div>
+      <div class="rating-summary">
+        <span class="rs-score">3.4</span>
+        <span class="rs-stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i><i class="fa-regular fa-star"></i></span>
+        <span class="rs-note">3.4 stars on Google with 111 reviews. A solid neighborhood option if you value the 24 hour door.</span>
+      </div>
+      <div class="review-links">
+        <a class="review-link" href="https://www.google.com/maps/search/?api=1&query=24%20Hour%20Laundromat%2C%203011%20Nicollet%20Ave%2C%20Minneapolis%2C%20MN%2055408" target="_blank" rel="noopener">
+          <i class="fa-brands fa-google"></i>
+          <span>See every review on Google<small>All 111 reviews, updated live on Google</small></span>
+        </a>
+      </div>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-visit">
+  <section class="block">
+    <div class="wrap">
+      <div class="block-head"><h2>Visit us</h2><div class="rule"></div></div>
+      <div class="keycard">
+        <div class="kc-card">
+          <div class="kc-chip" aria-hidden="true"></div>
+          <span class="kc-phone"><a href="tel:+16128233643">(612) 823-3643</a></span>
+          <span class="kc-note">Tap to call. If the line rings through, someone can answer questions about machines and sizing.</span>
+        </div>
+        <div class="kc-side">
+          <h3>Send a question ahead</h3>
+          <div class="form-card">
+            <form id="qform">
+              <label for="f-name">Your name</label>
+              <input id="f-name" type="text" autocomplete="name" placeholder="First name">
+              <label for="f-phone">Your phone</label>
+              <input id="f-phone" type="tel" autocomplete="tel" placeholder="(555) 555-5555">
+              <label for="f-msg">Message</label>
+              <textarea id="f-msg" rows="3" placeholder="Question about machines, prices, or large items"></textarea>
+              <button type="submit"><i class="fa-solid fa-paper-plane"></i> Send by text</button>
+              <div class="form-feedback" id="form-feedback"></div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="visit-grid" style="margin-top:24px;">
+        <div class="vcard">
+          <h3>Hours</h3>
+          <p class="hours-line"><i class="fa-solid fa-clock" style="color:#3A5A7A;"></i> Open 24 hours, every single day</p>
+          <p style="margin-top:8px; font-size:.92rem;">Holidays can shift things now and then. Call to confirm holiday hours before a late-night run.</p>
+        </div>
+        <div class="vcard">
+          <h3>Find the door</h3>
+          <div class="row"><i class="fa-solid fa-location-dot"></i><span>3011 Nicollet Ave, Minneapolis, MN 55408</span></div>
+          <div class="row"><i class="fa-solid fa-phone"></i><span>(612) 823-3643</span></div>
+          <div class="map-card" style="cursor:default;">
+            <i class="fa-solid fa-diamond-turn-right"></i>
+            <span>3011 Nicollet Ave, Minneapolis, MN 55408<small>Free street parking on Nicollet and the surrounding blocks</small></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+</main>
+<footer>
+  <div class="foot-grid">
+    <span>24 Hour Laundromat</span>
+    <span>3011 Nicollet Ave, Minneapolis, MN 55408</span>
+    <span>Open 24 hours</span>
+    <a href="tel:+16128233643">(612) 823-3643</a>
+  </div>
+  <div class="copyright">© 24 Hour Laundromat · Minneapolis, MN</div>
+</footer>
+</div>
+
+<script>
+var BUSINESS = "24 Hour Laundromat";
+var TITLES = { home: "The Wash", reviews: "Reviews", visit: "Visit" };
+var CITY_TZ = "America/Chicago";
+var HOURS = {0:[0,24],1:[0,24],2:[0,24],3:[0,24],4:[0,24],5:[0,24],6:[0,24]};
+var PHONE = "+16128233643";
+var PRETTY = "(612) 823-3643";
+
+function cityNow(){
+  var parts = new Intl.DateTimeFormat("en-US", { timeZone: CITY_TZ,
+    weekday: "short", hour: "numeric", minute: "numeric", hour12: false })
+    .formatToParts(new Date());
+  var o = {}; parts.forEach(function(p){ o[p.type] = p.value; });
+  var days = { Sun:0, Mon:1, Tue:2, Wed:3, Thu:4, Fri:5, Sat:6 };
+  return { day: days[o.weekday], hour: (+o.hour) % 24, minute: +o.minute };
+}
+function fmtH(t){
+  var h = Math.floor(t), m = Math.round((t - h) * 60);
+  var ap = h >= 12 && h < 24 ? "PM" : "AM", hh = h % 12; if (hh === 0) hh = 12;
+  return hh + (m ? ":" + String(m).padStart(2, "0") : ":00") + " " + ap;
+}
+function openState(){
+  var n = cityNow(), t = n.hour + n.minute / 60, today = HOURS[n.day];
+  if (today) {
+    if (today[1] > 24 && t < today[1] - 24) return { open: true, label: "Open now" };
+    if (t >= today[0] && t < (today[1] > 24 ? 24 : today[1])) return { open: true, label: "Open now" };
+  }
+  var names = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  for (var i = 0; i < 7; i++) {
+    var d = (n.day + i) % 7, h = HOURS[d];
+    if (!h) continue;
+    if (i === 0 && t < h[0]) return { open: false, label: "Opens " + fmtH(h[0]) + " today" };
+    if (i > 0) return { open: false, label: "Opens " + names[d] + (h[0] ? " at " + fmtH(h[0]) : "") };
+  }
+  return { open: false, label: "Closed" };
+}
+function renderChip(){
+  var st = openState();
+  var chip = document.getElementById("chip");
+  if (!chip) return;
+  chip.classList.toggle("open", st.open);
+  var lbl = chip.querySelector(".chip-label");
+  if (lbl) lbl.textContent = st.label;
+}
+
+function getPageFromHash(){
+  var h = (location.hash || "").replace(/^#\/?/, "");
+  return TITLES[h] ? h : "home";
+}
+function navigateTo(id, push){
+  document.querySelectorAll(".page").forEach(function(p){
+    p.classList.toggle("active", p.id === "page-" + id);
+  });
+  if (push) history.pushState({ page: id }, "", "#/" + id);
+  document.title = TITLES[id] + " | " + BUSINESS;
+  window.scrollTo({ top: 0, behavior: "instant" });
+  var mb = document.getElementById("menu-btn");
+  var nl = document.querySelector(".nav-links");
+  if (mb && nl) { mb.classList.remove("open"); nl.classList.remove("open"); }
+}
+document.addEventListener("click", function(e){
+  var t = e.target.closest("[data-page]");
+  if (t) { e.preventDefault(); navigateTo(t.getAttribute("data-page"), true); }
+});
+window.addEventListener("popstate", function(){ navigateTo(getPageFromHash(), false); });
+navigateTo(getPageFromHash(), false);
+
+var mb = document.getElementById("menu-btn");
+if (mb) mb.addEventListener("click", function(e){
+  e.stopPropagation();
+  var nl = document.querySelector(".nav-links");
+  if (nl) nl.classList.toggle("open");
+  mb.classList.toggle("open");
+});
+
+var form = document.getElementById("qform");
+if (form) form.addEventListener("submit", function(ev){
+  ev.preventDefault();
+  var name = (document.getElementById("f-name").value || "").trim();
+  var phone = (document.getElementById("f-phone").value || "").trim();
+  var msg = (document.getElementById("f-msg").value || "").trim();
+  var text = "Hi, this is " + (name || "a customer") + (phone ? " (" + phone + ")" : "") +
+    ". I have a question about 24 Hour Laundromat: " + (msg || "no message added");
+  var fb = document.getElementById("form-feedback");
+  if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
+    location.href = "sms:" + PHONE + "?&body=" + encodeURIComponent(text);
+  } else {
+    navigator.clipboard.writeText(text).then(function(){
+      fb.textContent = "Copied. Now paste it in a text to " + PRETTY;
+    });
+  }
+});
+
+renderChip();
+</script>
+</body>
+</html>

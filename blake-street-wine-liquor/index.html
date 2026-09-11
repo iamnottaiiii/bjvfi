@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Open Till Midnight in Downtown Denver | Blake Street Wine and Liquor</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{
+  --navy:#101C2C;
+  --navy-2:#16263A;
+  --brass:#C9A227;
+  --brass-soft:#E0C568;
+  --cream:#F5EFE0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{margin:0}
+body{
+  font-family:"Inter",sans-serif;
+  background:var(--navy);
+  color:var(--cream);
+  line-height:1.65;
+  overflow-x:hidden;
+}
+h1,h2,h3,h4{font-family:"Cormorant",serif;color:var(--cream);font-weight:600}
+a{color:inherit}
+.site-shell{min-height:100vh;display:flex;flex-direction:column}
+main{flex:1 0 auto}
+footer{flex-shrink:0}
+.wrap{width:min(1100px,92%);margin:0 auto}
+/* downtown grid motif */
+.grid-bg{
+  background-image:
+    linear-gradient(rgba(201,162,39,.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,162,39,.07) 1px, transparent 1px);
+  background-size:56px 56px;
+}
+/* Header */
+.site-head{
+  position:sticky;top:0;z-index:50;background:rgba(16,28,44,.95);
+  border-bottom:1px solid rgba(201,162,39,.3);backdrop-filter:blur(6px);
+}
+.head-row{display:flex;align-items:center;justify-content:space-between;padding:15px 0}
+.brand{display:flex;align-items:baseline;gap:10px;text-decoration:none}
+.brand-mark{
+  font-family:"Cormorant",serif;font-weight:700;font-size:1.35rem;color:var(--cream);
+  letter-spacing:.5px;
+}
+.brand-mark em{color:var(--brass);font-style:normal}
+.nav-links{display:flex;gap:28px;align-items:center;list-style:none}
+.nav-links a{
+  text-decoration:none;font-size:.86rem;font-weight:600;letter-spacing:1.6px;
+  text-transform:uppercase;color:rgba(245,239,224,.85);padding:6px 0;
+  border-bottom:1px solid transparent;
+}
+.nav-links a:hover{color:var(--brass);border-bottom-color:var(--brass)}
+#menu-btn{
+  display:none;background:transparent;border:1px solid rgba(201,162,39,.5);
+  width:44px;height:40px;border-radius:8px;cursor:pointer;
+}
+#menu-btn span{
+  display:block;width:18px;height:2px;background:var(--brass);margin:4px auto;
+  transition:transform .2s ease,opacity .2s ease;
+}
+#menu-btn.open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+#menu-btn.open span:nth-child(2){opacity:0}
+#menu-btn.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+/* Pages */
+.page{display:none}
+.page.active{display:block}
+/* Hero */
+.hero{padding:64px 0 56px;text-align:center;position:relative}
+.nightly-badge{
+  display:inline-flex;align-items:center;gap:10px;
+  border:1px solid var(--brass);color:var(--brass);
+  padding:8px 20px;border-radius:999px;font-size:.8rem;font-weight:700;
+  letter-spacing:2.4px;text-transform:uppercase;margin-bottom:26px;
+}
+.nightly-badge i{font-size:.85rem}
+.hero h1{font-size:clamp(2.4rem,5.4vw,4rem);line-height:1.08;font-weight:700}
+.hero h1 em{font-style:italic;color:var(--brass)}
+.hero .lead{
+  max-width:38rem;margin:20px auto 30px;color:rgba(245,239,224,.82);font-size:1.05rem;
+}
+.hero-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn{
+  display:inline-block;text-decoration:none;font-weight:600;font-size:.9rem;
+  letter-spacing:1.4px;text-transform:uppercase;padding:14px 28px;border-radius:4px;
+  transition:transform .15s ease;
+}
+.btn:hover{transform:translateY(-2px)}
+.btn-brass{background:var(--brass);color:var(--navy)}
+.btn-line{border:1px solid rgba(245,239,224,.4);color:var(--cream)}
+.status-chip{
+  display:inline-flex;align-items:center;gap:8px;background:var(--navy-2);
+  border:1px solid rgba(201,162,39,.4);border-radius:999px;padding:8px 18px;
+  font-size:.88rem;font-weight:600;margin-bottom:20px;
+}
+.chip-dot{width:9px;height:9px;border-radius:50%;background:#8B93A0;flex:none}
+.status-chip.is-open .chip-dot{background:#4CC38A}
+.status-chip.is-closed .chip-dot{background:#8B93A0}
+/* 21+ strip */
+.age-strip{
+  border-top:1px solid rgba(201,162,39,.35);border-bottom:1px solid rgba(201,162,39,.35);
+  padding:16px 0;margin:44px 0 0;text-align:center;
+}
+.age-strip p{font-size:.92rem;letter-spacing:.6px;color:rgba(245,239,224,.9)}
+.age-strip strong{color:var(--brass)}
+/* Sections */
+.section{padding:56px 0}
+.section-head{text-align:center;margin-bottom:34px}
+.kicker{
+  font-size:.75rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;
+  color:var(--brass);display:block;margin-bottom:10px;
+}
+.section-head h2{font-size:clamp(1.8rem,3.6vw,2.5rem)}
+.section-head p{color:rgba(245,239,224,.75);max-width:36rem;margin:10px auto 0}
+/* Stock grid */
+.stock-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.stock-card{
+  background:var(--navy-2);border:1px solid rgba(201,162,39,.25);border-radius:6px;
+  padding:28px 24px;text-align:center;
+}
+.stock-ico{
+  width:52px;height:52px;margin:0 auto 14px;border-radius:50%;
+  border:1px solid var(--brass);display:flex;align-items:center;justify-content:center;
+  color:var(--brass);font-size:1.2rem;
+}
+.stock-card h3{font-size:1.35rem;margin-bottom:8px}
+.stock-card p{font-size:.93rem;color:rgba(245,239,224,.75)}
+/* Hours */
+.hours-table{
+  max-width:620px;margin:0 auto;background:var(--navy-2);
+  border:1px solid rgba(201,162,39,.3);border-radius:6px;overflow:hidden;
+}
+.h-row{
+  display:flex;justify-content:space-between;align-items:center;gap:14px;
+  padding:15px 26px;border-bottom:1px solid rgba(201,162,39,.16);font-size:.95rem;
+}
+.h-row:last-child{border-bottom:0}
+.h-row .h-day{font-family:"Cormorant",serif;font-weight:700;font-size:1.1rem;letter-spacing:.5px}
+.h-row .h-time{color:rgba(245,239,224,.8)}
+.h-row.today{background:rgba(201,162,39,.14)}
+.h-row.today .h-day{color:var(--brass-soft)}
+.hours-note{text-align:center;margin-top:16px;font-size:.85rem;color:rgba(245,239,224,.6)}
+/* Shop page */
+.shop-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:30px;align-items:start;margin-top:30px}
+.panel{
+  background:var(--navy-2);border:1px solid rgba(201,162,39,.25);border-radius:6px;
+  padding:30px;
+}
+.panel h3{font-size:1.5rem;margin-bottom:12px}
+.panel p{font-size:.96rem;color:rgba(245,239,224,.8)}
+.panel ul{list-style:none;margin-top:14px}
+.panel li{padding:9px 0 9px 28px;position:relative;font-size:.95rem;color:rgba(245,239,224,.85);border-bottom:1px solid rgba(201,162,39,.12)}
+.panel li:last-child{border-bottom:0}
+.panel li i{position:absolute;left:0;top:12px;color:var(--brass);font-size:.8rem}
+.quote-line{
+  border-left:2px solid var(--brass);padding:6px 0 6px 18px;margin-top:16px;
+  font-family:"Cormorant",serif;font-style:italic;font-size:1.15rem;color:var(--cream);
+}
+/* Reviews */
+.review-plate{
+  max-width:720px;margin:26px auto 0;padding:30px 34px;
+  border-top:1px solid rgba(201,162,39,.4);border-bottom:1px solid rgba(201,162,39,.4);
+  text-align:center;
+}
+.review-plate .rq{font-family:"Cormorant",serif;font-style:italic;font-size:1.3rem;line-height:1.5}
+.review-plate .rm{margin-top:14px;display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap}
+.rstars{color:var(--brass);font-size:.8rem;letter-spacing:4px}
+.rsrc{font-size:.8rem;letter-spacing:2px;text-transform:uppercase;color:rgba(245,239,224,.6)}
+.rating-summary{
+  max-width:720px;margin:30px auto 0;text-align:center;
+  background:var(--navy-2);border:1px solid rgba(201,162,39,.35);border-radius:6px;padding:22px;
+}
+.rs-big{font-family:"Cormorant",serif;font-size:2rem;font-weight:700;color:var(--brass);margin-right:8px}
+.link-cards{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:24px}
+.review-link{
+  text-decoration:none;border:1px solid var(--brass);color:var(--brass);
+  padding:13px 26px;border-radius:4px;font-weight:600;font-size:.85rem;
+  letter-spacing:1.6px;text-transform:uppercase;display:inline-flex;gap:10px;align-items:center;
+}
+.review-link:hover{background:var(--brass);color:var(--navy)}
+/* Visit */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start;margin-top:30px}
+.info-panel{background:var(--navy-2);border:1px solid rgba(201,162,39,.25);border-radius:6px;padding:30px}
+.info-lines{list-style:none;margin-top:6px}
+.info-lines li{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid rgba(201,162,39,.14);font-size:.95rem}
+.info-lines li:last-child{border-bottom:0}
+.info-lines i{color:var(--brass);margin-top:4px;width:18px;text-align:center}
+.info-lines a{text-decoration:none;font-weight:600;color:var(--brass-soft)}
+/* Wine tag */
+.wine-tag{
+  width:min(300px,100%);margin:0 auto;background:var(--cream);color:var(--navy);
+  border-radius:10px 10px 18px 18px;padding:34px 26px 26px;text-align:center;
+  position:relative;box-shadow:0 18px 40px rgba(0,0,0,.45);
+}
+.wine-tag::before{
+  content:"";position:absolute;top:-26px;left:50%;transform:translateX(-50%);
+  width:2px;height:26px;background:var(--brass);
+}
+.tag-hole{
+  display:block;width:18px;height:18px;border-radius:50%;margin:0 auto 14px;
+  background:var(--navy);box-shadow:inset 0 0 0 4px var(--cream),inset 0 0 0 10px var(--navy);
+}
+.tag-kicker{font-size:.68rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#7A6A32}
+.tag-name{font-family:"Cormorant",serif;font-weight:700;font-size:1.35rem;margin:6px 0 2px}
+.tag-label{font-size:.85rem;color:#4A5568}
+.tag-phone{
+  display:block;font-family:"Cormorant",serif;font-weight:700;font-size:1.75rem;
+  color:var(--navy);text-decoration:none;margin:10px 0 12px;
+}
+.tag-phone:hover{color:#8A6D14}
+.tag-rule{width:44px;height:2px;background:var(--brass);margin:0 auto 12px}
+.tag-sub{font-size:.78rem;color:#6B7280}
+/* Form */
+.form-panel{background:var(--navy-2);border:1px solid rgba(201,162,39,.25);border-radius:6px;padding:30px;margin-top:26px}
+.form-panel h3{font-size:1.4rem;margin-bottom:6px}
+.form-sub{font-size:.92rem;color:rgba(245,239,224,.7);margin-bottom:18px}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.field label{font-weight:600;font-size:.82rem;letter-spacing:1px;text-transform:uppercase;color:rgba(245,239,224,.75)}
+.field input,.field textarea{
+  font-family:"Inter",sans-serif;font-size:.98rem;color:var(--cream);
+  background:var(--navy);border:1px solid rgba(201,162,39,.3);border-radius:4px;
+  padding:12px 14px;outline:none;resize:vertical;
+}
+.field input:focus,.field textarea:focus{border-color:var(--brass)}
+.form-note{font-size:.88rem;margin-top:12px;min-height:1.3em;color:rgba(245,239,224,.75)}
+.form-note.ok{color:#4CC38A;font-weight:600}
+/* Footer */
+.site-foot{background:#0B1420;border-top:1px solid rgba(201,162,39,.3);padding:44px 0 26px;margin-top:60px}
+.foot-grid{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:26px}
+.foot-grid h4{font-size:1.2rem;margin-bottom:10px}
+.foot-grid p{font-size:.92rem;color:rgba(245,239,224,.7)}
+.foot-quiet{display:flex;align-items:center;gap:9px;margin-top:8px}
+.foot-quiet i{color:var(--brass);font-size:.8rem}
+.foot-quiet a{color:rgba(245,239,224,.85);text-decoration:none}
+.foot-quiet a:hover{color:var(--brass)}
+.foot-copy{
+  border-top:1px solid rgba(201,162,39,.2);margin-top:28px;padding-top:18px;
+  text-align:center;font-size:.9rem;color:rgba(245,239,224,.65);
+}
+/* Responsive */
+@media (max-width:900px){
+  #menu-btn{display:block}
+  .nav-links{
+    display:none;position:absolute;left:0;right:0;top:100%;background:var(--navy-2);
+    flex-direction:column;gap:0;padding:8px 0;box-shadow:0 18px 30px rgba(0,0,0,.5);
+  }
+  .nav-links.open{display:flex}
+  .nav-links a{display:block;padding:13px 26px}
+  .stock-grid{grid-template-columns:1fr}
+  .shop-grid,.visit-grid{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr;gap:20px}
+  .hero{padding:46px 0 40px}
+}
+@media (max-width:520px){
+  .h-row{padding:13px 18px}
+  .review-plate{padding:24px 20px}
+}
+</style>
+</head>
+<body>
+<div class="site-shell">
+  <header class="site-head">
+    <div class="wrap head-row">
+      <a class="brand" href="#/home" data-page="home">
+        <span class="brand-mark">Blake St <em>Late</em></span>
+      </a>
+      <button id="menu-btn" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="#/home" data-page="home">Home</a></li>
+          <li><a href="#/shop" data-page="shop">The Shop</a></li>
+          <li><a href="#/reviews" data-page="reviews">Reviews</a></li>
+          <li><a href="#/visit" data-page="visit">Visit</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- HOME -->
+    <section class="page" id="page-home">
+      <div class="wrap hero grid-bg">
+        <div class="status-chip"><span class="chip-dot"></span><span class="status-label">Checking hours...</span></div>
+        <div class="nightly-badge"><i class="fa-regular fa-moon"></i> Open till midnight, every night</div>
+        <h1>Blake Street Wine <em>and</em> Liquor</h1>
+        <p class="lead">A reliable, friendly downtown Denver liquor shop at 1432 Blake St. We open in the afternoon and stay open until midnight, so the run for tonight never has to be rushed.</p>
+        <div class="hero-actions">
+          <a class="btn btn-brass" href="#/shop" data-page="shop">Browse the shop</a>
+          <a class="btn btn-line" href="#/visit" data-page="visit">Hours and directions</a>
+        </div>
+        <div class="age-strip">
+          <p><strong>21 and over, valid ID required.</strong> Please have your ID ready at the counter. We card everyone.</p>
+        </div>
+      </div>
+
+      <div class="wrap section">
+        <div class="section-head">
+          <span class="kicker">On the shelves</span>
+          <h2>The downtown run, covered</h2>
+          <p>Beer, wine, spirits, mixers and snacks, picked for an evening downtown. Ask at the counter and we will point you right.</p>
+        </div>
+        <div class="stock-grid">
+          <div class="stock-card">
+            <div class="stock-ico"><i class="fa-solid fa-wine-glass"></i></div>
+            <h3>Wine</h3>
+            <p>Reds, whites and bubbles for weeknights and weekends alike. Friendly picks, honest prices.</p>
+          </div>
+          <div class="stock-card">
+            <div class="stock-ico"><i class="fa-solid fa-bottle-droplet"></i></div>
+            <h3>Spirits</h3>
+            <p>The classics and the usual suspects, from well bottles up. Tell us what you are mixing.</p>
+          </div>
+          <div class="stock-card">
+            <div class="stock-ico"><i class="fa-solid fa-beer-mug-empty"></i></div>
+            <h3>Beer, mixers and snacks</h3>
+            <p>Cold beer plus the mixers, sodas and snacks that finish the shopping list in one stop.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="wrap section">
+        <div class="section-head">
+          <span class="kicker">Late, honestly</span>
+          <h2>Hours till midnight</h2>
+          <p>Afternoon openings, midnight closings, every day of the week.</p>
+        </div>
+        <div class="hours-table">
+          <div class="h-row" data-day="0"><span class="h-day">Sunday</span><span class="h-time">2:00 PM - midnight</span></div>
+          <div class="h-row" data-day="1"><span class="h-day">Monday</span><span class="h-time">3:00 PM - midnight</span></div>
+          <div class="h-row" data-day="2"><span class="h-day">Tuesday</span><span class="h-time">3:00 PM - midnight</span></div>
+          <div class="h-row" data-day="3"><span class="h-day">Wednesday</span><span class="h-time">3:00 PM - midnight</span></div>
+          <div class="h-row" data-day="4"><span class="h-day">Thursday</span><span class="h-time">3:00 PM - midnight</span></div>
+          <div class="h-row" data-day="5"><span class="h-day">Friday</span><span class="h-time">2:00 PM - midnight</span></div>
+          <div class="h-row" data-day="6"><span class="h-day">Saturday</span><span class="h-time">2:00 PM - midnight</span></div>
+        </div>
+        <p class="hours-note">21 and over, valid ID required for all alcohol purchases.</p>
+      </div>
+    </section>
+
+    <!-- THE SHOP -->
+    <section class="page" id="page-shop">
+      <div class="wrap section">
+        <div class="section-head">
+          <span class="kicker">1432 Blake St</span>
+          <h2>The Shop</h2>
+          <p>Small footprint, good variety, zero attitude. That is the formula.</p>
+        </div>
+        <div class="shop-grid">
+          <div class="panel">
+            <h3>What you will find</h3>
+            <p>A compact downtown store where the shelves are handled with care and the counter actually helps. Beer, wine and spirits up front, mixers and snacks for the ride.</p>
+            <ul>
+              <li><i class="fa-solid fa-star"></i> Beer, wine and spirits for every budget</li>
+              <li><i class="fa-solid fa-star"></i> Mixers, sodas and snacks in one stop</li>
+              <li><i class="fa-solid fa-star"></i> Open afternoons till midnight, nightly</li>
+              <li><i class="fa-solid fa-star"></i> Quick counter service when you are on the clock</li>
+            </ul>
+          </div>
+          <div class="panel">
+            <h3>What customers say</h3>
+            <p>Reviews call the service five star, reliable and friendly, and the prices great for downtown.</p>
+            <p class="quote-line">"Always 5star service and great prices at a reliable and friendly downtown liquor store."</p>
+            <p class="quote-line">"Super helpful! The place is smaller but has a bit of variety!"</p>
+            <p style="margin-top:18px;font-size:.9rem;color:rgba(245,239,224,.65)">Full reviews live on the Reviews page.</p>
+          </div>
+        </div>
+        <div class="age-strip" style="margin-top:40px">
+          <p><strong>21 and over, valid ID required.</strong> No ID, no sale, no exceptions.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- REVIEWS -->
+    <section class="page" id="page-reviews">
+      <div class="wrap section">
+        <div class="section-head">
+          <span class="kicker">Word of mouth</span>
+          <h2>Reviews</h2>
+          <p>Every review quote we have, shown word for word.</p>
+        </div>
+
+        <div class="review-plate">
+          <p class="rq">"Always 5star service and great prices at a reliable and friendly downtown liquor store."</p>
+          <div class="rm">
+            <span class="rstars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></span>
+            <span class="rsrc">Yelp review</span>
+          </div>
+        </div>
+
+        <div class="review-plate">
+          <p class="rq">"Super helpful! The place is smaller but has a bit of variety!"</p>
+          <div class="rm">
+            <span class="rstars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></span>
+            <span class="rsrc">Yelp review</span>
+          </div>
+        </div>
+
+        <div class="rating-summary">
+          <span class="rs-big">4.3</span>
+          <span>stars on Yelp, from 50 reviews</span>
+        </div>
+
+        <div class="link-cards">
+          <a class="review-link" href="https://www.google.com/maps/search/?api=1&query=Blake%20Street%20Wine%20and%20Liquor%2C%201432%20Blake%20St%2C%20Denver%2C%20CO%2080202" target="_blank" rel="noopener"><i class="fa-brands fa-google"></i> See every review on Google</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- VISIT -->
+    <section class="page" id="page-visit">
+      <div class="wrap section">
+        <div class="section-head">
+          <span class="kicker">Downtown Denver</span>
+          <h2>Visit us on Blake St</h2>
+          <p>Two blocks of grid, one brass tag. Here is everything you need to find us tonight.</p>
+        </div>
+        <div class="visit-grid">
+          <div>
+            <div class="info-panel">
+              <h3>The details</h3>
+              <ul class="info-lines">
+                <li><i class="fa-solid fa-location-dot"></i><span>1432 Blake St, Denver, CO 80202</span></li>
+                <li><i class="fa-solid fa-moon"></i><span>Open till midnight, every night</span></li>
+                <li><i class="fa-solid fa-sun"></i><span>Sun and Fri to Sat from 2 PM, Mon to Thu from 3 PM</span></li>
+                <li><i class="fa-solid fa-id-card"></i><span>21 and over, valid ID required</span></li>
+              </ul>
+            </div>
+            <div class="form-panel">
+              <h3>Ask about a bottle</h3>
+              <p class="form-sub">Wondering if we carry something, or planning a bigger run? Send the note and we will have an answer.</p>
+              <form id="quote-form" novalidate>
+                <div class="field">
+                  <label for="cf-name">Your name</label>
+                  <input id="cf-name" type="text" autocomplete="name" placeholder="Alex">
+                </div>
+                <div class="field">
+                  <label for="cf-phone">Your phone</label>
+                  <input id="cf-phone" type="tel" autocomplete="tel" placeholder="(720) 555-0134">
+                </div>
+                <div class="field">
+                  <label for="cf-message">Message</label>
+                  <textarea id="cf-message" rows="4" placeholder="Do you carry..."></textarea>
+                </div>
+                <button class="btn btn-brass" type="submit">Send it over</button>
+                <p class="form-note" id="form-feedback"></p>
+              </form>
+            </div>
+          </div>
+          <div>
+            <div class="wine-tag">
+              <span class="tag-hole" aria-hidden="true"></span>
+              <p class="tag-kicker">Bottle tag</p>
+              <p class="tag-name">Blake Street Wine and Liquor</p>
+              <p class="tag-label">Call the counter</p>
+              <span class="tag-rule"></span>
+              <a class="tag-phone" href="tel:+13038258000">(303) 825-8000</a>
+              <p class="tag-sub">1432 Blake St, Denver, CO 80202</p>
+            </div>
+            <div class="info-panel" style="margin-top:26px">
+              <h3>This week</h3>
+              <ul class="info-lines">
+                <li data-day="0"><i class="fa-solid fa-angle-right"></i><span>Sunday, 2:00 PM - midnight</span></li>
+                <li data-day="1"><i class="fa-solid fa-angle-right"></i><span>Monday, 3:00 PM - midnight</span></li>
+                <li data-day="2"><i class="fa-solid fa-angle-right"></i><span>Tuesday, 3:00 PM - midnight</span></li>
+                <li data-day="3"><i class="fa-solid fa-angle-right"></i><span>Wednesday, 3:00 PM - midnight</span></li>
+                <li data-day="4"><i class="fa-solid fa-angle-right"></i><span>Thursday, 3:00 PM - midnight</span></li>
+                <li data-day="5"><i class="fa-solid fa-angle-right"></i><span>Friday, 2:00 PM - midnight</span></li>
+                <li data-day="6"><i class="fa-solid fa-angle-right"></i><span>Saturday, 2:00 PM - midnight</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-foot">
+    <div class="wrap">
+      <div class="foot-grid">
+        <div>
+          <h4>Blake Street Wine and Liquor</h4>
+          <p>A friendly downtown Denver liquor shop, open till midnight nightly.</p>
+          <p class="foot-quiet"><i class="fa-solid fa-phone"></i><a href="tel:+13038258000">(303) 825-8000</a></p>
+        </div>
+        <div>
+          <h4>Where</h4>
+          <p>1432 Blake St<br>Denver, CO 80202</p>
+        </div>
+        <div>
+          <h4>Hours</h4>
+          <p>Afternoons till midnight, every day<br>21 and over, valid ID required</p>
+        </div>
+      </div>
+      <p class="foot-copy">© Blake Street Wine and Liquor · Denver, CO</p>
+    </div>
+  </footer>
+</div>
+
+<script>
+var BUSINESS = "Blake Street Wine and Liquor";
+var TITLES = { home: "Open Till Midnight", shop: "The Shop", reviews: "Reviews", visit: "Visit Us" };
+function getPageFromHash(){
+  var h = (location.hash || "").replace(/^#\/?/, "");
+  return TITLES[h] ? h : "home";
+}
+function navigateTo(id, push){
+  document.querySelectorAll(".page").forEach(function(p){
+    p.classList.toggle("active", p.id === "page-" + id);
+  });
+  if (push) history.pushState({ page: id }, "", "#/" + id);
+  document.title = TITLES[id] + " | " + BUSINESS;
+  window.scrollTo({ top: 0, behavior: "instant" });
+  var mb = document.getElementById("menu-btn");
+  var nl = document.querySelector(".nav-links");
+  if (mb && nl) { mb.classList.remove("open"); nl.classList.remove("open"); }
+}
+document.addEventListener("click", function(e){
+  var t = e.target.closest("[data-page]");
+  if (t) { e.preventDefault(); navigateTo(t.getAttribute("data-page"), true); }
+});
+window.addEventListener("popstate", function(){ navigateTo(getPageFromHash(), false); });
+navigateTo(getPageFromHash(), false);
+
+var menuBtn = document.getElementById("menu-btn");
+var navLinks = document.querySelector(".nav-links");
+if (menuBtn && navLinks) {
+  menuBtn.addEventListener("click", function(){
+    menuBtn.classList.toggle("open");
+    navLinks.classList.toggle("open");
+  });
+}
+
+var CITY_TZ = "America/Denver";
+var HOURS = { 0:[14,24], 1:[15,24], 2:[15,24], 3:[15,24], 4:[15,24], 5:[14,24], 6:[14,24] };
+function cityNow(){
+  var parts = new Intl.DateTimeFormat("en-US", { timeZone: CITY_TZ,
+    weekday: "short", hour: "numeric", minute: "numeric", hour12: false })
+    .formatToParts(new Date());
+  var o = {}; parts.forEach(function(p){ o[p.type] = p.value; });
+  var days = { Sun:0, Mon:1, Tue:2, Wed:3, Thu:4, Fri:5, Sat:6 };
+  return { day: days[o.weekday], hour: (+o.hour) % 24, minute: +o.minute };
+}
+function fmtH(t){
+  var h = Math.floor(t), m = Math.round((t - h) * 60);
+  var ap = h >= 12 && h < 24 ? "PM" : "AM", hh = h % 12; if (hh === 0) hh = 12;
+  return hh + (m ? ":" + String(m).padStart(2, "0") : ":00") + " " + ap;
+}
+function openState(){
+  var n = cityNow(), t = n.hour + n.minute / 60, today = HOURS[n.day];
+  if (today) {
+    if (today[1] > 24 && t < today[1] - 24) return { open: true, label: "Open now" };
+    if (t >= today[0] && t < (today[1] > 24 ? 24 : today[1])) return { open: true, label: "Open now" };
+  }
+  var names = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  for (var i = 0; i < 7; i++) {
+    var d = (n.day + i) % 7, h = HOURS[d];
+    if (!h) continue;
+    if (i === 0 && t < h[0]) return { open: false, label: "Opens " + fmtH(h[0]) + " today" };
+    if (i > 0) return { open: false, label: "Opens " + names[d] + (h[0] ? " at " + fmtH(h[0]) : "") };
+  }
+  return { open: false, label: "Closed" };
+}
+function renderChips(){
+  var st = openState();
+  document.querySelectorAll(".status-chip").forEach(function(chip){
+    chip.classList.remove("is-open", "is-closed");
+    chip.classList.add(st.open ? "is-open" : "is-closed");
+    var lab = chip.querySelector(".status-label");
+    if (lab) lab.textContent = st.label;
+  });
+}
+function markToday(){
+  var n = cityNow();
+  document.querySelectorAll("[data-day]").forEach(function(r){
+    r.classList.toggle("today", +r.getAttribute("data-day") === n.day);
+  });
+}
+renderChips();
+markToday();
+
+var PHONE = "+13038258000";
+var prettyPhone = "(303) 825-8000";
+var form = document.getElementById("quote-form");
+var feedback = document.getElementById("form-feedback");
+if (form) {
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    var name = document.getElementById("cf-name").value.trim();
+    var phone = document.getElementById("cf-phone").value.trim();
+    var message = document.getElementById("cf-message").value.trim();
+    if (!name || !message) {
+      feedback.textContent = "Add your name and a short note, then send.";
+      feedback.classList.remove("ok");
+      return;
+    }
+    var msg = "Hi " + BUSINESS + ", this is " + name + ". " + message + (phone ? " Reply to " + phone + "." : "");
+    var body = encodeURIComponent(msg);
+    if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
+      location.href = "sms:" + PHONE + "?&body=" + body;
+    } else {
+      navigator.clipboard.writeText(msg).then(function(){
+        feedback.textContent = "Copied. Now paste it in a text to " + prettyPhone;
+        feedback.classList.add("ok");
+      });
+    }
+  });
+}
+</script>
+</body>
+</html>

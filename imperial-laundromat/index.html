@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Self Service on W Holden | Imperial Laundromat</title>
+<meta name="description" content="Imperial Laundromat on W Holden Ave in Orlando. Self-service washers and dryers, Monday through Saturday, 9 AM to 6 PM.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Forum&family=PT+Sans:wght@400;700&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{
+  --navy:#1F3A5F;
+  --navy-deep:#162A46;
+  --marble:#F2F2F0;
+  --gold:#C9A227;
+  --ink:#2A2F36;
+  --white:#FFFFFF;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:'PT Sans',sans-serif;background:var(--marble);color:var(--ink);line-height:1.65}
+.site-shell{min-height:100vh;display:flex;flex-direction:column}
+main{flex:1 0 auto}
+footer{flex-shrink:0}
+h1,h2,h3,.display{font-family:'Forum',serif;color:var(--navy);line-height:1.25;margin:0 0 .5em;font-weight:400;letter-spacing:.03em}
+p{margin:0 0 1em}
+a{color:var(--navy)}
+.wrap{max-width:980px;margin:0 auto;padding:0 22px}
+
+/* Header */
+.site-head{background:var(--navy);position:sticky;top:0;z-index:50;border-bottom:3px solid var(--gold)}
+.head-in{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:15px 22px;max-width:980px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+.pillar{
+  width:20px;height:40px;border-radius:3px;flex:0 0 auto;
+  background:repeating-linear-gradient(90deg,var(--marble) 0 3px,var(--navy) 3px 6px);
+  border:2px solid var(--gold);
+}
+.brand-name{font-family:'Forum',serif;color:var(--marble);font-size:1.32rem;letter-spacing:.12em;text-transform:uppercase;line-height:1.1}
+.brand-name small{display:block;font-family:'PT Sans',sans-serif;font-size:.6rem;letter-spacing:.3em;color:var(--gold);text-transform:uppercase}
+.nav-links{display:flex;gap:6px;align-items:center}
+.nav-links a{color:var(--marble);text-decoration:none;font-weight:700;font-size:.92rem;padding:9px 15px;border-radius:2px;border:1px solid transparent;letter-spacing:.06em;text-transform:uppercase}
+.nav-links a:hover{border-color:var(--gold);color:var(--gold)}
+.menu-btn{display:none;flex-direction:column;justify-content:center;gap:5px;width:46px;height:42px;padding:8px;background:transparent;border:2px solid var(--marble);border-radius:4px;cursor:pointer}
+.menu-btn span{display:block;height:3px;background:var(--marble);border-radius:1px;transition:transform .2s,opacity .2s}
+.menu-btn.open span:nth-child(1){transform:translateY(8px) rotate(45deg)}
+.menu-btn.open span:nth-child(2){opacity:0}
+.menu-btn.open span:nth-child(3){transform:translateY(-8px) rotate(-45deg)}
+
+/* Pages + chip */
+.page{display:none}
+.page.active{display:block}
+.status-chip{display:inline-flex;align-items:center;gap:9px;font-weight:700;font-size:.84rem;padding:7px 18px;border-radius:2px;background:var(--white);border:1px solid var(--navy);color:var(--navy);letter-spacing:.08em;text-transform:uppercase}
+.status-chip::before{content:"";width:10px;height:10px;border-radius:50%;background:#9aa0a8}
+.status-chip.chip-open::before{background:#2E9E4F;box-shadow:0 0 0 3px rgba(46,158,79,.22)}
+.status-chip.chip-closed::before{background:#B03A2E;box-shadow:0 0 0 3px rgba(176,58,46,.18)}
+
+/* Laurel hero */
+.laurel-hero{position:relative;background:var(--white);border:1px solid rgba(31,58,95,.18);outline:1px solid rgba(201,162,39,.5);outline-offset:6px;padding:70px 40px 60px;text-align:center;margin-top:48px}
+.laurel{position:absolute;color:var(--gold);opacity:.85}
+.laurel.tl{top:12px;left:12px}
+.laurel.tr{top:12px;right:12px;transform:scaleX(-1)}
+.laurel.bl{bottom:12px;left:12px;transform:scaleY(-1)}
+.laurel.br{bottom:12px;right:12px;transform:scale(-1)}
+.gold-underline{display:inline-block;border-bottom:2px solid var(--gold);padding-bottom:10px}
+
+.hero-center{padding:20px 0 10px}
+.kicker{font-size:.72rem;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+.hero-center h1{font-size:clamp(2.2rem,5vw,3.4rem)}
+.hero-center .lead{max-width:34em;margin:0 auto 24px;font-size:1.08rem}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;align-items:center}
+.btn{display:inline-block;text-decoration:none;font-weight:700;font-size:.92rem;padding:13px 28px;border-radius:2px;border:1px solid var(--navy);background:var(--navy);color:var(--marble);cursor:pointer;transition:background .15s;letter-spacing:.06em;text-transform:uppercase}
+.btn:hover{background:var(--navy-deep)}
+.btn.line{background:transparent;color:var(--navy)}
+
+section.block{padding:54px 0}
+.block-head{max-width:600px;margin-bottom:30px}
+.block-head h2{font-size:clamp(1.6rem,3.2vw,2.2rem)}
+.center-head{text-align:center;margin-left:auto;margin-right:auto}
+
+/* Essentials strip */
+.essentials{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid rgba(31,58,95,.2);background:var(--white)}
+.ess{padding:30px 24px;text-align:center;border-right:1px solid rgba(31,58,95,.15)}
+.ess:last-child{border-right:none}
+.ess i{color:var(--gold);font-size:1.5rem;margin-bottom:10px;display:block}
+.ess h3{font-size:1.15rem;margin-bottom:4px}
+.ess p{font-size:.9rem;margin:0;color:#4C545E}
+
+/* Reviews - honest and plain */
+.plain-rating{max-width:620px;margin:34px auto 0;background:var(--white);border:1px solid rgba(31,58,95,.18);padding:40px 36px;text-align:center}
+.plain-rating .score{font-family:'Forum',serif;font-size:3.2rem;color:var(--navy);line-height:1}
+.plain-rating .score-note{font-size:.8rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#5A6472;margin-top:8px}
+.plain-rating .stars{margin:14px 0 4px}
+.plain-rating .stars i{color:var(--gold)}
+.plain-rating .honest{color:#5A6472;font-size:.95rem;max-width:30em;margin:14px auto 0}
+.rev-links{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-top:28px}
+.rev-link{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;padding:13px 26px;border-radius:2px;border:1px solid var(--navy);color:var(--navy);background:var(--white);letter-spacing:.04em}
+.rev-link.solid{background:var(--navy);color:var(--marble)}
+.rev-link:hover{background:var(--navy-deep);color:var(--marble)}
+
+/* Visit */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:34px;align-items:start}
+.hours-card{background:var(--white);border:1px solid rgba(31,58,95,.18);padding:28px}
+.day-row{display:flex;justify-content:space-between;gap:12px;padding:10px 12px;font-size:.97rem;border-bottom:1px solid rgba(31,58,95,.1)}
+.day-row:last-of-type{border-bottom:none}
+.day-row .d{font-weight:700;color:var(--navy)}
+.day-row.closed .t{color:#B03A2E;font-weight:700}
+.day-row.today{background:var(--marble)}
+.confirm-note{margin-top:16px;font-size:.9rem;background:var(--marble);border:1px dashed var(--gold);padding:10px 14px}
+.addr-card{background:var(--navy);color:#D7DEE8;padding:28px;margin-top:22px}
+.addr-card h3{color:var(--white)}
+.addr-line{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px}
+.addr-line i{color:var(--gold);margin-top:5px}
+/* Pillar plaque contact card */
+.plaque{
+  background:linear-gradient(160deg,#FFFFFF,var(--marble));
+  border:1px solid var(--gold);outline:1px solid var(--gold);outline-offset:4px;
+  padding:36px 30px 32px;margin-top:28px;text-align:center;
+}
+.plaque .p-top{font-size:.7rem;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:#5A6472}
+.plaque .p-name{font-family:'Forum',serif;font-size:1.5rem;color:var(--navy);letter-spacing:.08em;margin:8px 0 2px}
+.plaque .p-rule{width:70px;height:2px;background:var(--gold);border:none;margin:14px auto}
+.plaque .p-phone{font-family:'Forum',serif;font-size:1.8rem;color:var(--navy);text-decoration:none;display:inline-block;letter-spacing:.04em}
+.plaque .p-sub{font-size:.88rem;color:#4C545E;max-width:28em;margin:10px auto 0}
+.form-card{background:var(--white);border:1px solid rgba(31,58,95,.18);padding:28px;margin-top:24px}
+.form-card .sub{font-size:.92rem;margin-bottom:16px}
+.f-field{margin-bottom:14px}
+.f-field label{display:block;font-size:.74rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--navy);margin-bottom:6px}
+.f-field input,.f-field textarea{width:100%;padding:12px 14px;border-radius:0;border:1px solid rgba(31,58,95,.35);font-family:'PT Sans',sans-serif;font-size:.98rem;background:var(--marble);color:var(--ink)}
+.f-field input:focus,.f-field textarea:focus{outline:none;border-color:var(--gold)}
+.form-feedback{margin-top:12px;font-weight:700;color:var(--navy);min-height:1.4em}
+
+/* Footer */
+.site-foot{background:var(--navy-deep);color:#C6D0DD;margin-top:70px;border-top:3px solid var(--gold)}
+.foot-grid{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:34px;padding:44px 0 28px}
+.foot-grid h4{font-family:'Forum',serif;font-weight:400;color:var(--white);margin:0 0 12px;font-size:1.05rem;letter-spacing:.1em;text-transform:uppercase}
+.foot-grid p{font-size:.9rem;margin:0 0 8px}
+.foot-grid a{color:var(--gold);text-decoration:none}
+.foot-copy{border-top:1px solid rgba(242,242,240,.15);padding:18px 0 24px;text-align:center;font-size:.85rem;color:#9DA9BA}
+.foot-copy .c-name{color:var(--marble)}
+
+@media(max-width:900px){
+  .essentials{grid-template-columns:1fr}
+  .ess{border-right:none;border-bottom:1px solid rgba(31,58,95,.15)}
+  .ess:last-child{border-bottom:none}
+  .visit-grid{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:820px){
+  .menu-btn{display:flex}
+  .nav-links{display:none;position:absolute;top:100%;left:0;right:0;background:var(--navy-deep);flex-direction:column;align-items:stretch;gap:0;padding:10px 18px 18px;border-bottom:2px solid var(--gold)}
+  .nav-links.open{display:flex}
+  .nav-links a{padding:13px 8px;border-bottom:1px solid rgba(242,242,240,.12);border-radius:0}
+  .nav-links a:last-child{border-bottom:none}
+}
+@media(max-width:560px){
+  .foot-grid{grid-template-columns:1fr}
+  .laurel-hero{padding:56px 20px 50px}
+  section.block{padding:42px 0}
+}
+</style>
+</head>
+<body>
+<div class="site-shell">
+
+<header class="site-head">
+  <div class="head-in">
+    <a class="brand" href="#/home" data-page="home" aria-label="Imperial Laundromat home">
+      <span class="pillar" aria-hidden="true"></span>
+      <span class="brand-name">Imperial Laundromat<small>W Holden Ave</small></span>
+    </a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="#/wash" data-page="wash">The Wash</a>
+      <a href="#/reviews" data-page="reviews">Reviews</a>
+      <a href="#/visit" data-page="visit">Visit</a>
+    </nav>
+    <button class="menu-btn" id="menu-btn" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main>
+
+<!-- HOME -->
+<section class="page active" id="page-home">
+  <div class="wrap hero-center">
+    <div class="laurel-hero">
+      <svg class="laurel tl" width="72" height="72" viewBox="0 0 72 72" aria-hidden="true">
+        <path d="M10 66 C 12 40, 24 20, 52 8" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <ellipse cx="20" cy="46" rx="8" ry="4" transform="rotate(-52 20 46)" fill="currentColor"/>
+        <ellipse cx="28" cy="32" rx="8" ry="4" transform="rotate(-48 28 32)" fill="currentColor"/>
+        <ellipse cx="38" cy="20" rx="8" ry="4" transform="rotate(-42 38 20)" fill="currentColor"/>
+      </svg>
+      <svg class="laurel tr" width="72" height="72" viewBox="0 0 72 72" aria-hidden="true">
+        <path d="M10 66 C 12 40, 24 20, 52 8" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <ellipse cx="20" cy="46" rx="8" ry="4" transform="rotate(-52 20 46)" fill="currentColor"/>
+        <ellipse cx="28" cy="32" rx="8" ry="4" transform="rotate(-48 28 32)" fill="currentColor"/>
+        <ellipse cx="38" cy="20" rx="8" ry="4" transform="rotate(-42 38 20)" fill="currentColor"/>
+      </svg>
+      <svg class="laurel bl" width="72" height="72" viewBox="0 0 72 72" aria-hidden="true">
+        <path d="M10 66 C 12 40, 24 20, 52 8" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <ellipse cx="20" cy="46" rx="8" ry="4" transform="rotate(-52 20 46)" fill="currentColor"/>
+        <ellipse cx="28" cy="32" rx="8" ry="4" transform="rotate(-48 28 32)" fill="currentColor"/>
+        <ellipse cx="38" cy="20" rx="8" ry="4" transform="rotate(-42 38 20)" fill="currentColor"/>
+      </svg>
+      <svg class="laurel br" width="72" height="72" viewBox="0 0 72 72" aria-hidden="true">
+        <path d="M10 66 C 12 40, 24 20, 52 8" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <ellipse cx="20" cy="46" rx="8" ry="4" transform="rotate(-52 20 46)" fill="currentColor"/>
+        <ellipse cx="28" cy="32" rx="8" ry="4" transform="rotate(-48 28 32)" fill="currentColor"/>
+        <ellipse cx="38" cy="20" rx="8" ry="4" transform="rotate(-42 38 20)" fill="currentColor"/>
+      </svg>
+      <p class="kicker">Orlando · W Holden Ave</p>
+      <h1><span class="gold-underline">Imperial Laundromat</span></h1>
+      <p class="lead">Self-service washers and dryers on West Holden Avenue. Straightforward machines, six days a week, no fuss.</p>
+      <div class="hero-cta">
+        <span class="status-chip" role="status">Checking hours</span>
+        <a class="btn" href="#/visit" data-page="visit">Hours and location</a>
+        <a class="btn line" href="#/wash" data-page="wash">The wash</a>
+      </div>
+    </div>
+  </div>
+
+  <section class="block" style="padding-top:40px">
+    <div class="wrap">
+      <div class="essentials">
+        <div class="ess"><i class="fa-solid fa-soap"></i><h3>Wash</h3><p>Self-service washers, ready when you are.</p></div>
+        <div class="ess"><i class="fa-solid fa-fire"></i><h3>Dry</h3><p>Dryers that finish the job, same visit.</p></div>
+        <div class="ess"><i class="fa-regular fa-calendar"></i><h3>Six days</h3><p>Monday through Saturday, closed Sundays.</p></div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- THE WASH -->
+<section class="page" id="page-wash">
+  <div class="wrap" style="padding-top:56px">
+    <p class="kicker">The wash</p>
+    <h1 style="font-size:clamp(2rem,4.5vw,2.9rem)">Simple, six days a week</h1>
+    <p class="lead" style="max-width:36em">This is a working laundromat, not a theme park. Washers and dryers that run, a room that gets cleaned, and hours that are easy to remember.</p>
+  </div>
+  <section class="block" style="padding-top:24px">
+    <div class="wrap two-col">
+      <div class="hours-card">
+        <h3><i class="fa-regular fa-clock" style="color:var(--gold)"></i> Hours</h3>
+        <div class="day-row closed" data-day="0"><span class="d">Sunday</span><span class="t">Closed</span></div>
+        <div class="day-row" data-day="1"><span class="d">Monday</span><span class="t">9:00 AM - 6:00 PM</span></div>
+        <div class="day-row" data-day="2"><span class="d">Tuesday</span><span class="t">9:00 AM - 6:00 PM</span></div>
+        <div class="day-row" data-day="3"><span class="d">Wednesday</span><span class="t">9:00 AM - 6:00 PM</span></div>
+        <div class="day-row" data-day="4"><span class="d">Thursday</span><span class="t">9:00 AM - 6:00 PM</span></div>
+        <div class="day-row" data-day="5"><span class="d">Friday</span><span class="t">9:00 AM - 6:00 PM</span></div>
+        <div class="day-row" data-day="6"><span class="d">Saturday</span><span class="t">9:00 AM - 6:00 PM</span></div>
+        <p class="confirm-note"><i class="fa-solid fa-circle-exclamation"></i> Hours are estimated. Call to confirm before you head over, especially on a holiday.</p>
+      </div>
+      <div class="hours-card">
+        <h3><i class="fa-solid fa-soap" style="color:var(--gold)"></i> What to expect</h3>
+        <p>Washers and dryers you run yourself, coin by coin and load by load. Come in, get the laundry done, get on with the day.</p>
+        <p style="margin-bottom:0">The doors open at 9 in the morning and close at 6 in the evening, Monday through Saturday.</p>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- REVIEWS -->
+<section class="page" id="page-reviews">
+  <div class="wrap" style="padding-top:56px">
+    <p class="kicker" style="text-align:center">Reviews</p>
+    <h1 style="font-size:clamp(2rem,4.5vw,2.9rem);text-align:center">The honest page</h1>
+    <div class="plain-rating">
+      <div class="score">1.0</div>
+      <div class="score-note">stars on Google</div>
+      <div class="stars"><i class="fas fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i></div>
+      <p class="honest">The rating is the rating, and we will not dress it up. Read the reviews on Google, take them for what they are, and come see the machines for yourself.</p>
+    </div>
+    <div class="rev-links">
+      <a class="rev-link solid" href="https://www.google.com/maps/search/?api=1&query=Imperial%20Laundromat%2C%201230%20W%20Holden%20Ave%2C%20Orlando%2C%20FL%2032839" target="_blank" rel="noopener">See every review on Google <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+    </div>
+  </div>
+</section>
+
+<!-- VISIT -->
+<section class="page" id="page-visit">
+  <div class="wrap" style="padding-top:56px">
+    <p class="kicker">West Holden Ave</p>
+    <h1 style="font-size:clamp(2rem,4.5vw,2.9rem)">Visit us</h1>
+  </div>
+  <section class="block" style="padding-top:30px">
+    <div class="wrap visit-grid">
+      <div>
+        <div class="hours-card">
+          <h3><i class="fa-regular fa-clock" style="color:var(--gold)"></i> Hours</h3>
+          <div class="day-row closed" data-day="0"><span class="d">Sunday</span><span class="t">Closed</span></div>
+          <div class="day-row" data-day="1"><span class="d">Monday</span><span class="t">9:00 AM - 6:00 PM</span></div>
+          <div class="day-row" data-day="2"><span class="d">Tuesday</span><span class="t">9:00 AM - 6:00 PM</span></div>
+          <div class="day-row" data-day="3"><span class="d">Wednesday</span><span class="t">9:00 AM - 6:00 PM</span></div>
+          <div class="day-row" data-day="4"><span class="d">Thursday</span><span class="t">9:00 AM - 6:00 PM</span></div>
+          <div class="day-row" data-day="5"><span class="d">Friday</span><span class="t">9:00 AM - 6:00 PM</span></div>
+          <div class="day-row" data-day="6"><span class="d">Saturday</span><span class="t">9:00 AM - 6:00 PM</span></div>
+          <p class="confirm-note"><i class="fa-solid fa-circle-exclamation"></i> Hours are estimated. Call to confirm before you head over.</p>
+        </div>
+        <div class="addr-card">
+          <h3>Where to find us</h3>
+          <div class="addr-line"><i class="fa-solid fa-location-dot"></i><span>1230 W Holden Ave,<br>Orlando, FL 32839</span></div>
+          <div class="addr-line"><i class="fa-solid fa-clock"></i><span>Monday through Saturday, 9 AM to 6 PM. Closed Sundays.</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="plaque">
+          <span class="p-top">Wash · Dry · Fold at home</span>
+          <div class="p-name">Imperial Laundromat</div>
+          <hr class="p-rule">
+          <a class="p-phone" href="tel:+14078559877">(407) 855-9877</a>
+          <p class="p-sub">Call about hours, machines or anything else. If nobody picks up, try again a little later; the attendant is often mid-load.</p>
+        </div>
+        <div class="form-card">
+          <h3>Send a note</h3>
+          <p class="sub">Your note becomes a text to the shop.</p>
+          <form id="contact-form" novalidate>
+            <div class="f-field">
+              <label for="cf-name">Your name</label>
+              <input id="cf-name" name="name" type="text" autocomplete="name" placeholder="First name is fine">
+            </div>
+            <div class="f-field">
+              <label for="cf-phone">Your phone</label>
+              <input id="cf-phone" name="phone" type="tel" autocomplete="tel" placeholder="(407) 555-0100">
+            </div>
+            <div class="f-field">
+              <label for="cf-message">Message</label>
+              <textarea id="cf-message" name="message" rows="4" placeholder="Hours, machines or anything else on your mind."></textarea>
+            </div>
+            <button class="btn" type="submit">Send it</button>
+            <p class="form-feedback" id="form-feedback" aria-live="polite"></p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <h4>Imperial Laundromat</h4>
+        <p>Self-service wash and dry on West Holden Avenue.</p>
+        <p><a href="tel:+14078559877">(407) 855-9877</a></p>
+      </div>
+      <div>
+        <h4>Find us</h4>
+        <p>1230 W Holden Ave<br>Orlando, FL 32839</p>
+      </div>
+      <div>
+        <h4>Hours</h4>
+        <p>Mon - Sat 9 AM - 6 PM<br>Sunday closed</p>
+      </div>
+    </div>
+    <div class="foot-copy"><span class="c-name">© Imperial Laundromat · Orlando, FL</span></div>
+  </div>
+</footer>
+
+</div>
+
+<script>
+var BUSINESS = "Imperial Laundromat";
+var TITLES = { home: "Self Service on W Holden", wash: "The Wash", reviews: "The Honest Page", visit: "Visit Us" };
+function getPageFromHash(){
+  var h = (location.hash || "").replace(/^#\/?/, "");
+  return TITLES[h] ? h : "home";
+}
+function navigateTo(id, push){
+  document.querySelectorAll(".page").forEach(function(p){
+    p.classList.toggle("active", p.id === "page-" + id);
+  });
+  if (push) history.pushState({ page: id }, "", "#/" + id);
+  document.title = TITLES[id] + " | " + BUSINESS;
+  window.scrollTo({ top: 0, behavior: "instant" });
+  var mb = document.getElementById("menu-btn");
+  var nl = document.querySelector(".nav-links");
+  if (mb && nl) { mb.classList.remove("open"); nl.classList.remove("open"); }
+}
+document.addEventListener("click", function(e){
+  var t = e.target.closest("[data-page]");
+  if (t) { e.preventDefault(); navigateTo(t.getAttribute("data-page"), true); }
+});
+window.addEventListener("popstate", function(){ navigateTo(getPageFromHash(), false); });
+
+var menuBtn = document.getElementById("menu-btn");
+if (menuBtn) {
+  menuBtn.addEventListener("click", function(){
+    menuBtn.classList.toggle("open");
+    var nl = document.querySelector(".nav-links");
+    if (nl) nl.classList.toggle("open");
+  });
+}
+
+var CITY_TZ = "America/New_York";
+var HOURS = { 0:null, 1:[9,18], 2:[9,18], 3:[9,18], 4:[9,18], 5:[9,18], 6:[9,18] };
+function cityNow(){
+  var parts = new Intl.DateTimeFormat("en-US", { timeZone: CITY_TZ,
+    weekday: "short", hour: "numeric", minute: "numeric", hour12: false })
+    .formatToParts(new Date());
+  var o = {}; parts.forEach(function(p){ o[p.type] = p.value; });
+  var days = { Sun:0, Mon:1, Tue:2, Wed:3, Thu:4, Fri:5, Sat:6 };
+  return { day: days[o.weekday], hour: (+o.hour) % 24, minute: +o.minute };
+}
+function fmtH(t){
+  var h = Math.floor(t), m = Math.round((t - h) * 60);
+  var ap = h >= 12 && h < 24 ? "PM" : "AM", hh = h % 12; if (hh === 0) hh = 12;
+  return hh + (m ? ":" + String(m).padStart(2, "0") : ":00") + " " + ap;
+}
+function openState(){
+  var n = cityNow(), t = n.hour + n.minute / 60, today = HOURS[n.day];
+  if (today) {
+    if (today[1] > 24 && t < today[1] - 24) return { open: true, label: "Open now" };
+    if (t >= today[0] && t < (today[1] > 24 ? 24 : today[1])) return { open: true, label: "Open now" };
+  }
+  var names = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  for (var i = 0; i < 7; i++) {
+    var d = (n.day + i) % 7, h = HOURS[d];
+    if (!h) continue;
+    if (i === 0 && t < h[0]) return { open: false, label: "Opens " + fmtH(h[0]) + " today" };
+    if (i > 0) return { open: false, label: "Opens " + names[d] + (h[0] ? " at " + fmtH(h[0]) : "") };
+  }
+  return { open: false, label: "Closed" };
+}
+function renderStatus(){
+  var st = openState(), now = cityNow();
+  document.querySelectorAll(".status-chip").forEach(function(c){
+    c.textContent = st.label;
+    c.classList.add(st.open ? "chip-open" : "chip-closed");
+  });
+  document.querySelectorAll("[data-day]").forEach(function(r){
+    r.classList.toggle("today", +r.getAttribute("data-day") === now.day);
+  });
+}
+renderStatus();
+
+var PHONE = "+14078559877";
+var PRETTY_PHONE = "(407) 855-9877";
+var contactForm = document.getElementById("contact-form");
+if (contactForm) {
+  contactForm.addEventListener("submit", function(e){
+    e.preventDefault();
+    var name = document.getElementById("cf-name").value.trim();
+    var phone = document.getElementById("cf-phone").value.trim();
+    var message = document.getElementById("cf-message").value.trim();
+    var fb = document.getElementById("form-feedback");
+    if (!name || !message) {
+      fb.textContent = "Please add your name and a short message.";
+      return;
+    }
+    var msg = "Hi " + BUSINESS + "! This is " + name + ". " + message + (phone ? " You can reach me at " + phone + "." : "");
+    var body = encodeURIComponent(msg);
+    if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
+      location.href = "sms:" + PHONE + "?&body=" + body;
+    } else {
+      navigator.clipboard.writeText(msg).then(function(){
+        fb.textContent = "Copied. Now paste it in a text to " + PRETTY_PHONE;
+      }, function(){
+        fb.textContent = "Copy did not go through. Please text " + PRETTY_PHONE + " directly.";
+      });
+    }
+  });
+}
+</script>
+</body>
+</html>

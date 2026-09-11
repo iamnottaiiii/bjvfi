@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Barber Shop in North Las Vegas | Cheyenne Square Barber Shop</title>
+<link href="https://fonts.googleapis.com/css2?family=Rye&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{
+  --red:#B33A3A;
+  --red-deep:#8E2B2B;
+  --cream:#FAF3E6;
+  --cream-deep:#F1E6D0;
+  --navy:#223A5E;
+  --navy-deep:#1A2C48;
+  --ink:#2A2018;
+  --muted:#6E6354;
+  --line:#E3D6BE;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{font-family:'Archivo',sans-serif;color:var(--ink);background:var(--cream);line-height:1.65;}
+h1,h2,h3{font-family:'Rye',serif;font-weight:400;line-height:1.2;margin:0 0 .5em;}
+p{margin:0 0 1em;}
+.site-shell{min-height:100vh;display:flex;flex-direction:column;}
+main{flex:1 0 auto;}
+footer{flex-shrink:0;}
+.wrap{max-width:1080px;margin:0 auto;padding:0 22px;}
+
+/* Barber pole divider */
+.pole-divider{height:14px;background:repeating-linear-gradient(-45deg, var(--red) 0 16px, var(--cream) 16px 32px, var(--navy) 32px 48px);}
+
+/* Header */
+header{background:var(--cream);border-bottom:3px solid var(--red);position:sticky;top:0;z-index:50;}
+.head-in{display:flex;align-items:center;justify-content:space-between;padding:12px 22px;max-width:1080px;margin:0 auto;}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;}
+.mini-pole{width:16px;height:38px;border-radius:8px;border:2.5px solid #C9B892;background:repeating-linear-gradient(-45deg, var(--red) 0 8px, var(--cream) 8px 16px, var(--navy) 16px 24px);flex:none;}
+.brand-name{font-family:'Rye',serif;font-size:1.15rem;color:var(--navy);line-height:1.1;}
+.brand-name small{display:block;font-family:'Archivo',sans-serif;font-size:.64rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--red);}
+#menu-btn{display:none;background:var(--navy);border:none;border-radius:10px;padding:11px 13px;cursor:pointer;}
+#menu-btn span{display:block;width:20px;height:2px;background:var(--cream);margin:4px 0;border-radius:2px;}
+#menu-btn.open span:nth-child(1){transform:translateY(6px) rotate(45deg);}
+#menu-btn.open span:nth-child(2){opacity:0;}
+#menu-btn.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg);}
+.nav-links{display:flex;gap:6px;align-items:center;}
+.nav-links a{text-decoration:none;font-weight:600;font-size:.95rem;padding:9px 15px;border-radius:8px;color:var(--ink);}
+.nav-links a:hover{background:var(--cream-deep);}
+.nav-links a:last-child{background:var(--red);color:var(--cream);}
+.nav-links a:last-child:hover{background:var(--red-deep);}
+
+/* Pages */
+.page{display:none;}
+.page.active{display:block;}
+
+/* Status chip */
+.status-chip{display:inline-flex;align-items:center;gap:9px;padding:9px 18px;border-radius:8px;background:#FFFFFF;border:2px solid var(--navy);font-size:.92rem;font-weight:600;color:var(--navy);}
+.status-chip .dot{width:10px;height:10px;border-radius:50%;background:#A79E90;flex:none;}
+.status-chip.open .dot{background:#3E9B5F;box-shadow:0 0 0 4px rgba(62,155,95,.18);}
+
+/* Hero */
+.hero{background:var(--cream);overflow:hidden;}
+.hero-in{display:grid;grid-template-columns:1.15fr .85fr;gap:30px;align-items:center;padding:60px 22px 64px;max-width:1080px;margin:0 auto;}
+.kicker{font-size:.74rem;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--red);margin-bottom:14px;}
+.hero h1{font-size:clamp(2rem,4.8vw,3.3rem);color:var(--navy);}
+.hero h1 em{color:var(--red);font-style:normal;}
+.hero p.lead{font-size:1.06rem;color:var(--muted);max-width:48ch;}
+.hero-cta{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:22px;}
+.btn{display:inline-block;text-decoration:none;font-weight:700;font-size:.95rem;padding:13px 24px;border-radius:8px;border:none;cursor:pointer;}
+.btn-red{background:var(--red);color:var(--cream);}
+.btn-red:hover{background:var(--red-deep);}
+.btn-navy{background:var(--navy);color:var(--cream);}
+.btn-navy:hover{background:var(--navy-deep);}
+
+/* Pole illustration */
+.pole{display:flex;flex-direction:column;align-items:center;justify-self:center;}
+.pole-cap{width:78px;height:26px;background:linear-gradient(180deg,#E2D3B4,#C4B28C);border-radius:12px 12px 5px 5px;box-shadow:0 3px 6px rgba(42,32,24,.2);}
+.pole-cap.bottom{border-radius:5px 5px 12px 12px;}
+.pole-glass{width:66px;height:238px;border-radius:33px;border:7px solid #C9B892;
+  background:repeating-linear-gradient(-45deg, var(--red) 0 20px, var(--cream) 20px 40px, var(--navy) 40px 60px);
+  box-shadow:inset 0 0 26px rgba(42,32,24,.35), 0 10px 22px rgba(42,32,24,.18);
+  animation:spin 9s linear infinite;}
+@keyframes spin{from{background-position:0 0;}to{background-position:85px 0;}}
+
+/* Sections */
+section.block{padding:58px 0;}
+section.block.tint{background:var(--cream-deep);}
+section.block.navyband{background:var(--navy);color:var(--cream);}
+section.block.navyband h2{color:var(--cream);}
+section.block.navyband p{color:#C9D4E6;}
+.sec-head{text-align:center;max-width:60ch;margin:0 auto 34px;}
+.sec-head h2{font-size:clamp(1.6rem,3.2vw,2.25rem);}
+.sec-head p{color:var(--muted);}
+.navyband .sec-head p{color:#C9D4E6;}
+.star-mark{color:var(--red);font-size:.9rem;letter-spacing:6px;margin-bottom:10px;}
+.navyband .star-mark{color:#E8C46A;}
+
+/* Cut cards */
+.cut-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px;}
+.cut-card{background:#fff;border:2px solid var(--line);border-radius:12px;padding:24px;position:relative;}
+.cut-card::before{content:"";position:absolute;top:0;left:24px;right:24px;height:5px;border-radius:0 0 4px 4px;background:repeating-linear-gradient(-45deg, var(--red) 0 8px, var(--cream) 8px 16px, var(--navy) 16px 24px);}
+.cut-card .ic{width:48px;height:48px;border-radius:50%;background:var(--cream-deep);color:var(--red);display:flex;align-items:center;justify-content:center;font-size:1.05rem;margin:8px 0 12px;}
+.cut-card h3{font-size:1.2rem;color:var(--navy);}
+.cut-card p{font-size:.92rem;color:var(--muted);margin:0;}
+
+/* Reviews */
+.quote-card{max-width:640px;margin:0 auto 20px;background:#fff;border:2px solid var(--line);border-left:8px solid var(--red);border-radius:12px;padding:26px 28px;}
+.quote-card blockquote{margin:0 0 12px;font-size:1.08rem;color:var(--ink);}
+.quote-stars{color:#E8A93C;font-size:.9rem;letter-spacing:3px;margin-bottom:6px;}
+.quote-src{font-size:.82rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+.rating-summary{text-align:center;margin:28px auto 8px;font-family:'Rye',serif;font-size:1.4rem;color:var(--navy);}
+.rev-links{display:flex;justify-content:center;margin-top:20px;}
+.rev-link-card{display:inline-flex;align-items:center;gap:12px;background:#fff;border:2px solid var(--navy);border-radius:10px;padding:15px 24px;text-decoration:none;font-weight:600;color:var(--navy);}
+.rev-link-card .fa-google{color:var(--red);}
+.rev-link-card:hover{background:var(--navy);color:var(--cream);}
+.rev-link-card:hover .fa-google{color:#E8C46A;}
+
+/* Visit page */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;}
+.info-card{background:#fff;border:2px solid var(--line);border-radius:12px;padding:26px;}
+.info-card h3{font-size:1.25rem;color:var(--navy);}
+.addr{font-size:1rem;}
+.hours-table{width:100%;border-collapse:collapse;margin-top:6px;}
+.hours-table td{padding:9px 10px;border-bottom:2px dotted var(--line);font-size:.95rem;}
+.hours-table tr:last-child td{border-bottom:none;}
+.hours-table td:last-child{text-align:right;font-weight:600;}
+.hours-table tr.today td{background:rgba(179,58,58,.1);color:var(--red-deep);font-weight:700;}
+.hours-table tr.closed-day td{color:var(--muted);}
+.hours-note{font-size:.82rem;color:var(--muted);margin-top:10px;}
+
+/* Walk-ins card */
+.walkin-card{background:var(--red);border-radius:14px;padding:30px 26px;text-align:center;color:var(--cream);box-shadow:0 12px 26px rgba(142,43,43,.3);}
+.walkin-card .pole-divider{height:10px;border-radius:99px;margin-bottom:22px;}
+.walkin-title{font-family:'Rye',serif;font-size:1.6rem;margin-bottom:8px;color:#fff;}
+.walkin-phone{font-family:'Rye',serif;font-size:1.7rem;color:#fff;text-decoration:none;display:inline-block;margin:6px 0 10px;}
+.walkin-phone:hover{color:var(--cream-deep);}
+.walkin-sub{font-size:.9rem;color:#F3D9CE;margin:0;}
+.walkin-badge{display:inline-block;background:var(--navy);color:var(--cream);font-size:.72rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;padding:7px 14px;border-radius:99px;margin-bottom:16px;}
+
+/* Form */
+.form-card{background:#fff;border:2px solid var(--line);border-radius:12px;padding:26px;margin-top:24px;}
+.form-card h3{font-size:1.25rem;color:var(--navy);}
+.f-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.f-row{margin-bottom:14px;}
+.f-row label{display:block;font-size:.85rem;font-weight:700;margin-bottom:6px;color:var(--navy);}
+.f-row input,.f-row textarea{width:100%;padding:12px 14px;border:2px solid var(--line);border-radius:8px;font-family:'Archivo',sans-serif;font-size:.95rem;color:var(--ink);background:var(--cream);}
+.f-row input:focus,.f-row textarea:focus{outline:none;border-color:var(--red);background:#fff;}
+.f-feedback{font-size:.9rem;font-weight:600;color:var(--red-deep);margin-top:10px;min-height:1.2em;}
+
+/* Footer */
+footer{background:var(--navy-deep);color:#C9D4E6;}
+.foot-in{max-width:1080px;margin:0 auto;padding:38px 22px 24px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:26px;}
+.foot-in h4{font-family:'Rye',serif;font-weight:400;font-size:1.05rem;margin:0 0 10px;color:#E8C46A;}
+.foot-in p,.foot-in a{font-size:.9rem;color:#C9D4E6;text-decoration:none;margin:0 0 6px;display:block;}
+.foot-in a:hover{color:#fff;}
+.foot-copy{border-top:1px solid rgba(255,255,255,.14);text-align:center;padding:16px 22px;font-size:.85rem;color:#8FA0BD;}
+
+/* Responsive */
+@media (max-width:900px){
+  .hero-in{grid-template-columns:1fr;padding:48px 22px 52px;}
+  .pole{margin-top:8px;}
+  .visit-grid{grid-template-columns:1fr;}
+  .foot-in{grid-template-columns:1fr;gap:18px;}
+}
+@media (max-width:768px){
+  #menu-btn{display:block;}
+  .nav-links{position:absolute;top:100%;left:0;right:0;background:var(--cream);border-bottom:3px solid var(--red);flex-direction:column;align-items:stretch;padding:10px 18px 16px;gap:4px;display:none;box-shadow:0 12px 24px rgba(42,32,24,.12);}
+  .nav-links.open{display:flex;}
+  .nav-links a{padding:12px 14px;}
+  .nav-links a:last-child{margin-top:6px;text-align:center;}
+  section.block{padding:44px 0;}
+  .f-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="site-shell">
+<header>
+  <div class="head-in">
+    <a class="brand" href="#/home" data-page="home">
+      <span class="mini-pole" aria-hidden="true"></span>
+      <span class="brand-name">Cheyenne Square Barber Shop<small>Civic Center Dr &middot; North Las Vegas</small></span>
+    </a>
+    <button id="menu-btn" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+    <nav class="nav-links">
+      <a href="#/home" data-page="home">Home</a>
+      <a href="#/services" data-page="services">Cuts</a>
+      <a href="#/reviews" data-page="reviews">Reviews</a>
+      <a href="#/contact" data-page="contact">Visit</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- HOME -->
+  <section class="page active" id="page-home">
+    <div class="hero">
+      <div class="hero-in">
+        <div>
+          <p class="kicker">North Las Vegas &middot; Walk-ins welcome</p>
+          <h1>A sharp cut, <em>no appointment needed</em></h1>
+          <p class="lead">Cheyenne Square Barber Shop keeps the chair warm and the line moving on Civic Center Drive. Fades, lineups, beard trims, and patient kids cuts, six days a week.</p>
+          <div class="hero-cta">
+            <span class="status-chip" id="status-chip"><span class="dot"></span><span id="status-text">Checking hours...</span></span>
+            <a class="btn btn-red" href="#/contact" data-page="contact">Come on by</a>
+          </div>
+        </div>
+        <div class="pole" aria-hidden="true">
+          <div class="pole-cap"></div>
+          <div class="pole-glass"></div>
+          <div class="pole-cap bottom"></div>
+        </div>
+      </div>
+    </div>
+    <div class="pole-divider" aria-hidden="true"></div>
+
+    <section class="block">
+      <div class="wrap">
+        <div class="sec-head">
+          <div class="star-mark"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+          <h2>The neighborhood's chair</h2>
+          <p>4.9 stars on Google across 45 reviews. Folks around here keep it simple: good cut, clean shop, fair price.</p>
+        </div>
+        <div class="cut-grid">
+          <div class="cut-card">
+            <div class="ic"><i class="fa-solid fa-scissors"></i></div>
+            <h3>Classic cuts</h3>
+            <p>The haircut you actually asked for, done right, every time.</p>
+          </div>
+          <div class="cut-card">
+            <div class="ic"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+            <h3>Fades &amp; tapers</h3>
+            <p>Crisp blends from skin to scissor, blended clean.</p>
+          </div>
+          <div class="cut-card">
+            <div class="ic"><i class="fa-solid fa-child"></i></div>
+            <h3>Kids cuts</h3>
+            <p>Patient with first haircuts and wiggly customers alike.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="block navyband">
+      <div class="wrap" style="text-align:center;">
+        <h2 style="font-size:clamp(1.5rem,3vw,2rem);">No app, no fuss</h2>
+        <p style="max-width:52ch;margin:0 auto 22px;">Walk in, take a seat, and you are next. Six days a week, Monday through Saturday, right in Cheyenne Square.</p>
+        <a class="btn btn-red" href="#/services" data-page="services">See the cuts</a>
+      </div>
+    </section>
+    <div class="pole-divider" aria-hidden="true"></div>
+  </section>
+
+  <!-- CUTS -->
+  <section class="page" id="page-services">
+    <section class="block">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2>What we do in the chair</h2>
+          <p>Straightforward barbering, done the same way every time: listen first, cut second, check the mirror together before you leave.</p>
+        </div>
+        <div class="cut-grid">
+          <div class="cut-card">
+            <div class="ic"><i class="fa-solid fa-scissors"></i></div>
+            <h3>Classic haircuts</h3>
+            <p>Short backs and sides, professional trims, and everything in between.</p>
+          </div>
+          <div class="cut-card">
+            <div class="ic"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+            <h3>Fades &amp; tapers</h3>
+            <p>Low, mid, and high fades with a blend that holds its shape for weeks.</p>
+          </div>
+          <div class="cut-card">
+            <div class="ic"><i class="fa-solid fa-ruler-combined"></i></div>
+            <h3>Lineups</h3>
+            <p>Sharp edges on the hairline and beard, the detail that makes the whole cut.</p>
+          </div>
+          <div class="cut-card">
+            <div class="ic"><i class="fa-solid fa-user-tie"></i></div>
+            <h3>Beard trims</h3>
+            <p>Shape it up, clean the neck, and send you out looking intentional.</p>
+          </div>
+          <div class="cut-card">
+            <div class="ic"><i class="fa-solid fa-child"></i></div>
+            <h3>Kids cuts</h3>
+            <p>Easygoing with the little ones. And when back-to-school season comes around, ask about the free kids cuts this shop is known for.</p>
+          </div>
+          <div class="cut-card">
+            <div class="ic"><i class="fa-solid fa-door-open"></i></div>
+            <h3>Walk-ins</h3>
+            <p>No appointment needed. Come by the shop and take the next open chair.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div class="pole-divider" aria-hidden="true"></div>
+  </section>
+
+  <!-- REVIEWS -->
+  <section class="page" id="page-reviews">
+    <section class="block">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2>Straight from the chair</h2>
+          <p>Real reviews from real customers, in their own words.</p>
+        </div>
+        <div class="quote-card">
+          <blockquote>Great businessman and barber. He's great with the kids and gives free cuts for back to school.</blockquote>
+          <div class="quote-stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+          <div class="quote-src">Google review</div>
+        </div>
+        <div class="quote-card">
+          <blockquote>He was amazing, shop was clean, chair was comfortable.</blockquote>
+          <div class="quote-stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+          <div class="quote-src">Google review</div>
+        </div>
+        <p class="rating-summary">4.9 stars on Google (45 reviews)</p>
+        <div class="rev-links">
+          <a class="rev-link-card" href="https://www.google.com/maps/search/?api=1&query=Cheyenne%20Square%20Barber%20Shop%2C%203250%20Civic%20Center%20Dr%2C%20North%20Las%20Vegas%2C%20NV%2089030" target="_blank" rel="noopener"><i class="fa-brands fa-google"></i> See every review on Google</a>
+        </div>
+      </div>
+    </section>
+    <div class="pole-divider" aria-hidden="true"></div>
+  </section>
+
+  <!-- VISIT -->
+  <section class="page" id="page-contact">
+    <section class="block">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2>Find the shop</h2>
+          <p>You will find us in Cheyenne Square on Civic Center Drive in North Las Vegas. Walk in, or call ahead and time your visit.</p>
+        </div>
+        <div class="visit-grid">
+          <div class="info-card">
+            <h3><i class="fa-solid fa-location-dot" style="color:var(--red);"></i> Where we are</h3>
+            <p class="addr">3250 Civic Center Dr<br>North Las Vegas, NV 89030</p>
+            <h3 style="margin-top:18px;"><i class="fa-solid fa-clock" style="color:var(--red);"></i> Hours</h3>
+            <table class="hours-table">
+              <tr data-day="0" class="closed-day"><td>Sunday</td><td>Closed</td></tr>
+              <tr data-day="1"><td>Monday</td><td>9:00 AM - 6:00 PM</td></tr>
+              <tr data-day="2"><td>Tuesday</td><td>9:00 AM - 6:00 PM</td></tr>
+              <tr data-day="3"><td>Wednesday</td><td>9:00 AM - 6:00 PM</td></tr>
+              <tr data-day="4"><td>Thursday</td><td>9:00 AM - 6:00 PM</td></tr>
+              <tr data-day="5"><td>Friday</td><td>9:00 AM - 6:00 PM</td></tr>
+              <tr data-day="6"><td>Saturday</td><td>9:00 AM - 6:00 PM</td></tr>
+            </table>
+            <p class="hours-note">Call to confirm holiday hours.</p>
+          </div>
+          <div class="walkin-card">
+            <div class="pole-divider" aria-hidden="true"></div>
+            <span class="walkin-badge">Walk-ins welcome</span>
+            <div class="walkin-title">Take the next chair</div>
+            <a class="walkin-phone" href="tel:+17023992194">(702) 399-2194</a>
+            <p class="walkin-sub">Call for a quick check on the wait, or just come by and have a seat.</p>
+          </div>
+        </div>
+
+        <div class="form-card">
+          <h3>Send a note ahead</h3>
+          <p style="font-size:.93rem;color:var(--muted);">Big family, special occasion, or a kid who needs a patient hand? Tell us and we will be ready.</p>
+          <form id="contact-form" novalidate>
+            <div class="f-grid">
+              <div class="f-row">
+                <label for="cf-name">Your name</label>
+                <input id="cf-name" type="text" autocomplete="name" placeholder="First name is fine">
+              </div>
+              <div class="f-row">
+                <label for="cf-phone">Your phone (optional)</label>
+                <input id="cf-phone" type="tel" autocomplete="tel" placeholder="So we can text you back">
+              </div>
+            </div>
+            <div class="f-row">
+              <label for="cf-msg">Your message</label>
+              <textarea id="cf-msg" rows="4" placeholder="For example: Two haircuts Saturday morning, one fade and one for my son."></textarea>
+            </div>
+            <button class="btn btn-navy" type="submit">Send to the shop</button>
+            <p class="f-feedback" id="cf-feedback"></p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </section>
+</main>
+
+<footer>
+  <div class="foot-in">
+    <div>
+      <h4>Cheyenne Square Barber Shop</h4>
+      <p>Fades, lineups, beard trims, and kids cuts in North Las Vegas. Walk-ins welcome, six days a week.</p>
+    </div>
+    <div>
+      <h4>Contact</h4>
+      <a href="tel:+17023992194">(702) 399-2194</a>
+      <p>3250 Civic Center Dr<br>North Las Vegas, NV 89030</p>
+    </div>
+    <div>
+      <h4>Hours</h4>
+      <p>Mon - Sat 9 AM - 6 PM<br>Sun closed</p>
+    </div>
+  </div>
+  <div class="foot-copy">© Cheyenne Square Barber Shop · North Las Vegas, NV</div>
+</footer>
+</div>
+
+<script>
+var BUSINESS = "Cheyenne Square Barber Shop";
+var TITLES = { home: "Barber Shop in North Las Vegas", services: "Cuts", reviews: "Reviews", contact: "Visit Us" };
+function getPageFromHash(){
+  var h = (location.hash || "").replace(/^#\/?/, "");
+  return TITLES[h] ? h : "home";
+}
+function navigateTo(id, push){
+  document.querySelectorAll(".page").forEach(function(p){
+    p.classList.toggle("active", p.id === "page-" + id);
+  });
+  if (push) history.pushState({ page: id }, "", "#/" + id);
+  document.title = TITLES[id] + " | " + BUSINESS;
+  window.scrollTo({ top: 0, behavior: "instant" });
+  var mb = document.getElementById("menu-btn");
+  var nl = document.querySelector(".nav-links");
+  if (mb && nl) { mb.classList.remove("open"); nl.classList.remove("open"); }
+}
+document.addEventListener("click", function(e){
+  var t = e.target.closest("[data-page]");
+  if (t) { e.preventDefault(); navigateTo(t.getAttribute("data-page"), true); }
+});
+window.addEventListener("popstate", function(){ navigateTo(getPageFromHash(), false); });
+navigateTo(getPageFromHash(), false);
+
+var mb = document.getElementById("menu-btn");
+if (mb) {
+  mb.addEventListener("click", function(){
+    mb.classList.toggle("open");
+    var nl = document.querySelector(".nav-links");
+    if (nl) nl.classList.toggle("open");
+  });
+}
+
+var HOURS = { 0: null, 1: [9,18], 2: [9,18], 3: [9,18], 4: [9,18], 5: [9,18], 6: [9,18] };
+function vegasNow(){
+  var parts = new Intl.DateTimeFormat("en-US", { timeZone: "America/Los_Angeles",
+    weekday: "short", hour: "numeric", minute: "numeric", hour12: false })
+    .formatToParts(new Date());
+  var o = {}; parts.forEach(function(p){ o[p.type] = p.value; });
+  var days = { Sun:0, Mon:1, Tue:2, Wed:3, Thu:4, Fri:5, Sat:6 };
+  return { day: days[o.weekday], hour: (+o.hour) % 24, minute: +o.minute };
+}
+function fmtH(t){
+  var h = Math.floor(t), m = Math.round((t - h) * 60);
+  var ap = h >= 12 && h < 24 ? "PM" : "AM", hh = h % 12; if (hh === 0) hh = 12;
+  return hh + (m ? ":" + String(m).padStart(2, "0") : ":00") + " " + ap;
+}
+function openState(){
+  var n = vegasNow(), t = n.hour + n.minute / 60, today = HOURS[n.day];
+  if (today) {
+    if (today[1] > 24 && t < today[1] - 24) return { open: true, label: "Open now" };
+    if (t >= today[0] && t < (today[1] > 24 ? 24 : today[1])) return { open: true, label: "Open now" };
+  }
+  var names = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  for (var i = 0; i < 7; i++) {
+    var d = (n.day + i) % 7, h = HOURS[d];
+    if (!h) continue;
+    if (i === 0 && t < h[0]) return { open: false, label: "Opens " + fmtH(h[0]) + " today" };
+    if (i > 0) return { open: false, label: "Opens " + names[d] + (h[0] ? " at " + fmtH(h[0]) : "") };
+  }
+  return { open: false, label: "Closed" };
+}
+(function(){
+  var chip = document.getElementById("status-chip");
+  var txt = document.getElementById("status-text");
+  if (chip && txt) {
+    var st = openState();
+    chip.classList.add(st.open ? "open" : "closed");
+    txt.textContent = st.label;
+  }
+  var n = vegasNow();
+  document.querySelectorAll("[data-day]").forEach(function(r){
+    if (parseInt(r.getAttribute("data-day"), 10) === n.day) r.classList.add("today");
+  });
+})();
+
+var PHONE = "+17023992194";
+var PRETTY = "(702) 399-2194";
+var form = document.getElementById("contact-form");
+if (form) {
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    var name = document.getElementById("cf-name").value.trim();
+    var phone = document.getElementById("cf-phone").value.trim();
+    var msg = document.getElementById("cf-msg").value.trim();
+    var feedbackEl = document.getElementById("cf-feedback");
+    if (!name || !msg) {
+      feedbackEl.textContent = "Please add your name and a short message so we can help.";
+      return;
+    }
+    var text = "Hi " + BUSINESS + ", this is " + name + (phone ? " (" + phone + ")" : "") + ". " + msg;
+    if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
+      location.href = "sms:" + PHONE + "?&body=" + encodeURIComponent(text);
+    } else {
+      navigator.clipboard.writeText(text).then(function(){
+        feedbackEl.textContent = "Copied. Now paste it in a text to " + PRETTY;
+      }, function(){
+        feedbackEl.textContent = "Could not copy automatically. Please call us at " + PRETTY + ".";
+      });
+    }
+  });
+}
+</script>
+</body>
+</html>

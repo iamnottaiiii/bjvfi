@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laundromat on Bluebonnet Lane | Michael A Laundromat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Damion&family=Mulish:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+<style>
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: 'Mulish', sans-serif;
+  background: #FFFFFF;
+  color: #35496B;
+  line-height: 1.65;
+  font-size: 17px;
+}
+h1, h2, h3, .display { font-family: 'Damion', cursive; font-weight: 400; }
+.site-shell { min-height: 100vh; display: flex; flex-direction: column; }
+main { flex: 1 0 auto; }
+footer { flex-shrink: 0; }
+.page { display: none; }
+.page.active { display: block; }
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 22px; }
+
+/* Header */
+header.site-head {
+  background: #FFFFFF;
+  border-bottom: 3px solid #D6E4F0;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+.head-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; min-height: 70px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; cursor: pointer; }
+.brand-name { font-family: 'Damion', cursive; font-size: 1.6rem; color: #4A6FA5; line-height: 1; }
+.menu-btn {
+  display: none;
+  background: #FFFFFF;
+  border: 2px solid #4A6FA5;
+  color: #4A6FA5;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.nav-links { display: flex; align-items: center; gap: 6px; }
+.nav-links a {
+  color: #35496B;
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 0.95rem;
+  padding: 9px 15px;
+  border-radius: 999px;
+}
+.nav-links a:hover { background: #D6E4F0; color: #2C4370; }
+@media (max-width: 760px) {
+  .menu-btn { display: inline-flex; }
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0; right: 0;
+    background: #FFFFFF;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px 16px 16px;
+    gap: 4px;
+    border-bottom: 3px solid #4A6FA5;
+    box-shadow: 0 12px 24px rgba(53,73,107,0.12);
+  }
+  .nav-links.open { display: flex; }
+  .nav-links a { padding: 12px 14px; }
+}
+
+/* Status chip */
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 16px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.92rem;
+  background: #EEF4FA;
+  border: 1px solid #C9DBEE;
+  color: #35496B;
+}
+.status-chip .dot { width: 10px; height: 10px; border-radius: 50%; background: #8B8B84; flex: 0 0 auto; }
+.status-chip.is-open { background: #E4F2E5; border-color: #9CCBA0; color: #22662F; }
+.status-chip.is-open .dot { background: #2E8B44; box-shadow: 0 0 0 4px rgba(46,139,68,0.16); }
+.status-chip.is-closed .dot { background: #A94A3F; box-shadow: 0 0 0 4px rgba(169,74,63,0.12); }
+
+/* Bluebonnet divider */
+.bloom-strip { display: flex; justify-content: center; align-items: flex-end; gap: 34px; padding: 10px 0; }
+@media (max-width: 560px) { .bloom-strip { gap: 18px; } }
+
+/* Hero */
+.hero { padding: 52px 0 36px; background: linear-gradient(180deg, #D6E4F0 0%, #FFFFFF 100%); }
+.hero-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 40px; align-items: center; }
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #4A6FA5;
+  margin: 0 0 10px;
+}
+.hero h1 { font-size: clamp(2.3rem, 5vw, 3.4rem); margin: 0 0 14px; line-height: 1.1; color: #2C4370; }
+.hero p.lead { font-size: 1.06rem; margin: 0 0 20px; color: #4E6288; max-width: 32em; }
+.early-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #4A6FA5;
+  color: #FFFFFF;
+  font-weight: 800;
+  font-size: 0.95rem;
+  padding: 10px 20px;
+  border-radius: 999px;
+  margin: 4px 0 18px;
+  box-shadow: 0 6px 16px rgba(74,111,165,0.35);
+}
+.early-badge i { color: #B8D4F0; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 0 0 18px; }
+.btn {
+  display: inline-block;
+  text-decoration: none;
+  font-weight: 800;
+  padding: 12px 26px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.97rem;
+  border: 0;
+}
+.btn-blue { background: #4A6FA5; color: #FFFFFF; box-shadow: 0 6px 16px rgba(74,111,165,0.35); }
+.btn-blue:hover { background: #3C5C8C; }
+.btn-sky { background: #D6E4F0; color: #2C4370; }
+.btn-sky:hover { background: #C2D6EA; }
+.hero-note { font-size: 0.92rem; color: #6E82A6; }
+.flower-panel { text-align: center; }
+.flower-panel svg { max-width: 240px; }
+.flower-panel .cap { font-family: 'Damion', cursive; font-size: 1.15rem; color: #4A6FA5; margin-top: 10px; }
+@media (max-width: 860px) {
+  .hero-grid { grid-template-columns: 1fr; gap: 24px; }
+  .flower-panel { display: none; }
+}
+
+/* Sections */
+section.band { padding: 50px 0; }
+section.band.sky { background: #D6E4F0; }
+.band-head { text-align: center; max-width: 640px; margin: 0 auto 34px; }
+.band-head h2 { font-size: clamp(1.7rem, 3.2vw, 2.3rem); margin: 0 0 10px; color: #2C4370; }
+.band-head p { margin: 0; color: #5A6E92; }
+section.band.sky .band-head p { color: #46608D; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; }
+.card {
+  background: #FFFFFF;
+  border: 1px solid #DCE7F3;
+  border-radius: 20px;
+  padding: 26px 22px;
+  box-shadow: 0 8px 20px rgba(74,111,165,0.1);
+}
+.card .ico {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: #D6E4F0;
+  color: #4A6FA5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  margin-bottom: 14px;
+}
+.card h3 { margin: 0 0 8px; font-size: 1.55rem; color: #2C4370; }
+.card p { margin: 0; font-size: 0.94rem; color: #5A6E92; }
+section.band.sky .card h3 { color: #4A6FA5; }
+
+/* Hours strip */
+.day-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; max-width: 720px; margin: 0 auto; }
+@media (max-width: 640px) { .day-strip { grid-template-columns: repeat(4, 1fr); } }
+.day-cell {
+  background: #FFFFFF;
+  border: 1.5px solid #DCE7F3;
+  border-radius: 14px;
+  padding: 12px 6px;
+  text-align: center;
+}
+.day-cell .d { display: block; font-weight: 800; font-size: 0.8rem; letter-spacing: 1px; text-transform: uppercase; color: #4A6FA5; }
+.day-cell .h { display: block; font-size: 0.82rem; color: #5A6E92; margin-top: 5px; }
+.day-cell.today { border-color: #4A6FA5; background: #EEF4FA; box-shadow: 0 5px 14px rgba(74,111,165,0.22); }
+.day-cell.today .d { color: #2C4370; }
+.big-line { text-align: center; font-weight: 800; font-size: 1.15rem; color: #2C4370; margin: 0 0 20px; }
+.confirm-line { text-align: center; font-size: 0.86rem; color: #7A8BA8; font-style: italic; margin: 14px 0 0; }
+
+/* Reviews */
+.quote-card {
+  max-width: 640px;
+  margin: 0 auto 20px;
+  background: #FFFFFF;
+  border: 1px solid #DCE7F3;
+  border-radius: 22px;
+  padding: 30px 30px 24px;
+  box-shadow: 0 10px 24px rgba(74,111,165,0.12);
+  text-align: center;
+}
+.quote-card .stars { color: #E8B33D; font-size: 1.05rem; letter-spacing: 5px; }
+.quote-card blockquote { margin: 14px 0 12px; font-size: 1.08rem; line-height: 1.6; color: #35496B; }
+.quote-card .attr { font-size: 0.82rem; letter-spacing: 2px; text-transform: uppercase; color: #8496B4; font-weight: 800; }
+.rating-line { text-align: center; font-size: 1.08rem; color: #4E6288; margin: 30px 0 0; }
+.rating-line strong { color: #4A6FA5; }
+.link-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  max-width: 520px;
+  margin: 26px auto 0;
+  background: #4A6FA5;
+  color: #FFFFFF;
+  text-decoration: none;
+  border-radius: 18px;
+  padding: 20px 24px;
+  box-shadow: 0 10px 24px rgba(74,111,165,0.35);
+}
+.link-card i { font-size: 1.4rem; color: #B8D4F0; }
+.link-card .lc-title { font-weight: 800; font-size: 1.02rem; }
+.link-card .lc-sub { font-size: 0.85rem; color: #D6E4F0; }
+.link-card:hover { background: #3C5C8C; }
+
+/* Visit */
+.visit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 34px; align-items: start; }
+@media (max-width: 860px) { .visit-grid { grid-template-columns: 1fr; } }
+.addr-card { background: #FFFFFF; border: 1px solid #DCE7F3; border-radius: 20px; padding: 22px 24px; margin-bottom: 16px; box-shadow: 0 8px 20px rgba(74,111,165,0.1); }
+.addr-card h3 { margin: 0 0 8px; font-size: 1.6rem; color: #2C4370; }
+.addr-card p { margin: 0 0 4px; color: #5A6E92; }
+
+/* Laundry ticket card */
+.ticket-wrap { text-align: center; }
+.ticket {
+  max-width: 340px;
+  margin: 0 auto 18px;
+  background: #FFFFFF;
+  border: 2px solid #C9DBEE;
+  border-radius: 16px;
+  box-shadow: 0 12px 26px rgba(74,111,165,0.18);
+  overflow: hidden;
+}
+.ticket .t-top { background: #4A6FA5; color: #FFFFFF; padding: 14px; text-align: center; position: relative; }
+.ticket .t-top .hole { width: 16px; height: 16px; border-radius: 50%; background: #FFFFFF; border: 3px solid #2C4370; position: absolute; left: 50%; transform: translateX(-50%); top: -9px; }
+.ticket .t-top .t-brand { font-family: 'Damion', cursive; font-size: 1.3rem; line-height: 1.1; padding-top: 6px; }
+.ticket .t-body { padding: 18px; }
+.ticket .t-phone { display: inline-block; font-weight: 800; font-size: 1.35rem; color: #2C4370; text-decoration: none; border-bottom: 3px solid #4A6FA5; margin-bottom: 8px; }
+.ticket .t-phone:hover { color: #4A6FA5; }
+.ticket .t-sub { font-size: 0.86rem; color: #7A8BA8; }
+.ticket .t-perf { height: 10px; background: radial-gradient(circle at 8px -4px, transparent 8px, #FFFFFF 8.5px) repeat-x; background-size: 16px 10px; border-top: 1.5px dashed #C9DBEE; }
+
+/* Form */
+.form-card { background: #FFFFFF; border: 1px solid #DCE7F3; border-radius: 20px; padding: 26px; margin-top: 24px; box-shadow: 0 8px 20px rgba(74,111,165,0.1); }
+.form-card h3 { margin: 0 0 6px; font-size: 1.7rem; color: #2C4370; }
+.form-card p.f-sub { margin: 0 0 18px; color: #5A6E92; font-size: 0.94rem; }
+label { display: block; font-weight: 800; font-size: 0.87rem; margin: 0 0 6px; color: #35496B; }
+input, textarea {
+  width: 100%;
+  font-family: 'Mulish', sans-serif;
+  font-size: 0.97rem;
+  padding: 11px 14px;
+  border: 1.5px solid #C9DBEE;
+  border-radius: 12px;
+  background: #F8FBFE;
+  color: #35496B;
+  margin: 0 0 14px;
+}
+input:focus, textarea:focus { outline: none; border-color: #4A6FA5; }
+textarea { min-height: 110px; resize: vertical; }
+#form-note { font-weight: 800; color: #22662F; margin: 10px 0 0; font-size: 0.94rem; min-height: 1.4em; }
+
+/* Footer */
+footer.site-foot { background: #2C4370; color: #C9DBEE; padding: 38px 0 24px; margin-top: 20px; }
+.foot-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 26px; }
+.foot-grid h4 { color: #FFFFFF; margin: 0 0 10px; font-size: 1.02rem; }
+.foot-grid p { margin: 0 0 5px; font-size: 0.92rem; }
+.foot-copy { border-top: 1px solid #3C5685; margin-top: 24px; padding-top: 16px; text-align: center; font-size: 0.9rem; color: #9DB6D6; }
+</style>
+</head>
+<body>
+<div class="site-shell">
+  <header class="site-head">
+    <div class="wrap head-row">
+      <a class="brand" href="#/home" data-page="home">
+        <span class="brand-name">Michael A Laundromat</span>
+      </a>
+      <button id="menu-btn" class="menu-btn" aria-label="Toggle menu"><i class="fa-solid fa-bars"></i></button>
+      <nav class="nav-links">
+        <a href="#/shop" data-page="shop">The Wash</a>
+        <a href="#/reviews" data-page="reviews">Reviews</a>
+        <a href="#/visit" data-page="visit">Visit</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- HOME -->
+    <section class="page active" id="page-home">
+      <div class="hero">
+        <div class="wrap hero-grid">
+          <div>
+            <p class="eyebrow">Bluebonnet Ln · Zilker and Barton Hills</p>
+            <h1>Laundry done early, done right</h1>
+            <p class="lead">Michael A Laundromat is the neighborhood wash house on Bluebonnet Lane. Self-service machines, doors open early, and a clean, bright place to get it all done.</p>
+            <span class="early-badge"><i class="fa-solid fa-sun"></i> Doors open 6:30 AM, every single day</span>
+            <div class="hero-actions">
+              <a class="btn btn-blue" href="#/shop" data-page="shop">See the wash</a>
+              <a class="btn btn-sky" href="#/visit" data-page="visit">Visit us</a>
+            </div>
+            <span class="status-chip"><span class="dot"></span>Checking hours</span>
+          </div>
+          <div class="flower-panel">
+            <svg viewBox="0 0 240 260" aria-hidden="true">
+              <g transform="translate(70,20)">
+                <path d="M50 230 C 48 190, 52 150, 50 110" stroke="#5A8A4E" stroke-width="5" fill="none" stroke-linecap="round"/>
+                <path d="M50 190 C 30 185, 22 172, 20 158" stroke="#5A8A4E" stroke-width="4" fill="none" stroke-linecap="round"/>
+                <ellipse cx="30" cy="158" rx="14" ry="6" fill="#5A8A4E" transform="rotate(-30 30 158)"/>
+                <g>
+                  <circle cx="50" cy="46" r="15" fill="#4A6FA5"/><circle cx="57" cy="38" r="4.5" fill="#FFFFFF"/>
+                  <circle cx="76" cy="60" r="15" fill="#4A6FA5"/><circle cx="86" cy="56" r="4.5" fill="#FFFFFF"/>
+                  <circle cx="76" cy="94" r="15" fill="#5A7CB0"/><circle cx="86" cy="98" r="4.5" fill="#FFFFFF"/>
+                  <circle cx="50" cy="108" r="15" fill="#4A6FA5"/><circle cx="56" cy="118" r="4.5" fill="#FFFFFF"/>
+                  <circle cx="26" cy="94" r="15" fill="#5A7CB0"/><circle cx="15" cy="96" r="4.5" fill="#FFFFFF"/>
+                  <circle cx="28" cy="60" r="15" fill="#4A6FA5"/><circle cx="19" cy="55" r="4.5" fill="#FFFFFF"/>
+                  <circle cx="51" cy="76" r="13" fill="#2C4370"/>
+                </g>
+              </g>
+              <g transform="translate(140,80) scale(0.62)">
+                <path d="M50 230 C 48 190, 52 150, 50 110" stroke="#5A8A4E" stroke-width="5" fill="none" stroke-linecap="round"/>
+                <circle cx="50" cy="46" r="15" fill="#4A6FA5"/><circle cx="57" cy="38" r="4.5" fill="#FFFFFF"/>
+                <circle cx="76" cy="60" r="15" fill="#4A6FA5"/><circle cx="86" cy="56" r="4.5" fill="#FFFFFF"/>
+                <circle cx="76" cy="94" r="15" fill="#5A7CB0"/><circle cx="86" cy="98" r="4.5" fill="#FFFFFF"/>
+                <circle cx="50" cy="108" r="15" fill="#4A6FA5"/><circle cx="56" cy="118" r="4.5" fill="#FFFFFF"/>
+                <circle cx="26" cy="94" r="15" fill="#5A7CB0"/><circle cx="15" cy="96" r="4.5" fill="#FFFFFF"/>
+                <circle cx="28" cy="60" r="15" fill="#4A6FA5"/><circle cx="19" cy="55" r="4.5" fill="#FFFFFF"/>
+                <circle cx="51" cy="76" r="13" fill="#2C4370"/>
+              </g>
+            </svg>
+            <p class="cap">Bluebonnets on the lane</p>
+          </div>
+        </div>
+      </div>
+      <div class="bloom-strip" aria-hidden="true">
+        <svg width="54" height="40" viewBox="0 0 54 40"><path d="M27 40 C 26 30, 28 22, 27 16" stroke="#5A8A4E" stroke-width="3" fill="none"/><circle cx="27" cy="10" r="6" fill="#4A6FA5"/><circle cx="30" cy="6" r="2" fill="#FFFFFF"/><circle cx="18" cy="15" r="5" fill="#5A7CB0"/><circle cx="14" cy="12" r="1.8" fill="#FFFFFF"/><circle cx="36" cy="15" r="5" fill="#5A7CB0"/><circle cx="40" cy="12" r="1.8" fill="#FFFFFF"/></svg>
+        <svg width="54" height="40" viewBox="0 0 54 40"><path d="M27 40 C 26 30, 28 22, 27 16" stroke="#5A8A4E" stroke-width="3" fill="none"/><circle cx="27" cy="10" r="6" fill="#4A6FA5"/><circle cx="30" cy="6" r="2" fill="#FFFFFF"/><circle cx="18" cy="15" r="5" fill="#5A7CB0"/><circle cx="14" cy="12" r="1.8" fill="#FFFFFF"/><circle cx="36" cy="15" r="5" fill="#5A7CB0"/><circle cx="40" cy="12" r="1.8" fill="#FFFFFF"/></svg>
+        <svg width="54" height="40" viewBox="0 0 54 40"><path d="M27 40 C 26 30, 28 22, 27 16" stroke="#5A8A4E" stroke-width="3" fill="none"/><circle cx="27" cy="10" r="6" fill="#4A6FA5"/><circle cx="30" cy="6" r="2" fill="#FFFFFF"/><circle cx="18" cy="15" r="5" fill="#5A7CB0"/><circle cx="14" cy="12" r="1.8" fill="#FFFFFF"/><circle cx="36" cy="15" r="5" fill="#5A7CB0"/><circle cx="40" cy="12" r="1.8" fill="#FFFFFF"/></svg>
+      </div>
+
+      <section class="band">
+        <div class="wrap">
+          <div class="band-head">
+            <h2>A wash day that works</h2>
+            <p>Open every day from early morning to late evening, so the laundry fits your schedule.</p>
+          </div>
+          <div class="cards">
+            <div class="card">
+              <span class="ico"><i class="fa-solid fa-soap"></i></span>
+              <h3>Washers</h3>
+              <p>Self-service washers, ready when you are, no wait most hours of the day.</p>
+            </div>
+            <div class="card">
+              <span class="ico"><i class="fa-solid fa-fire"></i></span>
+              <h3>Dryers</h3>
+              <p>Hot dryers to finish the load while you run your errands.</p>
+            </div>
+            <div class="card">
+              <span class="ico"><i class="fa-solid fa-clock"></i></span>
+              <h3>Long hours</h3>
+              <p>6:30 AM to 10:30 PM, seven days a week. Early birds and night washers both welcome.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="band sky">
+        <div class="wrap">
+          <div class="band-head">
+            <h2>The whole week</h2>
+            <p>Same hours every day, early open and late close.</p>
+          </div>
+          <p class="big-line">Every day, 6:30 AM to 10:30 PM</p>
+          <div class="day-strip">
+            <div class="day-cell" data-day="0"><span class="d">Sun</span><span class="h">6:30 to 10:30</span></div>
+            <div class="day-cell" data-day="1"><span class="d">Mon</span><span class="h">6:30 to 10:30</span></div>
+            <div class="day-cell" data-day="2"><span class="d">Tue</span><span class="h">6:30 to 10:30</span></div>
+            <div class="day-cell" data-day="3"><span class="d">Wed</span><span class="h">6:30 to 10:30</span></div>
+            <div class="day-cell" data-day="4"><span class="d">Thu</span><span class="h">6:30 to 10:30</span></div>
+            <div class="day-cell" data-day="5"><span class="d">Fri</span><span class="h">6:30 to 10:30</span></div>
+            <div class="day-cell" data-day="6"><span class="d">Sat</span><span class="h">6:30 to 10:30</span></div>
+          </div>
+          <p class="confirm-line">Call to confirm hours on holidays.</p>
+        </div>
+      </section>
+    </section>
+
+    <!-- SHOP -->
+    <section class="page" id="page-shop">
+      <section class="band" style="padding-top:56px">
+        <div class="wrap">
+          <div class="band-head">
+            <h2>The Wash</h2>
+            <p>What wash day at Michael A Laundromat looks like.</p>
+          </div>
+          <div class="cards">
+            <div class="card">
+              <span class="ico"><i class="fa-solid fa-soap"></i></span>
+              <h3>Self-service wash</h3>
+              <p>Bring your basket, pick a machine, and let it run. Simple and self-serve.</p>
+            </div>
+            <div class="card">
+              <span class="ico"><i class="fa-solid fa-fire"></i></span>
+              <h3>Self-service dry</h3>
+              <p>Dryers by the row, hot and quick, fold at the counter or at home.</p>
+            </div>
+            <div class="card">
+              <span class="ico"><i class="fa-solid fa-lightbulb"></i></span>
+              <h3>Bright and clean</h3>
+              <p>A spotlessly clean, bright space to spend your wash time in. Our customers say it better than we do.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <div class="bloom-strip" aria-hidden="true">
+        <svg width="54" height="40" viewBox="0 0 54 40"><path d="M27 40 C 26 30, 28 22, 27 16" stroke="#5A8A4E" stroke-width="3" fill="none"/><circle cx="27" cy="10" r="6" fill="#4A6FA5"/><circle cx="30" cy="6" r="2" fill="#FFFFFF"/><circle cx="18" cy="15" r="5" fill="#5A7CB0"/><circle cx="14" cy="12" r="1.8" fill="#FFFFFF"/><circle cx="36" cy="15" r="5" fill="#5A7CB0"/><circle cx="40" cy="12" r="1.8" fill="#FFFFFF"/></svg>
+        <svg width="54" height="40" viewBox="0 0 54 40"><path d="M27 40 C 26 30, 28 22, 27 16" stroke="#5A8A4E" stroke-width="3" fill="none"/><circle cx="27" cy="10" r="6" fill="#4A6FA5"/><circle cx="30" cy="6" r="2" fill="#FFFFFF"/><circle cx="18" cy="15" r="5" fill="#5A7CB0"/><circle cx="14" cy="12" r="1.8" fill="#FFFFFF"/><circle cx="36" cy="15" r="5" fill="#5A7CB0"/><circle cx="40" cy="12" r="1.8" fill="#FFFFFF"/></svg>
+        <svg width="54" height="40" viewBox="0 0 54 40"><path d="M27 40 C 26 30, 28 22, 27 16" stroke="#5A8A4E" stroke-width="3" fill="none"/><circle cx="27" cy="10" r="6" fill="#4A6FA5"/><circle cx="30" cy="6" r="2" fill="#FFFFFF"/><circle cx="18" cy="15" r="5" fill="#5A7CB0"/><circle cx="14" cy="12" r="1.8" fill="#FFFFFF"/><circle cx="36" cy="15" r="5" fill="#5A7CB0"/><circle cx="40" cy="12" r="1.8" fill="#FFFFFF"/></svg>
+      </div>
+      <section class="band">
+        <div class="wrap">
+          <div class="band-head" style="margin-bottom:0">
+            <h2>In the neighborhood</h2>
+            <p>You will find us on Bluebonnet Lane in the Zilker and Barton Hills part of Austin, an easy stop on the way to work or on the way home.</p>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <!-- REVIEWS -->
+    <section class="page" id="page-reviews">
+      <section class="band" style="padding-top:56px">
+        <div class="wrap">
+          <div class="band-head">
+            <h2>In their words</h2>
+            <p>Reviews left for us on Google, kept word for word.</p>
+          </div>
+          <div class="quote-card">
+            <p class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></p>
+            <blockquote>we were very pleased. Top level service</blockquote>
+            <p class="attr">Google review</p>
+          </div>
+          <div class="quote-card">
+            <p class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></p>
+            <blockquote>The facility is spotlessly clean, bright, and comfortable to spend time in while you wait. Plenty of machines available so you never have to wait long.</blockquote>
+            <p class="attr">Google review</p>
+          </div>
+          <p class="rating-line"><strong>5.0 stars</strong> on Google</p>
+          <a class="link-card" href="https://www.google.com/maps/search/?api=1&query=Michael%20A%20Laundromat%2C%201701%20Bluebonnet%20Ln%2C%20Austin%2C%20TX%2078704" rel="noopener">
+            <i class="fa-brands fa-google"></i>
+            <span>
+              <span class="lc-title">See every review on Google</span><br>
+              <span class="lc-sub">The full record, straight from Google.</span>
+            </span>
+          </a>
+        </div>
+      </section>
+    </section>
+
+    <!-- VISIT -->
+    <section class="page" id="page-visit">
+      <section class="band">
+        <div class="wrap">
+          <div class="band-head">
+            <h2>Visit the laundromat</h2>
+            <p>On Bluebonnet Lane, open early and late, every day of the week.</p>
+          </div>
+          <div class="visit-grid">
+            <div>
+              <div class="addr-card">
+                <h3>Where to find us</h3>
+                <p>1701 Bluebonnet Ln</p>
+                <p>Austin, TX 78704</p>
+                <p>Zilker and Barton Hills, South Austin.</p>
+              </div>
+              <div class="day-strip" style="max-width:none">
+                <div class="day-cell" data-day="0"><span class="d">Sun</span><span class="h">6:30 to 10:30</span></div>
+                <div class="day-cell" data-day="1"><span class="d">Mon</span><span class="h">6:30 to 10:30</span></div>
+                <div class="day-cell" data-day="2"><span class="d">Tue</span><span class="h">6:30 to 10:30</span></div>
+                <div class="day-cell" data-day="3"><span class="d">Wed</span><span class="h">6:30 to 10:30</span></div>
+                <div class="day-cell" data-day="4"><span class="d">Thu</span><span class="h">6:30 to 10:30</span></div>
+                <div class="day-cell" data-day="5"><span class="d">Fri</span><span class="h">6:30 to 10:30</span></div>
+                <div class="day-cell" data-day="6"><span class="d">Sat</span><span class="h">6:30 to 10:30</span></div>
+              </div>
+              <p class="confirm-line">Every day, 6:30 AM to 10:30 PM. Call to confirm holiday hours.</p>
+            </div>
+            <div>
+              <div class="ticket-wrap">
+                <div class="ticket">
+                  <div class="t-top"><span class="hole"></span><p class="t-brand" style="margin:0">Michael A Laundromat</p></div>
+                  <div class="t-body">
+                    <a class="t-phone" href="tel:+15122066330">(512) 206-6330</a>
+                    <p class="t-sub">Call about the machines or hours before you haul the baskets over.</p>
+                  </div>
+                  <div class="t-perf"></div>
+                </div>
+              </div>
+              <div class="form-card">
+                <h3>Send us a note</h3>
+                <p class="f-sub">Your name and your question, and we will get back to you.</p>
+                <form id="note-form">
+                  <label for="f-name">Your name</label>
+                  <input id="f-name" type="text" autocomplete="name" required>
+                  <label for="f-phone">Your phone</label>
+                  <input id="f-phone" type="tel" autocomplete="tel">
+                  <label for="f-msg">Your message</label>
+                  <textarea id="f-msg" required></textarea>
+                  <button class="btn btn-blue" type="submit">Send the note</button>
+                  <p id="form-note" role="status"></p>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="site-foot">
+    <div class="wrap">
+      <div class="foot-grid">
+        <div>
+          <h4>Michael A Laundromat</h4>
+          <p>1701 Bluebonnet Ln</p>
+          <p>Austin, TX 78704</p>
+          <p>(512) 206-6330</p>
+        </div>
+        <div>
+          <h4>Hours</h4>
+          <p>Every day, 6:30 AM to 10:30 PM</p>
+          <p>Early open, late close</p>
+        </div>
+        <div>
+          <h4>The wash</h4>
+          <p>Self-service washers and dryers, clean and bright.</p>
+        </div>
+      </div>
+      <p class="foot-copy">© Michael A Laundromat · Austin, TX</p>
+    </div>
+  </footer>
+</div>
+
+<script>
+var BUSINESS = "Michael A Laundromat";
+var TITLES = {
+  home: "Laundromat on Bluebonnet Lane",
+  shop: "The Wash",
+  reviews: "Reviews",
+  visit: "Visit Us"
+};
+function getPageFromHash(){
+  var h = (location.hash || "").replace(/^#\/?/, "");
+  return TITLES[h] ? h : "home";
+}
+function navigateTo(id, push){
+  document.querySelectorAll(".page").forEach(function(p){
+    p.classList.toggle("active", p.id === "page-" + id);
+  });
+  if (push) history.pushState({ page: id }, "", "#/" + id);
+  document.title = TITLES[id] + " | " + BUSINESS;
+  window.scrollTo({ top: 0, behavior: "instant" });
+  var mb = document.getElementById("menu-btn");
+  var nl = document.querySelector(".nav-links");
+  if (mb && nl) { mb.classList.remove("open"); nl.classList.remove("open"); }
+}
+document.addEventListener("click", function(e){
+  var t = e.target.closest("[data-page]");
+  if (t) { e.preventDefault(); navigateTo(t.getAttribute("data-page"), true); }
+});
+window.addEventListener("popstate", function(){ navigateTo(getPageFromHash(), false); });
+
+var CITY_TZ = "America/Chicago";
+var HOURS = { 0:[6.5,22.5], 1:[6.5,22.5], 2:[6.5,22.5], 3:[6.5,22.5], 4:[6.5,22.5], 5:[6.5,22.5], 6:[6.5,22.5] };
+function cityNow(){
+  var parts = new Intl.DateTimeFormat("en-US", { timeZone: CITY_TZ,
+    weekday: "short", hour: "numeric", minute: "numeric", hour12: false })
+    .formatToParts(new Date());
+  var o = {}; parts.forEach(function(p){ o[p.type] = p.value; });
+  var days = { Sun:0, Mon:1, Tue:2, Wed:3, Thu:4, Fri:5, Sat:6 };
+  return { day: days[o.weekday], hour: (+o.hour) % 24, minute: +o.minute };
+}
+function fmtH(t){
+  var h = Math.floor(t), m = Math.round((t - h) * 60);
+  var ap = h >= 12 && h < 24 ? "PM" : "AM", hh = h % 12; if (hh === 0) hh = 12;
+  return hh + (m ? ":" + String(m).padStart(2, "0") : ":00") + " " + ap;
+}
+function openState(){
+  var n = cityNow(), t = n.hour + n.minute / 60, today = HOURS[n.day];
+  if (today) {
+    if (today[1] > 24 && t < today[1] - 24) return { open: true, label: "Open now" };
+    if (t >= today[0] && t < (today[1] > 24 ? 24 : today[1])) return { open: true, label: "Open now" };
+  }
+  var names = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  for (var i = 0; i < 7; i++) {
+    var d = (n.day + i) % 7, h = HOURS[d];
+    if (!h) continue;
+    if (i === 0 && t < h[0]) return { open: false, label: "Opens " + fmtH(h[0]) + " today" };
+    if (i > 0) return { open: false, label: "Opens " + names[d] + (h[0] ? " at " + fmtH(h[0]) : "") };
+  }
+  return { open: false, label: "Closed" };
+}
+function renderStatus(){
+  var s = openState();
+  document.querySelectorAll(".status-chip").forEach(function(el){
+    el.classList.remove("is-open", "is-closed");
+    el.classList.add(s.open ? "is-open" : "is-closed");
+    el.innerHTML = '<span class="dot"></span>' + s.label;
+  });
+  var day = cityNow().day;
+  document.querySelectorAll("[data-day]").forEach(function(el){
+    if (+el.getAttribute("data-day") === day) el.classList.add("today");
+  });
+}
+renderStatus();
+
+var menuBtn = document.getElementById("menu-btn");
+if (menuBtn) {
+  menuBtn.addEventListener("click", function(){
+    menuBtn.classList.toggle("open");
+    var nl = document.querySelector(".nav-links");
+    if (nl) nl.classList.toggle("open");
+  });
+}
+
+var PHONE = "+15122066330";
+var PRETTY = "(512) 206-6330";
+var noteForm = document.getElementById("note-form");
+if (noteForm) {
+  noteForm.addEventListener("submit", function(ev){
+    ev.preventDefault();
+    var name = document.getElementById("f-name").value.trim();
+    var from = document.getElementById("f-phone").value.trim();
+    var msg = document.getElementById("f-msg").value.trim();
+    if (!name || !msg) return;
+    var text = "Hi " + BUSINESS + ", this is " + name + (from ? " (" + from + ")" : "") + ". " + msg;
+    if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
+      location.href = "sms:" + PHONE + "?&body=" + encodeURIComponent(text);
+    } else {
+      navigator.clipboard.writeText(text).then(function(){
+        var fb = document.getElementById("form-note");
+        fb.textContent = "Copied. Now paste it in a text to " + PRETTY;
+        noteForm.reset();
+      });
+    }
+  });
+}
+
+navigateTo(getPageFromHash(), false);
+</script>
+</body>
+</html>

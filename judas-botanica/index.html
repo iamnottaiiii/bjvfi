@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A Small Botanica on Cameron Rd | Judas Botanica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Infant:ital,wght@0,400;0,500;0,600;1,400&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+<style>
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: 'Lato', sans-serif;
+  background: #FBF5EA;
+  color: #4A3A28;
+  line-height: 1.7;
+  font-size: 17px;
+}
+h1, h2, h3, .display { font-family: 'Cormorant Infant', serif; font-weight: 600; }
+.site-shell { min-height: 100vh; display: flex; flex-direction: column; }
+main { flex: 1 0 auto; }
+footer { flex-shrink: 0; }
+.page { display: none; }
+.page.active { display: block; }
+.col { max-width: 680px; margin: 0 auto; padding: 0 22px; }
+
+/* Header, humble single bar */
+header.site-head {
+  background: #FBF5EA;
+  border-bottom: 1px solid #E3D5BC;
+  padding: 16px 0 0;
+  text-align: center;
+}
+.brand { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; text-decoration: none; color: #6B4A2F; cursor: pointer; }
+.brand .small-cap { font-size: 0.72rem; letter-spacing: 3px; text-transform: uppercase; color: #A58B60; }
+.brand .brand-name { font-family: 'Cormorant Infant', serif; font-size: 1.75rem; font-weight: 600; line-height: 1.1; }
+.menu-btn {
+  position: absolute;
+  top: 18px; right: 18px;
+  background: transparent;
+  border: 1.5px solid #C9A227;
+  color: #6B4A2F;
+  border-radius: 8px;
+  font-size: 1rem;
+  padding: 7px 11px;
+  cursor: pointer;
+}
+header.site-head { position: relative; }
+.nav-links {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin: 14px 0 0;
+  flex-wrap: wrap;
+}
+.nav-links a {
+  color: #6B4A2F;
+  text-decoration: none;
+  font-size: 0.92rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 10px 16px 12px;
+  border-bottom: 3px solid transparent;
+}
+.nav-links a:hover { border-bottom-color: #C9A227; }
+@media (max-width: 760px) {
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0; right: 0;
+    background: #F4EAD5;
+    flex-direction: column;
+    align-items: stretch;
+    margin: 0;
+    padding: 8px 0 12px;
+    gap: 0;
+    border-bottom: 2px solid #C9A227;
+    z-index: 40;
+  }
+  .nav-links.open { display: flex; }
+  .nav-links a { padding: 12px 22px; border-bottom: 0; }
+}
+
+/* Flame dot rule */
+.rule { display: flex; align-items: center; gap: 12px; margin: 34px auto; max-width: 320px; }
+.rule::before, .rule::after { content: ""; flex: 1; height: 1px; background: #D9C69A; }
+.rule i { color: #C9A227; font-size: 0.85rem; }
+
+/* Status chip */
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 16px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  background: #F4EAD5;
+  border: 1px solid #DECBA0;
+  color: #6B5A3C;
+}
+.status-chip .dot { width: 10px; height: 10px; border-radius: 50%; background: #8B8B84; flex: 0 0 auto; }
+.status-chip.is-open { background: #EAF2E2; border-color: #B4C99A; color: #4C6633; }
+.status-chip.is-open .dot { background: #5E8C3E; box-shadow: 0 0 0 4px rgba(94,140,62,0.15); }
+.status-chip.is-closed .dot { background: #A94A3F; box-shadow: 0 0 0 4px rgba(169,74,63,0.12); }
+
+/* Hero */
+.hero { padding: 52px 0 10px; text-align: center; }
+.hero .kicker { font-size: 0.75rem; letter-spacing: 3px; text-transform: uppercase; color: #A58B60; margin: 0 0 14px; }
+.hero h1 { font-size: clamp(2rem, 5vw, 2.9rem); margin: 0 0 14px; color: #6B4A2F; line-height: 1.15; }
+.hero p.lead { margin: 0 auto 22px; max-width: 32em; color: #5D4C36; }
+.saturday-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 2px solid #C9A227;
+  border-radius: 999px;
+  background: #FFFDF6;
+  color: #6B4A2F;
+  font-weight: 700;
+  font-size: 0.98rem;
+  padding: 10px 22px;
+  margin: 6px 0 18px;
+}
+.saturday-badge i { color: #C9A227; }
+.hero .chip-row { margin: 8px 0 4px; }
+
+/* Sections */
+section.band { padding: 34px 0; }
+.band h2 { font-size: 1.7rem; color: #6B4A2F; margin: 0 0 12px; text-align: center; }
+.band p.body { margin: 0 0 14px; color: #5D4C36; text-align: center; }
+.quiet-list { list-style: none; margin: 22px 0 0; padding: 0; }
+.quiet-list li {
+  padding: 14px 18px;
+  border-left: 3px solid #C9A227;
+  background: #FFFDF6;
+  margin: 0 0 10px;
+  border-radius: 0 10px 10px 0;
+}
+.quiet-list li strong { color: #6B4A2F; font-family: 'Cormorant Infant', serif; font-size: 1.15rem; }
+.quiet-list li span { display: block; font-size: 0.94rem; color: #6E5C44; }
+
+/* Reviews */
+.rating-hero { text-align: center; padding: 46px 0 20px; }
+.rating-num { font-family: 'Cormorant Infant', serif; font-size: clamp(3.6rem, 9vw, 5.2rem); color: #6B4A2F; line-height: 1; margin: 0; }
+.rating-sub { font-size: 1.08rem; color: #5D4C36; margin: 12px 0 0; }
+.rating-note { font-size: 0.92rem; color: #8A7550; margin: 14px auto 0; max-width: 30em; font-style: italic; }
+.link-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  max-width: 480px;
+  margin: 30px auto 0;
+  background: #6B4A2F;
+  color: #FBF5EA;
+  text-decoration: none;
+  border-radius: 14px;
+  padding: 20px 24px;
+  box-shadow: 0 8px 20px rgba(107,74,47,0.25);
+}
+.link-card i { font-size: 1.4rem; color: #C9A227; }
+.link-card .lc-title { font-weight: 700; font-size: 1rem; }
+.link-card .lc-sub { font-size: 0.85rem; color: #E0CFAF; }
+.link-card:hover { background: #7C583A; }
+
+/* Visit */
+.addr { text-align: center; margin: 0 0 8px; color: #5D4C36; }
+.addr strong { color: #6B4A2F; font-family: 'Cormorant Infant', serif; font-size: 1.2rem; }
+.day-list { list-style: none; margin: 20px auto 0; padding: 0; max-width: 380px; border: 1px solid #E3D5BC; border-radius: 14px; overflow: hidden; background: #FFFDF6; }
+.day-list li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 18px; border-bottom: 1px solid #F0E6D2; font-size: 0.95rem; }
+.day-list li:last-child { border-bottom: 0; }
+.day-list li .day { font-weight: 700; color: #6B4A2F; }
+.day-list li.closed .hrs { color: #A94A3F; }
+.day-list li.today { background: #F7EDD6; }
+.day-list li.today .day { color: #8A6A14; }
+.confirm-line { text-align: center; font-size: 0.86rem; color: #8A7550; font-style: italic; margin: 12px 0 0; }
+
+/* Devotion slip */
+.slip {
+  max-width: 420px;
+  margin: 36px auto 0;
+  background: #FFFDF6;
+  border: 1px solid #E3D5BC;
+  border-radius: 12px;
+  padding: 26px 26px 24px;
+  box-shadow: 0 10px 24px rgba(107,74,47,0.14);
+  position: relative;
+  text-align: center;
+}
+.slip::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1.5px dashed #D9C69A;
+  border-radius: 8px;
+  pointer-events: none;
+}
+.slip .slip-top { font-size: 0.72rem; letter-spacing: 3px; text-transform: uppercase; color: #A58B60; margin: 0 0 8px; }
+.slip .slip-phone {
+  display: inline-block;
+  font-family: 'Cormorant Infant', serif;
+  font-size: 1.7rem;
+  font-weight: 600;
+  color: #6B4A2F;
+  text-decoration: none;
+  border-bottom: 2px solid #C9A227;
+  padding: 0 6px 2px;
+  margin: 4px 0 10px;
+}
+.slip .slip-phone:hover { color: #C9A227; }
+.slip p.slip-sub { font-size: 0.9rem; color: #6E5C44; margin: 0; position: relative; }
+
+/* Form */
+.form-card { background: #FFFDF6; border: 1px solid #E3D5BC; border-radius: 14px; padding: 26px; margin: 26px 0 0; }
+.form-card h3 { margin: 0 0 6px; font-size: 1.4rem; color: #6B4A2F; text-align: center; }
+.form-card p.f-sub { margin: 0 0 18px; color: #6E5C44; font-size: 0.93rem; text-align: center; }
+label { display: block; font-weight: 700; font-size: 0.86rem; margin: 0 0 6px; color: #6B4A2F; }
+input, textarea {
+  width: 100%;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.97rem;
+  padding: 11px 14px;
+  border: 1.5px solid #DECBA0;
+  border-radius: 10px;
+  background: #FDFAF1;
+  color: #4A3A28;
+  margin: 0 0 14px;
+}
+input:focus, textarea:focus { outline: none; border-color: #C9A227; }
+textarea { min-height: 110px; resize: vertical; }
+.btn {
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  background: #6B4A2F;
+  color: #FBF5EA;
+  border: 0;
+  border-radius: 999px;
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 0.98rem;
+  padding: 13px 24px;
+  cursor: pointer;
+}
+.btn:hover { background: #7C583A; }
+#form-note { font-weight: 700; color: #4C6633; margin: 12px 0 0; font-size: 0.93rem; text-align: center; min-height: 1.4em; }
+
+/* Footer */
+footer.site-foot { background: #5D4128; color: #E0CFAF; padding: 34px 0 24px; margin-top: 30px; text-align: center; }
+footer.site-foot .foot-name { font-family: 'Cormorant Infant', serif; font-size: 1.3rem; color: #FBF5EA; margin: 0 0 8px; }
+footer.site-foot p { margin: 0 0 4px; font-size: 0.9rem; }
+.foot-copy { border-top: 1px solid #7A5A3C; margin-top: 20px; padding-top: 16px; font-size: 0.88rem; color: #CBB48D; }
+</style>
+</head>
+<body>
+<div class="site-shell">
+  <header class="site-head">
+    <button id="menu-btn" class="menu-btn" aria-label="Toggle menu"><i class="fa-solid fa-bars"></i></button>
+    <a class="brand" href="#/home" data-page="home">
+      <span class="small-cap">San Judas Tadeo, patron of difficult causes</span>
+      <span class="brand-name">Judas Botanica</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#/shop" data-page="shop">La Botanica</a>
+      <a href="#/reviews" data-page="reviews">Reviews</a>
+      <a href="#/visit" data-page="visit">Visit</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- HOME -->
+    <section class="page active" id="page-home">
+      <div class="col hero">
+        <p class="kicker">Cameron Rd, North Central Austin</p>
+        <h1>A small botanica, kept with devotion</h1>
+        <p class="lead">Judas Botanica is a modest neighborhood shop of velas, remedios, yerbas and devotional goods. We keep simple hours and a quiet shop, and we are here on Saturdays for whoever comes by.</p>
+        <div class="chip-row">
+          <span class="status-chip"><span class="dot"></span>Checking hours</span>
+        </div>
+        <br>
+        <span class="saturday-badge"><i class="fa-solid fa-calendar-day"></i> Open Saturdays only, 10 AM to 6:30 PM</span>
+      </div>
+      <div class="col rule"><i class="fa-solid fa-fire-flame-curved"></i></div>
+      <section class="band">
+        <div class="col">
+          <h2>Inside the shop</h2>
+          <p class="body">Shelves kept simply, for home altars and quiet practice.</p>
+          <ul class="quiet-list">
+            <li><strong>Velas</strong><span>Candles for the days you set aside light and time.</span></li>
+            <li><strong>Remedios and oils</strong><span>Bottled remedies and esencias, shelved within reach.</span></li>
+            <li><strong>Yerbas</strong><span>Dried herbs for baths and home preparations.</span></li>
+            <li><strong>Statues and estampitas</strong><span>Images for the corner of a room that matters.</span></li>
+          </ul>
+        </div>
+      </section>
+      <div class="col rule"><i class="fa-solid fa-fire-flame-curved"></i></div>
+      <section class="band">
+        <div class="col">
+          <h2>Plan your Saturday</h2>
+          <p class="body">Saturday is the day we open the doors, from 10 AM to 6:30 PM. The other six days the shop is closed. If you are coming from across town, call ahead and we will confirm the hours.</p>
+          <p class="body"><a href="#/visit" data-page="visit" style="color:#8A6A14; font-weight:700">Find us on Cameron Rd</a></p>
+        </div>
+      </section>
+    </section>
+
+    <!-- SHOP -->
+    <section class="page" id="page-shop">
+      <div class="col hero" style="padding-top:40px">
+        <p class="kicker">La Botanica</p>
+        <h1>What we keep on the shelves</h1>
+        <p class="lead">A working list of what you will usually find at Judas Botanica. Stock shifts week to week, so ask when you arrive.</p>
+      </div>
+      <section class="band">
+        <div class="col">
+          <ul class="quiet-list">
+            <li><strong>Velas and veladoras</strong><span>Glass and pillar candles in the colors of your devotion.</span></li>
+            <li><strong>Yerbas</strong><span>Dried herbs, tied and bagged, for baths and home use.</span></li>
+            <li><strong>Remedios</strong><span>Remedios and esencias for the home altar.</span></li>
+            <li><strong>Oils</strong><span>Small bottles of spiritual oils, easy to carry.</span></li>
+            <li><strong>Soaps and baths</strong><span>Soaps and bath supplies for cleansing days.</span></li>
+            <li><strong>Statues and images</strong><span>Devotional statues, prints and cards.</span></li>
+          </ul>
+        </div>
+      </section>
+      <div class="col rule"><i class="fa-solid fa-fire-flame-curved"></i></div>
+      <section class="band">
+        <div class="col">
+          <h2>A quiet promise</h2>
+          <p class="body">We keep this shop for the neighborhood. Come in, ask your questions, and take what you need. No appointment is needed on a Saturday, just knock softly and come in.</p>
+        </div>
+      </section>
+    </section>
+
+    <!-- REVIEWS -->
+    <section class="page" id="page-reviews">
+      <div class="col rating-hero">
+        <p class="kicker">Reviews</p>
+        <p class="rating-num">3.7</p>
+        <p class="rating-sub">3.7 stars with 27 reviews on Google</p>
+        <p class="rating-note">We show the number as it stands. Every review is read, and the shop keeps working to serve its neighbors better.</p>
+        <a class="link-card" href="https://www.google.com/maps/search/?api=1&query=Judas%20Botanica%2C%206305%20Cameron%20Rd%20%23113%2C%20Austin%2C%20TX%2078723" rel="noopener">
+          <i class="fa-brands fa-google"></i>
+          <span>
+            <span class="lc-title">See every review on Google</span><br>
+            <span class="lc-sub">Read the full record yourself, unedited.</span>
+          </span>
+        </a>
+      </div>
+    </section>
+
+    <!-- VISIT -->
+    <section class="page" id="page-visit">
+      <div class="col hero" style="padding-top:40px">
+        <p class="kicker">Visit</p>
+        <h1>One day a week, one small door</h1>
+        <p class="addr">
+          <strong>6305 Cameron Rd #113, Austin, TX 78723</strong><br>
+          In the suite on Cameron Rd, North Central Austin.
+        </p>
+        <div class="chip-row">
+          <span class="status-chip"><span class="dot"></span>Checking hours</span>
+        </div>
+      </div>
+      <section class="band">
+        <div class="col">
+          <ul class="day-list">
+            <li data-day="0" class="closed"><span class="day">Sunday</span><span class="hrs">Closed</span></li>
+            <li data-day="1" class="closed"><span class="day">Monday</span><span class="hrs">Closed</span></li>
+            <li data-day="2" class="closed"><span class="day">Tuesday</span><span class="hrs">Closed</span></li>
+            <li data-day="3" class="closed"><span class="day">Wednesday</span><span class="hrs">Closed</span></li>
+            <li data-day="4" class="closed"><span class="day">Thursday</span><span class="hrs">Closed</span></li>
+            <li data-day="5" class="closed"><span class="day">Friday</span><span class="hrs">Closed</span></li>
+            <li data-day="6"><span class="day">Saturday</span><span class="hrs">10:00 AM to 6:30 PM</span></li>
+          </ul>
+          <p class="confirm-line">Saturdays are our day. Call to confirm hours before a long drive, or around holidays.</p>
+          <div class="slip">
+            <p class="slip-top">Devotion card</p>
+            <a class="slip-phone" href="tel:+15126213008">(512) 621-3008</a>
+            <p class="slip-sub">Call about a candle color, an item on hold, or Saturday hours.</p>
+          </div>
+          <div class="form-card">
+            <h3>Leave a note</h3>
+            <p class="f-sub">Your name and your question. We answer when the shop is open.</p>
+            <form id="note-form">
+              <label for="f-name">Your name</label>
+              <input id="f-name" type="text" autocomplete="name" required>
+              <label for="f-phone">Your phone</label>
+              <input id="f-phone" type="tel" autocomplete="tel">
+              <label for="f-msg">Your message</label>
+              <textarea id="f-msg" required></textarea>
+              <button class="btn" type="submit">Send the note</button>
+              <p id="form-note" role="status"></p>
+            </form>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="site-foot">
+    <div class="col">
+      <p class="foot-name">Judas Botanica</p>
+      <p>6305 Cameron Rd #113, Austin, TX 78723</p>
+      <p>(512) 621-3008</p>
+      <p>Open Saturdays, 10 AM to 6:30 PM</p>
+      <p class="foot-copy">© Judas Botanica · Austin, TX</p>
+    </div>
+  </footer>
+</div>
+
+<script>
+var BUSINESS = "Judas Botanica";
+var TITLES = {
+  home: "A Small Botanica on Cameron Rd",
+  shop: "La Botanica",
+  reviews: "Reviews",
+  visit: "Visit Us"
+};
+function getPageFromHash(){
+  var h = (location.hash || "").replace(/^#\/?/, "");
+  return TITLES[h] ? h : "home";
+}
+function navigateTo(id, push){
+  document.querySelectorAll(".page").forEach(function(p){
+    p.classList.toggle("active", p.id === "page-" + id);
+  });
+  if (push) history.pushState({ page: id }, "", "#/" + id);
+  document.title = TITLES[id] + " | " + BUSINESS;
+  window.scrollTo({ top: 0, behavior: "instant" });
+  var mb = document.getElementById("menu-btn");
+  var nl = document.querySelector(".nav-links");
+  if (mb && nl) { mb.classList.remove("open"); nl.classList.remove("open"); }
+}
+document.addEventListener("click", function(e){
+  var t = e.target.closest("[data-page]");
+  if (t) { e.preventDefault(); navigateTo(t.getAttribute("data-page"), true); }
+});
+window.addEventListener("popstate", function(){ navigateTo(getPageFromHash(), false); });
+
+var CITY_TZ = "America/Chicago";
+var HOURS = { 0:null, 1:null, 2:null, 3:null, 4:null, 5:null, 6:[10,18.5] };
+function cityNow(){
+  var parts = new Intl.DateTimeFormat("en-US", { timeZone: CITY_TZ,
+    weekday: "short", hour: "numeric", minute: "numeric", hour12: false })
+    .formatToParts(new Date());
+  var o = {}; parts.forEach(function(p){ o[p.type] = p.value; });
+  var days = { Sun:0, Mon:1, Tue:2, Wed:3, Thu:4, Fri:5, Sat:6 };
+  return { day: days[o.weekday], hour: (+o.hour) % 24, minute: +o.minute };
+}
+function fmtH(t){
+  var h = Math.floor(t), m = Math.round((t - h) * 60);
+  var ap = h >= 12 && h < 24 ? "PM" : "AM", hh = h % 12; if (hh === 0) hh = 12;
+  return hh + (m ? ":" + String(m).padStart(2, "0") : ":00") + " " + ap;
+}
+function openState(){
+  var n = cityNow(), t = n.hour + n.minute / 60, today = HOURS[n.day];
+  if (today) {
+    if (today[1] > 24 && t < today[1] - 24) return { open: true, label: "Open now" };
+    if (t >= today[0] && t < (today[1] > 24 ? 24 : today[1])) return { open: true, label: "Open now" };
+  }
+  var names = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  for (var i = 0; i < 7; i++) {
+    var d = (n.day + i) % 7, h = HOURS[d];
+    if (!h) continue;
+    if (i === 0 && t < h[0]) return { open: false, label: "Opens " + fmtH(h[0]) + " today" };
+    if (i > 0) return { open: false, label: "Opens " + names[d] + (h[0] ? " at " + fmtH(h[0]) : "") };
+  }
+  return { open: false, label: "Closed" };
+}
+function renderStatus(){
+  var s = openState();
+  document.querySelectorAll(".status-chip").forEach(function(el){
+    el.classList.remove("is-open", "is-closed");
+    el.classList.add(s.open ? "is-open" : "is-closed");
+    el.innerHTML = '<span class="dot"></span>' + s.label;
+  });
+  var day = cityNow().day;
+  document.querySelectorAll("[data-day]").forEach(function(el){
+    if (+el.getAttribute("data-day") === day) el.classList.add("today");
+  });
+}
+renderStatus();
+
+var menuBtn = document.getElementById("menu-btn");
+if (menuBtn) {
+  menuBtn.addEventListener("click", function(){
+    menuBtn.classList.toggle("open");
+    var nl = document.querySelector(".nav-links");
+    if (nl) nl.classList.toggle("open");
+  });
+}
+
+var PHONE = "+15126213008";
+var PRETTY = "(512) 621-3008";
+var noteForm = document.getElementById("note-form");
+if (noteForm) {
+  noteForm.addEventListener("submit", function(ev){
+    ev.preventDefault();
+    var name = document.getElementById("f-name").value.trim();
+    var from = document.getElementById("f-phone").value.trim();
+    var msg = document.getElementById("f-msg").value.trim();
+    if (!name || !msg) return;
+    var text = "Hi " + BUSINESS + ", this is " + name + (from ? " (" + from + ")" : "") + ". " + msg;
+    if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
+      location.href = "sms:" + PHONE + "?&body=" + encodeURIComponent(text);
+    } else {
+      navigator.clipboard.writeText(text).then(function(){
+        var fb = document.getElementById("form-note");
+        fb.textContent = "Copied. Now paste it in a text to " + PRETTY;
+        noteForm.reset();
+      });
+    }
+  });
+}
+
+navigateTo(getPageFromHash(), false);
+</script>
+</body>
+</html>
