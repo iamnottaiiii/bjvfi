@@ -5,15 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>bjvfi</title>
 <link rel="icon" type="image/png" href="/bjvfi/favicon.png">
+<link rel="shortcut icon" type="image/png" href="/bjvfi/favicon.png">
+<link rel="apple-touch-icon" href="/bjvfi/favicon.png">
 <style>
 @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap");
 
 *{box-sizing:border-box; margin:0; padding:0;}
-html, body { scrollbar-width: none; -ms-overflow-style: none; background:#000; }
+
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  background:#000;
+}
 html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
 
 body {
-  min-height: 100vh;
   background: #000;
   color: #F2F2F5;
   font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -22,9 +31,10 @@ body {
 
 .bjvfi-void{
   --ink:#F2F2F5; --muted:#6B7080;
-  min-height:100vh; background:#000; color:var(--ink);
-  position:relative; overflow:hidden;
-  display:block;
+  position: fixed;
+  inset: 0;
+  background:#000; color:var(--ink);
+  overflow:hidden;
 }
 .bjvfi-void *{box-sizing:border-box;}
 
@@ -63,6 +73,7 @@ body {
   pointer-events:none;
 }
 
+/* Wordmark — exact center of the hole */
 .bjvfi-mark{
   position:absolute;
   top:50%; left:50%;
@@ -76,20 +87,18 @@ body {
   color:var(--ink);
   text-shadow:0 0 30px rgba(0,0,0,.9), 0 0 60px rgba(0,0,0,.7);
   pointer-events:none;
+  white-space: nowrap;
 }
 
+/* Search sits below the center, not at it */
 .bjvfi-stage{
   position:absolute;
-  top:calc(50% + 110px);
+  top:calc(50% + 90px);
   left:50%;
   transform:translateX(-50%);
   z-index:2;
   width:min(560px, calc(100% - 40px));
   display:flex; flex-direction:column; align-items:center; gap:16px;
-}
-.bjvfi-sub{
-  margin:0; color:var(--muted); font-size:.9rem; letter-spacing:.02em;
-  text-align:center;
 }
 .bjvfi-search-wrap{width:100%; position:relative;}
 
@@ -106,6 +115,7 @@ body {
   font-weight: 400;
   box-shadow: none;
   transition: none;
+  text-align: center;
 }
 .bjvfi-search::placeholder{ color:#444853; }
 .bjvfi-search:focus,
@@ -162,7 +172,7 @@ body {
 .bjvfi-status.error{color:#c8a0a0;}
 
 @media (max-height: 620px) {
-  .bjvfi-stage{ top:calc(50% + 80px); }
+  .bjvfi-stage{ top:calc(50% + 70px); }
 }
 </style>
 </head>
@@ -171,9 +181,8 @@ body {
   <h1 class="bjvfi-mark">bjvfi</h1>
 
   <div class="bjvfi-stage">
-    <p class="bjvfi-sub">Search a site</p>
     <div class="bjvfi-search-wrap">
-      <input class="bjvfi-search" id="bjvfi-search" type="search" placeholder="Type a business name..." autocomplete="off" spellcheck="false">
+      <input class="bjvfi-search" id="bjvfi-search" type="search" placeholder="Search the business name" autocomplete="off" spellcheck="false">
       <div class="bjvfi-results" id="bjvfi-results" role="listbox" aria-label="Search results"></div>
     </div>
     <div class="bjvfi-status" id="bjvfi-status" aria-live="polite"></div>
