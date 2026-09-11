@@ -1,0 +1,44 @@
+name: Rebuild sites.json
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: rebuild-sites-json
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    # Skip the bot's own catalog commits to avoid loops
+    if: github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, 'chore: rebuild sites.json')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Rebuild catalog
+        run: python3 scripts/rebuild-sites-json.py
+
+      - name: Commit if changed
+        run: |
+          if git diff --quiet -- sites.json; then
+            echo "No catalog changes"
+            exit 0
+          fi
+          git config user.name "Not Ai"
+          git config user.email "iamnottaiii@gmail.com"
+          git add sites.json
+          git commit -m "chore: rebuild sites.json"
+          git push
