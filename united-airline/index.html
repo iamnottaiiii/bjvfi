@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>United Airline | Duarte, CA</title>
+<meta name="description" content="United Airline, 1730 Evergreen St, Duarte, CA 91010. Call (626) 209-4519.">
+<style>
+  :root{
+    --paper:#fafafa; --ink:#14202e; --muted:#5c6a7a; --sky:#1f6fb2; --sky-d:#14578f;
+    --line:#e3e8ee; --tint:#eef4f9; --card:#ffffff;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;background:var(--paper);color:var(--ink);line-height:1.7}
+  a{color:var(--sky-d)}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 24px}
+  .page{display:none}
+  .page.active{display:block;animation:fadeIn .45s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .badge{display:inline-block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    background:var(--ink);color:#fff;padding:5px 10px;border-radius:3px}
+
+  /* minimal nav */
+  header.top{border-bottom:1px solid var(--line);background:var(--paper);position:sticky;top:0;z-index:50}
+  .navbar{display:flex;justify-content:space-between;align-items:center;padding:16px 0}
+  .brand{font-weight:700;font-size:19px;text-decoration:none;color:var(--ink);letter-spacing:.01em}
+  .brand span{color:var(--sky)}
+  nav.main{display:flex;gap:26px}
+  nav.main a{text-decoration:none;color:var(--muted);font-size:14px;letter-spacing:.06em;text-transform:uppercase;
+    padding:4px 0;border-bottom:2px solid transparent}
+  nav.main a:hover{color:var(--ink)}
+  nav.main a.active{color:var(--sky-d);border-bottom-color:var(--sky)}
+  #burger{display:none;background:none;border:1px solid var(--line);border-radius:6px;padding:8px 12px;font-size:18px;cursor:pointer}
+
+  /* editorial hero */
+  .editorial{padding:88px 0 60px}
+  .editorial .kicker{font-size:13px;letter-spacing:.3em;text-transform:uppercase;color:var(--sky-d);margin-bottom:18px}
+  .editorial h1{font-size:clamp(42px,7vw,76px);line-height:1.06;font-weight:800;letter-spacing:-.01em;max-width:14ch}
+  .editorial h1 span{color:var(--sky)}
+  .editorial .lede{font-size:19px;color:var(--muted);max-width:56ch;margin-top:22px}
+  .cta-row{margin-top:30px;display:flex;gap:14px;flex-wrap:wrap}
+  .btn{display:inline-block;padding:14px 28px;border-radius:6px;text-decoration:none;font-size:15px;cursor:pointer;border:2px solid var(--sky)}
+  .btn-solid{background:var(--sky);color:#fff}
+  .btn-solid:hover{background:var(--sky-d)}
+  .btn-ghost{background:transparent;color:var(--sky-d)}
+  .btn-ghost:hover{background:var(--sky);color:#fff}
+  .rule{border:none;border-top:3px solid var(--ink);margin:40px 0 0}
+
+  /* magazine rhythm */
+  .mag{padding:20px 0 60px}
+  .mag-row{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:start;margin:44px 0}
+  .mag-row.flip .mag-text{order:2}
+  .mag-row.flip .mag-side{order:1}
+  .mag-text h2{font-size:28px;margin-bottom:12px;letter-spacing:-.01em}
+  .mag-text p{color:var(--muted);font-size:16px}
+  .mag-side{background:var(--tint);border:1px solid var(--line);border-radius:10px;padding:30px;position:relative;min-height:220px}
+  .mag-side .badge{position:absolute;top:14px;right:14px}
+  .mag-side .big-ic{font-size:56px;color:var(--sky);opacity:.85}
+  .mag-side h3{font-size:18px;margin:14px 0 8px}
+  .mag-side p{font-size:15px;color:var(--muted)}
+
+  /* editorial offerings list */
+  .offer{border-top:1px solid var(--line);padding:26px 0;display:grid;grid-template-columns:80px 1fr;gap:20px}
+  .offer:last-child{border-bottom:1px solid var(--line)}
+  .offer .num{font-size:15px;color:var(--sky-d);font-weight:700;letter-spacing:.1em}
+  .offer h3{font-size:20px;margin-bottom:6px}
+  .offer p{color:var(--muted);font-size:15px;max-width:62ch}
+
+  /* arch tile gallery */
+  .arch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:30px}
+  .arch{background:linear-gradient(180deg,var(--tint),#dfe9f2);border:1px solid var(--line);
+    border-radius:140px 140px 12px 12px;height:300px;position:relative;overflow:hidden}
+  .arch .badge{position:absolute;top:22px;left:50%;transform:translateX(-50%)}
+  .arch .cap{position:absolute;bottom:0;left:0;right:0;text-align:center;padding:12px;font-size:14px;color:var(--muted)}
+  .arch svg{position:absolute;inset:0;width:100%;height:100%}
+
+  .rev{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:40px;max-width:680px;margin:30px auto;text-align:center}
+  .stars{color:var(--sky);font-size:26px;letter-spacing:.2em;margin-bottom:12px}
+
+  .contact-box{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:30px}
+  .contact-box .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:32px}
+  .contact-box h3{font-size:18px;margin-bottom:12px}
+  .note{font-size:13px;color:var(--muted);margin-top:10px}
+
+  footer{background:var(--ink);color:#aeb9c6;margin-top:30px;font-size:14px}
+  footer .cols{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:28px;padding:44px 0 30px}
+  footer h4{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:#fff;margin-bottom:12px}
+  footer a{color:#cfe0f1}
+  footer .about{font-size:15px;max-width:34ch}
+  footer .foot-bottom{border-top:1px solid #2b3a4c;padding:16px 0}
+
+  @media(max-width:820px){
+    #burger{display:block}
+    nav.main{display:none;flex-direction:column;gap:8px;padding:10px 0}
+    nav.main.open{display:flex}
+    .navbar{flex-wrap:wrap}
+    .mag-row{grid-template-columns:1fr}
+    .mag-row.flip .mag-text{order:1}
+    .arch-grid{grid-template-columns:1fr 1fr}
+    .contact-box{grid-template-columns:1fr}
+    footer .cols{grid-template-columns:1fr 1fr}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap navbar">
+    <a class="brand" href="#home" data-page="home">United <span>Airline</span></a>
+    <button id="burger" aria-label="Menu" aria-expanded="false">&#9776;</button>
+    <nav class="main" id="mainNav" aria-label="Primary">
+      <a href="#home" data-page="home" class="active" aria-current="page">Home</a>
+      <a href="#about" data-page="about">About</a>
+      <a href="#gallery" data-page="gallery">Gallery</a>
+      <a href="#reviews" data-page="reviews">Reviews</a>
+      <a href="#contact" data-page="contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<!-- ============ HOME ============ -->
+<section class="page" id="page-home">
+  <div class="wrap">
+    <div class="editorial">
+      <p class="kicker">Duarte, California</p>
+      <h1>United <span>Airline</span>, right here in Duarte.</h1>
+      <p class="lede">United Airline is listed at 1730 Evergreen St, Duarte, CA 91010. For questions about what they offer, the fastest answer is a phone call: <a href="tel:+16262094519">(626) 209-4519</a>.</p>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="tel:+16262094519">Call (626) 209-4519</a>
+        <a class="btn btn-ghost" href="https://www.google.com/maps/place/?q=place_id:ChIJm9-RvFXYwoARovaMXb26l5E">Get directions</a>
+      </div>
+      <hr class="rule">
+    </div>
+
+    <div class="mag">
+      <div class="mag-row">
+        <div class="mag-text">
+          <h2>A local listing worth a call</h2>
+          <p>Public directory listings place United Airline in Duarte with an aviation category, but details like services and hours are not published online. If you are looking for help related to this listing, calling is the direct route to real answers.</p>
+        </div>
+        <div class="mag-side">
+          <span class="badge">Illustration</span>
+          <div class="big-ic">&#9992;</div>
+          <h3>Category: Airplane</h3>
+          <p>That is the category shown in the public listing. Call to confirm what United Airline actually provides.</p>
+        </div>
+      </div>
+      <div class="mag-row flip">
+        <div class="mag-text">
+          <h2>Simple to reach</h2>
+          <p>One phone number, one address. No forms, no waiting rooms. Reach United Airline at (626) 209-4519 or visit 1730 Evergreen St, Duarte, CA 91010.</p>
+        </div>
+        <div class="mag-side">
+          <span class="badge">Illustration</span>
+          <div class="big-ic">&#9742;</div>
+          <h3>Call for hours</h3>
+          <p>Hours are not published online, so call ahead before visiting.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ABOUT ============ -->
+<section class="page" id="page-about">
+  <div class="wrap">
+    <div class="editorial" style="padding-top:60px">
+      <p class="kicker">About</p>
+      <h1>What we can tell you <span>about United Airline.</span></h1>
+      <p class="lede">We keep this page to verified facts only. United Airline appears in public business listings at the address below with the phone number below. We found no website, no published hours, and no reviews tied to this listing, and we will not invent a backstory.</p>
+      <hr class="rule">
+    </div>
+    <div class="mag" style="padding-top:0">
+      <div class="offer">
+        <div class="num">01</div>
+        <div><h3>Name</h3><p>United Airline, exactly as listed in public directories.</p></div>
+      </div>
+      <div class="offer">
+        <div class="num">02</div>
+        <div><h3>Address</h3><p>1730 Evergreen St, Duarte, CA 91010.</p></div>
+      </div>
+      <div class="offer">
+        <div class="num">03</div>
+        <div><h3>Phone</h3><p><a href="tel:+16262094519">(626) 209-4519</a>. This is the number shown in the listing.</p></div>
+      </div>
+      <div class="offer">
+        <div class="num">04</div>
+        <div><h3>Category</h3><p>Listed under Airplane / aviation. The exact nature of the business is unconfirmed, so please call to ask directly.</p></div>
+      </div>
+      <div class="offer">
+        <div class="num">05</div>
+        <div><h3>Hours</h3><p>Not published. Call for hours.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ GALLERY ============ -->
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div class="editorial" style="padding-top:60px">
+      <p class="kicker">Gallery</p>
+      <h1>Photos <span>coming soon.</span></h1>
+      <p class="lede">No photos of United Airline are published online yet. Placeholder tiles below will be replaced with real photos.</p>
+      <hr class="rule">
+    </div>
+    <div class="mag" style="padding-top:0">
+      <div class="arch-grid">
+        <div class="arch"><span class="badge">Photo soon</span>
+          <svg viewBox="0 0 200 300" aria-hidden="true"><path d="M60 220 L140 220 L100 120 Z" fill="#1f6fb2" opacity=".18"/><circle cx="100" cy="80" r="34" fill="#1f6fb2" opacity=".14"/></svg>
+          <div class="cap">Exterior</div></div>
+        <div class="arch"><span class="badge">Photo soon</span>
+          <svg viewBox="0 0 200 300" aria-hidden="true"><rect x="55" y="150" width="90" height="70" rx="8" fill="#1f6fb2" opacity=".16"/><circle cx="100" cy="110" r="26" fill="#1f6fb2" opacity=".14"/></svg>
+          <div class="cap">Interior</div></div>
+        <div class="arch"><span class="badge">Photo soon</span>
+          <svg viewBox="0 0 200 300" aria-hidden="true"><path d="M70 200 h60 M70 180 h60 M70 160 h40" stroke="#1f6fb2" stroke-width="8" opacity=".2"/><circle cx="100" cy="100" r="30" fill="#1f6fb2" opacity=".12"/></svg>
+          <div class="cap">Details</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ REVIEWS ============ -->
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div class="editorial" style="padding-top:60px">
+      <p class="kicker">Reviews</p>
+      <h1>What people <span>are saying.</span></h1>
+      <hr class="rule">
+    </div>
+    <div class="mag" style="padding-top:0">
+      <div class="rev">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p>No published reviews for United Airline were found during our research. If you have done business with United Airline, your review would be the first.</p>
+        <p style="margin-top:22px"><a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJm9-RvFXYwoARovaMXb26l5E">See reviews on Google</a></p>
+        <p class="note">Review link goes to the United Airline Google Maps listing.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<section class="page" id="page-contact">
+  <div class="wrap">
+    <div class="editorial" style="padding-top:60px">
+      <p class="kicker">Contact</p>
+      <h1>Get in <span>touch.</span></h1>
+      <hr class="rule">
+    </div>
+    <div class="mag" style="padding-top:0">
+      <div class="contact-box">
+        <div class="card">
+          <h3>Address and phone</h3>
+          <p>United Airline<br>1730 Evergreen St<br>Duarte, CA 91010</p>
+          <p style="margin-top:14px"><a href="tel:+16262094519" style="font-size:20px;font-weight:700">(626) 209-4519</a></p>
+          <p style="margin-top:18px"><a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJm9-RvFXYwoARovaMXb26l5E">Get directions</a></p>
+        </div>
+        <div class="card">
+          <h3>Hours</h3>
+          <p>Hours are not published online.</p>
+          <p class="note">Please call <a href="tel:+16262094519">(626) 209-4519</a> for hours before visiting.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <h4>United Airline</h4>
+        <p class="about">Listed at 1730 Evergreen St, Duarte, CA 91010. Call (626) 209-4519 for information about services and hours.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <p><a href="#home" data-page="home">Home</a><br><a href="#about" data-page="about">About</a><br><a href="#gallery" data-page="gallery">Gallery</a></p>
+      </div>
+      <div>
+        <h4>More</h4>
+        <p><a href="#reviews" data-page="reviews">Reviews</a><br><a href="#contact" data-page="contact">Contact</a></p>
+      </div>
+      <div>
+        <h4>Find us</h4>
+        <p><a href="https://www.google.com/maps/place/?q=place_id:ChIJm9-RvFXYwoARovaMXb26l5E">Directions on Google Maps</a><br><a href="https://www.google.com/maps/place/?q=place_id:ChIJm9-RvFXYwoARovaMXb26l5E">See reviews on Google</a></p>
+      </div>
+    </div>
+    <div class="foot-bottom">© United Airline</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var PAGES = ["home","about","gallery","reviews","contact"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+    closeMenu();
+    window.scrollTo(0, 0);
+  }
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

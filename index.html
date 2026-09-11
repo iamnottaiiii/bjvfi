@@ -179,6 +179,7 @@ body {
       <div class="bjvfi-results" id="bjvfi-results" role="listbox" aria-label="Search results"></div>
     </div>
     <div class="bjvfi-status" id="bjvfi-status" aria-live="polite"></div>
+    <a href="/directory/" style="color:#888;font-size:.82rem;text-decoration:none;margin-top:4px">directory →</a>
   </div>
 </div>
 
@@ -201,26 +202,15 @@ body {
   let loading = null;
 
   async function fetchAllSites() {
-    const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/`;
-    const res = await fetch(url);
+    const res = await fetch("/sites.json", { cache: "no-store" });
     if (!res.ok) throw new Error("Could not load sites (" + res.status + ")");
     const data = await res.json();
-
     return data
-      .filter(item => item.type === "dir")
-      .filter(item => !item.name.startsWith("."))
-      .filter(item => !IGNORE.has(item.name))
-      .map(folder => {
-        const title = folder.name
-          .replace(/-/g, " ")
-          .replace(/\b\w/g, c => c.toUpperCase());
-        return {
-          title,
-          slug: folder.name,
-          // Custom domain → no /bjvfi/ prefix
-          link: `/${encodeURIComponent(folder.name)}/`
-        };
-      })
+      .map(item => ({
+        title: item.n || item.s,
+        slug: item.s,
+        link: "/" + encodeURIComponent(item.s) + "/"
+      }))
       .sort((a, b) => a.title.localeCompare(b.title));
   }
 

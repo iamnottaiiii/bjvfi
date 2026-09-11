@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doyle Custom Construction Inc | Custom Builder & Contractor, Cincinnati OH</title>
+<meta name="description" content="Doyle Custom Construction Inc is a construction company and contractor at 1810 Rusticwood Ln, Cincinnati, OH 45255. Custom builds, remodels, additions, and renovations. Call (513) 315-6966 for a bid.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FBF6E9; --paper-2:#F4EDD8; --card:#FFFDF6;
+  --ink:#243044; --ink-soft:#5A6B84;
+  --copper:#B0652A; --copper-deep:#8A4E1E; --copper-soft:#F3E2C9;
+  --rule:rgba(36,48,68,.14); --rule-blue:#A9C2E6;
+  --margin-red:#D64545;
+  --tape:#F2C230; --tape-deep:#D9A91F;
+  --radius:14px;
+  --shadow:0 18px 40px -18px rgba(36,48,68,.28);
+  --shadow-sm:0 8px 22px -12px rgba(36,48,68,.25);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  background:var(--paper);
+  background-image:repeating-linear-gradient(transparent 0 31px, rgba(169,194,230,.28) 31px 32px);
+  color:var(--ink);
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%}
+a{color:var(--copper-deep)}
+::selection{background:var(--tape);color:var(--ink)}
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+.serif{font-family:"Fraunces",Georgia,serif;line-height:1.12;letter-spacing:-.01em}
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* ============ measuring-tape header ============ */
+header.tape{position:sticky;top:0;z-index:60;background:var(--tape);box-shadow:0 4px 18px -8px rgba(36,48,68,.45)}
+.tape-ticks{height:10px;background:repeating-linear-gradient(to right, rgba(36,48,68,.75) 0 2px, transparent 2px 12px, rgba(36,48,68,.75) 12px 13px, transparent 13px 60px)}
+.tape-bar{display:flex;align-items:center;gap:18px;padding:10px 0}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
+.brand svg{flex:none}
+.brand .b-name{font-family:"Fraunces",Georgia,serif;font-weight:900;font-size:1.22rem;line-height:1.05}
+.brand .b-sub{font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;color:#5c4a12}
+nav.main{margin-left:auto;display:flex;gap:4px;align-items:center}
+nav.main a{color:var(--ink);text-decoration:none;font-weight:600;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;padding:9px 13px;border-radius:9px;position:relative}
+nav.main a:hover{background:rgba(36,48,68,.1)}
+nav.main a.active{background:var(--ink);color:var(--tape)}
+#burger{display:none;margin-left:auto;background:var(--ink);color:var(--tape);border:0;border-radius:9px;padding:10px 14px;font:inherit;font-weight:700;cursor:pointer}
+
+/* ============ hero: bid sheet ============ */
+.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:44px;align-items:center;padding:64px 0 56px}
+.eyebrow{display:inline-block;font-size:.72rem;font-weight:600;letter-spacing:.28em;text-transform:uppercase;color:var(--copper-deep);border:1px solid var(--copper);border-radius:999px;padding:7px 16px;margin-bottom:20px;background:var(--card)}
+.hero h1{font-size:clamp(2.4rem,5vw,3.9rem);font-weight:900;margin-bottom:18px}
+.hero h1 em{font-style:italic;color:var(--copper-deep)}
+.hero p.lede{color:var(--ink-soft);font-size:1rem;max-width:46ch;margin-bottom:26px}
+.btnrow{display:flex;gap:14px;flex-wrap:wrap}
+.btn{display:inline-block;text-decoration:none;font-weight:600;font-size:.9rem;padding:14px 26px;border-radius:12px;transition:transform .15s ease, box-shadow .15s ease}
+.btn-solid{background:var(--ink);color:#fff;box-shadow:var(--shadow-sm)}
+.btn-solid:hover{transform:translateY(-2px)}
+.btn-ghost{border:2px solid var(--ink);color:var(--ink)}
+.btn-ghost:hover{background:var(--ink);color:#fff}
+.herostats{display:flex;gap:26px;margin-top:30px;flex-wrap:wrap}
+.herostats .stat b{display:block;font-family:"Fraunces",serif;font-size:1.7rem;color:var(--copper-deep)}
+.herostats .stat span{font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
+
+.bidcard{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);position:relative;overflow:hidden;border:1px solid var(--rule)}
+.bidcard .perf{height:16px;background:radial-gradient(circle at 8px 8px, var(--paper) 5px, var(--card) 5.5px);background-size:22px 16px;border-bottom:1px dashed var(--rule)}
+.bidcard .pad{padding:26px 28px 30px}
+.bidcard .bid-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.bidcard .bid-no{font-weight:600;font-size:.8rem;letter-spacing:.12em}
+.bidcard .stamp{display:inline-block;border:3px double var(--margin-red);color:var(--margin-red);font-weight:700;font-size:.78rem;letter-spacing:.24em;padding:4px 12px;transform:rotate(-8deg);border-radius:6px;text-transform:uppercase}
+.bidrow{display:flex;justify-content:space-between;gap:14px;padding:10px 0;border-bottom:1px dotted var(--rule);font-size:.86rem}
+.bidrow .amt{color:var(--ink-soft);white-space:nowrap}
+.bidtotal{display:flex;justify-content:space-between;padding:14px 0 4px;font-weight:700;font-size:1rem}
+.bidnote{font-size:.72rem;color:var(--ink-soft);margin-top:12px}
+
+/* ============ ledger rhythm ============ */
+.ledger{position:relative;padding:56px 0;border-top:2px solid var(--rule)}
+.ledger::before{content:"";position:absolute;top:0;bottom:0;left:max(12px, calc(50% - 558px));width:2px;background:var(--margin-red);opacity:.55}
+.ledger-row{display:grid;grid-template-columns:64px 1fr;gap:22px;padding:26px 0;border-bottom:1px solid var(--rule);max-width:900px}
+.ledger-row:last-child{border-bottom:0}
+.lineno{font-weight:600;color:var(--copper-deep);font-size:.85rem;padding-top:6px}
+.ledger-row h3{font-family:"Fraunces",serif;font-size:1.5rem;font-weight:700;margin-bottom:8px}
+.ledger-row p{color:var(--ink-soft);font-size:.92rem;max-width:62ch}
+.ledger-row .tag{display:inline-block;font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;background:var(--copper-soft);color:var(--copper-deep);border-radius:6px;padding:3px 10px;margin-bottom:10px}
+
+.band{background:var(--ink);color:#EDEFF4;border-radius:20px;padding:52px 48px;margin:56px 0;position:relative;overflow:hidden}
+.band::after{content:"";position:absolute;inset:0;background-image:repeating-linear-gradient(transparent 0 31px, rgba(255,255,255,.06) 31px 32px);pointer-events:none}
+.band h2{font-family:"Fraunces",serif;font-size:clamp(1.8rem,3.4vw,2.6rem);font-weight:900;margin-bottom:12px;position:relative;z-index:1}
+.band p{color:#B9C3D4;max-width:60ch;position:relative;z-index:1}
+.band .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:30px;position:relative;z-index:1}
+.band .step{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);border-radius:12px;padding:20px}
+.band .step b{display:block;font-size:.75rem;letter-spacing:.2em;color:var(--tape);margin-bottom:8px}
+.band .step p{font-size:.85rem;color:#DDE3EC}
+
+/* ============ section heads ============ */
+.pagehead{padding:56px 0 10px}
+.pagehead h1{font-family:"Fraunces",serif;font-size:clamp(2.2rem,4.6vw,3.4rem);font-weight:900;margin:14px 0 10px}
+.pagehead p{color:var(--ink-soft);max-width:64ch}
+
+/* ============ services: scope schedule ============ */
+.schedule{margin:34px 0 70px;border-top:2px solid var(--ink)}
+.sched-row{display:grid;grid-template-columns:70px 1fr 1fr;gap:26px;padding:30px 0;border-bottom:1px solid var(--rule)}
+.sched-row .no{font-family:"Fraunces",serif;font-size:2rem;font-weight:900;color:var(--copper)}
+.sched-row h3{font-family:"Fraunces",serif;font-size:1.4rem;margin-bottom:8px}
+.sched-row .desc{color:var(--ink-soft);font-size:.9rem;margin-bottom:14px}
+.scope-list{list-style:none}
+.scope-list li{font-size:.86rem;padding:7px 0 7px 28px;position:relative;border-bottom:1px dotted var(--rule)}
+.scope-list li::before{content:"✓";position:absolute;left:4px;color:var(--copper-deep);font-weight:700}
+.scope-note{grid-column:1/-1;font-size:.78rem;color:var(--ink-soft);background:var(--paper-2);border:1px dashed var(--copper);border-radius:10px;padding:14px 18px;margin-top:6px}
+
+/* ============ gallery: proof sheet ============ */
+.proof{background:#2B2F36;border-radius:20px;padding:44px;margin:34px 0 70px}
+.proof h2{color:#F2EFE6;font-family:"Fraunces",serif;font-size:1.8rem;margin-bottom:6px}
+.proof .sub{color:#9AA1AD;font-size:.85rem;margin-bottom:26px}
+.frames{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.frame{background:#1E2228;border:1px solid #3A4048;border-radius:8px;padding:14px;position:relative}
+.frame .ph{aspect-ratio:4/3;border-radius:5px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;background:linear-gradient(135deg,#333945,#262B32);color:#8B93A0;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase}
+.frame .fno{position:absolute;top:22px;left:22px;font-size:.68rem;color:var(--tape);letter-spacing:.14em}
+.frame .cap{margin-top:10px;color:#C9CFD8;font-size:.78rem;display:flex;justify-content:space-between;align-items:center}
+.badge{display:inline-block;font-size:.62rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;background:var(--tape);color:#1c1c1c;border-radius:5px;padding:3px 9px}
+
+/* ============ reviews ============ */
+.rev-hero{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start;margin:34px 0 20px}
+.scorecard{background:var(--card);border:1px solid var(--rule);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:34px;text-align:center}
+.scorecard .big{font-family:"Fraunces",serif;font-size:4rem;font-weight:900;color:var(--copper-deep)}
+.scorecard .stars{color:var(--tape-deep);font-size:1.6rem;letter-spacing:.2em;margin:6px 0}
+.src-links{margin-top:18px;display:flex;flex-direction:column;gap:10px}
+.src-links a{display:inline-block;text-decoration:none;font-weight:600;border:2px solid var(--ink);color:var(--ink);border-radius:10px;padding:11px 18px;font-size:.88rem}
+.src-links a:hover{background:var(--ink);color:#fff}
+.rev-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin:10px 0 60px}
+.rev-card{background:var(--card);border:1px solid var(--rule);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow-sm);position:relative}
+.rev-card .q{font-family:"Fraunces",serif;font-size:2.4rem;color:var(--copper);line-height:1;position:absolute;top:14px;right:20px}
+.rev-card p{font-size:.9rem;color:var(--ink-soft);font-style:italic;margin-bottom:14px}
+.rev-card .who{font-size:.78rem;font-weight:600;letter-spacing:.06em}
+.rev-card .stars{color:var(--tape-deep);letter-spacing:.18em;font-size:.9rem}
+
+/* ============ contact ============ */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin:34px 0 70px}
+.ccard{background:var(--card);border:1px solid var(--rule);border-radius:var(--radius);padding:34px;box-shadow:var(--shadow-sm)}
+.ccard h3{font-family:"Fraunces",serif;font-size:1.4rem;margin-bottom:14px}
+.ccard .big-phone{font-family:"Fraunces",serif;font-size:1.9rem;font-weight:900;color:var(--ink);text-decoration:none;display:block;margin:8px 0 16px}
+.ccard .big-phone:hover{color:var(--copper-deep)}
+.hours-table{width:100%;border-collapse:collapse;font-size:.88rem}
+.hours-table td{padding:9px 4px;border-bottom:1px dotted var(--rule)}
+.hours-table td:last-child{text-align:right;color:var(--ink-soft)}
+.kv{display:grid;grid-template-columns:120px 1fr;gap:8px;font-size:.88rem;padding:8px 0;border-bottom:1px dotted var(--rule)}
+.kv b{font-weight:600}
+.dirbtn{margin-top:20px}
+
+/* ============ invoice footer ============ */
+footer{margin-top:70px}
+.invoice{background:var(--card);border:2px solid var(--ink);border-radius:var(--radius);box-shadow:var(--shadow);padding:34px;margin-bottom:26px;position:relative;overflow:hidden}
+.invoice .perf{position:absolute;left:0;right:0;top:0;height:12px;background:radial-gradient(circle at 10px 0, var(--paper) 6px, transparent 6.5px);background-size:26px 12px}
+.invoice h2{font-family:"Fraunces",serif;font-size:1.7rem;margin-bottom:6px;padding-top:8px}
+.invoice p{color:var(--ink-soft);font-size:.9rem;margin-bottom:20px}
+.fine{font-size:.74rem;color:var(--ink-soft);margin-bottom:26px}
+.copyright{text-align:center;font-size:.85rem;color:var(--ink-soft);padding:0 24px 34px}
+
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr;padding:44px 0 40px}
+  .band{padding:36px 26px}
+  .band .steps{grid-template-columns:1fr 1fr}
+  .sched-row{grid-template-columns:44px 1fr}
+  .sched-row .scope-list{grid-column:2}
+  .frames{grid-template-columns:1fr 1fr}
+  .rev-hero{grid-template-columns:1fr}
+  .rev-cards{grid-template-columns:1fr}
+  .contact-grid{grid-template-columns:1fr}
+  .ledger::before{display:none}
+  #burger{display:block}
+  nav.main{display:none;position:absolute;top:100%;left:0;right:0;background:var(--tape-deep);flex-direction:column;align-items:stretch;padding:10px 18px 18px;gap:2px}
+  nav.main.open{display:flex}
+  header.tape{position:sticky}
+  .tape-bar{position:relative}
+}
+</style>
+</head>
+<body>
+
+<header class="tape">
+  <div class="tape-ticks" aria-hidden="true"></div>
+  <div class="wrap tape-bar">
+    <a class="brand" href="#home" data-page="home" aria-label="Doyle Custom Construction Inc, home">
+      <svg width="46" height="46" viewBox="0 0 46 46" aria-hidden="true">
+        <rect x="4" y="10" width="38" height="26" rx="5" fill="#243044"/>
+        <rect x="10" y="16" width="26" height="10" rx="2" fill="#F2C230"/>
+        <text x="23" y="24.5" text-anchor="middle" font-size="8" font-family="IBM Plex Mono, monospace" font-weight="700" fill="#243044">DCC</text>
+        <rect x="14" y="28" width="18" height="3" rx="1.5" fill="#B0652A"/>
+      </svg>
+      <span>
+        <span class="b-name">Doyle Custom<br>Construction</span><br>
+        <span class="b-sub">Cincinnati, Ohio</span>
+      </span>
+    </a>
+    <button id="burger" aria-label="Open menu" aria-expanded="false">MENU</button>
+    <nav class="main" id="mainNav" aria-label="Main navigation">
+      <a href="#home" data-page="home" class="active" aria-current="page">Home</a>
+      <a href="#services" data-page="services">Services</a>
+      <a href="#about" data-page="about">Our Story</a>
+      <a href="#gallery" data-page="gallery">Gallery</a>
+      <a href="#reviews" data-page="reviews">Reviews</a>
+      <a href="#contact" data-page="contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+<!-- ================= HOME ================= -->
+<section class="page" id="page-home">
+  <div class="hero">
+    <div class="reveal">
+      <span class="eyebrow">Estimator's office · Cincinnati, OH</span>
+      <h1 class="serif">Measured twice.<br><em>Built to last.</em></h1>
+      <p class="lede">Doyle Custom Construction Inc is a construction company and contractor serving Cincinnati, Ohio. From custom builds to remodels and additions, every job starts on paper and ends with a walkthrough you can sign off on.</p>
+      <div class="btnrow">
+        <a class="btn btn-solid" href="tel:+15133156966">Call (513) 315-6966</a>
+        <a class="btn btn-ghost" href="#services" data-page="services">See services</a>
+      </div>
+      <div class="herostats">
+        <div class="stat"><b>Bid-first</b><span>Written scope up front</span></div>
+        <div class="stat"><b>Local</b><span>Cincinnati, Ohio</span></div>
+        <div class="stat"><b>Custom</b><span>Built around your plans</span></div>
+      </div>
+    </div>
+    <div class="reveal">
+      <div class="bidcard" role="img" aria-label="Sample estimate sheet showing typical bid line items">
+        <div class="perf"></div>
+        <div class="pad">
+          <div class="bid-head">
+            <span class="bid-no">ESTIMATE No. 2026-001</span>
+            <span class="stamp">Sample</span>
+          </div>
+          <div class="bidrow"><span>Site prep and layout</span><span class="amt">line item</span></div>
+          <div class="bidrow"><span>Framing and structure</span><span class="amt">line item</span></div>
+          <div class="bidrow"><span>Rough-in: electrical, plumbing</span><span class="amt">line item</span></div>
+          <div class="bidrow"><span>Finishes, trim, and paint</span><span class="amt">line item</span></div>
+          <div class="bidrow"><span>Final walkthrough and punch list</span><span class="amt">included</span></div>
+          <div class="bidtotal"><span>Your project total</span><span>priced per job</span></div>
+          <p class="bidnote">Sample layout only. Real numbers are priced per job after a site visit and a written scope. Nothing here is a quote.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ledger">
+    <div class="ledger-row reveal">
+      <span class="lineno">01</span>
+      <div><span class="tag">Custom builds</span><h3>Homes built around the way you live</h3><p>New construction planned with you from the first sketch to the final key. Doyle works as your contractor from foundation to finish, keeping the plan, the budget, and the schedule on one page.</p></div>
+    </div>
+    <div class="ledger-row reveal">
+      <span class="lineno">02</span>
+      <div><span class="tag">Remodels</span><h3>Rooms that finally make sense</h3><p>Kitchens, baths, basements, and whole-home updates. The crew opens up walls, moves what needs moving, and leaves finishes that look like they were always there.</p></div>
+    </div>
+    <div class="ledger-row reveal">
+      <span class="lineno">03</span>
+      <div><span class="tag">Additions</span><h3>Room to grow without moving</h3><p>Bedrooms, offices, garages, and second stories tied into your existing home so the addition reads as one house, not a bolt-on.</p></div>
+    </div>
+    <div class="ledger-row reveal">
+      <span class="lineno">04</span>
+      <div><span class="tag">General contracting</span><h3>One point of contact, start to finish</h3><p>Doyle coordinates the trades, the inspections, and the timeline, so you make decisions instead of chasing schedules.</p></div>
+    </div>
+  </div>
+
+  <div class="band reveal">
+    <h2 class="serif">How a Doyle project runs</h2>
+    <p>Four phases, no surprises. You always know what happens next and what it includes before work begins.</p>
+    <div class="steps">
+      <div class="step"><b>Phase 01</b><p>Walk the site, talk goals, measure everything.</p></div>
+      <div class="step"><b>Phase 02</b><p>Written scope and bid with line items you can read.</p></div>
+      <div class="step"><b>Phase 03</b><p>Build, with scheduled check-ins and photo updates.</p></div>
+      <div class="step"><b>Phase 04</b><p>Final walkthrough and punch list sign-off.</p></div>
+    </div>
+  </div>
+
+  <div class="ledger" style="padding-top:20px">
+    <div class="ledger-row reveal">
+      <span class="lineno">★</span>
+      <div><span class="tag">Why bid-first</span><h3>The number is on paper before the first cut</h3><p>Too many projects start with a handshake and end with a surprise. Doyle prices the scope in writing, so change orders stay rare and always approved by you first.</p></div>
+    </div>
+    <div class="ledger-row reveal">
+      <span class="lineno">→</span>
+      <div><h3>Ready when you are</h3><p>Call <a href="tel:+15133156966">(513) 315-6966</a> to talk through your project. Bring plans, sketches, or just an idea, and leave with a clear next step.</p>
+      <p style="margin-top:14px"><a class="btn btn-solid" href="#contact" data-page="contact">Request a bid</a></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SERVICES ================= -->
+<section class="page" id="page-services">
+  <div class="pagehead reveal">
+    <span class="eyebrow">Scope of work</span>
+    <h1 class="serif">Services</h1>
+    <p>What Doyle Custom Construction Inc builds. Scopes below are typical for a full-service construction company; your exact scope is set in writing with your bid. Call <a href="tel:+15133156966">(513) 315-6966</a> to confirm fit for your project.</p>
+  </div>
+
+  <div class="schedule">
+    <div class="sched-row reveal">
+      <span class="no">01</span>
+      <div><h3>Custom home building</h3><p class="desc">Ground-up construction for homeowners building on their lot, managed as your general contractor from permits to move-in.</p></div>
+      <ul class="scope-list">
+        <li>Site planning and permit coordination</li>
+        <li>Foundation through framing</li>
+        <li>Mechanical, electrical, and plumbing rough-in</li>
+        <li>Exterior finishes, roofing, and siding</li>
+        <li>Interior finishes and final detailing</li>
+      </ul>
+    </div>
+    <div class="sched-row reveal">
+      <span class="no">02</span>
+      <div><h3>Kitchen remodeling</h3><p class="desc">Layouts that work harder: better storage, better flow, and finishes chosen to fit the rest of the house.</p></div>
+      <ul class="scope-list">
+        <li>Layout redesign and cabinet planning</li>
+        <li>Countertops, backsplash, and fixtures</li>
+        <li>Flooring, lighting, and electrical updates</li>
+        <li>Appliance coordination</li>
+      </ul>
+    </div>
+    <div class="sched-row reveal">
+      <span class="no">03</span>
+      <div><h3>Bathroom remodeling</h3><p class="desc">From quick refreshes to full gut renovations, with waterproofing and ventilation done right the first time.</p></div>
+      <ul class="scope-list">
+        <li>Tile, tub, and shower work</li>
+        <li>Vanities, fixtures, and mirrors</li>
+        <li>Plumbing and ventilation updates</li>
+        <li>Accessibility upgrades on request</li>
+      </ul>
+    </div>
+    <div class="sched-row reveal">
+      <span class="no">04</span>
+      <div><h3>Home additions</h3><p class="desc">Bedrooms, offices, garages, and second stories engineered to tie into your existing structure cleanly.</p></div>
+      <ul class="scope-list">
+        <li>Structural tie-in and foundation work</li>
+        <li>Framing, roofing, and weatherproofing</li>
+        <li>HVAC and electrical extensions</li>
+        <li>Interior and exterior finish matching</li>
+      </ul>
+    </div>
+    <div class="sched-row reveal">
+      <span class="no">05</span>
+      <div><h3>Basement finishing</h3><p class="desc">Turn unfinished square footage into living space: family rooms, guest suites, home offices, and bars.</p></div>
+      <ul class="scope-list">
+        <li>Moisture control and framing</li>
+        <li>Egress, lighting, and electrical</li>
+        <li>Drywall, flooring, and trim</li>
+        <li>Bath and wet-bar rough-ins</li>
+      </ul>
+    </div>
+    <div class="sched-row reveal">
+      <span class="no">06</span>
+      <div><h3>General contracting</h3><p class="desc">Trade coordination, scheduling, and inspections handled under one roof for projects large and small.</p></div>
+      <ul class="scope-list">
+        <li>Written scope and line-item bids</li>
+        <li>Licensed trade coordination</li>
+        <li>Inspection and permit management</li>
+        <li>Scheduled progress check-ins</li>
+      </ul>
+    </div>
+    <div class="scope-note reveal">Typical scopes shown. Doyle Custom Construction Inc confirms exact scope, materials, and pricing in your written bid before work starts. Nothing on this page is a quote.</div>
+  </div>
+</section>
+
+<!-- ================= ABOUT ================= -->
+<section class="page" id="page-about">
+  <div class="pagehead reveal">
+    <span class="eyebrow">Our story</span>
+    <h1 class="serif">Built like it carries our name</h1>
+    <p>Doyle Custom Construction Inc is a construction company and contractor based at 1810 Rusticwood Ln, Cincinnati, OH. The name on the truck is the name on the bid, and that keeps every job honest.</p>
+  </div>
+
+  <div class="ledger">
+    <div class="ledger-row reveal">
+      <span class="lineno">I.</span>
+      <div><h3>A builder, not a call center</h3><p>When you call Doyle, you talk to the people who will be on your job. Estimates come from walking the site, not from a price book. Questions get answered by the crew doing the work, in plain language.</p></div>
+    </div>
+    <div class="ledger-row reveal">
+      <span class="lineno">II.</span>
+      <div><h3>Custom means custom</h3><p>Stock plans have their place, but most homes need something more specific: a kitchen that fits the cook, an addition that matches the roofline, a basement that earns its keep. Doyle plans around your house and your life, not a template.</p></div>
+    </div>
+    <div class="ledger-row reveal">
+      <span class="lineno">III.</span>
+      <div><h3>The walkthrough is the product</h3><p>The last day matters as much as the first. Every project ends with a punch list and a walkthrough where nothing gets signed off until you are satisfied with the details.</p></div>
+    </div>
+  </div>
+
+  <div class="band reveal">
+    <h2 class="serif">Working principles</h2>
+    <p>The short list taped to the estimator's desk.</p>
+    <div class="steps">
+      <div class="step"><b>Rule 01</b><p>Bid it in writing before cutting anything.</p></div>
+      <div class="step"><b>Rule 02</b><p>Match the existing house, inside and out.</p></div>
+      <div class="step"><b>Rule 03</b><p>Change orders need your signature first.</p></div>
+      <div class="step"><b>Rule 04</b><p>Leave the site clean every day.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= GALLERY ================= -->
+<section class="page" id="page-gallery">
+  <div class="pagehead reveal">
+    <span class="eyebrow">Proof sheet</span>
+    <h1 class="serif">Gallery</h1>
+    <p>A contact sheet of recent work. Project photos are being added; placeholders below mark where finished-project frames will appear.</p>
+  </div>
+
+  <div class="proof reveal">
+    <h2>Contact sheet · recent projects</h2>
+    <p class="sub">Frames marked SAMPLE are placeholders. Real project photos replace them as they are delivered.</p>
+    <div class="frames">
+      <div class="frame"><span class="fno">FR 01</span><div class="ph"><span>Kitchen remodel</span><span class="badge">Sample</span></div><p class="cap"><span>Kitchen, Cincinnati OH</span><span>↗</span></p></div>
+      <div class="frame"><span class="fno">FR 02</span><div class="ph"><span>Framing stage</span><span class="badge">Sample</span></div><p class="cap"><span>Addition framing</span><span>↗</span></p></div>
+      <div class="frame"><span class="fno">FR 03</span><div class="ph"><span>Bathroom tile</span><span class="badge">Sample</span></div><p class="cap"><span>Bath renovation</span><span>↗</span></p></div>
+      <div class="frame"><span class="fno">FR 04</span><div class="ph"><span>Finished basement</span><span class="badge">Sample</span></div><p class="cap"><span>Basement finish</span><span>↗</span></p></div>
+      <div class="frame"><span class="fno">FR 05</span><div class="ph"><span>Exterior addition</span><span class="badge">Sample</span></div><p class="cap"><span>Addition exterior</span><span>↗</span></p></div>
+      <div class="frame"><span class="fno">FR 06</span><div class="ph"><span>Custom trim</span><span class="badge">Sample</span></div><p class="cap"><span>Finish carpentry</span><span>↗</span></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= REVIEWS ================= -->
+<section class="page" id="page-reviews">
+  <div class="pagehead reveal">
+    <span class="eyebrow">Word of mouth</span>
+    <h1 class="serif">Reviews</h1>
+    <p>Our research did not surface public reviews for Doyle Custom Construction Inc yet. If Doyle has worked on your home, your review on Google helps neighbors find a builder they can trust.</p>
+  </div>
+
+  <div class="rev-hero">
+    <div class="scorecard reveal">
+      <div class="big">New</div>
+      <div class="stars">☆☆☆☆☆</div>
+      <p style="color:var(--ink-soft);font-size:.88rem">No public reviews found in our research.<br>Be the first to share your experience.</p>
+      <div class="src-links">
+        <a href="https://www.google.com/maps/place/?q=place_id:ChIJh960dkapQYgR30Bd0ZEFh1o" target="_blank" rel="noopener">See reviews on Google</a>
+      </div>
+    </div>
+    <div class="reveal">
+      <h3 class="serif" style="font-size:1.5rem;margin-bottom:12px">What clients will say here</h3>
+      <p style="color:var(--ink-soft);font-size:.92rem">Sample cards below show the kind of feedback a bid-first builder earns. They are placeholders, clearly marked, until real reviews arrive.</p>
+      <p style="margin-top:16px"><a class="btn btn-ghost" href="https://www.google.com/maps/place/?q=place_id:ChIJh960dkapQYgR30Bd0ZEFh1o" target="_blank" rel="noopener">Review Doyle on Google</a></p>
+    </div>
+  </div>
+
+  <div class="rev-cards">
+    <div class="rev-card reveal">
+      <span class="q">&ldquo;</span>
+      <div class="stars">★★★★★</div>
+      <p>The bid was line by line, and the final number matched it. The kitchen looks like it was always part of the house.</p>
+      <div class="who">Sample review <span class="badge">Sample</span></div>
+    </div>
+    <div class="rev-card reveal">
+      <span class="q">&ldquo;</span>
+      <div class="stars">★★★★★</div>
+      <p>Crew showed up when they said they would, kept the site clean, and walked us through every phase. The addition is seamless.</p>
+      <div class="who">Sample review <span class="badge">Sample</span></div>
+    </div>
+    <div class="rev-card reveal">
+      <span class="q">&ldquo;</span>
+      <div class="stars">★★★★★</div>
+      <p>Fair price, honest timeline, and they caught a framing issue the last contractor missed. We would hire them again.</p>
+      <div class="who">Sample review <span class="badge">Sample</span></div>
+    </div>
+    <div class="rev-card reveal">
+      <span class="q">&ldquo;</span>
+      <div class="stars">★★★★★</div>
+      <p>Communication was the best part. We always knew what was happening next and what it would cost.</p>
+      <div class="who">Sample review <span class="badge">Sample</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONTACT ================= -->
+<section class="page" id="page-contact">
+  <div class="pagehead reveal">
+    <span class="eyebrow">Request a bid</span>
+    <h1 class="serif">Contact</h1>
+    <p>Call to talk through your project. Bring plans, sketches, or just an idea, and Doyle will tell you plainly whether it is a fit.</p>
+  </div>
+
+  <div class="contact-grid">
+    <div class="ccard reveal">
+      <h3>Talk to the builder</h3>
+      <a class="big-phone" href="tel:+15133156966">(513) 315-6966</a>
+      <div class="kv"><b>Address</b><span>1810 Rusticwood Ln<br>Cincinnati, OH 45255</span></div>
+      <div class="kv"><b>Hours</b><span>Call for hours</span></div>
+      <div class="kv"><b>Service area</b><span>Cincinnati, OH and nearby communities</span></div>
+      <p class="dirbtn"><a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJh960dkapQYgR30Bd0ZEFh1o" target="_blank" rel="noopener">Get directions</a></p>
+    </div>
+    <div class="ccard reveal">
+      <h3>Before you call</h3>
+      <p style="color:var(--ink-soft);font-size:.9rem;margin-bottom:14px">Have these handy and your estimate moves faster:</p>
+      <ul class="scope-list">
+        <li>Your address and the room or area involved</li>
+        <li>Photos of the space as it is today</li>
+        <li>Any plans, sketches, or inspiration images</li>
+        <li>Your target timeline and budget range</li>
+        <li>HOA or permit constraints, if any</li>
+      </ul>
+      <table class="hours-table" style="margin-top:20px">
+        <tr><td>Monday to Friday</td><td>Call for hours</td></tr>
+        <tr><td>Saturday</td><td>Call for hours</td></tr>
+        <tr><td>Sunday</td><td>Call for hours</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="invoice reveal">
+      <div class="perf"></div>
+      <h2 class="serif">Invoice No. 0000 · paid in full with a handshake</h2>
+      <p>Doyle Custom Construction Inc · 1810 Rusticwood Ln, Cincinnati, OH 45255 · <a href="tel:+15133156966">(513) 315-6966</a></p>
+      <div class="btnrow">
+        <a class="btn btn-solid" href="tel:+15133156966">Call (513) 315-6966</a>
+        <a class="btn btn-ghost" href="#reviews" data-page="reviews">Read reviews</a>
+      </div>
+    </div>
+    <p class="fine">Demo website prepared for Doyle Custom Construction Inc. Business facts drawn from public listings. Sample content is labeled as such.</p>
+    <p class="copyright">© Doyle Custom Construction Inc</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "contact"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

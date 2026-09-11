@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pix &amp; Combs Barbershop LLC | Independence, KY</title>
+<meta name="description" content="Pix & Combs Barbershop LLC, 1997 Walton Nicholson Rd, Independence, KY 41051. Sharp fades, clean cuts, and beard trims. Call (513) 265-3686.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Monoton&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{
+  --midnight:#060713;
+  --midnight-2:#0b0d22;
+  --pink:#ff2e9a;
+  --cyan:#29e6ff;
+  --violet:#8a5cff;
+  --text:#eef0ff;
+  --muted:#a7adc9;
+  --card:#10132b;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Outfit',sans-serif;
+  background:var(--midnight);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+  background-image:
+    radial-gradient(circle at 15% 10%, rgba(255,46,154,.10), transparent 40%),
+    radial-gradient(circle at 85% 20%, rgba(41,230,255,.10), transparent 40%),
+    radial-gradient(circle at 50% 90%, rgba(138,92,255,.12), transparent 45%);
+}
+::selection{background:var(--pink);color:#fff}
+a{color:inherit}
+img{max-width:100%}
+
+/* ============ TOP BAR ============ */
+.topbar{
+  position:sticky;top:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.9rem 1.25rem;
+  background:rgba(6,7,19,.85);backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(41,230,255,.25);
+}
+.brandmark{
+  font-family:'Monoton',cursive;font-size:1.35rem;letter-spacing:.05em;
+  color:#fff;
+  text-shadow:0 0 6px var(--pink),0 0 18px var(--pink),0 0 42px rgba(255,46,154,.7);
+}
+.brandmark .amp{color:var(--cyan);text-shadow:0 0 6px var(--cyan),0 0 18px var(--cyan)}
+.hours-pill{
+  display:none;font-size:.8rem;color:var(--muted);border:1px solid rgba(255,255,255,.18);
+  padding:.35rem .8rem;border-radius:999px;align-items:center;gap:.5rem;
+}
+.hours-pill .dot{width:.55rem;height:.55rem;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);animation:pulse 1.8s infinite}
+@keyframes pulse{50%{opacity:.35}}
+.burger{
+  background:none;border:2px solid var(--pink);border-radius:12px;color:#fff;
+  width:48px;height:48px;cursor:pointer;font-size:1.2rem;
+  box-shadow:0 0 12px rgba(255,46,154,.6), inset 0 0 8px rgba(255,46,154,.25);
+  transition:transform .2s;
+}
+.burger:hover{transform:scale(1.06)}
+@media(min-width:760px){.hours-pill{display:inline-flex}}
+
+/* ============ SIDE DRAWER NAV ============ */
+.scrim{
+  position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:290;
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.scrim.show{opacity:1;pointer-events:auto}
+.drawer{
+  position:fixed;top:0;right:-320px;width:300px;max-width:85vw;height:100dvh;z-index:300;
+  background:linear-gradient(160deg,#141735,#0b0d22 60%);
+  border-left:2px solid var(--pink);
+  box-shadow:-10px 0 60px rgba(255,46,154,.35);
+  transition:right .38s cubic-bezier(.22,1,.36,1);
+  padding:1.5rem 1.25rem;display:flex;flex-direction:column;gap:.4rem;
+}
+.drawer.open{right:0}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.drawer-title{
+  font-family:'Monoton',cursive;color:#fff;font-size:1rem;
+  text-shadow:0 0 8px var(--cyan),0 0 24px rgba(41,230,255,.8);
+}
+.drawer-close{
+  background:none;border:1px solid var(--cyan);color:var(--cyan);border-radius:10px;
+  width:42px;height:42px;cursor:pointer;font-size:1.1rem;
+}
+.drawer a.navlink{
+  text-decoration:none;font-weight:700;font-size:1.15rem;letter-spacing:.08em;text-transform:uppercase;
+  padding:.85rem 1rem;border-radius:14px;color:var(--text);
+  border:1px solid transparent;transition:all .25s;
+  display:flex;align-items:center;gap:.9rem;
+}
+.drawer a.navlink i{width:1.4rem;text-align:center;color:var(--cyan)}
+.drawer a.navlink:hover,.drawer a.navlink.on{
+  border-color:rgba(255,46,154,.5);background:rgba(255,46,154,.10);
+  text-shadow:0 0 10px var(--pink);
+}
+.drawer .pass{
+  margin-top:auto;border:1px dashed rgba(41,230,255,.5);border-radius:14px;padding:1rem;
+  font-size:.8rem;color:var(--muted);text-align:center;line-height:1.7;
+}
+.drawer .pass strong{color:var(--cyan);display:block;letter-spacing:.15em;font-size:.75rem}
+
+/* ============ ROUTER PAGES ============ */
+.page{display:none;animation:fadein .45s ease}
+.page.active{display:block}
+@keyframes fadein{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.wrap{max-width:1080px;margin:0 auto;padding:0 1.25rem}
+
+/* ============ HERO ============ */
+.hero{padding:4.5rem 0 2.5rem;text-align:center;position:relative}
+.neon-sign{
+  font-family:'Monoton',cursive;font-size:clamp(2.4rem,9vw,5.4rem);line-height:1.15;color:#fff;
+  text-shadow:
+    0 0 6px #fff, 0 0 14px var(--pink), 0 0 34px var(--pink),
+    0 0 70px var(--pink), 0 0 120px rgba(255,46,154,.55);
+  animation:flicker 6s infinite;
+}
+.neon-sign .amp{
+  color:var(--cyan);
+  text-shadow:0 0 6px #fff,0 0 14px var(--cyan),0 0 34px var(--cyan),0 0 70px var(--cyan);
+}
+@keyframes flicker{0%,100%{opacity:1}92%{opacity:1}93%{opacity:.55}94%{opacity:1}96%{opacity:.75}97%{opacity:1}}
+.neon-sub{
+  margin-top:1rem;font-size:clamp(1rem,3vw,1.35rem);letter-spacing:.42em;text-transform:uppercase;color:var(--cyan);
+  text-shadow:0 0 12px rgba(41,230,255,.9);
+}
+.hero-blurb{max-width:640px;margin:1.6rem auto 0;color:var(--muted);font-size:1.05rem;line-height:1.8}
+.hero-cta{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:2rem}
+.btn{
+  display:inline-flex;align-items:center;gap:.6rem;text-decoration:none;font-weight:800;letter-spacing:.06em;
+  padding:.95rem 1.9rem;border-radius:999px;cursor:pointer;border:none;font-size:1rem;
+  transition:transform .2s, box-shadow .2s;
+}
+.btn-pink{background:var(--pink);color:#0b0410;box-shadow:0 0 22px rgba(255,46,154,.8)}
+.btn-pink:hover{transform:translateY(-2px);box-shadow:0 0 34px rgba(255,46,154,1)}
+.btn-ghost{border:2px solid var(--cyan);color:#fff;box-shadow:0 0 16px rgba(41,230,255,.35), inset 0 0 10px rgba(41,230,255,.15)}
+.btn-ghost:hover{transform:translateY(-2px);box-shadow:0 0 28px rgba(41,230,255,.6)}
+.open-badge{
+  display:inline-flex;align-items:center;gap:.55rem;margin-bottom:1.4rem;
+  border:1px solid rgba(41,230,255,.45);border-radius:999px;padding:.45rem 1.1rem;
+  font-size:.82rem;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);
+  text-shadow:0 0 10px rgba(41,230,255,.8);
+}
+.open-badge .dot{width:.6rem;height:.6rem;border-radius:50%;background:#37ff8b;box-shadow:0 0 12px #37ff8b;animation:pulse 1.6s infinite}
+
+/* ============ MARQUEE ============ */
+.marquee{
+  overflow:hidden;white-space:nowrap;border-top:1px solid rgba(255,46,154,.4);border-bottom:1px solid rgba(255,46,154,.4);
+  background:rgba(255,46,154,.06);margin:2.5rem 0 0;
+}
+.marquee-track{display:inline-block;padding:.85rem 0;animation:scroll 24s linear infinite;font-weight:800;letter-spacing:.22em;text-transform:uppercase;font-size:.95rem}
+.marquee-track span{margin:0 1.6rem;color:#fff;text-shadow:0 0 10px var(--pink)}
+.marquee-track span.cy{color:var(--cyan);text-shadow:0 0 10px var(--cyan)}
+@keyframes scroll{to{transform:translateX(-50%)}}
+
+/* ============ SECTION TITLES ============ */
+.sect{padding:3.5rem 0}
+.kicker{letter-spacing:.35em;text-transform:uppercase;font-size:.78rem;color:var(--pink);text-shadow:0 0 10px rgba(255,46,154,.8);margin-bottom:.6rem}
+h2.title{font-family:'Monoton',cursive;font-size:clamp(1.6rem,5vw,2.6rem);color:#fff;margin-bottom:1rem;
+  text-shadow:0 0 8px var(--cyan),0 0 28px rgba(41,230,255,.7)}
+.lead{color:var(--muted);line-height:1.8;max-width:680px}
+
+/* ============ SHOW CARDS (services poster wall) ============ */
+.poster-wall{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem;margin-top:2rem}
+.showcard{
+  position:relative;background:var(--card);border-radius:18px;overflow:hidden;
+  border:1px solid rgba(255,255,255,.10);padding:0;transition:transform .25s;
+}
+.showcard:hover{transform:translateY(-6px) rotate(-.4deg)}
+.showcard .poster{
+  height:150px;display:flex;align-items:center;justify-content:center;font-size:3rem;
+  position:relative;overflow:hidden;
+}
+.showcard .poster::after{
+  content:"";position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent 0 12px,rgba(255,255,255,.05) 12px 24px);
+}
+.poster.p1{background:linear-gradient(135deg,#2b0a24,#5c103f);color:var(--pink)}
+.poster.p2{background:linear-gradient(135deg,#07242e,#0a4a5c);color:var(--cyan)}
+.poster.p3{background:linear-gradient(135deg,#1c1040,#3c2180);color:var(--violet)}
+.poster.p4{background:linear-gradient(135deg,#3a0a1e,#7a1445);color:#ffb3d9}
+.showcard .poster i{filter:drop-shadow(0 0 14px currentColor);z-index:1}
+.showcard .body{padding:1.3rem 1.35rem 1.5rem}
+.showcard h3{font-size:1.25rem;letter-spacing:.04em;margin-bottom:.4rem}
+.showcard .price{
+  display:inline-block;font-weight:800;color:var(--cyan);font-size:1.1rem;margin:.4rem 0;
+  text-shadow:0 0 12px rgba(41,230,255,.7);
+}
+.showcard p.desc{color:var(--muted);font-size:.94rem;line-height:1.7;margin-top:.4rem}
+.showcard .meta{display:flex;gap:.5rem;margin-top:.9rem;flex-wrap:wrap}
+.tag{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:.25rem .7rem;color:var(--muted)}
+.tag.sample{border-color:rgba(255,46,154,.7);color:#ffb3d9;box-shadow:0 0 8px rgba(255,46,154,.35)}
+.tag.book{border-color:rgba(41,230,255,.7);color:var(--cyan)}
+
+/* ============ HOURS TABLE ============ */
+.hours-box{
+  margin-top:2rem;background:var(--card);border:1px solid rgba(41,230,255,.3);border-radius:18px;
+  padding:1.8rem;box-shadow:0 0 30px rgba(41,230,255,.10);
+}
+.hours-box h3{letter-spacing:.2em;text-transform:uppercase;font-size:.85rem;color:var(--cyan);margin-bottom:1.1rem}
+.hours-row{display:flex;justify-content:space-between;padding:.6rem 0;border-bottom:1px dashed rgba(255,255,255,.12);font-size:1rem}
+.hours-row:last-child{border-bottom:none}
+.hours-row .day{font-weight:600}
+.hours-row .time{color:var(--muted)}
+.hours-row.closed .time{color:var(--pink)}
+
+/* ============ POLAROID GALLERY ============ */
+.polawall{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.8rem;margin-top:2rem}
+.polaroid{
+  background:#f4f1ea;color:#222;border-radius:6px;padding:.8rem .8rem 2.6rem;position:relative;
+  transform:rotate(-2deg);box-shadow:0 12px 30px rgba(0,0,0,.5);transition:transform .25s;
+}
+.polaroid:nth-child(even){transform:rotate(1.6deg)}
+.polaroid:hover{transform:rotate(0) scale(1.04)}
+.polaroid .photo{
+  height:190px;border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.6rem;
+  background:linear-gradient(135deg,#151838,#232a5e);color:var(--muted);font-size:.85rem;text-align:center;padding:1rem;
+}
+.polaroid .photo i{font-size:2.2rem;color:var(--cyan);filter:drop-shadow(0 0 10px var(--cyan))}
+.polaroid .caption{margin-top:.7rem;font-weight:600;font-size:.92rem;text-align:center;letter-spacing:.03em}
+.tape{
+  position:absolute;top:-14px;left:50%;transform:translateX(-50%) rotate(-4deg);
+  width:96px;height:30px;background:rgba(255,46,154,.55);border-left:1px dashed rgba(255,255,255,.6);border-right:1px dashed rgba(255,255,255,.6);
+  box-shadow:0 0 12px rgba(255,46,154,.5);
+}
+.tape.cy{background:rgba(41,230,255,.5);box-shadow:0 0 12px rgba(41,230,255,.5)}
+
+/* ============ ABOUT ============ */
+.about-grid{display:grid;gap:1.5rem;margin-top:2rem}
+@media(min-width:820px){.about-grid{grid-template-columns:1fr 1fr}}
+.about-card{
+  background:var(--card);border:1px solid rgba(255,255,255,.10);border-radius:18px;padding:1.8rem;
+}
+.about-card h3{color:var(--pink);text-shadow:0 0 12px rgba(255,46,154,.7);letter-spacing:.14em;text-transform:uppercase;font-size:.9rem;margin-bottom:.9rem}
+.about-card p{color:var(--muted);line-height:1.85;margin-bottom:.8rem}
+.about-card p strong{color:var(--text)}
+.quote-card{border-color:rgba(255,46,154,.45);box-shadow:0 0 26px rgba(255,46,154,.12)}
+blockquote.big{
+  font-size:1.25rem;line-height:1.8;font-weight:500;color:#fff;font-style:italic;
+  border-left:3px solid var(--pink);padding-left:1.2rem;margin-bottom:.8rem;
+}
+
+/* ============ REVIEWS ============ */
+.rating-strip{display:flex;align-items:center;gap:1rem;margin:1.6rem 0 2rem;flex-wrap:wrap}
+.stars{color:#ffc94d;font-size:1.4rem;text-shadow:0 0 12px rgba(255,201,77,.7);letter-spacing:.15em}
+.rating-note{color:var(--muted);font-size:.95rem}
+.review-grid{display:grid;gap:1.4rem;margin-top:.5rem}
+@media(min-width:820px){.review-grid{grid-template-columns:1fr 1fr}}
+.review{
+  background:var(--card);border-radius:18px;padding:1.7rem;border:1px solid rgba(255,255,255,.10);
+  position:relative;transition:transform .25s;
+}
+.review:hover{transform:translateY(-4px)}
+.review .rhead{display:flex;align-items:center;gap:.9rem;margin-bottom:.9rem}
+.avatar{
+  width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:1.1rem;color:#0b0410;background:linear-gradient(135deg,var(--pink),var(--cyan));
+  box-shadow:0 0 16px rgba(255,46,154,.5);flex-shrink:0;
+}
+.review .who{font-weight:700}
+.review .src{font-size:.78rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.review .rstars{color:#ffc94d;letter-spacing:.2em;font-size:.9rem;margin-left:auto}
+.review p.q{color:#dfe3f5;line-height:1.8;font-style:italic}
+.review p.q::before{content:"\201C";color:var(--pink);font-size:1.6em;line-height:0;margin-right:.15rem}
+.src-link{color:var(--cyan);font-size:.85rem;text-decoration:none;border-bottom:1px dotted var(--cyan)}
+
+/* ============ CONTACT ============ */
+.contact-grid{display:grid;gap:1.5rem;margin-top:2rem}
+@media(min-width:900px){.contact-grid{grid-template-columns:1fr 1fr}}
+.info-card{
+  background:var(--card);border:1px solid rgba(41,230,255,.3);border-radius:18px;padding:1.8rem;
+}
+.info-card h3{letter-spacing:.2em;text-transform:uppercase;font-size:.85rem;color:var(--cyan);margin-bottom:1.2rem}
+.info-line{display:flex;gap:1rem;align-items:flex-start;margin-bottom:1.1rem;color:var(--muted);line-height:1.7}
+.info-line i{color:var(--pink);width:1.3rem;text-align:center;margin-top:.25rem}
+.info-line a{color:#fff;text-decoration:none;border-bottom:1px solid rgba(255,46,154,.6)}
+.form-card{background:var(--card);border:1px solid rgba(255,46,154,.4);border-radius:18px;padding:1.8rem;box-shadow:0 0 30px rgba(255,46,154,.10)}
+.form-card h3{letter-spacing:.2em;text-transform:uppercase;font-size:.85rem;color:var(--pink);margin-bottom:1.2rem}
+label{display:block;font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:.9rem 0 .35rem}
+input,select,textarea{
+  width:100%;background:#0a0c20;border:1px solid rgba(255,255,255,.16);border-radius:12px;
+  color:var(--text);padding:.8rem 1rem;font-family:inherit;font-size:1rem;
+}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 14px rgba(41,230,255,.35)}
+textarea{min-height:120px;resize:vertical}
+.form-note{font-size:.82rem;color:var(--muted);margin-top:1rem;line-height:1.7}
+.form-ok{
+  display:none;margin-top:1.2rem;padding:1rem 1.2rem;border-radius:12px;
+  border:1px solid rgba(55,255,139,.6);color:#b8ffd6;background:rgba(55,255,139,.08);line-height:1.7;
+}
+
+/* ============ FOOTER ============ */
+footer{
+  margin-top:4rem;padding:2.2rem 1rem 2.6rem;text-align:center;
+  border-top:1px solid rgba(255,46,154,.4);background:rgba(11,13,34,.7);
+  font-size:.95rem;letter-spacing:.04em;color:var(--muted);
+}
+
+/* ============ MISC ============ */
+.call-float{
+  position:fixed;bottom:1.4rem;right:1.4rem;z-index:150;width:60px;height:60px;border-radius:50%;
+  background:var(--pink);color:#0b0410;display:flex;align-items:center;justify-content:center;font-size:1.4rem;
+  text-decoration:none;box-shadow:0 0 26px rgba(255,46,154,.9);transition:transform .2s;
+}
+.call-float:hover{transform:scale(1.1)}
+.badge-sample{
+  display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  border:1px solid var(--pink);color:#ffb3d9;border-radius:6px;padding:.2rem .6rem;margin-left:.5rem;vertical-align:middle;
+}
+.small{font-size:.82rem;color:var(--muted)}
+.mt{margin-top:1.2rem}
+.center{text-align:center}
+</style>
+</head>
+<body>
+
+
+<header class="topbar">
+  <div class="brandmark">Pix <span class="amp">&amp;</span> Combs</div>
+  <span class="hours-pill"><span class="dot"></span> Open tonight: call to confirm hours</span>
+  <button class="burger" id="burger" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+</header>
+
+
+<div class="scrim" id="scrim"></div>
+<nav class="drawer" id="drawer" aria-label="Site navigation">
+  <div class="drawer-head">
+    <div class="drawer-title">BACKSTAGE PASS</div>
+    <button class="drawer-close" id="drawerClose" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <a class="navlink on" href="#home" data-nav="home"><i class="fa-solid fa-house"></i> Home</a>
+  <a class="navlink" href="#services" data-nav="services"><i class="fa-solid fa-scissors"></i> Services</a>
+  <a class="navlink" href="#about" data-nav="about"><i class="fa-solid fa-star"></i> About</a>
+  <a class="navlink" href="#reviews" data-nav="reviews"><i class="fa-solid fa-comments"></i> Reviews</a>
+  <a class="navlink" href="#contact" data-nav="contact"><i class="fa-solid fa-phone"></i> Contact</a>
+  <div class="pass">
+    <strong>ADMIT ONE</strong>
+    Pix &amp; Combs Barbershop LLC<br>
+    Independence, Kentucky<br>
+    Walk-ins welcome
+  </div>
+</nav>
+
+<main>
+
+<section class="page active" id="page-home" data-page="home">
+  <div class="hero wrap">
+    <div class="open-badge"><span class="dot"></span> Neighborhood barbershop, Independence KY</div>
+    <h1 class="neon-sign">PIX <span class="amp">&amp;</span> COMBS</h1>
+    <div class="neon-sub">Barbershop LLC</div>
+    <p class="hero-blurb">Sharp fades, clean cuts, and beard work with an experience beyond just a haircut. Owner-barber AP keeps the shop spotless, the vibe relaxed, and the clippers humming late into the night.</p>
+    <div class="hero-cta">
+      <a class="btn btn-pink" href="tel:+15132653686"><i class="fa-solid fa-phone"></i> (513) 265-3686</a>
+      <a class="btn btn-ghost" href="#services" data-nav="services"><i class="fa-solid fa-scissors"></i> See the lineup</a>
+    </div>
+  </div>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <span>Haircuts</span><span class="cy">Low taper fades</span><span>Beard trims</span><span class="cy">Line ups</span><span>Kids cuts</span><span class="cy">Haircut + beard</span><span>Haircuts</span><span class="cy">Low taper fades</span><span>Beard trims</span><span class="cy">Line ups</span><span>Kids cuts</span><span class="cy">Haircut + beard</span>
+    </div>
+  </div>
+
+  <div class="sect wrap">
+    <div class="kicker">Why the chair fills up</div>
+    <h2 class="title">The After Hours Cut</h2>
+    <p class="lead">Pix &amp; Combs is a neighborhood shop built on fast confirmations, friendly barbers who treat you like family, and detail work that sends kids home smiling. Book Thursday night, sit in the chair Friday morning. That is the house style.</p>
+
+    <div class="polawall">
+      <div class="polaroid">
+        <div class="tape"></div>
+        <div class="photo"><i class="fa-solid fa-scissors"></i><span>Photo coming soon</span></div>
+        <div class="caption">The chair is waiting</div>
+      </div>
+      <div class="polaroid">
+        <div class="tape cy"></div>
+        <div class="photo"><i class="fa-solid fa-bolt"></i><span>Photo coming soon</span></div>
+        <div class="caption">Low taper, high shine</div>
+      </div>
+      <div class="polaroid">
+        <div class="tape"></div>
+        <div class="photo"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Photo coming soon</span></div>
+        <div class="caption">Fresh lineup energy</div>
+      </div>
+    </div>
+
+    <div class="hours-box">
+      <h3><i class="fa-solid fa-clock"></i> Shop hours <span class="badge-sample">Call to confirm</span></h3>
+      <div class="hours-row"><span class="day">Monday</span><span class="time">10:00 AM to 6:00 PM</span></div>
+      <div class="hours-row"><span class="day">Tuesday</span><span class="time">10:00 AM to 6:00 PM</span></div>
+      <div class="hours-row"><span class="day">Wednesday</span><span class="time">10:00 AM to 6:00 PM</span></div>
+      <div class="hours-row"><span class="day">Thursday</span><span class="time">10:00 AM to 6:00 PM</span></div>
+      <div class="hours-row"><span class="day">Friday</span><span class="time">10:00 AM to 6:00 PM</span></div>
+      <div class="hours-row"><span class="day">Saturday</span><span class="time">10:00 AM to 4:00 PM</span></div>
+      <div class="hours-row closed"><span class="day">Sunday</span><span class="time">Closed</span></div>
+      <p class="small mt">Hours sourced from public listings. Walk-ins welcome, appointments get priority. One barber at this shop books through theCut, cash only.</p>
+    </div>
+
+    <div class="center mt">
+      <a class="btn btn-pink" href="tel:+15132653686"><i class="fa-solid fa-phone"></i> Call to book</a>
+      <a class="btn btn-ghost" href="#reviews" data-nav="reviews" style="margin-left:.6rem"><i class="fa-solid fa-comments"></i> Read the reviews</a>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-services" data-page="services">
+  <div class="sect wrap">
+    <div class="kicker">Tonight on the bill</div>
+    <h2 class="title">The Service Posters</h2>
+    <p class="lead">Every cut gets the full treatment: consult, precision work, and a finish that holds up under neon. Prices below come from the shop's public booking page on theCut and are subject to change. Call the shop to confirm.</p>
+
+    <div class="poster-wall">
+      <article class="showcard">
+        <div class="poster p1"><i class="fa-solid fa-scissors"></i></div>
+        <div class="body">
+          <h3>Haircut</h3>
+          <span class="price">$30</span>
+          <p class="desc">Regular haircut, about 30 minutes. Fades, tapers, and clean finishes done right.</p>
+          <div class="meta"><span class="tag book">Bookable on theCut</span><span class="tag">30 min</span></div>
+        </div>
+      </article>
+      <article class="showcard">
+        <div class="poster p2"><i class="fa-solid fa-user-astronaut"></i></div>
+        <div class="body">
+          <h3>Haircut and Beard</h3>
+          <span class="price">$40</span>
+          <p class="desc">Full cut plus beard shaping and lineup. The complete reset in one chair, about 40 minutes.</p>
+          <div class="meta"><span class="tag book">Bookable on theCut</span><span class="tag">40 min</span></div>
+        </div>
+      </article>
+      <article class="showcard">
+        <div class="poster p3"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+        <div class="body">
+          <h3>Line Up</h3>
+          <span class="price">$20</span>
+          <p class="desc">Crisp edges and a fresh lineup to keep your cut sharp between full appointments, about 20 minutes.</p>
+          <div class="meta"><span class="tag book">Bookable on theCut</span><span class="tag">20 min</span></div>
+        </div>
+      </article>
+      <article class="showcard">
+        <div class="poster p4"><i class="fa-solid fa-children"></i></div>
+        <div class="body">
+          <h3>Kids Cuts <span class="badge-sample">Sample</span></h3>
+          <span class="price">Call to confirm</span>
+          <p class="desc">Reviewers rave about the shop's work on young clients, from super fresh low taper fades to first-visit cleanups that leave kids grinning.</p>
+          <div class="meta"><span class="tag sample">Details not published</span></div>
+        </div>
+      </article>
+    </div>
+
+    <div class="hours-box mt">
+      <h3><i class="fa-solid fa-circle-info"></i> Booking notes</h3>
+      <div class="hours-row"><span class="day">Appointments</span><span class="time">One barber books via theCut, call the shop to confirm who is in the chair</span></div>
+      <div class="hours-row"><span class="day">Payment</span><span class="time">Cash only reported on the booking page, call to confirm</span></div>
+      <div class="hours-row"><span class="day">Location</span><span class="time">Suite #3, 1997 Walton Nicholson Rd</span></div>
+    </div>
+
+    <div class="center mt">
+      <a class="btn btn-pink" href="tel:+15132653686"><i class="fa-solid fa-phone"></i> Book by phone</a>
+      <a class="btn btn-ghost" href="https://search.thecut.co/barbers/Jeremy-abdon-jauwf7h" target="_blank" rel="noopener" style="margin-left:.6rem"><i class="fa-solid fa-calendar-check"></i> Book on theCut</a>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-about" data-page="about">
+  <div class="sect wrap">
+    <div class="kicker">Behind the neon</div>
+    <h2 class="title">The Pix &amp; Combs Story</h2>
+    <p class="lead">A neighborhood barbershop in Independence, Kentucky, built on one simple idea: it should feel like more than a haircut.</p>
+
+    <div class="about-grid">
+      <div class="about-card quote-card">
+        <h3><i class="fa-solid fa-quote-left"></i> In the shop's own words</h3>
+        <blockquote class="big">I love what I do! Providing an experience beyond just a haircut, with outstanding customers service and giving back to my community.</blockquote>
+        <p class="small">Public business description, quoted verbatim.</p>
+      </div>
+      <div class="about-card">
+        <h3><i class="fa-solid fa-user"></i> Meet the chair</h3>
+        <p><strong>Owner-barber AP</strong> is the name reviewers know. Public write-ups describe AP as incredibly personable, keeping the shop spotless and the atmosphere relaxed while turning out sharp low taper fades and clean beard trims.</p>
+        <p>Reviewers also praise the wider crew, including barbers known in reviews as <strong>Showcase</strong> and <strong>Jeremy</strong>, for fast confirmations, family-warm service, and detail work that brings kids and parents back. <span class="badge-sample">Unverified</span></p>
+      </div>
+      <div class="about-card">
+        <h3><i class="fa-solid fa-location-dot"></i> The neighborhood</h3>
+        <p><strong>1997 Walton Nicholson Rd, Suite #3, Independence, KY 41051.</strong> A local shop serving Independence and the surrounding Northern Kentucky area, open six days a week with Saturday hours for the weekend crowd.</p>
+        <p>Walk-ins are welcome and appointments get priority. Hours are published as Monday to Friday 10 AM to 6 PM, Saturday 10 AM to 4 PM, Sunday closed. <span class="badge-sample">Call to confirm</span></p>
+      </div>
+      <div class="about-card">
+        <h3><i class="fa-solid fa-heart"></i> What regulars say</h3>
+        <p>Public reviews keep hitting the same notes: <strong>fantastic atmosphere</strong>, <strong>friendly barbers who treat you like family</strong>, and <strong>top-notch detail and professionalism</strong>, especially on kids cuts and low taper fades.</p>
+        <p>One parent wrote that their son left smiling from ear to ear, feeling confident and super fresh. Another called it their new go-to haircut place. See the <a href="#reviews" data-nav="reviews" style="color:var(--cyan)">Reviews page</a> for the full word from the street.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-reviews" data-page="reviews">
+  <div class="sect wrap">
+    <div class="kicker">Word from the street</div>
+    <h2 class="title">Reviews</h2>
+    <div class="rating-strip">
+      <span class="stars">★★★★★</span>
+      <span class="rating-note">Public sentiment is strongly positive across Google and theCut reviews. Quotes below are shown verbatim from public reviews. No negative reviews were found in public sources at the time of writing.</span>
+    </div>
+
+    <div class="review-grid">
+      <article class="review">
+        <div class="rhead">
+          <div class="avatar">GD</div>
+          <div><div class="who">Google reviewer</div><div class="src">Google review</div></div>
+          <span class="rstars">★★★★★</span>
+        </div>
+        <p class="q">I would highly recommend this shop! I booked an appointment Thursday night and they were able to get me in Friday morning, very quick confirmation. Very friendly barbers that treat you like family. Definitely an amazing shop and amazing/knowledgeable babers.</p>
+      </article>
+      <article class="review">
+        <div class="rhead">
+          <div class="avatar">GD</div>
+          <div><div class="who">Google reviewer</div><div class="src">Google review</div></div>
+          <span class="rstars">★★★★★</span>
+        </div>
+        <p class="q">Fantastic atmosphere and hair cut with beard trim! Highly recommend! My new go to hair cut place!</p>
+      </article>
+      <article class="review">
+        <div class="rhead">
+          <div class="avatar">GD</div>
+          <div><div class="who">Google reviewer</div><div class="src">Google review</div></div>
+          <span class="rstars">★★★★★</span>
+        </div>
+        <p class="q">Showcase hooked my little man up with the super fresh low taper fade he's been wanting for some time now. My son left smiling from ear to ear, feeling confident and super fresh! We will be back!</p>
+      </article>
+      <article class="review">
+        <div class="rhead">
+          <div class="avatar">GD</div>
+          <div><div class="who">Google reviewer</div><div class="src">Google review</div></div>
+          <span class="rstars">★★★★★</span>
+        </div>
+        <p class="q">My husband took our son in for a cleanup, and ShowCase absolutely nailed it. The detail and professionalism were top-notch. Our son came home looking fresh, confident, and somehow a little taller. My husband will definitely be stopping in soon for his own cut.</p>
+      </article>
+      <article class="review">
+        <div class="rhead">
+          <div class="avatar">GD</div>
+          <div><div class="who">Google reviewer</div><div class="src">Google review</div></div>
+          <span class="rstars">★★★★★</span>
+        </div>
+        <p class="q">We have been hoping to find a local barber that our son likes, and it looks like today we found him! A nice clean cut, local, and nice environment!!</p>
+      </article>
+      <article class="review">
+        <div class="rhead">
+          <div class="avatar">AD</div>
+          <div><div class="who">Angel Dickmeyer</div><div class="src">theCut review</div></div>
+          <span class="rstars">★★★★★</span>
+        </div>
+        <p class="q">Jeremy is a fantastic barber and very laid back nice guy! Both my boys are picky about their hair and they both leave his chair happy! If you're looking for someone who's great at what they do go see Jeremy!</p>
+      </article>
+      <article class="review">
+        <div class="rhead">
+          <div class="avatar">JH</div>
+          <div><div class="who">Jared Hanhart</div><div class="src">theCut review</div></div>
+          <span class="rstars">★★★★★</span>
+        </div>
+        <p class="q">Amazing work as always! Smooth fade, great lines on the edge up. As someone that travels for a living, it's important to find a reliable barber. Jeremy does fantastic, reliable work. Great conversation as always! Plus, as a veteran, I 100% advocate for supporting other veterans.</p>
+      </article>
+      <article class="review">
+        <div class="rhead">
+          <div class="avatar">EA</div>
+          <div><div class="who">Eric Anderson</div><div class="src">theCut review</div></div>
+          <span class="rstars">★★★★★</span>
+        </div>
+        <p class="q">Been looking for a good barber for a long while for my son and my self needless to say I found a great barber finally. Definitely will be going to only jermy. Very personal and nice guy. Simple to talk to and does a top notch job</p>
+      </article>
+      <article class="review">
+        <div class="rhead">
+          <div class="avatar">MA</div>
+          <div><div class="who">Michael Ashley</div><div class="src">theCut review</div></div>
+          <span class="rstars">★★★★★</span>
+        </div>
+        <p class="q">Best beard trim I have ever received. Definitely recommend.</p>
+      </article>
+      <article class="review">
+        <div class="rhead">
+          <div class="avatar">KH</div>
+          <div><div class="who">Kenneth Hall</div><div class="src">theCut review</div></div>
+          <span class="rstars">★★★★★</span>
+        </div>
+        <p class="q">Always does a great job with my hair</p>
+      </article>
+    </div>
+
+    <p class="small mt center">Review quotes shown verbatim from public sources (Google and theCut). Read the full reviews on <a class="src-link" href="https://search.thecut.co/barbers/Jeremy-abdon-jauwf7h" target="_blank" rel="noopener">theCut</a> or leave your own on Google after your visit.</p>
+  </div>
+</section>
+
+
+<section class="page" id="page-contact" data-page="contact">
+  <div class="sect wrap">
+    <div class="kicker">Get in the chair</div>
+    <h2 class="title">Contact</h2>
+    <p class="lead">Call for the fastest booking, or drop a message and the shop will get back to you. Suite #3, right off Walton Nicholson Rd in Independence.</p>
+
+    <div class="contact-grid">
+      <div class="info-card">
+        <h3><i class="fa-solid fa-location-dot"></i> Find the shop</h3>
+        <div class="info-line"><i class="fa-solid fa-map"></i><span>Pix &amp; Combs Barbershop LLC<br>1997 Walton Nicholson Rd, Suite #3<br>Independence, KY 41051</span></div>
+        <div class="info-line"><i class="fa-solid fa-phone"></i><span><a href="tel:+15132653686">(513) 265-3686</a></span></div>
+        <div class="info-line"><i class="fa-solid fa-clock"></i><span>Mon to Fri: 10 AM to 6 PM<br>Sat: 10 AM to 4 PM<br>Sun: Closed <span class="badge-sample">Call to confirm</span></span></div>
+        <div class="hero-cta" style="justify-content:flex-start">
+          <a class="btn btn-pink" href="https://www.google.com/maps/search/?api=1&amp;query=1997%20Walton%20Nicholson%20Rd%2C%20Independence%2C%20KY%2041051" target="_blank" rel="noopener"><i class="fa-solid fa-diamond-turn-right"></i> Get directions</a>
+        </div>
+      </div>
+      <div class="form-card">
+        <h3><i class="fa-solid fa-envelope"></i> Send a message</h3>
+        <form id="contactForm">
+          <label for="fname">Your name</label>
+          <input id="fname" name="name" type="text" required placeholder="Jane Doe">
+          <label for="fphone">Phone</label>
+          <input id="fphone" name="phone" type="tel" placeholder="(555) 123-4567">
+          <label for="fservice">Service wanted</label>
+          <select id="fservice" name="service">
+            <option>Haircut</option>
+            <option>Haircut and Beard</option>
+            <option>Line Up</option>
+            <option>Kids Cut</option>
+            <option>Something else</option>
+          </select>
+          <label for="fmsg">Message</label>
+          <textarea id="fmsg" name="message" required placeholder="Hi, I would like to book a haircut this Saturday morning..."></textarea>
+          <button class="btn btn-pink" type="submit" style="margin-top:1.1rem;width:100%;justify-content:center"><i class="fa-solid fa-paper-plane"></i> Send message</button>
+          <p class="form-note">Submitting opens a pre-filled email draft in your mail app addressed for the shop. Prefer to talk? Call <a href="tel:+15132653686" style="color:var(--cyan)">(513) 265-3686</a>.</p>
+          <div class="form-ok" id="formOk">Your message draft is ready in your mail app. If it did not open, call the shop directly at <strong>(513) 265-3686</strong> and they will take care of you.</div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<a class="call-float" href="tel:+15132653686" aria-label="Call Pix and Combs Barbershop"><i class="fa-solid fa-phone"></i></a>
+
+<footer>© Pix & Combs Barbershop LLC</footer>
+
+<script>
+// Router: hash based pages with popstate support
+function pageFromHash(){
+  var h = (location.hash || "#home").replace("#","");
+  var valid = ["home","services","about","reviews","contact"];
+  return valid.indexOf(h) >= 0 ? h : "home";
+}
+function navigateTo(page){
+  var pages = document.querySelectorAll(".page");
+  for(var i=0;i<pages.length;i++){
+    pages[i].classList.toggle("active", pages[i].getAttribute("data-page") === page);
+  }
+  var links = document.querySelectorAll("[data-nav]");
+  for(var j=0;j<links.length;j++){
+    links[j].classList.toggle("on", links[j].getAttribute("data-nav") === page);
+  }
+  if(("#" + page) !== location.hash){
+    history.pushState({page:page}, "", "#" + page);
+  }
+  closeDrawer();
+  window.scrollTo(0,0);
+}
+window.addEventListener("popstate", function(){
+  navigateTo(pageFromHash());
+});
+document.addEventListener("click", function(e){
+  var el = e.target.closest("[data-nav]");
+  if(el){
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-nav"));
+  }
+});
+navigateTo(pageFromHash());
+
+// Side drawer
+var drawer = document.getElementById("drawer");
+var scrim = document.getElementById("scrim");
+function openDrawer(){ drawer.classList.add("open"); scrim.classList.add("show"); }
+function closeDrawer(){ drawer.classList.remove("open"); scrim.classList.remove("show"); }
+document.getElementById("burger").addEventListener("click", openDrawer);
+document.getElementById("drawerClose").addEventListener("click", closeDrawer);
+scrim.addEventListener("click", closeDrawer);
+document.addEventListener("keydown", function(e){ if(e.key === "Escape"){ closeDrawer(); } });
+
+// Contact form: opens a mailto draft prefilled with the form content
+document.getElementById("contactForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  var name = document.getElementById("fname").value.trim();
+  var phone = document.getElementById("fphone").value.trim();
+  var service = document.getElementById("fservice").value;
+  var msg = document.getElementById("fmsg").value.trim();
+  var subject = "Booking request from " + name + " via Pix and Combs website";
+  var body = "Name: " + name + "\nPhone: " + phone + "\nService wanted: " + service + "\n\nMessage:\n" + msg;
+  window.location.href = "mailto:?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+  document.getElementById("formOk").style.display = "block";
+});
+</script>
+</body>
+</html>

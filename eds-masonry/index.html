@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ed's Masonry | Masonry Contractor in Cincinnati, OH</title>
+<meta name="description" content="Ed's Masonry is a masonry contractor serving Cincinnati, OH. Call (513) 404-9880 for brick, stone, chimney, and tuckpointing work.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,500&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+/* Design tokens: brick red, warm cream, deep brown mortar, gold accent */
+:root{
+  --brick:#8c2f1b;
+  --brick-dark:#6e2414;
+  --brick-deep:#54200f;
+  --cream:#f7f0e1;
+  --cream-soft:#fdf8ec;
+  --mortar:#e6d8ba;
+  --ink:#3b2a21;
+  --gold:#c99b3f;
+  --slate:#6f5b4c;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Source Sans 3",system-ui,sans-serif;
+  background:var(--cream);
+  color:var(--ink);
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,.serif{font-family:"Playfair Display",Georgia,serif;color:var(--brick-deep)}
+img{max-width:100%}
+a{color:var(--brick)}
+.wrap{max-width:1100px;margin:0 auto;padding:0 1.25rem}
+
+/* Running bond brick divider strip (CSS only) */
+.brick-strip{
+  height:46px;
+  background-color:var(--brick);
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0 34px, var(--mortar) 34px 40px),
+    repeating-linear-gradient(90deg, transparent 0 58px, var(--mortar) 58px 62px),
+    repeating-linear-gradient(90deg, transparent 0 58px, var(--mortar) 58px 62px);
+  background-size:100% 40px, 62px 80px, 62px 80px;
+  background-position:0 0, 0 0, 31px 40px;
+  background-repeat:repeat;
+  border-top:2px solid var(--brick-deep);
+  border-bottom:2px solid var(--brick-deep);
+}
+.brick-strip.thin{height:26px;
+  background-size:100% 22px, 34px 44px, 34px 44px;
+  background-position:0 0, 0 0, 17px 22px;
+}
+.brick-strip.thin{
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0 18px, var(--mortar) 18px 22px),
+    repeating-linear-gradient(90deg, transparent 0 30px, var(--mortar) 30px 34px),
+    repeating-linear-gradient(90deg, transparent 0 30px, var(--mortar) 30px 34px);
+}
+
+/* Hand drawn underline accent for headings */
+.squiggle{
+  display:inline-block;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='12' viewBox='0 0 120 12'%3E%3Cpath d='M2 8 Q 12 2, 24 7 T 46 7 T 68 7 T 90 7 T 118 6' fill='none' stroke='%23c99b3f' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E") left bottom/120px 12px no-repeat;
+  padding-bottom:14px;
+}
+
+/* Header */
+.site-header{
+  background:var(--cream-soft);
+  border-bottom:3px solid var(--brick);
+  position:sticky;top:0;z-index:50;
+}
+.header-inner{display:flex;align-items:center;justify-content:space-between;padding:.8rem 0;gap:1rem}
+.brand{display:flex;align-items:center;gap:.7rem;text-decoration:none;color:var(--brick-deep)}
+.brand-mark{
+  width:52px;height:52px;border-radius:8px;flex:0 0 52px;
+  background-color:var(--brick);
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0 15px, var(--mortar) 15px 18px),
+    repeating-linear-gradient(90deg, transparent 0 21px, var(--mortar) 21px 24px);
+  background-size:100% 18px, 24px 36px;
+  border:2px solid var(--brick-deep);
+}
+.brand-name{font-family:"Playfair Display",serif;font-weight:900;font-size:1.45rem;line-height:1.1}
+.brand-tag{font-size:.75rem;letter-spacing:.18em;text-transform:uppercase;color:var(--slate);font-weight:600}
+.main-nav{display:flex;gap:.25rem;align-items:center}
+.main-nav a{
+  text-decoration:none;color:var(--ink);font-weight:600;
+  padding:.55rem .9rem;border-radius:6px;transition:background .15s,color .15s;
+}
+.main-nav a:hover{background:#efe2c8}
+.main-nav a.active{background:var(--brick);color:var(--cream)}
+.nav-cta{
+  background:var(--gold)!important;color:#2c1e12!important;font-weight:700;
+}
+.hamburger{
+  display:none;background:var(--brick);color:var(--cream);
+  border:2px solid var(--brick-deep);border-radius:8px;
+  font-size:1.3rem;padding:.45rem .7rem;cursor:pointer;
+}
+
+/* Router pages */
+.page{display:none;animation:fadein .3s ease}
+.page.active{display:block}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* Hero */
+.hero{
+  background:
+    radial-gradient(ellipse at 20% 10%, rgba(201,155,63,.25), transparent 55%),
+    linear-gradient(160deg, var(--brick-deep), var(--brick) 70%);
+  color:var(--cream);
+  padding:4.5rem 0 4rem;
+  position:relative;overflow:hidden;
+}
+.hero h1{color:var(--cream);font-size:clamp(2.2rem,5vw,3.6rem);line-height:1.12;font-weight:900}
+.hero .sub{font-size:1.15rem;margin:1rem 0 1.75rem;max-width:36rem;color:#f3e6cd}
+.hero .squiggle{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='12' viewBox='0 0 120 12'%3E%3Cpath d='M2 8 Q 12 2, 24 7 T 46 7 T 68 7 T 90 7 T 118 6' fill='none' stroke='%23f7f0e1' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E")}
+.btn{
+  display:inline-block;text-decoration:none;cursor:pointer;
+  font-weight:700;font-size:1.02rem;
+  padding:.8rem 1.6rem;border-radius:8px;border:2px solid transparent;
+  transition:transform .12s, box-shadow .12s;
+}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.18)}
+.btn-gold{background:var(--gold);color:#2c1e12}
+.btn-outline{background:transparent;color:var(--cream);border-color:var(--cream);margin-left:.6rem}
+.btn-brick{background:var(--brick);color:var(--cream)}
+.btn-cream-outline{background:transparent;color:var(--brick-deep);border-color:var(--brick-deep)}
+.hero-meta{display:flex;gap:1.6rem;flex-wrap:wrap;margin-top:2rem;font-size:.95rem;color:#f3e6cd}
+.hero-meta i{color:var(--gold);margin-right:.4rem}
+
+/* Sections */
+.section{padding:3.5rem 0}
+.section h2{font-size:2rem;margin-bottom:.6rem}
+.lede{font-size:1.1rem;color:var(--slate);max-width:44rem;margin-bottom:2rem}
+
+/* Service cards */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.25rem}
+.card{
+  background:var(--cream-soft);border:1px solid #e2d3b4;border-radius:12px;
+  padding:1.5rem;box-shadow:0 2px 8px rgba(84,32,15,.08);
+  border-top:6px solid var(--brick);
+}
+.card i.fa-solid,.card i.fa-regular{font-size:1.7rem;color:var(--brick);margin-bottom:.7rem}
+.card h3{font-size:1.25rem;margin-bottom:.4rem}
+.card p{font-size:.97rem;color:#57463a}
+.badge{
+  display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  background:#efe2c8;color:#7a5a1e;border:1px dashed #b98d2e;border-radius:20px;
+  padding:.18rem .7rem;margin-top:.7rem;
+}
+.notice{
+  background:#fdf3dd;border:1px solid var(--gold);border-left:6px solid var(--gold);
+  border-radius:8px;padding:1rem 1.25rem;margin-bottom:2rem;font-size:.98rem;
+}
+
+/* Story / about */
+.story{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;align-items:start}
+.story h2{font-size:2rem;margin-bottom:.8rem}
+.story p{margin-bottom:1rem}
+.fact-box{
+  background:var(--brick-deep);color:var(--cream);border-radius:12px;padding:1.75rem;
+  border:3px solid var(--gold);
+}
+.fact-box h3{color:var(--gold);font-size:1.3rem;margin-bottom:.8rem}
+.fact-box ul{list-style:none}
+.fact-box li{padding:.45rem 0;border-bottom:1px solid rgba(247,240,225,.18);font-size:.98rem}
+.fact-box li:last-child{border-bottom:none}
+.fact-box i{color:var(--gold);margin-right:.55rem}
+
+/* Gallery */
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1.25rem}
+.gcard{
+  border-radius:12px;overflow:hidden;border:1px solid #e2d3b4;background:var(--cream-soft);
+}
+.gimg{
+  height:170px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.5rem;
+  background-color:#e9dcc0;
+  background-image:
+    repeating-linear-gradient(45deg, rgba(140,47,27,.08) 0 14px, transparent 14px 28px);
+  color:#8a7454;text-align:center;padding:1rem;
+}
+.gimg i{font-size:2.2rem;color:var(--brick)}
+.gimg span{font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:.8rem}
+.gbody{padding:1rem 1.2rem}
+.gbody h3{font-size:1.12rem;margin-bottom:.25rem}
+.gbody p{font-size:.93rem;color:#57463a}
+
+/* Reviews */
+.review-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.25rem}
+.review{
+  background:var(--cream-soft);border-radius:12px;padding:1.6rem;
+  border:1px solid #e2d3b4;position:relative;
+}
+.review .stars{color:var(--gold);letter-spacing:.15em;margin-bottom:.6rem}
+.review blockquote{font-family:"Playfair Display",serif;font-style:italic;font-size:1.05rem;margin-bottom:.8rem}
+.review .who{font-size:.85rem;color:var(--slate)}
+.review.sample-card{border-style:dashed;border-color:var(--gold)}
+
+/* Contact */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
+.info-card{background:var(--cream-soft);border:1px solid #e2d3b4;border-radius:12px;padding:1.75rem}
+.info-card h3{font-size:1.2rem;margin-bottom:1rem}
+.info-row{display:flex;gap:.8rem;align-items:flex-start;padding:.6rem 0;border-bottom:1px solid #eadbbd}
+.info-row:last-child{border-bottom:none}
+.info-row i{color:var(--brick);font-size:1.15rem;margin-top:.2rem}
+form.contact-form{background:var(--cream-soft);border:1px solid #e2d3b4;border-radius:12px;padding:1.75rem}
+form.contact-form label{display:block;font-weight:600;margin:.9rem 0 .3rem}
+form.contact-form input,form.contact-form textarea,form.contact-form select{
+  width:100%;padding:.7rem .8rem;border:2px solid #d8c6a0;border-radius:8px;
+  font:inherit;background:#fffdf6;
+}
+form.contact-form input:focus,form.contact-form textarea:focus,form.contact-form select:focus{
+  outline:none;border-color:var(--brick);
+}
+.form-ok{
+  display:none;background:#eef5e6;border:2px solid #6a9a4f;color:#3c6428;
+  border-radius:8px;padding:1rem 1.25rem;margin-top:1rem;font-weight:600;
+}
+.form-ok.show{display:block}
+
+/* Footer */
+footer.site-footer{
+  background:var(--brick-deep);color:var(--cream);
+  text-align:center;padding:1.4rem 1rem;font-size:.95rem;
+}
+
+@media (max-width:760px){
+  .hamburger{display:block}
+  .main-nav{
+    display:none;position:absolute;top:100%;left:0;right:0;
+    background:var(--cream-soft);flex-direction:column;align-items:stretch;
+    padding:.8rem;border-bottom:3px solid var(--brick);
+    box-shadow:0 10px 20px rgba(0,0,0,.15);
+  }
+  .main-nav.open{display:flex}
+  .main-nav a{text-align:center;padding:.8rem}
+  .story,.contact-grid{grid-template-columns:1fr}
+  .btn-outline{margin-left:0;margin-top:.6rem}
+}
+</style>
+</head>
+<body>
+
+<div class="brick-strip" aria-hidden="true"></div>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="#home" data-page="home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>
+        <span class="brand-name">Ed's Masonry</span><br>
+        <span class="brand-tag">Cincinnati, Ohio</span>
+      </span>
+    </a>
+    <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+    <nav class="main-nav" id="mainNav" aria-label="Main navigation">
+      <a href="#home" data-page="home" class="active">Home</a>
+      <a href="#services" data-page="services">Services</a>
+      <a href="#about" data-page="about">About</a>
+      <a href="#reviews" data-page="reviews">Reviews</a>
+      <a href="#contact" data-page="contact">Contact</a>
+      <a href="tel:+15134049880" class="nav-cta"><i class="fa-solid fa-phone"></i> (513) 404-9880</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="wrap">
+      <h1>Built Brick by Brick,<br>the <span class="squiggle">Old-Fashioned</span> Way</h1>
+      <p class="sub">Ed's Masonry is a masonry contractor in Cincinnati, Ohio. Chimneys, brickwork, stone, and tuckpointing done by a craftsman who takes pride in every course he lays.</p>
+      <a class="btn btn-gold" href="tel:+15134049880"><i class="fa-solid fa-phone"></i> Call (513) 404-9880</a>
+      <a class="btn btn-outline" href="#contact" data-page="contact">Request an Estimate</a>
+      <div class="hero-meta">
+        <span><i class="fa-solid fa-location-dot"></i> 2716 Merrittview Ln, Cincinnati, OH 45231</span>
+        <span><i class="fa-solid fa-award"></i> BBB A+ rating</span>
+        <span><i class="fa-solid fa-trowel-bricks"></i> Masonry contractor</span>
+      </div>
+    </div>
+  </div>
+  <div class="brick-strip thin" aria-hidden="true"></div>
+  <div class="section">
+    <div class="wrap">
+      <h2><span class="squiggle">What We Do</span></h2>
+      <p class="lede">From weathered chimneys to brand-new patios, Ed's Masonry handles the heavy, honest work of masonry. Call to confirm services and get a straight answer on your project.</p>
+      <div class="card-grid">
+        <div class="card"><i class="fa-solid fa-house-chimney"></i><h3>Chimney Repair</h3><p>Rebuilds, repointing, and caps to keep your chimney sound and safe.</p><span class="badge">Sample: call to confirm</span></div>
+        <div class="card"><i class="fa-solid fa-trowel-bricks"></i><h3>Brick Repair &amp; Tuckpointing</h3><p>Crumbled mortar joints cut out and repointed so old walls stand strong.</p><span class="badge">Sample: call to confirm</span></div>
+        <div class="card"><i class="fa-solid fa-layer-group"></i><h3>Stone &amp; Block Work</h3><p>Retaining walls, foundations, and stone veneer built to last.</p><span class="badge">Sample: call to confirm</span></div>
+      </div>
+      <p style="margin-top:1.75rem"><a class="btn btn-brick" href="#services" data-page="services">See All Services</a></p>
+    </div>
+  </div>
+  <div class="brick-strip thin" aria-hidden="true"></div>
+  <div class="section" style="padding-top:2.5rem">
+    <div class="wrap">
+      <h2><span class="squiggle">A Craftsman You Can Reach</span></h2>
+      <p class="lede">No call centers, no runaround. When you call Ed's Masonry, you talk to the mason. Estimates are honest and the work is guaranteed with pride.</p>
+      <a class="btn btn-cream-outline" href="#about" data-page="about">Our Story</a>
+      <a class="btn btn-brick" href="#reviews" data-page="reviews" style="margin-left:.6rem">What Neighbors Say</a>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-services">
+  <div class="section">
+    <div class="wrap">
+      <h2><span class="squiggle">Services</span></h2>
+      <p class="lede">Masonry services for homes across Cincinnati and the surrounding neighborhoods.</p>
+      <div class="notice"><i class="fa-solid fa-circle-info"></i> <strong>Heads up:</strong> this service list is a sample based on the trade, not a confirmed price list. Call <a href="tel:+15134049880">(513) 404-9880</a> to confirm what Ed's Masonry offers and get an honest estimate.</div>
+      <div class="card-grid">
+        <div class="card"><i class="fa-solid fa-house-chimney"></i><h3>Chimney Repair &amp; Rebuilds</h3><p>From crown to flue: repointing, partial rebuilds, caps, and flashing.</p></div>
+        <div class="card"><i class="fa-solid fa-trowel-bricks"></i><h3>Tuckpointing</h3><p>Old mortar joints ground out and repointed to match the original look.</p></div>
+        <div class="card"><i class="fa-solid fa-bricks"></i><h3>Brick Laying &amp; Repair</h3><p>New brick walls, veneer, and repairs that blend with existing brick.</p></div>
+        <div class="card"><i class="fa-solid fa-mountain"></i><h3>Stone Work</h3><p>Natural and manufactured stone for walls, columns, and facades.</p></div>
+        <div class="card"><i class="fa-solid fa-border-all"></i><h3>Patios &amp; Walkways</h3><p>Brick and stone pavers for outdoor living spaces that age gracefully.</p></div>
+        <div class="card"><i class="fa-solid fa-landmark"></i><h3>Retaining Walls</h3><p>Block and stone retaining walls engineered to hold their ground.</p></div>
+        <div class="card"><i class="fa-solid fa-fire"></i><h3>Fireplaces &amp; Fire Pits</h3><p>Outdoor fireplaces and fire pits built for cool Ohio evenings.</p></div>
+        <div class="card"><i class="fa-solid fa-screwdriver-wrench"></i><h3>Masonry Restoration</h3><p>Bringing tired brick and stone back to life, course by course.</p></div>
+      </div>
+      <p style="margin-top:2rem"><a class="btn btn-brick" href="tel:+15134049880"><i class="fa-solid fa-phone"></i> Call for a Free Estimate</a></p>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-about">
+  <div class="section">
+    <div class="wrap">
+      <h2><span class="squiggle">The Story Behind the Trowel</span></h2>
+      <div class="story">
+        <div>
+          <p>There is a rhythm to laying brick that you cannot fake. Butter the brick, set it, tap it true, strike the joint. Do it ten thousand times and your hands learn things no classroom can teach. That is the kind of work Ed's Masonry was built on.</p>
+          <p>Based on Merrittview Lane in Cincinnati, Ed's Masonry is a one-name, one-reputation kind of business. The Better Business Bureau has carried the company's file since 2007, and it holds an A+ rating. In a trade where fly-by-night operators come and go, that kind of staying power says something.</p>
+          <p>Ed's Masonry takes on the jobs other contractors walk past: the leaning chimney, the spalling brick, the retaining wall that has seen better decades. The philosophy is simple. Show up when you say you will, do the work the right way, and leave the place cleaner than you found it.</p>
+          <p><em>Note: the story above reflects the spirit of the trade. Specific company history is unverified. Call <a href="tel:+15134049880">(513) 404-9880</a> and ask Ed himself.</em></p>
+        </div>
+        <aside class="fact-box">
+          <h3><i class="fa-solid fa-scroll"></i> At a Glance</h3>
+          <ul>
+            <li><i class="fa-solid fa-check"></i> Masonry contractor, Cincinnati, OH</li>
+            <li><i class="fa-solid fa-check"></i> BBB file on record since 2007</li>
+            <li><i class="fa-solid fa-check"></i> BBB rating: A+</li>
+            <li><i class="fa-solid fa-check"></i> 2716 Merrittview Ln, Cincinnati, OH 45231</li>
+            <li><i class="fa-solid fa-check"></i> Phone: (513) 404-9880</li>
+            <li><i class="fa-solid fa-check"></i> Hours: call to confirm</li>
+          </ul>
+        </aside>
+      </div>
+    </div>
+  </div>
+  <div class="brick-strip thin" aria-hidden="true"></div>
+  <div class="section">
+    <div class="wrap">
+      <h2><span class="squiggle">Recent Work</span></h2>
+      <p class="lede">A look at the kind of projects Ed's Masonry takes on. Project photos are on the way.</p>
+      <div class="gallery-grid">
+        <div class="gcard"><div class="gimg"><i class="fa-solid fa-camera"></i><span>Photo coming soon</span></div><div class="gbody"><h3>Chimney Rebuild</h3><p>Torn down to sound brick and rebuilt course by course.</p></div></div>
+        <div class="gcard"><div class="gimg"><i class="fa-solid fa-camera"></i><span>Photo coming soon</span></div><div class="gbody"><h3>Tuckpointing</h3><p>Fresh mortar joints matched to the original masonry.</p></div></div>
+        <div class="gcard"><div class="gimg"><i class="fa-solid fa-camera"></i><span>Photo coming soon</span></div><div class="gbody"><h3>Stone Retaining Wall</h3><p>A wall built to hold its ground for decades.</p></div></div>
+        <div class="gcard"><div class="gimg"><i class="fa-solid fa-camera"></i><span>Photo coming soon</span></div><div class="gbody"><h3>Brick Patio</h3><p>Running bond pavers for an outdoor gathering space.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-reviews">
+  <div class="section">
+    <div class="wrap">
+      <h2><span class="squiggle">Reviews</span></h2>
+      <p class="lede">What neighbors and customers have to say about Ed's Masonry.</p>
+      <div class="notice"><i class="fa-solid fa-circle-info"></i> <strong>Honest note:</strong> we could not find published Google reviews for Ed's Masonry. The Better Business Bureau, which has carried the company's file since 2007, gives it an <strong>A+ rating</strong>. The quotes below are clearly marked samples, shown only to illustrate this page's layout.</div>
+      <div class="review-grid">
+        <div class="review sample-card">
+          <div class="stars">★★★★★</div>
+          <blockquote>"SAMPLE quote: He rebuilt our chimney and it looks better than the day the house was built."</blockquote>
+          <p class="who">SAMPLE review, placeholder text</p>
+          <span class="badge">Sample</span>
+        </div>
+        <div class="review sample-card">
+          <div class="stars">★★★★★</div>
+          <blockquote>"SAMPLE quote: Showed up on time, gave a fair price, and the tuckpointing work is flawless."</blockquote>
+          <p class="who">SAMPLE review, placeholder text</p>
+          <span class="badge">Sample</span>
+        </div>
+        <div class="review sample-card">
+          <div class="stars">★★★★☆</div>
+          <blockquote>"SAMPLE quote: Great stonework on our retaining wall. Took a little longer than quoted, but worth the wait."</blockquote>
+          <p class="who">SAMPLE review, placeholder text</p>
+          <span class="badge">Sample</span>
+        </div>
+      </div>
+      <p style="margin-top:2rem"><a class="btn btn-brick" href="https://www.bbb.org/us/oh/cincinnati/profile/mason-contractors/eds-masonry-0292-11031011" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> View BBB Profile</a></p>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-contact">
+  <div class="section">
+    <div class="wrap">
+      <h2><span class="squiggle">Get in Touch</span></h2>
+      <p class="lede">Ready to talk brick? Reach out and Ed will give you a straight answer on your project.</p>
+      <div class="contact-grid">
+        <div class="info-card">
+          <h3>Contact Details</h3>
+          <div class="info-row"><i class="fa-solid fa-phone"></i><div><strong>Phone</strong><br><a href="tel:+15134049880">(513) 404-9880</a></div></div>
+          <div class="info-row"><i class="fa-solid fa-location-dot"></i><div><strong>Address</strong><br>2716 Merrittview Ln<br>Cincinnati, OH 45231</div></div>
+          <div class="info-row"><i class="fa-solid fa-clock"></i><div><strong>Hours</strong><br>Call to confirm</div></div>
+          <p style="margin-top:1.25rem">
+            <a class="btn btn-brick" href="https://www.google.com/maps/search/?api=1&query=2716%20Merrittview%20Ln%2C%20Cincinnati%2C%20OH%2045231" target="_blank" rel="noopener"><i class="fa-solid fa-diamond-turn-right"></i> Get Directions</a>
+          </p>
+        </div>
+        <form class="contact-form" id="contactForm" novalidate>
+          <h3>Request an Estimate</h3>
+          <label for="cf-name">Your name</label>
+          <input type="text" id="cf-name" name="name" autocomplete="name" required>
+          <label for="cf-phone">Phone number</label>
+          <input type="tel" id="cf-phone" name="phone" autocomplete="tel" required>
+          <label for="cf-service">Service needed</label>
+          <select id="cf-service" name="service">
+            <option>Chimney repair</option>
+            <option>Tuckpointing</option>
+            <option>Brick repair</option>
+            <option>Stone or block work</option>
+            <option>Patio or walkway</option>
+            <option>Retaining wall</option>
+            <option>Something else</option>
+          </select>
+          <label for="cf-msg">Project details</label>
+          <textarea id="cf-msg" name="message" rows="4" placeholder="Tell us about your project"></textarea>
+          <p style="margin-top:1.1rem"><button type="submit" class="btn btn-brick" id="cf-submit"><i class="fa-solid fa-paper-plane"></i> Send Request</button></p>
+          <div class="form-ok" id="formOk" role="status">
+            Thanks! Your request is ready in your email app. No email on file for Ed's Masonry yet, so for the fastest reply please call <a href="tel:+15134049880">(513) 404-9880</a> and mention your project.
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<div class="brick-strip" aria-hidden="true"></div>
+
+<footer class="site-footer">© Ed's Masonry</footer>
+
+<script>
+// Router: hash based, five pages, popstate support, mobile menu
+(function(){
+  var pages = ["home","services","about","reviews","contact"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("hamburger");
+
+  function currentPage(){
+    var h = (location.hash || "#home").replace("#","").toLowerCase();
+    return pages.indexOf(h) !== -1 ? h : "home";
+  }
+
+  function setActive(page){
+    var sections = document.querySelectorAll("section.page");
+    for(var i=0;i<sections.length;i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-"+page);
+    }
+    var links = document.querySelectorAll(".main-nav a[data-page]");
+    for(var j=0;j<links.length;j++){
+      links[j].classList.toggle("active", links[j].getAttribute("data-page") === page);
+    }
+  }
+
+  function navigateTo(page){
+    if(pages.indexOf(page) === -1){ page = "home"; }
+    if(("#"+page) !== location.hash){ location.hash = "#"+page; }
+    setActive(page);
+    closeMenu();
+    window.scrollTo(0,0);
+  }
+
+  function closeMenu(){
+    nav.classList.remove("open");
+    burger.setAttribute("aria-expanded","false");
+  }
+
+  // Nav link clicks go through the router
+  var navLinks = document.querySelectorAll("a[data-page]");
+  for(var k=0;k<navLinks.length;k++){
+    navLinks[k].addEventListener("click", function(e){
+      e.preventDefault();
+      navigateTo(this.getAttribute("data-page"));
+    });
+  }
+
+  burger.addEventListener("click", function(){
+    var open = nav.classList.toggle("open");
+    burger.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+
+  window.addEventListener("popstate", function(){
+    setActive(currentPage());
+    closeMenu();
+    window.scrollTo(0,0);
+  });
+
+  window.navigateTo = navigateTo;
+
+  // Initial state from hash
+  setActive(currentPage());
+
+  // Contact form: build a mailto draft (no recipient on file) plus a success message
+  var form = document.getElementById("contactForm");
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    var name = document.getElementById("cf-name").value || "";
+    var phone = document.getElementById("cf-phone").value || "";
+    var service = document.getElementById("cf-service").value || "";
+    var msg = document.getElementById("cf-msg").value || "";
+    var subject = encodeURIComponent("Estimate request: " + service);
+    var body = encodeURIComponent("Name: " + name + "\nPhone: " + phone + "\nService: " + service + "\n\n" + msg);
+    window.location.href = "mailto:?subject=" + subject + "&body=" + body;
+    document.getElementById("formOk").classList.add("show");
+  });
+})();
+</script>
+
+</body>
+</html>

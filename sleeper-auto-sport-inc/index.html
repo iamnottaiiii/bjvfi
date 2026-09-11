@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sleeper Auto Sport Inc | Auto Repair, Cincinnati OH</title>
+<meta name="description" content="Sleeper Auto Sport Inc, 1848 Springdale Rd, Cincinnati, OH 45231. Auto repair and customizing shop specializing in Honda and most foreign automobiles. Call (513) 825-3947.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{
+  --black:#0b0c0e;
+  --panel:#141619;
+  --gunmetal:#1d2024;
+  --gunmetal-2:#262a30;
+  --line:#2e333a;
+  --ink:#d8dadd;
+  --ink-dim:#9aa0a8;
+  --ink-faint:#6b7178;
+  --red:#c0392b;
+  --red-dim:#8e2a20;
+  --amber:#d9a441;
+  --paper:#e8e6e0;
+  --radius:6px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--black);
+  color:var(--ink);
+  font-family:'Inter',system-ui,sans-serif;
+  line-height:1.6;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  background-image:
+    radial-gradient(ellipse at 20% 0%, rgba(217,164,65,0.05) 0, transparent 50%),
+    repeating-linear-gradient(0deg, transparent 0 3px, rgba(255,255,255,0.008) 3px 4px);
+}
+.mono{font-family:'IBM Plex Mono',monospace}
+a{color:var(--amber);text-decoration:none}
+a:hover{text-decoration:underline}
+/* ---------- top strip ---------- */
+.topstrip{
+  background:#07080a;
+  border-bottom:1px solid var(--line);
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;
+  letter-spacing:0.08em;
+  color:var(--ink-faint);
+  padding:8px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.topstrip .file-no{color:var(--ink-dim)}
+.topstrip .file-no b{color:var(--amber);font-weight:600}
+.topstrip a{color:var(--ink-dim)}
+.topstrip a:hover{color:var(--amber)}
+/* ---------- dossier tab nav ---------- */
+.navwrap{
+  background:var(--panel);
+  border-bottom:1px solid var(--line);
+  padding:0 20px;
+  position:relative;
+}
+.brandline{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:16px 0 12px;
+  gap:16px;
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+.brand .mark{
+  width:44px;height:44px;flex:0 0 44px;
+  background:linear-gradient(145deg,var(--gunmetal-2),#101214);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'IBM Plex Mono',monospace;
+  font-weight:700;color:var(--red);font-size:18px;
+}
+.brand h1{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:17px;font-weight:700;letter-spacing:0.04em;color:var(--paper);
+  text-transform:uppercase;line-height:1.2;
+}
+.brand h1 small{
+  display:block;font-size:10px;font-weight:400;color:var(--ink-faint);
+  letter-spacing:0.22em;
+}
+.menu-btn{
+  display:none;
+  background:var(--gunmetal);color:var(--paper);
+  border:1px solid var(--line);border-radius:var(--radius);
+  font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.1em;
+  padding:10px 14px;cursor:pointer;
+}
+.tabs{
+  display:flex;gap:4px;list-style:none;align-items:flex-end;
+}
+.tabs li{list-style:none}
+.tab-btn{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:12px;letter-spacing:0.14em;font-weight:600;
+  background:transparent;border:1px solid transparent;
+  border-bottom:none;color:var(--ink-dim);
+  padding:12px 20px 10px;cursor:pointer;
+  border-radius:var(--radius) var(--radius) 0 0;
+  text-transform:uppercase;
+  display:flex;align-items:center;gap:8px;
+}
+.tab-btn i{font-size:12px;color:var(--ink-faint)}
+.tab-btn:hover{color:var(--paper);background:var(--gunmetal)}
+.tab-btn.active{
+  background:var(--black);color:var(--amber);
+  border-color:var(--line);
+  box-shadow:inset 0 2px 0 var(--red);
+}
+.tab-btn.active i{color:var(--red)}
+/* ---------- main ---------- */
+main{flex:1;padding:0 20px}
+.page{display:none;max-width:1120px;margin:0 auto;padding:36px 0 56px}
+.page.active{display:block;animation:fadein 0.25s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+/* ---------- dossier panel ---------- */
+.dossier{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  position:relative;
+  overflow:hidden;
+}
+.dossier::before{
+  content:"";
+  position:absolute;inset:0;
+  background:repeating-linear-gradient(45deg, transparent 0 18px, rgba(255,255,255,0.012) 18px 20px);
+  pointer-events:none;
+}
+.dossier-head{
+  padding:22px 28px;
+  border-bottom:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;
+  position:relative;
+}
+.stamp{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;font-weight:700;letter-spacing:0.28em;
+  color:var(--red);
+  border:2px solid var(--red);
+  border-radius:4px;
+  padding:6px 12px;
+  transform:rotate(-4deg);
+  text-transform:uppercase;
+  opacity:0.92;
+  white-space:nowrap;
+}
+.stamp.green{color:var(--amber);border-color:var(--amber)}
+.kicker{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;letter-spacing:0.24em;color:var(--ink-faint);
+  text-transform:uppercase;margin-bottom:10px;
+}
+.hero-title{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:clamp(30px,5.4vw,58px);
+  font-weight:700;line-height:1.05;
+  color:var(--paper);letter-spacing:0.01em;
+  text-transform:uppercase;
+}
+.hero-title .thin{color:var(--ink-faint);font-weight:400}
+.hero-sub{
+  margin-top:14px;color:var(--ink-dim);font-size:16px;max-width:640px;
+}
+.hero-sub b{color:var(--ink)}
+.redact{
+  display:inline-block;background:#000;color:transparent;
+  border-radius:2px;padding:0 8px;margin:0 2px;
+  user-select:none;
+  background-image:repeating-linear-gradient(90deg,#000 0 6px,#0a0a0a 6px 8px);
+}
+/* spec grid */
+.specgrid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:1px;background:var(--line);
+  border-top:1px solid var(--line);
+  position:relative;
+}
+.spec{
+  background:var(--gunmetal);
+  padding:20px 22px;
+}
+.spec .label{
+  font-family:'IBM Plex Mono',monospace;font-size:10px;
+  letter-spacing:0.22em;color:var(--ink-faint);text-transform:uppercase;
+  margin-bottom:8px;
+}
+.spec .value{color:var(--paper);font-weight:600;font-size:15px}
+.spec .value a{color:var(--paper)}
+.spec .note{font-size:12px;color:var(--ink-faint);margin-top:6px}
+.cta-row{
+  display:flex;gap:12px;flex-wrap:wrap;
+  padding:22px 28px;position:relative;
+}
+.btn{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:13px;font-weight:600;letter-spacing:0.1em;
+  text-transform:uppercase;
+  padding:14px 22px;border-radius:var(--radius);
+  border:1px solid var(--line);
+  display:inline-flex;align-items:center;gap:10px;
+  cursor:pointer;transition:transform 0.12s ease, background 0.12s ease;
+}
+.btn:hover{text-decoration:none;transform:translateY(-1px)}
+.btn-primary{background:var(--red);border-color:var(--red-dim);color:#fff}
+.btn-primary:hover{background:#a93226}
+.btn-ghost{background:transparent;color:var(--ink)}
+.btn-ghost:hover{background:var(--gunmetal-2);color:var(--paper)}
+/* ---------- section blocks ---------- */
+.block{margin-top:34px}
+.block h2{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:13px;font-weight:600;letter-spacing:0.26em;
+  text-transform:uppercase;color:var(--ink-dim);
+  display:flex;align-items:center;gap:12px;margin-bottom:18px;
+}
+.block h2::after{content:"";flex:1;height:1px;background:var(--line)}
+.cardgrid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;
+}
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);padding:22px;
+  position:relative;
+}
+.card::before{
+  content:attr(data-index);
+  position:absolute;top:14px;right:16px;
+  font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-faint);
+  letter-spacing:0.1em;
+}
+.card h3{
+  font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;
+  color:var(--paper);text-transform:uppercase;letter-spacing:0.04em;
+  margin-bottom:10px;display:flex;align-items:center;gap:10px;
+}
+.card h3 i{color:var(--red)}
+.card p{font-size:14px;color:var(--ink-dim)}
+.badge{
+  display:inline-block;font-family:'IBM Plex Mono',monospace;
+  font-size:10px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;
+  border:1px solid var(--amber);color:var(--amber);
+  border-radius:3px;padding:3px 8px;margin-top:12px;
+}
+.badge.gray{border-color:var(--ink-faint);color:var(--ink-faint)}
+/* redacted strip decoration */
+.redact-strip{
+  margin-top:26px;background:#050607;border:1px solid var(--line);
+  border-radius:var(--radius);padding:18px 22px;
+  font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-faint);
+  line-height:2.1;
+}
+/* review sources */
+.source-card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);padding:24px;margin-bottom:16px;
+  display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;
+}
+.source-card .rating{
+  font-family:'IBM Plex Mono',monospace;font-size:34px;font-weight:700;color:var(--paper);
+}
+.source-card .rating small{font-size:13px;color:var(--ink-faint);font-weight:400}
+.source-card h3{font-size:17px;color:var(--paper);margin-bottom:4px}
+.source-card p{font-size:13px;color:var(--ink-dim)}
+.stars{color:var(--amber);letter-spacing:3px;font-size:15px}
+/* form */
+.formwrap{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);padding:28px;
+  display:grid;grid-template-columns:1fr 1fr;gap:16px;
+}
+.field{display:flex;flex-direction:column;gap:6px}
+.field.full{grid-column:1 / -1}
+.field label{
+  font-family:'IBM Plex Mono',monospace;font-size:11px;
+  letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-dim);
+}
+.field input,.field select,.field textarea{
+  background:var(--gunmetal);border:1px solid var(--line);
+  border-radius:var(--radius);color:var(--paper);
+  padding:12px 14px;font-size:15px;font-family:'Inter',sans-serif;
+}
+.field input:focus,.field select:focus,.field textarea:focus{
+  outline:none;border-color:var(--amber);
+}
+.form-confirm{
+  display:none;grid-column:1 / -1;
+  background:#0f1a12;border:1px solid #2f5d3a;border-radius:var(--radius);
+  padding:16px 18px;font-size:14px;color:#bfe3c6;
+}
+.form-confirm.show{display:block}
+/* contact info rows */
+.info-rows{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:28px}
+.info-row{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);padding:20px 22px;
+}
+.info-row .label{
+  font-family:'IBM Plex Mono',monospace;font-size:10px;
+  letter-spacing:0.22em;color:var(--ink-faint);text-transform:uppercase;margin-bottom:8px;
+}
+.info-row .value{color:var(--paper);font-weight:600;font-size:16px}
+.info-row .value a{color:var(--paper)}
+.info-row .sub{font-size:13px;color:var(--ink-faint);margin-top:6px}
+/* hours table */
+.hours{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);padding:24px;
+}
+.hours table{width:100%;border-collapse:collapse;font-size:14px}
+.hours td{padding:9px 4px;border-bottom:1px solid var(--line);color:var(--ink-dim)}
+.hours td:last-child{text-align:right;font-family:'IBM Plex Mono',monospace;color:var(--paper)}
+.hours tr:last-child td{border-bottom:none}
+/* footer area */
+.prefooter{
+  border-top:1px solid var(--line);
+  background:#07080a;
+  padding:26px 20px;
+  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.08em;
+  color:var(--ink-faint);
+}
+.prefooter .inner{max-width:1120px;margin:0 auto;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.prefooter a{color:var(--ink-dim)}
+footer{
+  background:#050607;color:var(--ink-faint);
+  font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.06em;
+  text-align:center;padding:18px 20px;
+}
+/* responsive */
+@media (max-width:760px){
+  .menu-btn{display:inline-flex;align-items:center;gap:8px}
+  .tabs{
+    display:none;flex-direction:column;align-items:stretch;
+    padding-bottom:12px;
+  }
+  .tabs.open{display:flex}
+  .tab-btn{border:1px solid var(--line);border-radius:var(--radius);text-align:left}
+  .tab-btn.active{box-shadow:none;border-color:var(--red)}
+  .formwrap{grid-template-columns:1fr;padding:20px}
+  .cta-row{padding:18px}
+  .dossier-head{padding:18px}
+}
+</style>
+</head>
+<body>
+
+<div class="topstrip">
+  <span class="file-no">FILE <b>SAS-1848</b> // AUTO REPAIR DOSSIER // CINCINNATI, OH</span>
+  <span><i class="fa-solid fa-phone" aria-hidden="true"></i> <a href="tel:+15138253947">(513) 825-3947</a></span>
+</div>
+
+<div class="navwrap">
+  <div class="brandline">
+    <div class="brand">
+      <div class="mark" aria-hidden="true">S</div>
+      <h1>Sleeper Auto Sport Inc<small>Auto Repair // Cincinnati, OH</small></h1>
+    </div>
+    <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="tabNav">
+      <i class="fa-solid fa-bars" aria-hidden="true"></i> MENU
+    </button>
+  </div>
+  <ul class="tabs" id="tabNav">
+    <li><button class="tab-btn active" data-nav="home"><i class="fa-solid fa-folder-open"></i>Home</button></li>
+    <li><button class="tab-btn" data-nav="services"><i class="fa-solid fa-wrench"></i>Services</button></li>
+    <li><button class="tab-btn" data-nav="about"><i class="fa-solid fa-file-lines"></i>About</button></li>
+    <li><button class="tab-btn" data-nav="reviews"><i class="fa-solid fa-star"></i>Reviews</button></li>
+    <li><button class="tab-btn" data-nav="contact"><i class="fa-solid fa-envelope"></i>Contact</button></li>
+  </ul>
+</div>
+
+<main>
+
+<section class="page active" id="page-home" data-page="home">
+  <div class="dossier">
+    <div class="dossier-head">
+      <div>
+        <p class="kicker">Case file // opened and verified</p>
+        <h2 class="hero-title">Sleeper Auto<br><span class="thin">Sport Inc</span></h2>
+        <p class="hero-sub">
+          An understated auto repair and customizing shop on Springdale Road.
+          In their own words: <b>"We specialize in Honda's, and most foreign automobiles."</b>
+          Quiet on the outside. Serious under the hood.
+        </p>
+      </div>
+      <div class="stamp">4.7 Rated<br>26 Reviews</div>
+    </div>
+    <div class="specgrid">
+      <div class="spec">
+        <p class="label">Location</p>
+        <p class="value">1848 Springdale Rd<br>Cincinnati, OH 45231</p>
+        <p class="note">Exact coordinates on file</p>
+      </div>
+      <div class="spec">
+        <p class="label">Direct line</p>
+        <p class="value"><a href="tel:+15138253947">(513) 825-3947</a></p>
+        <p class="note">Call for quotes and scheduling</p>
+      </div>
+      <div class="spec">
+        <p class="label">Specialty</p>
+        <p class="value">Honda + foreign automobiles</p>
+        <p class="note">Plus general auto repair and customizing</p>
+      </div>
+      <div class="spec">
+        <p class="label">Price level</p>
+        <p class="value">Inexpensive</p>
+        <p class="note">Per public listing data</p>
+      </div>
+    </div>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://www.google.com/maps/search/?api=1&amp;query=Sleeper%20Auto%20Sport%20Inc%2C%201848%20Springdale%20Rd%2C%20Cincinnati%2C%20OH%2045231" target="_blank" rel="noopener"><i class="fa-solid fa-location-dot"></i>Get Directions</a>
+      <button class="btn btn-ghost" data-nav="contact"><i class="fa-solid fa-clipboard-list"></i>Request Service</button>
+      <button class="btn btn-ghost" data-nav="reviews"><i class="fa-solid fa-star"></i>Read Reviews</button>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>Field notes</h2>
+    <div class="cardgrid">
+      <div class="card" data-index="N-01">
+        <h3><i class="fa-solid fa-car-side"></i>The sleeper approach</h3>
+        <p>No flash, no upsell theater. The shop keeps a low profile and puts the work into the vehicle. Customers note the crew is helpful and friendly on the lot.</p>
+        <span class="badge gray">Public listing summary</span>
+      </div>
+      <div class="card" data-index="N-02">
+        <h3><i class="fa-solid fa-gears"></i>Repair + customizing</h3>
+        <p>Listed categories cover automotive repair, automotive services, automotive customizing, and auto body work, so both daily-driver fixes and upgrades live under one roof.</p>
+        <span class="badge gray">Listed categories</span>
+      </div>
+      <div class="card" data-index="N-03">
+        <h3><i class="fa-solid fa-clock"></i>Hours</h3>
+        <p>Published hours differ across listings, so treat them as a rough guide. Call <a href="tel:+15138253947">(513) 825-3947</a> to confirm before you roll in.</p>
+        <span class="badge">Call to confirm</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="redact-strip" aria-hidden="true">
+    &gt; intake log // vehicle received <span class="redact">classified</span> // diagnostics running <span class="redact">classified</span><br>
+    &gt; work order opened // technician assigned <span class="redact">classified</span> // parts verified<br>
+    &gt; road test complete // customer notified <span class="redact">classified</span> // file closed
+  </div>
+</section>
+
+
+<section class="page" id="page-services" data-page="services">
+  <div class="dossier">
+    <div class="dossier-head">
+      <div>
+        <p class="kicker">Service manifest</p>
+        <h2 class="hero-title">What the shop<br><span class="thin">handles</span></h2>
+        <p class="hero-sub">
+          Listed as an automotive repair, service, customizing, and body shop with a stated focus on
+          <b>Honda and most foreign automobiles</b>. Exact services and pricing are not published, so confirm by phone.
+        </p>
+      </div>
+      <div class="stamp green">Call to<br>confirm</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>Service files</h2>
+    <div class="cardgrid">
+      <div class="card" data-index="S-01">
+        <h3><i class="fa-solid fa-screwdriver-wrench"></i>Auto repair</h3>
+        <p>General automotive repair work at an independent shop. Diagnostics, mechanical fixes, and getting daily drivers back on the road.</p>
+        <span class="badge">Call for details</span>
+      </div>
+      <div class="card" data-index="S-02">
+        <h3><i class="fa-solid fa-oil-can"></i>Maintenance + services</h3>
+        <p>Routine automotive services and upkeep. Ask about oil changes, brakes, tires, and inspections when you call.</p>
+        <span class="badge">Call for details</span>
+      </div>
+      <div class="card" data-index="S-03">
+        <h3><i class="fa-solid fa-gauge-high"></i>Performance + customizing</h3>
+        <p>Listed under automotive customizing, with a stated specialty in Honda and foreign automobiles. Discuss your build or upgrade goals directly with the shop.</p>
+        <span class="badge">Call for details</span>
+      </div>
+      <div class="card" data-index="S-04">
+        <h3><i class="fa-solid fa-car-burst"></i>Body shop work</h3>
+        <p>Also listed as an auto body shop. Confirm what body and collision work they currently take on before booking.</p>
+        <span class="badge">Call for details</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>How to book</h2>
+    <div class="card">
+      <h3><i class="fa-solid fa-phone"></i>One step: call the shop</h3>
+      <p>The fastest way to get a quote or schedule work is to call <a href="tel:+15138253947"><b>(513) 825-3947</b></a>. No online booking has been verified, and service menus are not published, so the phone is the source of truth.</p>
+      <div style="margin-top:14px;display:flex;gap:12px;flex-wrap:wrap">
+        <a class="btn btn-primary" href="tel:+15138253947"><i class="fa-solid fa-phone"></i>Call now</a>
+        <button class="btn btn-ghost" data-nav="contact"><i class="fa-solid fa-envelope"></i>Send a request</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-about" data-page="about">
+  <div class="dossier">
+    <div class="dossier-head">
+      <div>
+        <p class="kicker">Background check</p>
+        <h2 class="hero-title">About the<br><span class="thin">shop</span></h2>
+        <p class="hero-sub">
+          Sleeper Auto Sport Inc operates out of <b>1848 Springdale Rd, Cincinnati, OH 45231</b>.
+          Everything below comes from public listings. Anything we could not verify is marked.
+        </p>
+      </div>
+      <div class="stamp">Public<br>record</div>
+    </div>
+    <div class="specgrid">
+      <div class="spec">
+        <p class="label">Full name</p>
+        <p class="value">Sleeper Auto Sport Inc</p>
+      </div>
+      <div class="spec">
+        <p class="label">Address</p>
+        <p class="value">1848 Springdale Rd<br>Cincinnati, OH 45231</p>
+      </div>
+      <div class="spec">
+        <p class="label">Phone</p>
+        <p class="value"><a href="tel:+15138253947">(513) 825-3947</a></p>
+      </div>
+      <div class="spec">
+        <p class="label">Shop's own words</p>
+        <p class="value">"We specialize in Honda's, and most foreign automobiles."</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>What the record shows</h2>
+    <div class="cardgrid">
+      <div class="card" data-index="A-01">
+        <h3><i class="fa-solid fa-tags"></i>Listed categories</h3>
+        <p>Public listings file the business under automotive customizing, automotive services, automotive repair, and auto body shop, plus automotive dealership in one listing.</p>
+        <span class="badge gray">Public listing data</span>
+      </div>
+      <div class="card" data-index="A-02">
+        <h3><i class="fa-solid fa-star-half-stroke"></i>Reputation signals</h3>
+        <p>Third-party listings show a 4.7 rating across 26 reviews on Birdeye and a 4.2 Google rating across 6 reviews, with a price level listed as inexpensive.</p>
+        <span class="badge gray">Third-party ratings</span>
+      </div>
+      <div class="card" data-index="A-03">
+        <h3><i class="fa-solid fa-circle-question"></i>Not on the record</h3>
+        <p>Founding year, ownership history, staff bios, certifications, and pricing are not published in any source we found. We left them out rather than guess.</p>
+        <span class="badge">Unverified: ask the shop</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-reviews" data-page="reviews">
+  <div class="dossier">
+    <div class="dossier-head">
+      <div>
+        <p class="kicker">Witness statements</p>
+        <h2 class="hero-title">Reviews,<br><span class="thin">unfiltered</span></h2>
+        <p class="hero-sub">
+          Ratings below are real third-party aggregates. We do not invent reviewer names or review text.
+          Read the full verified reviews on the source sites.
+        </p>
+      </div>
+      <div class="stamp">Verified<br>sources</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>Rating summary</h2>
+    <div class="source-card">
+      <div>
+        <h3>Birdeye business profile</h3>
+        <p>26 reviews aggregated on Birdeye, a third-party review platform.</p>
+        <div class="stars" aria-label="4.7 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9734;</div>
+      </div>
+      <div style="text-align:right">
+        <p class="rating">4.7<small>/5</small></p>
+        <a class="btn btn-ghost" style="margin-top:10px" href="https://reviews.birdeye.com/sleeper-auto-sport-inc-166090248797134" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i>Read on Birdeye</a>
+      </div>
+    </div>
+    <div class="source-card">
+      <div>
+        <h3>Google listing</h3>
+        <p>6 reviews aggregated on the business's Google listing.</p>
+        <div class="stars" aria-label="4.2 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9734;</div>
+      </div>
+      <div style="text-align:right">
+        <p class="rating">4.2<small>/5</small></p>
+        <p style="font-size:12px;color:var(--ink-faint);margin-top:10px">See the Contact page for directions to the listing.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>Customer words</h2>
+    <div class="card">
+      <h3><i class="fa-solid fa-quote-left"></i>From the public record</h3>
+      <p>One Birdeye reviewer described arriving to pick up scrap metal with a flat tire and said the shop fixed it for free and was "incredibly helpful and friendly." Individual experiences vary; read the full set of verified reviews on Birdeye before deciding.</p>
+      <span class="badge gray">Short fair-use summary, not a full review</span>
+    </div>
+  </div>
+
+  <div class="redact-strip" aria-hidden="true">
+    &gt; review audit // names withheld <span class="redact">classified</span> // ratings verified <span class="redact">classified</span><br>
+    &gt; no fabricated testimonials on file <span class="redact">classified</span> // sources linked above
+  </div>
+</section>
+
+
+<section class="page" id="page-contact" data-page="contact">
+  <div class="dossier">
+    <div class="dossier-head">
+      <div>
+        <p class="kicker">Open a case</p>
+        <h2 class="hero-title">Get in<br><span class="thin">touch</span></h2>
+        <p class="hero-sub">
+          Call for the fastest response. Or send a service request below and it will open
+          as an email draft with your details filled in.
+        </p>
+      </div>
+      <div class="stamp green">Response<br>via phone</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>Direct channels</h2>
+    <div class="info-rows">
+      <div class="info-row">
+        <p class="label">Phone</p>
+        <p class="value"><a href="tel:+15138253947">(513) 825-3947</a></p>
+        <p class="sub">Call to confirm hours and quotes</p>
+      </div>
+      <div class="info-row">
+        <p class="label">Address</p>
+        <p class="value">1848 Springdale Rd<br>Cincinnati, OH 45231</p>
+        <p class="sub"><a href="https://www.google.com/maps/search/?api=1&amp;query=Sleeper%20Auto%20Sport%20Inc%2C%201848%20Springdale%20Rd%2C%20Cincinnati%2C%20OH%2045231" target="_blank" rel="noopener">Get directions <i class="fa-solid fa-arrow-up-right-from-square"></i></a></p>
+      </div>
+      <div class="info-row">
+        <p class="label">Hours</p>
+        <p class="value">Varies by listing</p>
+        <p class="sub">Published hours conflict across sources. Call to confirm.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>Service request form</h2>
+    <form class="formwrap" id="contactForm" novalidate>
+      <div class="field">
+        <label for="fName">Your name</label>
+        <input type="text" id="fName" name="name" placeholder="Full name" required>
+      </div>
+      <div class="field">
+        <label for="fPhone">Your phone</label>
+        <input type="tel" id="fPhone" name="phone" placeholder="(513) 555-0100" required>
+      </div>
+      <div class="field">
+        <label for="fVehicle">Vehicle</label>
+        <input type="text" id="fVehicle" name="vehicle" placeholder="Year, make, model">
+      </div>
+      <div class="field">
+        <label for="fService">Service needed</label>
+        <select id="fService" name="service">
+          <option>General repair</option>
+          <option>Maintenance / service</option>
+          <option>Performance / customizing</option>
+          <option>Body work</option>
+          <option>Other (describe below)</option>
+        </select>
+      </div>
+      <div class="field full">
+        <label for="fMsg">Describe the issue</label>
+        <textarea id="fMsg" name="message" rows="5" placeholder="Symptoms, noises, warning lights, timeline..."></textarea>
+      </div>
+      <div class="field full">
+        <button type="submit" class="btn btn-primary" style="justify-content:center"><i class="fa-solid fa-paper-plane"></i>Open email draft</button>
+      </div>
+      <div class="form-confirm" id="formConfirm" role="status">
+        <b>Draft ready.</b> Your email app should now open with the request pre-filled. Add the shop's email address if you have it, then send. Prefer to talk? Call <a href="tel:+15138253947">(513) 825-3947</a>.
+      </div>
+    </form>
+  </div>
+
+  <div class="block">
+    <h2>Listed hours (unverified)</h2>
+    <div class="hours">
+      <table>
+        <tr><td>Monday</td><td>10:00 AM - 5:00 PM</td></tr>
+        <tr><td>Tuesday</td><td>10:00 AM - 10:00 PM</td></tr>
+        <tr><td>Wednesday</td><td>10:00 AM - 10:00 PM</td></tr>
+        <tr><td>Thursday</td><td>10:00 AM - 10:00 PM</td></tr>
+        <tr><td>Friday</td><td>10:00 AM - 10:00 PM</td></tr>
+        <tr><td>Saturday</td><td>10:00 AM - 10:00 PM</td></tr>
+        <tr><td>Sunday</td><td>Closed (per one listing)</td></tr>
+      </table>
+      <p style="font-size:12px;color:var(--ink-faint);margin-top:12px;font-family:'IBM Plex Mono',monospace;letter-spacing:0.06em">SOURCE: PUBLIC LISTINGS, CONFLICTING. CALL (513) 825-3947 TO CONFIRM.</p>
+    </div>
+  </div>
+</section>
+</main>
+
+<div class="prefooter">
+  <div class="inner">
+    <span>SAS-1848 // 1848 SPRINGDALE RD, CINCINNATI, OH 45231</span>
+    <span><a href="tel:+15138253947">(513) 825-3947</a> // HONDA + FOREIGN AUTO SPECIALISTS</span>
+  </div>
+</div>
+<footer>© Sleeper Auto Sport Inc</footer>
+
+<script>
+(function(){
+  var pages = document.querySelectorAll('.page');
+  var tabBtns = document.querySelectorAll('.tab-btn');
+  var tabNav = document.getElementById('tabNav');
+  var menuBtn = document.getElementById('menuBtn');
+
+  function setActive(page){
+    var found = false;
+    pages.forEach(function(p){
+      var on = p.getAttribute('data-page') === page;
+      p.classList.toggle('active', on);
+      if(on) found = true;
+    });
+    if(!found){
+      page = 'home';
+      pages.forEach(function(p){
+        p.classList.toggle('active', p.getAttribute('data-page') === 'home');
+      });
+    }
+    tabBtns.forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-nav') === page);
+    });
+    window.scrollTo(0, 0);
+    return page;
+  }
+
+  function navigateTo(page){
+    page = setActive(page);
+    try{
+      history.pushState({page: page}, '', '#' + page);
+    }catch(e){
+      location.hash = page;
+    }
+  }
+
+  tabBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      navigateTo(btn.getAttribute('data-nav'));
+      tabNav.classList.remove('open');
+      menuBtn.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  document.querySelectorAll('[data-nav]').forEach(function(el){
+    if(el.classList.contains('tab-btn')) return;
+    el.addEventListener('click', function(){
+      navigateTo(el.getAttribute('data-nav'));
+    });
+  });
+
+  window.addEventListener('popstate', function(e){
+    var page = (e.state && e.state.page) || (location.hash ? location.hash.replace('#','') : 'home');
+    setActive(page);
+  });
+
+  menuBtn.addEventListener('click', function(){
+    var open = tabNav.classList.toggle('open');
+    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+
+  var initial = location.hash ? location.hash.replace('#','') : 'home';
+  setActive(initial);
+
+  var form = document.getElementById('contactForm');
+  var confirmBox = document.getElementById('formConfirm');
+  form.addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var name = document.getElementById('fName').value.trim();
+    var phone = document.getElementById('fPhone').value.trim();
+    var vehicle = document.getElementById('fVehicle').value.trim();
+    var service = document.getElementById('fService').value;
+    var msg = document.getElementById('fMsg').value.trim();
+    if(!name || !phone){
+      confirmBox.classList.add('show');
+      confirmBox.innerHTML = '<b>Almost there.</b> Please add your name and phone number so the shop can reach you, then submit again.';
+      return;
+    }
+    var subject = encodeURIComponent('Service request - Sleeper Auto Sport Inc');
+    var body = encodeURIComponent(
+      'Name: ' + name + '\n' +
+      'Phone: ' + phone + '\n' +
+      'Vehicle: ' + (vehicle || 'Not specified') + '\n' +
+      'Service needed: ' + service + '\n\n' +
+      'Details:\n' + (msg || 'Not specified')
+    );
+    window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
+    confirmBox.classList.add('show');
+    confirmBox.innerHTML = '<b>Draft ready.</b> Your email app should now open with the request pre-filled. Add the shop\'s email address if you have it, then send. Prefer to talk? Call <a href="tel:+15138253947">(513) 825-3947</a>.';
+  });
+})();
+</script>
+</body>
+</html>

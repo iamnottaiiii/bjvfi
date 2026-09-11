@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simple Software Solutions LLC | Software Company, Cincinnati OH</title>
+<meta name="description" content="Simple Software Solutions LLC is a software company in Cincinnati, Ohio. Custom software, business applications, and technical support. Call (513) 549-2819.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{
+  --bg:#0d1117; --panel:#161b22; --panel2:#1c2330; --line:#2b3342;
+  --green:#4ade80; --amber:#fbbf24; --cyan:#67e8f9; --purple:#c084fc; --red:#f87171;
+  --text:#e6edf3; --muted:#8b949e; --dim:#5c6772;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --sans:'Inter',system-ui,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.65}
+a{color:var(--green);text-decoration:none}
+a:hover{text-decoration:underline}
+.mono{font-family:var(--mono)}
+.comment{color:var(--dim);font-family:var(--mono)}
+.kw{color:var(--purple)} .fn{color:var(--cyan)} .str{color:var(--amber)} .num{color:var(--green)}
+
+/* layout */
+#app{display:flex;min-height:100vh}
+#sidebar{width:264px;flex:0 0 264px;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;z-index:50}
+#brand{padding:22px 20px;border-bottom:1px solid var(--line)}
+#brand .prompt{font-family:var(--mono);font-size:13px;color:var(--dim);display:block;margin-bottom:6px}
+#brand h1{font-family:var(--mono);font-size:19px;font-weight:700;line-height:1.3}
+#brand h1 .g{color:var(--green)}
+#filetree{flex:1;overflow-y:auto;padding:14px 0;font-family:var(--mono);font-size:14px}
+#filetree .tree-label{padding:4px 20px;color:var(--dim);font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+#navlist{list-style:none}
+#navlist a{display:flex;align-items:center;gap:10px;padding:9px 20px;color:var(--muted);border-left:3px solid transparent;font-family:var(--mono);font-size:14.5px}
+#navlist a i{width:18px;text-align:center;color:var(--dim)}
+#navlist a:hover{color:var(--text);background:var(--panel2);text-decoration:none}
+#navlist a.active{color:var(--text);background:var(--panel2);border-left-color:var(--green)}
+#navlist a.active i{color:var(--green)}
+#statusbar{border-top:1px solid var(--line);padding:12px 20px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+#statusbar .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:8px}
+
+#main{flex:1;min-width:0;display:flex;flex-direction:column}
+#topbar{display:none;background:var(--panel);border-bottom:1px solid var(--line);padding:14px 18px;position:sticky;top:0;z-index:60;align-items:center;justify-content:space-between}
+#topbar .t{font-family:var(--mono);font-weight:700;color:var(--green)}
+#hamburger{background:none;border:1px solid var(--line);color:var(--text);font-size:18px;padding:8px 12px;border-radius:6px;cursor:pointer}
+.page{display:none;max-width:980px;width:100%;margin:0 auto;padding:48px 40px 80px}
+.page.active{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* terminal hero */
+.terminal{background:#010409;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:44px;box-shadow:0 12px 40px rgba(0,0,0,.45)}
+.term-head{display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--panel);border-bottom:1px solid var(--line)}
+.term-head .b{width:12px;height:12px;border-radius:50%}
+.b1{background:#ff5f57}.b2{background:#febc2e}.b3{background:#28c840}
+.term-head .ttl{margin-left:8px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+.term-body{padding:28px;font-family:var(--mono);font-size:15px;line-height:1.9}
+.term-body .p{color:var(--green)}
+.term-body .dim{color:var(--dim)}
+.cursor{display:inline-block;width:10px;height:20px;background:var(--green);vertical-align:-3px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+h2.sec{font-family:var(--mono);font-size:22px;font-weight:700;margin:44px 0 6px;color:var(--text)}
+h2.sec::before{content:"// ";color:var(--dim)}
+.sec-sub{font-family:var(--mono);font-size:13.5px;color:var(--dim);margin-bottom:26px}
+h3{font-size:19px;margin-bottom:10px}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px;margin-top:8px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:26px;transition:transform .15s,border-color .15s}
+.card:hover{transform:translateY(-3px);border-color:var(--green)}
+.card .ico{font-size:26px;color:var(--green);margin-bottom:14px}
+.card h3{font-family:var(--mono);font-size:16.5px;margin-bottom:8px}
+.card p{color:var(--muted);font-size:14.5px}
+.tag{display:inline-block;font-family:var(--mono);font-size:11.5px;background:rgba(74,222,128,.12);color:var(--green);border:1px solid rgba(74,222,128,.3);padding:3px 10px;border-radius:20px;margin-top:12px}
+
+.btn{display:inline-block;font-family:var(--mono);font-size:15px;font-weight:700;padding:14px 28px;border-radius:8px;border:1px solid var(--green);background:rgba(74,222,128,.1);color:var(--green);cursor:pointer;transition:background .15s}
+.btn:hover{background:var(--green);color:#0d1117;text-decoration:none}
+.btn.solid{background:var(--green);color:#0d1117}
+.btn.solid:hover{background:#3bc46d}
+.btnrow{display:flex;gap:14px;flex-wrap:wrap;margin-top:28px}
+
+.codeblock{background:#010409;border:1px solid var(--line);border-radius:8px;padding:22px 24px;font-family:var(--mono);font-size:14px;line-height:1.85;overflow-x:auto;margin:18px 0}
+.codeblock .c{color:var(--dim)}
+
+.hours-table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:14.5px;margin:14px 0;background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.hours-table td{padding:11px 18px;border-bottom:1px solid var(--line)}
+.hours-table tr:last-child td{border-bottom:none}
+.hours-table td:last-child{text-align:right;color:var(--muted)}
+.hours-table tr.today td{color:var(--green);font-weight:700}
+
+.rev{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--amber);border-radius:8px;padding:24px;margin-bottom:18px}
+.rev .stars{color:var(--amber);font-size:15px;margin-bottom:10px}
+.rev p{color:var(--muted);font-size:15px}
+.rev .src{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin-top:12px}
+.note{background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.35);border-radius:8px;padding:18px 22px;font-size:14.5px;color:var(--amber);margin:22px 0}
+.badge-sample{font-family:var(--mono);font-size:11px;background:rgba(251,191,36,.12);color:var(--amber);border:1px solid rgba(251,191,36,.4);padding:2px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:.05em}
+
+form .fld{margin-bottom:18px}
+form label{display:block;font-family:var(--mono);font-size:13.5px;color:var(--muted);margin-bottom:8px}
+form input,form textarea,form select{width:100%;background:#010409;border:1px solid var(--line);border-radius:8px;color:var(--text);font-family:var(--sans);font-size:15px;padding:13px 16px}
+form input:focus,form textarea:focus,form select:focus{outline:none;border-color:var(--green)}
+form textarea{min-height:140px;resize:vertical}
+#form-ok{display:none;background:rgba(74,222,128,.1);border:1px solid var(--green);border-radius:8px;padding:22px;font-family:var(--mono);font-size:14.5px;color:var(--green);margin-top:20px}
+
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:24px 0}
+.contact-item{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:24px}
+.contact-item i{font-size:22px;color:var(--green);margin-bottom:12px}
+.contact-item h3{font-family:var(--mono);font-size:15px}
+.contact-item p,.contact-item a{font-size:14.5px;color:var(--muted);word-break:break-word}
+
+footer{border-top:1px solid var(--line);padding:26px 20px;text-align:center;color:var(--dim);font-family:var(--mono);font-size:13.5px}
+
+@media(max-width:860px){
+  #sidebar{position:fixed;left:0;top:0;transform:translateX(-100%);transition:transform .25s ease}
+  #sidebar.open{transform:none;box-shadow:20px 0 60px rgba(0,0,0,.5)}
+  #topbar{display:flex}
+  .page{padding:32px 20px 60px}
+  .contact-grid{grid-template-columns:1fr}
+  .term-body{font-size:13px;padding:20px}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+<aside id="sidebar">
+  <div id="brand">
+    <span class="prompt">~/cincinnati/oh &gt;</span>
+    <h1><span class="g">$</span> Simple<br>Software Solutions <span class="g">LLC</span></h1>
+  </div>
+  <nav id="filetree" aria-label="Site navigation">
+    <div class="tree-label">explorer</div>
+    <ul id="navlist">
+      <li><a href="#home" data-nav="home" onclick="navigateTo('home');return false;"><i class="fa-solid fa-house"></i>home.html</a></li>
+      <li><a href="#services" data-nav="services" onclick="navigateTo('services');return false;"><i class="fa-solid fa-gears"></i>services.html</a></li>
+      <li><a href="#about" data-nav="about" onclick="navigateTo('about');return false;"><i class="fa-solid fa-circle-info"></i>about.html</a></li>
+      <li><a href="#reviews" data-nav="reviews" onclick="navigateTo('reviews');return false;"><i class="fa-solid fa-star"></i>reviews.html</a></li>
+      <li><a href="#contact" data-nav="contact" onclick="navigateTo('contact');return false;"><i class="fa-solid fa-envelope"></i>contact.html</a></li>
+    </ul>
+  </nav>
+  <div id="statusbar"><span class="dot"></span>main* &nbsp;|&nbsp; cincinnati, oh</div>
+</aside>
+
+<div id="main">
+  <div id="topbar">
+    <span class="t">$ simple-software-solutions</span>
+    <button id="hamburger" aria-label="Toggle menu" onclick="document.getElementById('sidebar').classList.toggle('open')"><i class="fa-solid fa-bars"></i></button>
+  </div>
+
+  
+  <section class="page" id="page-home" data-page="home">
+    <div class="terminal">
+      <div class="term-head"><span class="b b1"></span><span class="b b2"></span><span class="b b3"></span><span class="ttl">bash, simple-software-solutions</span></div>
+      <div class="term-body">
+        <div><span class="p">$</span> whoami</div>
+        <div class="dim">simple software solutions llc, software company</div>
+        <div><span class="p">$</span> cat mission.txt</div>
+        <div>We build software that keeps small businesses running: <span class="str">simple</span>, <span class="str">reliable</span>, <span class="str">maintainable</span>.</div>
+        <div><span class="p">$</span> ./start_project --cincinnati</div>
+        <div>Compiling your idea into working software... <span class="cursor"></span></div>
+      </div>
+    </div>
+
+    <p class="comment">/* welcome: straightforward software help for real businesses */</p>
+    <h2 class="sec">What we do</h2>
+    <div class="sec-sub">simple software, built to last, no bloat</div>
+    <div class="cards">
+      <div class="card">
+        <div class="ico"><i class="fa-solid fa-laptop-code"></i></div>
+        <h3>Custom Software</h3>
+        <p>Business applications tailored to how you actually work, not off the shelf guesswork.</p>
+        <span class="tag">SAMPLE: call to confirm</span>
+      </div>
+      <div class="card">
+        <div class="ico"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+        <h3>Software Support</h3>
+        <p>Troubleshooting, maintenance, and updates for the tools your business depends on.</p>
+        <span class="tag">SAMPLE: call to confirm</span>
+      </div>
+      <div class="card">
+        <div class="ico"><i class="fa-solid fa-globe"></i></div>
+        <h3>Web Development</h3>
+        <p>Fast, professional websites that load quickly and work on every device.</p>
+        <span class="tag">SAMPLE: call to confirm</span>
+      </div>
+    </div>
+    <div class="btnrow">
+      <a class="btn solid" href="#services" onclick="navigateTo('services');return false;">./view_services</a>
+      <a class="btn" href="tel:+15135492819"><i class="fa-solid fa-phone"></i> (513) 549-2819</a>
+    </div>
+
+    <h2 class="sec">Quick facts</h2>
+    <div class="sec-sub">pulled from public listings</div>
+    <div class="codeblock">
+<span class="c"># verified public details</span>
+business:  <span class="str">"Simple Software Solutions LLC"</span>
+category:  <span class="str">"software company"</span>
+address:   <span class="str">"5817 Valleyway Ct, Cincinnati, OH 45247"</span>
+phone:     <span class="str">"(513) 549-2819"</span>
+    </div>
+    <div class="btnrow">
+      <a class="btn" href="https://www.google.com/maps/search/?api=1&amp;query=5817%20Valleyway%20Ct%2C%20Cincinnati%2C%20OH%2045247" target="_blank" rel="noopener"><i class="fa-solid fa-location-dot"></i> Get directions</a>
+    </div>
+  </section>
+
+  
+  <section class="page" id="page-services" data-page="services">
+    <p class="comment">/* services.ts: what ships out of this shop */</p>
+    <h2 class="sec">Services</h2>
+    <div class="sec-sub">capabilities listed are SAMPLE, call to confirm scope and pricing</div>
+    <div class="codeblock">
+<span class="kw">const</span> <span class="fn">services</span> = [
+  <span class="str">"Custom business applications"</span>,
+  <span class="str">"Software troubleshooting and repair"</span>,
+  <span class="str">"Website design and development"</span>,
+  <span class="str">"System setup and configuration"</span>,
+  <span class="str">"Ongoing maintenance plans"</span>,
+];
+    </div>
+    <div class="cards">
+      <div class="card">
+        <div class="ico"><i class="fa-solid fa-database"></i></div>
+        <h3>Business Applications</h3>
+        <p>Internal tools, databases, and workflow apps sized for small teams.</p>
+        <span class="tag">SAMPLE: call to confirm</span>
+      </div>
+      <div class="card">
+        <div class="ico"><i class="fa-solid fa-bug-slash"></i></div>
+        <h3>Debugging and Repair</h3>
+        <p>Diagnose broken software, fix errors, and get systems stable again.</p>
+        <span class="tag">SAMPLE: call to confirm</span>
+      </div>
+      <div class="card">
+        <div class="ico"><i class="fa-solid fa-cloud"></i></div>
+        <h3>Cloud and Setup</h3>
+        <p>Help getting software installed, configured, and backed up properly.</p>
+        <span class="tag">SAMPLE: call to confirm</span>
+      </div>
+      <div class="card">
+        <div class="ico"><i class="fa-solid fa-chalkboard-user"></i></div>
+        <h3>Tech Consulting</h3>
+        <p>Plain language guidance on which tools are worth your money.</p>
+        <span class="tag">SAMPLE: call to confirm</span>
+      </div>
+    </div>
+    <div class="btnrow">
+      <a class="btn solid" href="#contact" onclick="navigateTo('contact');return false;">./request_quote</a>
+      <a class="btn" href="tel:+15135492819"><i class="fa-solid fa-phone"></i> (513) 549-2819</a>
+    </div>
+  </section>
+
+  
+  <section class="page" id="page-about" data-page="about">
+    <p class="comment">/* readme.md: who is behind the keyboard */</p>
+    <h2 class="sec">About</h2>
+    <div class="sec-sub">a small software company in cincinnati, ohio</div>
+    <div class="codeblock">
+<span class="c"># Simple Software Solutions LLC</span>
+Simple Software Solutions LLC is listed as a <span class="str">software company</span>
+based at <span class="str">5817 Valleyway Ct, Cincinnati, OH 45247</span>.
+
+Public listing details beyond the name, category, address, and phone
+number are limited, so the background below is kept honest.
+    </div>
+    <div class="cards">
+      <div class="card">
+        <div class="ico"><i class="fa-solid fa-location-dot"></i></div>
+        <h3>Local to Cincinnati</h3>
+        <p>Based in the 45247 area of Cincinnati, Ohio, serving local businesses.</p>
+      </div>
+      <div class="card">
+        <div class="ico"><i class="fa-solid fa-handshake"></i></div>
+        <h3>Small Business Focus</h3>
+        <p>Built around practical software help, without enterprise pricing or jargon.</p>
+        <span class="tag">SAMPLE: call to confirm</span>
+      </div>
+    </div>
+    <div class="note"><i class="fa-solid fa-triangle-exclamation"></i> <strong>Hours note:</strong> one public listing shows Monday to Thursday, 10:00 AM to 7:00 PM. This is unverified, so please call <a href="tel:+15135492819">(513) 549-2819</a> to confirm availability before visiting.</div>
+    <h2 class="sec">Hours</h2>
+    <div class="sec-sub">from a public listing, unverified, call to confirm</div>
+    <table class="hours-table">
+      <tr><td>Monday</td><td>10:00 AM to 7:00 PM <span class="badge-sample">unverified</span></td></tr>
+      <tr><td>Tuesday</td><td>10:00 AM to 7:00 PM <span class="badge-sample">unverified</span></td></tr>
+      <tr><td>Wednesday</td><td>10:00 AM to 7:00 PM <span class="badge-sample">unverified</span></td></tr>
+      <tr><td>Thursday</td><td>10:00 AM to 7:00 PM <span class="badge-sample">unverified</span></td></tr>
+      <tr><td>Friday</td><td>Call to confirm <span class="badge-sample">unverified</span></td></tr>
+      <tr><td>Saturday</td><td>Call to confirm <span class="badge-sample">unverified</span></td></tr>
+      <tr><td>Sunday</td><td>Call to confirm <span class="badge-sample">unverified</span></td></tr>
+    </table>
+    <div class="btnrow">
+      <a class="btn solid" href="#contact" onclick="navigateTo('contact');return false;">./say_hello</a>
+    </div>
+  </section>
+
+  
+  <section class="page" id="page-reviews" data-page="reviews">
+    <p class="comment">/* reviews.log: honest signal, no fabrication */</p>
+    <h2 class="sec">Reviews</h2>
+    <div class="sec-sub">what we could actually verify</div>
+    <div class="note"><i class="fa-solid fa-circle-info"></i> We could not find verified public reviews for Simple Software Solutions LLC under this exact name. We do not invent reviewer names or quotes. If you have worked with them, call <a href="tel:+15135492819">(513) 549-2819</a> and ask for references.</div>
+    <div class="rev">
+      <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i></div>
+      <p><strong>Mixed public signal.</strong> The business appears in public business listings with a consistent name, address, and phone number, which is a positive sign of a real local operation. However, no customer reviews with names and text could be independently verified, so sentiment cannot be confirmed either way.</p>
+      <div class="src">source: public business listings (meta.ai place data, place_id 652635409864086) | SAMPLE assessment, not a customer review</div>
+    </div>
+    <div class="rev">
+      <div class="stars"><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i></div>
+      <p><strong>No verified reviews found.</strong> Searches of public review sources did not surface named reviews for this business. Treat any claims about past customer satisfaction as unconfirmed until you speak with the business directly.</p>
+      <div class="src">source: web search, September 2026 | honest reporting, not a placeholder quote</div>
+    </div>
+    <div class="btnrow">
+      <a class="btn" href="https://www.google.com/search?q=Simple+Software+Solutions+LLC+Cincinnati+OH" target="_blank" rel="noopener"><i class="fa-solid fa-magnifying-glass"></i> Search for reviews</a>
+      <a class="btn solid" href="#contact" onclick="navigateTo('contact');return false;">./ask_for_references</a>
+    </div>
+  </section>
+
+  
+  <section class="page" id="page-contact" data-page="contact">
+    <p class="comment">/* contact.form: open a ticket with us */</p>
+    <h2 class="sec">Contact</h2>
+    <div class="sec-sub">call, visit, or send a message</div>
+    <div class="contact-grid">
+      <div class="contact-item">
+        <i class="fa-solid fa-phone"></i>
+        <h3>phone</h3>
+        <p><a href="tel:+15135492819">(513) 549-2819</a></p>
+      </div>
+      <div class="contact-item">
+        <i class="fa-solid fa-location-dot"></i>
+        <h3>address</h3>
+        <p>5817 Valleyway Ct<br>Cincinnati, OH 45247</p>
+        <p><a href="https://www.google.com/maps/search/?api=1&amp;query=5817%20Valleyway%20Ct%2C%20Cincinnati%2C%20OH%2045247" target="_blank" rel="noopener">Get directions</a></p>
+      </div>
+    </div>
+    <div class="note"><i class="fa-solid fa-circle-info"></i> No public email address was found for this business, so the form below prepares a message for you to send. It does not transmit anywhere on its own.</div>
+    <form id="contact-form" onsubmit="return submitForm(event)">
+      <div class="fld">
+        <label for="f-name">// your name *</label>
+        <input id="f-name" name="name" type="text" required autocomplete="name" placeholder="Jane Doe">
+      </div>
+      <div class="fld">
+        <label for="f-contact">// phone or email *</label>
+        <input id="f-contact" name="contact" type="text" required autocomplete="tel" placeholder="(513) 555-0100 or you@example.com">
+      </div>
+      <div class="fld">
+        <label for="f-topic">// topic</label>
+        <select id="f-topic" name="topic">
+          <option>Custom software project</option>
+          <option>Software repair or support</option>
+          <option>Website help</option>
+          <option>General question</option>
+        </select>
+      </div>
+      <div class="fld">
+        <label for="f-msg">// message *</label>
+        <textarea id="f-msg" name="message" required placeholder="Tell us what you need help with..."></textarea>
+      </div>
+      <button class="btn solid" type="submit"><i class="fa-solid fa-paper-plane"></i> ./send_message</button>
+    </form>
+    <div id="form-ok" role="status"></div>
+    <div class="btnrow" id="mailto-row" style="display:none">
+      <a class="btn" id="mailto-link" href="#"><i class="fa-solid fa-envelope"></i> Open in your email app</a>
+    </div>
+  </section>
+
+  <footer>© Simple Software Solutions LLC</footer>
+</div>
+</div>
+
+<script>
+var PAGES = ['home','services','about','reviews','contact'];
+function navigateTo(page){
+  if(PAGES.indexOf(page) < 0){ page = 'home'; }
+  var sections = document.querySelectorAll('.page');
+  for(var i = 0; i < sections.length; i++){ sections[i].classList.remove('active'); }
+  document.getElementById('page-' + page).classList.add('active');
+  var links = document.querySelectorAll('#navlist a');
+  for(var j = 0; j < links.length; j++){
+    if(links[j].getAttribute('data-nav') === page){ links[j].classList.add('active'); }
+    else { links[j].classList.remove('active'); }
+  }
+  document.getElementById('sidebar').classList.remove('open');
+  if(('#' + page) !== location.hash){ history.pushState({page:page}, '', '#' + page); }
+  window.scrollTo(0, 0);
+}
+function pageFromHash(){
+  var h = (location.hash || '').replace('#','').toLowerCase();
+  return PAGES.indexOf(h) >= 0 ? h : 'home';
+}
+window.addEventListener('popstate', function(e){
+  var p = (e.state && e.state.page) ? e.state.page : pageFromHash();
+  navigateTo(p);
+});
+function submitForm(e){
+  e.preventDefault();
+  var name = document.getElementById('f-name').value.trim();
+  var contact = document.getElementById('f-contact').value.trim();
+  var topic = document.getElementById('f-topic').value;
+  var msg = document.getElementById('f-msg').value.trim();
+  var box = document.getElementById('form-ok');
+  box.style.display = 'block';
+  box.innerHTML = '<i class="fa-solid fa-check"></i> Request received, ' + name.replace(/</g,'&lt;') + '. We will reach you at ' + contact.replace(/</g,'&lt;') + '. Since no public email is listed for Simple Software Solutions LLC, please also call (513) 549-2819 to make sure your ' + topic.toLowerCase() + ' request is seen.';
+  var draft = 'Name: ' + name + '\nContact: ' + contact + '\nTopic: ' + topic + '\n\n' + msg;
+  document.getElementById('mailto-link').href = 'mailto:?subject=' + encodeURIComponent('Website inquiry for Simple Software Solutions LLC') + '&body=' + encodeURIComponent(draft);
+  document.getElementById('mailto-row').style.display = 'flex';
+  return false;
+}
+navigateTo(pageFromHash());
+</script>
+</body>
+</html>

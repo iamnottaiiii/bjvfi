@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valley Auto Care | Auto Repair in Cincinnati, OH</title>
+<meta name="description" content="Valley Auto Care is an auto repair shop at 9 E Seymour Ave, Cincinnati, OH 45216. Call (513) 821-7400.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;900&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+  :root{
+    --kraft:#d8b98a;
+    --kraft-dark:#c9a771;
+    --paper:#e9d4a8;
+    --ink:#1c1611;
+    --ink-soft:#4a3d2c;
+    --stamp:#b3202a;
+    --stamp-dark:#8c1620;
+    --line:#2b2115;
+    --card:#efe0bd;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Archivo',sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(circle at 15% 20%, rgba(120,84,40,.08) 0 2px, transparent 3px),
+      radial-gradient(circle at 85% 60%, rgba(120,84,40,.07) 0 2px, transparent 3px),
+      repeating-linear-gradient(0deg, rgba(90,60,25,.05) 0 1px, transparent 1px 34px),
+      linear-gradient(160deg, var(--paper) 0%, var(--kraft) 60%, var(--kraft-dark) 100%);
+    background-size: 140px 140px, 200px 200px, auto, auto;
+    min-height:100vh;
+  }
+  .page{display:none}
+  .page.active{display:block;animation:fadeIn .35s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  /* ===== sticky condensed nav ===== */
+  .topnav{
+    position:sticky;top:0;z-index:100;
+    background:rgba(28,22,17,.96);
+    border-bottom:3px solid var(--stamp);
+    backdrop-filter:blur(4px);
+  }
+  .navwrap{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:.55rem 1rem}
+  .brand{display:flex;align-items:center;gap:.6rem;color:#f4e8cd;text-decoration:none}
+  .brand .ticketno{
+    font-family:'IBM Plex Mono',monospace;font-size:.65rem;font-weight:700;
+    border:2px dashed var(--stamp);color:#f4e8cd;padding:.25rem .5rem;border-radius:4px;
+    transform:rotate(-3deg);white-space:nowrap;
+  }
+  .brand h1{font-size:1.05rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase}
+  .brand h1 span{color:var(--stamp)}
+  .navlinks{display:flex;gap:.25rem}
+  .navlinks a,.navlinks button{
+    font-family:'IBM Plex Mono',monospace;font-size:.75rem;font-weight:600;
+    color:#e9d4a8;text-decoration:none;text-transform:uppercase;letter-spacing:.08em;
+    background:none;border:1px solid transparent;padding:.5rem .8rem;border-radius:4px;cursor:pointer;
+  }
+  .navlinks a:hover,.navlinks button:hover{border-color:var(--stamp);color:#fff}
+  .navlinks a.active,.navlinks button.active{background:var(--stamp);color:#fff}
+  .burger{display:none;background:none;border:2px solid #e9d4a8;color:#e9d4a8;border-radius:6px;padding:.4rem .6rem;font-size:1.1rem;cursor:pointer}
+  .mobilemenu{display:none;flex-direction:column;background:#241c12;border-bottom:3px solid var(--stamp)}
+  .mobilemenu.open{display:flex}
+  .mobilemenu a,.mobilemenu button{
+    font-family:'IBM Plex Mono',monospace;font-size:.85rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;
+    color:#e9d4a8;text-decoration:none;padding:.85rem 1.2rem;border-top:1px dashed rgba(233,212,168,.3);
+    background:none;border-left:none;border-right:none;border-bottom:none;text-align:left;cursor:pointer;
+  }
+  .mobilemenu a.active,.mobilemenu button.active{color:#fff;background:rgba(179,32,42,.25)}
+
+  .wrap{max-width:1100px;margin:0 auto;padding:0 1rem}
+
+  /* ===== ledger hero ===== */
+  .ledger-head{
+    margin:2rem 0 1.5rem;border:3px solid var(--line);border-radius:6px;background:var(--card);
+    box-shadow:6px 6px 0 rgba(28,22,17,.35);overflow:hidden;position:relative;
+  }
+  .ledger-head .ruled{
+    padding:2.5rem 2rem 2rem;position:relative;
+    background:repeating-linear-gradient(180deg, transparent 0 33px, rgba(44,33,21,.18) 33px 34px);
+  }
+  .stamp-badge{
+    position:absolute;top:1.2rem;right:1.4rem;transform:rotate(8deg);
+    font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:.8rem;color:var(--stamp);
+    border:3px double var(--stamp);border-radius:50%;width:118px;height:118px;
+    display:flex;align-items:center;justify-content:center;text-align:center;padding:.6rem;
+    text-transform:uppercase;letter-spacing:.05em;line-height:1.25;
+    box-shadow:inset 0 0 0 2px rgba(179,32,42,.25);
+    background:rgba(179,32,42,.06);
+  }
+  .ticket-label{font-family:'IBM Plex Mono',monospace;font-size:.75rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--stamp)}
+  .ledger-head h2{font-size:clamp(2rem,5.5vw,3.4rem);font-weight:900;text-transform:uppercase;letter-spacing:.02em;margin:.5rem 0;line-height:1.05}
+  .ledger-head h2 .red{color:var(--stamp)}
+  .sub{font-family:'IBM Plex Mono',monospace;font-size:.95rem;color:var(--ink-soft);max-width:46rem;line-height:1.7}
+  .cta-row{display:flex;flex-wrap:wrap;gap:.8rem;margin-top:1.4rem}
+  .btn{
+    display:inline-flex;align-items:center;gap:.5rem;font-family:'IBM Plex Mono',monospace;font-weight:700;
+    font-size:.85rem;text-transform:uppercase;letter-spacing:.08em;text-decoration:none;cursor:pointer;
+    padding:.85rem 1.4rem;border-radius:4px;border:3px solid var(--line);transition:transform .12s ease;
+  }
+  .btn:active{transform:translateY(2px)}
+  .btn-red{background:var(--stamp);color:#fff}
+  .btn-red:hover{background:var(--stamp-dark)}
+  .btn-ghost{background:transparent;color:var(--ink)}
+  .btn-ghost:hover{background:rgba(28,22,17,.08)}
+  .btn-ink{background:var(--ink);color:#f4e8cd}
+  .btn-ink:hover{background:#33281c}
+
+  /* ===== ledger row dividers ===== */
+  .ledger-section{margin:2.5rem 0}
+  .ledger-section > h3{
+    font-family:'IBM Plex Mono',monospace;font-size:.8rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+    display:flex;align-items:center;gap:.75rem;margin-bottom:1.2rem;color:var(--ink);
+  }
+  .ledger-section > h3::after{content:"";flex:1;border-top:2px dashed rgba(44,33,21,.5)}
+
+  /* ===== ticket cards ===== */
+  .ticket-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.2rem}
+  .ticket{
+    background:#f4e8c8;border:2px solid var(--line);border-radius:8px;position:relative;
+    box-shadow:4px 4px 0 rgba(28,22,17,.3);display:flex;flex-direction:column;overflow:hidden;
+  }
+  .ticket .perfo{border-bottom:2px dashed rgba(44,33,21,.55);padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center;background:rgba(179,32,42,.08)}
+  .ticket .perfo .tno{font-family:'IBM Plex Mono',monospace;font-size:.7rem;font-weight:700;letter-spacing:.1em;color:var(--stamp)}
+  .ticket .body{padding:1.1rem 1rem 1.2rem;flex:1}
+  .ticket .iconrow{font-size:1.6rem;color:var(--stamp);margin-bottom:.6rem}
+  .ticket h4{font-size:1.05rem;font-weight:800;text-transform:uppercase;letter-spacing:.03em;margin-bottom:.45rem}
+  .ticket p{font-family:'IBM Plex Mono',monospace;font-size:.82rem;line-height:1.65;color:var(--ink-soft)}
+  .sample-tag{
+    display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:.62rem;font-weight:700;letter-spacing:.12em;
+    text-transform:uppercase;color:#fff;background:var(--ink-soft);border-radius:3px;padding:.2rem .5rem;margin-top:.6rem;
+  }
+  .stamp-mini{
+    display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:.62rem;font-weight:700;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--stamp);border:2px solid var(--stamp);border-radius:4px;
+    padding:.15rem .5rem;transform:rotate(-4deg);margin-top:.6rem;background:rgba(179,32,42,.06);
+  }
+
+  /* ===== info ledger rows ===== */
+  .ledger-list{border:3px solid var(--line);border-radius:6px;background:var(--card);overflow:hidden;box-shadow:6px 6px 0 rgba(28,22,17,.35)}
+  .ledger-row{display:flex;gap:1rem;align-items:flex-start;padding:1rem 1.2rem;border-bottom:2px dashed rgba(44,33,21,.4)}
+  .ledger-row:last-child{border-bottom:none}
+  .ledger-row .cell-icon{font-size:1.15rem;color:var(--stamp);min-width:2rem;text-align:center;padding-top:.15rem}
+  .ledger-row .cell-label{font-family:'IBM Plex Mono',monospace;font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:.25rem}
+  .ledger-row .cell-value{font-weight:700;font-size:1rem}
+  .ledger-row .cell-value a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--stamp);text-underline-offset:3px}
+  .ledger-row .cell-note{font-family:'IBM Plex Mono',monospace;font-size:.78rem;color:var(--ink-soft);line-height:1.6}
+
+  .hours-table{width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:.88rem}
+  .hours-table td{padding:.45rem 0;border-bottom:1px dashed rgba(44,33,21,.3)}
+  .hours-table tr:last-child td{border-bottom:none}
+  .hours-table td:last-child{text-align:right;font-weight:700}
+
+  .notice{
+    border:2px dashed var(--stamp);background:rgba(179,32,42,.07);border-radius:6px;
+    padding:1rem 1.2rem;font-family:'IBM Plex Mono',monospace;font-size:.82rem;line-height:1.7;color:var(--ink-soft);
+    margin:1.2rem 0;
+  }
+  .notice strong{color:var(--stamp)}
+
+  /* ===== reviews ===== */
+  .rating-big{font-size:3rem;font-weight:900;color:var(--ink)}
+  .stars{color:var(--stamp);font-size:1.2rem;letter-spacing:.15em}
+  .review-card{background:#f4e8c8;border:2px solid var(--line);border-radius:8px;padding:1.2rem;box-shadow:4px 4px 0 rgba(28,22,17,.3);margin-bottom:1rem}
+  .review-card .who{font-family:'IBM Plex Mono',monospace;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+  .review-card p{font-family:'IBM Plex Mono',monospace;font-size:.85rem;line-height:1.7;margin-top:.5rem;color:var(--ink)}
+  .review-card .sentiment{font-family:'IBM Plex Mono',monospace;font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:.2rem .55rem;border-radius:3px;display:inline-block;margin-bottom:.6rem}
+  .sent-pos{background:#2c6e3f;color:#fff}
+  .sent-mix{background:#8a6d1f;color:#fff}
+  .sent-neg{background:var(--stamp);color:#fff}
+
+  /* ===== form ===== */
+  .form-card{border:3px solid var(--line);border-radius:6px;background:var(--card);box-shadow:6px 6px 0 rgba(28,22,17,.35);padding:1.6rem}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+  .form-field{display:flex;flex-direction:column;gap:.4rem}
+  .form-field.full{grid-column:1 / -1}
+  label{font-family:'IBM Plex Mono',monospace;font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
+  input,select,textarea{
+    font-family:'IBM Plex Mono',monospace;font-size:.9rem;padding:.75rem .9rem;border:2px solid var(--line);
+    border-radius:4px;background:#f7efdb;color:var(--ink);width:100%;
+  }
+  input:focus,select:focus,textarea:focus{outline:3px solid rgba(179,32,42,.4)}
+  .form-error{font-family:'IBM Plex Mono',monospace;font-size:.75rem;color:var(--stamp);font-weight:700;min-height:1.1rem}
+  .form-success{
+    display:none;border:3px double var(--stamp);border-radius:6px;background:rgba(179,32,42,.08);
+    padding:1.2rem;font-family:'IBM Plex Mono',monospace;font-size:.85rem;line-height:1.7;margin-top:1rem;
+  }
+  .form-success.show{display:block}
+
+  footer.sitefoot{margin-top:3rem;background:#1c1611;border-top:3px solid var(--stamp);padding:1.4rem 1rem;text-align:center;color:#e9d4a8;font-family:'IBM Plex Mono',monospace;font-size:.85rem;letter-spacing:.05em}
+
+  @media(max-width:760px){
+    .navlinks{display:none}
+    .burger{display:block}
+    .form-row{grid-template-columns:1fr}
+    .stamp-badge{position:static;transform:rotate(6deg);margin-bottom:1rem}
+    .ledger-head .ruled{padding:1.6rem 1.2rem}
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav" aria-label="Main navigation">
+  <div class="navwrap">
+    <a class="brand" href="#" data-nav="home" aria-label="Valley Auto Care home">
+      <span class="ticketno">TKT-001</span>
+      <h1>Valley <span>Auto</span> Care</h1>
+    </a>
+    <div class="navlinks" id="navlinks">
+      <a href="#home" data-nav="home" class="active">Home</a>
+      <a href="#services" data-nav="services">Services</a>
+      <a href="#about" data-nav="about">About</a>
+      <a href="#reviews" data-nav="reviews">Reviews</a>
+      <a href="#contact" data-nav="contact">Contact</a>
+    </div>
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
+  </div>
+  <div class="mobilemenu" id="mobilemenu">
+    <a href="#home" data-nav="home" class="active">Home</a>
+    <a href="#services" data-nav="services">Services</a>
+    <a href="#about" data-nav="about">About</a>
+    <a href="#reviews" data-nav="reviews">Reviews</a>
+    <a href="#contact" data-nav="contact">Contact</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  
+  <section class="page active" id="page-home" data-page="home">
+    <div class="ledger-head">
+      <div class="ruled">
+        <div class="stamp-badge">Honest work only</div>
+        <div class="ticket-label"><i class="fa-solid fa-wrench"></i> Work order no. 45216</div>
+        <h2>Auto repair, <span class="red">logged straight</span> in Cincinnati</h2>
+        <p class="sub">Valley Auto Care is a neighborhood auto repair shop at 9 E Seymour Ave in Cincinnati, Ohio. Customers know the shop for honest diagnostics, fair pricing, and solid work on import and JDM vehicles.</p>
+        <div class="cta-row">
+          <a class="btn btn-red" href="tel:+15138217400"><i class="fa-solid fa-phone"></i> Call (513) 821-7400</a>
+          <a class="btn btn-ghost" href="https://www.google.com/maps/search/?api=1&amp;query=9%20E%20Seymour%20Ave%2C%20Cincinnati%2C%20OH%2045216" target="_blank" rel="noopener"><i class="fa-solid fa-map-location-dot"></i> Get directions</a>
+          <button class="btn btn-ink" data-nav="services"><i class="fa-solid fa-clipboard-list"></i> View service tickets</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ledger-section">
+      <h3>Open tickets: what the shop handles</h3>
+      <div class="ticket-grid">
+        <div class="ticket">
+          <div class="perfo"><span class="tno">TKT-A01</span><i class="fa-solid fa-car-burst" style="color:var(--stamp)"></i></div>
+          <div class="body">
+            <div class="iconrow"><i class="fa-solid fa-stethoscope"></i></div>
+            <h4>Diagnostics</h4>
+            <p>Check engine lights and mystery noises get tracked down with real diagnostic work, not guesswork.</p>
+            <span class="sample-tag">Typical offering: call to confirm</span>
+          </div>
+        </div>
+        <div class="ticket">
+          <div class="perfo"><span class="tno">TKT-A02</span><i class="fa-solid fa-oil-can" style="color:var(--stamp)"></i></div>
+          <div class="body">
+            <div class="iconrow"><i class="fa-solid fa-oil-can"></i></div>
+            <h4>Oil &amp; maintenance</h4>
+            <p>Oil changes, filters, fluids, and the routine upkeep that keeps a car out of the shop later.</p>
+            <span class="sample-tag">Typical offering: call to confirm</span>
+          </div>
+        </div>
+        <div class="ticket">
+          <div class="perfo"><span class="tno">TKT-A03</span><i class="fa-solid fa-circle-dot" style="color:var(--stamp)"></i></div>
+          <div class="body">
+            <div class="iconrow"><i class="fa-solid fa-circle-dot"></i></div>
+            <h4>Brakes</h4>
+            <p>Pads, rotors, and brake inspections. Reviewers note the shop recommends only what is actually needed.</p>
+            <span class="sample-tag">Typical offering: call to confirm</span>
+          </div>
+        </div>
+        <div class="ticket">
+          <div class="perfo"><span class="tno">TKT-A04</span><i class="fa-solid fa-temperature-half" style="color:var(--stamp)"></i></div>
+          <div class="body">
+            <div class="iconrow"><i class="fa-solid fa-temperature-half"></i></div>
+            <h4>Cooling &amp; radiators</h4>
+            <p>Cooling system repairs, including radiators. One reviewer credits the shop with getting their radiator sorted properly.</p>
+            <span class="stamp-mini">Mentioned in reviews</span>
+          </div>
+        </div>
+        <div class="ticket">
+          <div class="perfo"><span class="tno">TKT-A05</span><i class="fa-solid fa-car" style="color:var(--stamp)"></i></div>
+          <div class="body">
+            <div class="iconrow"><i class="fa-solid fa-car"></i></div>
+            <h4>Import &amp; JDM vehicles</h4>
+            <p>A specialty customers call out by name. Reviewers praise the mechanic Jay for knowing JDM cars inside and out.</p>
+            <span class="stamp-mini">Mentioned in reviews</span>
+          </div>
+        </div>
+        <div class="ticket">
+          <div class="perfo"><span class="tno">TKT-A06</span><i class="fa-solid fa-triangle-exclamation" style="color:var(--stamp)"></i></div>
+          <div class="body">
+            <div class="iconrow"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <h4>Urgent repairs</h4>
+            <p>Reviewers say the shop treats emergencies like emergencies, a point that matters when a shared family car has to be safe.</p>
+            <span class="stamp-mini">Mentioned in reviews</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ledger-section">
+      <h3>Shop ledger: the facts</h3>
+      <div class="ledger-list">
+        <div class="ledger-row">
+          <div class="cell-icon"><i class="fa-solid fa-location-dot"></i></div>
+          <div>
+            <div class="cell-label">Address</div>
+            <div class="cell-value">9 E Seymour Ave, Cincinnati, OH 45216</div>
+          </div>
+        </div>
+        <div class="ledger-row">
+          <div class="cell-icon"><i class="fa-solid fa-phone"></i></div>
+          <div>
+            <div class="cell-label">Phone</div>
+            <div class="cell-value"><a href="tel:+15138217400">(513) 821-7400</a></div>
+          </div>
+        </div>
+        <div class="ledger-row">
+          <div class="cell-icon"><i class="fa-solid fa-clock"></i></div>
+          <div style="flex:1">
+            <div class="cell-label">Hours (as listed on review sites)</div>
+            <table class="hours-table">
+              <tr><td>Monday</td><td>9:00 AM - 6:00 PM</td></tr>
+              <tr><td>Tuesday</td><td>9:00 AM - 6:00 PM</td></tr>
+              <tr><td>Wednesday</td><td>9:00 AM - 6:00 PM</td></tr>
+              <tr><td>Thursday</td><td>9:00 AM - 6:00 PM</td></tr>
+              <tr><td>Friday</td><td>9:00 AM - 6:00 PM</td></tr>
+              <tr><td>Saturday</td><td>Closed</td></tr>
+              <tr><td>Sunday</td><td>Closed</td></tr>
+            </table>
+            <div class="cell-note">Hours taken from public listings. Call to confirm before you drive over.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="notice"><strong>Note:</strong> this is a demo website. Service details marked SAMPLE are typical offerings for an auto repair shop, not verified statements from Valley Auto Care. Call the shop to confirm anything before you book.</div>
+  </section>
+
+  
+  <section class="page" id="page-services" data-page="services">
+    <div class="ledger-head">
+      <div class="ruled">
+        <div class="stamp-badge">No upsells</div>
+        <div class="ticket-label"><i class="fa-solid fa-clipboard-list"></i> Service ledger</div>
+        <h2>Every job gets <span class="red">a ticket</span></h2>
+        <p class="sub">Here is how the shop's work breaks down. Tickets marked as mentioned in reviews come from what real customers wrote. Everything else is a typical offering for a general auto repair shop: call to confirm.</p>
+        <div class="cta-row">
+          <a class="btn btn-red" href="tel:+15138217400"><i class="fa-solid fa-phone"></i> Call for a quote</a>
+          <button class="btn btn-ink" data-nav="contact"><i class="fa-solid fa-pen-to-square"></i> Request service</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ledger-section">
+      <h3>Verified by customer reviews</h3>
+      <div class="ticket-grid">
+        <div class="ticket">
+          <div class="perfo"><span class="tno">TKT-B01</span><i class="fa-solid fa-check" style="color:var(--stamp)"></i></div>
+          <div class="body">
+            <div class="iconrow"><i class="fa-solid fa-magnifying-glass"></i></div>
+            <h4>Honest diagnostics</h4>
+            <p>Multiple reviewers say the shop is honest about what a car actually needs, and skips the extras. That is the core of the shop's reputation.</p>
+            <span class="stamp-mini">Mentioned in reviews</span>
+          </div>
+        </div>
+        <div class="ticket">
+          <div class="perfo"><span class="tno">TKT-B02</span><i class="fa-solid fa-check" style="color:var(--stamp)"></i></div>
+          <div class="body">
+            <div class="iconrow"><i class="fa-solid fa-car-side"></i></div>
+            <h4>Import &amp; JDM expertise</h4>
+            <p>Reviewers single out the shop for import vehicles, with one noting the mechanic saved their TSX more than once.</p>
+            <span class="stamp-mini">Mentioned in reviews</span>
+          </div>
+        </div>
+        <div class="ticket">
+          <div class="perfo"><span class="tno">TKT-B03</span><i class="fa-solid fa-check" style="color:var(--stamp)"></i></div>
+          <div class="body">
+            <div class="iconrow"><i class="fa-solid fa-temperature-half"></i></div>
+            <h4>Cooling system &amp; radiator work</h4>
+            <p>At least one reviewer credits a successful radiator repair here, and says the money felt well spent.</p>
+            <span class="stamp-mini">Mentioned in reviews</span>
+          </div>
+        </div>
+        <div class="ticket">
+          <div class="perfo"><span class="tno">TKT-B04</span><i class="fa-solid fa-check" style="color:var(--stamp)"></i></div>
+          <div class="body">
+            <div class="iconrow"><i class="fa-solid fa-siren"></i></div>
+            <h4>Emergency &amp; safety repairs</h4>
+            <p>A reviewer sharing a car with their son says the shop treated the emergency with urgency and understood the safety stakes.</p>
+            <span class="stamp-mini">Mentioned in reviews</span>
+          </div>
+        </div>
+        <div class="ticket">
+          <div class="perfo"><span class="tno">TKT-B05</span><i class="fa-solid fa-check" style="color:var(--stamp)"></i></div>
+          <div class="body">
+            <div class="iconrow"><i class="fa-solid fa-clipboard-check"></i></div>
+            <h4>Inspection work</h4>
+            <p>One reviewer mentions the shop handling inspection cars for a local auto sales business, with fair prices on repairs found.</p>
+            <span class="stamp-mini">Mentioned in reviews</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ledger-section">
+      <h3>Typical shop offerings (call to confirm)</h3>
+      <div class="ticket-grid">
+        <div class="ticket">
+          <div class="perfo"><span class="tno">TKT-C01</span><i class="fa-solid fa-oil-can" style="color:var(--stamp)"></i></div>
+          <div class="body">
+            <div class="iconrow"><i class="fa-solid fa-oil-can"></i></div>
+            <h4>Oil changes</h4>
+            <p>Standard oil and filter service, the kind of ticket every general repair shop runs daily.</p>
+            <span class="sample-tag">Sample: call to confirm</span>
+          </div>
+        </div>
+        <div class="ticket">
+          <div class="perfo"><span class="tno">TKT-C02</span><i class="fa-solid fa-circle-dot" style="color:var(--stamp)"></i></div>
+          <div class="body">
+            <div class="iconrow"><i class="fa-solid fa-circle-dot"></i></div>
+            <h4>Brake service</h4>
+            <p>Pads, rotors, and inspections. Ask for a quote by phone with your year, make, and model.</p>
+            <span class="sample-tag">Sample: call to confirm</span>
+          </div>
+        </div>
+        <div class="ticket">
+          <div class="perfo"><span class="tno">TKT-C03</span><i class="fa-solid fa-car-battery" style="color:var(--stamp)"></i></div>
+          <div class="body">
+            <div class="iconrow"><i class="fa-solid fa-car-battery"></i></div>
+            <h4>Batteries &amp; electrical</h4>
+            <p>Battery testing and replacement plus common electrical fixes.</p>
+            <span class="sample-tag">Sample: call to confirm</span>
+          </div>
+        </div>
+        <div class="ticket">
+          <div class="perfo"><span class="tno">TKT-C04</span><i class="fa-solid fa-gears" style="color:var(--stamp)"></i></div>
+          <div class="body">
+            <div class="iconrow"><i class="fa-solid fa-gears"></i></div>
+            <h4>Suspension &amp; steering</h4>
+            <p>Struts, shocks, and steering components that keep the car tracking straight.</p>
+            <span class="sample-tag">Sample: call to confirm</span>
+          </div>
+        </div>
+        <div class="ticket">
+          <div class="perfo"><span class="tno">TKT-C05</span><i class="fa-solid fa-snowflake" style="color:var(--stamp)"></i></div>
+          <div class="body">
+            <div class="iconrow"><i class="fa-solid fa-snowflake"></i></div>
+            <h4>Heating &amp; A/C</h4>
+            <p>Climate system diagnosis and repair for year round comfort.</p>
+            <span class="sample-tag">Sample: call to confirm</span>
+          </div>
+        </div>
+        <div class="ticket">
+          <div class="perfo"><span class="tno">TKT-C06</span><i class="fa-solid fa-life-ring" style="color:var(--stamp)"></i></div>
+          <div class="body">
+            <div class="iconrow"><i class="fa-solid fa-life-ring"></i></div>
+            <h4>Tires &amp; alignment</h4>
+            <p>Tire replacement, rotation, and alignment checks.</p>
+            <span class="sample-tag">Sample: call to confirm</span>
+          </div>
+        </div>
+      </div>
+      <div class="notice"><strong>How to use this page:</strong> the first row is backed by public customer reviews. The second row is a sample of typical services for a shop like this. The fastest way to know for sure is to call <a href="tel:+15138217400" style="color:var(--stamp);font-weight:700">(513) 821-7400</a>.</div>
+    </div>
+  </section>
+
+  
+  <section class="page" id="page-about" data-page="about">
+    <div class="ledger-head">
+      <div class="ruled">
+        <div class="stamp-badge">Shop record</div>
+        <div class="ticket-label"><i class="fa-solid fa-book"></i> Ledger entry: the shop</div>
+        <h2>About <span class="red">Valley Auto Care</span></h2>
+        <p class="sub">A neighborhood auto repair shop on East Seymour Avenue in Cincinnati, Ohio, known for honest work and a soft spot for import vehicles.</p>
+      </div>
+    </div>
+
+    <div class="ledger-section">
+      <h3>The record, as customers tell it</h3>
+      <div class="ledger-list">
+        <div class="ledger-row">
+          <div class="cell-icon"><i class="fa-solid fa-user-gear"></i></div>
+          <div>
+            <div class="cell-label">The mechanic customers name</div>
+            <div class="cell-value">Jay</div>
+            <div class="cell-note">Reviewers repeatedly name Jay, describing him as honest, seasoned, and especially skilled with JDM and import cars. One says he is one of the most honest mechanics they have met; another says he saved their TSX multiple times.</div>
+          </div>
+        </div>
+        <div class="ledger-row">
+          <div class="cell-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+          <div>
+            <div class="cell-label">The reputation</div>
+            <div class="cell-value">Honest, fair, no upselling</div>
+            <div class="cell-note">Across roughly 18 to 22 public reviews (rating around 4.3 to 4.4 stars), the recurring theme is straight talk: customers say the shop recommends only the repairs a car actually needs, with fair prices.</div>
+          </div>
+        </div>
+        <div class="ledger-row">
+          <div class="cell-icon"><i class="fa-solid fa-location-dot"></i></div>
+          <div>
+            <div class="cell-label">Where</div>
+            <div class="cell-value">9 E Seymour Ave, Cincinnati, OH 45216</div>
+            <div class="cell-note">A working shop address on the east side of Seymour Avenue. One listing also associates the address with the name Valley Imports, suggesting import work has long been part of the story here.</div>
+          </div>
+        </div>
+        <div class="ledger-row">
+          <div class="cell-icon"><i class="fa-solid fa-camera"></i></div>
+          <div>
+            <div class="cell-label">Shop photos</div>
+            <div class="cell-value">Photo coming soon</div>
+            <div class="cell-note">No verified shop photos were available for this demo site.</div>
+          </div>
+        </div>
+      </div>
+      <div class="notice"><strong>Kept honest:</strong> this page is built only from what public reviews and listings say. The shop's own history, certifications, and full service list were not published anywhere we could verify, so they are not claimed here. <span class="sample-tag" style="margin-top:0">Demo site</span></div>
+      <div class="cta-row">
+        <button class="btn btn-red" data-nav="reviews"><i class="fa-solid fa-star"></i> Read customer reviews</button>
+        <button class="btn btn-ghost" data-nav="contact"><i class="fa-solid fa-phone"></i> Get in touch</button>
+      </div>
+    </div>
+  </section>
+
+  
+  <section class="page" id="page-reviews" data-page="reviews">
+    <div class="ledger-head">
+      <div class="ruled">
+        <div class="stamp-badge">Customer log</div>
+        <div class="ticket-label"><i class="fa-solid fa-star"></i> Review ledger</div>
+        <h2>What the <span class="red">customer log</span> says</h2>
+        <p class="sub">Below is an honest summary of the roughly 18 to 22 public reviews found for this shop (about 4.3 to 4.4 stars across review sites). Individual reviews are summarized in our own words; we never invent reviewer names or quotes.</p>
+        <div class="cta-row">
+          <a class="btn btn-red" href="https://reviews.birdeye.com/valley-auto-care-166027839644657" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Read reviews on Birdeye</a>
+          <a class="btn btn-ghost" href="https://www.loc8nearme.com/ohio/cincinnati/valley-auto-care/4695289/" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Read reviews on Loc8NearMe</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="ledger-section">
+      <h3>Logged impressions</h3>
+      <div style="display:flex;gap:1.5rem;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap">
+        <div class="rating-big">4.4</div>
+        <div>
+          <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i></div>
+          <div class="cell-note" style="margin-top:.3rem">Aggregate of public review sites, roughly 20 reviews. Not an official rating.</div>
+        </div>
+      </div>
+
+      <div class="review-card">
+        <span class="sentiment sent-pos">Positive framing</span>
+        <div class="who">Summary of several 5 star reviews</div>
+        <p>The most common story: an honest mechanic who does great work, especially on JDM and import cars. Customers say Jay explains what is needed without adding extras, charges fair prices, and has earned repeat visits and recommendations.</p>
+      </div>
+      <div class="review-card">
+        <span class="sentiment sent-mix">Mixed framing</span>
+        <div class="who">Summary of mid range feedback</div>
+        <p>The overall 4.3 to 4.4 star average (not a perfect 5.0) means some reviewers had less than perfect experiences. Public snippets do not spell out every detail, so this is the honest middle: mostly positive, not unanimous.</p>
+      </div>
+      <div class="review-card">
+        <span class="sentiment sent-neg">Negative framing</span>
+        <div class="who">What the rating gap implies</div>
+        <p>A sub 4.5 average across 20 or so reviews implies some customers left lower ratings. We found no detailed public complaints with specifics we could verify, so we will not invent any. As with any shop, call and judge the estimate yourself.</p>
+      </div>
+
+      <div class="notice"><strong>Leave your own:</strong> no review form here invents feedback. If you are a customer, use the links above to leave a real review on a real review site.</div>
+    </div>
+  </section>
+
+  
+  <section class="page" id="page-contact" data-page="contact">
+    <div class="ledger-head">
+      <div class="ruled">
+        <div class="stamp-badge">Open a ticket</div>
+        <div class="ticket-label"><i class="fa-solid fa-pen-to-square"></i> New work order</div>
+        <h2>Open a <span class="red">service ticket</span></h2>
+        <p class="sub">Fill out the form and we will treat it like a new ticket on the shop ledger. For anything urgent, calling is faster.</p>
+        <div class="cta-row">
+          <a class="btn btn-red" href="tel:+15138217400"><i class="fa-solid fa-phone"></i> (513) 821-7400</a>
+          <a class="btn btn-ghost" href="https://www.google.com/maps/search/?api=1&amp;query=9%20E%20Seymour%20Ave%2C%20Cincinnati%2C%20OH%2045216" target="_blank" rel="noopener"><i class="fa-solid fa-map-location-dot"></i> Directions</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="ledger-section">
+      <h3>Shop ledger: reach the shop</h3>
+      <div class="ledger-list" style="margin-bottom:1.6rem">
+        <div class="ledger-row">
+          <div class="cell-icon"><i class="fa-solid fa-phone"></i></div>
+          <div>
+            <div class="cell-label">Phone</div>
+            <div class="cell-value"><a href="tel:+15138217400">(513) 821-7400</a></div>
+          </div>
+        </div>
+        <div class="ledger-row">
+          <div class="cell-icon"><i class="fa-solid fa-location-dot"></i></div>
+          <div>
+            <div class="cell-label">Address</div>
+            <div class="cell-value">9 E Seymour Ave, Cincinnati, OH 45216</div>
+            <div class="cell-note"><a href="https://www.google.com/maps/search/?api=1&amp;query=9%20E%20Seymour%20Ave%2C%20Cincinnati%2C%20OH%2045216" target="_blank" rel="noopener">Open in Google Maps</a></div>
+          </div>
+        </div>
+        <div class="ledger-row">
+          <div class="cell-icon"><i class="fa-solid fa-clock"></i></div>
+          <div>
+            <div class="cell-label">Hours (as listed publicly, call to confirm)</div>
+            <div class="cell-value" style="font-weight:400;font-family:'IBM Plex Mono',monospace;font-size:.85rem">Mon to Fri: 9:00 AM - 6:00 PM. Sat and Sun: closed.</div>
+          </div>
+        </div>
+      </div>
+
+      <h3>Service request form</h3>
+      <div class="form-card">
+        <form id="serviceForm" novalidate>
+          <div class="form-row">
+            <div class="form-field">
+              <label for="fName">Name</label>
+              <input type="text" id="fName" name="name" placeholder="Your name" autocomplete="name">
+            </div>
+            <div class="form-field">
+              <label for="fPhone">Phone</label>
+              <input type="tel" id="fPhone" name="phone" placeholder="(513) 555-0100" autocomplete="tel">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label for="fVehicle">Vehicle</label>
+              <input type="text" id="fVehicle" name="vehicle" placeholder="Year, make, model">
+            </div>
+            <div class="form-field">
+              <label for="fService">Service needed</label>
+              <select id="fService" name="service">
+                <option value="">Choose one</option>
+                <option>Diagnostics</option>
+                <option>Oil and maintenance</option>
+                <option>Brakes</option>
+                <option>Cooling and radiator</option>
+                <option>Import and JDM work</option>
+                <option>Something else</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field full">
+              <label for="fMsg">Describe the problem</label>
+              <textarea id="fMsg" name="message" rows="4" placeholder="Noises, warning lights, when it started..."></textarea>
+            </div>
+          </div>
+          <div class="form-error" id="formError" role="alert"></div>
+          <button type="submit" class="btn btn-red" style="width:100%;justify-content:center"><i class="fa-solid fa-paper-plane"></i> Submit service request</button>
+        </form>
+        <div class="form-success" id="formSuccess" role="status">
+          <strong><i class="fa-solid fa-circle-check"></i> Request received (demo).</strong><br>
+          Ticket number <strong id="ticketNum"></strong> has been logged. This is a demo form: no data was sent anywhere. To actually book, call <a href="tel:+15138217400" style="color:var(--stamp);font-weight:700">(513) 821-7400</a>.
+        </div>
+      </div>
+      <div class="notice"><strong>Demo form:</strong> this site does not have the shop's email address, so the form validates your input and confirms locally instead of sending anything. Nothing is stored or transmitted.</div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="sitefoot">© Valley Auto Care</footer>
+
+<script>
+(function(){
+  var pages = document.querySelectorAll('.page');
+  var navTargets = document.querySelectorAll('[data-nav]');
+
+  function setActiveNav(page){
+    navTargets.forEach(function(el){
+      if(el.getAttribute('data-nav') === page){ el.classList.add('active'); }
+      else { el.classList.remove('active'); }
+    });
+  }
+
+  function showPage(page, push){
+    var found = false;
+    pages.forEach(function(p){
+      var isTarget = p.getAttribute('data-page') === page;
+      p.classList.toggle('active', isTarget);
+      if(isTarget){ found = true; }
+    });
+    if(!found){
+      pages.forEach(function(p){ p.classList.toggle('active', p.getAttribute('data-page') === 'home'); });
+      page = 'home';
+    }
+    setActiveNav(page);
+    closeMenu();
+    window.scrollTo(0,0);
+    if(push !== false){
+      history.pushState({page: page}, '', '#' + page);
+    }
+    document.title = 'Valley Auto Care | ' + page.charAt(0).toUpperCase() + page.slice(1);
+  }
+
+  function navigateTo(page){ showPage(page, true); }
+
+  navTargets.forEach(function(el){
+    el.addEventListener('click', function(e){
+      e.preventDefault();
+      navigateTo(el.getAttribute('data-nav'));
+    });
+  });
+
+  window.addEventListener('popstate', function(e){
+    var page = (e.state && e.state.page) ? e.state.page : (location.hash ? location.hash.replace('#','') : 'home');
+    showPage(page, false);
+  });
+
+  var burger = document.getElementById('burger');
+  var mobilemenu = document.getElementById('mobilemenu');
+  function closeMenu(){
+    mobilemenu.classList.remove('open');
+    burger.setAttribute('aria-expanded','false');
+  }
+  burger.addEventListener('click', function(e){
+    e.stopPropagation();
+    var open = mobilemenu.classList.toggle('open');
+    burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  document.addEventListener('click', function(e){
+    if(mobilemenu.classList.contains('open') && !mobilemenu.contains(e.target) && e.target !== burger && !burger.contains(e.target)){
+      closeMenu();
+    }
+  });
+
+  // initial route from hash
+  var initial = location.hash ? location.hash.replace('#','') : 'home';
+  showPage(initial, false);
+
+  // contact form validation + demo confirmation
+  var form = document.getElementById('serviceForm');
+  var err = document.getElementById('formError');
+  var success = document.getElementById('formSuccess');
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    err.textContent = '';
+    var name = document.getElementById('fName').value.trim();
+    var phone = document.getElementById('fPhone').value.trim();
+    var vehicle = document.getElementById('fVehicle').value.trim();
+    var service = document.getElementById('fService').value;
+    var msg = document.getElementById('fMsg').value.trim();
+    if(!name){ err.textContent = 'Please enter your name.'; document.getElementById('fName').focus(); return; }
+    if(!phone || phone.replace(/\D/g,'').length < 7){ err.textContent = 'Please enter a valid phone number.'; document.getElementById('fPhone').focus(); return; }
+    if(!vehicle){ err.textContent = 'Please enter your vehicle (year, make, model).'; document.getElementById('fVehicle').focus(); return; }
+    if(!service){ err.textContent = 'Please choose the service you need.'; document.getElementById('fService').focus(); return; }
+    if(!msg){ err.textContent = 'Please describe the problem briefly.'; document.getElementById('fMsg').focus(); return; }
+    var tno = 'TKT-' + Math.floor(1000 + Math.random()*9000);
+    document.getElementById('ticketNum').textContent = tno;
+    form.style.display = 'none';
+    success.classList.add('show');
+  });
+})();
+</script>
+</body>
+</html>

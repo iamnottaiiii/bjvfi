@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jacobs Mechanical, Inc | Cincinnati HVAC & Mechanical Contractor</title>
+<meta name="description" content="Jacobs Mechanical, Inc. Air conditioning, heating and mechanical contracting at 4500 W Mitchell Ave, Cincinnati, OH. Call (513) 681-6800.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+/* Plain hyphens only in this file. No em dashes or en dashes anywhere. */
+:root{
+  --graphite:#16181b;
+  --steel:#23262b;
+  --panel:#1e2126;
+  --paper:#f2ede1;
+  --paper-dim:#d9d2c2;
+  --brass:#c9a227;
+  --copper:#b87333;
+  --safety:#e8722a;
+  --blueprint:#0f3b66;
+  --blueprint-line:#7fb2e5;
+  --green:#57b26a;
+  --red:#d05252;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--graphite);
+  color:var(--paper);
+  font-family:'IBM Plex Sans',system-ui,sans-serif;
+  line-height:1.6;
+}
+h1,h2,h3,.display{font-family:'Bebas Neue',sans-serif;letter-spacing:.04em;font-weight:400}
+.mono{font-family:'IBM Plex Mono',monospace}
+a{color:var(--brass)}
+img{max-width:100%}
+
+/* Page router: only the active page shows */
+.page{display:none}
+.page.active{display:block;animation:pageIn .35s ease}
+@keyframes pageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* Header with gauge dial nav */
+header.topbar{
+  position:sticky;top:0;z-index:100;
+  background:linear-gradient(180deg,#1c1f24,#16181b);
+  border-bottom:3px solid var(--brass);
+}
+.topbar-inner{
+  max-width:1200px;margin:0 auto;padding:10px 20px;
+  display:flex;align-items:center;gap:20px;
+}
+.brand h1{font-size:1.6rem;color:var(--paper);line-height:1}
+.brand .sub{font-size:.72rem;color:var(--brass);letter-spacing:.25em;text-transform:uppercase;font-family:'IBM Plex Mono',monospace}
+.dialnav{margin-left:auto;position:relative;width:170px;height:170px;flex:0 0 auto}
+/* The dial face */
+.dial-face{
+  position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle at 50% 40%, #2c3036 0%, #1a1c20 70%);
+  border:4px solid var(--copper);
+  box-shadow:inset 0 0 24px rgba(0,0,0,.6), 0 2px 10px rgba(0,0,0,.5);
+}
+.dial-hub{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:64px;height:64px;border-radius:50%;
+  background:radial-gradient(circle at 50% 35%,#3a3f46,#22252a);
+  border:3px solid var(--brass);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--brass);
+  z-index:3;
+}
+.dial-needle{
+  position:absolute;left:50%;top:50%;width:4px;height:62px;z-index:2;
+  background:linear-gradient(180deg,var(--safety),var(--red));
+  transform-origin:50% 100%;
+  border-radius:2px;
+  transition:transform .5s cubic-bezier(.34,1.4,.64,1);
+}
+.dialnav a{
+  position:absolute;left:50%;top:50%;z-index:4;
+  width:52px;height:22px;margin:-11px 0 0 -26px;
+  font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.05em;
+  color:var(--paper-dim);text-decoration:none;text-transform:uppercase;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:11px;background:rgba(0,0,0,.35);
+  transition:color .2s,background .2s;
+}
+.dialnav a:hover{color:var(--brass)}
+.dialnav a.active{color:#111;background:var(--brass);font-weight:600}
+/* tick marks on dial */
+.dial-tick{position:absolute;left:50%;top:50%;width:2px;height:8px;background:var(--paper-dim);opacity:.5;z-index:1;transform-origin:50% 0}
+
+/* mobile hamburger */
+.hamburger{display:none;margin-left:auto;background:none;border:2px solid var(--brass);color:var(--brass);font-size:1.3rem;border-radius:8px;padding:6px 12px;cursor:pointer}
+.mobile-menu{display:none;background:var(--steel);border-top:2px solid var(--brass)}
+.mobile-menu a{display:block;padding:14px 22px;color:var(--paper);text-decoration:none;border-bottom:1px solid #333;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;font-size:.85rem;letter-spacing:.08em}
+.mobile-menu a.active{color:var(--brass)}
+.mobile-menu.open{display:block}
+
+main{max-width:1200px;margin:0 auto;padding:0 20px 60px}
+
+/* Hero pressure gauge */
+.hero{
+  padding:60px 0 40px;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;
+}
+.hero-copy .kicker{font-family:'IBM Plex Mono',monospace;color:var(--safety);letter-spacing:.2em;font-size:.75rem;text-transform:uppercase}
+.hero-copy h2{font-size:clamp(2.6rem,6vw,4.5rem);line-height:1.02;color:var(--paper);margin:12px 0}
+.hero-copy h2 .accent{color:var(--brass)}
+.hero-copy p{color:var(--paper-dim);max-width:46ch}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-top:26px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:'IBM Plex Mono',monospace;font-weight:600;text-transform:uppercase;letter-spacing:.06em;
+  padding:14px 22px;border-radius:6px;text-decoration:none;font-size:.85rem;cursor:pointer;border:none;
+}
+.btn-call{background:var(--safety);color:#141414}
+.btn-call:hover{background:#f5822f}
+.btn-ghost{background:transparent;color:var(--paper);border:2px solid var(--brass)}
+.btn-ghost:hover{background:rgba(201,162,39,.12)}
+.gauge-wrap{position:relative;text-align:center}
+.gauge-tag{margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:.75rem;color:var(--green);letter-spacing:.15em}
+/* animated needle sweep */
+.needle-anim{transform-origin:200px 170px;animation:needleSweep 5s ease-in-out infinite}
+@keyframes needleSweep{0%,100%{transform:rotate(-38deg)}50%{transform:rotate(38deg)}}
+
+/* badge */
+.badge{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;background:var(--steel);color:var(--safety);border:1px dashed var(--safety);border-radius:4px;padding:4px 10px;margin:6px 6px 6px 0}
+
+/* Section titles */
+.sec-head{margin:56px 0 26px;display:flex;align-items:center;gap:16px}
+.sec-head h2{font-size:2.4rem;color:var(--paper)}
+.sec-head .rule{flex:1;height:2px;background:repeating-linear-gradient(90deg,var(--brass) 0 14px,transparent 14px 22px)}
+
+/* Diagnostic checklist services */
+.checklist{background:var(--panel);border:1px solid #333;border-radius:10px;overflow:hidden}
+.check-row{
+  display:grid;grid-template-columns:56px 1fr auto;gap:16px;align-items:center;
+  padding:20px 24px;border-bottom:1px solid #2c2f35;
+}
+.check-row:last-child{border-bottom:none}
+.check-box{
+  width:38px;height:38px;border:3px solid var(--green);border-radius:8px;position:relative;flex:0 0 auto;
+}
+.check-box::after{
+  content:"";position:absolute;left:10px;top:4px;width:12px;height:20px;
+  border:solid var(--green);border-width:0 4px 4px 0;transform:rotate(42deg);
+}
+.check-row h3{font-size:1.4rem;color:var(--paper)}
+.check-row p{color:var(--paper-dim);font-size:.92rem}
+.readout{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--brass);text-align:right;white-space:nowrap}
+.readout .ok{color:var(--green)}
+
+/* Blueprint gallery */
+.blueprint{
+  background:
+    linear-gradient(rgba(127,178,229,.14) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(127,178,229,.14) 1px,transparent 1px),
+    var(--blueprint);
+  background-size:28px 28px;
+  border:2px solid var(--blueprint-line);border-radius:10px;padding:34px;
+}
+.bp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:26px}
+.bp-card{
+  border:1px solid var(--blueprint-line);border-radius:6px;padding:18px;background:rgba(15,59,102,.55);
+  color:#dcebfb;
+}
+.bp-card svg{width:100%;height:auto;display:block}
+.bp-card h3{font-size:1.2rem;color:#fff;margin:12px 0 4px}
+.bp-card p{font-size:.85rem;color:#b9d2ec}
+.bp-card .fig{font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.15em;color:var(--blueprint-line)}
+
+/* generic card rows */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+.card{background:var(--panel);border:1px solid #333;border-radius:10px;padding:26px}
+.card h3{font-size:1.5rem;color:var(--brass);margin-bottom:10px}
+.card ul{list-style:none;margin-top:10px}
+.card li{padding:8px 0;border-bottom:1px dashed #333;color:var(--paper-dim);font-size:.95rem}
+.card li:last-child{border-bottom:none}
+.card li strong{color:var(--paper)}
+
+/* reviews */
+.review{background:var(--panel);border:1px solid #333;border-left:5px solid var(--copper);border-radius:8px;padding:22px;margin-bottom:18px}
+.review .stars{color:var(--brass);letter-spacing:3px;margin-bottom:8px}
+.review p{color:var(--paper-dim)}
+.review .tag{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--paper-dim);text-transform:uppercase;letter-spacing:.1em;margin-top:10px}
+.notice{background:#262019;border:1px solid var(--brass);border-radius:8px;padding:18px 22px;margin:26px 0;color:var(--paper-dim);font-size:.92rem}
+.notice strong{color:var(--brass)}
+
+/* contact */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-grid .full{grid-column:1/-1}
+label{font-family:'IBM Plex Mono',monospace;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--brass)}
+input,select,textarea{
+  width:100%;padding:12px;margin-top:6px;border-radius:6px;border:1px solid #444;
+  background:#141619;color:var(--paper);font-family:'IBM Plex Sans',sans-serif;font-size:.95rem;
+}
+textarea{min-height:130px;resize:vertical}
+.contact-line{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px dashed #333}
+.contact-line i{color:var(--brass);width:22px;text-align:center}
+.contact-line a{color:var(--paper);text-decoration:none;font-weight:500}
+.contact-line a:hover{color:var(--brass)}
+
+/* Big type footer */
+footer.bigfoot{
+  background:#0e0f11;border-top:4px solid var(--brass);margin-top:70px;
+  padding:70px 20px 40px;text-align:center;overflow:hidden;
+}
+footer.bigfoot .giant{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(3rem,11vw,9rem);line-height:.95;color:var(--paper);
+  text-transform:uppercase;
+}
+footer.bigfoot .giant .fill{color:transparent;-webkit-text-stroke:2px var(--copper)}
+footer.bigfoot p{margin-top:26px;color:var(--paper-dim);font-size:.85rem}
+
+@media(max-width:860px){
+  .hero,.two-col,.form-grid{grid-template-columns:1fr}
+  .dialnav{display:none}
+  .hamburger{display:block}
+  .topbar-inner{padding:10px 16px}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <h1>Jacobs Mechanical, Inc</h1>
+      <div class="sub">HVAC Contractors</div>
+    </div>
+    
+    <nav class="dialnav" id="dialnav" aria-label="Main navigation">
+      <div class="dial-face"></div>
+      <div class="dial-needle" id="dialNeedle"></div>
+      <div class="dial-hub">JM</div>
+      <a href="#home" data-page="home" data-angle="-90">Home</a>
+      <a href="#services" data-page="services" data-angle="-18">Services</a>
+      <a href="#about" data-page="about" data-angle="54">About</a>
+      <a href="#reviews" data-page="reviews" data-angle="126">Reviews</a>
+      <a href="#contact" data-page="contact" data-angle="198">Contact</a>
+    </nav>
+    <button class="hamburger" id="hamburger" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+  </div>
+  <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile navigation">
+    <a href="#home" data-page="home">Home</a>
+    <a href="#services" data-page="services">Services</a>
+    <a href="#about" data-page="about">About</a>
+    <a href="#reviews" data-page="reviews">Reviews</a>
+    <a href="#contact" data-page="contact">Contact</a>
+  </nav>
+</header>
+
+<main>
+
+<section class="page" id="page-home">
+  <div class="hero">
+    <div class="hero-copy">
+      <div class="kicker mono">Cincinnati, Ohio Mechanical Shop</div>
+      <h2>Keeping Cincinnati <span class="accent">Cool</span> and <span class="accent">Heated</span> Since Day One</h2>
+      <p>Jacobs Mechanical, Inc is a licensed HVAC mechanical contractor at 4500 W Mitchell Ave, Cincinnati, OH 45232. Same-day diagnostics, straight pricing, and installations that get done right the first time. Serving homes, rentals, and commercial buildings across the Cincinnati area.</p>
+      <div class="badge"><i class="fa-solid fa-shield-halved"></i> Licensed HVAC Contractor</div>
+      <div class="badge"><i class="fa-solid fa-screwdriver-wrench"></i> Commercial and Residential</div>
+      <div class="cta-row">
+        <a class="btn btn-call" href="tel:+15136816800"><i class="fa-solid fa-phone"></i> (513) 681-6800</a>
+        <a class="btn btn-ghost" href="#services" data-page="services"><i class="fa-solid fa-clipboard-check"></i> Run Diagnostics</a>
+      </div>
+    </div>
+    <div class="gauge-wrap">
+      
+      <svg viewBox="0 0 400 260" width="100%" role="img" aria-label="Pressure gauge with animated needle pointing to optimal">
+        <defs>
+          <radialGradient id="gface" cx="50%" cy="42%" r="75%">
+            <stop offset="0%" stop-color="#2e333a"/><stop offset="100%" stop-color="#17191d"/>
+          </radialGradient>
+        </defs>
+        <rect x="60" y="150" width="280" height="34" rx="6" fill="#23262b" stroke="#c9a227" stroke-width="3"/>
+        <circle cx="200" cy="170" r="150" fill="url(#gface)" stroke="#b87333" stroke-width="6"/>
+        <circle cx="200" cy="170" r="150" fill="none" stroke="#0c0d0f" stroke-width="2" opacity=".5"/>
+        
+        <path d="M 70 150 A 140 140 0 0 1 170 42" fill="none" stroke="#d05252" stroke-width="14" opacity=".8"/>
+        <path d="M 170 42 A 140 140 0 0 1 330 100" fill="none" stroke="#57b26a" stroke-width="14" opacity=".85"/>
+        <path d="M 330 100 A 140 140 0 0 1 330 150" fill="none" stroke="#d05252" stroke-width="14" opacity=".8"/>
+        
+        <g stroke="#f2ede1" stroke-width="2" opacity=".85">
+          <line x1="200" y1="38" x2="200" y2="54"/>
+          <line x1="262" y1="52" x2="255" y2="66"/>
+          <line x1="313" y1="90" x2="301" y2="99"/>
+          <line x1="138" y1="52" x2="145" y2="66"/>
+          <line x1="87" y1="90" x2="99" y2="99"/>
+        </g>
+        <text x="200" y="92" text-anchor="middle" fill="#f2ede1" font-family="Bebas Neue" font-size="22" letter-spacing="3">SYSTEM PRESSURE</text>
+        <text x="120" y="205" text-anchor="middle" fill="#d05252" font-family="IBM Plex Mono" font-size="11">LOW</text>
+        <text x="280" y="205" text-anchor="middle" fill="#57b26a" font-family="IBM Plex Mono" font-size="11">OPTIMAL</text>
+        
+        <g class="needle-anim">
+          <line x1="200" y1="170" x2="200" y2="56" stroke="#e8722a" stroke-width="5" stroke-linecap="round"/>
+        </g>
+        <circle cx="200" cy="170" r="16" fill="#c9a227" stroke="#111" stroke-width="3"/>
+        <text x="200" y="242" text-anchor="middle" fill="#c9a227" font-family="IBM Plex Mono" font-size="13" letter-spacing="2">JACOBS MECHANICAL</text>
+      </svg>
+      <div class="gauge-tag mono"><i class="fa-solid fa-circle-check"></i> SYSTEM STATUS: OPTIMAL</div>
+    </div>
+  </div>
+
+  <div class="sec-head"><h2>Why Call The Shop</h2><div class="rule"></div></div>
+  <div class="two-col">
+    <div class="card">
+      <h3><i class="fa-solid fa-bolt"></i> Fast, Same-Day Response</h3>
+      <p>Reviewers on Birdeye describe techs arriving fast, diagnosing fast, and fixing fast, often out the door in about an hour. One homeowner whose furnace was blowing cold air got the crew out the same morning they called.</p>
+    </div>
+    <div class="card">
+      <h3><i class="fa-solid fa-hand-holding-dollar"></i> Straight, Competitive Pricing</h3>
+      <p>Customers repeatedly mention honest pricing and quotes that came in well under competing bids. One full AC replacement was proposed at half the price of other estimates, with a one-day install and a clean workspace left behind.</p>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-services">
+  <div class="sec-head"><h2>Service Diagnostic Checklist</h2><div class="rule"></div></div>
+  <p style="color:var(--paper-dim);max-width:70ch">Every call gets the full workup. Tick through the checklist below, then call the shop to confirm availability and scheduling.</p>
+  <div class="badge"><i class="fa-solid fa-triangle-exclamation"></i> Call to confirm: details from public listings</div>
+
+  <div class="checklist" style="margin-top:18px">
+    <div class="check-row">
+      <div class="check-box"></div>
+      <div><h3>Air Conditioning Repair</h3><p>Fast diagnosis and repair of central air systems. Customers report same-day fixes and straight answers on what the repair really needs.</p></div>
+      <div class="readout">DIAG: <span class="ok">READY</span><br>RESPONSE: SAME DAY*</div>
+    </div>
+    <div class="check-row">
+      <div class="check-box"></div>
+      <div><h3>AC Replacement and Installation</h3><p>Full system changeouts, including tricky or unusual setups. Reviewers note creative solutions, competitive bids, and one-day installs with the old unit hauled away.</p></div>
+      <div class="readout">INSTALL: <span class="ok">1 DAY*</span><br>CLEANUP: INCLUDED*</div>
+    </div>
+    <div class="check-row">
+      <div class="check-box"></div>
+      <div><h3>Furnace and Heating Service</h3><p>Heating repairs and central heating equipment service. One customer with a leaking, cold-blowing furnace was fixed the same day they called.</p></div>
+      <div class="readout">HEAT: <span class="ok">READY</span><br>SAFETY CHECK: YES</div>
+    </div>
+    <div class="check-row">
+      <div class="check-box"></div>
+      <div><h3>Commercial and Industrial HVAC</h3><p>Listed for commercial, industrial, energy, and institutional market sectors, with public project and permit history across the Cincinnati area.</p></div>
+      <div class="readout">SECTOR: COMM/IND<br>UNION SHOP</div>
+    </div>
+    <div class="check-row">
+      <div class="check-box"></div>
+      <div><h3>HVAC Air Distribution and Ductwork</h3><p>Air distribution, terminal units, and central HVAC equipment operation and maintenance per trade classification codes.</p></div>
+      <div class="readout">AIRFLOW: <span class="ok">READY</span><br>BALANCE: CALL</div>
+    </div>
+    <div class="check-row">
+      <div class="check-box"></div>
+      <div><h3>Rental Property and Multi-Site Service</h3><p>A local rental property manager praised the team for being professional, mindful of tenants, and reasonably priced across multiple properties.</p></div>
+      <div class="readout">ACCOUNTS: WELCOME<br>RATE: REASONABLE*</div>
+    </div>
+  </div>
+  <p style="color:var(--paper-dim);font-size:.85rem;margin-top:16px">* From customer reviews on Birdeye and Loc8NearMe. Your job may differ. Call <a href="tel:+15136816800">(513) 681-6800</a> for a real quote.</p>
+</section>
+
+
+<section class="page" id="page-about">
+  <div class="sec-head"><h2>Under The Hood</h2><div class="rule"></div></div>
+  <div class="two-col">
+    <div class="card">
+      <h3><i class="fa-solid fa-wrench"></i> The Shop</h3>
+      <p style="color:var(--paper-dim)">Jacobs Mechanical, Inc is a mechanical contractor in Cincinnati, Ohio. The shop handles heating, ventilation, and air conditioning work for homes, rental properties, and commercial and industrial buildings, and is listed as a union shop with an active Ohio HVAC contractor license.</p>
+      <ul>
+        <li><strong>Established:</strong> 1922, per the company Blue Book listing</li>
+        <li><strong>License:</strong> Active Ohio HVAC contractor license, per BuildZoom</li>
+        <li><strong>BuildZoom score:</strong> 106, top 7% of Ohio licensed contractors</li>
+        <li><strong>Shop type:</strong> Union mechanical contractor</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><i class="fa-solid fa-location-dot"></i> Find Us</h3>
+      <ul>
+        <li><strong>Address:</strong> 4500 W Mitchell Ave, Cincinnati, OH 45232</li>
+        <li><strong>Phone:</strong> <a href="tel:+15136816800">(513) 681-6800</a></li>
+        <li><strong>Mon - Fri:</strong> 8:00 AM to 4:00 PM</li>
+        <li><strong>Sat - Sun:</strong> Closed</li>
+        <li><strong>Service area:</strong> Cincinnati, OH 45232 and surrounding areas</li>
+      </ul>
+      <div class="badge"><i class="fa-solid fa-clock"></i> Hours from public listings: call to confirm</div>
+    </div>
+  </div>
+  <div class="notice">
+    <strong>Website:</strong> a real website exists for this business at <span class="mono">jacobsmech.com</span>, found through public search. This page is a demo built from public listings and reviews, not the company site.
+  </div>
+</section>
+
+
+<section class="page" id="page-reviews">
+  <div class="sec-head"><h2>Field Reports</h2><div class="rule"></div></div>
+  <p style="color:var(--paper-dim)">Rated 4.0 out of 5 across 14 reviews on Birdeye. The notes below paraphrase real review sentiments. No reviewer names are shown.</p>
+
+  <div class="review">
+    <div class="stars">★★★★★</div>
+    <p>One homeowner got a same-day visit when their furnace was blowing cold air and leaking, right before a trip out of town. The crew diagnosed the problem and fixed it that day. The reviewer called it some of the best customer service they had received as a homeowner.</p>
+    <div class="tag">Sentiment: same-day emergency service</div>
+  </div>
+  <div class="review">
+    <div class="stars">★★★★★</div>
+    <p>On an unusual AC system that needed replacing, Jacobs was described as the most creative and helpful of all the companies that gave estimates. The proposed system came in at half the price of competitors, installed in one day, with the old unit removed and the workspace left clean. The manager followed up afterward.</p>
+    <div class="tag">Sentiment: competitive pricing, one-day install</div>
+  </div>
+  <div class="review">
+    <div class="stars">★★★★★</div>
+    <p>A landlord managing several rental properties was impressed by the crew. They were described as professional, respectful of tenants, and knowledgeable, with reasonable rates and top-quality work.</p>
+    <div class="tag">Sentiment: trusted by property managers</div>
+  </div>
+  <div class="review">
+    <div class="stars">★★★★★</div>
+    <p>Other reviewers mention fast arrival, quick diagnosis, fair prices, good communication, and crews that clean up after themselves. Several say they would use the shop again and recommend it to family.</p>
+    <div class="tag">Sentiment: repeat business, referrals</div>
+  </div>
+  <div class="review" style="border-left-color:var(--red)">
+    <div class="stars">★</div>
+    <p>Not every review is glowing. One reviewer, a delivery driver, said the shop has no loading dock and reported a wait of over three hours to unload, plus a lunch break in the middle. Worth knowing if you are delivering materials, not a comment on the service work itself.</p>
+    <div class="tag">Sentiment: logistics complaint, shown honestly</div>
+  </div>
+
+  <div class="notice">
+    <strong>About the Google reviews link:</strong> we could not verify the Google Maps listing URL from our records, so there is no "See reviews on Google" button here. Verified review sources for this business include <a href="https://reviews.birdeye.com/jacobs-mechanical-inc-166908537133876" target="_blank" rel="noopener">Birdeye</a> and <a href="https://www.loc8nearme.com/ohio/cincinnati/jacobs-mechanical-inc/6408998/" target="_blank" rel="noopener">Loc8NearMe</a>.
+  </div>
+</section>
+
+
+<section class="page" id="page-contact">
+  <div class="sec-head"><h2>Request A Service Call</h2><div class="rule"></div></div>
+  <div class="two-col">
+    <div class="card">
+      <h3><i class="fa-solid fa-phone"></i> Reach The Shop</h3>
+      <div class="contact-line"><i class="fa-solid fa-phone"></i><a href="tel:+15136816800">(513) 681-6800</a></div>
+      <div class="contact-line"><i class="fa-solid fa-location-dot"></i><a href="https://www.google.com/maps/search/?api=1&query=4500%20W%20Mitchell%20Ave%2C%20Cincinnati%2C%20OH%2045232" target="_blank" rel="noopener">Get Directions: 4500 W Mitchell Ave, Cincinnati, OH 45232</a></div>
+      <div class="contact-line"><i class="fa-solid fa-clock"></i><span>Mon - Fri: 8:00 AM to 4:00 PM <span class="badge" style="margin:0 0 0 8px">Call to confirm</span></span></div>
+      <div class="contact-line"><i class="fa-solid fa-envelope"></i><span>No public email listed. Use the form or call.</span></div>
+    </div>
+    <div class="card">
+      <h3><i class="fa-solid fa-clipboard-list"></i> Service Request</h3>
+      <form id="serviceForm">
+        <div class="form-grid">
+          <div><label for="fName">Name</label><input id="fName" name="name" type="text" required placeholder="Your name"></div>
+          <div><label for="fPhone">Phone</label><input id="fPhone" name="phone" type="tel" required placeholder="Your phone number"></div>
+          <div class="full"><label for="fType">Job Type</label>
+            <select id="fType" name="job">
+              <option>AC repair</option>
+              <option>AC replacement or install</option>
+              <option>Furnace or heating repair</option>
+              <option>Commercial HVAC</option>
+              <option>Maintenance</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="full"><label for="fMsg">Describe The Problem</label><textarea id="fMsg" name="message" required placeholder="What is the system doing, or not doing?"></textarea></div>
+          <div class="full"><button class="btn btn-call" type="submit"><i class="fa-solid fa-paper-plane"></i> Compose Service Email</button></div>
+        </div>
+      </form>
+      <p style="color:var(--paper-dim);font-size:.82rem;margin-top:12px">This opens your email app with the request ready to send. No public email address is listed for the shop, so add a recipient or simply call <a href="tel:+15136816800">(513) 681-6800</a>.</p>
+    </div>
+  </div>
+
+  <div class="sec-head"><h2>Schematic Gallery</h2><div class="rule"></div></div>
+  <div class="blueprint">
+    <div class="bp-grid">
+      <div class="bp-card">
+        <div class="fig">FIG. 01</div>
+        <svg viewBox="0 0 200 120">
+          <rect x="30" y="20" width="140" height="80" fill="none" stroke="#dcebfb" stroke-width="2"/>
+          <circle cx="100" cy="60" r="26" fill="none" stroke="#dcebfb" stroke-width="2"/>
+          <line x1="100" y1="34" x2="100" y2="86" stroke="#dcebfb" stroke-width="2"/>
+          <line x1="74" y1="60" x2="126" y2="60" stroke="#dcebfb" stroke-width="2"/>
+          <path d="M30 100 L10 120 M170 100 L190 120" stroke="#dcebfb" stroke-width="2"/>
+        </svg>
+        <h3>Condenser Unit</h3><p>Schematic concept. <span class="badge">Photo coming soon</span></p>
+      </div>
+      <div class="bp-card">
+        <div class="fig">FIG. 02</div>
+        <svg viewBox="0 0 200 120">
+          <rect x="20" y="40" width="160" height="24" fill="none" stroke="#dcebfb" stroke-width="2"/>
+          <line x1="60" y1="40" x2="60" y2="20" stroke="#dcebfb" stroke-width="2"/>
+          <line x1="100" y1="40" x2="100" y2="20" stroke="#dcebfb" stroke-width="2"/>
+          <line x1="140" y1="40" x2="140" y2="20" stroke="#dcebfb" stroke-width="2"/>
+          <path d="M20 52 h20 M60 52 h20 M100 52 h20 M140 52 h20" stroke="#7fb2e5" stroke-width="2"/>
+        </svg>
+        <h3>Air Distribution Run</h3><p>Duct layout concept. <span class="badge">Photo coming soon</span></p>
+      </div>
+      <div class="bp-card">
+        <div class="fig">FIG. 03</div>
+        <svg viewBox="0 0 200 120">
+          <rect x="70" y="25" width="60" height="70" rx="6" fill="none" stroke="#dcebfb" stroke-width="2"/>
+          <circle cx="100" cy="50" r="10" fill="none" stroke="#dcebfb" stroke-width="2"/>
+          <text x="100" y="80" text-anchor="middle" fill="#dcebfb" font-family="IBM Plex Mono" font-size="12">72F</text>
+        </svg>
+        <h3>Thermostat Control</h3><p>Control wiring concept. <span class="badge">Photo coming soon</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="bigfoot">
+  <div class="giant">Jacobs <span class="fill">Mechanical</span></div>
+  <p>&copy; Jacobs Mechanical, Inc</p>
+</footer>
+
+<script>
+/* Page router: plain hyphens only in this file. */
+var pageMap = {
+  home: "page-home",
+  services: "page-services",
+  about: "page-about",
+  reviews: "page-reviews",
+  contact: "page-contact"
+};
+
+function setActiveNav(page){
+  var links = document.querySelectorAll('[data-page]');
+  links.forEach(function(a){
+    if(a.getAttribute('data-page') === page){ a.classList.add('active'); }
+    else { a.classList.remove('active'); }
+  });
+  var dialLinks = document.querySelectorAll('#dialnav a[data-page]');
+  dialLinks.forEach(function(a){
+    if(a.getAttribute('data-page') === page){
+      var angle = parseFloat(a.getAttribute('data-angle')) || 0;
+      document.getElementById('dialNeedle').style.transform = 'rotate(' + angle + 'deg) translateY(-62px)';
+    }
+  });
+}
+
+function navigateTo(page, push){
+  if(!pageMap[page]){ page = 'home'; }
+  document.querySelectorAll('.page').forEach(function(s){ s.classList.remove('active'); });
+  var target = document.getElementById(pageMap[page]);
+  if(target){ target.classList.add('active'); }
+  setActiveNav(page);
+  if(push !== false){
+    try { history.pushState({page: page}, '', '#' + page); } catch(e) {}
+  }
+  document.getElementById('mobileMenu').classList.remove('open');
+  window.scrollTo(0, 0);
+}
+
+/* Position dial links around the circle */
+(function layoutDial(){
+  var nav = document.getElementById('dialnav');
+  if(!nav) return;
+  var R = 68;
+  nav.querySelectorAll('a[data-page]').forEach(function(a){
+    var angle = parseFloat(a.getAttribute('data-angle')) || 0;
+    var rad = (angle - 90) * Math.PI / 180;
+    var x = Math.cos(rad) * R, y = Math.sin(rad) * R;
+    a.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)';
+  });
+  /* ticks */
+  for(var i = 0; i < 12; i++){
+    var t = document.createElement('div');
+    t.className = 'dial-tick';
+    t.style.transform = 'rotate(' + (i * 30) + 'deg) translateY(-78px)';
+    nav.appendChild(t);
+  }
+})();
+
+/* Bind nav clicks to router only */
+document.querySelectorAll('a[data-page]').forEach(function(a){
+  a.addEventListener('click', function(ev){
+    ev.preventDefault();
+    navigateTo(a.getAttribute('data-page'));
+  });
+});
+
+/* Mobile hamburger */
+document.getElementById('hamburger').addEventListener('click', function(){
+  document.getElementById('mobileMenu').classList.toggle('open');
+});
+
+/* Back and forward buttons */
+window.addEventListener('popstate', function(ev){
+  var page = (ev.state && ev.state.page) || location.hash.replace('#','') || 'home';
+  navigateTo(page, false);
+});
+
+/* Service form: compose a mailto message */
+document.getElementById('serviceForm').addEventListener('submit', function(ev){
+  ev.preventDefault();
+  var name = document.getElementById('fName').value;
+  var phone = document.getElementById('fPhone').value;
+  var job = document.getElementById('fType').value;
+  var msg = document.getElementById('fMsg').value;
+  var body = 'Name: ' + name + '\nPhone: ' + phone + '\nJob type: ' + job + '\n\n' + msg;
+  window.location.href = 'mailto:?subject=' + encodeURIComponent('Service Request - Jacobs Mechanical') + '&body=' + encodeURIComponent(body);
+});
+
+/* Start on the hash page or home */
+(function init(){
+  var start = location.hash.replace('#','');
+  navigateTo(pageMap[start] ? start : 'home', false);
+})();
+</script>
+</body>
+</html>

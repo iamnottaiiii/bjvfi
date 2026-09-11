@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matt's Masonry | Bricklayer in Cincinnati, OH</title>
+<meta name="description" content="Matt's Masonry: chimney repair, tuckpointing, brick restoration, retaining walls and all masonry work in Cincinnati, OH. Call (513) 764-1330.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Nunito+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+/* Tokens: oxblood, parchment, brass. */
+:root{
+  --oxblood:#5a1016;
+  --oxblood-deep:#3d0a10;
+  --oxblood-soft:#7a1f28;
+  --parchment:#f5ecda;
+  --parchment-deep:#ece0c6;
+  --brass:#b08a3c;
+  --brass-light:#d3b268;
+  --ink:#2a1c12;
+  --cream:#fbf7ec;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Nunito Sans',sans-serif;
+  background:var(--parchment);
+  color:var(--ink);
+  line-height:1.6;
+}
+h1,h2,h3,.serif{font-family:'EB Garamond',serif;color:var(--oxblood)}
+a{color:var(--oxblood-soft)}
+img{max-width:100%}
+
+/* Top bar with hamburger (drawer nav pattern). */
+.topbar{
+  position:sticky;top:0;z-index:900;
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--oxblood-deep);color:var(--parchment);
+  padding:.65rem 1.1rem;
+  box-shadow:0 2px 10px rgba(0,0,0,.35);
+}
+.brand{font-family:'EB Garamond',serif;font-size:1.45rem;letter-spacing:.02em;color:var(--parchment);text-decoration:none}
+.brand i{color:var(--brass-light);margin-right:.45rem}
+.hamburger{
+  background:none;border:2px solid var(--brass);border-radius:6px;
+  color:var(--brass-light);font-size:1.25rem;padding:.35rem .65rem;cursor:pointer;
+}
+.hamburger:hover{background:var(--oxblood)}
+.scrim{
+  position:fixed;inset:0;background:rgba(20,5,8,.55);
+  opacity:0;pointer-events:none;transition:opacity .28s ease;z-index:940;
+}
+body.nav-open .scrim{opacity:1;pointer-events:auto}
+
+/* Drawer slides in from the left. */
+.drawer{
+  position:fixed;top:0;left:0;bottom:0;width:min(320px,86vw);
+  background:linear-gradient(160deg,var(--oxblood-deep),var(--oxblood));
+  color:var(--parchment);z-index:950;
+  transform:translateX(-105%);transition:transform .3s ease;
+  display:flex;flex-direction:column;padding:1.2rem 0;
+  box-shadow:4px 0 24px rgba(0,0,0,.4);
+}
+body.nav-open .drawer{transform:translateX(0)}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:0 1.2rem 1rem;border-bottom:1px solid rgba(211,178,104,.35)}
+.drawer-head .serif{color:var(--brass-light);font-size:1.4rem}
+.drawer-close{background:none;border:none;color:var(--brass-light);font-size:1.4rem;cursor:pointer}
+.drawer nav{display:flex;flex-direction:column;padding:.8rem 0}
+.drawer a.navlink{
+  color:var(--parchment);text-decoration:none;font-size:1.08rem;
+  padding:.8rem 1.4rem;border-left:4px solid transparent;display:flex;gap:.7rem;align-items:center;
+}
+.drawer a.navlink i{color:var(--brass-light);width:1.3rem;text-align:center}
+.drawer a.navlink:hover,.drawer a.navlink.active{background:rgba(211,178,104,.14);border-left-color:var(--brass-light)}
+.drawer-foot{margin-top:auto;padding:1rem 1.2rem;border-top:1px solid rgba(211,178,104,.35);font-size:.9rem;color:var(--brass-light)}
+.drawer-foot a{color:var(--parchment)}
+
+/* Router pages. */
+.page{display:none;max-width:1080px;margin:0 auto;padding:2.2rem 1.2rem 3.5rem}
+.page.active{display:block;animation:fadein .3s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* Ticket stub hero. */
+.ticket-hero{
+  background:var(--cream);border:2px solid var(--oxblood);
+  border-radius:14px;overflow:hidden;margin-bottom:2.4rem;
+  box-shadow:0 10px 28px rgba(90,16,22,.18);
+}
+.ticket-main{padding:2rem 1.8rem;position:relative}
+.ticket-main .kicker{
+  display:inline-block;background:var(--oxblood);color:var(--parchment);
+  font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;
+  padding:.3rem .8rem;border-radius:20px;margin-bottom:.9rem;
+}
+.ticket-main h1{font-size:clamp(2.2rem,6vw,3.6rem);line-height:1.05;margin-bottom:.6rem}
+.ticket-main p.lede{font-size:1.08rem;max-width:34rem;margin-bottom:1.4rem}
+.ticket-cta{display:flex;flex-wrap:wrap;gap:.8rem}
+.btn{
+  display:inline-flex;align-items:center;gap:.5rem;cursor:pointer;text-decoration:none;
+  font-weight:700;font-size:1rem;border-radius:8px;padding:.8rem 1.5rem;border:2px solid var(--oxblood);
+}
+.btn-solid{background:var(--oxblood);color:var(--parchment)}
+.btn-solid:hover{background:var(--oxblood-deep)}
+.btn-line{background:transparent;color:var(--oxblood)}
+.btn-line:hover{background:var(--oxblood);color:var(--parchment)}
+.ticket-perf{
+  height:22px;
+  background-image:radial-gradient(circle at 10px 50%, var(--parchment) 8px, transparent 9px);
+  background-size:26px 22px;background-repeat:repeat-x;
+  border-top:2px dashed var(--brass);
+}
+.ticket-stub{
+  background:var(--oxblood-deep);color:var(--parchment);
+  display:flex;flex-wrap:wrap;gap:1.4rem;align-items:center;justify-content:space-between;
+  padding:1.2rem 1.8rem;
+}
+.stub-item{display:flex;align-items:center;gap:.6rem;font-size:.95rem}
+.stub-item i{color:var(--brass-light)}
+.stub-item a{color:var(--parchment)}
+.stub-seal{
+  font-family:'EB Garamond',serif;font-size:1.6rem;color:var(--brass-light);
+  border:2px dashed var(--brass);border-radius:10px;padding:.2rem 1rem;transform:rotate(-3deg);
+  letter-spacing:.08em;
+}
+
+/* Section titles. */
+.sec-title{text-align:center;margin:0 0 .4rem;font-size:2rem}
+.sec-sub{text-align:center;color:#5d4632;max-width:38rem;margin:0 auto 2rem}
+
+/* Punch list services: each row looks punched off a job list. */
+.punchlist{list-style:none;max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:.9rem}
+.punchlist li{
+  background:var(--cream);border:1px solid var(--brass);border-left:6px solid var(--oxblood);
+  border-radius:6px;padding:1rem 1.2rem 1rem 3.4rem;position:relative;
+  box-shadow:2px 2px 0 rgba(90,16,22,.12);
+}
+.punchlist li::before{
+  content:"";position:absolute;left:1.05rem;top:50%;transform:translateY(-50%);
+  width:1.25rem;height:1.25rem;border-radius:50%;
+  background:var(--parchment);border:2px solid var(--brass);
+  box-shadow:inset 0 2px 4px rgba(0,0,0,.25);
+}
+.punchlist li::after{
+  content:"\f00c";font-family:"Font Awesome 6 Free";font-weight:900;
+  position:absolute;left:1.18rem;top:50%;transform:translateY(-50%) scale(.7);
+  color:var(--oxblood);font-size:1.05rem;
+}
+.punchlist h3{font-size:1.25rem;margin-bottom:.25rem}
+.punchlist p{font-size:.95rem;color:#4c3a28}
+.punch-note{
+  max-width:760px;margin:1.6rem auto 0;text-align:center;font-size:.92rem;
+  background:var(--parchment-deep);border:1px dashed var(--oxblood-soft);
+  padding:.9rem 1.2rem;border-radius:8px;
+}
+.badge{
+  display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  border:1px solid var(--oxblood-soft);color:var(--oxblood-soft);border-radius:4px;
+  padding:.15rem .5rem;margin-left:.5rem;vertical-align:middle;background:#fff8;
+}
+
+/* Value cards. */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.2rem;margin-top:1.6rem}
+.card{
+  background:var(--cream);border:1px solid var(--brass);border-top:5px solid var(--oxblood);
+  border-radius:8px;padding:1.4rem;box-shadow:0 6px 16px rgba(90,16,22,.10);
+}
+.card i{font-size:1.6rem;color:var(--oxblood);margin-bottom:.6rem}
+.card h3{font-size:1.3rem;margin-bottom:.4rem}
+.card p{font-size:.95rem}
+
+/* Ticket gallery: project cards styled as admission tickets. */
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.4rem}
+.ticket-card{
+  background:var(--cream);border:2px solid var(--oxblood);border-radius:12px;overflow:hidden;
+  box-shadow:0 8px 20px rgba(90,16,22,.14);
+}
+.ticket-photo{
+  background:
+    repeating-linear-gradient(45deg,var(--parchment-deep) 0 14px,var(--parchment) 14px 28px);
+  min-height:150px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.4rem;
+  color:var(--oxblood-soft);border-bottom:2px dashed var(--brass);
+}
+.ticket-photo i{font-size:2.4rem}
+.ticket-photo span{font-size:.85rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.ticket-body{padding:1.1rem 1.2rem 1.3rem}
+.ticket-body h3{font-size:1.25rem;margin-bottom:.3rem}
+.ticket-body p{font-size:.93rem;color:#4c3a28}
+.ticket-no{font-size:.75rem;letter-spacing:.2em;color:var(--brass);font-weight:700;text-transform:uppercase}
+
+/* Reviews. */
+.notice{
+  background:var(--cream);border:2px solid var(--brass);border-radius:10px;
+  padding:1.4rem 1.5rem;max-width:720px;margin:0 auto 2rem;text-align:center;
+}
+.notice i{font-size:1.8rem;color:var(--oxblood);margin-bottom:.5rem}
+.review-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.2rem}
+.review-card{
+  background:var(--cream);border:1px solid var(--brass);border-radius:8px;padding:1.3rem;position:relative;
+}
+.review-card .stars{color:var(--brass);margin-bottom:.5rem;letter-spacing:.1em}
+.review-card blockquote{font-family:'EB Garamond',serif;font-size:1.08rem;font-style:italic;margin-bottom:.6rem}
+.review-card .who{font-size:.88rem;color:#5d4632}
+.source-links{max-width:720px;margin:2.2rem auto 0;text-align:center;font-size:.95rem}
+
+/* Contact. */
+.contact-wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.6rem;align-items:start}
+.info-panel{background:var(--cream);border:1px solid var(--brass);border-radius:10px;padding:1.5rem}
+.info-panel h3{font-size:1.35rem;margin-bottom:.8rem}
+.info-row{display:flex;gap:.8rem;align-items:flex-start;margin-bottom:.9rem;font-size:.97rem}
+.info-row i{color:var(--oxblood);margin-top:.2rem;width:1.2rem;text-align:center}
+.hours-table{width:100%;border-collapse:collapse;font-size:.93rem;margin-top:.4rem}
+.hours-table td{padding:.3rem 0;border-bottom:1px dotted var(--brass)}
+.hours-table td:last-child{text-align:right}
+form.contact-form{background:var(--cream);border:1px solid var(--brass);border-radius:10px;padding:1.5rem}
+form.contact-form h3{font-size:1.35rem;margin-bottom:.8rem}
+label{display:block;font-weight:700;font-size:.9rem;margin:.9rem 0 .3rem}
+input,select,textarea{
+  width:100%;padding:.7rem .8rem;border:1px solid var(--brass);border-radius:6px;
+  font-family:'Nunito Sans',sans-serif;font-size:.97rem;background:#fff;
+}
+textarea{min-height:120px;resize:vertical}
+.form-note{font-size:.85rem;color:#5d4632;margin-top:.8rem}
+
+/* Footer: exactly "© Matt's Masonry" and nothing else. */
+footer{
+  background:var(--oxblood-deep);color:var(--parchment);text-align:center;
+  padding:1.4rem 1rem;font-family:'EB Garamond',serif;font-size:1.05rem;
+}
+
+@media(max-width:640px){
+  .ticket-stub{flex-direction:column;align-items:flex-start}
+  .page{padding:1.6rem .9rem 3rem}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="#" data-page="home"><i class="fa-solid fa-trowel-bricks"></i>Matt's Masonry</a>
+  <button class="hamburger" id="hamburger" aria-label="Open navigation menu"><i class="fa-solid fa-bars"></i></button>
+</header>
+
+<div class="scrim" id="scrim"></div>
+
+<aside class="drawer" id="drawer" aria-label="Site navigation">
+  <div class="drawer-head">
+    <span class="serif">Matt's Masonry</span>
+    <button class="drawer-close" id="drawerClose" aria-label="Close navigation menu"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <nav>
+    <a class="navlink active" href="#home" data-page="home"><i class="fa-solid fa-house"></i>Home</a>
+    <a class="navlink" href="#services" data-page="services"><i class="fa-solid fa-list-check"></i>Services</a>
+    <a class="navlink" href="#about" data-page="about"><i class="fa-solid fa-circle-info"></i>About</a>
+    <a class="navlink" href="#reviews" data-page="reviews"><i class="fa-solid fa-star"></i>Reviews</a>
+    <a class="navlink" href="#contact" data-page="contact"><i class="fa-solid fa-envelope"></i>Contact</a>
+  </nav>
+  <div class="drawer-foot">
+    <i class="fa-solid fa-phone"></i> <a href="tel:+15137641330">(513) 764-1330</a><br>
+    <i class="fa-solid fa-location-dot"></i> Cincinnati, OH
+  </div>
+</aside>
+
+<main>
+
+<section class="page active" id="page-home">
+  <div class="ticket-hero">
+    <div class="ticket-main">
+      <span class="kicker">Cincinnati, Ohio Bricklayer</span>
+      <h1>Brickwork Done Right, The First Time</h1>
+      <p class="lede">Chimney repairs, tuckpointing, brick restoration, retaining walls, fireplaces and cultured stone. Twenty years of experience, and every job done by our own crew. Nothing ever subcontracted out.</p>
+      <div class="ticket-cta">
+        <a class="btn btn-solid" href="tel:+15137641330"><i class="fa-solid fa-phone"></i>Call (513) 764-1330</a>
+        <a class="btn btn-line" href="#contact" data-page="contact"><i class="fa-solid fa-envelope"></i>Request an Estimate</a>
+      </div>
+    </div>
+    <div class="ticket-perf" aria-hidden="true"></div>
+    <div class="ticket-stub">
+      <div class="stub-item"><i class="fa-solid fa-clock"></i><span>Open daily, 7:00 AM to 7:00 PM <span class="badge">Call to confirm</span></span></div>
+      <div class="stub-item"><i class="fa-solid fa-bolt"></i><span>Emergency services offered</span></div>
+      <div class="stub-seal">ADMIT ONE</div>
+    </div>
+  </div>
+
+  <h2 class="sec-title">Why Homeowners Call Matt</h2>
+  <p class="sec-sub">Straight from the business listing: two decades in the trade, satisfaction guaranteed, and a crew that shows up and does the work themselves.</p>
+  <div class="cards">
+    <div class="card"><i class="fa-solid fa-user-hard-hat"></i><h3>20 Years Experience</h3><p>Two decades of chimney and masonry work across the Cincinnati area. The listing notes 20 years of experience in the trade.</p></div>
+    <div class="card"><i class="fa-solid fa-handshake"></i><h3>No Subcontractors</h3><p>"We do all our own work, we never sub out work." The crew you hire is the crew that shows up.</p></div>
+    <div class="card"><i class="fa-solid fa-shield-halved"></i><h3>Satisfaction Guaranteed</h3><p>The business advertises satisfaction guaranteed on every job, backed by emergency service availability.</p></div>
+    <div class="card"><i class="fa-solid fa-fire"></i><h3>Chimney Specialists</h3><p>Chimney repairs, chimney caps, and full teardowns with relay work are core specialties, along with brick restoration.</p></div>
+  </div>
+</section>
+
+
+<section class="page" id="page-services">
+  <h2 class="sec-title">The Punch List</h2>
+  <p class="sec-sub">Every service below comes straight from the business listing. If it is masonry, it is on the list. One thing they do not take on: roofing.</p>
+  <ul class="punchlist">
+    <li><h3>Chimney Repairs</h3><p>Leaks, spalling brick, damaged flues and worn mortar joints repaired to keep your chimney safe and draft-ready.</p></li>
+    <li><h3>Chimney Caps</h3><p>Caps fitted to keep rain, animals and debris out of the flue, extending the life of the whole chimney.</p></li>
+    <li><h3>Teardown and Relay</h3><p>Chimneys too far gone for patching are taken down and rebuilt course by course.</p></li>
+    <li><h3>Tuckpointing</h3><p>Old, crumbling mortar raked out and replaced so brickwork looks sharp and stays watertight.</p></li>
+    <li><h3>Brick Restoration</h3><p>Historic and damaged brickwork restored with care to match the original look. Listed as a specialty.</p></li>
+    <li><h3>Retaining Walls</h3><p>Sturdy block and stone retaining walls built to hold grade and dress up the landscape.</p></li>
+    <li><h3>Fireplaces</h3><p>Masonry fireplaces built or repaired, indoors and out.</p></li>
+    <li><h3>Block Work</h3><p>Concrete block walls and foundations, laid plumb and true.</p></li>
+    <li><h3>Cultured Stone</h3><p>Cultured stone veneer installed for the look of natural stone without the weight or cost. <span class="badge">Sample</span></p></li>
+  </ul>
+  <p class="punch-note">Pricing, scheduling and senior discounts vary, so <strong>call to confirm</strong> before booking. The listing mentions a senior discount and free estimates, but details were not independently verified. <a href="tel:+15137641330">(513) 764-1330</a></p>
+</section>
+
+
+<section class="page" id="page-about">
+  <h2 class="sec-title">About Matt's Masonry</h2>
+  <p class="sec-sub">A Cincinnati bricklayer with twenty years in the trade, based on Deshler Drive.</p>
+  <div class="contact-wrap">
+    <div class="info-panel">
+      <h3>The Business</h3>
+      <div class="info-row"><i class="fa-solid fa-location-dot"></i><span>Matt's Masonry, 3175 Deshler Dr, Cincinnati, OH 45251</span></div>
+      <div class="info-row"><i class="fa-solid fa-phone"></i><span><a href="tel:+15137641330">(513) 764-1330</a></span></div>
+      <div class="info-row"><i class="fa-solid fa-trowel-bricks"></i><span>Category: Bricklayer, chimney repair, masonry restoration</span></div>
+      <div class="info-row"><i class="fa-solid fa-circle-check"></i><span>Listing reports the business as insured. Emergency services offered. <span class="badge">Call to confirm</span></span></div>
+    </div>
+    <div class="info-panel">
+      <h3>How They Work</h3>
+      <p style="margin-bottom:.8rem">Per the business listing: "free estimates, 10% discount seniors, 20 years experience, we do all our own work, we never sub out work, satisfaction guaranteed."</p>
+      <p>Payment methods listed: check. <span class="badge">Call to confirm</span></p>
+    </div>
+  </div>
+  <h2 class="sec-title" style="margin-top:2.6rem">Recent Work</h2>
+  <p class="sec-sub">Project gallery. Photos of actual jobs have not been published, so these tickets are placeholders.</p>
+  <div class="gallery">
+    <div class="ticket-card"><div class="ticket-photo"><i class="fa-solid fa-fire"></i><span>Photo coming soon</span></div><div class="ticket-body"><div class="ticket-no">Job 001</div><h3>Chimney Repair</h3><p>Example of the chimney and flue repair work offered in Cincinnati. <span class="badge">Sample</span></p></div></div>
+    <div class="ticket-card"><div class="ticket-photo"><i class="fa-solid fa-layer-group"></i><span>Photo coming soon</span></div><div class="ticket-body"><div class="ticket-no">Job 002</div><h3>Tuckpointing</h3><p>Mortar joint renewal on brick homes and commercial walls. <span class="badge">Sample</span></p></div></div>
+    <div class="ticket-card"><div class="ticket-photo"><i class="fa-solid fa-landmark"></i><span>Photo coming soon</span></div><div class="ticket-body"><div class="ticket-no">Job 003</div><h3>Brick Restoration</h3><p>Restoration work on aging and historic brickwork. <span class="badge">Sample</span></p></div></div>
+    <div class="ticket-card"><div class="ticket-photo"><i class="fa-solid fa-border-all"></i><span>Photo coming soon</span></div><div class="ticket-body"><div class="ticket-no">Job 004</div><h3>Retaining Wall</h3><p>Block and stone retaining walls for homes and yards. <span class="badge">Sample</span></p></div></div>
+  </div>
+</section>
+
+
+<section class="page" id="page-reviews">
+  <h2 class="sec-title">Reviews</h2>
+  <p class="sec-sub">What customers say about Matt's Masonry.</p>
+  <div class="notice">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <h3 style="margin-bottom:.4rem">No public reviews found yet</h3>
+    <p>We searched public review sources and could not find any published customer reviews for Matt's Masonry. The Angi listing for this business shows no reviews and notes the pro is new to the platform. The cards below are <strong>examples only</strong> of how reviews would appear here.</p>
+  </div>
+  <div class="review-grid">
+    <div class="review-card"><span class="badge">Sample</span><div class="stars" style="margin-top:.6rem"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div><blockquote>Sample review text would appear here once real customer reviews are published.</blockquote><p class="who">Example reviewer, not a real customer</p></div>
+    <div class="review-card"><span class="badge">Sample</span><div class="stars" style="margin-top:.6rem"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star"></i></div><blockquote>Sample review text would appear here once real customer reviews are published.</blockquote><p class="who">Example reviewer, not a real customer</p></div>
+    <div class="review-card"><span class="badge">Sample</span><div class="stars" style="margin-top:.6rem"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i></div><blockquote>Sample review text would appear here once real customer reviews are published.</blockquote><p class="who">Example reviewer, not a real customer</p></div>
+  </div>
+  <div class="source-links">
+    <p><strong>Verified source:</strong> <a href="https://www.angi.com/companylist/us/oh/cincinnati/matt%27s-masonry-reviews-7606026.htm" target="_blank" rel="noopener">Matt's Masonry on Angi</a> (listing verified, no reviews posted there yet).</p>
+    <p style="margin-top:.6rem">Had work done by Matt's Masonry? Call <a href="tel:+15137641330">(513) 764-1330</a> and ask how to leave a review.</p>
+  </div>
+</section>
+
+
+<section class="page" id="page-contact">
+  <h2 class="sec-title">Get In Touch</h2>
+  <p class="sec-sub">Call for the fastest response, or send a message and the business will get back to you.</p>
+  <div class="contact-wrap">
+    <div class="info-panel">
+      <h3>Contact Details</h3>
+      <div class="info-row"><i class="fa-solid fa-phone"></i><span><a href="tel:+15137641330">(513) 764-1330</a></span></div>
+      <div class="info-row"><i class="fa-solid fa-location-dot"></i><span>Matt's Masonry, 3175 Deshler Dr, Cincinnati, OH 45251</span></div>
+      <div class="info-row"><i class="fa-solid fa-diamond-turn-right"></i><span><a href="https://www.google.com/maps/search/?api=1&query=Matt%27s%20Masonry%2C%203175%20Deshler%20Dr%2C%20Cincinnati%2C%20OH%2045251" target="_blank" rel="noopener">Get directions on Google Maps</a></span></div>
+      <h3 style="margin-top:1.2rem">Hours <span class="badge">Call to confirm</span></h3>
+      <table class="hours-table">
+        <tr><td>Monday</td><td>7:00 AM - 7:00 PM</td></tr>
+        <tr><td>Tuesday</td><td>7:00 AM - 7:00 PM</td></tr>
+        <tr><td>Wednesday</td><td>7:00 AM - 7:00 PM</td></tr>
+        <tr><td>Thursday</td><td>7:00 AM - 7:00 PM</td></tr>
+        <tr><td>Friday</td><td>7:00 AM - 7:00 PM</td></tr>
+        <tr><td>Saturday</td><td>7:00 AM - 7:00 PM</td></tr>
+        <tr><td>Sunday</td><td>7:00 AM - 7:00 PM</td></tr>
+      </table>
+    </div>
+    <form class="contact-form" id="contactForm">
+      <h3>Request an Estimate</h3>
+      <label for="cf-name">Name</label>
+      <input id="cf-name" name="name" type="text" required autocomplete="name">
+      <label for="cf-phone">Phone</label>
+      <input id="cf-phone" name="phone" type="tel" required autocomplete="tel">
+      <label for="cf-service">Service needed</label>
+      <select id="cf-service" name="service">
+        <option>Chimney repair</option>
+        <option>Tuckpointing</option>
+        <option>Brick restoration</option>
+        <option>Retaining wall</option>
+        <option>Fireplace</option>
+        <option>Chimney cap</option>
+        <option>Other masonry work</option>
+      </select>
+      <label for="cf-msg">Project details</label>
+      <textarea id="cf-msg" name="message" required placeholder="Tell us about the job: what needs work, where, and when."></textarea>
+      <button class="btn btn-solid" type="submit" style="margin-top:1rem;width:100%;justify-content:center"><i class="fa-solid fa-paper-plane"></i>Send Message</button>
+      <p class="form-note">This opens your email app with the message addressed and ready. No business email is published online, so the recipient field is left for you to fill in, or just call <a href="tel:+15137641330">(513) 764-1330</a>.</p>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer>© Matt's Masonry</footer>
+
+<script>
+// Data-page router.
+var pages = document.querySelectorAll('.page');
+var navlinks = document.querySelectorAll('[data-page]');
+function navigateTo(name){
+  var found = false;
+  pages.forEach(function(p){
+    var on = p.id === 'page-' + name;
+    p.classList.toggle('active', on);
+    if(on) found = true;
+  });
+  if(!found) return;
+  navlinks.forEach(function(a){
+    a.classList.toggle('active', a.getAttribute('data-page') === name);
+  });
+  if(window.location.hash !== '#' + name){
+    history.pushState({page:name}, '', '#' + name);
+  }
+  document.body.classList.remove('nav-open');
+  window.scrollTo(0, 0);
+}
+navlinks.forEach(function(a){
+  a.addEventListener('click', function(e){
+    e.preventDefault();
+    navigateTo(a.getAttribute('data-page'));
+  });
+});
+window.addEventListener('popstate', function(e){
+  var name = (e.state && e.state.page) || window.location.hash.replace('#','') || 'home';
+  navigateTo(name);
+});
+(function(){
+  var initial = window.location.hash.replace('#','');
+  if(initial && document.getElementById('page-' + initial)){ navigateTo(initial); }
+})();
+
+// Drawer (slide nav) controls.
+var hamburger = document.getElementById('hamburger');
+var drawer = document.getElementById('drawer');
+var drawerClose = document.getElementById('drawerClose');
+var scrim = document.getElementById('scrim');
+function openNav(){ document.body.classList.add('nav-open'); }
+function closeNav(){ document.body.classList.remove('nav-open'); }
+hamburger.addEventListener('click', function(e){ e.stopPropagation(); openNav(); });
+drawerClose.addEventListener('click', closeNav);
+scrim.addEventListener('click', closeNav);
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape'){ closeNav(); }
+});
+
+// Contact form: compose a mailto draft (no invented email address).
+document.getElementById('contactForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  var name = document.getElementById('cf-name').value.trim();
+  var phone = document.getElementById('cf-phone').value.trim();
+  var service = document.getElementById('cf-service').value;
+  var msg = document.getElementById('cf-msg').value.trim();
+  var subject = encodeURIComponent('Estimate request: ' + service + ' (Matt\'s Masonry website)');
+  var body = encodeURIComponent('Name: ' + name + '\nPhone: ' + phone + '\nService: ' + service + '\n\n' + msg);
+  window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
+});
+</script>
+</body>
+</html>

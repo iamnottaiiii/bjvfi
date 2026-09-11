@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TW Development Group | Commercial Real Estate Developer, Cincinnati OH</title>
+<meta name="description" content="TW Development Group works with corporate clients of all sizes to develop customized, high performance facilities throughout the United States. Based in Cincinnati, Ohio.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+/* TW Development Group demo site. Industrial blueprint design system. */
+:root{
+  --ink:#0e1822;
+  --steel:#23394e;
+  --blue:#17456b;
+  --paper:#f5f2eb;
+  --concrete:#e4ded1;
+  --amber:#d97e1f;
+  --amber-dark:#b0620f;
+  --white:#ffffff;
+  --mut:#5c6b7a;
+  --line:#d8d2c2;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',system-ui,sans-serif;
+  background:var(--paper);
+  color:var(--ink);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+img,svg{max-width:100%}
+a{color:inherit}
+::selection{background:var(--amber);color:var(--ink)}
+
+/* mono labels and display type */
+.eyebrow{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--amber-dark);font-weight:600;
+}
+h1,h2,h3,.display{font-family:'Anton',sans-serif;font-weight:400;letter-spacing:.01em;line-height:1.05;text-transform:uppercase}
+
+/* top bar */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:60;
+  height:76px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 22px;background:var(--ink);color:var(--paper);
+  border-bottom:3px solid var(--amber);
+}
+.brand{display:flex;align-items:center;gap:14px;cursor:pointer;background:none;border:none;color:inherit;text-align:left;font:inherit}
+.medallion{
+  width:52px;height:52px;border-radius:50%;flex:none;
+  border:2px solid var(--amber);display:flex;align-items:center;justify-content:center;
+  font-family:'Anton',sans-serif;font-size:1.15rem;letter-spacing:.05em;
+  background:radial-gradient(circle at 35% 30%, #2c4a63, var(--ink));
+  color:var(--paper);position:relative;
+}
+.medallion::after{
+  content:"";position:absolute;inset:5px;border-radius:50%;border:1px dashed rgba(217,126,31,.55);
+}
+.brand-name{font-family:'Anton',sans-serif;font-size:1.05rem;letter-spacing:.06em;text-transform:uppercase;line-height:1.15}
+.brand-name small{display:block;font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.3em;color:var(--amber);font-weight:600}
+.menu-toggle{
+  width:56px;height:56px;border-radius:50%;border:2px solid var(--amber);
+  background:var(--amber);color:var(--ink);font-size:1.25rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:transform .25s ease, background .25s ease;
+}
+.menu-toggle:hover{transform:rotate(90deg);background:var(--amber-dark);color:var(--white)}
+.menu-toggle.open{background:var(--paper);color:var(--ink)}
+
+/* circular radial menu overlay */
+.radial{
+  position:fixed;inset:0;z-index:55;background:rgba(14,24,34,.96);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .35s ease;
+}
+.radial.open{opacity:1;pointer-events:auto}
+.radial-hub{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:132px;height:132px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #2c4a63, var(--ink));
+  border:3px solid var(--amber);color:var(--paper);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-family:'Anton',sans-serif;font-size:1.6rem;letter-spacing:.05em;z-index:2;
+}
+.radial-hub span{font-family:'IBM Plex Mono',monospace;font-size:.55rem;letter-spacing:.28em;color:var(--amber);margin-top:4px}
+.radial-ring{
+  position:absolute;left:50%;top:50%;border:1px dashed rgba(217,126,31,.35);border-radius:50%;
+  width:0;height:0;transform:translate(-50%,-50%);transition:width .4s ease,height .4s ease;pointer-events:none;
+}
+.radial-link{
+  position:absolute;left:50%;top:50%;width:118px;height:118px;border-radius:50%;
+  background:var(--paper);color:var(--ink);border:2px solid var(--amber);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  text-decoration:none;font-weight:700;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;
+  transform:translate(-50%,-50%) scale(.4);opacity:0;transition:opacity .3s ease, transform .3s ease, background .2s ease;
+  text-align:center;padding:10px;
+}
+.radial.open .radial-link{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.radial-link i{font-size:1.3rem;color:var(--amber-dark)}
+.radial-link:hover{background:var(--amber);color:var(--ink)}
+.radial-link:hover i{color:var(--ink)}
+.radial-hint{
+  position:absolute;bottom:34px;left:0;right:0;text-align:center;
+  font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.3em;color:var(--mut);text-transform:uppercase;
+}
+
+/* pages */
+main{padding-top:76px}
+.page{display:none}
+.page.active{display:block;animation:pageIn .45s ease}
+@keyframes pageIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+section.block{padding:84px 0}
+
+/* half screen split hero */
+.hero{
+  display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - 76px);
+  background:var(--ink);color:var(--paper);
+}
+.hero-copy{
+  display:flex;flex-direction:column;justify-content:center;
+  padding:70px 56px 70px 8vw;position:relative;overflow:hidden;
+}
+.hero-copy::before{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.14;
+  background-image:linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px);
+  background-size:44px 44px;
+}
+.hero-copy>*{position:relative}
+.hero h1{font-size:clamp(2.6rem,5.2vw,4.6rem);margin:18px 0 22px}
+.hero h1 .accent{color:var(--amber)}
+.hero p.lede{font-size:1.08rem;color:#c9d3dc;max-width:34rem;margin-bottom:34px}
+.hero-ctas{display:flex;gap:14px;flex-wrap:wrap}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;cursor:pointer;
+  font-weight:700;font-size:.86rem;letter-spacing:.1em;text-transform:uppercase;
+  padding:15px 26px;border:2px solid var(--amber);transition:all .22s ease;font-family:inherit;
+}
+.btn-solid{background:var(--amber);color:var(--ink)}
+.btn-solid:hover{background:var(--amber-dark);border-color:var(--amber-dark);color:var(--white)}
+.btn-ghost{background:transparent;color:var(--paper)}
+.btn-ghost:hover{background:var(--paper);color:var(--ink)}
+.btn-dark{background:var(--ink);color:var(--paper)}
+.btn-dark:hover{background:var(--steel)}
+.hero-visual{
+  position:relative;overflow:hidden;
+  background:
+    radial-gradient(circle at 70% 20%, rgba(217,126,31,.25), transparent 55%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0 1px, transparent 1px 40px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 1px, transparent 1px 40px);
+  background-color:#12263a;
+  display:flex;align-items:flex-end;justify-content:center;
+  border-left:3px solid var(--amber);
+}
+.spec-card{
+  position:absolute;background:var(--paper);color:var(--ink);padding:14px 18px;
+  font-family:'IBM Plex Mono',monospace;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;
+  border-left:6px solid var(--amber);box-shadow:0 12px 30px rgba(0,0,0,.45);
+}
+.spec-card b{display:block;font-family:'Anton',sans-serif;font-size:1.5rem;letter-spacing:.03em}
+.spec-a{top:12%;right:8%;animation:float 6s ease-in-out infinite}
+.spec-b{top:38%;left:6%;animation:float 7.5s ease-in-out infinite reverse}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+
+/* stat strip */
+.stats{background:var(--amber);color:var(--ink);border-top:3px solid var(--ink);border-bottom:3px solid var(--ink)}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);max-width:1180px;margin:0 auto}
+.stat{padding:26px 22px;border-left:3px solid var(--ink)}
+.stat:first-child{border-left:none}
+.stat b{font-family:'Anton',sans-serif;font-size:2rem;display:block;letter-spacing:.02em}
+.stat span{font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase}
+.stats-note{max-width:1180px;margin:0 auto;padding:10px 22px 16px;font-family:'IBM Plex Mono',monospace;font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;opacity:.75}
+
+/* section headers */
+.sec-head{margin-bottom:44px}
+.sec-head h2{font-size:clamp(2rem,4vw,3.2rem);margin:14px 0 10px}
+.sec-head h2 .accent{color:var(--amber-dark)}
+.sec-head p{color:var(--mut);max-width:44rem}
+.rule{width:72px;height:6px;background:var(--amber);margin-top:18px}
+
+/* expandable rows */
+.rows{border-top:3px solid var(--ink)}
+.row{border-bottom:3px solid var(--ink);background:var(--paper)}
+.row-head{
+  width:100%;background:none;border:none;cursor:pointer;font:inherit;color:inherit;text-align:left;
+  display:grid;grid-template-columns:70px 1fr auto;align-items:center;gap:18px;
+  padding:24px 10px;transition:background .2s ease;
+}
+.row-head:hover{background:var(--concrete)}
+.row-num{font-family:'Anton',sans-serif;font-size:1.6rem;color:var(--amber-dark)}
+.row-title{font-family:'Anton',sans-serif;font-size:clamp(1.15rem,2.4vw,1.7rem);text-transform:uppercase;letter-spacing:.03em}
+.row-sub{font-size:.85rem;color:var(--mut);margin-top:4px;font-family:'Inter',sans-serif;letter-spacing:0;text-transform:none}
+.row-icon{
+  width:46px;height:46px;border-radius:50%;border:2px solid var(--ink);flex:none;
+  display:flex;align-items:center;justify-content:center;font-size:1rem;transition:transform .3s ease, background .3s ease;
+}
+.row.open .row-icon{transform:rotate(45deg);background:var(--amber);border-color:var(--amber)}
+.row-body{max-height:0;overflow:hidden;transition:max-height .45s ease}
+.row-inner{padding:6px 10px 34px 88px;display:grid;grid-template-columns:1fr 1fr;gap:26px}
+.row-inner p{color:#3c4a57;font-size:.96rem}
+.row-inner ul{list-style:none;margin-top:12px}
+.row-inner li{padding:8px 0 8px 28px;position:relative;font-size:.92rem;color:#3c4a57;border-top:1px solid var(--line)}
+.row-inner li i{position:absolute;left:2px;top:12px;color:var(--amber-dark)}
+
+/* values cards */
+.values{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:10px}
+.value-card{background:var(--ink);color:var(--paper);padding:34px 28px;border-top:6px solid var(--amber);position:relative;overflow:hidden}
+.value-card::after{content:"";position:absolute;inset:0;opacity:.1;pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,.6) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.6) 1px,transparent 1px);
+  background-size:30px 30px}
+.value-card i{font-size:1.8rem;color:var(--amber);margin-bottom:16px}
+.value-card h3{font-size:1.25rem;margin-bottom:10px;position:relative}
+.value-card p{font-size:.92rem;color:#c9d3dc;position:relative}
+
+/* filmstrip gallery */
+.film{background:var(--ink);padding:70px 0 84px;color:var(--paper);position:relative}
+.film .wrap{position:relative}
+.strip-frame{position:relative;padding:34px 0}
+.strip-frame::before,.strip-frame::after{
+  content:"";position:absolute;left:0;right:0;height:26px;
+  background-image:radial-gradient(circle, var(--paper) 5px, transparent 6px);
+  background-size:44px 26px;background-repeat:repeat-x;background-position:center;
+}
+.strip-frame::before{top:0}
+.strip-frame::after{bottom:0}
+.strip{display:flex;gap:26px;overflow-x:auto;scroll-snap-type:x mandatory;padding:18px 4px;scrollbar-width:thin}
+.frame{
+  flex:0 0 330px;scroll-snap-align:start;background:var(--paper);color:var(--ink);
+  border:2px solid var(--line);display:flex;flex-direction:column;
+}
+.frame-art{height:210px;position:relative;overflow:hidden;flex:none}
+.frame-body{padding:22px 22px 24px;display:flex;flex-direction:column;gap:10px;flex:1}
+.frame-body h3{font-size:1.3rem}
+.frame-body p{font-size:.9rem;color:#3c4a57}
+.frame-meta{font-family:'IBM Plex Mono',monospace;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+.frame-foot{margin-top:auto;padding-top:12px;display:flex;justify-content:space-between;align-items:center}
+.badge{
+  display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:.62rem;font-weight:600;
+  letter-spacing:.16em;text-transform:uppercase;padding:5px 10px;border:2px solid var(--ink);
+}
+.badge-amber{background:var(--amber);border-color:var(--amber-dark);color:var(--ink)}
+.badge-line{background:transparent;color:var(--mut);border-color:var(--mut)}
+.film-nav{display:flex;gap:12px;margin-top:26px}
+.film-btn{
+  width:54px;height:54px;border-radius:50%;border:2px solid var(--amber);background:transparent;color:var(--amber);
+  font-size:1.1rem;cursor:pointer;transition:all .2s ease;
+}
+.film-btn:hover{background:var(--amber);color:var(--ink)}
+
+/* about */
+.about-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:50px;align-items:start}
+.about-grid p{margin-bottom:16px;color:#2c3947}
+.expertise{background:var(--ink);color:var(--paper);padding:36px 32px;border-top:6px solid var(--amber)}
+.expertise h3{font-size:1.4rem;margin-bottom:18px}
+.expertise ul{list-style:none}
+.expertise li{padding:12px 0;border-top:1px solid #33475c;display:flex;gap:14px;align-items:center;font-size:.94rem}
+.expertise li i{color:var(--amber);width:20px;text-align:center}
+.fact-list{margin-top:26px;border:3px solid var(--ink)}
+.fact-list dt{font-family:'IBM Plex Mono',monospace;font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--mut);padding:14px 20px 0}
+.fact-list dd{padding:4px 20px 14px;font-weight:600}
+
+/* reviews */
+.rating-hero{background:var(--ink);color:var(--paper);padding:56px 0;border-top:3px solid var(--amber);border-bottom:3px solid var(--amber)}
+.rating-grid{display:grid;grid-template-columns:auto 1fr;gap:44px;align-items:center;max-width:1180px;margin:0 auto;padding:0 22px}
+.big-score{font-family:'Anton',sans-serif;font-size:5.5rem;line-height:1;color:var(--amber)}
+.rating-grid p{color:#c9d3dc;max-width:40rem}
+.stars{color:var(--amber);font-size:1.4rem;letter-spacing:.3em;margin:10px 0}
+.review-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:44px}
+.review-card{background:var(--white);border:2px solid var(--line);padding:28px;position:relative}
+.review-card .badge{position:absolute;top:-14px;right:18px}
+.review-card .stars{font-size:1rem;margin:0 0 12px}
+.review-card p{font-size:.92rem;color:#3c4a57;font-style:italic}
+.review-card cite{display:block;margin-top:14px;font-style:normal;font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+
+/* contact */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:start}
+.contact-card{background:var(--ink);color:var(--paper);padding:40px 36px;border-top:6px solid var(--amber)}
+.contact-card h3{font-size:1.5rem;margin-bottom:20px}
+.contact-line{display:flex;gap:16px;align-items:flex-start;padding:16px 0;border-top:1px solid #33475c}
+.contact-line i{color:var(--amber);font-size:1.2rem;margin-top:4px;width:24px;text-align:center}
+.contact-line b{display:block;font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.22em;text-transform:uppercase;color:#9fb0bf;margin-bottom:4px}
+.contact-line a{color:var(--paper);text-decoration:none;font-weight:600;font-size:1.05rem}
+.contact-line a:hover{color:var(--amber)}
+.contact-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+form.inquiry{background:var(--white);border:3px solid var(--ink);padding:36px 32px}
+form.inquiry h3{font-size:1.5rem;margin-bottom:6px}
+form.inquiry>p{font-size:.88rem;color:var(--mut);margin-bottom:22px}
+.field{margin-bottom:16px}
+.field label{display:block;font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+.field input,.field select,.field textarea{
+  width:100%;padding:13px 14px;border:2px solid var(--line);font:inherit;font-size:.95rem;background:var(--paper);color:var(--ink);
+}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--amber)}
+.field textarea{min-height:130px;resize:vertical}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-note{font-size:.8rem;color:var(--mut);margin-top:14px}
+
+/* footer */
+footer{background:var(--ink);color:var(--paper);text-align:center;padding:30px 20px;border-top:3px solid var(--amber)}
+footer p{font-family:'IBM Plex Mono',monospace;font-size:.78rem;letter-spacing:.14em}
+
+/* toast */
+.toast{
+  position:fixed;bottom:26px;left:50%;transform:translate(-50%,120px);z-index:80;
+  background:var(--ink);color:var(--paper);border:2px solid var(--amber);
+  padding:14px 22px;font-size:.88rem;font-weight:600;transition:transform .35s ease;max-width:90vw;text-align:center;
+}
+.toast.show{transform:translate(-50%,0)}
+
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr;min-height:0}
+  .hero-copy{padding:60px 26px}
+  .hero-visual{min-height:340px;border-left:none;border-top:3px solid var(--amber)}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .stat:nth-child(3){border-left:none}
+  .stat{border-top:3px solid var(--ink)}
+  .stat:nth-child(1),.stat:nth-child(2){border-top:none}
+  .values{grid-template-columns:1fr}
+  .about-grid,.contact-grid{grid-template-columns:1fr}
+  .row-inner{grid-template-columns:1fr;padding-left:10px}
+  .review-cards{grid-template-columns:1fr}
+  .rating-grid{grid-template-columns:1fr}
+  .field-row{grid-template-columns:1fr}
+  .radial-link{width:104px;height:104px;font-size:.68rem}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <button class="brand" data-page="home" aria-label="TW Development Group home">
+    <span class="medallion">TW</span>
+    <span class="brand-name">TW Development Group<small>Commercial Real Estate</small></span>
+  </button>
+  <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false">
+    <i class="fa-solid fa-bars"></i>
+  </button>
+</header>
+
+
+<div class="radial" id="radial" aria-hidden="true">
+  <div class="radial-ring" id="radialRing"></div>
+  <div class="radial-hub">TW<span>Menu</span></div>
+  <a class="radial-link" href="#home" data-page="home"><i class="fa-solid fa-house"></i>Home</a>
+  <a class="radial-link" href="#projects" data-page="projects"><i class="fa-solid fa-building"></i>Projects</a>
+  <a class="radial-link" href="#about" data-page="about"><i class="fa-solid fa-circle-info"></i>About</a>
+  <a class="radial-link" href="#reviews" data-page="reviews"><i class="fa-solid fa-star"></i>Reviews</a>
+  <a class="radial-link" href="#contact" data-page="contact"><i class="fa-solid fa-phone"></i>Contact</a>
+  <p class="radial-hint">Select a section</p>
+</div>
+
+<main>
+
+
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow">Commercial Real Estate Developer / Cincinnati, Ohio</p>
+      <h1>High performance facilities, <span class="accent">built around your business.</span></h1>
+      <p class="lede">TW Development Group works with corporate clients of all sizes to develop customized, high performance facilities throughout the United States. Budget discipline and condensed schedules are where this team does its best work.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-solid" href="#projects" data-page="projects">Explore capabilities <i class="fa-solid fa-arrow-right"></i></a>
+        <a class="btn btn-ghost" href="tel:+15135020078"><i class="fa-solid fa-phone"></i> (513) 502-0078</a>
+      </div>
+    </div>
+    <div class="hero-visual" aria-hidden="true">
+      <svg viewBox="0 0 600 420" width="100%" height="100%" preserveAspectRatio="xMidYMax slice" style="position:absolute;inset:0">
+        <g fill="#0e1822" stroke="#d97e1f" stroke-width="2">
+          <rect x="40" y="180" width="90" height="240"/>
+          <rect x="150" y="120" width="110" height="300"/>
+          <rect x="280" y="200" width="80" height="220"/>
+          <rect x="380" y="90" width="120" height="330"/>
+          <rect x="520" y="220" width="60" height="200"/>
+        </g>
+        <g fill="#d97e1f" opacity=".85">
+          <rect x="165" y="140" width="14" height="14"/><rect x="190" y="140" width="14" height="14"/><rect x="215" y="140" width="14" height="14"/>
+          <rect x="165" y="170" width="14" height="14"/><rect x="190" y="170" width="14" height="14"/><rect x="215" y="170" width="14" height="14"/>
+          <rect x="395" y="110" width="14" height="14"/><rect x="420" y="110" width="14" height="14"/><rect x="445" y="110" width="14" height="14"/>
+          <rect x="395" y="140" width="14" height="14"/><rect x="420" y="140" width="14" height="14"/><rect x="445" y="140" width="14" height="14"/>
+          <rect x="395" y="170" width="14" height="14"/><rect x="420" y="170" width="14" height="14"/><rect x="445" y="170" width="14" height="14"/>
+        </g>
+        <g stroke="#d97e1f" stroke-width="3" opacity=".9">
+          <line x1="440" y1="90" x2="440" y2="40"/><line x1="420" y1="40" x2="460" y2="40"/>
+        </g>
+        <rect x="0" y="415" width="600" height="5" fill="#d97e1f"/>
+      </svg>
+      <div class="spec-card spec-a"><b>87,000</b>sq ft distribution facility</div>
+      <div class="spec-card spec-b"><b>$8.3M</b>interior build out</div>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stats-grid">
+      <div class="stat"><b>87,000</b><span>Sq ft Kettering facility repositioned</span></div>
+      <div class="stat"><b>$8.3M</b><span>Interior build out investment</span></div>
+      <div class="stat"><b>750</b><span>New parking spaces created</span></div>
+      <div class="stat"><b>32,000</b><span>Sq ft Hamilton Ave repositioning</span></div>
+    </div>
+    <p class="stats-note">Figures drawn from public project reporting, see Projects page</p>
+  </div>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">How we work</p>
+        <h2>Decades of experience, <span class="accent">one measured approach.</span></h2>
+        <p>Project budgets and condensed schedules are often the deciding factors when a company chooses a development partner. TW Development excels at managing both, from site selection through delivery.</p>
+        <div class="rule"></div>
+      </div>
+      <div class="values">
+        <div class="value-card">
+          <i class="fa-solid fa-handshake"></i>
+          <h3>Client first</h3>
+          <p>Dedication and commitment to the needs of clients above all else, from the first site tour to final delivery.</p>
+        </div>
+        <div class="value-card">
+          <i class="fa-solid fa-award"></i>
+          <h3>Excellence</h3>
+          <p>The highest levels of excellence in every project, regardless of schedule demands, budget constraints, or location.</p>
+        </div>
+        <div class="value-card">
+          <i class="fa-solid fa-scale-balanced"></i>
+          <h3>Integrity</h3>
+          <p>Demonstrated honesty and integrity in all that we do, so the entire decision making process stays seamless and straightforward.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+
+<section class="page" id="page-projects">
+  <section class="block">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Capabilities</p>
+        <h2>What we <span class="accent">develop.</span></h2>
+        <p>Facility types from the company's stated project history. Select a row to see how a typical engagement works.</p>
+        <div class="rule"></div>
+      </div>
+      <div class="rows" id="capRows">
+        <div class="row">
+          <button class="row-head" aria-expanded="false">
+            <span class="row-num">01</span>
+            <span><span class="row-title">Corporate Headquarters</span><span class="row-sub">Custom facilities planned around a corporate client's exact program.</span></span>
+            <span class="row-icon"><i class="fa-solid fa-plus"></i></span>
+          </button>
+          <div class="row-body"><div class="row-inner">
+            <p>Headquarters projects start with the client's program: headcount, growth plans, image, and budget. The development team coordinates site selection, design, financing, and construction so leadership gets one accountable partner.</p>
+            <ul>
+              <li><i class="fa-solid fa-check"></i>Site selection and land analysis</li>
+              <li><i class="fa-solid fa-check"></i>Design and budget coordination</li>
+              <li><i class="fa-solid fa-check"></i>Schedule management through delivery</li>
+            </ul>
+          </div></div>
+        </div>
+        <div class="row">
+          <button class="row-head" aria-expanded="false">
+            <span class="row-num">02</span>
+            <span><span class="row-title">Fulfillment and Distribution Centers</span><span class="row-sub">Last mile and regional facilities positioned for speed.</span></span>
+            <span class="row-icon"><i class="fa-solid fa-plus"></i></span>
+          </button>
+          <div class="row-body"><div class="row-inner">
+            <p>Distribution work is about throughput: dock configuration, trailer parking, clear heights, and labor access. TW Development has repositioned existing buildings into modern fulfillment space, including an 87,000 sq ft facility in Kettering, Ohio.</p>
+            <ul>
+              <li><i class="fa-solid fa-check"></i>Building repositioning and conversion</li>
+              <li><i class="fa-solid fa-check"></i>Dock modifications and trailer courts</li>
+              <li><i class="fa-solid fa-check"></i>Parking expansion and site work</li>
+            </ul>
+          </div></div>
+        </div>
+        <div class="row">
+          <button class="row-head" aria-expanded="false">
+            <span class="row-num">03</span>
+            <span><span class="row-title">Data Centers</span><span class="row-sub">Mission critical facilities with power and connectivity in mind.</span></span>
+            <span class="row-icon"><i class="fa-solid fa-plus"></i></span>
+          </button>
+          <div class="row-body"><div class="row-inner">
+            <p>Data center development demands rigorous site diligence around power capacity, fiber routes, and redundancy. The team's finance and construction expertise supports the long lead items these projects require.</p>
+            <ul>
+              <li><i class="fa-solid fa-check"></i>Power and utility coordination</li>
+              <li><i class="fa-solid fa-check"></i>Secure, resilient design standards</li>
+              <li><i class="fa-solid fa-check"></i>Phased delivery planning</li>
+            </ul>
+          </div></div>
+        </div>
+        <div class="row">
+          <button class="row-head" aria-expanded="false">
+            <span class="row-num">04</span>
+            <span><span class="row-title">Call Centers</span><span class="row-sub">High density operations space delivered on tight timelines.</span></span>
+            <span class="row-icon"><i class="fa-solid fa-plus"></i></span>
+          </button>
+          <div class="row-body"><div class="row-inner">
+            <p>Call center clients typically need large floor plates, robust parking ratios, and fast occupancy. The development approach keeps budget and schedule as the two governing constraints from day one.</p>
+            <ul>
+              <li><i class="fa-solid fa-check"></i>Large floor plate layouts</li>
+              <li><i class="fa-solid fa-check"></i>Parking and access planning</li>
+              <li><i class="fa-solid fa-check"></i>Accelerated delivery schedules</li>
+            </ul>
+          </div></div>
+        </div>
+        <div class="row">
+          <button class="row-head" aria-expanded="false">
+            <span class="row-num">05</span>
+            <span><span class="row-title">Retail</span><span class="row-sub">Commercial space positioned for visibility and traffic.</span></span>
+            <span class="row-icon"><i class="fa-solid fa-plus"></i></span>
+          </button>
+          <div class="row-body"><div class="row-inner">
+            <p>Retail development lives or dies on location analytics: traffic counts, demographics, and co-tenancy. The team has repositioned retail assets, including a former grocery building in Cincinnati, for new commercial use.</p>
+            <ul>
+              <li><i class="fa-solid fa-check"></i>Site selection and market analysis</li>
+              <li><i class="fa-solid fa-check"></i>Asset repositioning</li>
+              <li><i class="fa-solid fa-check"></i>Sale or lease marketing support</li>
+            </ul>
+          </div></div>
+        </div>
+        <div class="row">
+          <button class="row-head" aria-expanded="false">
+            <span class="row-num">06</span>
+            <span><span class="row-title">Multi-Family</span><span class="row-sub">Residential communities developed to institutional standards.</span></span>
+            <span class="row-icon"><i class="fa-solid fa-plus"></i></span>
+          </button>
+          <div class="row-body"><div class="row-inner">
+            <p>Multi-family projects pair development discipline with long term asset thinking: unit mix, amenity programming, and durable construction that performs for owners and residents alike.</p>
+            <ul>
+              <li><i class="fa-solid fa-check"></i>Unit mix and amenity planning</li>
+              <li><i class="fa-solid fa-check"></i>Full development and financing coordination</li>
+              <li><i class="fa-solid fa-check"></i>Long term asset performance focus</li>
+            </ul>
+          </div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="film">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow" style="color:var(--amber)">Project reel</p>
+        <h2 style="color:var(--paper)">Selected <span style="color:var(--amber)">work.</span></h2>
+        <p style="color:#9fb0bf">Documented projects from public reporting and the company's own news feed. Graphics are illustrative.</p>
+      </div>
+      <div class="strip-frame">
+        <div class="strip" id="filmStrip">
+          <article class="frame">
+            <div class="frame-art" style="background:linear-gradient(150deg,#17456b,#0e1822)">
+              <svg viewBox="0 0 330 210" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                <rect x="30" y="90" width="270" height="90" fill="#0e1822" stroke="#d97e1f" stroke-width="2"/>
+                <rect x="30" y="70" width="270" height="20" fill="#d97e1f" opacity=".85"/>
+                <rect x="60" y="110" width="34" height="70" fill="#23394e" stroke="#d97e1f"/><rect x="110" y="110" width="34" height="70" fill="#23394e" stroke="#d97e1f"/><rect x="160" y="110" width="34" height="70" fill="#23394e" stroke="#d97e1f"/>
+                <rect x="220" y="120" width="60" height="60" fill="#23394e" stroke="#d97e1f"/>
+                <circle cx="90" cy="192" r="10" fill="#0e1822" stroke="#f5f2eb"/><circle cx="250" cy="192" r="10" fill="#0e1822" stroke="#f5f2eb"/>
+              </svg>
+            </div>
+            <div class="frame-body">
+              <p class="frame-meta">Kettering, Ohio</p>
+              <h3>Kettering Business Park</h3>
+              <p>An 87,000 sq ft building converted into a distribution center under a 10-year lease. The build out included an $8.3M interior investment, 750 new parking spaces, and dock modifications.</p>
+              <div class="frame-foot"><span class="badge badge-amber">Public reporting</span><span class="frame-meta">Soapbox Media</span></div>
+            </div>
+          </article>
+          <article class="frame">
+            <div class="frame-art" style="background:linear-gradient(150deg,#3a4a5c,#0e1822)">
+              <svg viewBox="0 0 330 210" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                <rect x="70" y="70" width="190" height="110" fill="#0e1822" stroke="#d97e1f" stroke-width="2"/>
+                <rect x="70" y="55" width="190" height="15" fill="#d97e1f" opacity=".85"/>
+                <rect x="150" y="110" width="30" height="70" fill="#23394e" stroke="#d97e1f"/>
+                <rect x="90" y="90" width="40" height="30" fill="#17456b" stroke="#d97e1f"/><rect x="200" y="90" width="40" height="30" fill="#17456b" stroke="#d97e1f"/>
+                <line x1="20" y1="180" x2="310" y2="180" stroke="#d97e1f" stroke-width="3"/>
+                <circle cx="60" cy="150" r="16" fill="none" stroke="#d97e1f" stroke-width="2"/><circle cx="280" cy="150" r="16" fill="none" stroke="#d97e1f" stroke-width="2"/>
+              </svg>
+            </div>
+            <div class="frame-body">
+              <p class="frame-meta">Cincinnati, Ohio</p>
+              <h3>11865 Hamilton Avenue</h3>
+              <p>A 32,000 sq ft former grocery building on about 8 acres, acquired in January 2019 as a speculative purchase and marketed for sale or lease.</p>
+              <div class="frame-foot"><span class="badge badge-amber">Company news feed</span><span class="frame-meta">twdevgroup.com</span></div>
+            </div>
+          </article>
+          <article class="frame">
+            <div class="frame-art" style="background:linear-gradient(150deg,#23394e,#0e1822)">
+              <svg viewBox="0 0 330 210" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                <rect x="40" y="40" width="110" height="130" fill="none" stroke="#d97e1f" stroke-width="2" stroke-dasharray="8 6"/>
+                <rect x="180" y="40" width="110" height="130" fill="none" stroke="#d97e1f" stroke-width="2" stroke-dasharray="8 6"/>
+                <circle cx="95" cy="105" r="8" fill="#d97e1f"/><circle cx="235" cy="105" r="8" fill="#d97e1f"/>
+                <line x1="95" y1="105" x2="235" y2="105" stroke="#d97e1f" stroke-width="2"/>
+                <rect x="120" y="150" width="90" height="20" fill="#d97e1f" opacity=".85"/>
+              </svg>
+            </div>
+            <div class="frame-body">
+              <p class="frame-meta">Evendale and Mason, Ohio</p>
+              <h3>Regional HQ Site Analysis</h3>
+              <p>Two parcels in Evendale and one in Mason analyzed for a national company exploring a regional headquarters in the Cincinnati area.</p>
+              <div class="frame-foot"><span class="badge badge-amber">Public minutes</span><span class="frame-meta">2017</span></div>
+            </div>
+          </article>
+          <article class="frame">
+            <div class="frame-art" style="background:linear-gradient(150deg,#17456b,#101b26)">
+              <svg viewBox="0 0 330 210" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                <g stroke="#d97e1f" stroke-width="2" fill="none">
+                  <rect x="60" y="60" width="80" height="110"/><rect x="190" y="60" width="80" height="110"/>
+                  <line x1="60" y1="60" x2="140" y2="30"/><line x1="140" y1="30" x2="140" y2="60"/>
+                  <line x1="190" y1="60" x2="270" y2="30"/><line x1="270" y1="30" x2="270" y2="60"/>
+                </g>
+                <rect x="150" y="95" width="30" height="40" fill="#d97e1f" opacity=".85"/>
+                <line x1="20" y1="180" x2="310" y2="180" stroke="#d97e1f" stroke-width="3"/>
+              </svg>
+            </div>
+            <div class="frame-body">
+              <p class="frame-meta">Company portfolio</p>
+              <h3>10 and 16 Spiral Drive</h3>
+              <p>Project noted on the company's news feed. Full scope and status were not published, so details are best confirmed with the office directly.</p>
+              <div class="frame-foot"><span class="badge badge-line">Call to confirm</span><span class="frame-meta">2019</span></div>
+            </div>
+          </article>
+          <article class="frame">
+            <div class="frame-art" style="background:linear-gradient(150deg,#0e1822,#23394e);display:flex;align-items:center;justify-content:center">
+              <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:3rem;color:var(--amber)"></i>
+            </div>
+            <div class="frame-body">
+              <p class="frame-meta">More projects</p>
+              <h3>On the official site</h3>
+              <p>The company publishes project news on its own website. Visit twdevgroup.com for the latest announcements straight from the source.</p>
+              <div class="frame-foot"><a class="btn btn-dark" href="https://www.twdevgroup.com/" target="_blank" rel="noopener" style="font-size:.72rem;padding:11px 18px">Visit official site</a></div>
+            </div>
+          </article>
+        </div>
+      </div>
+      <div class="film-nav">
+        <button class="film-btn" id="filmPrev" aria-label="Scroll projects left"><i class="fa-solid fa-arrow-left"></i></button>
+        <button class="film-btn" id="filmNext" aria-label="Scroll projects right"><i class="fa-solid fa-arrow-right"></i></button>
+        <p class="frame-meta" style="align-self:center;margin-left:10px">Drag or use arrows to browse the reel</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-about">
+  <section class="block">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">About</p>
+        <h2>A Cincinnati developer with <span class="accent">national reach.</span></h2>
+        <div class="rule"></div>
+      </div>
+      <div class="about-grid">
+        <div>
+          <p>TW Development Group is a commercial real estate development company based at 5533 Fair Lane in Cincinnati, Ohio. The firm works with corporate clients of all sizes to develop customized, high performance facilities throughout the United States.</p>
+          <p>The team's diversified talents and decades of experience bring a unique and measured perspective to every project. For many clients, the deciding factors are the project budget and a condensed schedule, and the firm is built to manage both on the client's behalf.</p>
+          <p>Across its history the company has developed retail, multi-family, call centers, data centers, fulfillment centers, and corporate headquarters facilities in locations across the country. The work is grounded in three commitments: dedication to clients above all else, the highest levels of excellence in every project, and demonstrated honesty and integrity in all that it does.</p>
+          <p>The firm is also active in the local community. TW Development Group served as an Eagle sponsor of the First Tee of Greater Cincinnati and Northern Kentucky annual golf tournament, supporting youth programs across the region.</p>
+          <dl class="fact-list">
+            <dt>Headquarters</dt><dd>5533 Fair Lane, Cincinnati, OH 45227</dd>
+            <dt>Phone</dt><dd><a href="tel:+15135020078">(513) 502-0078</a></dd>
+            <dt>Office hours</dt><dd>Mon to Fri, 9:00 AM to 5:00 PM <span class="badge badge-line" style="margin-left:8px">Call to confirm</span></dd>
+            <dt>Official website</dt><dd><a href="https://www.twdevgroup.com/" target="_blank" rel="noopener">twdevgroup.com</a></dd>
+          </dl>
+        </div>
+        <aside class="expertise">
+          <h3>Leadership expertise</h3>
+          <p style="color:#9fb0bf;font-size:.9rem;margin-bottom:14px">The leadership team combines specialists across six disciplines for a holistic approach to every development.</p>
+          <ul>
+            <li><i class="fa-solid fa-building"></i>Real estate</li>
+            <li><i class="fa-solid fa-diagram-project"></i>Development</li>
+            <li><i class="fa-solid fa-chart-line"></i>Finance</li>
+            <li><i class="fa-solid fa-helmet-safety"></i>Construction</li>
+            <li><i class="fa-solid fa-map-location-dot"></i>Site selection</li>
+            <li><i class="fa-solid fa-pen-ruler"></i>Design</li>
+          </ul>
+        </aside>
+      </div>
+    </div>
+  </section>
+</section>
+
+
+<section class="page" id="page-reviews">
+  <div class="rating-hero">
+    <div class="rating-grid">
+      <div class="big-score">4.0</div>
+      <div>
+        <p class="eyebrow" style="color:var(--amber)">Public reputation</p>
+        <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star"></i></div>
+        <p>TW Development Group holds a 4 out of 5 rating from 1 published rating on its Birdeye business profile. No written review text has been published publicly, so the cards below are clearly marked samples of the format, not real client quotes.</p>
+        <div style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap">
+          <a class="btn btn-solid" href="https://reviews.birdeye.com/tw-development-group-156874103689330" target="_blank" rel="noopener">See profile on Birdeye <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <section class="block">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">What clients say</p>
+        <h2>Reviews, <span class="accent">honestly presented.</span></h2>
+        <p>We show what is actually published and label everything else. Sample cards are marked SAMPLE.</p>
+        <div class="rule"></div>
+      </div>
+      <div class="review-cards">
+        <div class="review-card">
+          <span class="badge badge-amber">Sample</span>
+          <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+          <p>"They kept a complex build on budget and on schedule, and communicated clearly the whole way through."</p>
+          <cite>Sample format, not a real review</cite>
+        </div>
+        <div class="review-card">
+          <span class="badge badge-amber">Sample</span>
+          <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star"></i></div>
+          <p>"A single point of accountability from site selection to delivery made the decision process straightforward."</p>
+          <cite>Sample format, not a real review</cite>
+        </div>
+        <div class="review-card">
+          <span class="badge badge-amber">Sample</span>
+          <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+          <p>"The repositioning scope was ambitious, and the finished facility performs exactly as planned."</p>
+          <cite>Sample format, not a real review</cite>
+        </div>
+      </div>
+      <p class="form-note" style="margin-top:26px">Have you worked with TW Development Group? Share your experience on their public business profiles to help future clients.</p>
+    </div>
+  </section>
+</section>
+
+
+<section class="page" id="page-contact">
+  <section class="block">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Contact</p>
+        <h2>Start the <span class="accent">conversation.</span></h2>
+        <p>Corporate facility project, site inquiry, or repositioning opportunity, the office is the fastest path to an answer.</p>
+        <div class="rule"></div>
+      </div>
+      <div class="contact-grid">
+        <div class="contact-card">
+          <h3>Reach the office</h3>
+          <div class="contact-line">
+            <i class="fa-solid fa-phone"></i>
+            <div><b>Phone</b><a href="tel:+15135020078">(513) 502-0078</a></div>
+          </div>
+          <div class="contact-line">
+            <i class="fa-solid fa-location-dot"></i>
+            <div><b>Address</b><span style="font-weight:600">5533 Fair Lane<br>Cincinnati, OH 45227</span></div>
+          </div>
+          <div class="contact-line">
+            <i class="fa-solid fa-clock"></i>
+            <div><b>Hours</b><span style="font-weight:600">Mon to Fri, 9:00 AM to 5:00 PM</span><br><span class="badge badge-line" style="margin-top:8px;border-color:var(--mut)">Call to confirm</span></div>
+          </div>
+          <div class="contact-line">
+            <i class="fa-solid fa-globe"></i>
+            <div><b>Official website</b><a href="https://www.twdevgroup.com/" target="_blank" rel="noopener">twdevgroup.com</a></div>
+          </div>
+          <div class="contact-actions">
+            <a class="btn btn-solid" href="tel:+15135020078"><i class="fa-solid fa-phone"></i> Call now</a>
+            <a class="btn btn-ghost" href="https://www.google.com/maps/search/?api=1&query=TW%20Development%20Group%2C%205533%20Fair%20Ln%2C%20Cincinnati%2C%20OH%2045227" target="_blank" rel="noopener"><i class="fa-solid fa-diamond-turn-right"></i> Get directions</a>
+          </div>
+        </div>
+        <form class="inquiry" id="inquiryForm">
+          <h3>Project inquiry</h3>
+          <p>Fill this out and your email app will open with the message drafted. Add the office address and send, or simply call.</p>
+          <div class="field-row">
+            <div class="field"><label for="fName">Name</label><input id="fName" name="name" type="text" required placeholder="Your full name"></div>
+            <div class="field"><label for="fCompany">Company</label><input id="fCompany" name="company" type="text" placeholder="Company name"></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label for="fPhone">Phone</label><input id="fPhone" name="phone" type="tel" placeholder="(513) 555-0100"></div>
+            <div class="field"><label for="fEmail">Email</label><input id="fEmail" name="email" type="email" required placeholder="you@company.com"></div>
+          </div>
+          <div class="field">
+            <label for="fType">Project type</label>
+            <select id="fType" name="type">
+              <option>Corporate headquarters</option>
+              <option>Fulfillment or distribution center</option>
+              <option>Data center</option>
+              <option>Call center</option>
+              <option>Retail</option>
+              <option>Multi-family</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="field"><label for="fMsg">Project details</label><textarea id="fMsg" name="message" required placeholder="Location, approximate size, timeline, and anything else that matters."></textarea></div>
+          <button class="btn btn-solid" type="submit" style="width:100%;justify-content:center">Draft email <i class="fa-solid fa-paper-plane"></i></button>
+          <p class="form-note">This opens a draft in your own email app with your message pre written. Address it to the TW Development Group office and press send, or call (513) 502-0078 instead.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+</section>
+
+</main>
+
+<footer>
+  <p>&copy; TW Development Group</p>
+</footer>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* data page router */
+const pageMap = {
+  home: 'page-home',
+  projects: 'page-projects',
+  about: 'page-about',
+  reviews: 'page-reviews',
+  contact: 'page-contact'
+};
+const pages = document.querySelectorAll('.page');
+function pageFromHash(){
+  const h = (location.hash || '#home').replace('#','').trim();
+  return pageMap[h] ? h : 'home';
+}
+function navigateTo(page){
+  if(!pageMap[page]) page = 'home';
+  pages.forEach(function(p){ p.classList.toggle('active', p.id === pageMap[page]); });
+  document.querySelectorAll('[data-page]').forEach(function(a){
+    if(a.classList && a.classList.contains('radial-link')){
+      a.setAttribute('aria-current', a.getAttribute('data-page') === page ? 'page' : 'false');
+    }
+  });
+  const titles = {home:'Home',projects:'Projects',about:'About',reviews:'Reviews',contact:'Contact'};
+  document.title = 'TW Development Group | ' + titles[page] + ', Cincinnati OH';
+  window.scrollTo({top:0, behavior:'smooth'});
+  if(('#' + page) !== location.hash){ history.pushState({page:page}, '', '#' + page); }
+}
+window.addEventListener('popstate', function(){ navigateTo(pageFromHash()); });
+document.querySelectorAll('[data-page]').forEach(function(el){
+  el.addEventListener('click', function(e){
+    e.preventDefault();
+    closeRadial();
+    navigateTo(el.getAttribute('data-page'));
+  });
+});
+
+/* circular radial menu */
+const radial = document.getElementById('radial');
+const ring = document.getElementById('radialRing');
+const toggle = document.getElementById('menuToggle');
+const links = Array.prototype.slice.call(document.querySelectorAll('.radial-link'));
+function positionLinks(){
+  const r = Math.max(150, Math.min(window.innerWidth, window.innerHeight) * 0.31);
+  links.forEach(function(link, i){
+    const angle = (-90 + i * (360 / links.length)) * Math.PI / 180;
+    const x = Math.cos(angle) * r;
+    const y = Math.sin(angle) * r;
+    link.style.left = 'calc(50% + ' + x.toFixed(1) + 'px)';
+    link.style.top = 'calc(50% + ' + y.toFixed(1) + 'px)';
+    link.style.transitionDelay = (i * 45) + 'ms';
+  });
+  ring.style.width = (r * 2 + 118) + 'px';
+  ring.style.height = (r * 2 + 118) + 'px';
+}
+function openRadial(){
+  positionLinks();
+  radial.classList.add('open');
+  radial.setAttribute('aria-hidden','false');
+  toggle.classList.add('open');
+  toggle.setAttribute('aria-expanded','true');
+  toggle.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+  document.body.style.overflow = 'hidden';
+}
+function closeRadial(){
+  if(!radial.classList.contains('open')) return;
+  radial.classList.remove('open');
+  radial.setAttribute('aria-hidden','true');
+  toggle.classList.remove('open');
+  toggle.setAttribute('aria-expanded','false');
+  toggle.innerHTML = '<i class="fa-solid fa-bars"></i>';
+  document.body.style.overflow = '';
+  links.forEach(function(l){ l.style.transitionDelay = '0ms'; });
+}
+toggle.addEventListener('click', function(){
+  radial.classList.contains('open') ? closeRadial() : openRadial();
+});
+radial.addEventListener('click', function(e){
+  if(e.target === radial) closeRadial();
+});
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape') closeRadial();
+});
+window.addEventListener('resize', function(){
+  if(radial.classList.contains('open')) positionLinks();
+});
+
+/* expandable rows */
+document.querySelectorAll('.row-head').forEach(function(head){
+  head.addEventListener('click', function(){
+    const row = head.parentElement;
+    const body = row.querySelector('.row-body');
+    const isOpen = row.classList.contains('open');
+    document.querySelectorAll('.row.open').forEach(function(r){
+      r.classList.remove('open');
+      r.querySelector('.row-body').style.maxHeight = '0px';
+      r.querySelector('.row-head').setAttribute('aria-expanded','false');
+    });
+    if(!isOpen){
+      row.classList.add('open');
+      body.style.maxHeight = body.scrollHeight + 'px';
+      head.setAttribute('aria-expanded','true');
+    }
+  });
+});
+
+/* filmstrip arrows */
+const strip = document.getElementById('filmStrip');
+document.getElementById('filmPrev').addEventListener('click', function(){
+  strip.scrollBy({left:-380, behavior:'smooth'});
+});
+document.getElementById('filmNext').addEventListener('click', function(){
+  strip.scrollBy({left:380, behavior:'smooth'});
+});
+
+/* toast helper */
+const toast = document.getElementById('toast');
+let toastTimer = null;
+function showToast(msg){
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 3600);
+}
+
+/* inquiry form builds a mailto draft, no invented recipient */
+document.getElementById('inquiryForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const v = function(id){ return document.getElementById(id).value.trim(); };
+  const subject = 'Project inquiry from ' + (v('fName') || 'website visitor');
+  const lines = [
+    'Name: ' + v('fName'),
+    'Company: ' + v('fCompany'),
+    'Phone: ' + v('fPhone'),
+    'Email: ' + v('fEmail'),
+    'Project type: ' + v('fType'),
+    '',
+    'Project details:',
+    v('fMsg')
+  ];
+  window.location.href = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(lines.join('\n'));
+  showToast('Opening your email app with the inquiry drafted.');
+});
+
+/* init from hash */
+navigateTo(pageFromHash());
+</script>
+</body>
+</html>

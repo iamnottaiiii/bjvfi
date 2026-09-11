@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clayton Werden Electric Co Inc | Electrician | Cincinnati, OH</title>
+<meta name="description" content="Clayton Werden Electric Co Inc, 6256 Wiehe Rd, Cincinnati, OH. Electrical contracting, outdoor warning siren sales and service, and electrical supplies.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;700;900&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+  :root{
+    --steel:#20242b;
+    --steel-deep:#16191e;
+    --paper:#f4f1e8;
+    --paper-warm:#ece7d8;
+    --signal:#f2a71b;
+    --signal-soft:#f7c35a;
+    --copper:#b06a32;
+    --ink:#2b2f36;
+    --muted:#6d6f75;
+    --line:#d8d2c0;
+    --badge:#f2a71b;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.slab{font-family:'Bitter',Georgia,serif}
+  .mono{font-family:'IBM Plex Mono',monospace}
+  a{color:inherit}
+  img{max-width:100%}
+
+  /* top utility bar */
+  .topbar{
+    background:var(--steel-deep);color:var(--paper);
+    font-size:.8rem;padding:.5rem 1.25rem;
+    display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;
+  }
+  .topbar a{color:var(--signal-soft);text-decoration:none;font-weight:600}
+  .topbar .mono{letter-spacing:.04em}
+  .topbar .right{display:flex;gap:1.25rem;align-items:center}
+
+  /* header */
+  header.site{
+    background:var(--steel);color:var(--paper);
+    border-bottom:4px solid var(--signal);
+    position:sticky;top:0;z-index:60;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:.9rem 1.5rem;gap:1rem;
+  }
+  .brand{display:flex;align-items:center;gap:.9rem;text-decoration:none}
+  .brand .mark{
+    width:46px;height:46px;border-radius:50%;
+    background:radial-gradient(circle at 35% 35%, var(--signal-soft), var(--signal) 60%, var(--copper));
+    display:grid;place-items:center;color:var(--steel-deep);font-size:1.25rem;
+    box-shadow:0 0 0 3px var(--steel-deep), 0 0 0 4.5px var(--signal);
+    flex:none;
+  }
+  .brand .name{line-height:1.15}
+  .brand .name strong{display:block;font-family:'Bitter',serif;font-size:1.06rem;letter-spacing:.01em}
+  .brand .name span{font-size:.72rem;text-transform:uppercase;letter-spacing:.18em;color:var(--signal-soft)}
+  nav.desktop{display:flex;gap:1.4rem;align-items:center}
+  nav.desktop a{
+    color:var(--paper);text-decoration:none;font-weight:600;font-size:.92rem;
+    letter-spacing:.04em;text-transform:uppercase;padding:.35rem .1rem;
+    border-bottom:2px solid transparent;
+  }
+  nav.desktop a:hover,nav.desktop a.on{color:var(--signal-soft);border-color:var(--signal)}
+  .btn{
+    display:inline-flex;align-items:center;gap:.5rem;
+    background:var(--signal);color:var(--steel-deep);
+    font-weight:700;text-decoration:none;border:none;cursor:pointer;
+    padding:.8rem 1.4rem;border-radius:3px;
+    text-transform:uppercase;letter-spacing:.06em;font-size:.85rem;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.25)}
+  .btn.ghost{background:transparent;color:var(--paper);border:2px solid var(--signal-soft)}
+  .btn.dark{background:var(--steel-deep);color:var(--paper)}
+  .btn.small{padding:.5rem .95rem;font-size:.78rem}
+
+  /* hamburger */
+  #burger{
+    display:none;background:none;border:none;color:var(--paper);
+    font-size:1.6rem;cursor:pointer;padding:.4rem;
+  }
+
+  /* fullscreen overlay menu */
+  #overlay{
+    position:fixed;inset:0;background:rgba(22,25,30,.97);
+    z-index:100;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:1.6rem;
+    opacity:0;pointer-events:none;transition:opacity .25s ease;
+  }
+  #overlay.open{opacity:1;pointer-events:auto}
+  #overlayClose{
+    position:absolute;top:1.1rem;right:1.4rem;
+    background:none;border:none;color:var(--paper);font-size:2rem;cursor:pointer;
+  }
+  #overlay a.ov-link{
+    color:var(--paper);text-decoration:none;
+    font-family:'Bitter',serif;font-size:2rem;font-weight:700;
+  }
+  #overlay a.ov-link:hover,#overlay a.ov-link.on{color:var(--signal)}
+  #overlay .ov-sub{color:var(--signal-soft);font-size:.85rem;letter-spacing:.2em;text-transform:uppercase}
+
+  /* pages */
+  .page{display:none}
+  .page.active{display:block;animation:fadeUp .35s ease}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .wrap{max-width:1120px;margin:0 auto;padding:3rem 1.5rem}
+
+  /* content-led intro (no hero) */
+  .ledger{
+    background:var(--steel);color:var(--paper);
+    border-top:1px solid var(--steel);
+    position:relative;overflow:hidden;
+  }
+  .ledger::before{
+    content:"";position:absolute;inset:0;
+    background:repeating-linear-gradient(0deg,transparent 0 34px,rgba(242,167,27,.06) 34px 35px);
+    pointer-events:none;
+  }
+  .ledger .wrap{display:grid;grid-template-columns:1.5fr 1fr;gap:2.5rem;align-items:start;position:relative}
+  .kicker{
+    display:inline-block;background:var(--signal);color:var(--steel-deep);
+    font-family:'IBM Plex Mono',monospace;font-size:.75rem;font-weight:600;
+    padding:.3rem .7rem;letter-spacing:.12em;text-transform:uppercase;border-radius:2px;
+    margin-bottom:1rem;
+  }
+  .ledger h1{font-size:clamp(2rem,4.6vw,3.4rem);line-height:1.08;font-weight:900;margin-bottom:1rem}
+  .ledger h1 em{font-style:normal;color:var(--signal)}
+  .ledger p.lead{font-size:1.12rem;color:#d9d4c4;max-width:46ch}
+  .ledger .cta-row{display:flex;gap:.9rem;flex-wrap:wrap;margin-top:1.6rem}
+  .spec-card{
+    background:#2a2f37;border:1px solid #3a414b;border-radius:6px;
+    padding:1.4rem;box-shadow:0 10px 30px rgba(0,0,0,.3);
+  }
+  .spec-card h3{font-size:.78rem;text-transform:uppercase;letter-spacing:.18em;color:var(--signal-soft);margin-bottom:1rem}
+  .spec-card dl{display:grid;grid-template-columns:auto 1fr;gap:.5rem .9rem;font-size:.9rem}
+  .spec-card dt{color:#a9a99a;font-family:'IBM Plex Mono',monospace;font-size:.78rem;text-transform:uppercase;letter-spacing:.08em}
+  .spec-card dd{color:var(--paper)}
+  .spec-card dd a{color:var(--signal-soft);text-decoration:none}
+  .stamp{
+    margin-top:1.2rem;border:2px dashed var(--signal);border-radius:4px;
+    padding:.8rem;text-align:center;color:var(--signal-soft);
+    font-family:'IBM Plex Mono',monospace;font-size:.8rem;letter-spacing:.06em;
+  }
+
+  .section-title{font-size:clamp(1.6rem,3vw,2.3rem);font-weight:900;margin-bottom:.4rem}
+  .section-sub{color:var(--muted);margin-bottom:2rem;max-width:64ch}
+
+  /* comparison table services */
+  .compare-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:#fff}
+  table.compare{width:100%;border-collapse:collapse;min-width:640px;font-size:.95rem}
+  table.compare caption{text-align:left;padding:1rem 1.2rem;font-family:'Bitter',serif;font-weight:700;font-size:1.1rem;background:var(--paper-warm)}
+  table.compare th,table.compare td{padding:.95rem 1.1rem;text-align:left;border-top:1px solid var(--line);vertical-align:top}
+  table.compare thead th{background:var(--steel);color:var(--paper);border-top:none;font-size:.82rem;text-transform:uppercase;letter-spacing:.1em}
+  table.compare thead th:first-child{border-radius:0}
+  table.compare tbody tr:nth-child(even){background:#faf8f1}
+  table.compare td.tick{color:var(--copper);font-weight:700}
+  .pill{
+    display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    padding:.2rem .55rem;border-radius:999px;margin-left:.5rem;vertical-align:middle;
+  }
+  .pill.sample{background:#fff3d6;color:#8a5a00;border:1px solid #e3c26a}
+  .pill.verified{background:#e6f4e9;color:#1d6b2f;border:1px solid #9ccfa7}
+  .note{font-size:.85rem;color:var(--muted);margin-top:.9rem}
+
+  /* masonry gallery */
+  .masonry{columns:3 300px;column-gap:1.2rem}
+  .tile{
+    break-inside:avoid;margin-bottom:1.2rem;border-radius:6px;overflow:hidden;
+    background:#fff;border:1px solid var(--line);box-shadow:0 4px 14px rgba(0,0,0,.06);
+  }
+  .tile .ph{
+    display:grid;place-items:center;color:var(--paper);
+    background:linear-gradient(135deg,var(--steel) 0%,#333a44 60%,var(--copper) 140%);
+    position:relative;
+  }
+  .tile .ph i{font-size:2.4rem;opacity:.9}
+  .tile .ph.tall{min-height:260px}.tile .ph.med{min-height:190px}.tile .ph.short{min-height:130px}
+  .tile .ph::after{
+    content:"";position:absolute;inset:0;
+    background:repeating-linear-gradient(45deg,transparent 0 14px,rgba(255,255,255,.04) 14px 15px);
+  }
+  .tile .cap{padding:1rem 1.1rem}
+  .tile .cap h3{font-size:1.02rem;margin-bottom:.25rem}
+  .tile .cap p{font-size:.88rem;color:var(--muted)}
+
+  /* cards */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.2rem}
+  .card{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1.5rem;box-shadow:0 4px 14px rgba(0,0,0,.05)}
+  .card i.fa-solid,.card i.fa-brands{font-size:1.6rem;color:var(--copper);margin-bottom:.7rem}
+  .card h3{margin-bottom:.4rem;font-size:1.1rem}
+  .card p{font-size:.93rem;color:var(--muted)}
+
+  /* reviews */
+  .rating-band{background:var(--steel-deep);color:var(--paper);border-radius:8px;padding:2rem;display:flex;gap:2rem;align-items:center;flex-wrap:wrap;margin-bottom:2rem}
+  .score{font-family:'Bitter',serif;font-size:3.4rem;font-weight:900;color:var(--signal)}
+  .stars{color:var(--signal);font-size:1.1rem;letter-spacing:.15em}
+  .review{border-left:4px solid var(--signal);background:#fff;padding:1.4rem 1.6rem;margin-bottom:1.2rem;border-radius:0 6px 6px 0;box-shadow:0 3px 10px rgba(0,0,0,.05)}
+  .review .meta{font-family:'IBM Plex Mono',monospace;font-size:.76rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem}
+  .review p{font-size:.97rem}
+
+  /* contact */
+  .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start}
+  .contact-list{list-style:none;display:grid;gap:1rem;margin-top:1.2rem}
+  .contact-list li{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1.1rem 1.3rem;display:flex;gap:1rem;align-items:center}
+  .contact-list i{font-size:1.4rem;color:var(--copper);width:2rem;text-align:center;flex:none}
+  .contact-list a{color:var(--ink);font-weight:600;text-decoration:none}
+  .contact-list a:hover{color:var(--copper);text-decoration:underline}
+  form.quote{background:var(--steel);color:var(--paper);padding:2rem;border-radius:8px}
+  form.quote h2{margin-bottom:.4rem}
+  form.quote p{color:#c9c4b4;font-size:.92rem;margin-bottom:1.3rem}
+  form.quote label{display:block;font-size:.8rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin:.9rem 0 .35rem;color:var(--signal-soft)}
+  form.quote input,form.quote select,form.quote textarea{
+    width:100%;padding:.75rem .9rem;border-radius:4px;border:1px solid #454c57;
+    background:#2a2f37;color:var(--paper);font-family:inherit;font-size:.95rem;
+  }
+  form.quote textarea{min-height:110px;resize:vertical}
+  form.quote .btn{margin-top:1.2rem;width:100%;justify-content:center}
+
+  /* map-style pre-footer */
+  .mapstrip{
+    background:var(--paper-warm);
+    border-top:1px solid var(--line);
+    background-image:
+      linear-gradient(rgba(176,106,50,.10) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(176,106,50,.10) 1px, transparent 1px),
+      linear-gradient(rgba(32,36,43,.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(32,36,43,.05) 1px, transparent 1px);
+    background-size:120px 120px,120px 120px,24px 24px,24px 24px;
+  }
+  .mapstrip .wrap{display:flex;gap:2rem;align-items:center;flex-wrap:wrap;padding-top:2.2rem;padding-bottom:2.2rem}
+  .pin{
+    width:64px;height:64px;flex:none;border-radius:50%;
+    background:var(--steel-deep);color:var(--signal);
+    display:grid;place-items:center;font-size:1.7rem;
+    box-shadow:0 0 0 6px rgba(242,167,27,.25);
+  }
+  .mapstrip h2{font-size:1.5rem}
+  .mapstrip address{font-style:normal;color:var(--muted)}
+  .mapstrip .grow{flex:1;min-width:220px}
+
+  footer{background:var(--steel-deep);color:#b9b3a2;text-align:center;padding:1.1rem;font-size:.9rem}
+
+  @media (max-width:860px){
+    nav.desktop{display:none}
+    #burger{display:block}
+    .ledger .wrap{grid-template-columns:1fr}
+    .contact-grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="mono"><i class="fa-solid fa-location-dot"></i> 6256 Wiehe Rd, Cincinnati, OH 45237</span>
+  <span class="right">
+    <span class="mono"><i class="fa-solid fa-clock"></i> Mon to Fri, 9 AM to 5 PM <span style="opacity:.7">(call to confirm)</span></span>
+    <a href="tel:+15137316843"><i class="fa-solid fa-phone"></i> (513) 731-6843</a>
+  </span>
+</div>
+
+<header class="site">
+  <a class="brand" href="#" data-page="home" aria-label="Clayton Werden Electric Co Inc home">
+    <span class="mark"><i class="fa-solid fa-bolt"></i></span>
+    <span class="name"><strong>Clayton Werden Electric Co Inc</strong><span>Electrician | Cincinnati, OH</span></span>
+  </a>
+  <nav class="desktop" aria-label="Primary">
+    <a href="#" data-page="home" class="on">Home</a>
+    <a href="#" data-page="services">Services</a>
+    <a href="#" data-page="about">About</a>
+    <a href="#" data-page="reviews">Reviews</a>
+    <a href="#" data-page="contact">Contact</a>
+  </nav>
+  <button id="burger" aria-label="Open menu" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
+</header>
+
+<div id="overlay" role="dialog" aria-label="Site menu">
+  <button id="overlayClose" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button>
+  <span class="ov-sub">Menu</span>
+  <a class="ov-link" href="#" data-page="home">Home</a>
+  <a class="ov-link" href="#" data-page="services">Services</a>
+  <a class="ov-link" href="#" data-page="about">About</a>
+  <a class="ov-link" href="#" data-page="reviews">Reviews</a>
+  <a class="ov-link" href="#" data-page="contact">Contact</a>
+  <a class="btn" href="tel:+15137316843"><i class="fa-solid fa-phone"></i> (513) 731-6843</a>
+</div>
+
+
+<section class="page active" id="page-home">
+  <div class="ledger">
+    <div class="wrap">
+      <div>
+        <span class="kicker">Heritage electrical contractor</span>
+        <h1>Wired for <em>safety</em> since 1948. Siren specialists for the Tri-State.</h1>
+        <p class="lead">Clayton Werden Electric Co Inc is a Cincinnati electrical contractor known for all kinds of electrical contract work, with a long standing specialty in outdoor warning sirens: sales, service, repair, and hard to find replacement parts. When the signal has to sound, it sounds.</p>
+        <div class="cta-row">
+          <a class="btn" href="#" data-page="services">See what we do</a>
+          <a class="btn ghost" href="tel:+15137316843"><i class="fa-solid fa-phone"></i> (513) 731-6843</a>
+        </div>
+      </div>
+      <aside class="spec-card" aria-label="Business facts">
+        <h3>Shop card</h3>
+        <dl>
+          <dt>Name</dt><dd>Clayton Werden Electric Co Inc</dd>
+          <dt>Address</dt><dd>6256 Wiehe Rd, Cincinnati, OH 45237</dd>
+          <dt>Phone</dt><dd><a href="tel:+15137316843">(513) 731-6843</a></dd>
+          <dt>Hours</dt><dd>Mon to Fri 9 AM to 5 PM (call to confirm)</dd>
+          <dt>Trade</dt><dd>Electrician, electrical supply store</dd>
+          <dt>Rating</dt><dd>4.5 of 5 across 22 public reviews</dd>
+        </dl>
+        <div class="stamp">EST. 1948 <span style="opacity:.75">(per public reviews)</span></div>
+      </aside>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <h2 class="section-title">Two crafts under one roof</h2>
+    <p class="section-sub">A working electrician's shop plus one of the region's go to names for outdoor warning sirens. Compare the service lines, then pick your lane.</p>
+    <div class="cards">
+      <div class="card">
+        <i class="fa-solid fa-plug-circle-bolt"></i>
+        <h3>Electrical contracting</h3>
+        <p>General electrical contract work for homes and businesses, from troubleshooting to installs. <span class="pill sample">Call to confirm scope</span></p>
+      </div>
+      <div class="card">
+        <i class="fa-solid fa-tower-broadcast"></i>
+        <h3>Warning siren service</h3>
+        <p>Sales, service, and repair of emergency outdoor warning sirens for municipalities and facilities across the Tri-State area.</p>
+      </div>
+      <div class="card">
+        <i class="fa-solid fa-screwdriver-wrench"></i>
+        <h3>Siren parts and rebuilds</h3>
+        <p>Replacement motors and parts for older mechanical sirens, with full motor rebuilds done in house. <span class="pill sample">Call to confirm stock</span></p>
+      </div>
+      <div class="card">
+        <i class="fa-solid fa-boxes-stacked"></i>
+        <h3>Electrical supplies</h3>
+        <p>Listed as an electrical supply store in public directories. Stop by or call ahead. <span class="pill sample">Call to confirm</span></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap" style="padding-top:0">
+    <h2 class="section-title">Why folks call Werden</h2>
+    <p class="section-sub">Sentiments paraphrased from public reviews of this business. No reviewer names shown here.</p>
+    <div class="cards">
+      <div class="card">
+        <i class="fa-solid fa-medal"></i>
+        <h3>4.5 out of 5</h3>
+        <p>Across 22 public reviews, with most reviewers giving the full five stars.</p>
+      </div>
+      <div class="card">
+        <i class="fa-solid fa-gears"></i>
+        <h3>Rare expertise</h3>
+        <p>Reviewers praise deep knowledge of vintage sirens and the ability to rebuild motors others cannot source parts for.</p>
+      </div>
+      <div class="card">
+        <i class="fa-solid fa-truck-fast"></i>
+        <h3>Quick turnarounds</h3>
+        <p>One reviewer reports a complete siren motor rebuild finished in under two weeks.</p>
+      </div>
+    </div>
+    <div style="margin-top:1.6rem">
+      <a class="btn dark" href="#" data-page="reviews">Read the reviews page</a>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <span class="kicker">Services</span>
+    <h2 class="section-title">Compare the service lines</h2>
+    <p class="section-sub">A side by side look at what this shop does. Items marked SAMPLE come from trade knowledge, not from the business's own published list, so call <a href="tel:+15137316843">(513) 731-6843</a> to confirm any detail before you plan around it.</p>
+
+    <div class="compare-scroll">
+      <table class="compare">
+        <caption>Service comparison <span class="pill sample">Scope marked SAMPLE is unverified</span></caption>
+        <thead>
+          <tr>
+            <th scope="col">Service line</th>
+            <th scope="col">What it covers</th>
+            <th scope="col">Who it is for</th>
+            <th scope="col">Typical response</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="tick"><i class="fa-solid fa-tower-broadcast"></i> Warning siren sales <span class="pill verified">Reported in reviews</span></td>
+            <td>Sales of outdoor warning sirens for American Signal Corporation and Federal Warning Systems across the Tri-State area</td>
+            <td>Municipalities, counties, campuses, industrial sites</td>
+            <td>Quote by phone <span class="pill sample">SAMPLE</span></td>
+          </tr>
+          <tr>
+            <td class="tick"><i class="fa-solid fa-screwdriver-wrench"></i> Siren repair and rebuilds <span class="pill verified">Reported in reviews</span></td>
+            <td>Repair of emergency outdoor warning sirens, including full rebuilds of older mechanical siren motors</td>
+            <td>Siren owners and maintainers with aging equipment</td>
+            <td>Under two weeks reported in one review</td>
+          </tr>
+          <tr>
+            <td class="tick"><i class="fa-solid fa-cog"></i> Siren parts <span class="pill verified">Reported in reviews</span></td>
+            <td>Replacement motors and parts for vintage mechanical sirens, including models others no longer stock</td>
+            <td>Collectors, hobbyists, small communities</td>
+            <td>Call to confirm stock <span class="pill sample">SAMPLE</span></td>
+          </tr>
+          <tr>
+            <td class="tick"><i class="fa-solid fa-plug-circle-bolt"></i> General electrical contracting <span class="pill verified">Reported in reviews</span></td>
+            <td>All kinds of electrical contract work, plus electrical equipment and direct current power supplies</td>
+            <td>Homes and businesses in the Cincinnati area</td>
+            <td>Call to schedule <span class="pill sample">SAMPLE</span></td>
+          </tr>
+          <tr>
+            <td class="tick"><i class="fa-solid fa-boxes-stacked"></i> Electrical supplies <span class="pill verified">Directory listing</span></td>
+            <td>Counter sales from an electrical supply storefront</td>
+            <td>Contractors and walk in customers</td>
+            <td>Mon to Fri 9 AM to 5 PM <span class="pill sample">Call to confirm</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">FACTS vs INFERRED: the siren specialty, the "since 1948" history, and the manufacturer relationships are reported in public reviews, not published by the business itself. Hours are listed by third party directories and are shown as call to confirm. Pricing, warranties, and emergency availability are not publicly listed: ask by phone.</p>
+
+    <div class="cta-row" style="display:flex;gap:.9rem;flex-wrap:wrap;margin-top:1.8rem">
+      <a class="btn" href="tel:+15137316843"><i class="fa-solid fa-phone"></i> Call (513) 731-6843</a>
+      <a class="btn ghost" style="color:var(--steel-deep);border-color:var(--steel-deep)" href="https://www.google.com/maps/search/?api=1&query=6256%20Wiehe%20Rd%2C%20Cincinnati%2C%20OH%2045237" target="_blank" rel="noopener"><i class="fa-solid fa-map-location-dot"></i> Get directions</a>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-about">
+  <div class="wrap">
+    <span class="kicker">About</span>
+    <h2 class="section-title">An old school shop on Wiehe Road</h2>
+    <p class="section-sub" style="max-width:70ch">Public reviews say the Clayton Werden Electric Company has been performing all kinds of electrical contract work since 1948. That makes this one of the longer running electrical shops in the Cincinnati area, and the reviews agree on one more thing: the place is famous among siren people.</p>
+
+    <div class="cards" style="margin-bottom:2.5rem">
+      <div class="card">
+        <i class="fa-solid fa-landmark"></i>
+        <h3>Heritage</h3>
+        <p>Reported in public reviews as operating since 1948. The business has not published its own history page that we could find, so treat dates as reported, not confirmed. <span class="pill sample">Unverified</span></p>
+      </div>
+      <div class="card">
+        <i class="fa-solid fa-bullhorn"></i>
+        <h3>The siren connection</h3>
+        <p>Reviewers describe Werden as a contractor for American Signal Corporation and Federal Warning Systems, handling sales and service of outdoor warning sirens across the Tri-State area. <span class="pill verified">Reported in reviews</span></p>
+      </div>
+      <div class="card">
+        <i class="fa-solid fa-handshake"></i>
+        <h3>How they work</h3>
+        <p>Reviewers note excellent customer service and first rate professionalism, especially for hard to solve equipment problems. <span class="pill verified">Review sentiment</span></p>
+      </div>
+    </div>
+
+    <h2 class="section-title">Shop gallery</h2>
+    <p class="section-sub">No verified photos of this business are publicly available, so these are illustrated placeholders. Real photos coming soon.</p>
+    <div class="masonry">
+      <div class="tile">
+        <div class="ph tall"><i class="fa-solid fa-tower-broadcast"></i></div>
+        <div class="cap"><h3>Outdoor warning sirens <span class="pill sample">Photo coming soon</span></h3><p>The shop's signature specialty, per public reviews.</p></div>
+      </div>
+      <div class="tile">
+        <div class="ph short"><i class="fa-solid fa-plug-circle-bolt"></i></div>
+        <div class="cap"><h3>Electrical contracting <span class="pill sample">Photo coming soon</span></h3><p>General electrical work for homes and businesses.</p></div>
+      </div>
+      <div class="tile">
+        <div class="ph med"><i class="fa-solid fa-gears"></i></div>
+        <div class="cap"><h3>Siren motor rebuilds <span class="pill sample">Photo coming soon</span></h3><p>Vintage mechanical siren motors rebuilt in house, per reviews.</p></div>
+      </div>
+      <div class="tile">
+        <div class="ph med"><i class="fa-solid fa-warehouse"></i></div>
+        <div class="cap"><h3>The Wiehe Road shop <span class="pill sample">Photo coming soon</span></h3><p>6256 Wiehe Rd, Cincinnati, OH 45237.</p></div>
+      </div>
+      <div class="tile">
+        <div class="ph short"><i class="fa-solid fa-boxes-stacked"></i></div>
+        <div class="cap"><h3>Electrical supplies <span class="pill sample">Photo coming soon</span></h3><p>Listed in directories as an electrical supply store.</p></div>
+      </div>
+      <div class="tile">
+        <div class="ph tall"><i class="fa-solid fa-bolt"></i></div>
+        <div class="cap"><h3>Power equipment <span class="pill sample">Photo coming soon</span></h3><p>Electrical equipment and DC power supplies, per reviews.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <span class="kicker">Reviews</span>
+    <h2 class="section-title">What the public says</h2>
+    <p class="section-sub">Sentiments below are paraphrased from real public reviews of Clayton Werden Electric Co Inc. Reviewer names are never shown on this demo page. We could not verify a live Google listing link for this business, so no outbound review link is provided: search the business name on Google or Yelp to read the originals.</p>
+
+    <div class="rating-band">
+      <div class="score">4.5</div>
+      <div>
+        <div class="stars" aria-label="4.5 out of 5 stars">
+          <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>
+        </div>
+        <p class="mono" style="margin-top:.4rem;font-size:.85rem">22 public reviews aggregated by a review platform<br>17 five star, 3 four star, 2 one star</p>
+      </div>
+    </div>
+
+    <div class="review">
+      <div class="meta">Public review sentiment | Five stars | Siren manufacturing</div>
+      <p>One reviewer describes the company as very old school, building warning sirens the way they used to be made, with sirens available by special order in several horn styles. They call it a very cool company.</p>
+    </div>
+    <div class="review">
+      <div class="meta">Public review sentiment | Five stars | Siren motor rebuild</div>
+      <p>A reviewer needed a replacement motor for a mechanical siren built in the 1970s. Werden had the parts and completed a full motor rebuild in under two weeks, putting the siren back in service protecting a small community. The reviewer calls them first rate professionals and highly recommends them.</p>
+    </div>
+    <div class="review">
+      <div class="meta">Public review sentiment | Mixed | Siren installation</div>
+      <p>A more recent review praises the company's siren installations and siren production, wishing they could purchase the horn style units on display.</p>
+    </div>
+    <div class="review">
+      <div class="meta">Honest note | Negative reviews exist</div>
+      <p>Two of the 22 aggregated reviews are one star. Their text was not available in the public summaries we could read, so we show the count honestly rather than guessing at the content. Overall sentiment remains strongly positive.</p>
+    </div>
+
+    <p class="note">Review honesty note: we attempted to verify a direct Google Maps listing link for this business and could not load it, so the "See reviews on Google" button is intentionally omitted. To read original reviews, search "Clayton Werden Electric Co Inc" on Google.</p>
+  </div>
+</section>
+
+
+<section class="page" id="page-contact">
+  <div class="wrap">
+    <span class="kicker">Contact</span>
+    <h2 class="section-title">Call the shop</h2>
+    <p class="section-sub">No email address is publicly listed for this business, so the form below drafts an email through your own mail app addressed to the shop by name, and the phone number is one tap away.</p>
+    <div class="contact-grid">
+      <div>
+        <ul class="contact-list">
+          <li>
+            <i class="fa-solid fa-phone"></i>
+            <div><strong>Phone</strong><br><a href="tel:+15137316843">(513) 731-6843</a></div>
+          </li>
+          <li>
+            <i class="fa-solid fa-location-dot"></i>
+            <div><strong>Address</strong><br>6256 Wiehe Rd, Cincinnati, OH 45237</div>
+          </li>
+          <li>
+            <i class="fa-solid fa-clock"></i>
+            <div><strong>Hours</strong><br>Mon to Fri, 9 AM to 5 PM <span class="pill sample">Call to confirm</span></div>
+          </li>
+          <li>
+            <i class="fa-solid fa-map-location-dot"></i>
+            <div><strong>Directions</strong><br><a href="https://www.google.com/maps/search/?api=1&query=6256%20Wiehe%20Rd%2C%20Cincinnati%2C%20OH%2045237" target="_blank" rel="noopener">Open in Google Maps</a></div>
+          </li>
+        </ul>
+        <p class="note">Status note: one directory lists this business as permanently closed while others show it open. Call <a href="tel:+15137316843">(513) 731-6843</a> to confirm current availability before visiting.</p>
+      </div>
+      <form class="quote" id="quoteForm" aria-label="Request a quote">
+        <h2>Request a quote</h2>
+        <p>This opens your email app with a draft addressed to the shop. No email on file, so it is addressed to the business name for you to route.</p>
+        <label for="q-name">Your name</label>
+        <input id="q-name" name="name" type="text" required autocomplete="name" placeholder="Jane Doe">
+        <label for="q-phone">Your phone</label>
+        <input id="q-phone" name="phone" type="tel" required autocomplete="tel" placeholder="(513) 555-0100">
+        <label for="q-service">What do you need?</label>
+        <select id="q-service" name="service">
+          <option>Warning siren sales</option>
+          <option>Siren repair or rebuild</option>
+          <option>Siren parts</option>
+          <option>General electrical work</option>
+          <option>Electrical supplies</option>
+          <option>Something else</option>
+        </select>
+        <label for="q-msg">Details</label>
+        <textarea id="q-msg" name="message" placeholder="Tell us about the job, the siren model, or the parts you need."></textarea>
+        <button class="btn" type="submit"><i class="fa-solid fa-paper-plane"></i> Draft email to the shop</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+
+<div class="mapstrip">
+  <div class="wrap">
+    <div class="pin"><i class="fa-solid fa-location-dot"></i></div>
+    <div class="grow">
+      <h2>Find the shop</h2>
+      <address>6256 Wiehe Rd, Cincinnati, OH 45237 | <a href="tel:+15137316843">(513) 731-6843</a></address>
+    </div>
+    <a class="btn dark" href="https://www.google.com/maps/search/?api=1&query=6256%20Wiehe%20Rd%2C%20Cincinnati%2C%20OH%2045237" target="_blank" rel="noopener"><i class="fa-solid fa-route"></i> Get directions</a>
+  </div>
+</div>
+
+<footer>&copy; Clayton Werden Electric Co Inc</footer>
+
+<script>
+// Single page router: sections carry class "page" and id "page-<name>";
+// nav anchors carry data-page="<name>". All values must match.
+var pageMap = {
+  home: "page-home",
+  services: "page-services",
+  about: "page-about",
+  reviews: "page-reviews",
+  contact: "page-contact"
+};
+
+function setActiveLinks(name){
+  var links = document.querySelectorAll("a[data-page]");
+  for (var i = 0; i < links.length; i++){
+    if (links[i].getAttribute("data-page") === name){
+      links[i].classList.add("on");
+    } else {
+      links[i].classList.remove("on");
+    }
+  }
+}
+
+function navigateTo(name, push){
+  if (!pageMap[name]) { name = "home"; }
+  var sections = document.querySelectorAll(".page");
+  for (var i = 0; i < sections.length; i++){
+    sections[i].classList.remove("active");
+  }
+  var target = document.getElementById(pageMap[name]);
+  if (target) { target.classList.add("active"); }
+  setActiveLinks(name);
+  closeOverlay();
+  window.scrollTo(0, 0);
+  if (push !== false){
+    try { history.pushState({page: name}, "", "#" + name); }
+    catch (e) { /* history unavailable, page still switches */ }
+  }
+}
+
+document.addEventListener("click", function (ev){
+  var el = ev.target.closest("a[data-page]");
+  if (!el) { return; }
+  ev.preventDefault();
+  navigateTo(el.getAttribute("data-page"));
+});
+
+window.addEventListener("popstate", function (ev){
+  var name = (ev.state && ev.state.page) || (location.hash || "").replace("#", "") || "home";
+  navigateTo(name, false);
+});
+
+// Fullscreen overlay menu
+var overlay = document.getElementById("overlay");
+var burger = document.getElementById("burger");
+var overlayClose = document.getElementById("overlayClose");
+
+function openOverlay(){
+  overlay.classList.add("open");
+  burger.setAttribute("aria-expanded", "true");
+  document.body.style.overflow = "hidden";
+}
+function closeOverlay(){
+  overlay.classList.remove("open");
+  burger.setAttribute("aria-expanded", "false");
+  document.body.style.overflow = "";
+}
+burger.addEventListener("click", openOverlay);
+overlayClose.addEventListener("click", closeOverlay);
+document.addEventListener("keydown", function (ev){
+  if (ev.key === "Escape") { closeOverlay(); }
+});
+
+// Contact form: draft an email via the visitor's mail app (no email on file for the shop)
+var form = document.getElementById("quoteForm");
+form.addEventListener("submit", function (ev){
+  ev.preventDefault();
+  var name = document.getElementById("q-name").value.trim();
+  var phone = document.getElementById("q-phone").value.trim();
+  var service = document.getElementById("q-service").value;
+  var msg = document.getElementById("q-msg").value.trim();
+  var subject = encodeURIComponent("Quote request for Clayton Werden Electric Co Inc: " + service);
+  var body = encodeURIComponent(
+    "To: Clayton Werden Electric Co Inc\n" +
+    "Shop phone: (513) 731-6843\n\n" +
+    "Name: " + name + "\n" +
+    "Phone: " + phone + "\n" +
+    "Service: " + service + "\n\n" +
+    "Details:\n" + msg + "\n"
+  );
+  // No published email for the business; the draft opens addressed generically
+  // so the visitor can route it. Phone remains the primary contact path.
+  window.location.href = "mailto:?subject=" + subject + "&body=" + body;
+});
+
+// Deep link support: #services etc on load
+(function init(){
+  var initial = (location.hash || "").replace("#", "");
+  if (pageMap[initial]) { navigateTo(initial, false); }
+})();
+</script>
+</body>
+</html>

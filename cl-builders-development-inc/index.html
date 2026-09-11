@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CL Builders &amp; Development Inc. | Design, Build, Develop | Arcadia CA</title>
+<meta name="description" content="CL Builders & Development Inc. is a design/build company in Arcadia, California. One team from first sketch to final walkthrough: new construction, additions and ADUs, remodeling, plans and permits.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#101418;
+  --paper:#f6f3ec;
+  --paper2:#efe9db;
+  --blue:#12365e;
+  --blue-deep:#0b2542;
+  --brass:#b98a2f;
+  --brass-soft:#e8d5a3;
+  --line:#d8d0bd;
+  --muted:#5d6268;
+  --radius:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Inter",system-ui,sans-serif;
+  background:var(--paper);
+  color:var(--ink);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,.display{font-family:"Archivo",sans-serif;font-stretch:expanded;letter-spacing:-0.01em;line-height:1.08}
+.mono{font-family:"IBM Plex Mono",monospace}
+a{color:inherit;text-decoration:none}
+img{max-width:100%}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .45s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ---------- centered-logo nav ---------- */
+.site-head{background:var(--ink);color:var(--paper);position:sticky;top:0;z-index:50}
+.nav-shell{max-width:1180px;margin:0 auto;padding:14px 24px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px}
+.nav-links{display:flex;gap:6px;list-style:none}
+.nav-links.left{justify-content:flex-end}
+.nav-links.right{justify-content:flex-start}
+.nav-links a{display:block;padding:10px 14px;border-radius:999px;font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#cfc9b8;white-space:nowrap}
+.nav-links a:hover{background:rgba(255,255,255,.08);color:#fff}
+.nav-links a.active{background:var(--brass);color:#111}
+.brand{text-align:center;line-height:1.15}
+.brand .mark{display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;border:2px solid var(--brass);border-radius:10px;color:var(--brass);font-family:"Archivo";font-weight:900;font-size:19px;margin-bottom:4px}
+.brand .name{font-family:"Archivo";font-weight:800;font-size:15px;letter-spacing:.02em;display:block}
+.brand .sub{font-size:10.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--brass-soft);display:block}
+.call-pill{justify-self:end;background:var(--brass);color:#141414;font-weight:700;font-size:13px;padding:10px 18px;border-radius:999px;letter-spacing:.06em;white-space:nowrap}
+.call-pill:hover{background:var(--brass-soft)}
+.burger{display:none;background:none;border:1px solid #3a4048;color:#fff;border-radius:10px;padding:9px 12px;font-size:16px;cursor:pointer}
+.mobile-menu{display:none;background:#0b0e12;border-top:1px solid #262b33;padding:10px 18px 18px}
+.mobile-menu a{display:block;padding:12px 6px;border-bottom:1px solid #22272e;font-size:14px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#d9d2c0}
+.mobile-menu a.active{color:var(--brass)}
+.mobile-menu.open{display:block}
+@media(max-width:900px){
+  .nav-shell{grid-template-columns:auto 1fr auto}
+  .nav-links{display:none}
+  .brand{text-align:left}
+  .burger{display:block}
+}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-block;padding:15px 30px;border-radius:999px;font-weight:700;font-size:14px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border:none;transition:transform .15s ease, box-shadow .15s ease}
+.btn:hover{transform:translateY(-2px)}
+.btn.brass{background:var(--brass);color:#141414;box-shadow:0 10px 24px rgba(185,138,47,.35)}
+.btn.ghost{border:2px solid var(--ink);color:var(--ink);background:transparent}
+.btn.ghost-light{border:2px solid rgba(255,255,255,.6);color:#fff;background:transparent}
+
+/* ---------- split hero ---------- */
+.hero{background:var(--ink);color:var(--paper);position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(185,138,47,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(185,138,47,.07) 1px,transparent 1px);background-size:44px 44px;pointer-events:none}
+.hero-grid{position:relative;display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center;max-width:1180px;margin:0 auto;padding:88px 24px 96px}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:"IBM Plex Mono";font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--brass);margin-bottom:22px}
+.eyebrow::before{content:"";width:34px;height:1px;background:var(--brass)}
+.hero h1{font-size:clamp(40px,5.4vw,72px);font-weight:850;margin-bottom:20px}
+.hero h1 .accent{color:var(--brass)}
+.hero p.lede{font-size:18px;color:#c9c2b1;max-width:52ch;margin-bottom:32px}
+.hero-ctas{display:flex;gap:14px;flex-wrap:wrap}
+.hero-facts{display:flex;gap:28px;margin-top:40px;flex-wrap:wrap}
+.hero-facts .fact .num{font-family:"Archivo";font-weight:800;font-size:26px;color:var(--brass)}
+.hero-facts .fact .lbl{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#9b9584}
+.blueprint-card{background:var(--blue-deep);border:1px solid rgba(185,138,47,.45);border-radius:20px;padding:26px;position:relative;box-shadow:0 30px 60px rgba(0,0,0,.4)}
+.blueprint-card .tag{position:absolute;top:-13px;left:26px;background:var(--brass);color:#141414;font-family:"IBM Plex Mono";font-size:11px;letter-spacing:.18em;text-transform:uppercase;padding:5px 14px;border-radius:999px}
+.blueprint-card svg{display:block;width:100%;height:auto;border-radius:10px}
+.blueprint-card .caption{margin-top:16px;font-family:"IBM Plex Mono";font-size:12px;color:#9db4d0;letter-spacing:.06em}
+@media(max-width:900px){.hero-grid{grid-template-columns:1fr;padding:60px 24px 70px}}
+
+/* ---------- magazine chapter rhythm ---------- */
+.chapter{padding:84px 0;border-top:1px solid var(--line)}
+.chapter.alt{background:var(--paper2)}
+.ch-head{display:flex;gap:26px;align-items:baseline;margin-bottom:26px}
+.ch-num{font-family:"Archivo";font-weight:900;font-size:64px;color:transparent;-webkit-text-stroke:2px var(--brass);line-height:1;flex-shrink:0}
+.ch-head h2{font-size:clamp(28px,3.4vw,44px);font-weight:800}
+.ch-body{max-width:760px;color:#33383e;font-size:17px}
+.ch-body p+p{margin-top:16px}
+.ch-rule{width:64px;height:4px;background:var(--brass);margin:26px 0}
+.spec-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:34px}
+.spec{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:22px}
+.spec .k{font-family:"IBM Plex Mono";font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--brass);margin-bottom:8px}
+.spec .v{font-weight:600;font-size:16px}
+
+/* ---------- accordion divisions ---------- */
+.acc{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:#fff;margin-bottom:14px}
+.acc-head{width:100%;display:flex;align-items:center;gap:18px;padding:22px 24px;background:none;border:none;cursor:pointer;text-align:left;font-family:"Archivo";font-weight:700;font-size:18px;color:var(--ink)}
+.acc-head .idx{font-family:"IBM Plex Mono";font-size:12px;color:var(--brass);letter-spacing:.15em;min-width:44px}
+.acc-head .plus{margin-left:auto;font-size:24px;color:var(--brass);transition:transform .25s ease;line-height:1}
+.acc.open .acc-head .plus{transform:rotate(45deg)}
+.acc-body{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.acc-body .inner{padding:0 24px 26px;color:#3c4147}
+.acc-body ul{margin:12px 0 0 20px}
+.acc-body li{margin:8px 0}
+.acc-note{margin-top:16px;font-size:13px;color:var(--muted);font-style:italic}
+
+/* ---------- scroll snap gallery ---------- */
+.snap-strip{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;padding:10px 4px 26px;scrollbar-width:thin}
+.snap-card{flex:0 0 min(360px,82vw);scroll-snap-align:start;background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.snap-card .art{height:220px;display:block}
+.snap-card .body{padding:20px 22px}
+.snap-card .body .k{font-family:"IBM Plex Mono";font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--brass);margin-bottom:6px}
+.snap-card h3{font-size:20px;margin-bottom:6px}
+.snap-card p{font-size:14px;color:var(--muted)}
+.snap-badge{display:inline-block;margin-top:10px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;background:var(--paper2);border:1px dashed #b9ae8f;color:#7a6f52;padding:5px 12px;border-radius:999px}
+
+/* ---------- reviews ---------- */
+.rev-hero{text-align:center;max-width:720px;margin:0 auto 44px}
+.stars{color:var(--brass);font-size:30px;letter-spacing:6px;margin:14px 0}
+.rev-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.rev-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:26px;position:relative}
+.rev-card .badge{position:absolute;top:16px;right:16px;font-size:10px;letter-spacing:.16em;text-transform:uppercase;background:var(--paper2);border:1px dashed #b9ae8f;color:#7a6f52;padding:4px 10px;border-radius:999px}
+.rev-card .stars{font-size:18px;margin:0 0 10px;letter-spacing:3px}
+.rev-card p{font-size:15px;color:#33383e}
+.g-link{display:inline-block;margin-top:26px;padding:15px 32px;border-radius:999px;background:var(--blue);color:#fff;font-weight:700;font-size:14px;letter-spacing:.08em;text-transform:uppercase}
+.g-link:hover{background:var(--blue-deep)}
+
+/* ---------- visit / contact ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
+@media(max-width:860px){.visit-grid{grid-template-columns:1fr}}
+.info-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:30px}
+.info-card h3{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--brass);margin-bottom:12px;font-family:"IBM Plex Mono"}
+.info-card p{font-size:17px;margin-bottom:6px}
+.big-phone{font-family:"Archivo";font-weight:800;font-size:30px;color:var(--blue)}
+.map-frame{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--blue-deep);min-height:320px;display:flex;align-items:center;justify-content:center;position:relative}
+.hours-table{width:100%;border-collapse:collapse;margin-top:8px}
+.hours-table td{padding:10px 4px;border-bottom:1px dashed var(--line);font-size:15px}
+.hours-table td:last-child{text-align:right;color:var(--muted)}
+
+/* ---------- section shells ---------- */
+.section{padding:84px 0}
+.section-head{max-width:760px;margin-bottom:44px}
+.section-head h2{font-size:clamp(30px,3.6vw,46px);font-weight:800;margin:14px 0 12px}
+.section-head p{color:var(--muted);font-size:17px}
+.center{text-align:center}
+.center .section-head{margin-left:auto;margin-right:auto}
+
+/* ---------- multi-column footer ---------- */
+footer{background:var(--ink);color:#c9c2b1;margin-top:0}
+.foot-grid{max-width:1180px;margin:0 auto;padding:64px 24px 40px;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:36px}
+@media(max-width:900px){.foot-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.foot-grid{grid-template-columns:1fr}}
+.foot-grid h4{font-family:"IBM Plex Mono";font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--brass);margin-bottom:16px}
+.foot-grid ul{list-style:none}
+.foot-grid li{margin:10px 0}
+.foot-grid a:hover{color:#fff}
+.foot-brand .name{font-family:"Archivo";font-weight:800;font-size:18px;color:#fff}
+.foot-brand p{font-size:14px;margin-top:10px;max-width:34ch}
+.copyright{border-top:1px solid #262b33;padding:22px 24px;text-align:center;color:#8f897a;font-size:14px}
+
+/* ---------- reveal ---------- */
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<header class="site-head">
+  <div class="nav-shell">
+    <button class="burger" id="burger" aria-expanded="false" aria-label="Open menu">&#9776;</button>
+    <ul class="nav-links left">
+      <li><a data-page="home" href="#home">Home</a></li>
+      <li><a data-page="services" href="#services">Divisions</a></li>
+      <li><a data-page="story" href="#story">Story</a></li>
+    </ul>
+    <a class="brand" data-page="home" href="#home" aria-label="CL Builders and Development Inc home">
+      <span class="mark">CL</span>
+      <span class="name">CL Builders &amp; Development Inc.</span>
+      <span class="sub">Design / Build / Develop</span>
+    </a>
+    <ul class="nav-links right">
+      <li><a data-page="gallery" href="#gallery">Work</a></li>
+      <li><a data-page="reviews" href="#reviews">Reviews</a></li>
+      <li><a data-page="visit" href="#visit">Contact</a></li>
+    </ul>
+    <a class="call-pill" href="tel:+16264382632">(626) 438-2632</a>
+  </div>
+  <nav class="mobile-menu" id="mainNav" aria-label="Mobile">
+    <a data-page="home" href="#home">Home</a>
+    <a data-page="services" href="#services">Divisions</a>
+    <a data-page="story" href="#story">Story</a>
+    <a data-page="gallery" href="#gallery">Work</a>
+    <a data-page="reviews" href="#reviews">Reviews</a>
+    <a data-page="visit" href="#visit">Contact</a>
+  </nav>
+</header>
+
+<main>
+
+<!-- ================= HOME ================= -->
+<section class="page" id="page-home">
+  <div class="hero">
+    <div class="hero-grid">
+      <div>
+        <span class="eyebrow">Design / Build / Develop</span>
+        <h1>One team, from first sketch to <span class="accent">final walkthrough</span>.</h1>
+        <p class="lede">CL Builders &amp; Development Inc. is a design/build company. That means you work with one team through every stage of development, from plans and permits to the last coat of paint.</p>
+        <div class="hero-ctas">
+          <a class="btn brass" href="tel:+16264382632">Call (626) 438-2632</a>
+          <a class="btn ghost-light" data-page="services" href="#services">Explore divisions</a>
+        </div>
+        <div class="hero-facts">
+          <div class="fact"><div class="num">1</div><div class="lbl">Team, all stages</div></div>
+          <div class="fact"><div class="num">Arcadia</div><div class="lbl">Based in the San Gabriel Valley</div></div>
+          <div class="fact"><div class="num">Full</div><div class="lbl">Plans and permit handling</div></div>
+        </div>
+      </div>
+      <div class="blueprint-card reveal">
+        <span class="tag">Sheet A-101</span>
+        <svg viewBox="0 0 400 260" role="img" aria-label="Blueprint style line drawing of a modern home elevation">
+          <rect x="0" y="0" width="400" height="260" fill="#0b2542"/>
+          <g stroke="#9db4d0" stroke-width="1.4" fill="none">
+            <rect x="90" y="110" width="220" height="100"/>
+            <path d="M80 110 L200 55 L320 110"/>
+            <rect x="185" y="160" width="30" height="50"/>
+            <rect x="120" y="130" width="40" height="40"/>
+            <rect x="240" y="130" width="40" height="40"/>
+            <line x1="200" y1="55" x2="200" y2="30"/>
+            <line x1="40" y1="230" x2="360" y2="230"/>
+            <line x1="60" y1="40" x2="60" y2="230" stroke-dasharray="5 5"/>
+            <line x1="340" y1="40" x2="340" y2="230" stroke-dasharray="5 5"/>
+            <circle cx="200" cy="30" r="4" fill="#b98a2f" stroke="none"/>
+          </g>
+          <text x="20" y="30" fill="#b98a2f" font-family="IBM Plex Mono" font-size="11" letter-spacing="2">ELEVATION 01</text>
+          <text x="20" y="248" fill="#9db4d0" font-family="IBM Plex Mono" font-size="10" letter-spacing="2">SCALE 1/4 IN = 1 FT</text>
+        </svg>
+        <p class="caption">Front elevation, typical design/build scope: structure, systems, and finish in one plan set.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="chapter">
+    <div class="wrap">
+      <div class="ch-head reveal"><span class="ch-num">01</span><h2>Design</h2></div>
+      <div class="ch-body reveal">
+        <p>Every project starts on paper. We develop the design with you, coordinate the structural and trade plans, and prepare a complete permit package, so the build begins with a clear, buildable roadmap.</p>
+        <div class="ch-rule"></div>
+        <div class="spec-row">
+          <div class="spec"><div class="k">Concept</div><div class="v">Floor plans and elevations drawn around how you live</div></div>
+          <div class="spec"><div class="k">Coordination</div><div class="v">Structural, electrical, plumbing, and mechanical planning</div></div>
+          <div class="spec"><div class="k">Permits</div><div class="v">Plan submittal and correction handling with the city</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chapter alt">
+    <div class="wrap">
+      <div class="ch-head reveal"><span class="ch-num">02</span><h2>Build</h2></div>
+      <div class="ch-body reveal">
+        <p>Because the same team that designed the project builds it, nothing gets lost in translation. Foundations, framing, systems, and finishes move in a planned sequence, managed on site by people who know the plans inside out.</p>
+        <div class="ch-rule"></div>
+        <div class="spec-row">
+          <div class="spec"><div class="k">Structure</div><div class="v">Foundation, framing, and roofing executed to plan</div></div>
+          <div class="spec"><div class="k">Systems</div><div class="v">Electrical, plumbing, and HVAC roughed in and inspected</div></div>
+          <div class="spec"><div class="k">Finish</div><div class="v">Cabinetry, tile, paint, and fixtures to the specified standard</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chapter">
+    <div class="wrap">
+      <div class="ch-head reveal"><span class="ch-num">03</span><h2>Develop</h2></div>
+      <div class="ch-body reveal">
+        <p>Development thinking runs through everything we do: budgeting that respects the numbers, schedules that hold, and guidance on additions, ADUs, and new builds that add lasting value to a property.</p>
+        <div class="ch-rule"></div>
+        <p><a class="btn ghost" data-page="services" href="#services">See our divisions</a></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="background:var(--blue-deep);color:#fff">
+    <div class="wrap center">
+      <div class="section-head reveal">
+        <span class="eyebrow" style="justify-content:center">Start the conversation</span>
+        <h2 style="color:#fff">Bring us the lot. Bring us the idea.</h2>
+        <p style="color:#b9c4d6">Tell us about your project and we will walk the site with you, talk through the design/build process, and outline realistic next steps.</p>
+      </div>
+      <div class="reveal" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+        <a class="btn brass" href="tel:+16264382632">Call (626) 438-2632</a>
+        <a class="btn ghost-light" data-page="visit" href="#visit">Visit the office</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SERVICES ================= -->
+<section class="page" id="page-services">
+  <div class="section">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">Divisions</span>
+        <h2>Four ways we build</h2>
+        <p>Each division is handled by the same design/build team, so design intent carries straight through to construction. Tap a division to see the typical scope.</p>
+      </div>
+
+      <div class="acc reveal">
+        <button class="acc-head" data-acc aria-expanded="false"><span class="idx">D.01</span>New Construction<span class="plus">+</span></button>
+        <div class="acc-body"><div class="inner">
+          <p>Ground-up homes built from a single coordinated plan set.</p>
+          <ul>
+            <li>Architectural design and engineering coordination</li>
+            <li>Grading, foundation, and framing</li>
+            <li>Full MEP systems: electrical, plumbing, HVAC</li>
+            <li>Interior and exterior finishes, landscaping rough-in</li>
+          </ul>
+        </div></div>
+      </div>
+
+      <div class="acc reveal">
+        <button class="acc-head" data-acc aria-expanded="false"><span class="idx">D.02</span>Additions and ADUs<span class="plus">+</span></button>
+        <div class="acc-body"><div class="inner">
+          <p>More room on the lot you already love: second stories, rear additions, garage conversions, and accessory dwelling units.</p>
+          <ul>
+            <li>Feasibility review and lot coverage planning</li>
+            <li>ADU layouts for rental income or multigenerational living</li>
+            <li>Tie-in detailing so new work matches the existing home</li>
+            <li>Separate metering and utility planning where required</li>
+          </ul>
+        </div></div>
+      </div>
+
+      <div class="acc reveal">
+        <button class="acc-head" data-acc aria-expanded="false"><span class="idx">D.03</span>Kitchen and Bath Remodeling<span class="plus">+</span></button>
+        <div class="acc-body"><div class="inner">
+          <p>The two rooms that define a home, rebuilt around how you use them.</p>
+          <ul>
+            <li>Layout reconfiguration and wall relocation</li>
+            <li>Custom cabinetry, stone, and tile</li>
+            <li>Lighting plans and fixture upgrades</li>
+            <li>Plumbing and electrical brought up to current code</li>
+          </ul>
+        </div></div>
+      </div>
+
+      <div class="acc reveal">
+        <button class="acc-head" data-acc aria-expanded="false"><span class="idx">D.04</span>Design, Plans and Permits<span class="plus">+</span></button>
+        <div class="acc-body"><div class="inner">
+          <p>The paper trail, handled: drawings, calculations, and city submittals for your project.</p>
+          <ul>
+            <li>As-built measurements and existing-condition plans</li>
+            <li>Permit-ready drawing sets and structural details</li>
+            <li>Plan-check correction responses</li>
+            <li>Inspection scheduling and sign-off coordination</li>
+          </ul>
+          <p class="acc-note">Scopes above describe typical design/build work. Final scope and pricing are set after a site walk and written proposal.</p>
+        </div></div>
+      </div>
+
+      <div class="center reveal" style="margin-top:40px">
+        <p style="color:var(--muted);margin-bottom:18px">Every project starts with a conversation and a site walk.</p>
+        <a class="btn brass" href="tel:+16264382632">Call (626) 438-2632</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= STORY ================= -->
+<section class="page" id="page-story">
+  <div class="section">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">Our story</span>
+        <h2>Built on the design/build idea</h2>
+        <p>One contract, one team, one point of responsibility, from the first sketch to the final walkthrough.</p>
+      </div>
+      <div class="ch-body reveal" style="font-size:18px">
+        <p>CL Builders &amp; Development Inc. is a design/build company based in Arcadia, California, working across the San Gabriel Valley. In the design/build model, the same team that draws the plans builds the project, which keeps design intent, budget, and schedule under one roof instead of split across separate designers and contractors.</p>
+        <p style="margin-top:18px">That single point of responsibility is the heart of the company: when the people framing the walls are the same people who drew them, details survive the journey from paper to jobsite. Projects move through design, permitting, construction, and finish work as one continuous process, with clear communication at every stage.</p>
+        <div class="ch-rule"></div>
+        <div class="spec-row">
+          <div class="spec"><div class="k">Model</div><div class="v">Design/build: one team, all stages</div></div>
+          <div class="spec"><div class="k">Base</div><div class="v">Arcadia, serving the San Gabriel Valley</div></div>
+          <div class="spec"><div class="k">Focus</div><div class="v">New construction, additions, ADUs, remodeling</div></div>
+        </div>
+      </div>
+      <div class="center reveal" style="margin-top:44px">
+        <a class="btn ghost" data-page="gallery" href="#gallery">See the work</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= GALLERY ================= -->
+<section class="page" id="page-gallery">
+  <div class="section">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">Selected work</span>
+        <h2>Project types we take on</h2>
+        <p>Swipe through the kinds of projects our design/build team handles. Illustrations below are concept drawings, not photographs of completed work.</p>
+      </div>
+      <div class="snap-strip reveal">
+        <article class="snap-card">
+          <svg class="art" viewBox="0 0 360 220" role="img" aria-label="Concept drawing of a new home">
+            <rect width="360" height="220" fill="#12365e"/>
+            <g stroke="#e8d5a3" stroke-width="1.5" fill="none">
+              <rect x="110" y="100" width="140" height="80"/>
+              <path d="M100 100 L180 60 L260 100"/>
+              <rect x="165" y="140" width="30" height="40"/>
+              <rect x="125" y="118" width="30" height="30"/>
+              <rect x="205" y="118" width="30" height="30"/>
+              <line x1="40" y1="190" x2="320" y2="190"/>
+            </g>
+            <text x="16" y="28" fill="#b98a2f" font-family="IBM Plex Mono" font-size="10" letter-spacing="2">TYPE 01</text>
+          </svg>
+          <div class="body"><div class="k">New construction</div><h3>Ground-up homes</h3><p>Designed, permitted, and built by one team.</p><span class="snap-badge">Concept illustration</span></div>
+        </article>
+        <article class="snap-card">
+          <svg class="art" viewBox="0 0 360 220" role="img" aria-label="Concept drawing of an addition">
+            <rect width="360" height="220" fill="#0b2542"/>
+            <g stroke="#e8d5a3" stroke-width="1.5" fill="none">
+              <rect x="60" y="110" width="120" height="70" stroke-dasharray="6 4"/>
+              <rect x="180" y="90" width="110" height="90"/>
+              <path d="M172 90 L235 55 L298 90"/>
+              <rect x="220" y="135" width="28" height="45"/>
+              <line x1="40" y1="190" x2="320" y2="190"/>
+            </g>
+            <text x="16" y="28" fill="#b98a2f" font-family="IBM Plex Mono" font-size="10" letter-spacing="2">TYPE 02</text>
+          </svg>
+          <div class="body"><div class="k">Additions</div><h3>Second stories and rear additions</h3><p>New space that ties into the existing home.</p><span class="snap-badge">Concept illustration</span></div>
+        </article>
+        <article class="snap-card">
+          <svg class="art" viewBox="0 0 360 220" role="img" aria-label="Concept drawing of an ADU">
+            <rect width="360" height="220" fill="#12365e"/>
+            <g stroke="#e8d5a3" stroke-width="1.5" fill="none">
+              <rect x="120" y="105" width="120" height="75"/>
+              <path d="M112 105 L180 70 L248 105"/>
+              <rect x="168" y="140" width="26" height="40"/>
+              <rect x="132" y="122" width="26" height="26"/>
+              <rect x="202" y="122" width="26" height="26"/>
+              <line x1="70" y1="190" x2="290" y2="190"/>
+            </g>
+            <text x="16" y="28" fill="#b98a2f" font-family="IBM Plex Mono" font-size="10" letter-spacing="2">TYPE 03</text>
+          </svg>
+          <div class="body"><div class="k">ADUs</div><h3>Accessory dwelling units</h3><p>Rental income or room for family, on your lot.</p><span class="snap-badge">Concept illustration</span></div>
+        </article>
+        <article class="snap-card">
+          <svg class="art" viewBox="0 0 360 220" role="img" aria-label="Concept drawing of a kitchen remodel">
+            <rect width="360" height="220" fill="#0b2542"/>
+            <g stroke="#e8d5a3" stroke-width="1.5" fill="none">
+              <rect x="70" y="120" width="220" height="60"/>
+              <rect x="70" y="90" width="90" height="30"/>
+              <rect x="170" y="90" width="120" height="30"/>
+              <line x1="115" y1="90" x2="115" y2="70"/>
+              <line x1="230" y1="90" x2="230" y2="70"/>
+              <line x1="40" y1="190" x2="320" y2="190"/>
+            </g>
+            <text x="16" y="28" fill="#b98a2f" font-family="IBM Plex Mono" font-size="10" letter-spacing="2">TYPE 04</text>
+          </svg>
+          <div class="body"><div class="k">Remodeling</div><h3>Kitchens and baths</h3><p>Reconfigured layouts, modern systems, lasting finishes.</p><span class="snap-badge">Concept illustration</span></div>
+        </article>
+      </div>
+      <div class="center reveal" style="margin-top:20px">
+        <p style="color:var(--muted);margin-bottom:18px">Have a project in mind? Start with a site walk.</p>
+        <a class="btn brass" href="tel:+16264382632">Call (626) 438-2632</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= REVIEWS ================= -->
+<section class="page" id="page-reviews">
+  <div class="section">
+    <div class="wrap">
+      <div class="rev-hero reveal">
+        <span class="eyebrow" style="justify-content:center">Reviews</span>
+        <h2 style="font-size:clamp(30px,3.6vw,46px);font-weight:800;margin:14px 0 10px">What clients say</h2>
+        <p style="color:var(--muted)">Our Google listing is new and does not show published reviews yet. If we have worked with you, your review would mean a lot.</p>
+        <a class="g-link" href="https://www.google.com/maps/place/?q=place_id:ChIJVVWFC-fbwoARTPF4ITqt0GQ" target="_blank" rel="noopener">See reviews on Google</a>
+      </div>
+      <div class="rev-grid">
+        <div class="rev-card reveal">
+          <span class="badge">Sample</span>
+          <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p>Having one team handle design and construction made everything simpler. The plans were clear, the crew was steady, and the finished addition feels like it was always part of the house.</p>
+          <p style="margin-top:12px;font-size:13px;color:var(--muted)">Sample review, for layout only</p>
+        </div>
+        <div class="rev-card reveal">
+          <span class="badge">Sample</span>
+          <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p>They walked us through permits, inspections, and every decision in between. Communication was straightforward from the first site visit to the final walkthrough.</p>
+          <p style="margin-top:12px;font-size:13px;color:var(--muted)">Sample review, for layout only</p>
+        </div>
+        <div class="rev-card reveal">
+          <span class="badge">Sample</span>
+          <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p>Our kitchen remodel finished on the timeline we were given. The design/build approach meant no surprises between the drawings and the actual work.</p>
+          <p style="margin-top:12px;font-size:13px;color:var(--muted)">Sample review, for layout only</p>
+        </div>
+      </div>
+      <p class="center" style="margin-top:26px;color:var(--muted);font-size:14px">Review cards above are samples showing how client feedback will appear. Real reviews will always link to their source.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= VISIT ================= -->
+<section class="page" id="page-visit">
+  <div class="section">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">Visit / Contact</span>
+        <h2>Talk to the team</h2>
+        <p>Call to schedule a site walk or stop by the office. We are based in Arcadia and work across the San Gabriel Valley.</p>
+      </div>
+      <div class="visit-grid">
+        <div class="info-card reveal">
+          <h3>Call</h3>
+          <p><a class="big-phone" href="tel:+16264382632">(626) 438-2632</a></p>
+          <h3 style="margin-top:26px">Office</h3>
+          <p>CL Builders &amp; Development Inc.<br>127 E St Joseph St<br>Arcadia, CA 91006</p>
+          <h3 style="margin-top:26px">Hours</h3>
+          <table class="hours-table">
+            <tr><td>Monday to Friday</td><td>Call for hours</td></tr>
+            <tr><td>Saturday to Sunday</td><td>Call for hours</td></tr>
+          </table>
+          <div style="margin-top:26px;display:flex;gap:12px;flex-wrap:wrap">
+            <a class="btn brass" href="tel:+16264382632">Call now</a>
+            <a class="btn ghost" href="https://www.google.com/maps/place/?q=place_id:ChIJVVWFC-fbwoARTPF4ITqt0GQ" target="_blank" rel="noopener">Get directions</a>
+          </div>
+        </div>
+        <div class="map-frame reveal">
+          <svg viewBox="0 0 400 320" width="100%" role="img" aria-label="Stylized map marker for the Arcadia office">
+            <rect width="400" height="320" fill="#0b2542"/>
+            <g stroke="#1d3a5f" stroke-width="1"><path d="M0 80 H400 M0 160 H400 M0 240 H400 M100 0 V320 M200 0 V320 M300 0 V320"/></g>
+            <g transform="translate(200,140)">
+              <path d="M0 52 C-32 20 -44 2 -44 -14 A44 44 0 1 1 44 -14 C44 2 32 20 0 52 Z" fill="#b98a2f"/>
+              <circle cx="0" cy="-14" r="16" fill="#0b2542"/>
+            </g>
+            <text x="200" y="230" text-anchor="middle" fill="#e8d5a3" font-family="IBM Plex Mono" font-size="12" letter-spacing="2">127 E ST JOSEPH ST</text>
+            <text x="200" y="250" text-anchor="middle" fill="#9db4d0" font-family="IBM Plex Mono" font-size="11" letter-spacing="2">ARCADIA, CA 91006</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="foot-grid">
+    <div class="foot-brand">
+      <span class="name">CL Builders &amp; Development Inc.</span>
+      <p>A design/build company in Arcadia, California. One team from first sketch to final walkthrough.</p>
+      <p style="margin-top:14px"><a href="tel:+16264382632" style="color:var(--brass-soft);font-weight:700">(626) 438-2632</a></p>
+    </div>
+    <div>
+      <h4>Pages</h4>
+      <ul>
+        <li><a data-page="home" href="#home">Home</a></li>
+        <li><a data-page="services" href="#services">Divisions</a></li>
+        <li><a data-page="story" href="#story">Story</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>More</h4>
+      <ul>
+        <li><a data-page="gallery" href="#gallery">Work</a></li>
+        <li><a data-page="reviews" href="#reviews">Reviews</a></li>
+        <li><a data-page="visit" href="#visit">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Office</h4>
+      <ul>
+        <li>127 E St Joseph St<br>Arcadia, CA 91006</li>
+        <li><a href="https://www.google.com/maps/place/?q=place_id:ChIJVVWFC-fbwoARTPF4ITqt0GQ" target="_blank" rel="noopener">Get directions</a></li>
+        <li><a href="https://www.google.com/maps/place/?q=place_id:ChIJVVWFC-fbwoARTPF4ITqt0GQ" target="_blank" rel="noopener">See reviews on Google</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="copyright">&copy; CL Builders &amp; Development Inc.</div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "story", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+
+  /* ---------- accordion divisions ---------- */
+  document.addEventListener("click", function(e){
+    var head = e.target.closest("[data-acc]");
+    if(!head) return;
+    var item = head.parentElement;
+    var body = item.querySelector(".acc-body");
+    var wasOpen = item.classList.contains("open");
+    var all = document.querySelectorAll(".acc.open");
+    for(var k = 0; k < all.length; k++){
+      all[k].classList.remove("open");
+      all[k].querySelector(".acc-body").style.maxHeight = null;
+      all[k].querySelector("[data-acc]").setAttribute("aria-expanded", "false");
+    }
+    if(!wasOpen){
+      item.classList.add("open");
+      body.style.maxHeight = body.scrollHeight + "px";
+      head.setAttribute("aria-expanded", "true");
+    }
+  });
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  function observeReveals(){
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    if(!("IntersectionObserver" in window)){
+      for(var i = 0; i < els.length; i++){ els[i].classList.add("in"); }
+      return;
+    }
+    if(!io){
+      io = new IntersectionObserver(function(entries){
+        entries.forEach(function(en){
+          if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+        });
+      }, {threshold: 0.12});
+    }
+    for(var j = 0; j < els.length; j++){ io.observe(els[j]); }
+  }
+
+  navigateTo(cleanHash() || "home");
+})();
+</script>
+</body>
+</html>

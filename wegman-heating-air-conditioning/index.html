@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wegman Heating &amp; Air Conditioning | Cincinnati, OH HVAC</title>
+<meta name="description" content="Wegman Heating & Air Conditioning, 10500 Chester Rd, Cincinnati, OH 45215. Heating and cooling installation, repair, and maintenance. Call (513) 244-5652.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{
+  --hot:#ff5a1f;
+  --hot-deep:#c93a00;
+  --hot-glow:#ffb25e;
+  --cold:#00a6e8;
+  --cold-deep:#005f9e;
+  --cold-glow:#9be1ff;
+  --ink:#12161c;
+  --ink-soft:#1e242e;
+  --paper:#f7f5f2;
+  --card:#ffffff;
+  --muted:#6b7280;
+  --radius:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.6}
+h1,h2,h3,.display{font-family:'Bebas Neue',Impact,sans-serif;letter-spacing:.04em;font-weight:400}
+a{color:inherit;text-decoration:none}
+img{max-width:100%}
+.container{max-width:1180px;margin:0 auto;padding:0 20px}
+
+/* ---------- top strip ---------- */
+.topstrip{background:var(--ink);color:#fff;font-size:.82rem}
+.topstrip .container{display:flex;justify-content:space-between;align-items:center;padding-top:8px;padding-bottom:8px;gap:12px;flex-wrap:wrap}
+.topstrip a.tel{font-weight:800;color:#ffd9b0}
+.topstrip .hours-pill{opacity:.85}
+
+/* ---------- header / nav ---------- */
+header.site{position:sticky;top:0;z-index:50;background:#fff;border-bottom:3px solid transparent;border-image:linear-gradient(90deg,var(--cold),#fff 50%,var(--hot)) 1}
+.navwrap{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;max-width:1180px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:10px;font-family:'Bebas Neue';font-size:1.5rem;letter-spacing:.05em}
+.brand .duos{display:flex;font-size:1.35rem}
+.brand .duos .fa-snowflake{color:var(--cold)}
+.brand .duos .fa-fire{color:var(--hot)}
+.brand small{display:block;font-family:'Inter';font-size:.62rem;font-weight:700;letter-spacing:.28em;color:var(--muted);text-transform:uppercase}
+nav.main{display:flex;gap:4px;align-items:center}
+nav.main a{padding:9px 14px;border-radius:999px;font-weight:700;font-size:.92rem;transition:.2s}
+nav.main a:hover{background:#f0ede8}
+nav.main a.active{background:var(--ink);color:#fff}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:13px 26px;font-weight:800;font-size:.95rem;transition:transform .15s,box-shadow .15s;cursor:pointer;border:none}
+.btn:active{transform:scale(.97)}
+.btn-hot{background:linear-gradient(135deg,var(--hot),var(--hot-deep));color:#fff;box-shadow:0 8px 20px rgba(255,90,31,.35)}
+.btn-cold{background:linear-gradient(135deg,var(--cold),var(--cold-deep));color:#fff;box-shadow:0 8px 20px rgba(0,166,232,.35)}
+.btn-dark{background:var(--ink);color:#fff}
+.btn-ghost{background:transparent;border:2px solid #fff;color:#fff}
+.hamburger{display:none;background:none;border:none;font-size:1.5rem;cursor:pointer;padding:8px}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadein .35s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ---------- SPLIT HERO ---------- */
+.hero{display:grid;grid-template-columns:1fr 1fr;position:relative;min-height:560px;overflow:hidden}
+.half{position:relative;display:flex;flex-direction:column;justify-content:center;padding:64px 48px;color:#fff;overflow:hidden}
+.half .big{font-size:clamp(3rem,7vw,5.4rem);line-height:.95;text-shadow:0 4px 24px rgba(0,0,0,.25)}
+.half p.lede{margin:14px 0 24px;font-size:1.05rem;max-width:420px;opacity:.95}
+.half .actions{display:flex;gap:12px;flex-wrap:wrap}
+.half-hot{background:radial-gradient(120% 140% at 20% 10%,var(--hot-glow) 0%,var(--hot) 45%,var(--hot-deep) 100%)}
+.half-cold{background:radial-gradient(120% 140% at 80% 10%,var(--cold-glow) 0%,var(--cold) 45%,var(--cold-deep) 100%)}
+.half .iconbg{position:absolute;right:18px;bottom:6px;font-size:11rem;opacity:.16;transform:rotate(-8deg)}
+.half .badge-line{display:inline-flex;align-items:center;gap:8px;font-size:.78rem;font-weight:800;letter-spacing:.22em;text-transform:uppercase;background:rgba(0,0,0,.28);padding:8px 16px;border-radius:999px;margin-bottom:18px;width:fit-content}
+/* thermometer divider */
+.thermo{position:absolute;left:50%;top:0;bottom:0;width:64px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;z-index:5;pointer-events:none}
+.thermo .tube{width:20px;flex:1;background:rgba(255,255,255,.28);backdrop-filter:blur(2px);border-radius:12px;position:relative;overflow:hidden;box-shadow:inset 0 0 8px rgba(0,0,0,.25)}
+.thermo .mercury{position:absolute;left:0;right:0;bottom:0;height:62%;background:linear-gradient(to top,var(--cold) 0%,#7be3ff 38%,#ffd166 62%,var(--hot) 100%)}
+.thermo .bulb{width:52px;height:52px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffb25e,var(--hot) 60%,var(--hot-deep));border:6px solid rgba(255,255,255,.85);margin-top:-8px;box-shadow:0 6px 18px rgba(0,0,0,.3)}
+.thermo .tick{position:absolute;top:14px;color:#fff;font-weight:800;font-size:.8rem;background:rgba(0,0,0,.45);border-radius:999px;padding:4px 12px;white-space:nowrap}
+.hero-caption{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:6;background:rgba(0,0,0,.55);color:#fff;font-size:.8rem;font-weight:600;padding:8px 18px;border-radius:999px;pointer-events:none}
+
+/* ---------- sections ---------- */
+.section{padding:72px 0}
+.section-title{font-size:clamp(2.2rem,4.5vw,3.4rem);margin-bottom:8px}
+.kicker{display:inline-block;font-size:.75rem;font-weight:800;letter-spacing:.28em;text-transform:uppercase;margin-bottom:10px}
+.kicker.hot{color:var(--hot-deep)}
+.kicker.cold{color:var(--cold-deep)}
+.sub{color:var(--muted);max-width:640px;margin-bottom:34px}
+
+/* split band */
+.splitband{display:grid;grid-template-columns:1fr 1fr;border-radius:var(--radius);overflow:hidden;box-shadow:0 18px 40px rgba(0,0,0,.12)}
+.splitband .band{padding:46px 38px;color:#fff;position:relative}
+.splitband .band.hot{background:linear-gradient(135deg,var(--hot-deep),var(--hot))}
+.splitband .band.cold{background:linear-gradient(135deg,var(--cold-deep),var(--cold))}
+.splitband h3{font-size:2rem;margin-bottom:10px}
+.splitband ul{list-style:none;margin:16px 0 24px;display:grid;gap:10px}
+.splitband ul li{display:flex;gap:10px;align-items:flex-start}
+.splitband ul li i{margin-top:5px}
+
+/* fact cards */
+.facts{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:36px}
+.fact{background:var(--card);border-radius:var(--radius);padding:26px 22px;box-shadow:0 10px 26px rgba(0,0,0,.07);text-align:center;border-top:6px solid #ddd}
+.fact.hot{border-top-color:var(--hot)}
+.fact.cold{border-top-color:var(--cold)}
+.fact .num{font-family:'Bebas Neue';font-size:2.6rem;line-height:1}
+.fact .lbl{font-size:.85rem;color:var(--muted);font-weight:600;margin-top:6px}
+.stars{color:#f5a623;font-size:1.05rem;letter-spacing:2px}
+
+/* ---------- DIAL SELECTOR ---------- */
+.dialzone{display:grid;grid-template-columns:minmax(300px,420px) 1fr;gap:44px;align-items:center;background:var(--ink);border-radius:26px;padding:52px;color:#fff;position:relative;overflow:hidden}
+.dialzone::before{content:"";position:absolute;inset:0;background:radial-gradient(80% 90% at 15% 20%,rgba(255,90,31,.28),transparent 60%),radial-gradient(80% 90% at 85% 80%,rgba(0,166,232,.28),transparent 60%);pointer-events:none}
+.dial{position:relative;width:320px;height:320px;margin:0 auto;flex:none}
+.dial .face{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 270deg,var(--cold-deep) 0deg,var(--cold) 130deg,#cfd8e3 165deg 195deg,var(--hot) 230deg,var(--hot-deep) 360deg);box-shadow:0 0 0 14px #242c38,0 0 0 16px rgba(255,255,255,.12),0 24px 60px rgba(0,0,0,.5)}
+.dial .ticks{position:absolute;inset:18px;border-radius:50%;background:repeating-conic-gradient(rgba(255,255,255,.75) 0 .6deg,transparent .6deg 15deg);-webkit-mask:radial-gradient(circle,transparent 62%,#000 63%);mask:radial-gradient(circle,transparent 62%,#000 63%)}
+.dial .center{position:absolute;inset:96px;border-radius:50%;background:#171c24;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 4px 14px rgba(0,0,0,.6)}
+.dial .center .temp{font-family:'Bebas Neue';font-size:2.2rem;line-height:1}
+.dial .center .mode{font-size:.68rem;font-weight:800;letter-spacing:.24em;text-transform:uppercase;opacity:.7}
+.dial .needle{position:absolute;left:50%;top:50%;width:8px;height:44%;transform-origin:50% 100%;transform:translate(-50%,-100%) rotate(-90deg);transition:transform .6s cubic-bezier(.34,1.4,.64,1);z-index:3}
+.dial .needle::before{content:"";position:absolute;inset:0;background:linear-gradient(#fff,#ffd166);border-radius:6px}
+.dial .needle::after{content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);width:28px;height:28px;border-radius:50%;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.5)}
+.dial-label{position:absolute;font-size:.68rem;font-weight:800;letter-spacing:.1em;color:rgba(255,255,255,.85)}
+.dial-label.l60{left:14px;top:52%}
+.dial-label.l75{left:50%;top:6px;transform:translateX(-50%)}
+.dial-label.l90{right:14px;top:52%}
+.dial-buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:26px}
+.dial-btn{background:#242c38;border:2px solid transparent;color:#fff;border-radius:12px;padding:12px 10px;font-weight:700;font-size:.85rem;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:8px;justify-content:center}
+.dial-btn i{font-size:1rem}
+.dial-btn[data-zone="cold"] i{color:var(--cold-glow)}
+.dial-btn[data-zone="hot"] i{color:var(--hot-glow)}
+.dial-btn.sel-cold{border-color:var(--cold);background:#0d2b3d}
+.dial-btn.sel-hot{border-color:var(--hot);background:#3d1d0d}
+.dial-info{position:relative;z-index:2}
+.dial-info .zone-tag{display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:.26em;text-transform:uppercase;padding:7px 16px;border-radius:999px;margin-bottom:14px}
+.zone-tag.cold{background:rgba(0,166,232,.2);color:var(--cold-glow);border:1px solid var(--cold)}
+.zone-tag.hot{background:rgba(255,90,31,.2);color:var(--hot-glow);border:1px solid var(--hot)}
+.dial-info h3{font-size:2.4rem;margin-bottom:10px}
+.dial-info p{opacity:.85;max-width:460px}
+.dial-info .note{margin-top:14px;font-size:.8rem;background:rgba(255,255,255,.08);border:1px dashed rgba(255,255,255,.3);border-radius:10px;padding:10px 14px;display:inline-block}
+.dial-info .actions{margin-top:22px;display:flex;gap:12px;flex-wrap:wrap}
+
+/* service cards */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:10px}
+.card{background:var(--card);border-radius:var(--radius);padding:30px 26px;box-shadow:0 10px 26px rgba(0,0,0,.07);position:relative;overflow:hidden;border:1px solid #ece8e1}
+.card::before{content:"";position:absolute;top:0;left:0;right:0;height:7px}
+.card.hot::before{background:linear-gradient(90deg,var(--hot),var(--hot-glow))}
+.card.cold::before{background:linear-gradient(90deg,var(--cold),var(--cold-glow))}
+.card .ic{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:16px;color:#fff}
+.card.hot .ic{background:linear-gradient(135deg,var(--hot),var(--hot-deep))}
+.card.cold .ic{background:linear-gradient(135deg,var(--cold),var(--cold-deep))}
+.card h3{font-size:1.6rem;margin-bottom:8px}
+.card p{font-size:.92rem;color:#4b5563}
+.card .tag{display:inline-block;margin-top:14px;font-size:.72rem;font-weight:700;background:#f3f0eb;border-radius:999px;padding:5px 12px;color:var(--muted)}
+
+/* hours table */
+.hours{background:var(--card);border-radius:var(--radius);box-shadow:0 10px 26px rgba(0,0,0,.07);overflow:hidden;max-width:560px}
+.hours .hrow{display:flex;justify-content:space-between;padding:14px 24px;border-bottom:1px solid #eee}
+.hours .hrow:last-child{border-bottom:none}
+.hours .hrow.today{background:#fff7ed;font-weight:800}
+.hours .closed{color:#b91c1c;font-weight:700}
+
+/* review cards */
+.revgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.review{background:var(--card);border-radius:var(--radius);padding:28px;box-shadow:0 10px 26px rgba(0,0,0,.07);border-left:8px solid var(--cold)}
+.review.warm{border-left-color:var(--hot)}
+.review .src{font-size:.75rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:14px}
+.bigstars{font-size:2.4rem;color:#f5a623;letter-spacing:4px}
+.ratingbox{display:flex;gap:32px;align-items:center;background:var(--ink);color:#fff;border-radius:var(--radius);padding:36px;margin-bottom:28px;flex-wrap:wrap}
+.ratingbox .score{font-family:'Bebas Neue';font-size:5rem;line-height:1}
+
+/* contact */
+.contactgrid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.cpanel{background:var(--card);border-radius:var(--radius);padding:34px;box-shadow:0 10px 26px rgba(0,0,0,.07)}
+.cpanel h3{font-size:1.8rem;margin-bottom:16px}
+.crow{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #f0ede8}
+.crow:last-child{border:none}
+.crow i{font-size:1.25rem;margin-top:3px}
+.crow.hot i{color:var(--hot)} .crow.cold i{color:var(--cold-deep)}
+.crow .t{font-weight:800;font-size:.95rem}
+.crow .d{color:var(--muted);font-size:.9rem}
+form .field{margin-bottom:16px}
+form label{display:block;font-weight:700;font-size:.85rem;margin-bottom:6px}
+form input,form select,form textarea{width:100%;padding:13px 15px;border:2px solid #e5e1da;border-radius:12px;font:inherit;font-size:.95rem;background:#fff}
+form input:focus,form select:focus,form textarea:focus{outline:none;border-color:var(--cold)}
+form textarea{min-height:110px;resize:vertical}
+.formnote{font-size:.8rem;color:var(--muted);margin-top:12px}
+
+/* CTA band */
+.ctaband{margin:0 0 72px;border-radius:26px;overflow:hidden;display:grid;grid-template-columns:1fr 1fr;color:#fff}
+.ctaband .cb{padding:52px 44px}
+.ctaband .cb.hot{background:linear-gradient(135deg,var(--hot-deep),var(--hot))}
+.ctaband .cb.cold{background:linear-gradient(135deg,var(--cold-deep),var(--cold))}
+.ctaband h3{font-size:2.6rem;line-height:1;margin-bottom:10px}
+.ctaband p{opacity:.92;margin-bottom:22px}
+
+/* footer */
+footer{background:var(--ink);color:#fff;text-align:center;padding:30px 20px;font-size:.95rem}
+
+/* misc */
+.verify-strip{background:#fff8e6;border:2px dashed #d97706;border-radius:12px;padding:12px 18px;font-size:.82rem;color:#92400e;margin-top:18px;display:inline-block}
+.mapframe{border:0;width:100%;height:320px;border-radius:var(--radius);box-shadow:0 10px 26px rgba(0,0,0,.1)}
+
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr}
+  .half{min-height:340px;padding:52px 28px}
+  .thermo{display:none}
+  .hero-caption{display:none}
+  .facts{grid-template-columns:repeat(2,1fr)}
+  .cards{grid-template-columns:1fr}
+  .dialzone{grid-template-columns:1fr;padding:36px 24px}
+  .contactgrid,.revgrid,.splitband,.ctaband{grid-template-columns:1fr}
+  nav.main{position:fixed;top:0;right:-280px;width:260px;height:100vh;background:#fff;flex-direction:column;align-items:stretch;gap:6px;padding:80px 22px 22px;transition:right .3s ease;box-shadow:-8px 0 30px rgba(0,0,0,.15);z-index:99}
+  nav.main.open{right:0}
+  nav.main a{padding:14px 16px}
+  .hamburger{display:block}
+  .nav-cta{margin-top:10px}
+  .menuclose{position:absolute;top:18px;right:18px;background:none;border:none;font-size:1.4rem;cursor:pointer}
+}
+@media(min-width:901px){.menuclose{display:none}}
+</style>
+</head>
+<body>
+
+<div class="topstrip">
+  <div class="container">
+    <span><i class="fa-solid fa-location-dot"></i> 10500 Chester Rd, Cincinnati, OH 45215</span>
+    <span class="hours-pill"><i class="fa-regular fa-clock"></i> Mon to Fri, 8:00 AM to 4:00 PM</span>
+    <a class="tel" href="tel:+15132445652"><i class="fa-solid fa-phone"></i> (513) 244-5652</a>
+  </div>
+</div>
+
+<header class="site">
+  <div class="navwrap">
+    <a class="brand" href="#home" data-nav="home">
+      <span class="duos"><i class="fa-solid fa-fire"></i><i class="fa-solid fa-snowflake"></i></span>
+      <span>Wegman<small>Heating &amp; Air Conditioning</small></span>
+    </a>
+    <button class="hamburger" id="hamburger" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+    <nav class="main" id="mainnav">
+      <button class="menuclose" id="menuclose" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button>
+      <a href="#home" data-nav="home" class="active">Home</a>
+      <a href="#services" data-nav="services">Services</a>
+      <a href="#about" data-nav="about">About</a>
+      <a href="#reviews" data-nav="reviews">Reviews</a>
+      <a href="#contact" data-nav="contact">Contact</a>
+      <a class="btn btn-hot nav-cta" href="tel:+15132445652" style="padding:10px 20px"><i class="fa-solid fa-phone"></i> (513) 244-5652</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section class="page active" id="page-home" data-page="home">
+
+  <div class="hero">
+    <div class="half half-hot">
+      <span class="badge-line"><i class="fa-solid fa-fire"></i> Heating Side</span>
+      <h1 class="big">TOO<br>COLD?</h1>
+      <p class="lede">Furnace trouble on a freezing Cincinnati morning is miserable. Wegman keeps the heat side of your home steady all winter.</p>
+      <div class="actions">
+        <button class="btn btn-dark" data-nav="services"><i class="fa-solid fa-fire"></i> Heating Services</button>
+        <a class="btn btn-ghost" href="tel:+15132445652"><i class="fa-solid fa-phone"></i> Call Now</a>
+      </div>
+      <i class="fa-solid fa-temperature-high iconbg"></i>
+    </div>
+    <div class="half half-cold">
+      <span class="badge-line"><i class="fa-solid fa-snowflake"></i> Cooling Side</span>
+      <h1 class="big">TOO<br>HOT?</h1>
+      <p class="lede">When the July humidity hits, your AC has one job. Wegman installs and repairs cooling systems that actually keep up.</p>
+      <div class="actions">
+        <button class="btn btn-dark" data-nav="services"><i class="fa-solid fa-snowflake"></i> Cooling Services</button>
+        <a class="btn btn-ghost" href="tel:+15132445652"><i class="fa-solid fa-phone"></i> Call Now</a>
+      </div>
+      <i class="fa-solid fa-temperature-low iconbg"></i>
+    </div>
+    <div class="thermo" aria-hidden="true">
+      <span class="tick">72&deg;</span>
+      <div class="tube"><div class="mercury"></div></div>
+      <div class="bulb"></div>
+    </div>
+    <div class="hero-caption">One company for both sides of the thermometer</div>
+  </div>
+
+  <div class="section">
+    <div class="container">
+      <span class="kicker hot"><i class="fa-solid fa-star"></i> Rated 4.6 by local customers</span>
+      <h2 class="section-title">Cincinnati comfort,<br>both directions</h2>
+      <p class="sub">Wegman Heating &amp; Air Conditioning is an air conditioning contractor on Chester Road in Cincinnati, Ohio, handling heating and cooling work for homes and businesses. Pick a side below.</p>
+
+      <div class="splitband">
+        <div class="band cold">
+          <h3><i class="fa-solid fa-snowflake"></i> Cooling</h3>
+          <ul>
+            <li><i class="fa-solid fa-check"></i> Air conditioning installation</li>
+            <li><i class="fa-solid fa-check"></i> AC repair and troubleshooting</li>
+            <li><i class="fa-solid fa-check"></i> Seasonal maintenance and tune-ups</li>
+          </ul>
+          <button class="btn btn-dark" data-nav="services">See cooling services</button>
+        </div>
+        <div class="band hot">
+          <h3><i class="fa-solid fa-fire"></i> Heating</h3>
+          <ul>
+            <li><i class="fa-solid fa-check"></i> Heating system installation</li>
+            <li><i class="fa-solid fa-check"></i> Furnace and heater repair</li>
+            <li><i class="fa-solid fa-check"></i> Energy efficient upgrades</li>
+          </ul>
+          <button class="btn btn-dark" data-nav="services">See heating services</button>
+        </div>
+      </div>
+
+      <div class="facts">
+        <div class="fact hot"><div class="num">4.6 <span class="stars">★★★★<span style="opacity:.35">★</span></span></div><div class="lbl">Average rating across 11 online reviews</div></div>
+        <div class="fact cold"><div class="num">Mon to Fri</div><div class="lbl">Open 8:00 AM to 4:00 PM weekdays</div></div>
+        <div class="fact hot"><div class="num">10500</div><div class="lbl">Chester Rd, Cincinnati, OH 45215</div></div>
+        <div class="fact cold"><div class="num"><a href="tel:+15132445652" style="font-weight:800">(513) 244-5652</a></div><div class="lbl">Call for service and estimates</div></div>
+      </div>
+      <span class="verify-strip"><i class="fa-solid fa-circle-info"></i> Rating, review count, and hours from public directory listings. Service details: call to confirm.</span>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="ctaband">
+      <div class="cb cold">
+        <h3>AC acting up?</h3>
+        <p>Weak airflow, warm air, strange noises. Tell us what is happening and we will take it from there.</p>
+        <a class="btn btn-dark" href="tel:+15132445652"><i class="fa-solid fa-phone"></i> (513) 244-5652</a>
+      </div>
+      <div class="cb hot">
+        <h3>Heat not keeping up?</h3>
+        <p>Cold spots, rising bills, a system that never seems to rest. Get it checked before the next cold snap.</p>
+        <button class="btn btn-dark" data-nav="contact"><i class="fa-solid fa-envelope"></i> Request service</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-services" data-page="services">
+  <div class="section">
+    <div class="container">
+      <span class="kicker cold"><i class="fa-solid fa-gauge-high"></i> Turn the dial</span>
+      <h2 class="section-title">Pick your temperature,<br>we handle the rest</h2>
+      <p class="sub">Tap a service on the dial. Blue side is cooling work, orange side is heating work. The needle points where your comfort problem lives.</p>
+
+      <div class="dialzone">
+        <div>
+          <div class="dial" role="img" aria-label="Temperature dial service selector">
+            <div class="face"></div>
+            <div class="ticks"></div>
+            <div class="needle" id="needle"></div>
+            <div class="center"><span class="temp" id="dialTemp">72&deg;</span><span class="mode" id="dialMode">Comfort</span></div>
+            <span class="dial-label l60">60&deg;</span>
+            <span class="dial-label l75">75&deg;</span>
+            <span class="dial-label l90">90&deg;</span>
+          </div>
+          <div class="dial-buttons" id="dialButtons">
+            <button class="dial-btn" data-zone="cold" data-angle="-125" data-temp="62&deg;" data-mode="Cooling" data-title="AC Installation" data-desc="New air conditioning system installs sized for your home, including replacements for aging or undersized units."><i class="fa-solid fa-snowflake"></i>AC Installation</button>
+            <button class="dial-btn" data-zone="cold" data-angle="-80" data-temp="68&deg;" data-mode="Cooling" data-title="AC Repair" data-desc="Diagnosis and repair for AC units that blow warm air, freeze up, short cycle, or quit on the hottest day of the year."><i class="fa-solid fa-wrench"></i>AC Repair</button>
+            <button class="dial-btn" data-zone="cold" data-angle="-35" data-temp="71&deg;" data-mode="Cooling" data-title="Maintenance Tune-Ups" data-desc="Seasonal checkups that keep cooling equipment efficient and catch small problems before they become breakdowns."><i class="fa-solid fa-clipboard-check"></i>Tune-Ups</button>
+            <button class="dial-btn" data-zone="hot" data-angle="35" data-temp="73&deg;" data-mode="Heating" data-title="Heating Repair" data-desc="Furnace and heater repairs for no-heat calls, uneven rooms, odd smells, and systems that will not stay lit."><i class="fa-solid fa-fire"></i>Heating Repair</button>
+            <button class="dial-btn" data-zone="hot" data-angle="80" data-temp="78&deg;" data-mode="Heating" data-title="Heating Installation" data-desc="New heating system installs and full replacements, matched to your home and your fuel type."><i class="fa-solid fa-house-fire"></i>Heating Install</button>
+            <button class="dial-btn" data-zone="hot" data-angle="125" data-temp="84&deg;" data-mode="Heating" data-title="Efficiency Upgrades" data-desc="High efficiency equipment and smart thermostat options that can trim monthly energy costs. Savings vary by home, call to confirm."><i class="fa-solid fa-leaf"></i>Efficiency Upgrades</button>
+          </div>
+        </div>
+        <div class="dial-info">
+          <span class="zone-tag cold" id="zoneTag">Cooling zone</span>
+          <h3 id="dialTitle">AC Installation</h3>
+          <p id="dialDesc">New air conditioning system installs sized for your home, including replacements for aging or undersized units.</p>
+          <span class="note"><i class="fa-solid fa-circle-info"></i> Service list based on the business directory profile. Specific availability, pricing, and emergency hours: call to confirm.</span>
+          <div class="actions">
+            <a class="btn btn-hot" href="tel:+15132445652"><i class="fa-solid fa-phone"></i> (513) 244-5652</a>
+            <button class="btn btn-ghost" data-nav="contact">Request this service</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:56px"></div>
+      <span class="kicker hot"><i class="fa-solid fa-list-check"></i> The full lineup</span>
+      <h2 class="section-title">Every service, hot or cold</h2>
+      <div class="cards">
+        <div class="card cold"><div class="ic"><i class="fa-solid fa-snowflake"></i></div><h3>AC Installation</h3><p>New central air installs and full system replacements for homes and small businesses.</p><span class="tag">Cooling side</span></div>
+        <div class="card cold"><div class="ic"><i class="fa-solid fa-wrench"></i></div><h3>AC Repair</h3><p>Fast diagnosis and repair when your cooling quits, blows warm, or runs nonstop.</p><span class="tag">Cooling side</span></div>
+        <div class="card cold"><div class="ic"><i class="fa-solid fa-clipboard-check"></i></div><h3>Maintenance Tune-Ups</h3><p>Seasonal inspections and tune-ups to extend equipment life and hold efficiency.</p><span class="tag">Call to confirm plan options</span></div>
+        <div class="card hot"><div class="ic"><i class="fa-solid fa-fire"></i></div><h3>Heating Repair</h3><p>No-heat calls and furnace repairs, from ignition problems to airflow trouble.</p><span class="tag">Heating side</span></div>
+        <div class="card hot"><div class="ic"><i class="fa-solid fa-house-fire"></i></div><h3>Heating Installation</h3><p>New furnaces and heating systems, installed and tested for safe operation.</p><span class="tag">Heating side</span></div>
+        <div class="card hot"><div class="ic"><i class="fa-solid fa-leaf"></i></div><h3>Efficiency Upgrades</h3><p>High efficiency equipment and smart controls that can lower energy use.</p><span class="tag">Call to confirm savings and rebates</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-about" data-page="about">
+  <div class="section">
+    <div class="container">
+      <span class="kicker hot"><i class="fa-solid fa-fire"></i><i class="fa-solid fa-snowflake"></i> Who we are</span>
+      <h2 class="section-title">A Cincinnati HVAC shop,<br>built for both seasons</h2>
+      <p class="sub">Wegman Heating &amp; Air Conditioning is an air conditioning contractor based at 10500 Chester Rd in Cincinnati, Ohio. Directory listings describe installation, repair, and maintenance services for heating and cooling systems across the Cincinnati area.</p>
+
+      <div class="splitband">
+        <div class="band hot">
+          <h3><i class="fa-solid fa-temperature-high"></i> The hot half</h3>
+          <p>Ohio winters do not negotiate. Wegman handles the heating side: furnaces, heaters, and the tune-ups that keep them running when the temperature drops.</p>
+        </div>
+        <div class="band cold">
+          <h3><i class="fa-solid fa-temperature-low"></i> The cold half</h3>
+          <p>Cincinnati summers bring heat and humidity. Wegman handles the cooling side: AC installs, repairs, and maintenance that keep indoor air comfortable.</p>
+        </div>
+      </div>
+
+      <div style="height:44px"></div>
+      <div class="contactgrid">
+        <div>
+          <h3 style="font-size:1.8rem;margin-bottom:14px">Business hours</h3>
+          <div class="hours" id="hoursTable">
+            <div class="hrow" data-day="1"><span>Monday</span><span>8:00 AM to 4:00 PM</span></div>
+            <div class="hrow" data-day="2"><span>Tuesday</span><span>8:00 AM to 4:00 PM</span></div>
+            <div class="hrow" data-day="3"><span>Wednesday</span><span>8:00 AM to 4:00 PM</span></div>
+            <div class="hrow" data-day="4"><span>Thursday</span><span>8:00 AM to 4:00 PM</span></div>
+            <div class="hrow" data-day="5"><span>Friday</span><span>8:00 AM to 4:00 PM</span></div>
+            <div class="hrow" data-day="6"><span>Saturday</span><span class="closed">Closed</span></div>
+            <div class="hrow" data-day="0"><span>Sunday</span><span class="closed">Closed</span></div>
+          </div>
+          <span class="verify-strip"><i class="fa-solid fa-circle-info"></i> Hours from public directory listings. Holiday hours: call to confirm.</span>
+        </div>
+        <div>
+          <h3 style="font-size:1.8rem;margin-bottom:14px">At a glance</h3>
+          <div class="crow hot"><i class="fa-solid fa-location-dot"></i><div><div class="t">10500 Chester Rd, Cincinnati, OH 45215</div><div class="d">Shop location in the 45215 area</div></div></div>
+          <div class="crow cold"><i class="fa-solid fa-phone"></i><div><div class="t"><a href="tel:+15132445652">(513) 244-5652</a></div><div class="d">Call during business hours</div></div></div>
+          <div class="crow hot"><i class="fa-solid fa-star"></i><div><div class="t">4.6 average rating</div><div class="d">Across 11 online reviews on Birdeye</div></div></div>
+          <div class="crow cold"><i class="fa-solid fa-briefcase"></i><div><div class="t">Heating and cooling contractor</div><div class="d">Install, repair, and maintenance work</div></div></div>
+          <div class="crow hot"><i class="fa-solid fa-map"></i><div><div class="t">Serving Cincinnati, Ohio</div><div class="d">Directory listings show the greater Cincinnati area</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-reviews" data-page="reviews">
+  <div class="section">
+    <div class="container">
+      <span class="kicker cold"><i class="fa-solid fa-comments"></i> Honest feedback</span>
+      <h2 class="section-title">What customers say</h2>
+      <p class="sub">Real review data only. We show the aggregate rating and a verified customer quote from the public listing. No invented names, no invented reviews.</p>
+
+      <div class="ratingbox">
+        <div class="score">4.6</div>
+        <div>
+          <div class="bigstars">★★★★<span style="opacity:.35">★</span></div>
+          <p style="margin-top:8px;opacity:.85">Based on <strong>11 reviews</strong> on the Birdeye business listing.<br>Overall sentiment: <strong>positive</strong>, with a modest review sample.</p>
+        </div>
+        <a class="btn btn-cold" style="margin-left:auto" href="https://reviews.birdeye.com/wegman-heating-air-conditioning-165373656412914" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Read all reviews on Birdeye</a>
+      </div>
+
+      <div class="revgrid">
+        <div class="review warm">
+          <div class="stars">★★★★★</div>
+          <p style="margin:12px 0;font-size:1.05rem">"Sean, Danny and Michael did a great job. I would highly recommend!"</p>
+          <div class="src">Verified customer quote, from the public Birdeye listing</div>
+        </div>
+        <div class="review">
+          <div class="stars">★★★★★</div>
+          <p style="margin:12px 0;font-size:1.05rem">One listing review notes repeat service on a decades old unit, with the technicians taking time to explain cleaning and troubleshooting to the homeowner.</p>
+          <div class="src">Summary of a public Yellow Pages review excerpt, paraphrased</div>
+        </div>
+      </div>
+
+      <div style="margin-top:28px;background:var(--card);border-radius:var(--radius);padding:30px;box-shadow:0 10px 26px rgba(0,0,0,.07)">
+        <h3 style="font-size:1.7rem;margin-bottom:8px">Had work done by Wegman?</h3>
+        <p style="color:var(--muted);margin-bottom:18px">Your review helps neighbors decide. Leave it on the verified listing linked above, or tell the crew directly at <a href="tel:+15132445652" style="font-weight:800;color:var(--cold-deep)">(513) 244-5652</a>.</p>
+        <a class="btn btn-dark" href="https://reviews.birdeye.com/wegman-heating-air-conditioning-165373656412914" target="_blank" rel="noopener"><i class="fa-solid fa-pen"></i> Leave a review on Birdeye</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-contact" data-page="contact">
+  <div class="section">
+    <div class="container">
+      <span class="kicker hot"><i class="fa-solid fa-phone"></i> Get in touch</span>
+      <h2 class="section-title">Call, visit, or send a note</h2>
+      <p class="sub">Fastest path is a phone call during business hours. For anything else, here is where to find us and how to reach out.</p>
+
+      <div class="contactgrid">
+        <div class="cpanel">
+          <h3>Reach us</h3>
+          <div class="crow hot"><i class="fa-solid fa-phone"></i><div><div class="t"><a href="tel:+15132445652">(513) 244-5652</a></div><div class="d">Tap to call now</div></div></div>
+          <div class="crow cold"><i class="fa-solid fa-location-dot"></i><div><div class="t">10500 Chester Rd<br>Cincinnati, OH 45215</div><div class="d"><a href="https://www.google.com/maps/search/?api=1&amp;query=10500%20Chester%20Rd%2C%20Cincinnati%2C%20OH%2045215" target="_blank" rel="noopener" style="font-weight:800;color:var(--cold-deep)">Get directions <i class="fa-solid fa-arrow-up-right-from-square"></i></a></div></div></div>
+          <div class="crow hot"><i class="fa-regular fa-clock"></i><div><div class="t">Mon to Fri, 8:00 AM to 4:00 PM</div><div class="d">Closed Saturday and Sunday</div></div></div>
+          <div class="crow cold"><i class="fa-solid fa-wrench"></i><div><div class="t">Heating and cooling service</div><div class="d">Install, repair, maintenance. Details: call to confirm.</div></div></div>
+          <div style="margin-top:22px">
+            <iframe class="mapframe" title="Map to Wegman Heating and Air Conditioning" loading="lazy" src="https://www.google.com/maps?q=10500%20Chester%20Rd%2C%20Cincinnati%2C%20OH%2045215&amp;output=embed"></iframe>
+          </div>
+        </div>
+        <div class="cpanel">
+          <h3>Request service</h3>
+          <form id="serviceForm">
+            <div class="field"><label for="fName">Your name</label><input id="fName" name="name" type="text" required placeholder="Jane Smith"></div>
+            <div class="field"><label for="fPhone">Phone number</label><input id="fPhone" name="phone" type="tel" required placeholder="(513) 555-0123"></div>
+            <div class="field"><label for="fService">What do you need?</label>
+              <select id="fService" name="service">
+                <option>AC repair</option>
+                <option>AC installation</option>
+                <option>Heating repair</option>
+                <option>Heating installation</option>
+                <option>Maintenance tune-up</option>
+                <option>Something else</option>
+              </select>
+            </div>
+            <div class="field"><label for="fMsg">Describe the problem</label><textarea id="fMsg" name="message" placeholder="Example: AC blows warm air on hot afternoons. Unit is about 10 years old."></textarea></div>
+            <button class="btn btn-hot" type="submit" style="width:100%;justify-content:center"><i class="fa-solid fa-envelope-open-text"></i> Draft service request</button>
+            <p class="formnote">This opens a prewritten email in your own mail app. Add the business as the recipient (or just call <a href="tel:+15132445652" style="font-weight:700">(513) 244-5652</a>). No email address for this business is published online, so we do not guess one.</p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>© Wegman Heating &amp; Air Conditioning</footer>
+
+<script>
+(function(){
+  var pages = document.querySelectorAll('.page');
+  var navLinks = document.querySelectorAll('[data-nav]');
+  var nav = document.getElementById('mainnav');
+
+  function validPage(p){
+    return document.querySelector('.page[data-page="' + p + '"]') ? p : 'home';
+  }
+  function navigateTo(page, push){
+    page = validPage(page);
+    pages.forEach(function(s){ s.classList.toggle('active', s.getAttribute('data-page') === page); });
+    navLinks.forEach(function(a){
+      if(a.tagName === 'A' && a.classList.contains('active') !== undefined){}
+      if(a.tagName === 'A'){ a.classList.toggle('active', a.getAttribute('data-nav') === page); }
+    });
+    if(push !== false){
+      try{ history.pushState({page:page}, '', '#' + page); }catch(e){}
+    }
+    nav.classList.remove('open');
+    window.scrollTo(0,0);
+  }
+  document.addEventListener('click', function(e){
+    var t = e.target.closest('[data-nav]');
+    if(t){
+      e.preventDefault();
+      navigateTo(t.getAttribute('data-nav'));
+    }
+  });
+  window.addEventListener('popstate', function(){
+    navigateTo(location.hash.replace('#','') || 'home', false);
+  });
+  navigateTo(location.hash.replace('#','') || 'home', false);
+
+  document.getElementById('hamburger').addEventListener('click', function(){ nav.classList.add('open'); });
+  document.getElementById('menuclose').addEventListener('click', function(){ nav.classList.remove('open'); });
+
+  var today = new Date().getDay();
+  document.querySelectorAll('#hoursTable .hrow').forEach(function(r){
+    if(parseInt(r.getAttribute('data-day'),10) === today){ r.classList.add('today'); }
+  });
+
+  var needle = document.getElementById('needle');
+  var dialTemp = document.getElementById('dialTemp');
+  var dialMode = document.getElementById('dialMode');
+  var dialTitle = document.getElementById('dialTitle');
+  var dialDesc = document.getElementById('dialDesc');
+  var zoneTag = document.getElementById('zoneTag');
+  var dialBtns = document.querySelectorAll('#dialButtons .dial-btn');
+  function selectDial(btn){
+    dialBtns.forEach(function(b){ b.classList.remove('sel-cold','sel-hot'); });
+    var zone = btn.getAttribute('data-zone');
+    btn.classList.add(zone === 'cold' ? 'sel-cold' : 'sel-hot');
+    needle.style.transform = 'translate(-50%,-100%) rotate(' + btn.getAttribute('data-angle') + 'deg)';
+    dialTemp.innerHTML = btn.getAttribute('data-temp');
+    dialMode.textContent = btn.getAttribute('data-mode');
+    dialTitle.textContent = btn.getAttribute('data-title');
+    dialDesc.textContent = btn.getAttribute('data-desc');
+    zoneTag.textContent = zone === 'cold' ? 'Cooling zone' : 'Heating zone';
+    zoneTag.className = 'zone-tag ' + zone;
+  }
+  dialBtns.forEach(function(b){ b.addEventListener('click', function(){ selectDial(b); }); });
+  if(dialBtns.length){ selectDial(dialBtns[0]); }
+
+  document.getElementById('serviceForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var name = document.getElementById('fName').value.trim();
+    var phone = document.getElementById('fPhone').value.trim();
+    var service = document.getElementById('fService').value;
+    var msg = document.getElementById('fMsg').value.trim();
+    var subject = encodeURIComponent('Service request: ' + service + ' (Wegman Heating and Air Conditioning website)');
+    var body = encodeURIComponent('Name: ' + name + '\nPhone: ' + phone + '\nService needed: ' + service + '\nDetails: ' + msg + '\n\nSent from the Wegman Heating and Air Conditioning website contact form.');
+    window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
+  });
+})();
+</script>
+</body>
+</html>
