@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sullivan Electric Group | Electrician in Cincinnati, OH</title>
+<meta name="description" content="Sullivan Electric Group, electrician at 3650 Roll Ave, Cincinnati, OH 45223. Call (513) 241-5413.">
+<style>
+:root{
+  --bg:#0b0e13; --panel:#121722; --panel2:#0e131b; --line:#232b38;
+  --amber:#f6a90c; --amber-deep:#c77f00; --ink:#f2f4f7; --muted:#98a2b3;
+  --blue:#57a6ff; --green:#3ddc84; --red:#ff5d5d;
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);line-height:1.6}
+a{color:inherit}
+.wrap{max-width:1200px;margin:0 auto;padding:0 24px}
+section.page{display:none}
+section.page.active{display:block;animation:fadein .35s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* SPLIT-SCREEN NAV */
+.splitnav{display:flex;min-height:76px;position:sticky;top:0;z-index:50;border-bottom:2px solid var(--amber)}
+.splitnav .brand{background:#05070a;flex:1;display:flex;align-items:center;gap:14px;padding:14px 24px;cursor:pointer}
+.splitnav .brand .bolt{width:42px;height:42px;background:var(--amber);color:#0b0e13;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:24px;font-weight:900}
+.splitnav .brand .bname{font-weight:800;letter-spacing:.5px;font-size:17px;line-height:1.2}
+.splitnav .brand .bsub{font-size:12px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase}
+.splitnav .links{background:var(--amber);flex:1.4;display:flex;align-items:center;justify-content:flex-end;gap:6px;padding:14px 24px;clip-path:polygon(28px 0,100% 0,100% 100%,0 100%)}
+.splitnav .links a.navlink{color:#0b0e13;text-decoration:none;font-weight:700;font-size:14px;padding:10px 14px;border-radius:6px;letter-spacing:.4px}
+.splitnav .links a.navlink:hover,.splitnav .links a.navlink.on{background:#0b0e13;color:var(--amber)}
+.splitnav .links a.callbtn{background:#0b0e13;color:#fff;text-decoration:none;font-weight:800;padding:10px 18px;border-radius:6px;font-size:14px;margin-left:8px;white-space:nowrap}
+.splitnav .links a.callbtn:hover{background:#1c2330}
+.hamburger{display:none;background:#0b0e13;border:0;cursor:pointer;padding:10px;border-radius:6px;margin-left:8px}
+.hamburger span{display:block;width:26px;height:3px;background:var(--amber);margin:5px 0;border-radius:2px}
+.mobilemenu{display:none;position:fixed;inset:0;background:#05070a;z-index:100;flex-direction:column;justify-content:center;align-items:center;gap:8px}
+.mobilemenu.open{display:flex}
+.mobilemenu a{color:var(--ink);text-decoration:none;font-size:26px;font-weight:800;padding:12px}
+.mobilemenu a.on{color:var(--amber)}
+.mobilemenu .closex{position:absolute;top:22px;right:26px;background:none;border:0;color:var(--amber);font-size:38px;cursor:pointer}
+.mobilemenu .mcall{margin-top:18px;background:var(--amber);color:#0b0e13;font-weight:800;text-decoration:none;padding:14px 30px;border-radius:8px;font-size:18px}
+
+/* DATA DASHBOARD HERO */
+.dashhero{position:relative;padding:64px 0 56px;background:
+  radial-gradient(900px 400px at 15% 0%,rgba(246,169,12,.12),transparent),
+  radial-gradient(700px 380px at 90% 20%,rgba(87,166,255,.10),transparent),var(--bg)}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:3px;color:var(--amber);text-transform:uppercase;margin-bottom:14px}
+.dashhero h1{font-size:clamp(38px,6vw,72px);font-weight:900;line-height:1.05;letter-spacing:-1px;margin-bottom:14px}
+.dashhero h1 .amp{color:var(--amber)}
+.dashhero .lede{color:var(--muted);font-size:18px;max-width:640px;margin-bottom:36px}
+.dashgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;position:relative;overflow:hidden}
+.tile::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--amber)}
+.tile .tlabel{font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
+.tile .tvalue{font-size:20px;font-weight:800;line-height:1.3}
+.tile .tsub{font-size:13px;color:var(--muted);margin-top:6px}
+.tile a.tlink{color:var(--amber);text-decoration:none;font-weight:800}
+.tile a.tlink:hover{text-decoration:underline}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px}
+.dot.g{background:var(--green);box-shadow:0 0 8px var(--green);animation:blink 2s infinite}
+.dot.r{background:var(--red)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+.gauge{height:8px;background:#1b222e;border-radius:4px;margin-top:12px;overflow:hidden}
+.gauge i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--amber-deep),var(--amber));border-radius:4px;transition:width 1.4s ease}
+.clock{font-family:var(--mono);font-size:26px;font-weight:700;color:var(--blue)}
+.herocta{display:flex;gap:12px;margin-top:30px;flex-wrap:wrap}
+.btn{display:inline-block;text-decoration:none;font-weight:800;padding:15px 30px;border-radius:8px;font-size:16px;transition:transform .15s ease}
+.btn:hover{transform:translateY(-2px)}
+.btn.amber{background:var(--amber);color:#0b0e13}
+.btn.ghost{border:2px solid var(--line);color:var(--ink)}
+.btn.ghost:hover{border-color:var(--amber);color:var(--amber)}
+.srclink{font-size:12px;color:var(--muted);margin-top:26px}
+.srclink a{color:var(--blue)}
+
+/* MARQUEE STRIP */
+.marquee{background:var(--amber);color:#0b0e13;overflow:hidden;white-space:nowrap;padding:14px 0;border-top:2px solid #0b0e13;border-bottom:2px solid #0b0e13}
+.marquee .track{display:inline-block;animation:scroll 26s linear infinite;font-weight:900;letter-spacing:2px;font-size:16px}
+@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* SECTION TITLES */
+.sectitle{padding:56px 0 8px}
+.sectitle h2{font-size:clamp(28px,4vw,44px);font-weight:900;letter-spacing:-.5px}
+.sectitle h2 .amp{color:var(--amber)}
+.sectitle p{color:var(--muted);max-width:640px;margin-top:8px}
+
+/* GRID WITH BADGES */
+.badgegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:26px 0 60px}
+.bcard{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:24px;position:relative;transition:transform .18s ease,border-color .18s ease}
+.bcard:hover{transform:translateY(-4px);border-color:var(--amber)}
+.bcard .badge{position:absolute;top:16px;right:16px;font-family:var(--mono);font-size:10px;letter-spacing:1.5px;padding:5px 10px;border-radius:20px;font-weight:700}
+.badge.sample{background:#2a2410;color:var(--amber);border:1px solid var(--amber-deep)}
+.badge.listed{background:#0e2a1a;color:var(--green);border:1px solid #1d5c37}
+.badge.ctc{background:#2a1414;color:#ff9c9c;border:1px solid #7a2e2e}
+.bcard .icon{font-size:34px;margin-bottom:14px}
+.bcard h3{font-size:19px;margin-bottom:8px;padding-right:88px}
+.bcard p{color:var(--muted);font-size:14.5px}
+
+/* REVIEWS */
+.revwrap{display:grid;grid-template-columns:1fr 1.4fr;gap:16px;padding:26px 0 60px}
+.revscore{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:32px;text-align:center}
+.revscore .num{font-size:72px;font-weight:900;color:var(--amber);line-height:1}
+.revscore .stars{color:var(--amber);font-size:24px;letter-spacing:4px;margin:10px 0}
+.revscore .meta{color:var(--muted);font-size:14px}
+.revlist .revitem{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:24px;margin-bottom:14px}
+.revitem .q{font-style:italic;font-size:16px;margin-bottom:10px}
+.revitem .src{font-size:13px;color:var(--muted)}
+.revitem .src a{color:var(--blue)}
+.revbtns{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+
+/* ABOUT */
+.aboutgrid{display:grid;grid-template-columns:1.2fr 1fr;gap:16px;padding:26px 0 60px}
+.aboutcard{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:28px}
+.aboutcard h3{font-size:20px;margin-bottom:12px;color:var(--amber)}
+.factrow{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);font-size:15px}
+.factrow:last-child{border-bottom:0}
+.factrow .k{color:var(--muted)}
+.factrow .v{font-weight:700;text-align:right}
+.factrow .v a{color:var(--amber);text-decoration:none}
+
+/* CONTACT */
+.contactgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:26px 0 60px}
+.cinfo{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:28px}
+.cinfo h3{font-size:20px;margin-bottom:16px}
+.cinfo .big{font-size:26px;font-weight:900;color:var(--amber);text-decoration:none}
+.cinfo .big:hover{text-decoration:underline}
+.cinfo p{margin:10px 0;color:var(--muted)}
+.cinfo p strong{color:var(--ink)}
+form.cform{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:28px}
+form.cform h3{font-size:20px;margin-bottom:16px}
+form.cform label{display:block;font-size:13px;color:var(--muted);margin:14px 0 6px;letter-spacing:.5px}
+form.cform input,form.cform select,form.cform textarea{width:100%;background:#0a0d12;border:1px solid var(--line);border-radius:8px;color:var(--ink);padding:12px 14px;font-size:15px;font-family:var(--font)}
+form.cform input:focus,form.cform select:focus,form.cform textarea:focus{outline:2px solid var(--amber);border-color:var(--amber)}
+form.cform textarea{min-height:120px;resize:vertical}
+.formnote{font-size:12.5px;color:var(--muted);margin-top:14px}
+.formdone{display:none;background:#0e2a1a;border:1px solid #1d5c37;border-radius:8px;padding:18px;margin-top:16px}
+.formdone.show{display:block}
+.formdone strong{color:var(--green)}
+.formdone a{color:var(--amber);font-weight:800}
+
+/* SPLIT CTA FOOTER */
+.splitcta{display:flex;margin-top:20px;border-top:2px solid var(--amber)}
+.splitcta a{flex:1;text-decoration:none;padding:44px 24px;text-align:center;font-weight:900;font-size:clamp(18px,2.6vw,28px);transition:filter .15s ease}
+.splitcta a:hover{filter:brightness(1.12)}
+.splitcta .cta-call{background:var(--amber);color:#0b0e13}
+.splitcta .cta-call small{display:block;font-size:13px;font-weight:700;letter-spacing:2px;margin-bottom:8px}
+.splitcta .cta-dir{background:#05070a;color:var(--ink);border-left:2px solid var(--amber)}
+.splitcta .cta-dir small{display:block;font-size:13px;font-weight:700;letter-spacing:2px;margin-bottom:8px;color:var(--amber)}
+footer{background:#05070a;padding:26px 24px;text-align:center;color:var(--muted);font-size:14px}
+
+@media(max-width:900px){
+  .dashgrid{grid-template-columns:repeat(2,1fr)}
+  .badgegrid{grid-template-columns:repeat(2,1fr)}
+  .revwrap,.aboutgrid,.contactgrid{grid-template-columns:1fr}
+}
+@media(max-width:720px){
+  .splitnav .links a.navlink{display:none}
+  .hamburger{display:block}
+  .splitnav .links{clip-path:none}
+  .splitnav .links a.callbtn{font-size:13px;padding:9px 12px}
+}
+@media(max-width:560px){
+  .badgegrid{grid-template-columns:1fr}
+  .splitcta{flex-direction:column}
+  .splitcta .cta-dir{border-left:0;border-top:2px solid var(--amber)}
+}
+</style>
+</head>
+<body>
+
+<nav class="splitnav" aria-label="Main navigation">
+  <div class="brand" data-goto="home" role="button" tabindex="0" aria-label="Sullivan Electric Group home">
+    <div class="bolt">&#9889;</div>
+    <div>
+      <div class="bname">Sullivan Electric Group</div>
+      <div class="bsub">Electrician &middot; Cincinnati OH</div>
+    </div>
+  </div>
+  <div class="links">
+    <a href="#home" class="navlink on" data-goto="home">Home</a>
+    <a href="#services" class="navlink" data-goto="services">Services</a>
+    <a href="#reviews" class="navlink" data-goto="reviews">Reviews</a>
+    <a href="#about" class="navlink" data-goto="about">About</a>
+    <a href="#contact" class="navlink" data-goto="contact">Contact</a>
+    <a href="tel:+15132415413" class="callbtn">(513) 241-5413</a>
+    <button class="hamburger" id="hamb" aria-label="Open menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="mobilemenu" id="mmenu">
+  <button class="closex" id="mclose" aria-label="Close menu">&times;</button>
+  <a href="#home" data-goto="home">Home</a>
+  <a href="#services" data-goto="services">Services</a>
+  <a href="#reviews" data-goto="reviews">Reviews</a>
+  <a href="#about" data-goto="about">About</a>
+  <a href="#contact" data-goto="contact">Contact</a>
+  <a href="tel:+15132415413" class="mcall">Call (513) 241-5413</a>
+</div>
+
+<main>
+
+<section class="page active" id="page-home" data-page="home">
+  <div class="dashhero">
+    <div class="wrap">
+      <div class="eyebrow"><span class="dot g"></span>Live listing readout &middot; Cincinnati, Ohio</div>
+      <h1>Sullivan<br>Electric <span class="amp">Group</span></h1>
+      <p class="lede">Electrical contractor listed in Cincinnati, Ohio. Public listings describe the company as an electrician, engineering service, and electronics company at 3650 Roll Ave.</p>
+
+      <div class="dashgrid">
+        <div class="tile">
+          <div class="tlabel">Direct line</div>
+          <div class="tvalue"><a class="tlink" href="tel:+15132415413">(513) 241-5413</a></div>
+          <div class="tsub"><span class="dot g"></span>Tap to call now</div>
+        </div>
+        <div class="tile">
+          <div class="tlabel">Shop hours</div>
+          <div class="tvalue">Mon - Fri<br>7:30 AM - 4:30 PM</div>
+          <div class="tsub">Per public listings. Call to confirm.</div>
+          <div class="gauge"><i id="gaugeHours"></i></div>
+        </div>
+        <div class="tile">
+          <div class="tlabel">Public rating</div>
+          <div class="tvalue">5.0 / 5.0</div>
+          <div class="tsub">3 public reviews via Birdeye</div>
+          <div class="gauge"><i id="gaugeRate"></i></div>
+        </div>
+        <div class="tile">
+          <div class="tlabel">Cincinnati time</div>
+          <div class="clock" id="cinclock">--:--:--</div>
+          <div class="tsub">America/New_York (Eastern)</div>
+        </div>
+        <div class="tile">
+          <div class="tlabel">Shop address</div>
+          <div class="tvalue" style="font-size:16px">3650 Roll Ave<br>Cincinnati, OH 45223</div>
+          <div class="tsub"><a class="tlink" href="https://www.google.com/maps/search/?api=1&amp;query=Sullivan%20Electric%20Group%2C%203650%20Roll%20Ave%2C%20Cincinnati%2C%20OH%2045223">Get directions</a></div>
+        </div>
+        <div class="tile">
+          <div class="tlabel">Map coordinates</div>
+          <div class="tvalue" style="font-size:16px;font-family:var(--mono)">39.153074<br>-84.54646</div>
+          <div class="tsub">Per public map listing</div>
+        </div>
+        <div class="tile">
+          <div class="tlabel">Listed categories</div>
+          <div class="tvalue" style="font-size:16px">Electrician<br>Engineering service</div>
+          <div class="tsub">Also: electronics company</div>
+        </div>
+        <div class="tile">
+          <div class="tlabel">Response</div>
+          <div class="tvalue"><span class="dot g"></span>Call first</div>
+          <div class="tsub">Fastest way to reach the shop</div>
+        </div>
+      </div>
+
+      <div class="herocta">
+        <a class="btn amber" href="tel:+15132415413">Call (513) 241-5413</a>
+        <a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Sullivan%20Electric%20Group%2C%203650%20Roll%20Ave%2C%20Cincinnati%2C%20OH%2045223">Get Directions</a>
+        <a class="btn ghost" href="#services" data-goto="services">View Services</a>
+      </div>
+      <p class="srclink">Facts on this page come from public listings: <a href="https://www.google.com/maps/place/?q=place_id:ChIJpSARmPW0QYgRAMgsZeGU9M4">Google Maps listing</a>, <a href="https://reviews.birdeye.com/sullivan-electric-group-145440773312667">Birdeye profile</a>. Hours and services not confirmed by the business; call to confirm.</p>
+    </div>
+  </div>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="track" id="marqueeTrack"></div>
+  </div>
+
+  <div class="wrap">
+    <div class="sectitle">
+      <h2>What the <span class="amp">listings</span> show</h2>
+      <p>Every card below is labeled so you know exactly what is verified and what is not.</p>
+    </div>
+    <div class="badgegrid">
+      <div class="bcard">
+        <span class="badge listed">Listed category</span>
+        <div class="icon">&#9889;</div>
+        <h3>Electrical contracting</h3>
+        <p>Primary category on the public business listing: electrician, based in Cincinnati, Ohio.</p>
+      </div>
+      <div class="bcard">
+        <span class="badge listed">Listed category</span>
+        <div class="icon">&#9881;</div>
+        <h3>Engineering service</h3>
+        <p>Also listed as an engineering service on public directory profiles.</p>
+      </div>
+      <div class="bcard">
+        <span class="badge listed">Listed category</span>
+        <div class="icon">&#128268;</div>
+        <h3>Electronics company</h3>
+        <p>A third listed category on the public profile: electronics company.</p>
+      </div>
+      <div class="bcard">
+        <span class="badge sample">Sample</span>
+        <div class="icon">&#128161;</div>
+        <h3>Lighting and fixtures</h3>
+        <p>Sample listing. Call to confirm whether lighting work is offered.</p>
+      </div>
+      <div class="bcard">
+        <span class="badge sample">Sample</span>
+        <div class="icon">&#9000;</div>
+        <h3>Panel and wiring work</h3>
+        <p>Sample listing. Call to confirm panel upgrades and wiring services.</p>
+      </div>
+      <div class="bcard">
+        <span class="badge ctc">Call to confirm</span>
+        <div class="icon">&#128222;</div>
+        <h3>Project quotes</h3>
+        <p>Pricing, availability, and service area are not published. Call the shop to confirm.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="splitcta">
+    <a class="cta-call" href="tel:+15132415413"><small>Talk to the shop</small>Call (513) 241-5413</a>
+    <a class="cta-dir" href="https://www.google.com/maps/search/?api=1&amp;query=Sullivan%20Electric%20Group%2C%203650%20Roll%20Ave%2C%20Cincinnati%2C%20OH%2045223"><small>3650 Roll Ave, Cincinnati OH</small>Get Directions</a>
+  </div>
+</section>
+
+
+<section class="page" id="page-services" data-page="services">
+  <div class="wrap">
+    <div class="sectitle">
+      <div class="eyebrow">Services</div>
+      <h2>Service <span class="amp">board</span></h2>
+      <p>Listed categories are from the public business profile. Everything marked SAMPLE is a common electrician service shown for reference only and is not confirmed. Call (513) 241-5413 to confirm what the shop offers.</p>
+    </div>
+    <div class="badgegrid">
+      <div class="bcard"><span class="badge listed">Listed category</span><div class="icon">&#9889;</div><h3>Electrical contracting</h3><p>The primary listed trade for Sullivan Electric Group: electrician in Cincinnati, Ohio.</p></div>
+      <div class="bcard"><span class="badge listed">Listed category</span><div class="icon">&#9881;</div><h3>Engineering service</h3><p>Secondary listed category on public directory profiles.</p></div>
+      <div class="bcard"><span class="badge listed">Listed category</span><div class="icon">&#128268;</div><h3>Electronics company</h3><p>Also appears as a listed category on the public profile.</p></div>
+      <div class="bcard"><span class="badge sample">Sample</span><div class="icon">&#128161;</div><h3>Lighting installation</h3><p>Sample service. Not confirmed. Call to confirm.</p></div>
+      <div class="bcard"><span class="badge sample">Sample</span><div class="icon">&#9000;</div><h3>Panel upgrades</h3><p>Sample service. Not confirmed. Call to confirm.</p></div>
+      <div class="bcard"><span class="badge sample">Sample</span><div class="icon">&#128268;</div><h3>Troubleshooting and repair</h3><p>Sample service. Not confirmed. Call to confirm.</p></div>
+      <div class="bcard"><span class="badge sample">Sample</span><div class="icon">&#127968;</div><h3>Residential wiring</h3><p>Sample service. Not confirmed. Call to confirm.</p></div>
+      <div class="bcard"><span class="badge sample">Sample</span><div class="icon">&#127981;</div><h3>Commercial electrical</h3><p>Sample service. Not confirmed. Call to confirm.</p></div>
+      <div class="bcard"><span class="badge ctc">Call to confirm</span><div class="icon">&#128222;</div><h3>Anything else</h3><p>Hours, pricing, and service area are not published. The fastest answer is a phone call: (513) 241-5413.</p></div>
+    </div>
+  </div>
+  <div class="splitcta">
+    <a class="cta-call" href="tel:+15132415413"><small>Confirm a service</small>Call (513) 241-5413</a>
+    <a class="cta-dir" href="#contact" data-goto="contact"><small>Send a message</small>Contact the Shop</a>
+  </div>
+</section>
+
+
+<section class="page" id="page-reviews" data-page="reviews">
+  <div class="wrap">
+    <div class="sectitle">
+      <div class="eyebrow">Reviews</div>
+      <h2>Public <span class="amp">rating</span></h2>
+      <p>Rating data comes from real public sources linked below. No reviewer names are shown because none were verified.</p>
+    </div>
+    <div class="revwrap">
+      <div class="revscore">
+        <div class="num">5.0</div>
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <div class="meta">5.0 star rating across 3 public reviews<br>Source: Birdeye business profile</div>
+        <div class="revbtns" style="justify-content:center;margin-top:20px">
+          <a class="btn amber" href="https://www.google.com/maps/place/?q=place_id:ChIJpSARmPW0QYgRAMgsZeGU9M4">Read Reviews on Google Maps</a>
+        </div>
+      </div>
+      <div class="revlist">
+        <div class="revitem">
+          <div class="q">"I am giving this repair facility five out of five stars for doing a job well done on a consistent basis. Yes, I am a regular customer of this place."</div>
+          <div class="src">Public review via <a href="https://reviews.birdeye.com/sullivan-electric-group-145440773312667">Birdeye</a>. Reviewer name not published in the public snippet; shown without attribution.</div>
+        </div>
+        <div class="revitem">
+          <div class="q">Three public reviews are currently listed for Sullivan Electric Group, all contributing to a 5.0 star average.</div>
+          <div class="src">Summary of public data via <a href="https://reviews.birdeye.com/sullivan-electric-group-145440773312667">Birdeye</a>. Individual review text beyond the snippet above was not publicly available.</div>
+        </div>
+        <div class="revitem">
+          <div class="q">Left a review after working with the shop? The most useful place to share it is the Google Maps listing.</div>
+          <div class="src"><a href="https://www.google.com/maps/place/?q=place_id:ChIJpSARmPW0QYgRAMgsZeGU9M4">Open the Google Maps listing</a> to read or write a review.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="splitcta">
+    <a class="cta-call" href="tel:+15132415413"><small>Questions about the work</small>Call (513) 241-5413</a>
+    <a class="cta-dir" href="https://www.google.com/maps/place/?q=place_id:ChIJpSARmPW0QYgRAMgsZeGU9M4"><small>Verified source</small>Google Maps Listing</a>
+  </div>
+</section>
+
+
+<section class="page" id="page-about" data-page="about">
+  <div class="wrap">
+    <div class="sectitle">
+      <div class="eyebrow">About</div>
+      <h2>The <span class="amp">shop</span> on record</h2>
+      <p>Only facts from public listings are shown. Anything the business has not published is marked clearly.</p>
+    </div>
+    <div class="aboutgrid">
+      <div class="aboutcard">
+        <h3>What public records say</h3>
+        <p style="color:var(--muted);margin-bottom:8px">Sullivan Electric Group is listed as an electrician at 3650 Roll Ave, Cincinnati, OH 45223. Public directory profiles also categorize the business as an engineering service and an electronics company, and the business website is listed as sullivan-group.net. Public listings show weekday hours of 7:30 AM to 4:30 PM, Monday through Friday.</p>
+        <p style="color:var(--muted)">No founding date, ownership history, staff credentials, or project portfolio are published in the sources checked. For anything beyond the listing facts, the shop can confirm directly by phone.</p>
+      </div>
+      <div class="aboutcard">
+        <h3>Listing facts</h3>
+        <div class="factrow"><span class="k">Business name</span><span class="v">Sullivan Electric Group</span></div>
+        <div class="factrow"><span class="k">Address</span><span class="v">3650 Roll Ave,<br>Cincinnati, OH 45223</span></div>
+        <div class="factrow"><span class="k">Phone</span><span class="v"><a href="tel:+15132415413">(513) 241-5413</a></span></div>
+        <div class="factrow"><span class="k">Primary category</span><span class="v">Electrician</span></div>
+        <div class="factrow"><span class="k">Other categories</span><span class="v">Engineering service,<br>electronics company</span></div>
+        <div class="factrow"><span class="k">Hours (listing)</span><span class="v">Mon - Fri, 7:30 AM - 4:30 PM</span></div>
+        <div class="factrow"><span class="k">Rating</span><span class="v">5.0 / 5.0 (3 reviews, Birdeye)</span></div>
+        <div class="factrow"><span class="k">Weekend hours</span><span class="v">Not published: call to confirm</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="splitcta">
+    <a class="cta-call" href="tel:+15132415413"><small>Talk to the shop</small>Call (513) 241-5413</a>
+    <a class="cta-dir" href="https://www.google.com/maps/search/?api=1&amp;query=Sullivan%20Electric%20Group%2C%203650%20Roll%20Ave%2C%20Cincinnati%2C%20OH%2045223"><small>Visit in person</small>Get Directions</a>
+  </div>
+</section>
+
+
+<section class="page" id="page-contact" data-page="contact">
+  <div class="wrap">
+    <div class="sectitle">
+      <div class="eyebrow">Contact</div>
+      <h2>Get in <span class="amp">touch</span></h2>
+      <p>The fastest way to reach the shop is a phone call. Use the form to organize your message, then call to send it.</p>
+    </div>
+    <div class="contactgrid">
+      <div class="cinfo">
+        <h3>Reach the shop</h3>
+        <a class="big" href="tel:+15132415413">(513) 241-5413</a>
+        <p><strong>Address:</strong> 3650 Roll Ave, Cincinnati, OH 45223</p>
+        <p><strong>Hours (public listing):</strong> Monday to Friday, 7:30 AM - 4:30 PM. Weekend hours not published: call to confirm.</p>
+        <p><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Sullivan%20Electric%20Group%2C%203650%20Roll%20Ave%2C%20Cincinnati%2C%20OH%2045223">Get Directions</a></p>
+        <p style="margin-top:14px"><a class="btn ghost" href="https://www.google.com/maps/place/?q=place_id:ChIJpSARmPW0QYgRAMgsZeGU9M4">Google Maps Listing</a></p>
+        <p class="formnote">No email address is published for this business, so this page does not send email. The form below prepares your message for a phone call.</p>
+      </div>
+      <form class="cform" id="contactForm" novalidate>
+        <h3>Prepare your message</h3>
+        <label for="cf-name">Your name</label>
+        <input id="cf-name" name="name" type="text" autocomplete="name" required>
+        <label for="cf-phone">Your phone number</label>
+        <input id="cf-phone" name="phone" type="tel" autocomplete="tel" required>
+        <label for="cf-topic">Topic</label>
+        <select id="cf-topic" name="topic">
+          <option>General question</option>
+          <option>Service request</option>
+          <option>Quote request (call to confirm pricing)</option>
+          <option>Hours or location question</option>
+        </select>
+        <label for="cf-msg">Message</label>
+        <textarea id="cf-msg" name="message" required></textarea>
+        <button class="btn amber" type="submit" style="margin-top:18px;border:0;cursor:pointer;width:100%">Prepare Message</button>
+        <div class="formdone" id="formDone">
+          <strong>Message ready.</strong>
+          <p id="formSummary" style="margin:10px 0;color:var(--ink)"></p>
+          <p style="color:var(--muted);font-size:13.5px">This page cannot send email for the business. To deliver your message, call <a href="tel:+15132415413">(513) 241-5413</a> and read it to the shop.</p>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="splitcta">
+    <a class="cta-call" href="tel:+15132415413"><small>Fastest response</small>Call (513) 241-5413</a>
+    <a class="cta-dir" href="https://www.google.com/maps/search/?api=1&amp;query=Sullivan%20Electric%20Group%2C%203650%20Roll%20Ave%2C%20Cincinnati%2C%20OH%2045223"><small>3650 Roll Ave, Cincinnati OH</small>Get Directions</a>
+  </div>
+</section>
+</main>
+
+<footer>&copy; Sullivan Electric Group</footer>
+
+<script>
+(function(){
+  "use strict";
+  var pageMap = {
+    home: document.getElementById("page-home"),
+    services: document.getElementById("page-services"),
+    reviews: document.getElementById("page-reviews"),
+    about: document.getElementById("page-about"),
+    contact: document.getElementById("page-contact")
+  };
+  var navLinks = document.querySelectorAll(".navlink");
+  var mmenu = document.getElementById("mmenu");
+
+  function setActiveNav(page){
+    navLinks.forEach(function(a){
+      a.classList.toggle("on", a.getAttribute("data-goto") === page);
+    });
+    mmenu.querySelectorAll("a[data-goto]").forEach(function(a){
+      a.classList.toggle("on", a.getAttribute("data-goto") === page);
+    });
+  }
+
+  function showPage(page, push){
+    if(!pageMap[page]){ page = "home"; }
+    Object.keys(pageMap).forEach(function(k){
+      pageMap[k].classList.toggle("active", k === page);
+    });
+    setActiveNav(page);
+    mmenu.classList.remove("open");
+    if(push !== false){
+      try{ history.pushState({page:page}, "", "#" + page); }
+      catch(e){ location.hash = page; }
+    }
+    window.scrollTo(0,0);
+  }
+
+  function navigateTo(page){ showPage(page, true); }
+
+  document.querySelectorAll("[data-goto]").forEach(function(el){
+    el.addEventListener("click", function(ev){
+      var target = el.getAttribute("data-goto");
+      if(el.tagName.toLowerCase() === "a" && el.getAttribute("href") === "#" + target){
+        ev.preventDefault();
+      }
+      navigateTo(target);
+    });
+  });
+
+  window.addEventListener("popstate", function(ev){
+    var page = (ev.state && ev.state.page) || location.hash.replace("#","") || "home";
+    showPage(page, false);
+  });
+
+  var initial = location.hash.replace("#","") || "home";
+  showPage(initial, false);
+
+  document.getElementById("hamb").addEventListener("click", function(){
+    mmenu.classList.add("open");
+  });
+  document.getElementById("mclose").addEventListener("click", function(){
+    mmenu.classList.remove("open");
+  });
+
+  var brand = document.querySelector(".brand");
+  brand.addEventListener("click", function(){ navigateTo("home"); });
+  brand.addEventListener("keydown", function(ev){
+    if(ev.key === "Enter" || ev.key === " "){ ev.preventDefault(); navigateTo("home"); }
+  });
+
+  var items = ["ELECTRICIAN","ENGINEERING SERVICE","ELECTRONICS COMPANY","CINCINNATI, OH","3650 ROLL AVE","(513) 241-5413"];
+  var chunk = items.map(function(t){ return t + " \u26A1 "; }).join("");
+  document.getElementById("marqueeTrack").textContent = chunk + chunk;
+
+  function tick(){
+    try{
+      var fmt = new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:true});
+      document.getElementById("cinclock").textContent = fmt.format(new Date());
+    }catch(e){
+      document.getElementById("cinclock").textContent = new Date().toLocaleTimeString();
+    }
+  }
+  tick(); setInterval(tick, 1000);
+
+  setTimeout(function(){
+    var g1 = document.getElementById("gaugeHours");
+    var g2 = document.getElementById("gaugeRate");
+    if(g1){ g1.style.width = "62%"; }
+    if(g2){ g2.style.width = "100%"; }
+  }, 300);
+
+  var form = document.getElementById("contactForm");
+  form.addEventListener("submit", function(ev){
+    ev.preventDefault();
+    var name = document.getElementById("cf-name").value.trim();
+    var phone = document.getElementById("cf-phone").value.trim();
+    var topic = document.getElementById("cf-topic").value;
+    var msg = document.getElementById("cf-msg").value.trim();
+    if(!name || !phone || !msg){
+      alert("Please fill in your name, phone number, and message first.");
+      return;
+    }
+    var summary = document.getElementById("formSummary");
+    summary.textContent = "From " + name + " (" + phone + "), topic: " + topic + ". Message: " + msg;
+    document.getElementById("formDone").classList.add("show");
+  });
+})();
+</script>
+</body>
+</html>

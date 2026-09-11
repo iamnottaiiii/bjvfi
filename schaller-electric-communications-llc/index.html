@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Schaller Electric &amp; Communications, LLC | Electrician in Cincinnati, OH</title>
+<meta name="description" content="Schaller Electric & Communications, LLC: electrical contracting, commercial electric, panel work, generators, network cabling and more in Cincinnati, OH.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{
+  --ink:#101820;
+  --ink2:#1b2733;
+  --paper:#f6f4ee;
+  --line:#d9d4c7;
+  --amber:#f5a800;
+  --amber-deep:#c98600;
+  --blue:#0e4d7a;
+  --blue-soft:#e3eef6;
+  --ok:#1e7d46;
+  --warn:#8a5a00;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'Archivo',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.6}
+a{color:var(--blue)}
+img{max-width:100%}
+/* ============ LAYOUT: fixed left rail nav ============ */
+.rail{position:fixed;top:0;left:0;bottom:0;width:264px;background:var(--ink);color:#fff;display:flex;flex-direction:column;z-index:50}
+.rail-brand{padding:28px 24px 20px;border-bottom:1px solid #2a3a48}
+.rail-brand .mark{font-family:var(--mono);font-size:12px;letter-spacing:3px;color:var(--amber);text-transform:uppercase}
+.rail-brand h1{font-size:20px;font-weight:800;line-height:1.25;margin-top:8px}
+.rail-brand h1 span{color:var(--amber)}
+.rail nav{flex:1;padding:16px 12px;overflow-y:auto}
+.rail nav button{display:flex;align-items:center;gap:12px;width:100%;background:none;border:0;color:#cfd8e0;font-family:var(--sans);font-size:15px;font-weight:600;text-align:left;padding:12px 14px;border-radius:10px;cursor:pointer;border-left:4px solid transparent}
+.rail nav button i{width:22px;text-align:center;color:var(--amber)}
+.rail nav button:hover{background:#22303d}
+.rail nav button.active{background:#22303d;border-left-color:var(--amber);color:#fff}
+.rail-foot{padding:18px 24px;border-top:1px solid #2a3a48;font-size:13px;color:#9fb0bd}
+.rail-foot a{color:var(--amber);text-decoration:none;font-weight:700}
+.topbar{display:none}
+main{margin-left:264px;min-height:100vh;display:flex;flex-direction:column}
+.page{display:none}
+.page.active{display:block;animation:fadein .35s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.wrap{max-width:1040px;margin:0 auto;padding:48px 32px}
+.hero{background:var(--ink2);color:#fff;position:relative;overflow:hidden}
+.hero .wrap{padding:72px 32px 64px;position:relative;z-index:2}
+.kicker{font-family:var(--mono);font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--amber);margin-bottom:14px}
+.hero h2{font-size:clamp(30px,4.5vw,52px);font-weight:800;line-height:1.12;max-width:640px}
+.hero h2 em{font-style:normal;color:var(--amber)}
+.hero p.lede{margin-top:16px;max-width:600px;color:#c8d4de;font-size:17px}
+.btnrow{display:flex;flex-wrap:wrap;gap:14px;margin-top:28px}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:14px 24px;border-radius:10px;font-weight:700;font-size:15px;text-decoration:none;border:2px solid transparent;cursor:pointer}
+.btn-amber{background:var(--amber);color:#141414}
+.btn-amber:hover{background:#ffc02e}
+.btn-ghost{border-color:#5a7183;color:#fff}
+.btn-ghost:hover{border-color:var(--amber);color:var(--amber)}
+.btn-dark{background:var(--ink);color:#fff}
+.btn-dark:hover{background:#24303c}
+/* floor plan svg */
+.plan{position:absolute;right:-40px;top:50%;transform:translateY(-50%);width:min(46vw,520px);opacity:.5;z-index:1}
+.section-title{font-size:28px;font-weight:800;margin-bottom:6px}
+.section-sub{color:#5b6670;margin-bottom:28px;max-width:640px}
+/* cable run cards */
+.runlist{display:grid;gap:14px;margin-top:8px}
+.run{background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px 22px;display:grid;grid-template-columns:56px 1fr auto;gap:18px;align-items:center;box-shadow:0 2px 6px rgba(16,24,32,.05)}
+.run:hover{border-color:var(--amber-deep)}
+.run .node{width:56px;height:56px;border-radius:50%;background:var(--ink);color:var(--amber);display:flex;align-items:center;justify-content:center;font-size:22px;position:relative}
+.run h3{font-size:17px;font-weight:700}
+.run p{font-size:14px;color:#5b6670;margin-top:4px}
+.badge{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:999px;background:#fff7e0;border:1px solid #e8c95c;color:var(--warn);margin-top:8px}
+.badge.blue{background:var(--blue-soft);border-color:#a9c8dd;color:var(--blue)}
+.trace{display:none}
+/* stats strip */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin:34px 0}
+.stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px;text-align:center}
+.stat .num{font-family:var(--mono);font-size:26px;font-weight:600;color:var(--blue)}
+.stat .lbl{font-size:13px;color:#5b6670;margin-top:4px}
+/* about */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:8px}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:26px}
+.card h3{font-size:18px;font-weight:700;margin-bottom:10px}
+.card h3 i{color:var(--amber-deep);margin-right:8px}
+.card ul{list-style:none;margin-top:8px}
+.card ul li{padding:8px 0;border-bottom:1px dashed var(--line);font-size:15px}
+.card ul li:last-child{border-bottom:0}
+.photo-ph{background:repeating-linear-gradient(45deg,#ece7d9,#ece7d9 12px,#e2dccb 12px,#e2dccb 24px);border:1px dashed #b7ad94;border-radius:12px;min-height:220px;display:flex;align-items:center;justify-content:center;color:#8a7f63;font-family:var(--mono);font-size:13px;text-align:center;padding:20px}
+/* reviews */
+.rev-note{background:#fff;border:1px solid var(--line);border-radius:12px;padding:26px;margin-bottom:20px}
+.rev-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.rev-link{background:var(--ink);color:#fff;border-radius:12px;padding:22px;text-decoration:none;display:block}
+.rev-link:hover{background:#24303c}
+.rev-link i{color:var(--amber);font-size:22px}
+.rev-link h3{margin:10px 0 4px;font-size:17px}
+.rev-link p{font-size:13px;color:#b8c4cf}
+/* contact */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.info-row{display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-bottom:1px dashed var(--line)}
+.info-row i{color:var(--amber-deep);font-size:20px;margin-top:4px;width:24px;text-align:center}
+.info-row strong{display:block;font-size:14px;text-transform:uppercase;letter-spacing:1px;font-family:var(--mono);color:#5b6670}
+.info-row p{font-size:16px;font-weight:600}
+form.contact{background:#fff;border:1px solid var(--line);border-radius:12px;padding:28px}
+form.contact label{display:block;font-size:13px;font-weight:700;margin:14px 0 6px;text-transform:uppercase;letter-spacing:1px;font-family:var(--mono);color:#5b6670}
+form.contact input,form.contact textarea,form.contact select{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:8px;font-family:var(--sans);font-size:15px}
+form.contact textarea{min-height:120px;resize:vertical}
+form.contact button{margin-top:18px;width:100%;justify-content:center}
+/* footer */
+footer{background:var(--ink);color:#8b9aa8;text-align:center;padding:26px 16px;font-size:14px;margin-top:auto}
+/* mobile */
+.hamb{display:none}
+@media(max-width:900px){
+  .rail{left:-264px;transition:left .3s ease}
+  .rail.open{left:0}
+  main{margin-left:0}
+  .topbar{display:flex;align-items:center;justify-content:space-between;background:var(--ink);color:#fff;padding:14px 18px;position:sticky;top:0;z-index:40}
+  .topbar strong{font-size:15px}
+  .topbar strong span{color:var(--amber)}
+  .hamb{display:block;background:none;border:1px solid #3a4d5e;color:#fff;border-radius:8px;padding:8px 12px;font-size:18px;cursor:pointer}
+  .about-grid,.contact-grid{grid-template-columns:1fr}
+  .run{grid-template-columns:44px 1fr}
+  .run .node{width:44px;height:44px;font-size:18px}
+  .run .cta{display:none}
+  .plan{display:none}
+  .wrap{padding:36px 20px}
+  .scrim{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:45;display:none}
+  .scrim.show{display:block}
+}
+</style>
+</head>
+<body>
+
+<aside class="rail" id="rail" aria-label="Site navigation">
+  <div class="rail-brand">
+    <div class="mark">Electrical Contractor</div>
+    <h1>Schaller Electric <span>&amp;</span> Communications, LLC</h1>
+  </div>
+  <nav>
+    <button data-nav="home" class="active"><i class="fa-solid fa-house"></i>Home</button>
+    <button data-nav="services"><i class="fa-solid fa-plug-circle-bolt"></i>Services</button>
+    <button data-nav="about"><i class="fa-solid fa-circle-info"></i>About</button>
+    <button data-nav="reviews"><i class="fa-solid fa-star"></i>Reviews</button>
+    <button data-nav="contact"><i class="fa-solid fa-envelope"></i>Contact</button>
+  </nav>
+  <div class="rail-foot">
+    <i class="fa-solid fa-phone"></i> <a href="tel:+15139067533">(513) 906-7533</a><br>
+    Cincinnati, OH 45247
+  </div>
+</aside>
+<div class="scrim" id="scrim"></div>
+
+<main>
+  <div class="topbar">
+    <button class="hamb" id="hamb" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+    <strong>Schaller Electric <span>&amp;</span> Communications</strong>
+    <a href="tel:+15139067533" style="color:var(--amber);font-size:18px" aria-label="Call now"><i class="fa-solid fa-phone"></i></a>
+  </div>
+
+  
+  <section class="page active" id="page-home" data-page="home">
+    <div class="hero">
+      <svg class="plan" viewBox="0 0 500 420" aria-hidden="true">
+        <g stroke="#f5a800" stroke-width="2" fill="none" opacity="0.85">
+          <rect x="30" y="30" width="200" height="150"/>
+          <rect x="270" y="30" width="200" height="150"/>
+          <rect x="30" y="220" width="200" height="170"/>
+          <rect x="270" y="220" width="200" height="170"/>
+        </g>
+        <g stroke="#f5a800" stroke-width="3" fill="none" stroke-dasharray="10 6">
+          <path d="M130 180 L130 215 L370 215 L370 185"/>
+          <path d="M230 105 L265 105"/>
+          <path d="M130 300 L265 300 L265 305"/>
+        </g>
+        <g fill="#f5a800">
+          <circle cx="130" cy="180" r="8"/><circle cx="370" cy="185" r="8"/>
+          <circle cx="230" cy="105" r="8"/><circle cx="265" cy="105" r="8"/>
+          <circle cx="130" cy="300" r="8"/><circle cx="265" cy="302" r="8"/>
+        </g>
+        <g fill="#ffffff" font-family="IBM Plex Mono, monospace" font-size="13">
+          <text x="44" y="52">PANEL</text><text x="284" y="52">OFFICE</text>
+          <text x="44" y="242">SHOP</text><text x="284" y="242">RETAIL</text>
+        </g>
+      </svg>
+      <div class="wrap">
+        <div class="kicker">Electrician | Cincinnati, Ohio</div>
+        <h2>Power, wired right. <em>Every circuit, every time.</em></h2>
+        <p class="lede">Schaller Electric &amp; Communications, LLC handles electrical work for commercial customers across Cincinnati, from panel repair and installation to generators, network cabling, audio/video consulting, and security systems.</p>
+        <div class="btnrow">
+          <a class="btn btn-amber" href="tel:+15139067533"><i class="fa-solid fa-phone"></i>Call (513) 906-7533</a>
+          <button class="btn btn-ghost" data-goto="services"><i class="fa-solid fa-plug-circle-bolt"></i>View Services</button>
+        </div>
+      </div>
+    </div>
+    <div class="wrap">
+      <div class="stats">
+        <div class="stat"><div class="num">14+</div><div class="lbl">Years of experience<span class="badge">As reported by business</span></div></div>
+        <div class="stat"><div class="num">~10</div><div class="lbl">Employees<span class="badge">Directory claim</span></div></div>
+        <div class="stat"><div class="num">45247</div><div class="lbl">Based in Cincinnati, OH</div></div>
+      </div>
+      <h2 class="section-title">What we wire up</h2>
+      <p class="section-sub">A quick look at the work. Full list on the Services page.</p>
+      <div class="runlist">
+        <div class="run"><div class="node"><i class="fa-solid fa-bolt"></i></div><div><h3>Electrical Design &amp; Commercial Electric</h3><p>Design and commercial electrical work, sized to the job.</p><span class="badge">As reported by business</span></div><button class="btn btn-dark cta" data-goto="services">Details</button></div>
+        <div class="run"><div class="node"><i class="fa-solid fa-toggle-on"></i></div><div><h3>Panel Repair &amp; Installation</h3><p>Breaker panels repaired, replaced, or installed fresh.</p><span class="badge">As reported by business</span></div><button class="btn btn-dark cta" data-goto="services">Details</button></div>
+        <div class="run"><div class="node"><i class="fa-solid fa-plug"></i></div><div><h3>Generators</h3><p>Standby power so an outage does not stop you.</p><span class="badge">As reported by business</span></div><button class="btn btn-dark cta" data-goto="services">Details</button></div>
+      </div>
+      <div class="btnrow" style="margin-top:28px">
+        <button class="btn btn-amber" data-goto="contact"><i class="fa-solid fa-envelope"></i>Request a Quote</button>
+        <a class="btn btn-dark" href="https://www.google.com/maps/search/?api=1&query=7700%20Harrison%20Ave%2C%20Cincinnati%2C%20OH%2045247" target="_blank" rel="noopener"><i class="fa-solid fa-location-dot"></i>Get Directions</a>
+      </div>
+    </div>
+  </section>
+
+  
+  <section class="page" id="page-services" data-page="services">
+    <div class="wrap">
+      <div class="kicker">What we do</div>
+      <h2 class="section-title">Services</h2>
+      <p class="section-sub">Service list below reflects how the business describes its own work in public directory listings. Call to confirm any service before booking.</p>
+      <div class="runlist">
+        <div class="run"><div class="node"><i class="fa-solid fa-pen-ruler"></i></div><div><h3>Electrical Design</h3><p>Electrical design services for new and existing builds.</p><span class="badge">As reported by business</span></div></div>
+        <div class="run"><div class="node"><i class="fa-solid fa-building"></i></div><div><h3>Commercial Electric</h3><p>Electrical work for commercial properties and job sites.</p><span class="badge">As reported by business</span></div></div>
+        <div class="run"><div class="node"><i class="fa-solid fa-toggle-on"></i></div><div><h3>Panel Repair &amp; Installation</h3><p>Repair and installation of electrical panels.</p><span class="badge">As reported by business</span></div></div>
+        <div class="run"><div class="node"><i class="fa-solid fa-plug"></i></div><div><h3>Generators</h3><p>Generator services for backup power.</p><span class="badge">As reported by business</span></div></div>
+        <div class="run"><div class="node"><i class="fa-solid fa-tv"></i></div><div><h3>Audio / Video Consulting</h3><p>Consulting on audio and video system setups.</p><span class="badge">As reported by business</span></div></div>
+        <div class="run"><div class="node"><i class="fa-solid fa-shield-halved"></i></div><div><h3>Commercial Security</h3><p>Security system work for commercial customers.</p><span class="badge">As reported by business</span></div></div>
+        <div class="run"><div class="node"><i class="fa-solid fa-network-wired"></i></div><div><h3>Network Cabling</h3><p>Structured network cabling installation.</p><span class="badge">As reported by business</span></div></div>
+      </div>
+      <div class="rev-note" style="margin-top:24px">
+        <h3 style="margin-bottom:8px"><i class="fa-solid fa-circle-exclamation" style="color:var(--amber-deep)"></i> Pricing &amp; scheduling</h3>
+        <p>No pricing is published. <strong>Call to confirm</strong> rates, availability, and whether a job is in scope: <a href="tel:+15139067533">(513) 906-7533</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  
+  <section class="page" id="page-about" data-page="about">
+    <div class="wrap">
+      <div class="kicker">Who we are</div>
+      <h2 class="section-title">About Schaller Electric &amp; Communications, LLC</h2>
+      <p class="section-sub">An electrical contractor based on the west side of Cincinnati, Ohio.</p>
+      <div class="about-grid">
+        <div>
+          <div class="card" style="margin-bottom:20px">
+            <h3><i class="fa-solid fa-bolt"></i>At a glance</h3>
+            <ul>
+              <li><strong>Trade:</strong> Electrician (NAICS 238210, Electrical Contractors)</li>
+              <li><strong>Location:</strong> 7700 Harrison Ave, Cincinnati, OH 45247</li>
+              <li><strong>Phone:</strong> <a href="tel:+15139067533">(513) 906-7533</a></li>
+              <li><strong>Experience:</strong> 14+ years <span class="badge">As reported by business</span></li>
+              <li><strong>Team size:</strong> About 10 employees <span class="badge">Directory claim</span></li>
+              <li><strong>Licensed &amp; insured:</strong> stated in business directory text <span class="badge">Unverified, call to confirm</span></li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3><i class="fa-solid fa-clock"></i>Hours</h3>
+            <ul>
+              <li>Monday to Friday: 7 AM to 3 PM <span class="badge">From directory listings, call to confirm</span></li>
+              <li>Saturday and Sunday: not listed <span class="badge">Call to confirm</span></li>
+            </ul>
+          </div>
+        </div>
+        <div>
+          <div class="photo-ph">Photo coming soon<br>Crew and jobsite photos will appear here.</div>
+          <div class="card" style="margin-top:20px">
+            <h3><i class="fa-solid fa-location-dot"></i>Address note</h3>
+            <p style="font-size:15px">Our records show <strong>7700 Harrison Ave, Cincinnati, OH 45247</strong>. One directory (BBB) lists a slightly different address, 7700 Hamilton Ave, Cincinnati, OH 45231. Call ahead to confirm the correct location for visits or estimates.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+  <section class="page" id="page-reviews" data-page="reviews">
+    <div class="wrap">
+      <div class="kicker">What customers say</div>
+      <h2 class="section-title">Reviews</h2>
+      <p class="section-sub">We only publish reviews we can verify. No customer reviews have been found for this business yet.</p>
+      <div class="rev-note">
+        <h3><i class="fa-solid fa-magnifying-glass" style="color:var(--amber-deep)"></i> No verified reviews yet</h3>
+        <p style="margin-top:8px">Public review platforms currently show zero reviews for Schaller Electric &amp; Communications, LLC (Birdeye: 0 reviews). If you are a past customer, leaving a review on Google helps neighbors find trusted local electricians.</p>
+      </div>
+      <h3 style="margin-bottom:14px">Check or leave a review on a real source</h3>
+      <div class="rev-links">
+        <a class="rev-link" href="https://www.google.com/maps/search/?api=1&query=Schaller%20Electric%20%26%20Communications%20LLC%20Cincinnati%20OH" target="_blank" rel="noopener">
+          <i class="fa-brands fa-google"></i><h3>Google Maps</h3><p>Search the business listing and leave a review.</p>
+        </a>
+        <a class="rev-link" href="https://www.bbb.org/search?find_text=Schaller%20Electric%20%26%20Communications&find_loc=Cincinnati%2C%20OH" target="_blank" rel="noopener">
+          <i class="fa-solid fa-award"></i><h3>BBB</h3><p>Check the Better Business Bureau profile.</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  
+  <section class="page" id="page-contact" data-page="contact">
+    <div class="wrap">
+      <div class="kicker">Get in touch</div>
+      <h2 class="section-title">Contact</h2>
+      <p class="section-sub">Call for the fastest response. The form below opens a pre-addressed email draft.</p>
+      <div class="contact-grid">
+        <div>
+          <div class="info-row"><i class="fa-solid fa-phone"></i><div><strong>Phone</strong><p><a href="tel:+15139067533">(513) 906-7533</a></p></div></div>
+          <div class="info-row"><i class="fa-solid fa-location-dot"></i><div><strong>Address</strong><p>7700 Harrison Ave<br>Cincinnati, OH 45247</p><span class="badge">Call to confirm before visiting</span></div></div>
+          <div class="info-row"><i class="fa-solid fa-clock"></i><div><strong>Hours</strong><p>Mon to Fri, 7 AM to 3 PM</p><span class="badge">From directory listings</span></div></div>
+          <div class="btnrow" style="margin-top:20px">
+            <a class="btn btn-amber" href="https://www.google.com/maps/search/?api=1&query=7700%20Harrison%20Ave%2C%20Cincinnati%2C%20OH%2045247" target="_blank" rel="noopener"><i class="fa-solid fa-location-dot"></i>Get Directions</a>
+          </div>
+        </div>
+        <form class="contact" id="contactForm">
+          <h3 style="font-size:18px;font-weight:700">Request a quote</h3>
+          <label for="cf-name">Name</label>
+          <input id="cf-name" name="name" type="text" required autocomplete="name">
+          <label for="cf-phone">Phone</label>
+          <input id="cf-phone" name="phone" type="tel" required autocomplete="tel">
+          <label for="cf-service">Service needed</label>
+          <select id="cf-service" name="service">
+            <option>Electrical Design</option>
+            <option>Commercial Electric</option>
+            <option>Panel Repair / Installation</option>
+            <option>Generators</option>
+            <option>Audio / Video Consulting</option>
+            <option>Commercial Security</option>
+            <option>Network Cabling</option>
+            <option>Other</option>
+          </select>
+          <label for="cf-msg">Project details</label>
+          <textarea id="cf-msg" name="message" required></textarea>
+          <button type="submit" class="btn btn-amber"><i class="fa-solid fa-paper-plane"></i>Send via Email</button>
+          <p style="font-size:13px;color:#5b6670;margin-top:10px">No email address is published for this business. Submitting opens your email app with the message addressed for you to send to the business by phone follow-up. Prefer to talk? <a href="tel:+15139067533">Call (513) 906-7533</a>.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <footer>© Schaller Electric &amp; Communications, LLC</footer>
+</main>
+
+<script>
+// Page router
+function navigateTo(page){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  var target = document.getElementById('page-' + page);
+  if(!target){ page = 'home'; target = document.getElementById('page-home'); }
+  target.classList.add('active');
+  document.querySelectorAll('.rail nav button').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-nav') === page);
+  });
+  if(location.hash !== '#' + page){ history.pushState({page:page}, '', '#' + page); }
+  closeRail();
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('.rail nav button').forEach(function(b){
+  b.addEventListener('click', function(){ navigateTo(b.getAttribute('data-nav')); });
+});
+document.querySelectorAll('[data-goto]').forEach(function(el){
+  el.addEventListener('click', function(){ navigateTo(el.getAttribute('data-goto')); });
+});
+window.addEventListener('popstate', function(e){
+  var page = (e.state && e.state.page) || location.hash.replace('#','') || 'home';
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  var t = document.getElementById('page-' + page) || document.getElementById('page-home');
+  t.classList.add('active');
+  document.querySelectorAll('.rail nav button').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-nav') === t.getAttribute('data-page'));
+  });
+  window.scrollTo(0,0);
+});
+// deep link on load
+(function(){
+  var h = location.hash.replace('#','');
+  if(h && document.getElementById('page-' + h)){ navigateTo(h); }
+})();
+// mobile rail
+var rail = document.getElementById('rail');
+var scrim = document.getElementById('scrim');
+function closeRail(){ rail.classList.remove('open'); scrim.classList.remove('show'); }
+document.getElementById('hamb').addEventListener('click', function(){
+  if(rail.classList.contains('open')){ closeRail(); }
+  else { rail.classList.add('open'); scrim.classList.add('show'); }
+});
+scrim.addEventListener('click', closeRail);
+// contact form: compose mailto draft
+document.getElementById('contactForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  var name = document.getElementById('cf-name').value.trim();
+  var phone = document.getElementById('cf-phone').value.trim();
+  var service = document.getElementById('cf-service').value;
+  var msg = document.getElementById('cf-msg').value.trim();
+  var body = 'Name: ' + name + '\nPhone: ' + phone + '\nService needed: ' + service + '\n\nProject details:\n' + msg;
+  window.location.href = 'mailto:?subject=' + encodeURIComponent('Quote request from ' + name + ' - ' + service) + '&body=' + encodeURIComponent(body);
+  alert('Your email app should now open with the quote request drafted. Please call (513) 906-7533 to confirm it was received, since no business email address is published.');
+});
+</script>
+</body>
+</html>

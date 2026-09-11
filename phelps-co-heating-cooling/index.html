@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phelps &amp; Co Heating &amp; Cooling | Cincinnati, OH</title>
+<meta name="description" content="Phelps & Co Heating & Cooling, a heating contractor at 2259 Harrison Ave, Cincinnati, OH 45211. Call (513) 481-2219 for heating and cooling service.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+  :root{
+    --ink:#23272e;
+    --ink-soft:#3a4048;
+    --paper:#faf7f0;
+    --paper-dark:#f1eadd;
+    --copper:#c07a33;
+    --copper-deep:#9a5e22;
+    --flame:#e0a458;
+    --frost:#4d7ea6;
+    --frost-deep:#35617f;
+    --line:#e4dccb;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Source Sans 3',system-ui,sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.6;
+  }
+  h1,h2,h3,h4,.brand-word{
+    font-family:'Oswald',sans-serif;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    line-height:1.15;
+  }
+  a{color:inherit}
+  img{max-width:100%}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 22px}
+
+  /* Slim top strip, always visible */
+  .topstrip{
+    position:fixed;top:0;left:0;right:0;z-index:60;
+    background:var(--ink);
+    color:var(--paper);
+    border-bottom:3px solid var(--copper);
+  }
+  .topstrip .wrap{
+    display:flex;align-items:center;justify-content:space-between;
+    height:64px;
+  }
+  .brandline{display:flex;align-items:center;gap:12px;text-decoration:none}
+  .badge{
+    width:40px;height:40px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, var(--flame), var(--copper-deep));
+    color:#fff;display:flex;align-items:center;justify-content:center;
+    font-family:'Oswald',sans-serif;font-weight:700;font-size:.8rem;
+    border:2px solid var(--paper);
+    flex:0 0 auto;
+  }
+  .brand-word{font-size:1.05rem;font-weight:600;color:var(--paper)}
+  .brand-word small{
+    display:block;font-size:.62rem;font-weight:400;
+    letter-spacing:.28em;color:var(--flame);
+    font-family:'Source Sans 3',sans-serif;
+  }
+  .strip-actions{display:flex;align-items:center;gap:10px}
+  .strip-call{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--copper);color:#fff;text-decoration:none;
+    font-weight:700;font-size:.95rem;
+    padding:10px 16px;border-radius:4px;
+    border:1px solid var(--copper-deep);
+  }
+  .strip-call:hover{background:var(--copper-deep)}
+  .hamburger{
+    background:transparent;border:2px solid var(--paper);
+    color:var(--paper);width:44px;height:44px;border-radius:4px;
+    font-size:1.25rem;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .hamburger:hover{background:rgba(255,255,255,.12)}
+
+  /* Fullscreen overlay menu */
+  .overlay{
+    position:fixed;inset:0;z-index:55;
+    background:linear-gradient(135deg,var(--ink) 0%,#14171b 100%);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:8px;opacity:0;visibility:hidden;
+    transition:opacity .3s ease,visibility .3s ease;
+  }
+  .overlay.open{opacity:1;visibility:visible}
+  .overlay::before{
+    content:"";position:absolute;inset:0;pointer-events:none;opacity:.08;
+    background:
+      radial-gradient(circle at 20% 80%, var(--copper) 0 90px, transparent 91px),
+      radial-gradient(circle at 80% 20%, var(--frost) 0 110px, transparent 111px);
+  }
+  .overlay a.ovlink{
+    color:var(--paper);text-decoration:none;
+    font-family:'Oswald',sans-serif;font-size:2.1rem;font-weight:600;
+    text-transform:uppercase;letter-spacing:.05em;
+    padding:10px 26px;position:relative;
+  }
+  .overlay a.ovlink:hover{color:var(--flame)}
+  .overlay a.ovlink.active{color:var(--flame)}
+  .ov-close{
+    position:absolute;top:18px;right:22px;
+    background:transparent;border:2px solid var(--paper);
+    color:var(--paper);width:46px;height:46px;border-radius:4px;
+    font-size:1.2rem;cursor:pointer;
+  }
+  .ov-close:hover{background:rgba(255,255,255,.12)}
+  .ov-foot{margin-top:26px;color:#b9b2a1;font-size:.95rem;text-align:center}
+  .ov-foot a{color:var(--flame);text-decoration:none;font-weight:700}
+
+  main{padding-top:64px}
+  .page{display:none}
+  .page.active{display:block;animation:fadein .35s ease}
+  @keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  /* Full-bleed band hero */
+  .band-hero{
+    background:
+      linear-gradient(100deg, rgba(35,39,46,.96) 0%, rgba(35,39,46,.82) 45%, rgba(77,126,166,.55) 100%),
+      repeating-linear-gradient(115deg, rgba(192,122,51,.14) 0 2px, transparent 2px 14px),
+      var(--ink);
+    color:var(--paper);
+    padding:76px 0 70px;
+    border-bottom:6px solid var(--copper);
+  }
+  .hero-kicker{
+    display:inline-flex;align-items:center;gap:10px;
+    font-size:.8rem;letter-spacing:.3em;text-transform:uppercase;
+    color:var(--flame);font-weight:700;margin-bottom:14px;
+  }
+  .hero-kicker::before{content:"";width:38px;height:2px;background:var(--copper)}
+  .band-hero h1{font-size:clamp(2.2rem,5.4vw,3.9rem);font-weight:700;max-width:16ch}
+  .band-hero h1 .hot{color:var(--flame)}
+  .band-hero h1 .cold{color:#9cc4dd}
+  .band-hero p.lede{font-size:1.15rem;max-width:56ch;margin:16px 0 26px;color:#d9d3c2}
+  .btnrow{display:flex;flex-wrap:wrap;gap:14px}
+  .btn{
+    display:inline-flex;align-items:center;gap:10px;
+    padding:14px 26px;border-radius:4px;text-decoration:none;
+    font-weight:700;font-size:1rem;cursor:pointer;border:2px solid transparent;
+  }
+  .btn-hot{background:var(--copper);color:#fff;border-color:var(--copper-deep)}
+  .btn-hot:hover{background:var(--copper-deep)}
+  .btn-ghost{background:transparent;color:var(--paper);border-color:var(--paper)}
+  .btn-ghost:hover{background:rgba(255,255,255,.12)}
+  .hero-meta{display:flex;flex-wrap:wrap;gap:26px;margin-top:30px;color:#cfc8b4;font-size:.95rem}
+  .hero-meta i{color:var(--flame);margin-right:8px}
+
+  /* Generic section headers */
+  .sec{padding:64px 0}
+  .sec.alt{background:var(--paper-dark);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .kicker{
+    font-size:.78rem;letter-spacing:.32em;text-transform:uppercase;
+    color:var(--copper-deep);font-weight:700;margin-bottom:10px;
+  }
+  .sec h2{font-size:clamp(1.7rem,3.6vw,2.6rem);margin-bottom:14px}
+  .sec p.sub{max-width:62ch;color:var(--ink-soft);margin-bottom:30px}
+
+  /* Process steps (services presentation) */
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+  .step{padding:30px 26px;position:relative;border-right:1px solid var(--line)}
+  .step:last-child{border-right:none}
+  .step:nth-child(even){background:var(--paper)}
+  .step .num{
+    font-family:'Oswald',sans-serif;font-size:2.6rem;font-weight:700;
+    color:transparent;-webkit-text-stroke:2px var(--copper);
+    line-height:1;margin-bottom:12px;display:block;
+  }
+  .step h3{font-size:1.15rem;margin-bottom:8px}
+  .step p{font-size:.95rem;color:var(--ink-soft)}
+  .step .sicon{
+    position:absolute;top:26px;right:22px;font-size:1.5rem;color:var(--frost);
+  }
+
+  .svc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:36px}
+  .svc{
+    background:#fff;border:1px solid var(--line);border-top:5px solid var(--copper);
+    border-radius:6px;padding:26px 22px;
+  }
+  .svc.cool{border-top-color:var(--frost)}
+  .svc i.big{font-size:1.8rem;margin-bottom:12px;display:block}
+  .svc.hot i.big{color:var(--copper-deep)}
+  .svc.cool i.big{color:var(--frost-deep)}
+  .svc h3{font-size:1.1rem;margin-bottom:8px}
+  .svc p{font-size:.93rem;color:var(--ink-soft)}
+  .confirm-note{
+    margin-top:26px;background:#fff8ec;border:1px dashed var(--copper-deep);
+    border-radius:6px;padding:16px 20px;font-size:.95rem;color:var(--ink-soft);
+  }
+  .confirm-note i{color:var(--copper-deep);margin-right:8px}
+
+  /* Snap-scroll gallery */
+  .gallery-strip{
+    display:flex;gap:18px;overflow-x:auto;padding:6px 4px 18px;
+    scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
+  }
+  .gallery-strip::-webkit-scrollbar{height:10px}
+  .gallery-strip::-webkit-scrollbar-track{background:var(--paper-dark);border-radius:5px}
+  .gallery-strip::-webkit-scrollbar-thumb{background:var(--copper);border-radius:5px}
+  .gtile{
+    flex:0 0 300px;height:220px;border-radius:8px;scroll-snap-align:start;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    color:#fff;text-align:center;padding:18px;position:relative;overflow:hidden;
+    border:1px solid rgba(0,0,0,.25);
+  }
+  .gtile .gicon{font-size:2.4rem;margin-bottom:10px;opacity:.95}
+  .gtile h3{font-size:1.05rem;margin-bottom:6px}
+  .gtile p{font-size:.82rem;opacity:.9;letter-spacing:.14em;text-transform:uppercase}
+  .g1{background:linear-gradient(135deg,#3a2a1c,#9a5e22 60%,#e0a458)}
+  .g2{background:linear-gradient(135deg,#1c2b3a,#35617f 60%,#9cc4dd)}
+  .g3{background:linear-gradient(135deg,#23272e,#3a4048 55%,#6b7280)}
+  .g4{background:linear-gradient(135deg,#5b3a1e,#c07a33 55%,#f2cf9a)}
+  .g5{background:linear-gradient(135deg,#233a4d,#4d7ea6 55%,#cfe4f2)}
+  .g6{background:linear-gradient(135deg,#2a2e35,#8a6a35 55%,#d8b96a)}
+  .gal-hint{font-size:.85rem;color:var(--ink-soft);margin-top:4px}
+  .gal-hint i{margin-right:6px;color:var(--copper-deep)}
+
+  /* Reviews */
+  .honest{
+    background:#fff;border:1px solid var(--line);border-left:6px solid var(--frost);
+    border-radius:6px;padding:24px 26px;margin-bottom:26px;
+  }
+  .honest h3{font-size:1.2rem;margin-bottom:8px}
+  .honest p{color:var(--ink-soft);font-size:.98rem}
+  .rev-cta{display:flex;flex-wrap:wrap;gap:14px;margin-top:22px}
+
+  /* About facts table */
+  .facts{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin-top:8px;
+  }
+  .fact{background:#fff;border:1px solid var(--line);border-radius:6px;padding:24px 22px}
+  .fact i{font-size:1.6rem;color:var(--copper-deep);margin-bottom:10px;display:block}
+  .fact h3{font-size:1.05rem;margin-bottom:8px}
+  .fact p{font-size:.95rem;color:var(--ink-soft)}
+  .fact a{color:var(--frost-deep);font-weight:700;text-decoration:none}
+  .fact a:hover{text-decoration:underline}
+  .hours-table{width:100%;border-collapse:collapse;font-size:.95rem}
+  .hours-table td{padding:7px 4px;border-bottom:1px dashed var(--line)}
+  .hours-table td:last-child{text-align:right;font-weight:600}
+
+  /* Contact */
+  .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:6px}
+  @media(max-width:820px){.contact-grid{grid-template-columns:1fr}}
+  .card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:28px 26px}
+  .card h3{font-size:1.2rem;margin-bottom:14px}
+  .card .row{display:flex;gap:12px;align-items:flex-start;margin-bottom:14px;font-size:.97rem;color:var(--ink-soft)}
+  .card .row i{color:var(--copper-deep);margin-top:4px;width:20px;text-align:center}
+  .card .row a{color:var(--frost-deep);font-weight:700;text-decoration:none}
+  .card .row a:hover{text-decoration:underline}
+  form .fld{margin-bottom:16px}
+  form label{display:block;font-weight:700;font-size:.9rem;margin-bottom:6px}
+  form input,form select,form textarea{
+    width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:4px;
+    font-family:inherit;font-size:1rem;background:var(--paper);
+  }
+  form input:focus,form select:focus,form textarea:focus{outline:2px solid var(--copper);border-color:var(--copper)}
+  form textarea{min-height:110px;resize:vertical}
+  .form-note{font-size:.85rem;color:var(--ink-soft);margin-top:10px}
+
+  /* Call-first footer block */
+  .callfirst{
+    background:linear-gradient(100deg,var(--copper-deep),var(--copper) 55%,var(--flame));
+    color:#fff;text-align:center;padding:60px 22px;
+  }
+  .callfirst h2{font-size:clamp(1.8rem,4vw,2.8rem);margin-bottom:10px}
+  .callfirst p{font-size:1.1rem;margin-bottom:24px;color:#fff8ec}
+  .callfirst a.bignum{
+    display:inline-flex;align-items:center;gap:14px;
+    background:#fff;color:var(--copper-deep);text-decoration:none;
+    font-family:'Oswald',sans-serif;font-weight:700;font-size:clamp(1.4rem,4vw,2.2rem);
+    padding:16px 34px;border-radius:8px;letter-spacing:.03em;
+  }
+  .callfirst a.bignum:hover{background:var(--ink);color:#fff}
+  .callfirst .sub-note{margin-top:16px;font-size:.9rem;color:#fff3e0}
+
+  footer.site{
+    background:var(--ink);color:#cfc8b4;text-align:center;padding:26px 16px;
+  }
+  footer.site p{font-size:.95rem;letter-spacing:.06em}
+
+  .float-call{
+    position:fixed;right:18px;bottom:18px;z-index:50;
+    width:58px;height:58px;border-radius:50%;
+    background:var(--copper);color:#fff;font-size:1.4rem;
+    display:flex;align-items:center;justify-content:center;text-decoration:none;
+    box-shadow:0 6px 18px rgba(0,0,0,.35);border:2px solid #fff;
+  }
+  .float-call:hover{background:var(--copper-deep)}
+</style>
+</head>
+<body>
+
+<header class="topstrip">
+  <div class="wrap">
+    <a class="brandline" href="#" data-page="home" aria-label="Phelps and Co Heating and Cooling home">
+      <span class="badge">P&amp;Co</span>
+      <span class="brand-word">Phelps &amp; Co<small>HEATING &amp; COOLING</small></span>
+    </a>
+    <div class="strip-actions">
+      <a class="strip-call" href="tel:+15134812219"><i class="fa-solid fa-phone"></i><span class="calltxt">(513) 481-2219</span></a>
+      <button class="hamburger" id="menuBtn" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+    </div>
+  </div>
+</header>
+
+<nav class="overlay" id="overlay" aria-hidden="true">
+  <button class="ov-close" id="ovClose" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button>
+  <a class="ovlink" href="#" data-page="home">Home</a>
+  <a class="ovlink" href="#" data-page="services">Services</a>
+  <a class="ovlink" href="#" data-page="about">About</a>
+  <a class="ovlink" href="#" data-page="reviews">Reviews</a>
+  <a class="ovlink" href="#" data-page="contact">Contact</a>
+  <div class="ov-foot">
+    <p>Ready when you are.<br><a href="tel:+15134812219">(513) 481-2219</a></p>
+  </div>
+</nav>
+
+<main>
+  
+  <section class="page" id="page-home">
+    <div class="band-hero">
+      <div class="wrap">
+        <span class="hero-kicker">Cincinnati Heating Contractor</span>
+        <h1>Heat when you need it. <span class="hot">Cool</span> when you want it. <span class="cold">Fixed right.</span></h1>
+        <p class="lede">Phelps &amp; Co Heating &amp; Cooling is a heating contractor on Harrison Ave in Cincinnati, Ohio. One call gets you straight to the shop for heating and cooling help around your home.</p>
+        <div class="btnrow">
+          <a class="btn btn-hot" href="tel:+15134812219"><i class="fa-solid fa-phone"></i> Call (513) 481-2219</a>
+          <a class="btn btn-ghost" href="#" data-page="services"><i class="fa-solid fa-wrench"></i> How We Work</a>
+        </div>
+        <div class="hero-meta">
+          <span><i class="fa-solid fa-location-dot"></i> 2259 Harrison Ave, Cincinnati, OH 45211</span>
+          <span><i class="fa-solid fa-clock"></i> Mon to Fri, 9:00 AM to 6:00 PM</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="wrap">
+        <p class="kicker">What we do</p>
+        <h2>A straight path from problem to comfort</h2>
+        <p class="sub">Every job follows the same simple process, so you always know what happens next. Listed services reflect this shop's category as a heating contractor. Call to confirm a specific service.</p>
+        <div class="steps">
+          <div class="step">
+            <i class="fa-solid fa-phone-volume sicon"></i>
+            <span class="num">01</span>
+            <h3>Call the shop</h3>
+            <p>Tell us what your system is doing, or not doing. We will set a time that fits your day.</p>
+          </div>
+          <div class="step">
+            <i class="fa-solid fa-magnifying-glass sicon"></i>
+            <span class="num">02</span>
+            <h3>On-site diagnosis</h3>
+            <p>A technician looks over your equipment and explains what is wrong in plain terms.</p>
+          </div>
+          <div class="step">
+            <i class="fa-solid fa-screwdriver-wrench sicon"></i>
+            <span class="num">03</span>
+            <h3>Repair or install</h3>
+            <p>We fix what can be fixed and replace what cannot, with your approval before any work starts.</p>
+          </div>
+          <div class="step">
+            <i class="fa-solid fa-temperature-half sicon"></i>
+            <span class="num">04</span>
+            <h3>Test and follow up</h3>
+            <p>We run the system through its paces and make sure your home feels right before we leave.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec alt">
+      <div class="wrap">
+        <p class="kicker">From the shop</p>
+        <h2>Recent work, coming soon</h2>
+        <p class="sub">We are adding photos of real jobs from around Cincinnati. Swipe through the placeholders below.</p>
+        <div class="gallery-strip" id="homeGallery">
+          <div class="gtile g1"><i class="fa-solid fa-fire gicon"></i><h3>Furnace Service</h3><p>Photo coming soon</p></div>
+          <div class="gtile g2"><i class="fa-solid fa-snowflake gicon"></i><h3>AC Tune-Up</h3><p>Photo coming soon</p></div>
+          <div class="gtile g3"><i class="fa-solid fa-fan gicon"></i><h3>System Install</h3><p>Photo coming soon</p></div>
+          <div class="gtile g4"><i class="fa-solid fa-house-chimney gicon"></i><h3>Harrison Ave Shop</h3><p>Photo coming soon</p></div>
+          <div class="gtile g5"><i class="fa-solid fa-temperature-arrow-down gicon"></i><h3>Cooling Repair</h3><p>Photo coming soon</p></div>
+          <div class="gtile g6"><i class="fa-solid fa-toolbox gicon"></i><h3>Maintenance Visit</h3><p>Photo coming soon</p></div>
+        </div>
+        <p class="gal-hint"><i class="fa-solid fa-hand-pointer"></i> Scroll or swipe sideways to browse the strip.</p>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="wrap">
+        <p class="kicker">Find us</p>
+        <h2>On Harrison Ave in Cincinnati</h2>
+        <p class="sub">Phelps &amp; Co Heating &amp; Cooling is listed as a heating contractor at 2259 Harrison Ave, Cincinnati, OH 45211.</p>
+        <div class="btnrow">
+          <a class="btn btn-hot" href="tel:+15134812219"><i class="fa-solid fa-phone"></i> (513) 481-2219</a>
+          <a class="btn" style="border-color:var(--ink);color:var(--ink)" href="https://www.google.com/maps/search/?api=1&amp;query=2259%20Harrison%20Ave%2C%20Cincinnati%2C%20OH%2045211" target="_blank" rel="noopener"><i class="fa-solid fa-diamond-turn-right"></i> Get Directions</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+  <section class="page" id="page-services">
+    <div class="band-hero">
+      <div class="wrap">
+        <span class="hero-kicker">Services</span>
+        <h1>Heating &amp; cooling, <span class="hot">step by step.</span></h1>
+        <p class="lede">A heating contractor's work, laid out as the process it follows in your home. Service details come from the business category; call to confirm what is available.</p>
+        <div class="btnrow">
+          <a class="btn btn-hot" href="tel:+15134812219"><i class="fa-solid fa-phone"></i> Call (513) 481-2219</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="wrap">
+        <p class="kicker">Our process</p>
+        <h2>Four steps, every time</h2>
+        <p class="sub">No surprises. You will know the plan and the price before work begins.</p>
+        <div class="steps">
+          <div class="step">
+            <i class="fa-solid fa-phone-volume sicon"></i>
+            <span class="num">01</span>
+            <h3>Reach out</h3>
+            <p>Call (513) 481-2219 during shop hours, Monday through Friday, 9 AM to 6 PM.</p>
+          </div>
+          <div class="step">
+            <i class="fa-solid fa-magnifying-glass sicon"></i>
+            <span class="num">02</span>
+            <h3>Diagnose</h3>
+            <p>We inspect the system, find the fault, and lay out your options clearly.</p>
+          </div>
+          <div class="step">
+            <i class="fa-solid fa-screwdriver-wrench sicon"></i>
+            <span class="num">03</span>
+            <h3>Service or install</h3>
+            <p>Repairs, tune-ups, or full system replacement, done with your sign-off first.</p>
+          </div>
+          <div class="step">
+            <i class="fa-solid fa-clipboard-check sicon"></i>
+            <span class="num">04</span>
+            <h3>Verify comfort</h3>
+            <p>We test heating and cooling cycles and confirm even comfort through the house.</p>
+          </div>
+        </div>
+
+        <h2 style="margin-top:52px">Typical services for a heating contractor</h2>
+        <p class="sub">The categories below reflect standard heating contractor work. Specific offerings are not published by this shop online, so call to confirm.</p>
+        <div class="svc-grid">
+          <div class="svc hot">
+            <i class="fa-solid fa-fire big"></i>
+            <h3>Furnace &amp; Heating Repair</h3>
+            <p>Diagnosis and repair of heating equipment when the house will not warm up.</p>
+          </div>
+          <div class="svc cool">
+            <i class="fa-solid fa-snowflake big"></i>
+            <h3>Air Conditioning Service</h3>
+            <p>Cooling system repair and tune-ups to keep summer humidity under control.</p>
+          </div>
+          <div class="svc hot">
+            <i class="fa-solid fa-gears big"></i>
+            <h3>System Installation</h3>
+            <p>Replacement of aging heating or cooling equipment sized for your home.</p>
+          </div>
+          <div class="svc cool">
+            <i class="fa-solid fa-clipboard-list big"></i>
+            <h3>Maintenance &amp; Tune-Ups</h3>
+            <p>Seasonal checkups to catch small problems before they become no-heat calls.</p>
+          </div>
+        </div>
+        <div class="confirm-note">
+          <i class="fa-solid fa-circle-info"></i>
+          Services listed here are based on the business category shown in public listings. This shop has not published a service menu online. Call <a href="tel:+15134812219" style="color:var(--copper-deep);font-weight:700">(513) 481-2219</a> to confirm a specific service before you book.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+  <section class="page" id="page-about">
+    <div class="band-hero">
+      <div class="wrap">
+        <span class="hero-kicker">About</span>
+        <h1>A Cincinnati <span class="hot">heating contractor.</span></h1>
+        <p class="lede">What public records say about Phelps &amp; Co Heating &amp; Cooling, stated plainly. Nothing here is embellished.</p>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="wrap">
+        <p class="kicker">The facts</p>
+        <h2>What we know</h2>
+        <div class="facts">
+          <div class="fact">
+            <i class="fa-solid fa-shop"></i>
+            <h3>The business</h3>
+            <p>Phelps &amp; Co Heating &amp; Cooling is listed in public business directories as a heating contractor serving Cincinnati, Ohio.</p>
+          </div>
+          <div class="fact">
+            <i class="fa-solid fa-location-dot"></i>
+            <h3>The location</h3>
+            <p>2259 Harrison Ave, Cincinnati, OH 45211. <a href="https://www.google.com/maps/search/?api=1&amp;query=2259%20Harrison%20Ave%2C%20Cincinnati%2C%20OH%2045211" target="_blank" rel="noopener">Get directions</a></p>
+          </div>
+          <div class="fact">
+            <i class="fa-solid fa-clock"></i>
+            <h3>Listed hours</h3>
+            <table class="hours-table">
+              <tr><td>Monday to Friday</td><td>9:00 AM to 6:00 PM</td></tr>
+              <tr><td>Saturday</td><td>Closed</td></tr>
+              <tr><td>Sunday</td><td>Closed</td></tr>
+            </table>
+            <p style="margin-top:8px;font-size:.85rem">Hours per a public directory listing. Call to confirm.</p>
+          </div>
+          <div class="fact">
+            <i class="fa-solid fa-phone"></i>
+            <h3>The phone</h3>
+            <p><a href="tel:+15134812219">(513) 481-2219</a><br>The direct line to the shop.</p>
+          </div>
+          <div class="fact">
+            <i class="fa-solid fa-star-half-stroke"></i>
+            <h3>Reviews</h3>
+            <p>No public reviews were found for this business in the directories checked. See the Reviews page for details.</p>
+          </div>
+          <div class="fact">
+            <i class="fa-solid fa-globe"></i>
+            <h3>Online presence</h3>
+            <p>No official website or social media pages were found. This page exists to make the basics easy to find.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+  <section class="page" id="page-reviews">
+    <div class="band-hero">
+      <div class="wrap">
+        <span class="hero-kicker">Reviews</span>
+        <h1>An honest <span class="cold">word</span> on reviews.</h1>
+        <p class="lede">We will not invent praise. Here is what is actually out there.</p>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="wrap">
+        <div class="honest">
+          <h3><i class="fa-solid fa-magnifying-glass" style="color:var(--frost-deep);margin-right:8px"></i>No public reviews found</h3>
+          <p>We checked public directories including Birdeye, where the listing for Phelps &amp; Co Heating &amp; Cooling shows zero reviews. No customer reviews, ratings, or reviewer names were found anywhere else public, so none are shown here. We will not fabricate them.</p>
+          <p style="margin-top:10px">We were also unable to verify that the Google Maps link provided for this business opens its live listing, so no "See reviews on Google" link is included.</p>
+        </div>
+        <h2>Had work done by this shop?</h2>
+        <p class="sub">The best review is a neighbor's recommendation. If Phelps &amp; Co has helped you, tell a friend, or call the shop and let them know.</p>
+        <div class="rev-cta">
+          <a class="btn btn-hot" href="tel:+15134812219"><i class="fa-solid fa-phone"></i> Call (513) 481-2219</a>
+          <a class="btn" style="border-color:var(--ink);color:var(--ink)" href="#" data-page="contact"><i class="fa-solid fa-envelope"></i> Send a Message</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+  <section class="page" id="page-contact">
+    <div class="band-hero">
+      <div class="wrap">
+        <span class="hero-kicker">Contact</span>
+        <h1>Talk to <span class="hot">the shop.</span></h1>
+        <p class="lede">Call during listed hours, or send a message and we will get back to you.</p>
+        <div class="btnrow">
+          <a class="btn btn-hot" href="tel:+15134812219"><i class="fa-solid fa-phone"></i> (513) 481-2219</a>
+        </div>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="wrap">
+        <div class="contact-grid">
+          <div class="card">
+            <h3><i class="fa-solid fa-address-card" style="color:var(--copper-deep);margin-right:8px"></i>Reach us</h3>
+            <div class="row"><i class="fa-solid fa-phone"></i><span>Phone: <a href="tel:+15134812219">(513) 481-2219</a></span></div>
+            <div class="row"><i class="fa-solid fa-location-dot"></i><span>2259 Harrison Ave<br>Cincinnati, OH 45211</span></div>
+            <div class="row"><i class="fa-solid fa-clock"></i><span>Mon to Fri, 9:00 AM to 6:00 PM<br>Sat and Sun, closed<br><small>(per public directory listing; call to confirm)</small></span></div>
+            <div class="row"><i class="fa-solid fa-diamond-turn-right"></i><a href="https://www.google.com/maps/search/?api=1&amp;query=2259%20Harrison%20Ave%2C%20Cincinnati%2C%20OH%2045211" target="_blank" rel="noopener">Get Directions on Google Maps</a></div>
+          </div>
+          <div class="card">
+            <h3><i class="fa-solid fa-envelope" style="color:var(--copper-deep);margin-right:8px"></i>Send a message</h3>
+            <form id="contactForm">
+              <div class="fld">
+                <label for="cf-name">Your name</label>
+                <input id="cf-name" name="name" type="text" required autocomplete="name">
+              </div>
+              <div class="fld">
+                <label for="cf-phone">Your phone</label>
+                <input id="cf-phone" name="phone" type="tel" required autocomplete="tel">
+              </div>
+              <div class="fld">
+                <label for="cf-topic">What do you need?</label>
+                <select id="cf-topic" name="topic">
+                  <option>Heating repair</option>
+                  <option>Cooling repair</option>
+                  <option>New system quote</option>
+                  <option>Maintenance or tune-up</option>
+                  <option>Something else</option>
+                </select>
+              </div>
+              <div class="fld">
+                <label for="cf-msg">Message</label>
+                <textarea id="cf-msg" name="message" required placeholder="Describe the problem: no heat, strange noise, system age, and so on."></textarea>
+              </div>
+              <button class="btn btn-hot" type="submit" style="width:100%;justify-content:center"><i class="fa-solid fa-paper-plane"></i> Draft Email to Send</button>
+              <p class="form-note">This opens a pre-filled email draft in your mail app addressed for you to send. No email address for the shop is published, so add the recipient or call (513) 481-2219.</p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+
+<div class="callfirst">
+  <h2>Furnace out? AC struggling?</h2>
+  <p>Call the shop. A real person picks up during listed hours.</p>
+  <a class="bignum" href="tel:+15134812219"><i class="fa-solid fa-phone"></i> (513) 481-2219</a>
+  <p class="sub-note">2259 Harrison Ave, Cincinnati, OH 45211</p>
+</div>
+
+<footer class="site">
+  <p>&copy; Phelps &amp; Co Heating &amp; Cooling</p>
+</footer>
+
+<a class="float-call" href="tel:+15134812219" aria-label="Call now"><i class="fa-solid fa-phone"></i></a>
+
+<script>
+(function(){
+  var pageMap = {
+    home: document.getElementById('page-home'),
+    services: document.getElementById('page-services'),
+    about: document.getElementById('page-about'),
+    reviews: document.getElementById('page-reviews'),
+    contact: document.getElementById('page-contact')
+  };
+  var overlay = document.getElementById('overlay');
+  var menuBtn = document.getElementById('menuBtn');
+  var ovClose = document.getElementById('ovClose');
+  var current = 'home';
+
+  function setActiveLink(name){
+    var links = overlay.querySelectorAll('a.ovlink');
+    for (var i = 0; i < links.length; i++){
+      if (links[i].getAttribute('data-page') === name) links[i].classList.add('active');
+      else links[i].classList.remove('active');
+    }
+  }
+
+  function navigateTo(name, push){
+    if (!pageMap[name]) name = 'home';
+    for (var key in pageMap){
+      if (pageMap.hasOwnProperty(key)) pageMap[key].classList.toggle('active', key === name);
+    }
+    current = name;
+    setActiveLink(name);
+    closeMenu();
+    window.scrollTo(0, 0);
+    if (push !== false){
+      try { history.pushState({page: name}, '', '#' + name); } catch (e) {}
+    }
+  }
+
+  function openMenu(){
+    overlay.classList.add('open');
+    overlay.setAttribute('aria-hidden', 'false');
+  }
+  function closeMenu(){
+    overlay.classList.remove('open');
+    overlay.setAttribute('aria-hidden', 'true');
+  }
+
+  menuBtn.addEventListener('click', openMenu);
+  ovClose.addEventListener('click', closeMenu);
+
+  var navLinks = document.querySelectorAll('[data-page]');
+  for (var i = 0; i < navLinks.length; i++){
+    (function(link){
+      link.addEventListener('click', function(ev){
+        ev.preventDefault();
+        navigateTo(link.getAttribute('data-page'), true);
+      });
+    })(navLinks[i]);
+  }
+
+  window.addEventListener('popstate', function(ev){
+    var name = (ev.state && ev.state.page) ? ev.state.page : (location.hash ? location.hash.replace('#','') : 'home');
+    navigateTo(name, false);
+  });
+
+  document.addEventListener('keydown', function(ev){
+    if (ev.key === 'Escape') closeMenu();
+  });
+
+  var start = location.hash ? location.hash.replace('#','') : 'home';
+  navigateTo(start, false);
+
+  var form = document.getElementById('contactForm');
+  form.addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var name = document.getElementById('cf-name').value.trim();
+    var phone = document.getElementById('cf-phone').value.trim();
+    var topic = document.getElementById('cf-topic').value;
+    var msg = document.getElementById('cf-msg').value.trim();
+    var subject = encodeURIComponent('Service request from ' + name + ' - ' + topic);
+    var body = encodeURIComponent('Name: ' + name + '\nPhone: ' + phone + '\nTopic: ' + topic + '\n\nMessage:\n' + msg);
+    window.location.href = 'mailto:;subject=' + subject + '&body=' + body;
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JS 24 Hour Road Service and Semi Truck Repair | Loveland, OH</title>
+<meta name="description" content="JS 24 Hour Road Service and Semi Truck Repair, a truck repair shop in Loveland, OH. Call (513) 572-7929.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{
+  --bg:#05080f;
+  --bg2:#0a101d;
+  --panel:#0d1526;
+  --line:rgba(255,255,255,.09);
+  --ink:#eef2fa;
+  --dim:#9aa6bd;
+  --red:#ff3b30;
+  --amber:#ffb020;
+  --green:#00e07a;
+  --blue:#2f7bff;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:'Barlow',sans-serif;line-height:1.6;overflow-x:hidden}
+a{color:inherit}
+.wrap{max-width:1160px;margin:0 auto;padding:0 20px}
+.disp{font-family:'Barlow Condensed',sans-serif}
+.mono{font-family:'JetBrains Mono',monospace}
+/* ===== top status strip ===== */
+.statusbar{background:#03050a;border-bottom:1px solid var(--line);font-size:12px;color:var(--dim)}
+.statusbar .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:8px;padding-bottom:8px}
+.live{display:inline-flex;align-items:center;gap:8px;color:var(--green);font-weight:600;letter-spacing:.12em}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:pulse 1.6s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.statusbar .mono{font-size:12px}
+/* ===== header / nav ===== */
+header{position:sticky;top:0;z-index:50;background:rgba(5,8,15,.92);backdrop-filter:blur(10px);border-bottom:2px solid var(--red)}
+.navbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+.brand .mark{width:46px;height:46px;border-radius:10px;background:linear-gradient(135deg,var(--red),#b31217);display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;box-shadow:0 4px 18px rgba(255,59,48,.4)}
+.brand b{font-family:'Barlow Condensed',sans-serif;font-size:19px;letter-spacing:.04em;line-height:1.1;display:block}
+.brand small{color:var(--dim);font-size:11px;letter-spacing:.22em;text-transform:uppercase}
+nav.main{display:flex;gap:4px}
+nav.main a{text-decoration:none;padding:10px 16px;font-family:'Barlow Condensed',sans-serif;font-size:17px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);border-bottom:3px solid transparent;transition:.2s}
+nav.main a:hover{color:var(--ink)}
+nav.main a.active{color:var(--amber);border-bottom-color:var(--amber)}
+.callbtn{display:inline-flex;align-items:center;gap:10px;background:var(--red);color:#fff;text-decoration:none;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;letter-spacing:.06em;padding:11px 20px;border-radius:8px;box-shadow:0 4px 20px rgba(255,59,48,.45);transition:.2s;white-space:nowrap}
+.callbtn:hover{background:#e03227;transform:translateY(-1px)}
+.burger{display:none;background:none;border:1px solid var(--line);color:var(--ink);font-size:22px;padding:8px 12px;border-radius:8px;cursor:pointer}
+.mobilemenu{display:none;flex-direction:column;background:var(--bg2);border-bottom:2px solid var(--red)}
+.mobilemenu a{text-decoration:none;padding:14px 22px;font-family:'Barlow Condensed',sans-serif;font-size:18px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink);border-top:1px solid var(--line)}
+.mobilemenu a.active{color:var(--amber)}
+.mobilemenu.open{display:flex}
+/* ===== pages ===== */
+.page{display:none}
+.page.active{display:block;animation:fadein .3s}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+/* ===== hero ===== */
+.hero{position:relative;overflow:hidden;background:
+  radial-gradient(900px 420px at 80% 10%,rgba(255,59,48,.14),transparent 60%),
+  radial-gradient(700px 500px at 10% 90%,rgba(47,123,255,.12),transparent 60%),var(--bg2)}
+.hero .scan{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(255,255,255,.015) 3px 4px)}
+.hero .wrap{display:grid;grid-template-columns:1.2fr .8fr;gap:40px;align-items:center;padding:72px 20px 64px}
+.kicker{display:inline-flex;align-items:center;gap:10px;background:rgba(255,176,32,.12);border:1px solid rgba(255,176,32,.4);color:var(--amber);font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.18em;padding:8px 14px;border-radius:4px;text-transform:uppercase;margin-bottom:18px}
+.hero h1{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:clamp(44px,6.5vw,84px);line-height:.95;letter-spacing:.01em;text-transform:uppercase}
+.hero h1 .hl{color:var(--red)}
+.hero h1 .amber{color:var(--amber)}
+.hero p.lead{color:var(--dim);font-size:19px;margin:18px 0 28px;max-width:560px}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap}
+.bigcall{display:inline-flex;align-items:center;gap:12px;background:var(--red);color:#fff;text-decoration:none;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:26px;letter-spacing:.04em;padding:16px 32px;border-radius:10px;box-shadow:0 6px 28px rgba(255,59,48,.5)}
+.bigcall:hover{background:#e03227}
+.ghostbtn{display:inline-flex;align-items:center;gap:10px;border:2px solid var(--line);color:var(--ink);text-decoration:none;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:18px;letter-spacing:.06em;padding:14px 26px;border-radius:10px;text-transform:uppercase}
+.ghostbtn:hover{border-color:var(--amber);color:var(--amber)}
+/* dispatch console card */
+.console{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.console .chead{background:#111a2e;border-bottom:1px solid var(--line);padding:12px 18px;display:flex;align-items:center;gap:10px}
+.console .chead .t{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.16em;color:var(--dim)}
+.console .lights{margin-left:auto;display:flex;gap:6px}
+.console .lights span{width:10px;height:10px;border-radius:50%}
+.console .cbody{padding:22px;font-family:'JetBrains Mono',monospace;font-size:13.5px}
+.crow{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px dashed rgba(255,255,255,.08)}
+.crow:last-child{border-bottom:none}
+.crow .k{color:var(--dim)}
+.crow .v{color:var(--ink);font-weight:600}
+.crow .v.ok{color:var(--green)}
+.crow .v.warn{color:var(--amber)}
+/* ===== sections ===== */
+section.band{padding:64px 0}
+.stitle{font-family:'Barlow Condensed',sans-serif;font-size:clamp(30px,4vw,46px);font-weight:800;text-transform:uppercase;letter-spacing:.02em;margin-bottom:8px}
+.stitle i{color:var(--red);margin-right:12px}
+.ssub{color:var(--dim);max-width:640px;margin-bottom:32px}
+/* service cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:26px;transition:.2s;position:relative;overflow:hidden}
+.card:hover{border-color:var(--red);transform:translateY(-3px)}
+.card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--red),var(--amber));opacity:0;transition:.2s}
+.card:hover::before{opacity:1}
+.card .ico{width:54px;height:54px;border-radius:12px;background:rgba(255,59,48,.12);border:1px solid rgba(255,59,48,.35);display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--red);margin-bottom:16px}
+.card h3{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;margin-bottom:8px}
+.card p{color:var(--dim);font-size:15px}
+.badge{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;padding:4px 10px;border-radius:4px;margin-top:14px}
+.badge.sample{background:rgba(255,176,32,.12);border:1px solid rgba(255,176,32,.45);color:var(--amber)}
+.badge.confirm{background:rgba(0,224,122,.1);border:1px solid rgba(0,224,122,.4);color:var(--green)}
+/* strip */
+.strip{background:linear-gradient(90deg,#14080a,#0a101d);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.strip .wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0}
+.stat{padding:34px 20px;text-align:center;border-left:1px solid var(--line)}
+.stat:first-child{border-left:none}
+.stat .n{font-family:'Barlow Condensed',sans-serif;font-size:44px;font-weight:800;color:var(--amber)}
+.stat .l{color:var(--dim);font-size:13px;letter-spacing:.18em;text-transform:uppercase}
+/* how it works */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;counter-reset:step}
+.step{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:28px;position:relative}
+.step .num{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;color:var(--bg);background:var(--amber);width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.step h3{font-family:'Barlow Condensed',sans-serif;font-size:21px;text-transform:uppercase;letter-spacing:.03em;margin-bottom:8px}
+.step p{color:var(--dim);font-size:15px}
+/* about */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:start}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:30px}
+.panel h3{font-family:'Barlow Condensed',sans-serif;font-size:22px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:14px;color:var(--amber)}
+.panel p,.panel li{color:var(--dim);font-size:16px}
+.panel ul{list-style:none;margin-top:12px}
+.panel li{padding:8px 0;border-bottom:1px dashed rgba(255,255,255,.08);display:flex;gap:12px;align-items:flex-start}
+.panel li i{color:var(--green);margin-top:4px}
+/* reviews */
+.revnote{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:28px;margin-bottom:24px}
+.revnote p{color:var(--dim);font-size:16px}
+.srcbtn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;border:1px solid var(--line);padding:12px 22px;border-radius:8px;font-weight:600;margin:8px 10px 0 0;color:var(--dim);cursor:not-allowed}
+.srcbtn i{font-size:20px}
+/* contact */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.info-item{display:flex;gap:16px;align-items:flex-start;padding:18px 0;border-bottom:1px dashed rgba(255,255,255,.08)}
+.info-item .ico{width:46px;height:46px;flex:none;border-radius:10px;background:rgba(255,59,48,.12);border:1px solid rgba(255,59,48,.35);display:flex;align-items:center;justify-content:center;color:var(--red);font-size:19px}
+.info-item h4{font-family:'Barlow Condensed',sans-serif;font-size:18px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.info-item a,.info-item p{color:var(--dim);text-decoration:none;font-size:16px}
+.info-item a:hover{color:var(--amber)}
+form.contactform label{display:block;font-family:'Barlow Condensed',sans-serif;font-size:16px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin:14px 0 6px}
+form.contactform input,form.contactform select,form.contactform textarea{width:100%;background:#0a1220;border:1px solid var(--line);border-radius:8px;color:var(--ink);padding:13px 15px;font-family:'Barlow',sans-serif;font-size:16px}
+form.contactform input:focus,form.contactform select:focus,form.contactform textarea:focus{outline:none;border-color:var(--red)}
+form.contactform textarea{min-height:130px;resize:vertical}
+form.contactform button{margin-top:20px;background:var(--red);border:none;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:19px;letter-spacing:.06em;text-transform:uppercase;padding:15px 34px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:10px}
+form.contactform button:hover{background:#e03227}
+.formnote{margin-top:12px;font-size:13.5px;color:var(--dim)}
+/* cta band */
+.ctaband{background:linear-gradient(135deg,#5a0f0c,#1a0b10);border-top:2px solid var(--red);border-bottom:2px solid var(--red);text-align:center;padding:56px 20px}
+.ctaband h2{font-family:'Barlow Condensed',sans-serif;font-size:clamp(32px,5vw,54px);font-weight:800;text-transform:uppercase;margin-bottom:10px}
+.ctaband p{color:#f3c1bd;margin-bottom:26px;font-size:18px}
+/* footer */
+footer{background:#03050a;border-top:1px solid var(--line);text-align:center;padding:26px 20px;font-family:'Barlow Condensed',sans-serif;font-size:16px;letter-spacing:.05em;color:var(--dim)}
+@media(max-width:860px){
+  nav.main,.callbtn.desktop{display:none}
+  .burger{display:block}
+  .hero .wrap{grid-template-columns:1fr;padding:52px 20px 48px}
+  .about-grid,.contact-grid{grid-template-columns:1fr}
+  .stat{border-left:none;border-top:1px solid var(--line)}
+  .stat:first-child{border-top:none}
+}
+</style>
+</head>
+<body>
+
+<div class="statusbar">
+  <div class="wrap">
+    <span class="live"><span class="dot"></span>DISPATCH ONLINE</span>
+    <span class="mono">Loveland, OH | 10084 E Kemper Rd Ste 10</span>
+  </div>
+</div>
+
+<header>
+  <div class="wrap navbar">
+    <a class="brand" href="#home" data-nav="home">
+      <span class="mark"><i class="fa-solid fa-truck-fast"></i></span>
+      <span><b>JS 24 Hour Road Service</b><small>Semi Truck Repair</small></span>
+    </a>
+    <nav class="main" aria-label="Main">
+      <a href="#home" data-nav="home" class="active">Home</a>
+      <a href="#services" data-nav="services">Services</a>
+      <a href="#about" data-nav="about">About</a>
+      <a href="#reviews" data-nav="reviews">Reviews</a>
+      <a href="#contact" data-nav="contact">Contact</a>
+    </nav>
+    <a class="callbtn desktop" href="tel:+15135727929"><i class="fa-solid fa-phone-volume"></i> (513) 572-7929</a>
+    <button class="burger" id="burger" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+  </div>
+  <nav class="mobilemenu" id="mobilemenu" aria-label="Mobile">
+    <a href="#home" data-nav="home" class="active">Home</a>
+    <a href="#services" data-nav="services">Services</a>
+    <a href="#about" data-nav="about">About</a>
+    <a href="#reviews" data-nav="reviews">Reviews</a>
+    <a href="#contact" data-nav="contact">Contact</a>
+    <a href="tel:+15135727929"><i class="fa-solid fa-phone"></i> (513) 572-7929</a>
+  </nav>
+</header>
+
+<main>
+
+<section class="page active" id="page-home" data-page="home">
+  <div class="hero">
+    <div class="scan"></div>
+    <div class="wrap">
+      <div>
+        <span class="kicker"><i class="fa-solid fa-tower-broadcast"></i> 24 Hour Road Service Unit</span>
+        <h1>Broken down?<br><span class="hl">We roll</span> <span class="amber">all night.</span></h1>
+        <p class="lead">JS 24 Hour Road Service and Semi Truck Repair keeps rigs moving around Loveland, Ohio. One call puts a truck repair shop on your breakdown, day or night.</p>
+        <div class="hero-cta">
+          <a class="bigcall" href="tel:+15135727929"><i class="fa-solid fa-phone-volume"></i> (513) 572-7929</a>
+          <a class="ghostbtn" href="#services" data-nav="services"><i class="fa-solid fa-wrench"></i> View Services</a>
+        </div>
+      </div>
+      <div class="console">
+        <div class="chead"><span class="t">DISPATCH CONSOLE</span><span class="lights"><span style="background:#ff5f57"></span><span style="background:#febc2e"></span><span style="background:#28c840"></span></span></div>
+        <div class="cbody">
+          <div class="crow"><span class="k">UNIT STATUS</span><span class="v ok">AVAILABLE</span></div>
+          <div class="crow"><span class="k">COVERAGE</span><span class="v">Loveland, OH area</span></div>
+          <div class="crow"><span class="k">SHOP TYPE</span><span class="v">Truck repair shop</span></div>
+          <div class="crow"><span class="k">SERVICE HOURS</span><span class="v warn">24 hours (call to confirm)</span></div>
+          <div class="crow"><span class="k">DISPATCH LINE</span><span class="v"><a href="tel:+15135727929" style="color:var(--amber);text-decoration:none">(513) 572-7929</a></span></div>
+          <div class="crow"><span class="k">SHOP ADDRESS</span><span class="v">10084 E Kemper Rd Ste 10</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="strip">
+    <div class="wrap">
+      <div class="stat"><div class="n">24</div><div class="l">Hour Road Service</div></div>
+      <div class="stat"><div class="n">1</div><div class="l">Call Dispatch Line</div></div>
+      <div class="stat"><div class="n">OH</div><div class="l">Loveland Based</div></div>
+      <div class="stat"><div class="n">GO</div><div class="l">Get Rolling Again</div></div>
+    </div>
+  </div>
+
+  <section class="band">
+    <div class="wrap">
+      <h2 class="stitle"><i class="fa-solid fa-siren"></i>Roadside rescue, shop repair</h2>
+      <p class="ssub">When a rig quits on the shoulder, every minute costs money. Call dispatch and get a plan moving fast.</p>
+      <div class="cards">
+        <div class="card"><div class="ico"><i class="fa-solid fa-truck-medical"></i></div><h3>24 Hour Road Service</h3><p>Roadside help for semis and heavy trucks, dispatched around the clock from Loveland.</p><span class="badge confirm">CALL TO CONFIRM</span></div>
+        <div class="card"><div class="ico"><i class="fa-solid fa-gears"></i></div><h3>Semi Truck Repair</h3><p>In-shop repairs for Class 8 trucks and tractors at our Kemper Road location.</p><span class="badge confirm">CALL TO CONFIRM</span></div>
+        <div class="card"><div class="ico"><i class="fa-solid fa-circle-dot"></i></div><h3>Tire Service</h3><p>Blowouts and flats handled roadside so you can get rolling again.</p><span class="badge sample">SAMPLE</span></div>
+        <div class="card"><div class="ico"><i class="fa-solid fa-car-battery"></i></div><h3>Jump Starts</h3><p>Dead batteries jumped on the spot, day or night.</p><span class="badge sample">SAMPLE</span></div>
+      </div>
+      <div style="margin-top:28px;text-align:center">
+        <a class="ghostbtn" href="#services" data-nav="services">See all services <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" style="background:var(--bg2);border-top:1px solid var(--line)">
+    <div class="wrap">
+      <h2 class="stitle"><i class="fa-solid fa-clipboard-list"></i>How a call goes</h2>
+      <p class="ssub">Simple, fast, and built for drivers on a deadline.</p>
+      <div class="steps">
+        <div class="step"><div class="num">1</div><h3>Call dispatch</h3><p>Dial <a href="tel:+15135727929" style="color:var(--amber)">(513) 572-7929</a> and describe your breakdown and location.</p></div>
+        <div class="step"><div class="num">2</div><h3>We roll out</h3><p>A service unit heads your way or books you into the shop, whichever gets you moving fastest.</p></div>
+        <div class="step"><div class="num">3</div><h3>Back on the road</h3><p>Repair done, paperwork simple, rig rolling. That is the whole job.</p></div>
+      </div>
+    </div>
+  </section>
+</section>
+
+
+<section class="page" id="page-services" data-page="services">
+  <section class="band">
+    <div class="wrap">
+      <h2 class="stitle"><i class="fa-solid fa-wrench"></i>Services</h2>
+      <p class="ssub">Capabilities are based on the business listing. Items marked SAMPLE are typical for a shop like this and should be confirmed by phone before you roll in.</p>
+      <div class="cards">
+        <div class="card"><div class="ico"><i class="fa-solid fa-truck-medical"></i></div><h3>24 Hour Road Service</h3><p>Emergency roadside response for semi trucks, around the clock.</p><span class="badge confirm">CALL TO CONFIRM</span></div>
+        <div class="card"><div class="ico"><i class="fa-solid fa-gears"></i></div><h3>Semi Truck Repair</h3><p>Tractor and heavy truck repairs at the Loveland shop.</p><span class="badge confirm">CALL TO CONFIRM</span></div>
+        <div class="card"><div class="ico"><i class="fa-solid fa-circle-dot"></i></div><h3>Tire Service</h3><p>Flat and blowout service for truck tires, roadside or in shop.</p><span class="badge sample">SAMPLE</span></div>
+        <div class="card"><div class="ico"><i class="fa-solid fa-car-battery"></i></div><h3>Jump Starts</h3><p>Battery jump starts for dead rigs, any hour.</p><span class="badge sample">SAMPLE</span></div>
+        <div class="card"><div class="ico"><i class="fa-solid fa-gas-pump"></i></div><h3>Fuel Delivery</h3><p>Emergency fuel delivery to get you to the next stop.</p><span class="badge sample">SAMPLE</span></div>
+        <div class="card"><div class="ico"><i class="fa-solid fa-lock"></i></div><h3>Lockout Service</h3><p>Locked out of the cab? Get back in and back on schedule.</p><span class="badge sample">SAMPLE</span></div>
+        <div class="card"><div class="ico"><i class="fa-solid fa-oil-can"></i></div><h3>Preventive Maintenance</h3><p>Scheduled upkeep to keep fleets and owner operators rolling.</p><span class="badge sample">SAMPLE</span></div>
+        <div class="card"><div class="ico"><i class="fa-solid fa-truck-ramp-box"></i></div><h3>Trailer Repair</h3><p>Trailer checks and repairs so the whole combination is road ready.</p><span class="badge sample">SAMPLE</span></div>
+      </div>
+    </div>
+  </section>
+  <div class="ctaband">
+    <h2>Not sure what you need?</h2>
+    <p>Describe the symptoms. We will tell you straight whether it is roadside or shop work.</p>
+    <a class="bigcall" href="tel:+15135727929"><i class="fa-solid fa-phone-volume"></i> Call (513) 572-7929</a>
+  </div>
+</section>
+
+
+<section class="page" id="page-about" data-page="about">
+  <section class="band">
+    <div class="wrap">
+      <h2 class="stitle"><i class="fa-solid fa-id-card"></i>About the shop</h2>
+      <p class="ssub">What we can say for sure, and what is still marked sample until confirmed.</p>
+      <div class="about-grid">
+        <div class="panel">
+          <h3><i class="fa-solid fa-circle-check"></i> On the record</h3>
+          <ul>
+            <li><i class="fa-solid fa-check"></i><span><strong>JS 24 Hour Road Service and Semi Truck Repair</strong>, a truck repair shop in Loveland, Ohio.</span></li>
+            <li><i class="fa-solid fa-check"></i><span>Shop address: 10084 E Kemper Rd Ste 10, Loveland, OH 45140.</span></li>
+            <li><i class="fa-solid fa-check"></i><span>Dispatch line: <a href="tel:+15135727929" style="color:var(--amber)">(513) 572-7929</a>.</span></li>
+            <li><i class="fa-solid fa-check"></i><span>Business name indicates 24 hour road service for semi trucks.</span></li>
+          </ul>
+        </div>
+        <div class="panel">
+          <h3><i class="fa-solid fa-triangle-exclamation"></i> Call to confirm</h3>
+          <ul>
+            <li><i class="fa-solid fa-phone"></i><span>Exact hours of operation <span class="badge sample">SAMPLE</span></span></li>
+            <li><i class="fa-solid fa-phone"></i><span>Full service menu and pricing <span class="badge sample">SAMPLE</span></span></li>
+            <li><i class="fa-solid fa-phone"></i><span>Roadside coverage radius <span class="badge sample">SAMPLE</span></span></li>
+            <li><i class="fa-solid fa-phone"></i><span>Fleet accounts and payment options <span class="badge sample">SAMPLE</span></span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:24px">
+        <h3><i class="fa-solid fa-road"></i> Why drivers call</h3>
+        <p>A breakdown at 2 a.m. does not wait for business hours. A shop built around 24 hour road service answers when others do not. If your rig is down anywhere near Loveland, one call to <a href="tel:+15135727929" style="color:var(--amber)">(513) 572-7929</a> gets the ball rolling.</p>
+      </div>
+    </div>
+  </section>
+</section>
+
+
+<section class="page" id="page-reviews" data-page="reviews">
+  <section class="band">
+    <div class="wrap">
+      <h2 class="stitle"><i class="fa-solid fa-star"></i>Reviews</h2>
+      <p class="ssub">Honest note: we could not verify public review profiles for this exact business, so nothing is quoted or invented here.</p>
+      <div class="revnote">
+        <p><strong style="color:var(--ink)">No verified review sources found yet.</strong> We searched public listings and did not find a confirmed Google or Facebook review page for JS 24 Hour Road Service and Semi Truck Repair in Loveland, OH. To keep this page honest, there are no reviewer names, no star ratings, and no quotes posted. If you are the owner, claim your Google Business Profile and link it here. If you are a driver who used this shop, call <a href="tel:+15135727929" style="color:var(--amber)">(513) 572-7929</a> and ask where to leave feedback.</p>
+        <div style="margin-top:18px">
+          <span class="srcbtn"><i class="fa-brands fa-google"></i> Google reviews: not verified</span>
+          <span class="srcbtn"><i class="fa-brands fa-facebook"></i> Facebook reviews: not verified</span>
+        </div>
+      </div>
+      <div class="panel">
+        <h3><i class="fa-solid fa-scale-balanced"></i> Our review policy</h3>
+        <ul>
+          <li><i class="fa-solid fa-check"></i><span>Only real, verifiable reviews are ever posted here.</span></li>
+          <li><i class="fa-solid fa-check"></i><span>Positive, mixed, and negative feedback are all shown as received.</span></li>
+          <li><i class="fa-solid fa-check"></i><span>Reviewer names and quotes are never invented or paraphrased from thin air.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</section>
+
+
+<section class="page" id="page-contact" data-page="contact">
+  <section class="band">
+    <div class="wrap">
+      <h2 class="stitle"><i class="fa-solid fa-headset"></i>Contact dispatch</h2>
+      <p class="ssub">Fastest option is always the phone. Use the form to draft a message.</p>
+      <div class="contact-grid">
+        <div class="panel">
+          <div class="info-item"><div class="ico"><i class="fa-solid fa-phone-volume"></i></div><div><h4>Dispatch line</h4><a href="tel:+15135727929">(513) 572-7929</a></div></div>
+          <div class="info-item"><div class="ico"><i class="fa-solid fa-location-dot"></i></div><div><h4>Shop address</h4><p>10084 E Kemper Rd Ste 10<br>Loveland, OH 45140</p><a href="https://www.google.com/maps/search/?api=1&amp;query=JS%2024%20Hour%20Road%20Service%20and%20Semi%20Truck%20Repair%2C%2010084%20E%20Kemper%20Rd%20Ste%2010%2C%20Loveland%2C%20OH%2045140" target="_blank" rel="noopener" style="color:var(--amber);font-weight:600">Get directions <i class="fa-solid fa-arrow-up-right-from-square"></i></a></div></div>
+          <div class="info-item"><div class="ico"><i class="fa-solid fa-clock"></i></div><div><h4>Hours</h4><p>24 hour road service <span class="badge sample">SAMPLE</span></p><p style="font-size:13.5px">Call to confirm current hours.</p></div></div>
+          <div class="info-item" style="border-bottom:none"><div class="ico"><i class="fa-solid fa-truck"></i></div><div><h4>Service type</h4><p>Truck repair shop, roadside assistance</p></div></div>
+        </div>
+        <div class="panel">
+          <h3><i class="fa-solid fa-envelope"></i> Draft a message</h3>
+          <form class="contactform" id="contactform">
+            <label for="fname">Your name</label>
+            <input id="fname" name="name" type="text" required placeholder="Jane Driver">
+            <label for="fphone">Phone</label>
+            <input id="fphone" name="phone" type="tel" placeholder="(513) 555-0100">
+            <label for="fneed">What do you need?</label>
+            <select id="fneed" name="need">
+              <option>Roadside breakdown</option>
+              <option>Semi truck repair</option>
+              <option>Tire service</option>
+              <option>Jump start</option>
+              <option>Other (describe below)</option>
+            </select>
+            <label for="fmsg">Details</label>
+            <textarea id="fmsg" name="message" placeholder="Rig type, location, and what happened..."></textarea>
+            <button type="submit"><i class="fa-solid fa-paper-plane"></i> Draft email</button>
+            <p class="formnote">This opens your email app with a pre-filled message. No email address for the shop is published, so add the recipient or just call <a href="tel:+15135727929" style="color:var(--amber)">(513) 572-7929</a> for the fastest response.</p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+</main>
+
+<footer>© JS 24 Hour Road Service and Semi Truck Repair</footer>
+
+<script>
+(function(){
+  var pages = document.querySelectorAll('.page');
+  var navLinks = document.querySelectorAll('[data-nav]');
+  var menu = document.getElementById('mobilemenu');
+  var burger = document.getElementById('burger');
+
+  function currentPage(){
+    var h = (location.hash || '#home').replace('#','');
+    var ok = false;
+    pages.forEach(function(p){ if(p.getAttribute('data-page') === h) ok = true; });
+    return ok ? h : 'home';
+  }
+
+  function navigateTo(page){
+    pages.forEach(function(p){
+      p.classList.toggle('active', p.getAttribute('data-page') === page);
+    });
+    navLinks.forEach(function(a){
+      a.classList.toggle('active', a.getAttribute('data-nav') === page);
+    });
+    if(menu.classList.contains('open')) menu.classList.remove('open');
+    window.scrollTo(0,0);
+  }
+
+  window.navigateTo = navigateTo;
+
+  navLinks.forEach(function(a){
+    a.addEventListener('click', function(e){
+      var target = a.getAttribute('data-nav');
+      if(a.getAttribute('href') && a.getAttribute('href').charAt(0) === '#'){
+        e.preventDefault();
+        if(('#' + target) !== location.hash){
+          history.pushState({page: target}, '', '#' + target);
+        }
+        navigateTo(target);
+      }
+    });
+  });
+
+  window.addEventListener('popstate', function(){
+    navigateTo(currentPage());
+  });
+
+  burger.addEventListener('click', function(e){
+    e.stopPropagation();
+    menu.classList.toggle('open');
+  });
+
+  document.addEventListener('click', function(e){
+    if(menu.classList.contains('open') && !menu.contains(e.target) && e.target !== burger && !burger.contains(e.target)){
+      menu.classList.remove('open');
+    }
+  });
+
+  navigateTo(currentPage());
+
+  var form = document.getElementById('contactform');
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var name = document.getElementById('fname').value;
+    var phone = document.getElementById('fphone').value;
+    var need = document.getElementById('fneed').value;
+    var msg = document.getElementById('fmsg').value;
+    var subject = encodeURIComponent('Service request: ' + need);
+    var body = encodeURIComponent('Name: ' + name + '\nPhone: ' + phone + '\nNeed: ' + need + '\nDetails: ' + msg);
+    window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
+  });
+})();
+</script>
+</body>
+</html>

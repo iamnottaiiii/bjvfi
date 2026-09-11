@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daisy's Bakery 2 | Chicago Heights, IL</title>
+<meta name="description" content="Daisy's Bakery 2 in Chicago Heights, IL. Family-owned panaderia since 1998: Mexican sweet bread, fresh breads, custom cakes and treats. 209 W 15th St. Call (708) 754-5855.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shrikhand&family=Karla:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FFFCF1;
+  --cream-deep:#FBF0D9;
+  --marigold:#F2A007;
+  --sun:#FFC93C;
+  --leaf:#4C7A45;
+  --leaf-dark:#35582F;
+  --cocoa:#4A3325;
+  --white:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Karla',sans-serif;background:var(--cream);color:var(--cocoa);line-height:1.65;}
+h1,h2,h3,.display{font-family:'Shrikhand',cursive;font-weight:400;line-height:1.2;}
+.page{display:none;}
+.page.active{display:block;animation:fadeIn .35s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+svg{max-width:100%;}
+a{color:var(--leaf-dark);}
+/* side-drawer nav: minimal top bar */
+.topbar{position:sticky;top:0;z-index:60;background:var(--cream);border-bottom:3px solid var(--marigold);}
+.topbar-inner{max-width:1200px;margin:0 auto;padding:0.55rem 1rem;display:flex;align-items:center;gap:1rem;}
+.icon-btn{background:var(--leaf);border:none;border-radius:10px;width:46px;height:42px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;flex:0 0 auto;}
+.icon-btn span{display:block;width:22px;height:3px;background:var(--white);border-radius:2px;}
+.brand{display:flex;align-items:center;gap:0.65rem;text-decoration:none;color:var(--cocoa);margin-right:auto;}
+.brand .logo-flower{width:46px;height:46px;}
+.brand-name{font-family:'Shrikhand',cursive;font-size:1.15rem;line-height:1;}
+.brand-name small{display:block;font-family:'Karla',sans-serif;font-weight:700;font-size:0.6rem;letter-spacing:0.3em;color:var(--leaf);}
+.call-btn{display:inline-block;text-decoration:none;font-weight:700;background:var(--marigold);color:var(--cocoa);padding:0.55rem 1.2rem;border-radius:999px;font-size:0.9rem;}
+/* drawer */
+.scrim{position:fixed;inset:0;background:rgba(74,51,37,.5);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:70;}
+.scrim.show{opacity:1;pointer-events:auto;}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:min(340px,86vw);background:var(--leaf-dark);color:var(--cream);z-index:80;transform:translateX(-105%);transition:transform .3s ease;display:flex;flex-direction:column;box-shadow:8px 0 24px rgba(0,0,0,.25);}
+.drawer.open{transform:none;}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.2rem;border-bottom:1px solid #4a6a44;}
+.drawer-head .display{font-size:1.3rem;color:var(--sun);}
+.drawer-close{background:transparent;border:2px solid var(--cream);color:var(--cream);border-radius:10px;width:40px;height:38px;font-size:1.3rem;cursor:pointer;line-height:1;}
+.drawer nav{padding:0.8rem 0;flex:1;overflow-y:auto;}
+.drawer nav a{display:flex;align-items:center;gap:0.8rem;color:var(--cream);text-decoration:none;font-weight:700;font-size:1.05rem;padding:0.85rem 1.4rem;}
+.drawer nav a:hover{background:#2c4a27;}
+.drawer nav a.current{color:var(--sun);border-left:5px solid var(--sun);}
+.drawer nav a .n{font-family:'Shrikhand',cursive;font-size:0.8rem;color:var(--sun);width:1.6rem;}
+.drawer-foot{padding:1.2rem;border-top:1px solid #4a6a44;font-size:0.9rem;}
+.drawer-foot a{color:var(--sun);font-weight:700;text-decoration:none;}
+/* no hero: straight into content */
+.page-intro{padding-top:2.6rem;}
+.kicker{display:inline-block;background:var(--leaf);color:var(--white);font-weight:700;font-size:0.78rem;letter-spacing:0.22em;text-transform:uppercase;padding:0.4rem 0.95rem;border-radius:999px;margin-bottom:1rem;}
+.page-intro h1{font-size:clamp(2rem,5vw,3.1rem);color:var(--cocoa);max-width:16em;}
+.page-intro h1 .gold{color:var(--marigold);}
+.lede{font-size:1.08rem;margin:1rem 0 1.4rem;max-width:38rem;color:#6b5540;}
+.btn-row{display:flex;gap:0.8rem;flex-wrap:wrap;}
+.btn{display:inline-block;text-decoration:none;font-weight:700;padding:0.85rem 1.6rem;border-radius:999px;border:2px solid transparent;transition:transform .15s ease;}
+.btn:hover{transform:translateY(-2px);}
+.btn-primary{background:var(--marigold);color:var(--cocoa);}
+.btn-ghost{background:var(--white);border-color:var(--leaf);color:var(--leaf-dark);}
+.pill{display:inline-flex;align-items:center;gap:0.5rem;margin-top:1.2rem;background:var(--white);border:2px solid var(--leaf);border-radius:999px;padding:0.4rem 1rem;font-weight:700;font-size:0.88rem;}
+.pill .dot{width:11px;height:11px;border-radius:50%;background:var(--marigold);}
+.pill.open .dot{background:var(--leaf);}
+/* sections */
+.section{max-width:1200px;margin:0 auto;padding:2.6rem 1rem;}
+.section h2{font-size:clamp(1.6rem,3.6vw,2.2rem);margin-bottom:0.4rem;color:var(--cocoa);}
+.section .sub{color:#7a6350;margin-bottom:1.8rem;max-width:40rem;}
+/* card-wall rhythm */
+.card-wall{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;}
+.wall-card{background:var(--white);border:2px solid var(--cream-deep);border-radius:14px;padding:1.2rem;box-shadow:0 5px 12px rgba(74,51,37,.07);}
+.wall-card:nth-child(4n+1){border-top:6px solid var(--marigold);}
+.wall-card:nth-child(4n+2){border-top:6px solid var(--leaf);}
+.wall-card:nth-child(4n+3){border-top:6px solid var(--sun);}
+.wall-card:nth-child(4n){border-top:6px solid var(--cocoa);}
+.wall-card .art{height:88px;display:flex;align-items:center;justify-content:center;margin-bottom:0.6rem;}
+.wall-card h3{font-size:1.02rem;margin-bottom:0.35rem;}
+.wall-card p{font-size:0.9rem;color:#7a6350;}
+.wall-card.feature{background:var(--leaf-dark);color:var(--cream);border:none;display:flex;flex-direction:column;justify-content:center;}
+.wall-card.feature h3{color:var(--sun);}
+.wall-card.feature p{color:#e8dcc2;}
+.wall-card.feature a{color:var(--sun);font-weight:700;}
+/* two-column editorial offerings */
+.ed-offerings{display:grid;grid-template-columns:1fr 1fr;gap:1.6rem 2.4rem;}
+.offer{display:grid;grid-template-columns:110px 1fr;gap:1.1rem;align-items:start;padding-bottom:1.4rem;border-bottom:2px dashed var(--cream-deep);}
+.offer-art{width:110px;height:110px;border-radius:50%;background:var(--cream-deep);display:flex;align-items:center;justify-content:center;flex:0 0 110px;}
+.offer-num{font-family:'Shrikhand',cursive;color:var(--marigold);font-size:0.95rem;}
+.offer h3{font-size:1.2rem;margin:0.15rem 0 0.3rem;}
+.offer p{font-size:0.93rem;color:#7a6350;}
+.offer-price{display:inline-block;margin-top:0.4rem;font-weight:700;color:var(--leaf-dark);background:var(--cream-deep);border-radius:999px;padding:0.15rem 0.8rem;font-size:0.88rem;}
+.offer-cat{grid-column:1 / -1;font-size:1.35rem;color:var(--leaf-dark);margin:1.2rem 0 0.2rem;display:flex;align-items:center;gap:0.7rem;}
+.offer-cat::after{content:"";flex:1;height:3px;background:var(--marigold);border-radius:2px;}
+.note{font-size:0.88rem;color:#7a6350;background:var(--cream-deep);border:2px dashed var(--marigold);border-radius:12px;padding:0.9rem 1.2rem;margin-top:1.6rem;}
+/* carousel gallery */
+.carousel-wrap{position:relative;}
+.carousel{display:flex;gap:1.1rem;overflow-x:auto;scroll-snap-type:x mandatory;padding:0.4rem 0.2rem 1rem;scrollbar-width:thin;}
+.car-tile{flex:0 0 280px;scroll-snap-align:start;background:var(--white);border:2px solid var(--cream-deep);border-radius:16px;overflow:hidden;position:relative;}
+.car-tile .tile-art{height:210px;display:flex;align-items:center;justify-content:center;background:var(--cream-deep);}
+.badge{position:absolute;top:10px;right:10px;background:var(--sun);color:var(--cocoa);font-weight:700;font-size:0.75rem;padding:0.25rem 0.7rem;border-radius:999px;border:2px solid var(--cocoa);}
+.car-tile figcaption{padding:0.8rem 1rem;font-size:0.9rem;font-weight:700;}
+.car-btn{position:absolute;top:38%;width:48px;height:48px;border-radius:50%;border:2px solid var(--cocoa);background:var(--white);font-size:1.5rem;cursor:pointer;color:var(--cocoa);z-index:5;box-shadow:0 4px 10px rgba(74,51,37,.15);}
+.car-btn.prev{left:-8px;}
+.car-btn.next{right:-8px;}
+.car-hint{text-align:center;font-size:0.85rem;color:#7a6350;margin-top:0.4rem;}
+/* story facts */
+.fact-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1.6rem;}
+.fact{background:var(--white);border:2px solid var(--cream-deep);border-radius:14px;padding:1rem;text-align:center;}
+.fact .num{font-family:'Shrikhand',cursive;font-size:1.5rem;color:var(--marigold);}
+.fact .lbl{font-size:0.85rem;color:#7a6350;font-weight:600;}
+.story-flex{display:grid;grid-template-columns:1.2fr 0.8fr;gap:2rem;align-items:start;}
+.story-art{background:var(--white);border:2px solid var(--cream-deep);border-radius:18px;padding:1rem;position:relative;box-shadow:0 8px 18px rgba(74,51,37,.08);}
+/* reviews */
+.review{background:var(--white);border:2px solid var(--cream-deep);border-left:8px solid var(--leaf);border-radius:14px;padding:1.4rem;margin-bottom:1.2rem;max-width:760px;}
+.stars{color:var(--marigold);font-size:1.25rem;letter-spacing:0.15em;}
+.review .who{font-size:0.85rem;color:#7a6350;margin-top:0.6rem;font-style:italic;}
+/* visit */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.6rem;}
+.info-card{background:var(--white);border:2px solid var(--cream-deep);border-radius:16px;padding:1.6rem;box-shadow:0 8px 18px rgba(74,51,37,.08);}
+.info-card h3{margin-bottom:0.8rem;}
+.hours-table{width:100%;border-collapse:collapse;font-size:0.95rem;}
+.hours-table td{padding:0.45rem 0;border-bottom:1px dashed #e4d3ae;}
+.hours-table tr:last-child td{border-bottom:none;}
+.hours-table td:last-child{text-align:right;font-weight:700;}
+.hours-table tr.today td{color:var(--leaf-dark);}
+/* big-type footer */
+footer{background:var(--leaf-dark);color:var(--cream);margin-top:2rem;overflow:hidden;}
+.big-type{font-family:'Shrikhand',cursive;font-size:clamp(3.4rem,14vw,9rem);line-height:1;color:var(--sun);text-align:center;padding:2.4rem 1rem 0;white-space:nowrap;}
+.foot-links{display:flex;gap:1.4rem;justify-content:center;flex-wrap:wrap;padding:1.2rem 1rem 0;}
+.foot-links a{color:var(--cream);text-decoration:none;font-weight:700;}
+.foot-links a:hover{color:var(--sun);}
+.foot-base{text-align:center;padding:1rem 1rem 1.8rem;font-size:0.9rem;color:#d9e4cf;}
+@media(max-width:900px){
+  .card-wall{grid-template-columns:repeat(2,1fr);}
+  .ed-offerings{grid-template-columns:1fr;}
+  .offer-cat{grid-column:auto;}
+  .story-flex,.visit-grid{grid-template-columns:1fr;}
+  .car-btn.prev{left:4px;}
+  .car-btn.next{right:4px;}
+}
+@media(max-width:560px){
+  .card-wall{grid-template-columns:1fr;}
+}
+
+/* review-source strip */
+.rs-strip{margin:22px 0;padding:18px 20px;border:1.5px solid;border-radius:14px;}
+.rs-note{margin:0 0 12px;font-size:.95rem;line-height:1.55;}
+.rs-links{display:flex;flex-wrap:wrap;gap:10px;}
+.rs-link{display:inline-block;padding:10px 22px;border-radius:999px;border:2px solid;font-weight:700;text-decoration:none;font-size:.92rem;transition:transform .15s ease;}
+.rs-link:hover{transform:translateY(-1px);}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <button class="icon-btn" id="drawer-open" aria-label="Open navigation"><span></span><span></span><span></span></button>
+    <a class="brand" data-page="home" href="#home" aria-label="Daisy's Bakery 2, home">
+      <svg class="logo-flower" viewBox="0 0 100 100" aria-hidden="true">
+        <g fill="#FFFFFF" stroke="#4A3325" stroke-width="4">
+          <ellipse cx="50" cy="22" rx="12" ry="20"/><ellipse cx="50" cy="78" rx="12" ry="20"/>
+          <ellipse cx="22" cy="50" rx="20" ry="12"/><ellipse cx="78" cy="50" rx="20" ry="12"/>
+          <ellipse cx="30" cy="30" rx="12" ry="18" transform="rotate(-45 30 30)"/>
+          <ellipse cx="70" cy="30" rx="12" ry="18" transform="rotate(45 70 30)"/>
+          <ellipse cx="30" cy="70" rx="12" ry="18" transform="rotate(45 30 70)"/>
+          <ellipse cx="70" cy="70" rx="12" ry="18" transform="rotate(-45 70 70)"/>
+        </g>
+        <circle cx="50" cy="50" r="15" fill="#F2A007" stroke="#4A3325" stroke-width="4"/>
+        <text x="50" y="57" text-anchor="middle" font-family="Shrikhand" font-size="14" fill="#4A3325">2</text>
+      </svg>
+      <span class="brand-name">Daisy's<small>BAKERY 2</small></span>
+    </a>
+    <a class="call-btn" href="tel:+17087545855">Call</a>
+  </div>
+</header>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Site navigation">
+  <div class="drawer-head">
+    <span class="display">Menu</span>
+    <button class="drawer-close" id="drawer-close" aria-label="Close navigation">&times;</button>
+  </div>
+  <nav>
+    <a data-page="home" href="#home" class="current"><span class="n">01</span>Home</a>
+    <a data-page="menu" href="#menu"><span class="n">02</span>Bakery Case</a>
+    <a data-page="story" href="#story"><span class="n">03</span>Our Story</a>
+    <a data-page="gallery" href="#gallery"><span class="n">04</span>Gallery</a>
+    <a data-page="reviews" href="#reviews"><span class="n">05</span>Reviews</a>
+    <a data-page="visit" href="#visit"><span class="n">06</span>Visit Us</a>
+  </nav>
+  <div class="drawer-foot">
+    <p>209 W 15th St, Chicago Heights<br><a href="tel:+17087545855">(708) 754-5855</a></p>
+    <p style="margin-top:0.4rem;">Open 4:30 AM - 7:30 PM<br>Closed Wednesdays</p>
+  </div>
+</aside>
+
+<main>
+
+<!-- HOME: no hero, straight into content -->
+<section class="page active" id="page-home">
+  <div class="section page-intro">
+    <span class="kicker">Chicago Heights, Illinois</span>
+    <h1>Fresh from the oven at <span class="gold">4:30 in the morning.</span></h1>
+    <p class="lede">Daisy's Bakery 2 is the Chicago Heights home of a family bakery making Mexican sweet bread and baked goods since 1998. Pan dulce, fresh breads, custom cakes, and treats made to share.</p>
+    <div class="btn-row">
+      <a class="btn btn-primary" data-page="menu" href="#menu">Peek the Bakery Case</a>
+      <a class="btn btn-ghost" href="https://www.google.com/maps/place/?q=place_id:ChIJTaNjBHsZDogRoch5QH17dhQ" target="_blank" rel="noopener">Get Directions</a>
+    </div>
+    <div><span class="pill" id="open-pill"><span class="dot"></span><span id="open-pill-text">Check hours below</span></span></div>
+  </div>
+  <div class="section">
+    <h2>Baked for the Neighborhood</h2>
+    <p class="sub">From sunrise pan dulce to birthday cakes, everything leaves our ovens fresh and ready to share.</p>
+    <div class="card-wall">
+      <div class="wall-card">
+        <div class="art"><svg width="80" height="80" viewBox="0 0 100 100" aria-hidden="true"><ellipse cx="50" cy="56" rx="34" ry="28" fill="#E8B04B" stroke="#4A3325" stroke-width="4"/><path d="M50 30v52M32 36c6 12 6 28 0 40M68 36c-6 12-6 28 0 40M41 32c3 14 3 30 0 44M59 32c-3 14-3 30 0 44" stroke="#C98A2E" stroke-width="3" fill="none"/></svg></div>
+        <h3>Pan Dulce</h3>
+        <p>Conchas, orejas, cuernos, and empanadas baked fresh daily.</p>
+      </div>
+      <div class="wall-card">
+        <div class="art"><svg width="80" height="80" viewBox="0 0 100 100" aria-hidden="true"><rect x="14" y="52" width="72" height="30" rx="15" fill="#D9A45B" stroke="#4A3325" stroke-width="4"/><path d="M28 52c2 8 2 16 0 24M44 52c2 8 2 16 0 24M60 52c2 8 2 16 0 24M74 52c2 8 2 16 0 24" stroke="#B57A2E" stroke-width="3"/><rect x="24" y="30" width="52" height="22" rx="11" fill="#E8B04B" stroke="#4A3325" stroke-width="4"/></svg></div>
+        <h3>Breads and Rolls</h3>
+        <p>Sandwich rolls and loaves. Bulk orders welcome, delivery available.</p>
+      </div>
+      <div class="wall-card">
+        <div class="art"><svg width="80" height="80" viewBox="0 0 100 100" aria-hidden="true"><rect x="22" y="58" width="56" height="26" rx="4" fill="#F5D7A1" stroke="#4A3325" stroke-width="4"/><rect x="22" y="44" width="56" height="16" rx="4" fill="#FFF" stroke="#4A3325" stroke-width="4"/><line x1="38" y1="44" x2="38" y2="28" stroke="#4A3325" stroke-width="4"/><line x1="62" y1="44" x2="62" y2="28" stroke="#4A3325" stroke-width="4"/><ellipse cx="38" cy="24" rx="5" ry="7" fill="#F2A007"/><ellipse cx="62" cy="24" rx="5" ry="7" fill="#F2A007"/></svg></div>
+        <h3>Custom Cakes</h3>
+        <p>Birthday and specialty cakes, down to balloon-shaped cake pops.</p>
+      </div>
+      <div class="wall-card">
+        <div class="art"><svg width="80" height="80" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 78c-14-8-24-16-24-28c0-8 6-12 12-12c5 0 9 3 12 7c3-4 7-7 12-7c6 0 12 4 12 12c0 12-10 20-24 28z" fill="#CE2B2B" stroke="#4A3325" stroke-width="4"/><path d="M50 38c-2-6-8-8-14-8" stroke="#4C7A45" stroke-width="6" fill="none" stroke-linecap="round"/><circle cx="42" cy="56" r="2.5" fill="#FFF"/><circle cx="56" cy="62" r="2.5" fill="#FFF"/><circle cx="50" cy="70" r="2.5" fill="#FFF"/></svg></div>
+        <h3>Sweet Treats</h3>
+        <p>Chocolate covered strawberries, muffins, and flaky croissants.</p>
+      </div>
+      <div class="wall-card">
+        <div class="art"><svg width="80" height="80" viewBox="0 0 100 100" aria-hidden="true"><g fill="#FFFFFF" stroke="#4A3325" stroke-width="4"><ellipse cx="50" cy="22" rx="12" ry="20"/><ellipse cx="50" cy="78" rx="12" ry="20"/><ellipse cx="22" cy="50" rx="20" ry="12"/><ellipse cx="78" cy="50" rx="20" ry="12"/></g><circle cx="50" cy="50" r="15" fill="#F2A007" stroke="#4A3325" stroke-width="4"/></svg></div>
+        <h3>Since 1998</h3>
+        <p>A family bakery for over 25 years, now blooming in Chicago Heights.</p>
+      </div>
+      <div class="wall-card">
+        <div class="art"><svg width="80" height="80" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="36" fill="none" stroke="#4A3325" stroke-width="5"/><path d="M50 20v-8M50 88v-8M20 50h-8M88 50h-8" stroke="#4A3325" stroke-width="5" stroke-linecap="round"/><path d="M50 32a18 18 0 0 1 18 18" fill="none" stroke="#F2A007" stroke-width="7" stroke-linecap="round"/><path d="M68 62a18 18 0 0 1-18 18" fill="none" stroke="#F2A007" stroke-width="7" stroke-linecap="round"/></svg></div>
+        <h3>Early Riser Hours</h3>
+        <p>Doors open at 4:30 AM daily, closed Wednesdays.</p>
+      </div>
+      <div class="wall-card">
+        <div class="art"><svg width="80" height="80" viewBox="0 0 100 100" aria-hidden="true"><rect x="18" y="38" width="64" height="40" rx="8" fill="#FFF" stroke="#4A3325" stroke-width="5"/><circle cx="36" cy="50" r="6" fill="#F2A007"/><circle cx="56" cy="60" r="6" fill="#F2A007"/><circle cx="66" cy="48" r="6" fill="#F2A007"/></svg></div>
+        <h3>Party Orders</h3>
+        <p>Cakes, cake pops, and bread by the tray for your celebration.</p>
+      </div>
+      <div class="wall-card feature">
+        <h3>Order Ahead</h3>
+        <p>Planning a birthday or a big office order? Call and we will have it warm and ready.</p>
+        <p style="margin-top:0.6rem;"><a href="tel:+17087545855">(708) 754-5855</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MENU: two-column editorial offerings -->
+<section class="page" id="page-menu">
+  <div class="section">
+    <h2>The Bakery Case</h2>
+    <p class="sub">Ovens start at 4:30 AM, so the case is fullest early. A few of our regulars:</p>
+    <div class="ed-offerings">
+      <h3 class="offer-cat">Pan Dulce</h3>
+      <article class="offer">
+        <div class="offer-art"><svg width="70" height="70" viewBox="0 0 100 100" aria-hidden="true"><ellipse cx="50" cy="56" rx="34" ry="28" fill="#E8B04B" stroke="#4A3325" stroke-width="4"/><path d="M50 30v52M32 36c6 12 6 28 0 40M68 36c-6 12-6 28 0 40" stroke="#C98A2E" stroke-width="3" fill="none"/></svg></div>
+        <div><span class="offer-num">01</span><h3>Conchas</h3><p>The classic shell-topped sweet bread, in vanilla and chocolate.</p><span class="offer-price">$1.50 sample</span></div>
+      </article>
+      <article class="offer">
+        <div class="offer-art"><svg width="70" height="70" viewBox="0 0 100 100" aria-hidden="true"><path d="M20 60c0-20 14-34 30-34s30 14 30 34z" fill="#E8B04B" stroke="#4A3325" stroke-width="4"/><path d="M30 58c4-12 10-20 20-20s16 8 20 20" fill="none" stroke="#C98A2E" stroke-width="3"/></svg></div>
+        <div><span class="offer-num">02</span><h3>Orejas</h3><p>Crisp, caramelized palmier "ears" with a buttery crunch.</p><span class="offer-price">$1.50 sample</span></div>
+      </article>
+      <article class="offer">
+        <div class="offer-art"><svg width="70" height="70" viewBox="0 0 100 100" aria-hidden="true"><path d="M25 65c5-18 20-30 25-30s20 12 25 30z" fill="#E8B04B" stroke="#4A3325" stroke-width="4"/><path d="M40 60c3-10 8-16 10-16s7 6 10 16" fill="none" stroke="#C98A2E" stroke-width="3"/></svg></div>
+        <div><span class="offer-num">03</span><h3>Cuernos</h3><p>Soft, buttery crescent horns, perfect with morning coffee.</p><span class="offer-price">$1.50 sample</span></div>
+      </article>
+      <article class="offer">
+        <div class="offer-art"><svg width="70" height="70" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 20c18 0 30 12 30 28c0 4-2 8-6 8H26c-4 0-6-4-6-8c0-16 12-28 30-28z" fill="#E8B04B" stroke="#4A3325" stroke-width="4"/><circle cx="50" cy="48" r="8" fill="#F2A007" stroke="#4A3325" stroke-width="3"/></svg></div>
+        <div><span class="offer-num">04</span><h3>Empanadas de Pina</h3><p>Flaky turnover pastries filled with sweet pineapple.</p><span class="offer-price">$1.75 sample</span></div>
+      </article>
+      <h3 class="offer-cat">Breads and Rolls</h3>
+      <article class="offer">
+        <div class="offer-art"><svg width="70" height="70" viewBox="0 0 100 100" aria-hidden="true"><rect x="14" y="52" width="72" height="30" rx="15" fill="#D9A45B" stroke="#4A3325" stroke-width="4"/><path d="M28 52c2 8 2 16 0 24M44 52c2 8 2 16 0 24M60 52c2 8 2 16 0 24" stroke="#B57A2E" stroke-width="3"/></svg></div>
+        <div><span class="offer-num">05</span><h3>Sandwich Rolls</h3><p>Soft rolls for tortas and sandwiches, baked daily.</p><span class="offer-price">$1.25 sample</span></div>
+      </article>
+      <article class="offer">
+        <div class="offer-art"><svg width="70" height="70" viewBox="0 0 100 100" aria-hidden="true"><rect x="24" y="30" width="52" height="44" rx="20" fill="#E8B04B" stroke="#4A3325" stroke-width="4"/><path d="M40 38c2 10 2 22 0 32M56 38c2 10 2 22 0 32" stroke="#C98A2E" stroke-width="3"/></svg></div>
+        <div><span class="offer-num">06</span><h3>Fresh Loaves</h3><p>Daily loaves for the family table. Bulk orders delivered.</p><span class="offer-price">$3.50 sample</span></div>
+      </article>
+      <h3 class="offer-cat">Cakes and Custom Orders</h3>
+      <article class="offer">
+        <div class="offer-art"><svg width="70" height="70" viewBox="0 0 100 100" aria-hidden="true"><rect x="22" y="58" width="56" height="26" rx="4" fill="#F5D7A1" stroke="#4A3325" stroke-width="4"/><rect x="22" y="44" width="56" height="16" rx="4" fill="#FFF" stroke="#4A3325" stroke-width="4"/><line x1="50" y1="44" x2="50" y2="28" stroke="#4A3325" stroke-width="4"/><ellipse cx="50" cy="24" rx="5" ry="7" fill="#F2A007"/></svg></div>
+        <div><span class="offer-num">07</span><h3>6-Inch Specialty Cake</h3><p>Small celebration cakes in classic flavors.</p><span class="offer-price">$25.00 sample</span></div>
+      </article>
+      <article class="offer">
+        <div class="offer-art"><svg width="70" height="70" viewBox="0 0 100 100" aria-hidden="true"><rect x="22" y="58" width="56" height="26" rx="4" fill="#D98E4A" stroke="#4A3325" stroke-width="4"/><rect x="22" y="44" width="56" height="16" rx="4" fill="#FFF" stroke="#4A3325" stroke-width="4"/><circle cx="38" cy="52" r="3" fill="#4A3325"/><circle cx="55" cy="52" r="3" fill="#4A3325"/><circle cx="68" cy="52" r="3" fill="#4A3325"/></svg></div>
+        <div><span class="offer-num">08</span><h3>Carrot Cake</h3><p>Spiced and moist with cream cheese frosting.</p><span class="offer-price">$28.00 sample</span></div>
+      </article>
+      <article class="offer">
+        <div class="offer-art"><svg width="70" height="70" viewBox="0 0 100 100" aria-hidden="true"><rect x="22" y="58" width="56" height="26" rx="4" fill="#F5D7A1" stroke="#4A3325" stroke-width="4"/><rect x="30" y="34" width="40" height="26" rx="4" fill="#FFF" stroke="#4A3325" stroke-width="4"/><line x1="42" y1="34" x2="42" y2="20" stroke="#4A3325" stroke-width="4"/><line x1="58" y1="34" x2="58" y2="20" stroke="#4A3325" stroke-width="4"/></svg></div>
+        <div><span class="offer-num">09</span><h3>Custom Birthday Cake</h3><p>Designed for your celebration, made to order.</p><span class="offer-price">Call for price</span></div>
+      </article>
+      <article class="offer">
+        <div class="offer-art"><svg width="70" height="70" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="60" r="18" fill="#8B5A2B" stroke="#4A3325" stroke-width="4"/><rect x="46" y="72" width="8" height="16" fill="#4A3325"/><circle cx="44" cy="56" r="3" fill="#F2A007"/><circle cx="56" cy="62" r="3" fill="#F2A007"/></svg></div>
+        <div><span class="offer-num">10</span><h3>Cake Pops</h3><p>Bite-size treats, including custom shapes for parties.</p><span class="offer-price">$2.50 sample</span></div>
+      </article>
+      <h3 class="offer-cat">Treats</h3>
+      <article class="offer">
+        <div class="offer-art"><svg width="70" height="70" viewBox="0 0 100 100" aria-hidden="true"><path d="M20 55c0-16 14-28 30-28s30 12 30 28z" fill="#E8B04B" stroke="#4A3325" stroke-width="4"/><rect x="18" y="52" width="64" height="10" rx="5" fill="#F2A007" stroke="#4A3325" stroke-width="3"/></svg></div>
+        <div><span class="offer-num">11</span><h3>Croissants</h3><p>Buttery and flaky, a step above the grocery kind.</p><span class="offer-price">$2.25 sample</span></div>
+      </article>
+      <article class="offer">
+        <div class="offer-art"><svg width="70" height="70" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 78c-14-8-24-16-24-28c0-8 6-12 12-12c5 0 9 3 12 7c3-4 7-7 12-7c6 0 12 4 12 12c0 12-10 20-24 28z" fill="#CE2B2B" stroke="#4A3325" stroke-width="4"/><path d="M50 38c-2-6-8-8-14-8" stroke="#4C7A45" stroke-width="6" fill="none" stroke-linecap="round"/></svg></div>
+        <div><span class="offer-num">12</span><h3>Chocolate Covered Strawberries</h3><p>Hand-dipped for gifts and special occasions.</p><span class="offer-price">$3.00 sample</span></div>
+      </article>
+    </div>
+    <div class="note">Prices shown are samples. Call <a href="tel:+17087545855">(708) 754-5855</a> to confirm today's case, pricing, and custom cake orders.</div>
+  </div>
+</section>
+
+<!-- STORY -->
+<section class="page" id="page-story">
+  <div class="section">
+    <h2>Our Story</h2>
+    <p class="sub">A family bakery, blooming in Chicago Heights.</p>
+    <div class="story-flex">
+      <div>
+        <p>Panaderia Daisy's Inc. is a family-owned bakery established in 1998, specializing in Mexican sweet bread and baked goods. For over twenty-five years, the family has been up before dawn, mixing, shaping, and baking the pan dulce that neighborhoods grow up on.</p>
+        <p style="margin-top:1rem;">Daisy's Bakery 2 brings that tradition to Chicago Heights at 209 W 15th St. It is the same family recipes, the same early-morning ovens, and the same warm welcome, now closer to home for the Southland.</p>
+        <p style="margin-top:1rem;">Regulars come for the conchas and stay for the personal touch: custom birthday cakes, cake pops shaped for parties, and bulk bread orders delivered ready for a crowd.</p>
+        <div class="fact-row">
+          <div class="fact"><div class="num">1998</div><div class="lbl">Family bakery established</div></div>
+          <div class="fact"><div class="num">4:30 AM</div><div class="lbl">Ovens fire up daily</div></div>
+          <div class="fact"><div class="num">100%</div><div class="lbl">Family owned</div></div>
+        </div>
+      </div>
+      <div class="story-art">
+        <span class="badge">Photo soon</span>
+        <div style="height:260px;display:flex;align-items:center;justify-content:center;background:var(--cream-deep);border-radius:12px;">
+          <svg width="200" height="200" viewBox="0 0 200 200" aria-label="Illustration of a daisy">
+            <g fill="#FFFFFF" stroke="#4A3325" stroke-width="5">
+              <ellipse cx="100" cy="45" rx="20" ry="35"/><ellipse cx="100" cy="155" rx="20" ry="35"/>
+              <ellipse cx="45" cy="100" rx="35" ry="20"/><ellipse cx="155" cy="100" rx="35" ry="20"/>
+              <ellipse cx="61" cy="61" rx="20" ry="30" transform="rotate(-45 61 61)"/>
+              <ellipse cx="139" cy="61" rx="20" ry="30" transform="rotate(45 139 61)"/>
+              <ellipse cx="61" cy="139" rx="20" ry="30" transform="rotate(45 61 139)"/>
+              <ellipse cx="139" cy="139" rx="20" ry="30" transform="rotate(-45 139 139)"/>
+            </g>
+            <circle cx="100" cy="100" r="24" fill="#F2A007" stroke="#4A3325" stroke-width="5"/>
+            <rect x="94" y="180" width="12" height="14" fill="#4C7A45"/>
+          </svg>
+        </div>
+        <p style="margin-top:0.8rem;font-size:0.9rem;font-weight:700;">209 W 15th St, Chicago Heights, IL</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY: carousel -->
+<section class="page" id="page-gallery">
+  <div class="section">
+    <h2>Gallery</h2>
+    <p class="sub">Sketches of the case while we gather fresh photos. Swipe or use the arrows.</p>
+    <div class="carousel-wrap">
+      <button class="car-btn prev" id="car-prev" aria-label="Previous photos">&#8249;</button>
+      <div class="carousel" id="car-track">
+        <figure class="car-tile"><span class="badge">Photo soon</span><div class="tile-art"><svg width="130" height="130" viewBox="0 0 100 100"><ellipse cx="50" cy="56" rx="34" ry="28" fill="#E8B04B" stroke="#4A3325" stroke-width="4"/><path d="M50 30v52M32 36c6 12 6 28 0 40M68 36c-6 12-6 28 0 40M41 32c3 14 3 30 0 44M59 32c-3 14-3 30 0 44" stroke="#C98A2E" stroke-width="3" fill="none"/></svg></div><figcaption>Fresh conchas</figcaption></figure>
+        <figure class="car-tile"><span class="badge">Photo soon</span><div class="tile-art"><svg width="130" height="130" viewBox="0 0 100 100"><rect x="22" y="58" width="56" height="26" rx="4" fill="#F5D7A1" stroke="#4A3325" stroke-width="4"/><rect x="22" y="44" width="56" height="16" rx="4" fill="#FFF" stroke="#4A3325" stroke-width="4"/><line x1="38" y1="44" x2="38" y2="28" stroke="#4A3325" stroke-width="4"/><line x1="62" y1="44" x2="62" y2="28" stroke="#4A3325" stroke-width="4"/><ellipse cx="38" cy="24" rx="5" ry="7" fill="#F2A007"/><ellipse cx="62" cy="24" rx="5" ry="7" fill="#F2A007"/></svg></div><figcaption>Birthday cakes</figcaption></figure>
+        <figure class="car-tile"><span class="badge">Photo soon</span><div class="tile-art"><svg width="130" height="130" viewBox="0 0 100 100"><rect x="14" y="52" width="72" height="30" rx="15" fill="#D9A45B" stroke="#4A3325" stroke-width="4"/><path d="M28 52c2 8 2 16 0 24M44 52c2 8 2 16 0 24M60 52c2 8 2 16 0 24M74 52c2 8 2 16 0 24" stroke="#B57A2E" stroke-width="3"/><rect x="24" y="30" width="52" height="22" rx="11" fill="#E8B04B" stroke="#4A3325" stroke-width="4"/></svg></div><figcaption>Breads and rolls</figcaption></figure>
+        <figure class="car-tile"><span class="badge">Photo soon</span><div class="tile-art"><svg width="130" height="130" viewBox="0 0 100 100"><path d="M50 78c-14-8-24-16-24-28c0-8 6-12 12-12c5 0 9 3 12 7c3-4 7-7 12-7c6 0 12 4 12 12c0 12-10 20-24 28z" fill="#CE2B2B" stroke="#4A3325" stroke-width="4"/><path d="M50 38c-2-6-8-8-14-8" stroke="#4C7A45" stroke-width="6" fill="none" stroke-linecap="round"/><circle cx="42" cy="56" r="2.5" fill="#FFF"/><circle cx="56" cy="62" r="2.5" fill="#FFF"/><circle cx="50" cy="70" r="2.5" fill="#FFF"/></svg></div><figcaption>Chocolate strawberries</figcaption></figure>
+        <figure class="car-tile"><span class="badge">Photo soon</span><div class="tile-art"><svg width="130" height="130" viewBox="0 0 100 100"><path d="M20 55c0-16 14-28 30-28s30 12 30 28z" fill="#E8B04B" stroke="#4A3325" stroke-width="4"/><rect x="18" y="52" width="64" height="10" rx="5" fill="#F2A007" stroke="#4A3325" stroke-width="3"/><rect x="26" y="66" width="48" height="18" rx="6" fill="#D9A45B" stroke="#4A3325" stroke-width="3"/></svg></div><figcaption>Croissants</figcaption></figure>
+        <figure class="car-tile"><span class="badge">Photo soon</span><div class="tile-art"><svg width="130" height="130" viewBox="0 0 100 100"><g fill="#FFFFFF" stroke="#4A3325" stroke-width="4"><ellipse cx="50" cy="22" rx="12" ry="20"/><ellipse cx="50" cy="78" rx="12" ry="20"/><ellipse cx="22" cy="50" rx="20" ry="12"/><ellipse cx="78" cy="50" rx="20" ry="12"/></g><circle cx="50" cy="50" r="15" fill="#F2A007" stroke="#4A3325" stroke-width="4"/></svg></div><figcaption>The Chicago Heights shop</figcaption></figure>
+      </div>
+      <button class="car-btn next" id="car-next" aria-label="Next photos">&#8250;</button>
+    </div>
+    <p class="car-hint">Tip: drag or scroll sideways to browse.</p>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="page" id="page-reviews">
+  <div class="section">
+    <h2>What Neighbors Say</h2>
+    <p class="sub">Kind words from customers, in their spirit if not their exact words.</p>
+      <div class="rs-strip" style="border-color:#F2A007;background:rgba(242,160,7,0.08);">
+        <p class="rs-note" style="color:#2e2a26;">Review themes on this page are paraphrased from public feedback. Open the source to read current reviews and ratings.</p>
+        <div class="rs-links"><a class="rs-link" style="background:#F2A007;border-color:#F2A007;color:#2e2a26;" href="https://www.google.com/maps/place/?q=place_id:ChIJTaNjBHsZDogRoch5QH17dhQ" target="_blank" rel="noopener">See reviews on Google</a></div>
+      </div>
+
+    <div class="review">
+      <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+      <p>"Fresh baked bread and so yummy. When we order a lot, they are always ready to deliver. So worth it."</p>
+      <p class="who">A customer review, shared in spirit</p>
+    </div>
+    <div class="review">
+      <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+      <p>"Love the muffins. Their croissants are a step above anything from the grocery store."</p>
+      <p class="who">A customer review, shared in spirit</p>
+    </div>
+    <div class="review">
+      <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+      <p>"They made balloon-shaped cake pops with strings for my kid's birthday. The staff goes the extra mile."</p>
+      <p class="who">A customer review, shared in spirit</p>
+    </div>
+  </div>
+</section>
+
+<!-- VISIT -->
+<section class="page" id="page-visit">
+  <div class="section">
+    <h2>Visit Us</h2>
+    <p class="sub">On 15th Street in Chicago Heights, with ample parking out front.</p>
+    <div class="visit-grid">
+      <div class="info-card">
+        <h3>Hours</h3>
+        <table class="hours-table" id="hours-table">
+          <tr data-day="1"><td>Monday</td><td>4:30 AM - 7:30 PM</td></tr>
+          <tr data-day="2"><td>Tuesday</td><td>4:30 AM - 7:30 PM</td></tr>
+          <tr data-day="3"><td>Wednesday</td><td>Closed</td></tr>
+          <tr data-day="4"><td>Thursday</td><td>4:30 AM - 7:30 PM</td></tr>
+          <tr data-day="5"><td>Friday</td><td>4:30 AM - 7:30 PM</td></tr>
+          <tr data-day="6"><td>Saturday</td><td>4:30 AM - 7:30 PM</td></tr>
+          <tr data-day="0"><td>Sunday</td><td>4:30 AM - 7:30 PM</td></tr>
+        </table>
+      </div>
+      <div class="info-card">
+        <h3>Find Us</h3>
+        <p><strong>Daisy's Bakery 2</strong><br>209 W 15th St<br>Chicago Heights, IL 60411</p>
+        <p style="margin-top:0.8rem;"><strong>Phone:</strong> <a href="tel:+17087545855">(708) 754-5855</a></p>
+        <div class="btn-row" style="margin-top:1.2rem;">
+          <a class="btn btn-primary" href="tel:+17087545855">Call Now</a>
+          <a class="btn btn-ghost" href="https://www.google.com/maps/place/?q=place_id:ChIJTaNjBHsZDogRoch5QH17dhQ" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="big-type">Daisy's</div>
+  <div class="foot-links">
+    <a data-page="home" href="#home">Home</a>
+    <a data-page="menu" href="#menu">Bakery Case</a>
+    <a data-page="story" href="#story">Our Story</a>
+    <a data-page="gallery" href="#gallery">Gallery</a>
+    <a data-page="reviews" href="#reviews">Reviews</a>
+    <a data-page="visit" href="#visit">Visit Us</a>
+  </div>
+  <div class="foot-base">&copy; Daisy's Bakery 2</div>
+</footer>
+
+<script>
+(function(){
+  var PAGES = ['home','menu','story','gallery','reviews','visit'];
+  var drawer = document.getElementById('drawer');
+  var scrim = document.getElementById('scrim');
+  function openDrawer(){ drawer.classList.add('open'); scrim.classList.add('show'); }
+  function closeDrawer(){ drawer.classList.remove('open'); scrim.classList.remove('show'); }
+  function cleanHash(){
+    return (location.hash || '').replace(/^#\/?/, '').split('?')[0];
+  }
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = 'home'; }
+    document.querySelectorAll('.page').forEach(function(p){
+      p.classList.toggle('active', p.id === 'page-' + page);
+    });
+    document.querySelectorAll('[data-page]').forEach(function(l){
+      l.classList.toggle('current', l.getAttribute('data-page') === page);
+    });
+    closeDrawer();
+    if(updateHash !== false && location.hash !== '#' + page){
+      location.hash = '#' + page;
+    }
+    window.scrollTo(0, 0);
+  }
+  document.addEventListener('click', function(e){
+    var el = e.target.closest('a[data-page], button[data-page]');
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute('data-page'));
+  });
+  document.getElementById('drawer-open').addEventListener('click', openDrawer);
+  document.getElementById('drawer-close').addEventListener('click', closeDrawer);
+  scrim.addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') closeDrawer();
+  });
+  window.addEventListener('hashchange', function(){ navigateTo(cleanHash() || 'home'); });
+  navigateTo(cleanHash() || 'home', false);
+  // Carousel controls
+  var track = document.getElementById('car-track');
+  document.getElementById('car-prev').addEventListener('click', function(){
+    track.scrollBy({left: -300, behavior: 'smooth'});
+  });
+  document.getElementById('car-next').addEventListener('click', function(){
+    track.scrollBy({left: 300, behavior: 'smooth'});
+  });
+  // Open/closed pill based on listed hours: 4:30 AM - 7:30 PM daily, closed Wednesday
+  try{
+    var now = new Date();
+    var day = now.getDay();
+    var mins = now.getHours() * 60 + now.getMinutes();
+    var pill = document.getElementById('open-pill');
+    var text = document.getElementById('open-pill-text');
+    if(day === 3){
+      text.textContent = 'Closed Wednesdays';
+    } else if(mins >= 270 && mins < 1170){
+      pill.classList.add('open');
+      text.textContent = 'Open now until 7:30 PM';
+    } else if(mins < 270){
+      text.textContent = 'Opens at 4:30 AM';
+    } else {
+      text.textContent = 'Opens 4:30 AM tomorrow';
+    }
+    document.querySelectorAll('#hours-table tr').forEach(function(tr){
+      if(parseInt(tr.getAttribute('data-day'), 10) === day) tr.classList.add('today');
+    });
+  }catch(err){}
+})();
+</script>
+</body>
+</html>

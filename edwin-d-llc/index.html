@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EDWIN D LLC | General Contractor | Cincinnati, OH</title>
+<meta name="description" content="EDWIN D LLC is a general contractor serving Cincinnati, OH. Call (513) 250-2650.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{
+  --concrete:#c9c9c4;
+  --concrete-dark:#a8a8a2;
+  --ash:#6f6f69;
+  --slate:#2b2b28;
+  --ink:#141412;
+  --paper:#ececea;
+  --safety:#e8ff47;
+  --rust:#b3401f;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Archivo',sans-serif;
+  background:var(--concrete);
+  color:var(--ink);
+  background-image:repeating-linear-gradient(0deg,rgba(0,0,0,.028) 0 1px,transparent 1px 3px);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+/* ghost lettering */
+.ghost{
+  font-family:'Anton',sans-serif;
+  position:absolute;
+  font-size:clamp(120px,26vw,380px);
+  line-height:.85;
+  color:transparent;
+  -webkit-text-stroke:2px rgba(20,20,18,.22);
+  pointer-events:none;
+  user-select:none;
+  white-space:nowrap;
+  z-index:0;
+}
+/* header */
+header{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  background:var(--ink);color:var(--paper);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px;
+  border-bottom:6px solid var(--ash);
+}
+.brand{display:flex;align-items:center;gap:12px;cursor:pointer;text-decoration:none;color:var(--paper)}
+.brand-mark{
+  font-family:'Anton',sans-serif;font-size:26px;line-height:1;
+  background:var(--safety);color:var(--ink);
+  width:46px;height:46px;display:flex;align-items:center;justify-content:center;
+}
+.brand-name{font-family:'Anton',sans-serif;font-size:22px;letter-spacing:2px}
+.brand-sub{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--concrete-dark)}
+.hamb{
+  background:var(--safety);border:none;color:var(--ink);
+  width:52px;height:52px;font-size:22px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+.hamb:hover{background:var(--paper)}
+/* drawer */
+.drawer{
+  position:fixed;top:0;right:-340px;width:320px;max-width:88vw;height:100vh;
+  background:var(--ink);color:var(--paper);z-index:200;
+  transition:right .32s cubic-bezier(.7,0,.2,1);
+  display:flex;flex-direction:column;
+  border-left:8px solid var(--safety);
+}
+.drawer.open{right:0}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:18px;border-bottom:2px solid var(--slate)}
+.drawer-head span{font-family:'Space Mono',monospace;letter-spacing:3px;font-size:12px;color:var(--safety)}
+.drawer-close{background:none;border:none;color:var(--paper);font-size:26px;cursor:pointer}
+.drawer nav{display:flex;flex-direction:column;padding:20px;gap:6px}
+.drawer nav a{
+  font-family:'Anton',sans-serif;font-size:38px;letter-spacing:1px;
+  color:var(--paper);text-decoration:none;padding:8px 4px;
+  border-bottom:2px solid var(--slate);
+  transition:padding-left .2s,color .2s;
+}
+.drawer nav a:hover,.drawer nav a.now{color:var(--safety);padding-left:18px}
+.drawer-foot{margin-top:auto;padding:20px;border-top:2px solid var(--slate);font-family:'Space Mono',monospace;font-size:12px}
+.drawer-foot a{color:var(--safety);text-decoration:none;font-weight:700}
+.scrim{
+  position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:150;
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.scrim.show{opacity:1;pointer-events:auto}
+/* pages */
+main{padding-top:88px;min-height:calc(100vh - 60px)}
+.page{display:none}
+.page.active{display:block;animation:rise .45s ease}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px;position:relative}
+/* slabs */
+.slab{
+  background:var(--paper);border:3px solid var(--ink);
+  box-shadow:10px 10px 0 var(--ink);
+  padding:34px;margin:34px 0;position:relative;z-index:1;
+}
+.slab.dark{background:var(--ink);color:var(--paper);box-shadow:10px 10px 0 var(--ash)}
+.slab .tag{
+  display:inline-block;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;
+  letter-spacing:2px;background:var(--ink);color:var(--safety);padding:6px 12px;margin-bottom:16px;
+}
+.slab.dark .tag{background:var(--safety);color:var(--ink)}
+h1.page-title{
+  font-family:'Anton',sans-serif;font-size:clamp(52px,10vw,120px);
+  line-height:.92;letter-spacing:1px;margin:46px 0 10px;position:relative;z-index:1;
+}
+h1.page-title .thin{-webkit-text-stroke:2px var(--ink);color:transparent}
+.lede{font-size:18px;max-width:640px;line-height:1.6;position:relative;z-index:1;font-weight:600}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:'Archivo',sans-serif;font-weight:900;letter-spacing:1px;
+  text-decoration:none;padding:16px 28px;font-size:15px;
+  border:3px solid var(--ink);cursor:pointer;text-transform:uppercase;
+  transition:transform .15s,box-shadow .15s;
+}
+.btn-solid{background:var(--safety);color:var(--ink);box-shadow:6px 6px 0 var(--ink)}
+.btn-ghost{background:var(--ink);color:var(--paper);box-shadow:6px 6px 0 var(--ash)}
+.btn:hover{transform:translate(-2px,-2px);box-shadow:9px 9px 0 var(--ink)}
+.btn-row{display:flex;gap:16px;flex-wrap:wrap;margin-top:24px;position:relative;z-index:1}
+/* hero */
+.hero{position:relative;padding:70px 0 40px;overflow:hidden;background:var(--ink);color:var(--paper)}
+.hero .ghost{top:10px;left:-10px;-webkit-text-stroke:2px rgba(236,236,234,.18)}
+.hero h1{font-family:'Anton',sans-serif;font-size:clamp(56px,11vw,140px);line-height:.9;position:relative;z-index:1}
+.hero h1 .y{background:var(--safety);color:var(--ink);padding:0 14px}
+.hero-sub{font-family:'Space Mono',monospace;font-size:14px;letter-spacing:2px;color:var(--concrete);margin-top:18px;position:relative;z-index:1;max-width:560px;line-height:2}
+.hero-bars{display:flex;gap:10px;margin-top:26px;position:relative;z-index:1}
+.hero-bars span{height:14px;background:var(--safety)}
+.hero-bars span:nth-child(1){width:60px}.hero-bars span:nth-child(2){width:120px;background:var(--ash)}.hero-bars span:nth-child(3){width:40px;background:var(--rust)}
+/* stats */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0;margin:34px 0;position:relative;z-index:1}
+.stat{background:var(--slate);color:var(--paper);border:3px solid var(--ink);padding:28px;text-align:left}
+.stat:nth-child(odd){background:var(--concrete-dark);color:var(--ink)}
+.stat b{font-family:'Anton',sans-serif;font-size:40px;display:block}
+.stat small{font-family:'Space Mono',monospace;letter-spacing:2px;font-size:11px}
+/* service slabs */
+.svc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px;margin-top:20px;position:relative;z-index:1}
+.svc{
+  background:var(--paper);border:3px solid var(--ink);box-shadow:8px 8px 0 var(--ink);
+  padding:26px;display:flex;flex-direction:column;gap:12px;
+}
+.svc i{font-size:34px;color:var(--rust)}
+.svc h3{font-family:'Anton',sans-serif;font-size:26px;letter-spacing:1px}
+.svc p{font-size:15px;line-height:1.6}
+.badge{
+  align-self:flex-start;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;
+  letter-spacing:2px;padding:5px 10px;background:var(--safety);border:2px solid var(--ink);
+}
+.badge.confirm{background:var(--ink);color:var(--safety)}
+.svc .btn{margin-top:auto;font-size:13px;padding:12px 18px}
+/* about */
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0;border:3px solid var(--ink);margin:30px 0;position:relative;z-index:1}
+.kv div{padding:22px;border-right:3px solid var(--ink);background:var(--paper)}
+.kv div:last-child{border-right:none}
+.kv label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--ash);display:block;margin-bottom:8px}
+.kv strong{font-size:18px}
+.kv a{color:var(--ink);font-weight:700}
+.photo-ph{
+  height:240px;border:3px dashed var(--ash);background:var(--concrete-dark);
+  display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;
+  font-family:'Space Mono',monospace;color:var(--slate);letter-spacing:2px;margin-top:20px;position:relative;z-index:1;
+}
+.photo-ph i{font-size:40px}
+/* reviews */
+.rev{border:3px solid var(--ink);background:var(--paper);padding:26px;margin:22px 0;box-shadow:8px 8px 0 var(--ink);position:relative;z-index:1}
+.rev .stars{color:var(--rust);font-size:18px;letter-spacing:3px}
+.rev p{margin:12px 0;line-height:1.7}
+.rev cite{font-family:'Space Mono',monospace;font-style:normal;font-size:12px;letter-spacing:1px;color:var(--ash)}
+.empty-note{background:var(--slate);color:var(--paper);border:3px solid var(--ink);padding:34px;margin:30px 0;box-shadow:8px 8px 0 var(--ash);position:relative;z-index:1}
+.empty-note h3{font-family:'Anton',sans-serif;font-size:30px;margin-bottom:12px;letter-spacing:1px}
+.empty-note p{line-height:1.7}
+/* contact */
+form.cta{display:grid;gap:16px;margin-top:20px;position:relative;z-index:1}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:640px){.frow{grid-template-columns:1fr}}
+label.f{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;display:block;margin-bottom:8px;font-weight:700}
+input,select,textarea{
+  width:100%;font-family:'Archivo',sans-serif;font-size:16px;
+  border:3px solid var(--ink);background:var(--paper);padding:14px;color:var(--ink);
+}
+input:focus,select:focus,textarea:focus{outline:4px solid var(--safety);outline-offset:-1px}
+textarea{min-height:140px;resize:vertical}
+.ferr{font-family:'Space Mono',monospace;font-size:12px;color:var(--rust);display:none;font-weight:700}
+.ferr.show{display:block}
+.confirm-box{display:none;background:var(--ink);color:var(--paper);border:3px solid var(--ink);box-shadow:10px 10px 0 var(--ash);padding:34px;margin-top:24px;position:relative;z-index:1}
+.confirm-box.show{display:block}
+.confirm-box h3{font-family:'Anton',sans-serif;font-size:34px;letter-spacing:1px;margin-bottom:10px}
+.confirm-box h3 i{color:var(--safety)}
+.confirm-box p{line-height:1.7;margin-bottom:8px}
+/* footer */
+footer{background:var(--ink);color:var(--paper);padding:22px 20px;text-align:center;font-family:'Space Mono',monospace;font-size:14px;letter-spacing:2px}
+.cut{background:var(--safety);height:10px}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="brand" href="#home" data-nav="home" aria-label="EDWIN D LLC home">
+    <span class="brand-mark">ED</span>
+    <span>
+      <span class="brand-name">EDWIN D LLC</span><br>
+      <span class="brand-sub">GENERAL CONTRACTOR</span>
+    </span>
+  </a>
+  <button class="hamb" id="hamb" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+</header>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Site navigation">
+  <div class="drawer-head">
+    <span>MENU / 05 PAGES</span>
+    <button class="drawer-close" id="drawerClose" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <nav>
+    <a href="#home" data-nav="home">01. HOME</a>
+    <a href="#services" data-nav="services">02. SERVICES</a>
+    <a href="#about" data-nav="about">03. ABOUT</a>
+    <a href="#reviews" data-nav="reviews">04. REVIEWS</a>
+    <a href="#contact" data-nav="contact">05. CONTACT</a>
+  </nav>
+  <div class="drawer-foot">
+    <p>CALL THE CREW</p>
+    <p><a href="tel:+15132502650"><i class="fa-solid fa-phone"></i> (513) 250-2650</a></p>
+  </div>
+</aside>
+
+<main>
+  
+  <section class="page active" id="page-home" data-page="home">
+    <div class="hero">
+      <span class="ghost">POURED</span>
+      <div class="wrap">
+        <h1>BUILT TO <span class="y">LAST.</span><br>POURED TO HOLD.</h1>
+        <p class="hero-sub">EDWIN D LLC / GENERAL CONTRACTOR / CINCINNATI, OH<br>Solid work, square corners, no shortcuts.</p>
+        <div class="btn-row">
+          <a class="btn btn-solid" href="tel:+15132502650"><i class="fa-solid fa-phone"></i> Call (513) 250-2650</a>
+          <a class="btn btn-ghost" href="#contact" data-nav="contact">Get an Estimate <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+        <div class="hero-bars" aria-hidden="true"><span></span><span></span><span></span></div>
+      </div>
+    </div>
+    <div class="wrap">
+      <div class="stat-grid">
+        <div class="stat"><b>GC</b><small>GENERAL CONTRACTOR</small></div>
+        <div class="stat"><b>45246</b><small>HOME ZIP, CINCINNATI</small></div>
+        <div class="stat"><b>6</b><small>DAYS A WEEK LISTED</small></div>
+        <div class="stat"><b>1</b><small>CREW TO CALL</small></div>
+      </div>
+      <div class="slab">
+        <span class="tag">WHAT WE POUR</span>
+        <h2 style="font-family:'Anton';font-size:38px;letter-spacing:1px;margin-bottom:12px">ONE CONTRACTOR. FULL JOB.</h2>
+        <p style="line-height:1.7;max-width:640px">EDWIN D LLC is a general contractor based in Cincinnati, Ohio. From planning to punch list, one crew runs the whole job. <strong>Call to confirm</strong> exact services and availability for your project.</p>
+        <div class="btn-row">
+          <a class="btn btn-solid" href="#services" data-nav="services">See Services</a>
+          <a class="btn btn-ghost" href="https://www.google.com/maps/search/?api=1&amp;query=11968%20Algiers%20Dr%2C%20Cincinnati%2C%20OH%2045246" target="_blank" rel="noopener"><i class="fa-solid fa-location-dot"></i> Directions</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+  <section class="page" id="page-services" data-page="services">
+    <div class="wrap">
+      <span class="ghost">SLABS</span>
+      <h1 class="page-title">SERVICE<br><span class="thin">SLABS</span></h1>
+      <p class="lede">The slabs below describe typical general contractor work. Every item is marked <strong>SAMPLE</strong> until confirmed on the phone: we do not publish a service list we cannot stand behind.</p>
+      <div class="svc-grid">
+        <div class="svc">
+          <i class="fa-solid fa-house-chimney"></i>
+          <h3>Remodeling</h3>
+          <p>Interior and exterior remodel scopes for homes and small commercial spaces.</p>
+          <span class="badge">SAMPLE</span>
+          <a class="btn btn-solid" href="#contact" data-nav="contact">Ask About This</a>
+        </div>
+        <div class="svc">
+          <i class="fa-solid fa-hammer"></i>
+          <h3>Carpentry</h3>
+          <p>Framing, trim, decks, and finish carpentry done square and true.</p>
+          <span class="badge">SAMPLE</span>
+          <a class="btn btn-solid" href="#contact" data-nav="contact">Ask About This</a>
+        </div>
+        <div class="svc">
+          <i class="fa-solid fa-trowel"></i>
+          <h3>Concrete Work</h3>
+          <p>Flatwork, pads, and repairs with a poured-to-hold finish.</p>
+          <span class="badge">SAMPLE</span>
+          <a class="btn btn-solid" href="#contact" data-nav="contact">Ask About This</a>
+        </div>
+        <div class="svc">
+          <i class="fa-solid fa-paint-roller"></i>
+          <h3>Painting and Finishing</h3>
+          <p>Interior and exterior coatings as part of a larger scope.</p>
+          <span class="badge">SAMPLE</span>
+          <a class="btn btn-solid" href="#contact" data-nav="contact">Ask About This</a>
+        </div>
+        <div class="svc">
+          <i class="fa-solid fa-screwdriver-wrench"></i>
+          <h3>Repairs</h3>
+          <p>General repairs and punch-list work for occupied buildings.</p>
+          <span class="badge">SAMPLE</span>
+          <a class="btn btn-solid" href="#contact" data-nav="contact">Ask About This</a>
+        </div>
+        <div class="svc">
+          <i class="fa-solid fa-clipboard-list"></i>
+          <h3>Project Management</h3>
+          <p>One point of contact coordinating trades from start to finish.</p>
+          <span class="badge">SAMPLE</span>
+          <a class="btn btn-solid" href="#contact" data-nav="contact">Ask About This</a>
+        </div>
+      </div>
+      <div class="slab dark">
+        <span class="tag">NO GUESSWORK</span>
+        <h2 style="font-family:'Anton';font-size:34px;letter-spacing:1px;margin-bottom:12px">NOT ON THE LIST? CALL.</h2>
+        <p style="line-height:1.7">Every job is different. If your project is not described above, call and ask. <strong>Call to confirm</strong> pricing, scheduling, and scope before you commit.</p>
+        <div class="btn-row">
+          <a class="btn btn-solid" href="tel:+15132502650"><i class="fa-solid fa-phone"></i> (513) 250-2650</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+  <section class="page" id="page-about" data-page="about">
+    <div class="wrap">
+      <span class="ghost">EDWIN</span>
+      <h1 class="page-title">ABOUT<br><span class="thin">THE CREW</span></h1>
+      <p class="lede">EDWIN D LLC is a general contractor operating out of Cincinnati, Ohio. Public details about the company are limited, so here is what is verifiable.</p>
+      <div class="photo-ph" aria-label="Company photo placeholder">
+        <i class="fa-solid fa-camera"></i>
+        <span>PHOTO COMING SOON</span>
+      </div>
+      <div class="kv">
+        <div>
+          <label>BUSINESS NAME</label>
+          <strong>EDWIN D LLC</strong>
+        </div>
+        <div>
+          <label>TRADE</label>
+          <strong>General Contractor</strong>
+        </div>
+        <div>
+          <label>ADDRESS</label>
+          <strong>11968 Algiers Dr<br>Cincinnati, OH 45246</strong>
+        </div>
+        <div>
+          <label>PHONE</label>
+          <strong><a href="tel:+15132502650">(513) 250-2650</a></strong>
+        </div>
+      </div>
+      <div class="slab">
+        <span class="tag">LISTED HOURS</span>
+        <h2 style="font-family:'Anton';font-size:34px;letter-spacing:1px;margin-bottom:12px">WHEN TO CALL</h2>
+        <p style="line-height:2;font-weight:600">Monday to Friday: 8:00 AM to 5:00 PM<br>Saturday: 8:00 AM to 2:00 PM<br>Sunday: Closed <span class="badge confirm" style="margin-left:8px">CALL TO CONFIRM</span></p>
+        <p style="margin-top:12px;line-height:1.7;font-size:14px;color:var(--ash)">Hours are taken from a public business listing and have not been verified with the owner. Call ahead before visiting.</p>
+        <div class="btn-row">
+          <a class="btn btn-solid" href="tel:+15132502650"><i class="fa-solid fa-phone"></i> Call Now</a>
+          <a class="btn btn-ghost" href="https://www.google.com/maps/search/?api=1&amp;query=11968%20Algiers%20Dr%2C%20Cincinnati%2C%20OH%2045246" target="_blank" rel="noopener"><i class="fa-solid fa-location-dot"></i> Directions</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+  <section class="page" id="page-reviews" data-page="reviews">
+    <div class="wrap">
+      <span class="ghost">PROOF</span>
+      <h1 class="page-title">WORD<br><span class="thin">ON SITE</span></h1>
+      <div class="empty-note">
+        <h3><i class="fa-solid fa-magnifying-glass"></i> NO PUBLIC REVIEWS FOUND</h3>
+        <p>We searched public directories, review sites, and social profiles for EDWIN D LLC and found <strong>no customer reviews</strong>, positive or negative, as of this writing. The business appears in a public business listing (category: contractor) at 11968 Algiers Dr, Cincinnati, OH 45246, with listed phone (513) 250-2650, but no review text exists to quote.</p>
+        <p style="margin-top:14px">We do not publish invented reviews. If you have worked with EDWIN D LLC, the most reliable move is to call and ask for references directly: <a href="tel:+15132502650" style="color:var(--safety);font-weight:700">(513) 250-2650</a>.</p>
+      </div>
+      <div class="slab">
+        <span class="tag">OUR POLICY</span>
+        <h2 style="font-family:'Anton';font-size:30px;letter-spacing:1px;margin-bottom:10px">ONLY REAL WORDS, QUOTED VERBATIM</h2>
+        <p style="line-height:1.7">When verified public reviews appear, this page will quote them word for word with the reviewer's name and the source linked. Nothing is written, paraphrased, or manufactured by us.</p>
+      </div>
+    </div>
+  </section>
+
+  
+  <section class="page" id="page-contact" data-page="contact">
+    <div class="wrap">
+      <span class="ghost">POUR IT</span>
+      <h1 class="page-title">START<br><span class="thin">THE JOB</span></h1>
+      <p class="lede">Tell us about the project. The form checks your details on this page, then we hand you the phone number to make it real. Nothing is sent anywhere automatically.</p>
+      <div class="slab">
+        <span class="tag">CONTACT FORM</span>
+        <form class="cta" id="quoteForm" novalidate>
+          <div class="frow">
+            <div>
+              <label class="f" for="fName">FULL NAME *</label>
+              <input type="text" id="fName" name="name" autocomplete="name" placeholder="Your name">
+              <p class="ferr" id="eName">Please enter your name.</p>
+            </div>
+            <div>
+              <label class="f" for="fPhone">PHONE *</label>
+              <input type="tel" id="fPhone" name="phone" autocomplete="tel" placeholder="(513) 555-0100">
+              <p class="ferr" id="ePhone">Please enter a valid phone number.</p>
+            </div>
+          </div>
+          <div class="frow">
+            <div>
+              <label class="f" for="fEmail">EMAIL (OPTIONAL)</label>
+              <input type="email" id="fEmail" name="email" autocomplete="email" placeholder="you@example.com">
+              <p class="ferr" id="eEmail">That email address does not look valid.</p>
+            </div>
+            <div>
+              <label class="f" for="fSvc">PROJECT TYPE *</label>
+              <select id="fSvc" name="service">
+                <option value="">Choose one</option>
+                <option>Remodeling (sample)</option>
+                <option>Carpentry (sample)</option>
+                <option>Concrete work (sample)</option>
+                <option>Painting and finishing (sample)</option>
+                <option>Repairs (sample)</option>
+                <option>Project management (sample)</option>
+                <option>Something else</option>
+              </select>
+              <p class="ferr" id="eSvc">Please choose a project type.</p>
+            </div>
+          </div>
+          <div>
+            <label class="f" for="fMsg">PROJECT DETAILS *</label>
+            <textarea id="fMsg" name="message" placeholder="What needs doing, where, and when?"></textarea>
+            <p class="ferr" id="eMsg">Please describe your project in a few words.</p>
+          </div>
+          <div class="btn-row" style="margin-top:4px">
+            <button type="submit" class="btn btn-solid"><i class="fa-solid fa-paper-plane"></i> Send Request</button>
+            <a class="btn btn-ghost" href="tel:+15132502650"><i class="fa-solid fa-phone"></i> Or Call Direct</a>
+          </div>
+        </form>
+        <div class="confirm-box" id="confirmBox" role="status">
+          <h3><i class="fa-solid fa-circle-check"></i> DETAILS CHECKED.</h3>
+          <p id="confirmText">Your request looks good.</p>
+          <p>Next step: call the crew to lock it in. Mention your name and project type when you ring.</p>
+          <div class="btn-row">
+            <a class="btn btn-solid" href="tel:+15132502650"><i class="fa-solid fa-phone"></i> Call (513) 250-2650</a>
+            <button class="btn btn-ghost" id="againBtn" type="button"><i class="fa-solid fa-rotate-left"></i> Start Over</button>
+          </div>
+        </div>
+      </div>
+      <div class="slab dark">
+        <span class="tag">DIRECT LINE</span>
+        <h2 style="font-family:'Anton';font-size:34px;letter-spacing:1px;margin-bottom:12px">SKIP THE FORM. CALL.</h2>
+        <p style="line-height:1.7;margin-bottom:8px"><i class="fa-solid fa-phone" style="color:var(--safety)"></i> <a href="tel:+15132502650" style="color:var(--paper);font-weight:700;font-size:20px">(513) 250-2650</a></p>
+        <p style="line-height:1.7"><i class="fa-solid fa-location-dot" style="color:var(--safety)"></i> 11968 Algiers Dr, Cincinnati, OH 45246</p>
+        <div class="btn-row">
+          <a class="btn btn-solid" href="https://www.google.com/maps/search/?api=1&amp;query=11968%20Algiers%20Dr%2C%20Cincinnati%2C%20OH%2045246" target="_blank" rel="noopener"><i class="fa-solid fa-location-dot"></i> Get Directions</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="cut" aria-hidden="true"></div>
+<footer>© EDWIN D LLC</footer>
+
+<script>
+(function(){
+  var pages = document.querySelectorAll('.page');
+  var links = document.querySelectorAll('[data-nav]');
+  var drawer = document.getElementById('drawer');
+  var scrim = document.getElementById('scrim');
+  var hamb = document.getElementById('hamb');
+  var closeBtn = document.getElementById('drawerClose');
+  var titles = {
+    home: 'EDWIN D LLC | General Contractor | Cincinnati, OH',
+    services: 'Services | EDWIN D LLC',
+    about: 'About | EDWIN D LLC',
+    reviews: 'Reviews | EDWIN D LLC',
+    contact: 'Contact | EDWIN D LLC'
+  };
+  function openDrawer(){ drawer.classList.add('open'); scrim.classList.add('show'); }
+  function closeDrawer(){ drawer.classList.remove('open'); scrim.classList.remove('show'); }
+  function navigateTo(page){
+    var ok = false;
+    pages.forEach(function(p){
+      var match = p.getAttribute('data-page') === page;
+      p.classList.toggle('active', match);
+      if(match) ok = true;
+    });
+    if(!ok) page = 'home';
+    links.forEach(function(l){ l.classList.toggle('now', l.getAttribute('data-nav') === page); });
+    document.title = titles[page] || titles.home;
+    if(location.hash !== '#' + page){ history.pushState({page: page}, '', '#' + page); }
+    closeDrawer();
+    window.scrollTo(0, 0);
+  }
+  window.navigateTo = navigateTo;
+  window.addEventListener('popstate', function(e){
+    var p = (e.state && e.state.page) || location.hash.replace('#','') || 'home';
+    navigateTo(p);
+  });
+  links.forEach(function(l){
+    l.addEventListener('click', function(e){
+      e.preventDefault();
+      navigateTo(l.getAttribute('data-nav'));
+    });
+  });
+  hamb.addEventListener('click', openDrawer);
+  closeBtn.addEventListener('click', closeDrawer);
+  scrim.addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeDrawer(); });
+  var start = location.hash.replace('#','');
+  navigateTo(start || 'home');
+  /* contact form */
+  var form = document.getElementById('quoteForm');
+  var box = document.getElementById('confirmBox');
+  var ctext = document.getElementById('confirmText');
+  function flag(id, bad){ document.getElementById(id).classList.toggle('show', bad); return !bad; }
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var name = document.getElementById('fName').value.trim();
+    var phone = document.getElementById('fPhone').value.trim();
+    var email = document.getElementById('fEmail').value.trim();
+    var svc = document.getElementById('fSvc').value;
+    var msg = document.getElementById('fMsg').value.trim();
+    var good = true;
+    good = flag('eName', name.length < 2) && good;
+    good = flag('ePhone', !/^[+()\-.\s\d]{7,20}$/.test(phone)) && good;
+    good = flag('eEmail', email.length > 0 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) && good;
+    good = flag('eSvc', svc === '') && good;
+    good = flag('eMsg', msg.length < 4) && good;
+    if(!good) return;
+    ctext.textContent = 'Thanks ' + name + '. You asked about "' + svc + '" and gave the number ' + phone + '. Nothing was sent online.';
+    form.style.display = 'none';
+    box.classList.add('show');
+    box.scrollIntoView({behavior:'smooth'});
+  });
+  document.getElementById('againBtn').addEventListener('click', function(){
+    form.reset();
+    form.style.display = 'grid';
+    box.classList.remove('show');
+  });
+})();
+</script>
+</body>
+</html>

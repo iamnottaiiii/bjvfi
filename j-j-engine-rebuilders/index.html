@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>J &amp; J Engine Rebuilders | Diesel Engine Repair Service, Cleves, OH</title>
+<meta name="description" content="J & J Engine Rebuilders: diesel engine repair service at 5835 OH-128, Cleves, OH 45002. Call (513) 353-1705.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{
+  --blue:#1B3A6B;
+  --blue-deep:#14294E;
+  --blue-panel:rgba(255,255,255,0.04);
+  --ink:#FFFFFF;
+  --muted:#C6D3EC;
+  --faint:rgba(255,255,255,0.35);
+  --line:rgba(255,255,255,0.55);
+  --line-soft:rgba(255,255,255,0.22);
+  --accent:#8FD0FF;
+  --amber:#F5B942;
+  --radius:3px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background-color:var(--blue);
+  background-image:
+    linear-gradient(rgba(255,255,255,0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.055) 1px, transparent 1px),
+    linear-gradient(rgba(255,255,255,0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.028) 1px, transparent 1px);
+  background-size:120px 120px,120px 120px,24px 24px,24px 24px;
+  color:var(--ink);
+  font-family:'IBM Plex Mono',monospace;
+  font-size:15px;
+  line-height:1.6;
+  min-height:100vh;
+}
+h1,h2,h3,.display{font-family:'Space Grotesk',sans-serif;letter-spacing:0.01em}
+a{color:var(--accent)}
+img{max-width:100%}
+
+/* ---------- Header / drawing frame ---------- */
+.site-header{
+  position:sticky;top:0;z-index:50;
+  background:rgba(20,41,78,0.96);
+  border-bottom:1px solid var(--line);
+}
+.header-inner{
+  max-width:1200px;margin:0 auto;padding:0 20px;
+  display:flex;align-items:center;justify-content:space-between;
+  min-height:68px;
+}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
+.brand-mark{
+  width:42px;height:42px;border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;flex:none;
+}
+.brand-mark::before,.brand-mark::after{
+  content:"";position:absolute;background:var(--line);
+}
+.brand-mark::before{width:9px;height:1px;top:-5px;left:50%;transform:translateX(-50%)}
+.brand-mark::after{width:1px;height:9px;left:-5px;top:50%;transform:translateY(-50%)}
+.brand-mark svg{width:26px;height:26px;stroke:var(--ink);fill:none;stroke-width:1.4}
+.brand-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.05rem;line-height:1.2}
+.brand-sub{font-size:0.62rem;letter-spacing:0.22em;color:var(--muted);text-transform:uppercase}
+.nav-list{display:flex;gap:4px;list-style:none;align-items:center}
+.nav-link{
+  color:var(--muted);text-decoration:none;font-size:0.78rem;letter-spacing:0.14em;
+  text-transform:uppercase;padding:10px 14px;border:1px solid transparent;
+  position:relative;transition:all .18s ease;
+}
+.nav-link:hover{color:var(--ink);border-color:var(--line-soft)}
+.nav-link.active{color:var(--ink);border-color:var(--line);background:rgba(255,255,255,0.06)}
+.nav-link.active::before{
+  content:"";position:absolute;left:6px;top:50%;transform:translateY(-50%);
+  width:5px;height:5px;border:1px solid var(--accent);border-radius:50%;
+}
+.nav-cta{
+  border:1px solid var(--accent);color:var(--accent);
+  padding:10px 16px;text-decoration:none;font-size:0.78rem;letter-spacing:0.14em;
+  text-transform:uppercase;margin-left:8px;transition:all .18s ease;white-space:nowrap;
+}
+.nav-cta:hover{background:var(--accent);color:var(--blue-deep)}
+.menu-toggle{
+  display:none;background:none;border:1px solid var(--line);color:var(--ink);
+  width:44px;height:44px;font-size:1.1rem;cursor:pointer;
+}
+
+/* ---------- Pages / router ---------- */
+.page{display:none;animation:fadeIn .3s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.wrap{max-width:1200px;margin:0 auto;padding:0 20px}
+
+/* ---------- Sheet header (title block) ---------- */
+.sheet-head{
+  border:1px solid var(--line);margin:28px 0 0;
+  display:flex;flex-wrap:wrap;justify-content:space-between;align-items:stretch;
+  background:rgba(255,255,255,0.03);
+}
+.sheet-title{padding:22px 26px;flex:1 1 320px;border-right:1px solid var(--line-soft)}
+.sheet-title .fig{font-size:0.7rem;letter-spacing:0.28em;color:var(--accent);text-transform:uppercase}
+.sheet-title h1{font-size:clamp(1.9rem,4.5vw,3rem);font-weight:700;margin:6px 0 4px;line-height:1.05}
+.sheet-title p{color:var(--muted);font-size:0.85rem;max-width:52ch}
+.title-block{
+  flex:0 1 320px;display:grid;grid-template-columns:1fr 1fr;
+  font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;
+}
+.title-block div{border-left:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft);padding:8px 12px;color:var(--muted)}
+.title-block div b{display:block;color:var(--ink);font-weight:600;margin-top:2px;letter-spacing:0.06em}
+
+/* ---------- Section blocks ---------- */
+.sheet{
+  border:1px solid var(--line);border-top:none;
+  padding:34px 30px;background:rgba(255,255,255,0.02);
+  position:relative;
+}
+.sheet + .sheet{border-top:1px solid var(--line-soft)}
+.sheet-label{
+  display:inline-block;font-size:0.68rem;letter-spacing:0.3em;text-transform:uppercase;
+  color:var(--accent);border:1px solid var(--line-soft);padding:6px 12px;margin-bottom:16px;
+  background:rgba(255,255,255,0.03);
+}
+.sheet h2{font-size:clamp(1.4rem,3vw,2rem);margin-bottom:10px}
+.sheet p.lead{color:var(--muted);max-width:68ch;margin-bottom:8px}
+.crosshair{position:absolute;width:14px;height:14px;pointer-events:none}
+.crosshair::before,.crosshair::after{content:"";position:absolute;background:var(--faint)}
+.crosshair::before{left:50%;top:0;bottom:0;width:1px}
+.crosshair::after{top:50%;left:0;right:0;height:1px}
+.ch-tl{top:-7px;left:-7px}.ch-tr{top:-7px;right:-7px}
+.ch-bl{bottom:-7px;left:-7px}.ch-br{bottom:-7px;right:-7px}
+
+/* ---------- Spec table ---------- */
+.spec-table{width:100%;border-collapse:collapse;margin-top:14px;font-size:0.85rem}
+.spec-table th,.spec-table td{border:1px solid var(--line-soft);padding:11px 14px;text-align:left;vertical-align:top}
+.spec-table th{
+  font-size:0.68rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--muted);
+  font-weight:500;width:220px;background:rgba(255,255,255,0.04);
+}
+.spec-table td{color:var(--ink)}
+.spec-table a{color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent)}
+.spec-table a:hover{border-bottom-style:solid}
+
+/* ---------- Buttons ---------- */
+.btn-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:'IBM Plex Mono',monospace;font-size:0.78rem;letter-spacing:0.16em;text-transform:uppercase;
+  padding:14px 22px;text-decoration:none;cursor:pointer;border:1px solid var(--accent);
+  color:var(--accent);background:transparent;transition:all .18s ease;
+}
+.btn:hover{background:var(--accent);color:var(--blue-deep)}
+.btn.solid{background:var(--ink);border-color:var(--ink);color:var(--blue-deep)}
+.btn.solid:hover{background:var(--accent);border-color:var(--accent)}
+.btn.ghost{border-color:var(--line-soft);color:var(--muted)}
+.btn.ghost:hover{border-color:var(--ink);color:var(--ink);background:transparent}
+
+/* ---------- Cards grid ---------- */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin-top:20px}
+.card{
+  border:1px solid var(--line-soft);padding:24px 22px;background:var(--blue-panel);
+  position:relative;transition:border-color .18s ease, transform .18s ease;
+}
+.card:hover{border-color:var(--line);transform:translateY(-2px)}
+.card .card-no{
+  position:absolute;top:10px;right:12px;font-size:0.65rem;letter-spacing:0.2em;color:var(--faint);
+}
+.card-icon{
+  width:52px;height:52px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+  margin-bottom:16px;
+}
+.card-icon svg{width:30px;height:30px;stroke:var(--accent);fill:none;stroke-width:1.3}
+.card-icon i{font-size:1.3rem;color:var(--accent);font-weight:300}
+.card h3{font-size:1.05rem;margin-bottom:8px}
+.card p{font-size:0.82rem;color:var(--muted)}
+.card .dims{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line-soft);font-size:0.7rem;color:var(--faint);letter-spacing:0.1em}
+
+/* ---------- Badges ---------- */
+.badge{
+  display:inline-block;font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;
+  border:1px dashed var(--amber);color:var(--amber);padding:4px 10px;margin-top:12px;
+}
+.badge.info{border-color:var(--accent);color:var(--accent);border-style:solid}
+.badge + .badge{margin-left:8px}
+
+/* ---------- Feature rows / steps ---------- */
+.step-list{list-style:none;margin-top:18px;counter-reset:step}
+.step-list li{
+  border:1px solid var(--line-soft);border-bottom:none;padding:18px 20px 18px 78px;
+  position:relative;background:rgba(255,255,255,0.02);
+}
+.step-list li:last-child{border-bottom:1px solid var(--line-soft)}
+.step-list li::before{
+  counter-increment:step;content:"0" counter(step);
+  position:absolute;left:20px;top:18px;font-family:'Space Grotesk',sans-serif;
+  font-size:1.3rem;font-weight:700;color:var(--accent);
+}
+.step-list li h3{font-size:1rem;margin-bottom:4px}
+.step-list li p{font-size:0.82rem;color:var(--muted)}
+
+/* ---------- Reviews ---------- */
+.rating-strip{
+  display:flex;flex-wrap:wrap;gap:18px;align-items:center;margin:16px 0 6px;
+  border:1px solid var(--line-soft);padding:18px 22px;background:rgba(255,255,255,0.03);
+}
+.rating-big{font-family:'Space Grotesk',sans-serif;font-size:2.6rem;font-weight:700;line-height:1}
+.stars{color:var(--amber);letter-spacing:4px;font-size:1rem}
+.rating-meta{font-size:0.75rem;color:var(--muted);letter-spacing:0.08em}
+.review-card{border:1px solid var(--line-soft);padding:22px;background:var(--blue-panel);position:relative}
+.review-card blockquote{font-size:0.9rem;color:var(--ink);margin:10px 0 14px;font-style:normal}
+.review-card .src{font-size:0.7rem;color:var(--muted);letter-spacing:0.1em}
+.review-card .src a{color:var(--accent)}
+.review-card .qmark{font-family:'Space Grotesk',sans-serif;font-size:2rem;color:var(--line-soft);line-height:1}
+
+/* ---------- Form ---------- */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field.full{grid-column:1 / -1}
+.field label{font-size:0.68rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--muted)}
+.field input,.field textarea,.field select{
+  background:rgba(255,255,255,0.05);border:1px solid var(--line-soft);color:var(--ink);
+  font-family:'IBM Plex Mono',monospace;font-size:0.9rem;padding:13px 14px;border-radius:var(--radius);
+}
+.field input:focus,.field textarea:focus,.field select:focus{
+  outline:none;border-color:var(--accent);background:rgba(255,255,255,0.08);
+}
+.field textarea{min-height:130px;resize:vertical}
+.form-note{font-size:0.75rem;color:var(--muted);margin-top:14px;max-width:70ch}
+
+/* ---------- Two-col layout ---------- */
+.cols{display:grid;grid-template-columns:1.2fr 1fr;gap:26px;margin-top:18px;align-items:start}
+.panel{border:1px solid var(--line-soft);padding:24px;background:var(--blue-panel)}
+.panel h3{font-size:1rem;margin-bottom:12px;letter-spacing:0.04em}
+.hours-list{list-style:none;font-size:0.85rem}
+.hours-list li{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px dashed var(--line-soft)}
+.hours-list li:last-child{border-bottom:none}
+.hours-list .closed{color:var(--faint)}
+
+/* ---------- Dimension divider ---------- */
+.dim-rule{display:flex;align-items:center;gap:12px;margin:26px 0;color:var(--faint);font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase}
+.dim-rule::before,.dim-rule::after{content:"";flex:1;height:1px;background:var(--line-soft)}
+.dim-rule i{font-style:normal}
+
+/* ---------- Hero drawing ---------- */
+.hero-drawing{
+  border:1px solid var(--line);margin-top:26px;padding:30px 26px;position:relative;
+  background:
+    radial-gradient(circle at 78% 30%, rgba(143,208,255,0.10), transparent 42%),
+    rgba(255,255,255,0.02);
+  overflow:hidden;
+}
+.hero-drawing .big-word{
+  font-family:'Space Grotesk',sans-serif;font-weight:700;
+  font-size:clamp(2.4rem,7vw,5.2rem);line-height:0.98;letter-spacing:-0.01em;
+}
+.hero-drawing .big-word .outline{
+  color:transparent;-webkit-text-stroke:1.5px var(--ink);
+}
+.hero-tag{margin-top:14px;color:var(--muted);max-width:60ch;font-size:0.92rem}
+.leader{position:absolute;font-size:0.62rem;letter-spacing:0.24em;color:var(--accent);text-transform:uppercase;white-space:nowrap}
+.leader.l1{top:22px;right:26px}
+.leader.l2{bottom:22px;right:26px}
+.leader .tick{display:inline-block;width:34px;height:1px;background:var(--accent);vertical-align:middle;margin:0 8px}
+
+/* ---------- Footer ---------- */
+footer{
+  border-top:1px solid var(--line);margin-top:44px;padding:26px 20px;
+  text-align:center;font-size:0.8rem;letter-spacing:0.18em;color:var(--muted);
+  text-transform:uppercase;background:rgba(20,41,78,0.9);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width:900px){
+  .cols{grid-template-columns:1fr}
+  .spec-table th{width:150px}
+}
+@media (max-width:760px){
+  .menu-toggle{display:block}
+  .nav-list{
+    display:none;position:absolute;top:100%;left:0;right:0;
+    flex-direction:column;align-items:stretch;background:rgba(20,41,78,0.99);
+    border-bottom:1px solid var(--line);padding:10px 16px 16px;gap:6px;
+  }
+  .nav-list.open{display:flex}
+  .nav-link{border:1px solid var(--line-soft);text-align:left}
+  .nav-cta{margin:6px 0 0;text-align:center}
+  .sheet{padding:24px 18px}
+  .title-block{flex-basis:100%}
+  .sheet-title{border-right:none;border-bottom:1px solid var(--line-soft)}
+  .form-grid{grid-template-columns:1fr}
+  .leader{display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="#home" data-nav="home" aria-label="J and J Engine Rebuilders, home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.4"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
+      </span>
+      <span>
+        <span class="brand-name">J &amp; J Engine Rebuilders</span><br>
+        <span class="brand-sub">Diesel Engine Repair</span>
+      </span>
+    </a>
+    <button class="menu-toggle" id="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="main-nav">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+    <nav aria-label="Main navigation">
+      <ul class="nav-list" id="main-nav">
+        <li><a class="nav-link active" href="#home" data-nav="home" data-page="home">Home</a></li>
+        <li><a class="nav-link" href="#services" data-nav="services" data-page="services">Services</a></li>
+        <li><a class="nav-link" href="#about" data-nav="about" data-page="about">About</a></li>
+        <li><a class="nav-link" href="#reviews" data-nav="reviews" data-page="reviews">Reviews</a></li>
+        <li><a class="nav-link" href="#contact" data-nav="contact" data-page="contact">Contact</a></li>
+        <li><a class="nav-cta" href="tel:+15133531705"><i class="fa-solid fa-phone"></i> (513) 353-1705</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  
+  <section class="page active" id="page-home" data-page="home">
+    <div class="sheet-head">
+      <div class="sheet-title">
+        <span class="fig">Fig. 01 / General Arrangement</span>
+        <h1>Diesel Engine Rebuilders</h1>
+        <p>A diesel engine repair service on OH-128 in Cleves, Ohio. Engine rebuilds, repair work, and honest machine-shop practice, drawn up one job at a time.</p>
+      </div>
+      <div class="title-block" aria-hidden="true">
+        <div>Project<b>J &amp; J Engine Rebuilders</b></div>
+        <div>Trade<b>Diesel Engine Repair</b></div>
+        <div>Dwg No.<b>JJ-001</b></div>
+        <div>Sheet<b>1 of 5</b></div>
+      </div>
+    </div>
+
+    <div class="sheet">
+      <span class="crosshair ch-tl"></span><span class="crosshair ch-tr"></span>
+      <span class="crosshair ch-bl"></span><span class="crosshair ch-br"></span>
+      <div class="hero-drawing">
+        <span class="leader l1">Ref A <span class="tick"></span> Rebuild Bay</span>
+        <span class="leader l2">Ref B <span class="tick"></span> Test Cell</span>
+        <div class="big-word">REBUILT<br><span class="outline">TO SPEC.</span></div>
+        <p class="hero-tag">J &amp; J Engine Rebuilders is listed as a diesel engine repair service at 5835 OH-128, Cleves, OH 45002. Public records list the shop as established in 1990, a single-location engine rebuilding business serving the Cincinnati area.</p>
+        <div class="btn-row">
+          <a class="btn solid" href="tel:+15133531705"><i class="fa-solid fa-phone"></i> Call (513) 353-1705</a>
+          <a class="btn" href="https://www.google.com/maps/search/?api=1&amp;query=5835%20OH-128%2C%20Cleves%2C%20OH%2045002" target="_blank" rel="noopener"><i class="fa-solid fa-location-dot"></i> Get Directions</a>
+          <a class="btn ghost" href="#services" data-nav="services"><i class="fa-solid fa-list"></i> View Services</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="sheet">
+      <span class="sheet-label">Spec Sheet / Business Data</span>
+      <h2>Drawing Notes</h2>
+      <p class="lead">The facts below come from public business listings. Anything not confirmed by a public source is badged so you know exactly what is verified and what is not.</p>
+      <table class="spec-table">
+        <tr><th scope="row">Business Name</th><td>J &amp; J Engine Rebuilders</td></tr>
+        <tr><th scope="row">Trade</th><td>Diesel Engine Repair Service (also listed under Engine Rebuilders)</td></tr>
+        <tr><th scope="row">Address</th><td>5835 OH-128, Cleves, OH 45002<br><a href="https://www.google.com/maps/search/?api=1&amp;query=5835%20OH-128%2C%20Cleves%2C%20OH%2045002" target="_blank" rel="noopener">Open in Google Maps</a></td></tr>
+        <tr><th scope="row">Phone</th><td><a href="tel:+15133531705">(513) 353-1705</a></td></tr>
+        <tr><th scope="row">Hours (public listing)</th><td>Mon - Fri: 7:00 AM - 4:00 PM<br>Sat - Sun: Closed<br><span class="badge">Call to confirm</span></td></tr>
+        <tr><th scope="row">Public Rating</th><td>5.0 stars from 12 reviews on the Birdeye business profile (unclaimed listing)</td></tr>
+      </table>
+    </div>
+
+    <div class="sheet">
+      <span class="sheet-label">Fig. 02 / Capabilities</span>
+      <h2>What the Shop Does</h2>
+      <p class="lead">The service list reflects the business's public category listings as a diesel engine repair service and engine rebuilder. Confirm scope and availability by phone before hauling in an engine.</p>
+      <div class="card-grid">
+        <div class="card">
+          <span class="card-no">S-01</span>
+          <div class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 3h6v6l3 4v6H6v-6l3-4V3z"/><path d="M9 3v6M15 3v6M6 15h12"/></svg></div>
+          <h3>Complete Engine Rebuilds</h3>
+          <p>Full teardown, inspection, and reassembly of diesel engines, the core of the business name.</p>
+          <span class="badge">Call to confirm</span>
+        </div>
+        <div class="card">
+          <span class="card-no">S-02</span>
+          <div class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a4.5 4.5 0 0 0-6 6L3 18l3 3 5.7-5.7a4.5 4.5 0 0 0 6-6L14 13l-3-3 3.7-3.7z"/></svg></div>
+          <h3>Diesel Engine Repair</h3>
+          <p>Repair work on diesel engines for trucks and equipment, per the public service category.</p>
+          <span class="badge">Call to confirm</span>
+        </div>
+        <div class="card">
+          <span class="card-no">S-03</span>
+          <div class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg></div>
+          <h3>Diagnostics &amp; Testing</h3>
+          <p>Inspection and test-run evaluation to find what an engine actually needs before work begins.</p>
+          <span class="badge">Call to confirm</span>
+        </div>
+      </div>
+      <div class="btn-row">
+        <a class="btn" href="#services" data-nav="services">Full Service Drawing <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+    </div>
+
+    <div class="sheet">
+      <span class="sheet-label">Fig. 03 / Field Notes</span>
+      <h2>Why Owners Call This Shop</h2>
+      <ul class="step-list">
+        <li>
+          <h3>Listed since 1990</h3>
+          <p>Public business records (Manta) list the company as established in 1990 and incorporated in Ohio, a single-location shop.</p>
+        </li>
+        <li>
+          <h3>5.0 on public reviews</h3>
+          <p>The Birdeye business profile shows a 5.0 star rating across 12 reviews for this Cleves location.</p>
+        </li>
+        <li>
+          <h3>Not the Florida company</h3>
+          <p>A public review notes: do not confuse this shop with JJ Rebuilders in Florida. This is the Cleves, Ohio business.</p>
+        </li>
+      </ul>
+      <div class="btn-row">
+        <a class="btn ghost" href="#about" data-nav="about">About the Shop</a>
+        <a class="btn ghost" href="#reviews" data-nav="reviews">Read Reviews</a>
+      </div>
+    </div>
+  </section>
+
+  
+  <section class="page" id="page-services" data-page="services">
+    <div class="sheet-head">
+      <div class="sheet-title">
+        <span class="fig">Fig. 04 / Service Schedule</span>
+        <h1>Services</h1>
+        <p>Work schedule for a diesel engine rebuild shop. Every item below reflects the public business category; scope, pricing, and turnaround are confirmed by phone.</p>
+      </div>
+      <div class="title-block" aria-hidden="true">
+        <div>Project<b>J &amp; J Engine Rebuilders</b></div>
+        <div>Trade<b>Diesel Engine Repair</b></div>
+        <div>Dwg No.<b>JJ-002</b></div>
+        <div>Sheet<b>2 of 5</b></div>
+      </div>
+    </div>
+
+    <div class="sheet">
+      <span class="sheet-label">Schedule of Work</span>
+      <h2>Service Line Items</h2>
+      <p class="lead">No invented services, prices, or timelines appear here. Each line is drawn from the shop's public category as a diesel engine repair service and engine rebuilder, and each carries a confirmation note.</p>
+      <table class="spec-table">
+        <tr><th scope="row">Item 01</th><td><b>Complete diesel engine rebuilds.</b> Teardown to bare block, inspection, reconditioning, and reassembly. <span class="badge">Call to confirm</span></td></tr>
+        <tr><th scope="row">Item 02</th><td><b>Diesel engine repair.</b> Repair service for diesel engines in trucks and equipment. <span class="badge">Call to confirm</span></td></tr>
+        <tr><th scope="row">Item 03</th><td><b>Engine diagnostics and inspection.</b> Evaluation of engine condition before committing to a rebuild. <span class="badge">Call to confirm</span></td></tr>
+        <tr><th scope="row">Item 04</th><td><b>Engine component work.</b> Heads, blocks, and rotating assembly service typical of a rebuild shop. <span class="badge">Call to confirm</span></td></tr>
+        <tr><th scope="row">Item 05</th><td><b>Test-run verification.</b> Running and checking the engine after assembly before it leaves the shop. <span class="badge">Call to confirm</span></td></tr>
+      </table>
+    </div>
+
+    <div class="sheet">
+      <span class="sheet-label">Fig. 05 / Process Section</span>
+      <h2>How a Rebuild Reads on Paper</h2>
+      <p class="lead">A generic rebuild sequence, shown for orientation only. Your engine's actual work order is written up with the shop.</p>
+      <ul class="step-list">
+        <li><h3>Intake and inspection</h3><p>The engine arrives, gets logged, and is inspected to scope the job. <span class="badge">Call to confirm</span></p></li>
+        <li><h3>Teardown and measurement</h3><p>Disassembly down to the block, with wear measured against spec. <span class="badge">Call to confirm</span></p></li>
+        <li><h3>Reconditioning</h3><p>Cleaning, machining coordination, and component replacement as needed. <span class="badge">Call to confirm</span></p></li>
+        <li><h3>Reassembly</h3><p>Rebuilt to spec with new gaskets, seals, and wear parts. <span class="badge">Call to confirm</span></p></li>
+        <li><h3>Test run</h3><p>The engine is run and checked before pickup or delivery. <span class="badge">Call to confirm</span></p></li>
+      </ul>
+      <div class="btn-row">
+        <a class="btn solid" href="tel:+15133531705"><i class="fa-solid fa-phone"></i> Call (513) 353-1705</a>
+        <a class="btn" href="#contact" data-nav="contact">Request a Quote</a>
+      </div>
+    </div>
+  </section>
+
+  
+  <section class="page" id="page-about" data-page="about">
+    <div class="sheet-head">
+      <div class="sheet-title">
+        <span class="fig">Fig. 06 / Record Drawing</span>
+        <h1>About the Shop</h1>
+        <p>What public records say about J &amp; J Engine Rebuilders in Cleves, Ohio. Nothing here is invented; sources are named.</p>
+      </div>
+      <div class="title-block" aria-hidden="true">
+        <div>Project<b>J &amp; J Engine Rebuilders</b></div>
+        <div>Trade<b>Diesel Engine Repair</b></div>
+        <div>Dwg No.<b>JJ-003</b></div>
+        <div>Sheet<b>3 of 5</b></div>
+      </div>
+    </div>
+
+    <div class="sheet">
+      <span class="sheet-label">Record Data</span>
+      <h2>On the Record</h2>
+      <table class="spec-table">
+        <tr><th scope="row">Business</th><td>J &amp; J Engine Rebuilders, 5835 OH-128, Cleves, OH 45002</td></tr>
+        <tr><th scope="row">Established</th><td>1990, per Manta business records (incorporated in Ohio)</td></tr>
+        <tr><th scope="row">Location Type</th><td>Single location, per Manta business records</td></tr>
+        <tr><th scope="row">Categories</th><td>Diesel Engine Repair Service (Ohio business directory); Engine Rebuilders (Manta)</td></tr>
+        <tr><th scope="row">Public Rating</th><td>5.0 stars, 12 reviews, per the Birdeye business profile (unclaimed listing)</td></tr>
+        <tr><th scope="row">Identity Note</th><td>A public review advises not to confuse this shop with JJ Rebuilders in Florida, a separate company. This site covers the Cleves, Ohio business only.</td></tr>
+      </table>
+    </div>
+
+    <div class="sheet">
+      <span class="sheet-label">Fig. 07 / Elevation</span>
+      <h2>A Working Shop, Not a Showroom</h2>
+      <div class="cols">
+        <div>
+          <p class="lead">J &amp; J Engine Rebuilders is a working engine shop on Hamilton Cleves Road (OH-128), west of Cincinnati. Public listings describe a small, single-location operation focused on diesel engine repair and rebuilding, open weekday day shifts.</p>
+          <p class="lead">The public review profile is small but unanimous: a 5.0 rating across 12 reviews on Birdeye, with reviewers describing quality work and quick turnaround on parts jobs.</p>
+          <div class="btn-row">
+            <a class="btn solid" href="tel:+15133531705"><i class="fa-solid fa-phone"></i> Call the Shop</a>
+            <a class="btn ghost" href="#reviews" data-nav="reviews">See Reviews</a>
+          </div>
+        </div>
+        <div class="panel">
+          <h3><i class="fa-regular fa-clock"></i> Listed Hours</h3>
+          <ul class="hours-list">
+            <li><span>Monday</span><span>7:00 AM - 4:00 PM</span></li>
+            <li><span>Tuesday</span><span>7:00 AM - 4:00 PM</span></li>
+            <li><span>Wednesday</span><span>7:00 AM - 4:00 PM</span></li>
+            <li><span>Thursday</span><span>7:00 AM - 4:00 PM</span></li>
+            <li><span>Friday</span><span>7:00 AM - 4:00 PM</span></li>
+            <li><span>Saturday</span><span class="closed">Closed</span></li>
+            <li><span>Sunday</span><span class="closed">Closed</span></li>
+          </ul>
+          <span class="badge">Call to confirm</span>
+          <p class="form-note">Hours are from the public Birdeye/Google business listing and may change. Call ahead before driving over.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+  <section class="page" id="page-reviews" data-page="reviews">
+    <div class="sheet-head">
+      <div class="sheet-title">
+        <span class="fig">Fig. 08 / Inspection Report</span>
+        <h1>Reviews</h1>
+        <p>Real review snippets from the public Birdeye profile, plus clearly marked samples where verified reviews are not available.</p>
+      </div>
+      <div class="title-block" aria-hidden="true">
+        <div>Project<b>J &amp; J Engine Rebuilders</b></div>
+        <div>Trade<b>Diesel Engine Repair</b></div>
+        <div>Dwg No.<b>JJ-004</b></div>
+        <div>Sheet<b>4 of 5</b></div>
+      </div>
+    </div>
+
+    <div class="sheet">
+      <span class="sheet-label">Inspection Summary</span>
+      <h2>Public Rating Record</h2>
+      <div class="rating-strip">
+        <div class="rating-big">5.0</div>
+        <div>
+          <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <div class="rating-meta">12 reviews on the Birdeye business profile (unclaimed listing). Reviewer names are not shown on the public profile page.</div>
+        </div>
+      </div>
+      <p class="lead">Source: <a href="https://reviews.birdeye.com/j-j-engine-rebuilders-167685737497937" target="_blank" rel="noopener">Birdeye profile for J &amp; J Engine Rebuilders</a>. No reviewer names or dates were published on the public page, so quotes below are credited to the source only.</p>
+    </div>
+
+    <div class="sheet">
+      <span class="sheet-label">Fig. 09 / Verified Excerpts</span>
+      <h2>From the Public Profile</h2>
+      <div class="card-grid">
+        <div class="review-card">
+          <span class="qmark" aria-hidden="true">&ldquo;</span>
+          <blockquote>Great shop to deal with and they do quality work.</blockquote>
+          <p class="src">Source: <a href="https://reviews.birdeye.com/j-j-engine-rebuilders-167685737497937" target="_blank" rel="noopener">Birdeye business profile</a> | Reviewer name not published</p>
+          <span class="badge info">Verified excerpt</span>
+        </div>
+        <div class="review-card">
+          <span class="qmark" aria-hidden="true">&ldquo;</span>
+          <blockquote>Dont confuse these guys with JJ Rebuilders in Florida.</blockquote>
+          <p class="src">Source: <a href="https://reviews.birdeye.com/j-j-engine-rebuilders-167685737497937" target="_blank" rel="noopener">Birdeye business profile</a> | Reviewer name not published</p>
+          <span class="badge info">Verified excerpt</span>
+        </div>
+        <div class="review-card">
+          <span class="qmark" aria-hidden="true">&ldquo;</span>
+          <blockquote>SAMPLE: A verified customer review would appear here with the reviewer's name and the original source link.</blockquote>
+          <p class="src">Illustrative placeholder only. Not a real review.</p>
+          <span class="badge">SAMPLE</span>
+        </div>
+        <div class="review-card">
+          <span class="qmark" aria-hidden="true">&ldquo;</span>
+          <blockquote>SAMPLE: Additional verified reviews will be added here as they are confirmed from public sources.</blockquote>
+          <p class="src">Illustrative placeholder only. Not a real review.</p>
+          <span class="badge">SAMPLE</span>
+        </div>
+      </div>
+      <div class="dim-rule"><i>End of inspection report</i></div>
+      <div class="btn-row">
+        <a class="btn" href="https://reviews.birdeye.com/j-j-engine-rebuilders-167685737497937" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> View All 12 Reviews on Birdeye</a>
+        <a class="btn ghost" href="#contact" data-nav="contact">Contact the Shop</a>
+      </div>
+    </div>
+  </section>
+
+  
+  <section class="page" id="page-contact" data-page="contact">
+    <div class="sheet-head">
+      <div class="sheet-title">
+        <span class="fig">Fig. 10 / Site Plan</span>
+        <h1>Contact</h1>
+        <p>Call first: this is a working shop with weekday day-shift hours. Use the form to draft an email, or just pick up the phone.</p>
+      </div>
+      <div class="title-block" aria-hidden="true">
+        <div>Project<b>J &amp; J Engine Rebuilders</b></div>
+        <div>Trade<b>Diesel Engine Repair</b></div>
+        <div>Dwg No.<b>JJ-005</b></div>
+        <div>Sheet<b>5 of 5</b></div>
+      </div>
+    </div>
+
+    <div class="sheet">
+      <span class="sheet-label">Site Coordinates</span>
+      <h2>Find the Shop</h2>
+      <div class="cols">
+        <div>
+          <table class="spec-table">
+            <tr><th scope="row">Address</th><td>J &amp; J Engine Rebuilders<br>5835 OH-128<br>Cleves, OH 45002</td></tr>
+            <tr><th scope="row">Phone</th><td><a href="tel:+15133531705">(513) 353-1705</a></td></tr>
+            <tr><th scope="row">Directions</th><td><a href="https://www.google.com/maps/search/?api=1&amp;query=5835%20OH-128%2C%20Cleves%2C%20OH%2045002" target="_blank" rel="noopener">Open directions in Google Maps</a></td></tr>
+            <tr><th scope="row">Hours (public listing)</th><td>Mon - Fri 7:00 AM - 4:00 PM; Sat - Sun Closed <span class="badge">Call to confirm</span></td></tr>
+          </table>
+          <div class="btn-row">
+            <a class="btn solid" href="tel:+15133531705"><i class="fa-solid fa-phone"></i> Call Now</a>
+            <a class="btn" href="https://www.google.com/maps/search/?api=1&amp;query=5835%20OH-128%2C%20Cleves%2C%20OH%2045002" target="_blank" rel="noopener"><i class="fa-solid fa-location-dot"></i> Directions</a>
+          </div>
+        </div>
+        <div class="panel">
+          <h3><i class="fa-regular fa-clock"></i> Listed Hours</h3>
+          <ul class="hours-list">
+            <li><span>Monday</span><span>7:00 AM - 4:00 PM</span></li>
+            <li><span>Tuesday</span><span>7:00 AM - 4:00 PM</span></li>
+            <li><span>Wednesday</span><span>7:00 AM - 4:00 PM</span></li>
+            <li><span>Thursday</span><span>7:00 AM - 4:00 PM</span></li>
+            <li><span>Friday</span><span>7:00 AM - 4:00 PM</span></li>
+            <li><span>Saturday</span><span class="closed">Closed</span></li>
+            <li><span>Sunday</span><span class="closed">Closed</span></li>
+          </ul>
+          <span class="badge">Call to confirm</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sheet">
+      <span class="sheet-label">Fig. 11 / Transmittal Form</span>
+      <h2>Send a Message</h2>
+      <p class="lead">Fill this out and your email app will open with the message drafted and ready. No email address is published for this business, so add the recipient before sending, or call <a href="tel:+15133531705">(513) 353-1705</a> directly.</p>
+      <form id="contact-form" novalidate>
+        <div class="form-grid">
+          <div class="field">
+            <label for="f-name">Name</label>
+            <input type="text" id="f-name" name="name" autocomplete="name" required>
+          </div>
+          <div class="field">
+            <label for="f-phone">Phone</label>
+            <input type="tel" id="f-phone" name="phone" autocomplete="tel">
+          </div>
+          <div class="field">
+            <label for="f-email">Email</label>
+            <input type="email" id="f-email" name="email" autocomplete="email">
+          </div>
+          <div class="field">
+            <label for="f-topic">Topic</label>
+            <select id="f-topic" name="topic">
+              <option>Engine rebuild quote</option>
+              <option>Diesel engine repair</option>
+              <option>Diagnostics / inspection</option>
+              <option>Parts question</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="field full">
+            <label for="f-msg">Message</label>
+            <textarea id="f-msg" name="message" required placeholder="Year, make, and engine model, plus what it needs."></textarea>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button type="submit" class="btn solid"><i class="fa-solid fa-paper-plane"></i> Draft Email</button>
+          <button type="reset" class="btn ghost">Clear Form</button>
+        </div>
+        <p class="form-note">Submitting opens your email app with the message drafted and ready to address. The shop has no published email address, so the draft opens without a recipient: add one or call instead.</p>
+      </form>
+    </div>
+  </section>
+
+</main>
+
+<footer>© J &amp; J Engine Rebuilders</footer>
+
+<script>
+// Router: five pages, hash-synced, with popstate support.
+(function(){
+  var pages = ['home','services','about','reviews','contact'];
+
+  function showPage(page, push){
+    if(pages.indexOf(page) === -1){ page = 'home'; }
+    var sections = document.querySelectorAll('.page');
+    for(var i=0;i<sections.length;i++){
+      sections[i].classList.toggle('active', sections[i].getAttribute('data-page') === page);
+    }
+    var links = document.querySelectorAll('.nav-link');
+    for(var j=0;j<links.length;j++){
+      links[j].classList.toggle('active', links[j].getAttribute('data-page') === page);
+    }
+    closeMenu();
+    window.scrollTo(0,0);
+    if(push !== false){
+      if(history.state !== page){
+        history.pushState(page, '', '#' + page);
+      }
+    }
+    document.title = pageTitle(page);
+  }
+
+  function pageTitle(page){
+    var names = {
+      home:'J & J Engine Rebuilders | Diesel Engine Repair Service, Cleves, OH',
+      services:'Services | J & J Engine Rebuilders',
+      about:'About | J & J Engine Rebuilders',
+      reviews:'Reviews | J & J Engine Rebuilders',
+      contact:'Contact | J & J Engine Rebuilders'
+    };
+    return names[page] || names.home;
+  }
+
+  window.navigateTo = function(page){ showPage(page, true); };
+
+  window.addEventListener('popstate', function(e){
+    var page = e.state || (location.hash ? location.hash.replace('#','') : 'home');
+    showPage(page, false);
+  });
+
+  // Nav clicks (header links and in-page links with data-nav).
+  document.addEventListener('click', function(e){
+    var link = e.target.closest ? e.target.closest('[data-nav]') : null;
+    if(link){
+      e.preventDefault();
+      showPage(link.getAttribute('data-nav'), true);
+    }
+  });
+
+  // Initial page from hash.
+  var initial = location.hash ? location.hash.replace('#','') : 'home';
+  showPage(initial, false);
+  if(!history.state){ history.replaceState(initial, '', '#' + initial); }
+
+  // Mobile menu.
+  var toggle = document.getElementById('menu-toggle');
+  var nav = document.getElementById('main-nav');
+  window.closeMenu = function(){
+    nav.classList.remove('open');
+    toggle.setAttribute('aria-expanded','false');
+  };
+  toggle.addEventListener('click', function(){
+    var open = nav.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+
+  // Contact form: compose a mailto draft from the fields. No recipient is
+  // invented; the draft opens without a To address for the user to fill in.
+  var form = document.getElementById('contact-form');
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var name = document.getElementById('f-name').value.trim();
+    var phone = document.getElementById('f-phone').value.trim();
+    var email = document.getElementById('f-email').value.trim();
+    var topic = document.getElementById('f-topic').value;
+    var msg = document.getElementById('f-msg').value.trim();
+    if(!name || !msg){
+      alert('Please add your name and a message before drafting the email.');
+      return;
+    }
+    var subject = 'Website inquiry: ' + topic + ' - ' + name;
+    var body = 'Name: ' + name + '\n'
+      + 'Phone: ' + phone + '\n'
+      + 'Email: ' + email + '\n'
+      + 'Topic: ' + topic + '\n\n'
+      + 'Message:\n' + msg;
+    window.location.href = 'mailto:?subject=' + encodeURIComponent(subject)
+      + '&body=' + encodeURIComponent(body);
+  });
+})();
+</script>
+</body>
+</html>

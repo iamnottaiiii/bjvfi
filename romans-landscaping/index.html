@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roman's Landscaping · Landscaper in Van Nuys, CA</title>
+<meta name="description" content="Roman's Landscaping, a landscaper in Van Nuys, CA. Complete landscaping, lawn care, irrigation, drainage, lighting and synthetic lawns. Call (818) 705-0598.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --forest:#1B4332; --forest-2:#14301F;
+  --leaf:#4E9A51; --leaf-soft:#E3F1E4; --mint:#95D5B2;
+  --terra:#C2703D; --terra-soft:#F6E3D3;
+  --parch:#F7F3E8; --paper:#FDFCF8;
+  --ink:#22301F; --ink-soft:#5B6B58;
+  --radius:18px;
+  --shadow:0 20px 42px -20px rgba(27,67,50,.35);
+  --shadow-sm:0 10px 24px -14px rgba(27,67,50,.25);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Outfit",system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased}
+img{max-width:100%}
+a{color:var(--forest)}
+::selection{background:var(--mint);color:var(--forest-2)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+.serif{font-family:"DM Serif Display",Georgia,serif;font-weight:400}
+
+/* ---------- slim bar + drawer nav ---------- */
+header.site{position:sticky;top:0;z-index:60;background:rgba(253,252,248,.95);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid rgba(27,67,50,.12)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--forest)}
+.brand svg{width:46px;height:46px;flex:none}
+.brand-name{font-family:"DM Serif Display",serif;font-size:1.35rem;line-height:1.05;letter-spacing:.2px}
+.brand-name small{display:block;font-family:"Outfit",sans-serif;font-weight:700;font-size:.6rem;letter-spacing:3.5px;text-transform:uppercase;color:var(--terra)}
+.bar-right{display:flex;align-items:center;gap:12px}
+.call-btn{display:inline-flex;align-items:center;gap:8px;background:var(--forest);color:#fff;text-decoration:none;font-weight:700;padding:11px 22px;border-radius:999px;box-shadow:var(--shadow-sm);transition:transform .18s,background .18s;white-space:nowrap;font-size:.95rem}
+.call-btn:hover{background:var(--forest-2);transform:translateY(-2px)}
+.burger{display:inline-flex;align-items:center;gap:10px;background:var(--leaf-soft);border:0;cursor:pointer;padding:11px 18px;border-radius:999px;font-family:"Outfit",sans-serif;font-weight:700;font-size:.95rem;color:var(--forest)}
+.burger .lines{display:inline-block}
+.burger .lines span{display:block;width:22px;height:2.6px;border-radius:3px;background:var(--forest);margin:4px 0;transition:.25s}
+
+/* drawer */
+.scrim{position:fixed;inset:0;background:rgba(20,48,31,.55);opacity:0;pointer-events:none;transition:opacity .3s;z-index:68}
+.scrim.show{opacity:1;pointer-events:auto}
+nav.main{position:fixed;top:0;left:0;bottom:0;width:min(380px,88vw);background:var(--forest);color:#fff;z-index:70;transform:translateX(-102%);transition:transform .34s cubic-bezier(.22,.8,.3,1);display:flex;flex-direction:column;padding:30px 34px;overflow-y:auto}
+nav.main.open{transform:none;box-shadow:30px 0 60px rgba(0,0,0,.3)}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px}
+.drawer-head span{font-family:"DM Serif Display",serif;font-size:1.4rem}
+.drawer-close{background:none;border:1px solid rgba(255,255,255,.4);color:#fff;width:42px;height:42px;border-radius:50%;font-size:1.2rem;cursor:pointer;line-height:1}
+.drawer-close:hover{background:rgba(255,255,255,.12)}
+nav.main .dlinks{display:flex;flex-direction:column;gap:2px}
+nav.main a.navlink{color:#fff;text-decoration:none;font-family:"DM Serif Display",serif;font-size:1.9rem;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.12);transition:color .2s,padding-left .2s}
+nav.main a.navlink:hover{color:var(--mint);padding-left:10px}
+nav.main a.navlink.active,nav.main a.navlink[aria-current="page"]{color:var(--mint)}
+.drawer-foot{margin-top:auto;padding-top:30px}
+.drawer-foot p{color:#BCD6BE;font-size:.95rem;margin-bottom:12px}
+.drawer-foot .call-btn{background:var(--terra)}
+.drawer-foot .call-btn:hover{background:#A95D30}
+
+/* ---------- router pages ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .32s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+/* ---------- split hero ---------- */
+.hero{background:linear-gradient(180deg,var(--parch),#EFF3E2);overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;padding:84px 0 90px}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-weight:700;font-size:.78rem;letter-spacing:3px;text-transform:uppercase;color:var(--terra);margin-bottom:16px}
+.eyebrow::before{content:"";width:34px;height:3px;border-radius:3px;background:var(--terra)}
+h1{font-family:"DM Serif Display",serif;font-weight:400;font-size:clamp(2.8rem,5.6vw,4.4rem);line-height:1.04;letter-spacing:-.5px;color:var(--forest);margin-bottom:18px}
+h1 em{font-style:italic;color:var(--leaf)}
+.lede{font-size:1.12rem;color:var(--ink-soft);max-width:32rem;margin-bottom:28px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:30px}
+.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;padding:15px 30px;border-radius:999px;font-size:1rem;transition:transform .18s,box-shadow .18s,background .18s}
+.btn-solid{background:var(--forest);color:#fff;box-shadow:var(--shadow-sm)}
+.btn-solid:hover{background:var(--forest-2);transform:translateY(-2px)}
+.btn-ghost{background:#fff;color:var(--forest);border:2px solid rgba(27,67,50,.25)}
+.btn-ghost:hover{border-color:var(--forest);transform:translateY(-2px)}
+.proof{display:flex;flex-wrap:wrap;gap:10px 30px;font-size:.95rem;color:var(--ink-soft)}
+.proof strong{color:var(--forest);font-size:1.15rem}
+.hero-art{position:relative}
+.garden-stage{position:relative;background:linear-gradient(150deg,#DFF0DA,#BFDDBB);border-radius:28px;box-shadow:var(--shadow);border:4px solid #fff;overflow:hidden;aspect-ratio:1/1.02}
+.garden-stage svg{width:100%;height:100%;display:block}
+.stage-tag{position:absolute;bottom:20px;left:20px;background:var(--forest);color:#fff;font-weight:700;font-size:.85rem;padding:10px 20px;border-radius:999px;box-shadow:var(--shadow-sm);letter-spacing:.4px}
+
+/* ---------- sections ---------- */
+section.block{padding:72px 0}
+.sec-head{max-width:48rem;margin:0 auto 42px;text-align:center}
+h2{font-family:"DM Serif Display",serif;font-weight:400;font-size:clamp(2rem,3.8vw,2.9rem);line-height:1.1;letter-spacing:-.4px;color:var(--forest);margin-bottom:12px}
+.sec-head p{color:var(--ink-soft);font-size:1.06rem}
+
+/* card wall */
+.wall{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.wcard{background:#fff;border-radius:var(--radius);padding:30px 26px;box-shadow:var(--shadow-sm);border:1px solid rgba(27,67,50,.08);transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden}
+.wcard:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+.wcard::before{content:"";position:absolute;top:0;left:0;right:0;height:6px;background:linear-gradient(90deg,var(--leaf),var(--mint))}
+.wcard.alt::before{background:linear-gradient(90deg,var(--terra),#E0A266)}
+.wcard .icon{width:52px;height:52px;border-radius:50%;background:var(--leaf-soft);display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.wcard.alt .icon{background:var(--terra-soft)}
+.wcard .icon svg{width:28px;height:28px}
+.wcard h3{font-size:1.22rem;font-weight:700;color:var(--forest);margin-bottom:8px}
+.wcard p{color:var(--ink-soft);font-size:.96rem}
+
+/* quote band */
+.band-leaf{background:var(--forest);color:#fff;position:relative;overflow:hidden}
+.band-leaf::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 88% 12%,rgba(149,213,178,.22),transparent 48%)}
+.band-leaf h2{color:#fff}
+.band-leaf .sec-head p{color:#C4DCC6}
+.split2{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;position:relative}
+.mini-list{list-style:none;display:grid;gap:14px;margin:24px 0}
+.mini-list li{display:flex;gap:12px;align-items:flex-start;color:#E4F1E5}
+.mini-list svg{flex:none;width:24px;height:24px;margin-top:2px}
+.review-tease{background:#fff;color:var(--ink);border-radius:22px;padding:36px 34px;box-shadow:var(--shadow);position:relative}
+.review-tease .stars{color:#E9A23B;font-size:1.25rem;letter-spacing:3px;margin-bottom:12px}
+.review-tease p{font-size:1.05rem;margin-bottom:12px}
+.review-tease cite{font-style:normal;font-weight:700;font-size:.85rem;color:var(--terra);letter-spacing:.5px}
+.review-tease .src{display:block;margin-top:16px;font-size:.9rem}
+
+/* ---------- services leader rows ---------- */
+.svc-cat{margin-bottom:46px}
+.svc-cat h3{font-family:"DM Serif Display",serif;font-size:1.8rem;color:var(--forest);margin-bottom:6px;display:flex;align-items:center;gap:14px}
+.svc-cat h3 .n{font-family:"Outfit",sans-serif;font-weight:800;font-size:.85rem;background:var(--forest);color:#fff;width:34px;height:34px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.svc-cat>p{color:var(--ink-soft);margin-bottom:18px}
+.leader{display:flex;align-items:baseline;gap:14px;padding:15px 4px;border-bottom:1px solid rgba(27,67,50,.14)}
+.leader .name{font-weight:700;font-size:1.06rem;color:var(--forest);white-space:nowrap}
+.leader .dots{flex:1;border-bottom:2px dotted rgba(78,154,81,.55);transform:translateY(-4px);min-width:30px}
+.leader .note{color:var(--ink-soft);font-size:.95rem;text-align:right;max-width:46%}
+.est-note{background:var(--leaf-soft);border:2px dashed rgba(27,67,50,.3);border-radius:var(--radius);padding:22px 28px;margin-top:10px;font-size:.98rem;color:#2E4A2C}
+.est-note strong{color:var(--forest)}
+
+/* ---------- strip headers ---------- */
+.strip{border-radius:26px;padding:56px 48px;color:#fff;position:relative;overflow:hidden;margin:44px 0;box-shadow:var(--shadow)}
+.strip::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%,rgba(255,255,255,.18),transparent 50%)}
+.strip .eyebrow{color:#fff}
+.strip .eyebrow::before{background:#fff}
+.strip h2{color:#fff;font-size:clamp(2rem,4vw,3rem);position:relative;margin-bottom:10px}
+.strip p{color:rgba(255,255,255,.9);max-width:38rem;position:relative}
+.strip.s-services{background:linear-gradient(120deg,#1B4332,#4E9A51)}
+.strip.s-story{background:linear-gradient(120deg,#14301F,#1B4332)}
+.strip.s-gal{background:linear-gradient(120deg,#4E9A51,#95D5B2)}
+.strip.s-rev{background:linear-gradient(120deg,#C2703D,#8F4E24)}
+.strip.s-contact{background:linear-gradient(120deg,#1B4332,#C2703D)}
+
+/* ---------- masonry gallery ---------- */
+.masonry{columns:3;column-gap:20px}
+.mtile{break-inside:avoid;margin-bottom:20px;background:#fff;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);border:1px solid rgba(27,67,50,.08);transition:transform .2s}
+.mtile:hover{transform:translateY(-5px)}
+.mtile .art{display:flex;align-items:center;justify-content:center;position:relative}
+.mtile .art svg{width:44%;height:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.16));margin:8% 0}
+.mtile .cap{padding:14px 20px}
+.mtile .cap strong{font-size:1.05rem;color:var(--forest);display:block}
+.mtile .cap small{color:var(--ink-soft)}
+.artbadge{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.88);font-size:.66rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 12px;border-radius:999px;color:var(--ink-soft)}
+.tall .art{min-height:300px}
+.short .art{min-height:210px}
+
+/* ---------- reviews ---------- */
+.rs-strip{margin:0 auto 34px;max-width:680px;background:#fff;border:1px solid var(--leaf-soft);border-radius:16px;padding:20px 24px;text-align:center;box-shadow:var(--shadow-sm)}
+.rs-note{margin:0 0 14px;font-size:.95rem;color:var(--ink-soft);line-height:1.55}
+.rs-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rs-btn{display:inline-block;background:var(--forest);color:#fff;padding:11px 26px;border-radius:999px;font-weight:700;text-decoration:none;font-size:.95rem}
+.rs-btn:hover{background:var(--forest-2)}
+.score-row{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:30px}
+.score{background:var(--forest);color:#fff;border-radius:var(--radius);padding:30px 28px;text-align:center;box-shadow:var(--shadow-sm)}
+.score.mid{background:var(--terra)}
+.score .big{font-family:"DM Serif Display",serif;font-size:3rem;line-height:1}
+.score .stars{color:#FFD98A;font-size:1.05rem;letter-spacing:3px;margin:8px 0}
+.score p{color:#D9EBDB;font-size:.92rem}
+.score.mid p{color:#FBE7D5}
+.score a{color:#fff;font-weight:700}
+.rev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.rev{background:#fff;border-radius:var(--radius);padding:30px;box-shadow:var(--shadow-sm);border:1px solid rgba(27,67,50,.08);position:relative}
+.rev .stars{color:#E9A23B;font-size:1.15rem;letter-spacing:3px;margin-bottom:12px}
+.rev p{font-size:1.01rem;margin-bottom:14px}
+.rev cite{font-style:normal;font-weight:700;font-size:.85rem;color:var(--terra);letter-spacing:.5px}
+.rev .sample{position:absolute;top:18px;right:18px;background:var(--terra-soft);color:#8F4E24;font-size:.66rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 12px;border-radius:999px}
+.cta-band{background:linear-gradient(120deg,#1B4332,#4E9A51);border-radius:26px;color:#fff;padding:52px 40px;text-align:center;margin-top:44px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.cta-band h2{color:#fff;position:relative}
+.cta-band p{color:#D9EBDB;position:relative;max-width:36rem;margin:0 auto 26px}
+.cta-band .btn-solid{background:#fff;color:var(--forest);position:relative}
+
+/* ---------- contact ---------- */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+.info-card{background:#fff;border-radius:var(--radius);padding:34px;box-shadow:var(--shadow-sm);border:1px solid rgba(27,67,50,.08)}
+.info-card h3{font-size:1.35rem;font-weight:800;color:var(--forest);margin-bottom:12px;display:flex;align-items:center;gap:12px}
+.info-card h3 svg{width:28px;height:28px;flex:none}
+.info-card p{color:var(--ink-soft);margin-bottom:8px}
+.info-card a.big{font-size:1.55rem;font-weight:800;color:var(--forest);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.map-card{border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:320px;background:repeating-linear-gradient(0deg,transparent 0 46px,rgba(78,154,81,.14) 46px 48px),repeating-linear-gradient(90deg,transparent 0 46px,rgba(78,154,81,.14) 46px 48px),linear-gradient(140deg,#EDF4E4,#DCE9CE);display:flex;align-items:center;justify-content:center;margin-bottom:20px}
+.map-pin{text-align:center;background:#fff;padding:28px 36px;border-radius:20px;box-shadow:var(--shadow);max-width:80%;position:relative}
+.map-pin::after{content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);border:14px solid transparent;border-top-color:#fff;border-bottom:0}
+.map-pin svg{width:44px;height:44px;margin-bottom:8px}
+.map-pin strong{font-size:1.15rem;color:var(--forest);display:block}
+.map-pin small{color:var(--ink-soft)}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- multi-column footer ---------- */
+footer{background:var(--forest-2);color:#BCD6BE;margin-top:20px}
+.foot-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:36px;padding:60px 0 36px}
+.foot-grid h4{font-family:"DM Serif Display",serif;color:#fff;font-size:1.2rem;margin-bottom:14px}
+.foot-grid p,.foot-grid a{color:#A9C4AC;font-size:.95rem}
+.foot-grid a{text-decoration:none;display:block;margin-bottom:8px}
+.foot-grid a:hover{color:var(--mint)}
+.foot-brand{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.foot-brand svg{width:46px;height:46px}
+.foot-brand span{font-family:"DM Serif Display",serif;color:#fff;font-size:1.35rem}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.12);padding:20px 0 26px;display:flex;justify-content:center;font-size:.88rem;color:#8FAE93}
+
+@media(max-width:980px){
+  .hero-grid{grid-template-columns:1fr;padding:60px 0 64px}
+  .wall{grid-template-columns:1fr 1fr}
+  .split2,.contact-grid,.rev-grid{grid-template-columns:1fr}
+  .score-row{grid-template-columns:1fr}
+  .masonry{columns:2}
+  .foot-grid{grid-template-columns:1fr 1fr}
+  .strip{padding:40px 28px}
+}
+@media(max-width:620px){
+  .wall{grid-template-columns:1fr}
+  .masonry{columns:1}
+  .foot-grid{grid-template-columns:1fr}
+  .leader{flex-wrap:wrap}
+  .leader .note{text-align:left;max-width:100%}
+}
+</style>
+</head>
+<body>
+
+<div class="scrim" id="scrim"></div>
+<header class="site">
+  <div class="wrap bar">
+    <a class="brand" href="#home" data-page="home" aria-label="Roman's Landscaping, home">
+      <svg viewBox="0 0 64 64" role="img" aria-label="Leaf logo"><circle cx="32" cy="32" r="29" fill="#1B4332"/><path d="M32 50 C18 40 18 24 32 12 C46 24 46 40 32 50Z" fill="#95D5B2"/><path d="M32 46 L32 16" stroke="#1B4332" stroke-width="3" stroke-linecap="round"/><path d="M32 30 L24 26 M32 36 L40 32 M32 24 L38 21" stroke="#1B4332" stroke-width="2.4" stroke-linecap="round"/></svg>
+      <span class="brand-name">Roman's Landscaping<small>Van Nuys · CA</small></span>
+    </a>
+    <div class="bar-right">
+      <a class="call-btn" href="tel:+18187050598">Call (818) 705-0598</a>
+      <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span class="lines"><span></span><span></span><span></span></span>Menu</button>
+    </div>
+  </div>
+</header>
+
+<nav class="main" id="mainNav" aria-label="Main navigation">
+  <div class="drawer-head">
+    <span>Roman's Landscaping</span>
+    <button class="drawer-close" id="drawerClose" aria-label="Close menu">×</button>
+  </div>
+  <div class="dlinks">
+    <a class="navlink active" href="#home" data-page="home" aria-current="page">Home</a>
+    <a class="navlink" href="#services" data-page="services">Services</a>
+    <a class="navlink" href="#story" data-page="story">Our Story</a>
+    <a class="navlink" href="#gallery" data-page="gallery">Gallery</a>
+    <a class="navlink" href="#reviews" data-page="reviews">Reviews</a>
+    <a class="navlink" href="#contact" data-page="contact">Contact</a>
+  </div>
+  <div class="drawer-foot">
+    <p>Ready to talk about your yard?<br>Call for hours and a quote.</p>
+    <a class="call-btn" href="tel:+18187050598">Call (818) 705-0598</a>
+  </div>
+</nav>
+
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="eyebrow">Landscaper · Van Nuys, CA</span>
+        <h1>Yards that make the <em>whole street</em> look twice.</h1>
+        <p class="lede">Roman's Landscaping brings decades of hands-on experience to lawns, gardens and outdoor spaces across Van Nuys. One call, and your yard is our project.</p>
+        <div class="cta-row">
+          <a class="btn btn-solid" href="tel:+18187050598">Call (818) 705-0598</a>
+          <a class="btn btn-ghost" href="#services" data-page="services">See services</a>
+        </div>
+        <div class="proof">
+          <span><strong>4.9</strong> on HomeAdvisor</span>
+          <span><strong>48 yrs</strong> experience listed</span>
+          <span><strong>4.8</strong> across 99 reviews on Porch</span>
+        </div>
+      </div>
+      <div class="hero-art">
+        <div class="garden-stage">
+          <svg viewBox="0 0 400 410" role="img" aria-label="Illustration of a landscaped garden">
+            <rect x="0" y="0" width="400" height="410" fill="#DFF0DA"/>
+            <circle cx="330" cy="60" r="34" fill="#F6D97A"/>
+            <path d="M0 300 Q100 250 200 290 T400 280 L400 410 L0 410 Z" fill="#7FB069"/>
+            <path d="M0 330 Q120 300 220 330 T400 320 L400 410 L0 410 Z" fill="#4E9A51"/>
+            <rect x="150" y="200" width="100" height="130" rx="8" fill="#C9A06A"/>
+            <rect x="150" y="200" width="100" height="130" rx="8" fill="none" stroke="#8A6A45" stroke-width="3"/>
+            <path d="M150 240 h100 M150 275 h100 M185 200 v130 M215 200 v130" stroke="#8A6A45" stroke-width="2.5"/>
+            <path d="M60 300 C60 240 90 210 110 190 C130 210 160 240 160 300 Z" fill="#2E7D4F"/>
+            <path d="M110 295 L110 210" stroke="#1B4332" stroke-width="5"/>
+            <path d="M250 310 C250 260 275 235 295 220 C315 235 340 260 340 310 Z" fill="#3E8E5A"/>
+            <path d="M295 305 L295 225" stroke="#1B4332" stroke-width="5"/>
+            <ellipse cx="110" cy="330" rx="70" ry="18" fill="#2E7D4F" opacity=".5"/>
+            <ellipse cx="295" cy="340" rx="60" ry="16" fill="#2E7D4F" opacity=".5"/>
+            <g fill="#C2703D"><circle cx="70" cy="345" r="9"/><circle cx="95" cy="352" r="7"/><circle cx="120" cy="345" r="8"/><circle cx="255" cy="355" r="8"/><circle cx="280" cy="350" r="9"/><circle cx="330" cy="358" r="7"/></g>
+            <g stroke="#4E9A51" stroke-width="4" stroke-linecap="round"><path d="M330 330 q6 -18 0 -30 M344 332 q10 -14 6 -28 M316 332 q2 -16 -4 -26"/></g>
+          </svg>
+        </div>
+        <span class="stage-tag">Serving Van Nuys and the Valley</span>
+      </div>
+    </div>
+  </div>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow" style="justify-content:center">What we do</span>
+        <h2>Full-service care for your outdoors</h2>
+        <p>From weekly lawn upkeep to complete landscape projects, one experienced crew handles it all.</p>
+      </div>
+      <div class="wall">
+        <div class="wcard reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#1B4332" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16M6 20c0-6 3-10 6-12 3 2 6 6 6 12"/><path d="M12 8V4M9 5l3 3 3-3"/></svg></div>
+          <h3>Lawn and garden care</h3>
+          <p>Regular mowing, edging, hedge trimming and bed cleanup that keeps everything neat between visits.</p>
+        </div>
+        <div class="wcard alt reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#8F4E24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v10M12 13c-4 0-7 2-7 6h14c0-4-3-6-7-6z"/><path d="M8 7c0-2 2-3 4-3s4 1 4 3"/></svg></div>
+          <h3>Irrigation and drainage</h3>
+          <p>Sprinkler installation and repairs plus drainage solutions, so water goes where it should.</p>
+        </div>
+        <div class="wcard reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#1B4332" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="12" rx="2"/><path d="M3 11h18M8 7V5M16 7V5"/></svg></div>
+          <h3>Complete landscaping</h3>
+          <p>Full yard projects: planting, mulch and rock, low voltage lighting and synthetic lawns.</p>
+        </div>
+        <div class="wcard alt reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#8F4E24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l3 3M16 16l3 3M19 5l-3 3M8 16l-3 3"/></svg></div>
+          <h3>Yard cleanups</h3>
+          <p>Overgrown lot or post-storm mess? A thorough one-time cleanup gets your yard back under control.</p>
+        </div>
+        <div class="wcard reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#1B4332" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-5 0-8-3-8-8 0-5 4-9 8-11 4 2 8 6 8 11 0 5-3 8-8 8z"/><path d="M12 21V9"/></svg></div>
+          <h3>Planting and beds</h3>
+          <p>New plants, refreshed beds and mulch that make the whole yard look cared for.</p>
+        </div>
+        <div class="wcard alt reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#8F4E24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></div>
+          <h3>Pavers and hardscape</h3>
+          <p>Patios and walkways done right, with attention to grading, base prep and clean edges.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block band-leaf">
+    <div class="wrap split2">
+      <div class="reveal">
+        <span class="eyebrow" style="color:var(--mint)">Why Roman's</span>
+        <h2>Experience you can see from the curb</h2>
+        <p style="color:#C4DCC6">Review profiles list 48 years of experience, and the reviews read like it: clear communication, fair pricing and crews that leave the yard tidy.</p>
+        <ul class="mini-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#95D5B2" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Clear, direct quotes before work begins</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#95D5B2" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Crews that listen and guide with expertise</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#95D5B2" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Tidy job sites, start to finish</li>
+        </ul>
+        <a class="btn btn-solid" style="background:#fff;color:var(--forest)" href="#reviews" data-page="reviews">Read reviews</a>
+      </div>
+      <div class="review-tease reveal">
+        <div class="stars">★★★★★</div>
+        <p>Fantastic work. Met on Saturday, pricing was great compared to other quotes, and by Wednesday the job was complete. They kept our yard tidy and went above and beyond.</p>
+        <cite>Paraphrased from a Porch review</cite>
+        <span class="src">Based on 99 reviews on <a href="https://pro.porch.com/lake-balboa-ca/landscapers/romans-landscaping-159894705/pp" target="_blank" rel="noopener">Porch</a> · rating 4.8</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow" style="justify-content:center">Getting started</span>
+        <h2>Three steps to a better yard</h2>
+      </div>
+      <div class="wall">
+        <div class="wcard reveal"><h3>1. Call and describe the job</h3><p>Big project or weekly upkeep, tell us what the yard needs. Call (818) 705-0598 for hours and scheduling.</p></div>
+        <div class="wcard alt reveal"><h3>2. Get a clear quote</h3><p>We look at the work and give you a direct price and plan, so you know exactly what is happening and when.</p></div>
+        <div class="wcard reveal"><h3>3. Enjoy the result</h3><p>Our crew does the work and leaves the site clean. You get a yard that looks great without lifting a finger.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="cta-band reveal">
+      <h2>Your yard called. It wants Roman.</h2>
+      <p>Roman's Landscaping, Van Nuys, CA 91406. Call for hours and a quote on your project.</p>
+      <a class="btn btn-solid" href="tel:+18187050598">Call (818) 705-0598</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div class="strip s-services">
+      <span class="eyebrow">Services</span>
+      <h2>One crew for the whole yard</h2>
+      <p>Maintenance, installations and full projects. Call for a quote on anything below.</p>
+    </div>
+
+    <div class="svc-cat reveal">
+      <h3><span class="n">1</span>Routine care</h3>
+      <p>The steady upkeep that keeps a yard looking sharp week after week.</p>
+      <div class="leader"><span class="name">Lawn mowing and edging</span><span class="dots"></span><span class="note">Clean lines, even cuts, clippings handled</span></div>
+      <div class="leader"><span class="name">Hedge and shrub trimming</span><span class="dots"></span><span class="note">Shaped, not hacked</span></div>
+      <div class="leader"><span class="name">Flower bed cleanup</span><span class="dots"></span><span class="note">Weeding, deadheading, tidy edges</span></div>
+      <div class="leader"><span class="name">Leaf and debris removal</span><span class="dots"></span><span class="note">Seasonal or one-time clear outs</span></div>
+    </div>
+
+    <div class="svc-cat reveal">
+      <h3><span class="n">2</span>Water systems</h3>
+      <p>Keep every drop working for the yard, not against it.</p>
+      <div class="leader"><span class="name">Sprinkler installation</span><span class="dots"></span><span class="note">New systems zoned for your plantings</span></div>
+      <div class="leader"><span class="name">Irrigation repair</span><span class="dots"></span><span class="note">Leaks, broken heads, coverage fixes</span></div>
+      <div class="leader"><span class="name">Drainage systems</span><span class="dots"></span><span class="note">French drains and grading for wet spots</span></div>
+    </div>
+
+    <div class="svc-cat reveal">
+      <h3><span class="n">3</span>Projects and upgrades</h3>
+      <p>Bigger transformations, handled start to finish.</p>
+      <div class="leader"><span class="name">Complete landscaping</span><span class="dots"></span><span class="note">Full yard designs and installs</span></div>
+      <div class="leader"><span class="name">Planting and sod</span><span class="dots"></span><span class="note">Plants, shrubs and fresh lawns</span></div>
+      <div class="leader"><span class="name">Mulch and rock</span><span class="dots"></span><span class="note">Beds that stay neat and hold moisture</span></div>
+      <div class="leader"><span class="name">Low voltage lighting</span><span class="dots"></span><span class="note">Path and accent lights for evenings</span></div>
+      <div class="leader"><span class="name">Synthetic lawns</span><span class="dots"></span><span class="note">Low maintenance green, year round</span></div>
+      <div class="leader"><span class="name">Patio pavers</span><span class="dots"></span><span class="note">Walkways and patios with clean edges</span></div>
+    </div>
+
+    <div class="est-note reveal">
+      <strong>Quotes:</strong> every yard is different, so call <strong>(818) 705-0598</strong> to talk through your project. Note from review profiles: this business does not advertise free estimates or warranties, so ask about terms when you call.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-story">
+  <div class="wrap">
+    <div class="strip s-story">
+      <span class="eyebrow">Our story</span>
+      <h2>Decades in Valley dirt</h2>
+      <p>Roman's Landscaping is a landscaping company serving Van Nuys and the surrounding Valley, with review profiles listing 48 years of experience in the trade.</p>
+    </div>
+
+    <section class="block" style="padding-top:8px">
+      <div class="wrap">
+        <div class="sec-head reveal">
+          <span class="eyebrow" style="justify-content:center">How we work</span>
+          <h2>Old school craft, clear communication</h2>
+          <p>Longtime customers describe the same pattern: Roman listens, quotes directly, and the crew works fast and leaves the place clean. That reputation was earned one yard at a time.</p>
+        </div>
+        <div class="wall">
+          <div class="wcard reveal">
+            <h3>Listen first</h3>
+            <p>Every project starts with what you want the yard to be, not a one-size-fits-all plan.</p>
+          </div>
+          <div class="wcard alt reveal">
+            <h3>Quote it straight</h3>
+            <p>Direct pricing and a clear explanation of how the work and payment will go.</p>
+          </div>
+          <div class="wcard reveal">
+            <h3>Leave it clean</h3>
+            <p>Tidy job sites during the work and a walkthrough when it is done.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="wrap">
+      <div class="cta-band reveal">
+        <h2>Put 48 years to work on your yard.</h2>
+        <p>Call (818) 705-0598 and tell us what the yard needs.</p>
+        <a class="btn btn-solid" href="tel:+18187050598">Call now</a>
+      </div>
+      <div style="height:56px"></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div class="strip s-gal">
+      <span class="eyebrow">Gallery</span>
+      <h2>The kind of yards we build</h2>
+      <p>Artistic previews of our work below. Real project photos are on the way.</p>
+    </div>
+
+    <div class="masonry reveal">
+      <div class="mtile tall"><div class="art" style="background:linear-gradient(160deg,#DFF0DA,#AED4A8)"><span class="artbadge">Illustration</span><svg viewBox="0 0 100 100"><path d="M50 88 C50 60 62 44 74 34 C84 44 92 60 92 88 Z" fill="#2E7D4F"/><path d="M50 88 C50 66 40 52 30 44 C22 52 16 66 14 88 Z" fill="#3E8E5A"/><path d="M50 88 L50 30" stroke="#1B4332" stroke-width="4"/></svg></div><div class="cap"><strong>Fresh plantings</strong><small>Shrubs and ornamentals</small></div></div>
+      <div class="mtile short"><div class="art" style="background:linear-gradient(160deg,#F7F3E8,#E4D9BE)"><span class="artbadge">Illustration</span><svg viewBox="0 0 100 100"><rect x="14" y="60" width="72" height="16" rx="4" fill="#C9A06A"/><rect x="22" y="44" width="56" height="16" rx="4" fill="#D9B57F"/><rect x="30" y="28" width="40" height="16" rx="4" fill="#C9A06A"/></svg></div><div class="cap"><strong>Patio pavers</strong><small>Walkways and patios</small></div></div>
+      <div class="mtile tall"><div class="art" style="background:linear-gradient(160deg,#D8ECF5,#A8D4E8)"><span class="artbadge">Illustration</span><svg viewBox="0 0 100 100"><path d="M30 20 C30 45 20 60 20 84" stroke="#1B4332" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="30" cy="18" r="8" fill="#4E9A51"/><path d="M30 40 q14 -4 20 -14 M30 55 q-14 -4 -20 -14" stroke="#2E7D4F" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M60 60 q4 10 0 20 M70 60 q4 10 0 20 M80 60 q4 10 0 20" stroke="#35C4DC" stroke-width="4" stroke-linecap="round"/></svg></div><div class="cap"><strong>Irrigation</strong><small>Water where it counts</small></div></div>
+      <div class="mtile short"><div class="art" style="background:linear-gradient(160deg,#FFF3D6,#F0D488)"><span class="artbadge">Illustration</span><svg viewBox="0 0 100 100"><circle cx="50" cy="44" r="20" fill="#F6D97A"/><path d="M50 64 L50 88 M38 70 L28 84 M62 70 L72 84" stroke="#8A6A45" stroke-width="5" stroke-linecap="round"/><ellipse cx="50" cy="90" rx="30" ry="8" fill="#4E9A51"/></svg></div><div class="cap"><strong>Landscape lighting</strong><small>Evenings in the garden</small></div></div>
+      <div class="mtile tall"><div class="art" style="background:linear-gradient(160deg,#E3F1E4,#B9D9BC)"><span class="artbadge">Illustration</span><svg viewBox="0 0 100 100"><rect x="10" y="70" width="80" height="20" rx="6" fill="#4E9A51"/><path d="M20 70 q4 -16 12 -20 q8 4 12 20 M48 70 q4 -16 12 -20 q8 4 12 20" fill="#2E7D4F"/><circle cx="50" cy="34" r="10" fill="#C2703D"/><circle cx="30" cy="40" r="7" fill="#C2703D"/><circle cx="70" cy="40" r="7" fill="#C2703D"/></svg></div><div class="cap"><strong>Garden beds</strong><small>Mulch, color, clean edges</small></div></div>
+      <div class="mtile short"><div class="art" style="background:linear-gradient(160deg,#DFF0DA,#95D5B2)"><span class="artbadge">Illustration</span><svg viewBox="0 0 100 100"><rect x="14" y="64" width="72" height="22" rx="6" fill="#3E8E5A"/><path d="M14 64 l10 -14 h52 l10 14" fill="#2E7D4F"/><rect x="40" y="34" width="20" height="16" rx="3" fill="#F7F3E8"/></svg></div><div class="cap"><strong>Lawn care</strong><small>Even, green, edged</small></div></div>
+    </div>
+    <p class="reveal" style="text-align:center;margin:10px 0 56px;color:var(--ink-soft);font-size:.95rem">Real photos of our projects are coming soon.</p>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div class="strip s-rev">
+      <span class="eyebrow">Reviews</span>
+      <h2>Neighbors rate us highly</h2>
+      <p>Real ratings from real review sites. Unverified sample comments are clearly marked below.</p>
+    </div>
+
+    <div class="rs-strip reveal">
+      <p class="rs-note">Review summaries on this page are paraphrased from public sources. Open the source to read current reviews and ratings.</p>
+      <div class="rs-links">
+        <a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJq6qqqlaWwoAR5yfqD6K6a4U" target="_blank" rel="noopener">See reviews on Google</a>
+        <a class="rs-btn" href="https://www.homeadvisor.com/rated.RomansLandscaping.4551784.html" target="_blank" rel="noopener">See reviews on HomeAdvisor</a>
+        <a class="rs-btn" href="https://pro.porch.com/lake-balboa-ca/landscapers/romans-landscaping-159894705/pp" target="_blank" rel="noopener">See reviews on Porch</a>
+      </div>
+    </div>
+
+    <div class="score-row">
+      <div class="score reveal">
+        <div class="big">4.9</div><div class="stars">★★★★★</div>
+        <p><strong>Based on 80 HomeAdvisor reviews.</strong> Reviewers describe Roman as friendly and professional, with clear pricing and fast, quality work. <a href="https://www.homeadvisor.com/rated.RomansLandscaping.4551784.html" target="_blank" rel="noopener">Read them on HomeAdvisor</a>.</p>
+      </div>
+      <div class="score mid reveal">
+        <div class="big">4.8</div><div class="stars">★★★★★</div>
+        <p><strong>Based on 99 reviews aggregated on Porch.</strong> Common themes: exceptional paver and yard work, tidy job sites, and crews that go above and beyond. <a href="https://pro.porch.com/lake-balboa-ca/landscapers/romans-landscaping-159894705/pp" target="_blank" rel="noopener">Read them on Porch</a>.</p>
+      </div>
+      <div class="score reveal">
+        <div class="big">5.0</div><div class="stars">★★★★★</div>
+        <p><strong>Based on 1 Google review via Birdeye.</strong> See the latest on <a href="https://reviews.birdeye.com/romans-landscaping-165690511174264" target="_blank" rel="noopener">Birdeye</a> or <a href="https://www.google.com/maps/place/?q=place_id:ChIJq6qqqlaWwoAR5yfqD6K6a4U" target="_blank" rel="noopener">Google</a>.</p>
+      </div>
+    </div>
+
+    <div class="rev-grid">
+      <div class="rev reveal"><span class="sample">Sample</span><div class="stars">★★★★★</div><p>Roman contacted us within days, was clear and direct about cost, and the project finished ahead of schedule. Exceeded our expectations.</p><cite>Sample customer comment</cite></div>
+      <div class="rev reveal"><span class="sample">Sample</span><div class="stars">★★★★★</div><p>Our new patio pavers look incredible. He guided every decision and the crew was with us every step of the way.</p><cite>Sample customer comment</cite></div>
+      <div class="rev reveal"><span class="sample">Sample</span><div class="stars">★★★★★</div><p>They sorted out our sprinkler system, kept the yard tidy the whole time, and the price beat every other quote.</p><cite>Sample customer comment</cite></div>
+      <div class="rev reveal"><span class="sample">Sample</span><div class="stars">★★★★★</div><p>Would not hesitate to call again. Knowledgeable, fast, and genuinely nice people to work with.</p><cite>Sample customer comment</cite></div>
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Love your yard? Tell the Valley.</h2>
+      <p>Your review helps a local landscaper keep growing. It takes a minute and it means a lot.</p>
+      <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJq6qqqlaWwoAR5yfqD6K6a4U" target="_blank" rel="noopener">Leave a Google review</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-contact">
+  <div class="wrap">
+    <div class="strip s-contact">
+      <span class="eyebrow">Contact</span>
+      <h2>Let's talk about your yard</h2>
+      <p>Call for hours and to get a quote on your project.</p>
+    </div>
+
+    <div class="contact-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#1B4332" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg>Call us</h3>
+        <p>Quotes, scheduling and questions:</p>
+        <a class="big" href="tel:+18187050598">(818) 705-0598</a>
+        <p style="margin-top:10px">Call for hours.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#1B4332" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Find us</h3>
+        <p><strong>Roman's Landscaping</strong><br>Van Nuys, CA 91406</p>
+        <p>Serving Van Nuys and surrounding Valley neighborhoods.</p>
+      </div>
+    </div>
+
+    <div class="map-card reveal">
+      <div class="map-pin">
+        <svg viewBox="0 0 24 24" fill="#1B4332"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#fff"/></svg>
+        <strong>Roman's Landscaping</strong>
+        <small>Van Nuys, CA 91406</small><br>
+        <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJq6qqqlaWwoAR5yfqD6K6a4U" target="_blank" rel="noopener">Get Directions</a>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand">
+          <svg viewBox="0 0 64 64" role="img" aria-label="Leaf logo"><circle cx="32" cy="32" r="29" fill="#95D5B2"/><path d="M32 50 C18 40 18 24 32 12 C46 24 46 40 32 50Z" fill="#1B4332"/><path d="M32 46 L32 16" stroke="#95D5B2" stroke-width="3" stroke-linecap="round"/></svg>
+          <span>Roman's Landscaping</span>
+        </div>
+        <p>Landscaper in Van Nuys, CA. Lawns, gardens, irrigation and complete landscape projects, done right.</p>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <p>Roman's Landscaping<br>Van Nuys, CA 91406</p>
+        <p style="margin-top:8px"><a href="tel:+18187050598" style="color:#fff;font-weight:700">(818) 705-0598</a></p>
+        <p>Call for hours.</p>
+      </div>
+      <div>
+        <h4>Services</h4>
+        <a href="#services" data-page="services">Lawn and garden care</a>
+        <a href="#services" data-page="services">Irrigation and drainage</a>
+        <a href="#services" data-page="services">Complete landscaping</a>
+        <a href="#services" data-page="services">Yard cleanups</a>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <a href="#home" data-page="home">Home</a>
+        <a href="#story" data-page="story">Our Story</a>
+        <a href="#gallery" data-page="gallery">Gallery</a>
+        <a href="#reviews" data-page="reviews">Reviews</a>
+        <a href="#contact" data-page="contact">Contact</a>
+      </div>
+    </div>
+    <div class="foot-bottom"><span>© Roman's Landscaping</span></div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "story", "gallery", "reviews", "contact"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+  var scrim = document.getElementById("scrim");
+  var drawerClose = document.getElementById("drawerClose");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(scrim){ scrim.classList.remove("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  function openMenu(){
+    if(nav){ nav.classList.add("open"); }
+    if(scrim){ scrim.classList.add("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "true"); }
+  }
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      if(nav.classList.contains("open")){ closeMenu(); }
+      else { openMenu(); }
+    });
+  }
+  if(drawerClose){ drawerClose.addEventListener("click", closeMenu); }
+  if(scrim){ scrim.addEventListener("click", closeMenu); }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

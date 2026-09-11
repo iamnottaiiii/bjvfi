@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jasper Homes | Custom Home Builder &amp; Remodeler in Cincinnati, OH</title>
+<meta name="description" content="Jasper Homes, Inc. is a family owned business building and remodeling homes throughout the greater Cincinnati area. Call (513) 753-6690.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --forest:#22352a;
+    --forest-deep:#18271e;
+    --cream:#f6f1e6;
+    --paper:#fbf8f1;
+    --brass:#b8892e;
+    --brass-soft:#e8d9b5;
+    --ink:#2a2a26;
+    --muted:#6b6a60;
+    --line:#ddd3bd;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Inter",system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.7}
+  h1,h2,h3{font-family:"Fraunces",serif;font-weight:600;line-height:1.08;letter-spacing:-0.01em;color:var(--forest)}
+  a{color:inherit}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+
+  /* ---------- slim top bar + side drawer nav ---------- */
+  .topline{position:sticky;top:0;z-index:70;background:var(--paper);border-bottom:1px solid var(--line)}
+  .topline .inner{display:flex;align-items:center;justify-content:space-between;max-width:1180px;margin:0 auto;padding:13px 24px}
+  .brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+  .brand svg{width:36px;height:36px;flex:none}
+  .brand .t{font-family:"Fraunces",serif;font-weight:700;font-size:1.2rem;color:var(--forest);line-height:1.1}
+  .brand .t small{display:block;font-family:"Inter",sans-serif;font-weight:600;font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--brass)}
+  .top-actions{display:flex;align-items:center;gap:12px}
+  .phone-link{font-weight:700;text-decoration:none;color:var(--forest);font-size:.95rem}
+  #burger{background:var(--forest);border:none;border-radius:10px;width:48px;height:48px;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px}
+  #burger span{display:block;width:22px;height:2px;background:var(--cream)}
+
+  .drawer-scrim{position:fixed;inset:0;background:rgba(24,39,30,.5);opacity:0;pointer-events:none;transition:opacity .3s;z-index:79}
+  nav.main{position:fixed;top:0;left:0;bottom:0;width:min(360px,86vw);background:var(--forest-deep);color:var(--cream);z-index:80;transform:translateX(-105%);transition:transform .34s cubic-bezier(.2,.8,.25,1);display:flex;flex-direction:column;padding:88px 36px 36px;overflow-y:auto}
+  nav.main.open{transform:none}
+  body.drawer-open .drawer-scrim{opacity:1;pointer-events:auto}
+  nav.main a[data-page]{text-decoration:none;font-family:"Fraunces",serif;font-size:1.7rem;font-weight:600;padding:12px 0;border-bottom:1px solid rgba(246,241,230,.14);color:var(--cream);display:block}
+  nav.main a[data-page]:hover{color:var(--brass-soft);padding-left:8px}
+  nav.main a[data-page].active{color:var(--brass-soft)}
+  .drawer-foot{margin-top:auto;padding-top:28px;font-size:.9rem;color:#b9b3a2}
+  .drawer-foot a{color:var(--brass-soft);font-weight:700;text-decoration:none}
+  #drawerClose{position:absolute;top:22px;right:22px;background:none;border:2px solid rgba(246,241,230,.4);color:var(--cream);border-radius:8px;width:42px;height:42px;font-size:1.2rem;cursor:pointer}
+
+  /* ---------- pages / router ---------- */
+  .page{display:none}
+  .page.active{display:block;animation:fadeIn .35s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  /* ---------- hero (editorial type) ---------- */
+  .hero-editorial{padding:96px 0 70px;border-bottom:1px solid var(--line)}
+  .kicker{font-size:.78rem;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--brass);margin-bottom:22px}
+  .hero-editorial h1{font-size:clamp(2.6rem,7vw,5.4rem);max-width:16ch}
+  .hero-editorial h1 em{font-style:italic;color:var(--brass)}
+  .hero-editorial .lede{font-size:1.18rem;color:var(--muted);max-width:58ch;margin:26px 0 34px}
+  .btn{display:inline-flex;align-items:center;gap:9px;text-decoration:none;font-weight:700;padding:15px 30px;border-radius:999px;font-size:1rem;border:2px solid transparent;cursor:pointer}
+  .btn-solid{background:var(--forest);color:var(--cream)}
+  .btn-solid:hover{background:var(--forest-deep)}
+  .btn-line{border-color:var(--forest);color:var(--forest);background:transparent}
+  .btn-line:hover{background:var(--forest);color:var(--cream)}
+  .cta-row{display:flex;gap:14px;flex-wrap:wrap}
+  .stat-row{display:flex;gap:0;margin-top:56px;border-top:1px solid var(--line);flex-wrap:wrap}
+  .stat{flex:1;min-width:170px;padding:22px 26px 6px 0}
+  .stat + .stat{border-left:1px solid var(--line);padding-left:26px}
+  .stat b{display:block;font-family:"Fraunces",serif;font-size:1.9rem;color:var(--forest)}
+  .stat span{font-size:.85rem;color:var(--muted)}
+
+  /* ---------- card wall rhythm ---------- */
+  .wall{padding:76px 0}
+  .wall-head{display:flex;align-items:baseline;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:34px}
+  .wall-head h2{font-size:clamp(1.7rem,3.6vw,2.6rem)}
+  .wall-head p{color:var(--muted);max-width:52ch}
+  .card-wall{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  .wcard{background:#fff;border:1px solid var(--line);border-radius:18px;padding:30px;display:flex;flex-direction:column;gap:12px;transition:transform .25s,box-shadow .25s}
+  .wcard:hover{transform:translateY(-5px);box-shadow:0 16px 34px rgba(34,53,42,.12)}
+  .wcard .icon{width:52px;height:52px;border-radius:14px;background:var(--cream);display:flex;align-items:center;justify-content:center}
+  .wcard h3{font-size:1.35rem}
+  .wcard p{font-size:.95rem;color:var(--muted)}
+  .wcard .go{margin-top:auto;font-weight:700;color:var(--brass);text-decoration:none;font-size:.95rem}
+  .wcard.accent{background:var(--forest);color:var(--cream);border-color:var(--forest)}
+  .wcard.accent h3{color:#fff}
+  .wcard.accent p{color:#c9c2ae}
+  .wcard.accent .go{color:var(--brass-soft)}
+
+  /* ---------- interior page head ---------- */
+  .pagehead{padding:64px 0 10px}
+  .pagehead h1{font-size:clamp(2rem,5vw,3.6rem);max-width:18ch}
+  .pagehead p{color:var(--muted);max-width:62ch;margin-top:14px;font-size:1.05rem}
+
+  /* ---------- services (cards) ---------- */
+  .svc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:26px;padding:40px 0 70px}
+  .svc{background:#fff;border:1px solid var(--line);border-radius:20px;overflow:hidden}
+  .svc .art{height:190px;display:flex;align-items:center;justify-content:center}
+  .svc .body{padding:30px 32px 34px}
+  .svc h2{font-size:1.7rem;margin-bottom:10px}
+  .svc p{color:var(--muted);font-size:.97rem;margin-bottom:14px}
+  .svc ul{list-style:none;margin:16px 0}
+  .svc li{padding:9px 0 9px 30px;position:relative;font-size:.94rem;border-bottom:1px dashed var(--line)}
+  .svc li::before{content:"";position:absolute;left:4px;top:15px;width:9px;height:9px;background:var(--brass);transform:rotate(45deg)}
+  .badge{display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border-radius:6px;padding:4px 9px}
+  .badge.sample{background:#f4e8c8;border:1px solid #c99f2e;color:#7c5f0e}
+  .badge.real{background:#dcefe4;border:1px solid #2e9e63;color:#1c6b41}
+  .badge.ph{background:#eee;border:1px solid #bbb;color:#555}
+  .process-band{background:var(--forest);color:var(--cream);padding:64px 0;margin:20px 0 70px}
+  .process-band h2{color:#fff;font-size:clamp(1.6rem,3.4vw,2.4rem);margin-bottom:26px}
+  .proc{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+  .proc div{border-top:2px solid var(--brass);padding-top:16px}
+  .proc b{font-family:"Fraunces",serif;font-size:1.15rem;display:block;margin-bottom:6px;color:var(--brass-soft)}
+  .proc p{font-size:.9rem;color:#c9c2ae}
+
+  /* ---------- gallery (masonry) ---------- */
+  .masonry{columns:3;column-gap:22px;padding:40px 0 70px}
+  .m-item{break-inside:avoid;margin-bottom:22px;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .m-item .art{display:flex;align-items:center;justify-content:center}
+  .m-item .cap{padding:16px 20px;font-size:.9rem}
+  .m-item .cap b{font-family:"Fraunces",serif;font-size:1.05rem;display:block}
+  .m-item .cap .badge{margin-top:8px}
+
+  /* ---------- reviews ---------- */
+  .rev-hero-card{background:var(--forest);color:var(--cream);border-radius:22px;padding:44px;margin:40px 0;display:flex;gap:36px;align-items:center;flex-wrap:wrap}
+  .rev-hero-card h2{color:#fff;font-size:2.6rem}
+  .rev-hero-card p{color:#c9c2ae;max-width:52ch;margin-top:8px}
+  .stars{color:var(--brass-soft);font-size:1.35rem;letter-spacing:3px}
+  .src-links{display:flex;gap:14px;flex-wrap:wrap;margin:8px 0 40px}
+  .src-links a{display:inline-flex;align-items:center;gap:8px;background:var(--forest);color:var(--cream);text-decoration:none;font-weight:700;padding:14px 26px;border-radius:999px}
+  .src-links a:hover{background:var(--brass);color:var(--forest-deep)}
+  .quote-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin:26px 0 70px}
+  .quote{background:#fff;border:1px solid var(--line);border-radius:16px;padding:28px;position:relative}
+  .quote .qmark{font-family:"Fraunces",serif;font-size:3rem;color:var(--brass-soft);line-height:1}
+  .quote p{font-size:.95rem;margin:10px 0 14px}
+  .quote .who{font-size:.82rem;color:var(--muted)}
+  .quote .badge{position:absolute;top:16px;right:16px}
+
+  /* ---------- visit ---------- */
+  .visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;padding:40px 0 70px}
+  .vcard{background:#fff;border:1px solid var(--line);border-radius:20px;padding:36px}
+  .vcard h2{font-size:1.6rem;margin-bottom:16px}
+  .vcard dl{display:grid;grid-template-columns:120px 1fr;gap:12px 18px;font-size:.97rem;margin:20px 0}
+  .vcard dt{font-weight:700;color:var(--muted)}
+  .map-art{background:var(--forest);border-radius:20px;min-height:380px;display:flex;align-items:center;justify-content:center;color:#c9c2ae;position:relative;overflow:hidden;text-align:center;padding:30px}
+  .map-art .badge{position:absolute;top:18px;left:18px}
+
+  /* ---------- story ---------- */
+  .story-cols{display:grid;grid-template-columns:1fr 1fr;gap:44px;padding:40px 0 30px;align-items:start}
+  .story-cols h2{font-size:clamp(1.7rem,3.4vw,2.5rem);margin-bottom:16px}
+  .story-cols p{margin-bottom:14px;color:var(--ink)}
+  .pull{font-family:"Fraunces",serif;font-size:1.5rem;font-style:italic;color:var(--forest);border-left:4px solid var(--brass);padding-left:22px;margin:30px 0}
+  .values{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;padding:10px 0 70px}
+  .value{background:#fff;border:1px solid var(--line);border-radius:16px;padding:28px}
+  .value h3{font-size:1.25rem;margin-bottom:8px}
+  .value p{font-size:.93rem;color:var(--muted)}
+
+  /* ---------- footer (big-type) ---------- */
+  footer.site{background:var(--forest-deep);color:#c9c2ae;margin-top:0}
+  .bigtype{padding:70px 0 10px;text-align:center}
+  .bigtype h2{font-size:clamp(2.6rem,9vw,7.5rem);color:var(--cream);font-weight:700;letter-spacing:.02em;line-height:1}
+  .bigtype p{letter-spacing:.3em;text-transform:uppercase;font-size:.78rem;color:var(--brass-soft);margin-top:14px;font-weight:600}
+  .foot-mid{display:flex;justify-content:space-between;gap:26px;flex-wrap:wrap;padding:36px 0 44px;border-top:1px solid rgba(246,241,230,.14);margin-top:44px}
+  .foot-mid a{color:#c9c2ae;text-decoration:none;font-size:.94rem;display:block;padding:4px 0}
+  .foot-mid a:hover{color:var(--brass-soft)}
+  .foot-mid .grp b{display:block;color:#fff;font-size:.8rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:10px}
+  .copyright{border-top:1px solid rgba(246,241,230,.14);padding:22px;text-align:center;color:var(--cream);font-size:.94rem}
+
+  @media(max-width:940px){
+    .card-wall{grid-template-columns:1fr 1fr}
+    .quote-grid{grid-template-columns:1fr}
+    .proc{grid-template-columns:1fr 1fr}
+    .svc-grid{grid-template-columns:1fr}
+    .masonry{columns:2}
+    .story-cols{grid-template-columns:1fr}
+    .visit-grid{grid-template-columns:1fr}
+    .values{grid-template-columns:1fr}
+    .phone-link{display:none}
+    .stat + .stat{border-left:none;padding-left:0}
+  }
+  @media(max-width:600px){
+    .card-wall{grid-template-columns:1fr}
+    .masonry{columns:1}
+    .proc{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<div class="topline">
+  <div class="inner">
+    <a class="brand" href="#home" data-page="home" aria-label="Jasper Homes, home">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20,4 L36,18 H32 V34 H8 V18 H4 Z" fill="none" stroke="#22352a" stroke-width="3"/><rect x="16" y="22" width="8" height="12" fill="#b8892e"/><path d="M20,4 L36,18" stroke="#b8892e" stroke-width="3"/></svg>
+      <span class="t">Jasper Homes<small>Custom Builder</small></span>
+    </a>
+    <div class="top-actions">
+      <a class="phone-link" href="tel:+15137536690">(513) 753-6690</a>
+      <button id="burger" aria-expanded="false" aria-label="Open navigation menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</div>
+
+<div class="drawer-scrim" id="drawerScrim"></div>
+<nav class="main" id="mainNav" aria-label="Main navigation">
+  <button id="drawerClose" aria-label="Close navigation menu">&times;</button>
+  <a href="#home" data-page="home" class="active" aria-current="page">Home</a>
+  <a href="#services" data-page="services">Services</a>
+  <a href="#story" data-page="story">Our Story</a>
+  <a href="#gallery" data-page="gallery">Gallery</a>
+  <a href="#reviews" data-page="reviews">Reviews</a>
+  <a href="#visit" data-page="visit">Visit Us</a>
+  <div class="drawer-foot">
+    <a href="tel:+15137536690">(513) 753-6690</a><br>
+    904 Winged Foot Way<br>Cincinnati, OH 45245
+  </div>
+</nav>
+
+<main>
+<!-- ============ HOME ============ -->
+<section class="page" id="page-home">
+  <div class="hero-editorial"><div class="wrap">
+    <p class="kicker">Family owned &middot; Greater Cincinnati</p>
+    <h1>Homes built for the way <em>you</em> live.</h1>
+    <p class="lede">Jasper Homes, Inc. is a family owned business that builds and remodels homes throughout the greater Cincinnati area. One builder, one point of contact, from first sketch to final walkthrough.</p>
+    <div class="cta-row">
+      <a class="btn btn-solid" href="tel:+15137536690">Call (513) 753-6690</a>
+      <a class="btn btn-line" href="#services" data-page="services">What We Build</a>
+    </div>
+    <div class="stat-row">
+      <div class="stat"><b>Family owned</b><span>per the company&rsquo;s business listing</span></div>
+      <div class="stat"><b>Build + remodel</b><span>new homes and renovations</span></div>
+      <div class="stat"><b>5.0 / 5</b><span>rating on Birdeye reviews</span></div>
+    </div>
+  </div></div>
+
+  <div class="wall"><div class="wrap">
+    <div class="wall-head">
+      <h2>Why build with Jasper</h2>
+      <p>A smaller builder means your project gets real attention, not a production-line schedule.</p>
+    </div>
+    <div class="card-wall">
+      <div class="wcard">
+        <div class="icon"><svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><path d="M13,3 L23,12 H20 V22 H6 V12 H3 Z" fill="none" stroke="#b8892e" stroke-width="2.4"/></svg></div>
+        <h3>Custom home building</h3>
+        <p>New homes planned around your lot, your budget, and your floor plan, not a catalog of three models.</p>
+        <a class="go" href="#services" data-page="services">Learn more</a>
+      </div>
+      <div class="wcard">
+        <div class="icon"><svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><path d="M4,20 L13,5 L22,20 Z" fill="none" stroke="#b8892e" stroke-width="2.4"/><rect x="11" y="14" width="4" height="6" fill="#b8892e"/></svg></div>
+        <h3>Whole-home remodeling</h3>
+        <p>Kitchens, additions, and full renovations that make the house you have feel like the house you want.</p>
+        <a class="go" href="#services" data-page="services">Learn more</a>
+      </div>
+      <div class="wcard accent">
+        <h3>Talk to the builder, not a call center</h3>
+        <p>When you call Jasper Homes, you reach the people doing the work. Call (513) 753-6690 to start the conversation.</p>
+        <a class="go" href="#visit" data-page="visit">Plan a visit</a>
+      </div>
+      <div class="wcard">
+        <div class="icon"><svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="9" fill="none" stroke="#b8892e" stroke-width="2.4"/><path d="M13,8 v5 l4,3" fill="none" stroke="#b8892e" stroke-width="2.4"/></svg></div>
+        <h3>Straightforward process</h3>
+        <p>Clear scope, honest timelines, and regular updates while the work is underway.</p>
+        <a class="go" href="#story" data-page="story">Our story</a>
+      </div>
+      <div class="wcard">
+        <div class="icon"><svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><path d="M13,22 C6,16 4,11 6,7 C8,4 12,4 13,7 C14,4 18,4 20,7 C22,11 20,16 13,22 Z" fill="none" stroke="#b8892e" stroke-width="2.4"/></svg></div>
+        <h3>Built for Cincinnati</h3>
+        <p>Local knowledge of lots, codes, and craftsmen across the east side and greater Cincinnati.</p>
+        <a class="go" href="#gallery" data-page="gallery">See the work</a>
+      </div>
+      <div class="wcard">
+        <div class="icon"><svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><path d="M4,13 l5,5 L22,6" fill="none" stroke="#b8892e" stroke-width="2.6"/></svg></div>
+        <h3>Rated 5 out of 5</h3>
+        <p>Based on published Birdeye reviews. Real links, no invented quotes, on our Reviews page.</p>
+        <a class="go" href="#reviews" data-page="reviews">Read reviews</a>
+      </div>
+    </div>
+  </div></div>
+</section>
+
+<!-- ============ SERVICES ============ -->
+<section class="page" id="page-services">
+  <div class="wrap pagehead">
+    <p class="kicker">Services</p>
+    <h1>What Jasper Homes builds</h1>
+    <p>Their public listing describes the company as a builder and remodeler of homes. The cards below reflect that; anything marked sample is our illustration, not a confirmed offering, and should be verified with the owner.</p>
+  </div>
+  <div class="wrap">
+    <div class="svc-grid">
+      <div class="svc">
+        <div class="art" style="background:linear-gradient(140deg,#22352a,#3c5a45)">
+          <svg width="200" height="130" viewBox="0 0 200 130" aria-hidden="true">
+            <rect x="45" y="55" width="110" height="60" fill="#f6f1e6"/>
+            <polygon points="32,58 100,18 168,58" fill="#b8892e"/>
+            <rect x="88" y="80" width="24" height="35" fill="#22352a"/>
+            <rect x="58" y="68" width="20" height="16" fill="#7fa8b8"/>
+            <rect x="122" y="68" width="20" height="16" fill="#7fa8b8"/>
+            <rect x="45" y="48" width="110" height="5" fill="#f6f1e6" opacity=".6"/>
+          </svg>
+        </div>
+        <div class="body">
+          <h2>Custom Home Building</h2>
+          <p><span class="badge real">From listing</span></p>
+          <p>Jasper Homes builds new homes in the greater Cincinnati area as a family owned company. You work directly with the builder on the plan, the lot, and the finishes.</p>
+          <ul>
+            <li>Floor plans shaped around your needs <span class="badge sample">Sample</span></li>
+            <li>Guidance on lot selection and orientation <span class="badge sample">Sample</span></li>
+            <li>Finish selections with builder input <span class="badge sample">Sample</span></li>
+          </ul>
+          <a class="btn btn-solid" href="tel:+15137536690">Discuss Your Build</a>
+        </div>
+      </div>
+      <div class="svc">
+        <div class="art" style="background:linear-gradient(140deg,#b8892e,#8a6420)">
+          <svg width="200" height="130" viewBox="0 0 200 130" aria-hidden="true">
+            <rect x="30" y="45" width="70" height="70" fill="#f6f1e6"/>
+            <polygon points="22,48 65,20 108,48" fill="#22352a"/>
+            <rect x="100" y="60" width="70" height="55" fill="#f6f1e6" opacity=".92"/>
+            <polygon points="94,62 135,34 176,62" fill="#22352a" opacity=".85"/>
+            <rect x="120" y="82" width="30" height="33" fill="#7fa8b8"/>
+            <rect x="42" y="60" width="18" height="14" fill="#7fa8b8"/>
+          </svg>
+        </div>
+        <div class="body">
+          <h2>Home Remodeling</h2>
+          <p><span class="badge real">From listing</span></p>
+          <p>The company also remodels homes across the area, from single-room updates to larger transformations of the spaces you use every day.</p>
+          <ul>
+            <li>Kitchen and bath renovations <span class="badge sample">Sample</span></li>
+            <li>Room additions and expansions <span class="badge sample">Sample</span></li>
+            <li>Whole-home updates and reconfigurations <span class="badge sample">Sample</span></li>
+          </ul>
+          <a class="btn btn-solid" href="tel:+15137536690">Discuss Your Remodel</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="process-band"><div class="wrap">
+    <h2>From first call to final walkthrough</h2>
+    <div class="proc">
+      <div><b>Conversation</b><p>Tell us about the home you want. We talk budget, timeline, and what is realistic. <span class="badge sample">Sample</span></p></div>
+      <div><b>Plan</b><p>Scope, drawings, and selections come together into a clear written plan. <span class="badge sample">Sample</span></p></div>
+      <div><b>Build</b><p>Construction with regular updates, so you always know where things stand. <span class="badge sample">Sample</span></p></div>
+      <div><b>Walkthrough</b><p>We go through the finished home together and make sure every detail is right. <span class="badge sample">Sample</span></p></div>
+    </div>
+  </div></div>
+</section>
+
+<!-- ============ STORY ============ -->
+<section class="page" id="page-story">
+  <div class="wrap pagehead">
+    <p class="kicker">Our story</p>
+    <h1>A family business, building where we live</h1>
+  </div>
+  <div class="wrap">
+    <div class="story-cols">
+      <div>
+        <h2>Rooted in Cincinnati</h2>
+        <p>Jasper Homes, Inc. describes itself as a family owned business that builds and remodels homes throughout the greater Cincinnati area. The company is based at 904 Winged Foot Way in Cincinnati, Ohio.</p>
+        <p>Family builders work differently. There is no corporate office three states away and no rotating cast of project managers. The name on the truck is the name on the contract, and reputation is built one home, and one neighbor, at a time.</p>
+        <div class="pull">&ldquo;We build the way we would want our own home built.&rdquo; <span class="badge sample" style="font-style:normal">Sample line</span></div>
+        <p>Beyond the confirmed facts above, the details of the Jasper story, the people, the history, the favorite projects, belong to the family. This page is a starting frame; the owner can fill it with the real story when the site goes live.</p>
+      </div>
+      <div>
+        <div class="svc">
+          <div class="art" style="background:linear-gradient(150deg,#f6f1e6,#e4d9bd);min-height:300px;display:flex;align-items:center;justify-content:center">
+            <svg width="240" height="200" viewBox="0 0 240 200" aria-hidden="true">
+              <rect x="60" y="80" width="120" height="90" fill="#22352a"/>
+              <polygon points="44,84 120,34 196,84" fill="#b8892e"/>
+              <rect x="108" y="115" width="24" height="55" fill="#f6f1e6"/>
+              <rect x="74" y="96" width="22" height="18" fill="#7fa8b8"/>
+              <rect x="144" y="96" width="22" height="18" fill="#7fa8b8"/>
+              <rect x="20" y="170" width="200" height="8" fill="#22352a" opacity=".15"/>
+              <circle cx="196" cy="44" r="14" fill="#b8892e" opacity=".7"/>
+            </svg>
+          </div>
+          <div class="body">
+            <p style="font-size:.88rem"><span class="badge ph">Placeholder art</span> &nbsp;Owner: swap in a photo of the family, the team, or a finished home.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="values">
+      <div class="value"><h3>One point of contact</h3><p>You talk to the builder throughout the project, not a chain of handoffs.</p></div>
+      <div class="value"><h3>Local through and through</h3><p>Based in Cincinnati, building in Cincinnati, accountable in Cincinnati.</p></div>
+      <div class="value"><h3>Built to last</h3><p>Quality framing, honest materials, and details that hold up for decades.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ GALLERY ============ -->
+<section class="page" id="page-gallery">
+  <div class="wrap pagehead">
+    <p class="kicker">Gallery</p>
+    <h1>Recent work</h1>
+    <p>Illustrated placeholders below. When this site goes live, they are swapped for real photos of Jasper Homes projects.</p>
+  </div>
+  <div class="wrap">
+    <div class="masonry">
+      <div class="m-item">
+        <div class="art" style="height:260px;background:linear-gradient(150deg,#22352a,#3c5a45)">
+          <svg width="150" height="150" viewBox="0 0 150 150" aria-hidden="true"><rect x="35" y="60" width="80" height="60" fill="#f6f1e6"/><polygon points="25,63 75,28 125,63" fill="#b8892e"/><rect x="65" y="88" width="20" height="32" fill="#22352a"/><rect x="44" y="72" width="16" height="14" fill="#7fa8b8"/><rect x="90" y="72" width="16" height="14" fill="#7fa8b8"/></svg>
+        </div>
+        <div class="cap"><b>Two-story custom build</b>Front elevation, finished exterior<span class="badge sample">Sample</span></div>
+      </div>
+      <div class="m-item">
+        <div class="art" style="height:180px;background:linear-gradient(150deg,#e9dfc8,#cfc09a)">
+          <svg width="150" height="110" viewBox="0 0 150 110" aria-hidden="true"><rect x="20" y="30" width="110" height="60" fill="#fff"/><rect x="20" y="30" width="110" height="12" fill="#b8892e"/><rect x="32" y="52" width="30" height="8" fill="#22352a" opacity=".2"/><rect x="32" y="66" width="50" height="8" fill="#22352a" opacity=".2"/><rect x="90" y="52" width="28" height="28" fill="#7fa8b8" opacity=".6"/></svg>
+        </div>
+        <div class="cap"><b>Kitchen renovation</b>Open plan with new cabinetry<span class="badge sample">Sample</span></div>
+      </div>
+      <div class="m-item">
+        <div class="art" style="height:300px;background:linear-gradient(150deg,#3c5a45,#18271e)">
+          <svg width="140" height="220" viewBox="0 0 140 220" aria-hidden="true"><rect x="25" y="60" width="90" height="120" fill="#f6f1e6"/><polygon points="15,64 70,22 125,64" fill="#b8892e"/><rect x="60" y="120" width="20" height="60" fill="#22352a"/><rect x="35" y="80" width="18" height="30" fill="#7fa8b8"/><rect x="87" y="80" width="18" height="30" fill="#7fa8b8"/><rect x="35" y="125" width="18" height="30" fill="#7fa8b8"/><rect x="87" y="125" width="18" height="30" fill="#7fa8b8"/></svg>
+        </div>
+        <div class="cap"><b>Craftsman-style new build</b>Full height, three finished levels<span class="badge sample">Sample</span></div>
+      </div>
+      <div class="m-item">
+        <div class="art" style="height:200px;background:linear-gradient(150deg,#7fa8b8,#3e6b7d)">
+          <svg width="150" height="130" viewBox="0 0 150 130" aria-hidden="true"><rect x="25" y="40" width="100" height="70" fill="#fff"/><rect x="25" y="40" width="100" height="10" fill="#22352a"/><rect x="35" y="62" width="34" height="26" fill="#7fa8b8"/><rect x="81" y="62" width="34" height="26" fill="#7fa8b8"/></svg>
+        </div>
+        <div class="cap"><b>Primary suite addition</b>New bedroom and bath wing<span class="badge sample">Sample</span></div>
+      </div>
+      <div class="m-item">
+        <div class="art" style="height:230px;background:linear-gradient(150deg,#8a6420,#4a3a12)">
+          <svg width="150" height="170" viewBox="0 0 150 170" aria-hidden="true"><rect x="30" y="60" width="90" height="80" fill="#f6f1e6"/><polygon points="20,63 75,25 130,63" fill="#22352a"/><rect x="66" y="100" width="18" height="40" fill="#8a6420"/><circle cx="118" cy="40" r="12" fill="#f6f1e6" opacity=".6"/></svg>
+        </div>
+        <div class="cap"><b>Ranch new build at dusk</b>Single-level living, covered porch<span class="badge sample">Sample</span></div>
+      </div>
+      <div class="m-item">
+        <div class="art" style="height:190px;background:linear-gradient(150deg,#f6f1e6,#ddd3bd)">
+          <svg width="150" height="120" viewBox="0 0 150 120" aria-hidden="true"><rect x="20" y="35" width="110" height="60" fill="#fff" stroke="#22352a" stroke-width="2"/><path d="M20,65 h110 M20,80 h110" stroke="#22352a" stroke-width="1" opacity=".3"/><rect x="30" y="45" width="24" height="12" fill="#b8892e"/><rect x="62" y="45" width="24" height="12" fill="#b8892e" opacity=".6"/></svg>
+        </div>
+        <div class="cap"><b>Floor plan study</b>Early sketch for a custom layout<span class="badge sample">Sample</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ REVIEWS ============ -->
+<section class="page" id="page-reviews">
+  <div class="wrap pagehead">
+    <p class="kicker">Reviews</p>
+    <h1>What homeowners say</h1>
+    <p>Real review links below. Our published review history is still short, so every new review carries real weight.</p>
+  </div>
+  <div class="wrap">
+    <div class="rev-hero-card">
+      <div><h2>5.0</h2><div class="stars" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div></div>
+      <div>
+        <p><strong>Based on 2 Birdeye reviews</strong>, both at 5 stars, for this home builder in the Cincinnati area. Our Google review count is not yet confirmed, see the live listing below.</p>
+      </div>
+    </div>
+    <h2 style="font-size:1.5rem;margin-bottom:14px">Read or leave a review</h2>
+    <div class="src-links">
+      <a href="https://www.google.com/maps/place/?q=place_id:ChIJV7p-cD2oQYgReoE1IW6bHk8" target="_blank" rel="noopener">See reviews on Google</a>
+      <a href="https://reviews.birdeye.com/jasper-homes-501161280" target="_blank" rel="noopener">See reviews on Birdeye</a>
+    </div>
+    <p style="font-size:.88rem;color:var(--muted)">We link only to real review sources. We never invent reviewer names or quotes.</p>
+    <h2 style="font-size:1.5rem;margin:36px 0 6px">How this page will look</h2>
+    <p style="color:var(--muted);font-size:.95rem">Published review detail is limited so far. The cards below are samples showing the layout as real reviews arrive.</p>
+    <div class="quote-grid">
+      <div class="quote"><span class="badge sample">Sample</span><div class="qmark">&ldquo;</div><p>Jasper built our home start to finish and communicated at every step. We always knew what was happening and when.</p><div class="who">Sample review, homeowner</div></div>
+      <div class="quote"><span class="badge sample">Sample</span><div class="qmark">&ldquo;</div><p>The remodel came in on the timeline they promised, and the craftsmanship in the kitchen is something we show off to guests.</p><div class="who">Sample review, homeowner</div></div>
+      <div class="quote"><span class="badge sample">Sample</span><div class="qmark">&ldquo;</div><p>Working directly with the builder made all the difference. Decisions were quick and the final walkthrough was thorough.</p><div class="who">Sample review, homeowner</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ VISIT ============ -->
+<section class="page" id="page-visit">
+  <div class="wrap pagehead">
+    <p class="kicker">Visit us</p>
+    <h1>Come talk about your home</h1>
+    <p>Call ahead so we can make sure someone is here to meet you.</p>
+  </div>
+  <div class="wrap">
+    <div class="visit-grid">
+      <div class="vcard">
+        <h2>Jasper Homes, Inc.</h2>
+        <dl>
+          <dt>Address</dt><dd>904 Winged Foot Way<br>Cincinnati, OH 45245</dd>
+          <dt>Phone</dt><dd><a href="tel:+15137536690">(513) 753-6690</a></dd>
+          <dt>Hours</dt><dd>Call for hours</dd>
+          <dt>Service area</dt><dd>Greater Cincinnati area</dd>
+        </dl>
+        <div class="cta-row" style="margin-top:10px">
+          <a class="btn btn-solid" href="tel:+15137536690">Call Now</a>
+          <a class="btn btn-line" href="https://www.google.com/maps/place/?q=place_id:ChIJV7p-cD2oQYgReoE1IW6bHk8" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+      </div>
+      <div class="map-art">
+        <span class="badge ph">Map placeholder</span>
+        <div>
+          <svg width="84" height="84" viewBox="0 0 80 80" aria-hidden="true"><path d="M40,8 C24,8 12,20 12,34 C12,54 40,74 40,74 C40,74 68,54 68,34 C68,20 56,8 40,8 Z" fill="#b8892e"/><circle cx="40" cy="34" r="11" fill="#18271e"/></svg>
+          <p style="margin-top:14px">Interactive map goes here.<br><a style="color:var(--brass-soft);font-weight:700" href="https://www.google.com/maps/place/?q=place_id:ChIJV7p-cD2oQYgReoE1IW6bHk8" target="_blank" rel="noopener">Open in Google Maps</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="bigtype">
+      <h2>JASPER HOMES</h2>
+      <p>Custom Builder &middot; Cincinnati, Ohio</p>
+    </div>
+    <div class="foot-mid">
+      <div class="grp">
+        <b>Pages</b>
+        <a href="#home" data-page="home">Home</a>
+        <a href="#services" data-page="services">Services</a>
+        <a href="#story" data-page="story">Our Story</a>
+        <a href="#gallery" data-page="gallery">Gallery</a>
+        <a href="#reviews" data-page="reviews">Reviews</a>
+        <a href="#visit" data-page="visit">Visit Us</a>
+      </div>
+      <div class="grp">
+        <b>Contact</b>
+        <a href="tel:+15137536690">(513) 753-6690</a>
+        <a href="https://www.google.com/maps/place/?q=place_id:ChIJV7p-cD2oQYgReoE1IW6bHk8" target="_blank" rel="noopener">904 Winged Foot Way, Cincinnati, OH 45245</a>
+      </div>
+      <div class="grp">
+        <b>Reviews</b>
+        <a href="https://www.google.com/maps/place/?q=place_id:ChIJV7p-cD2oQYgReoE1IW6bHk8" target="_blank" rel="noopener">Google reviews</a>
+        <a href="https://reviews.birdeye.com/jasper-homes-501161280" target="_blank" rel="noopener">Birdeye reviews</a>
+      </div>
+    </div>
+  </div>
+  <div class="copyright">&copy; Jasper Homes</div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "story", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+    document.body.classList.remove("drawer-open");
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+      document.body.classList.toggle("drawer-open", open);
+    });
+  }
+
+  var drawerClose = document.getElementById("drawerClose");
+  if(drawerClose){
+    drawerClose.addEventListener("click", function(){ closeMenu(); });
+  }
+  var scrim = document.getElementById("drawerScrim");
+  if(scrim){
+    scrim.addEventListener("click", function(){ closeMenu(); });
+  }
+
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

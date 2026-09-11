@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>T J Williams Electric Co | Electrician in Harrison, OH</title>
+<meta name="description" content="T J Williams Electric Co, 7925 New Haven Rd, Harrison, OH 45030. Call (513) 738-5366.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{
+  --navy:#050b1a;
+  --navy2:#0a1430;
+  --panel:#0b1732;
+  --blue:#38bdf8;
+  --blue-deep:#0ea5e9;
+  --copper:#d08a4b;
+  --copper-bright:#f0a95e;
+  --text:#dbe7f5;
+  --muted:#8ea3c2;
+  --line:rgba(56,189,248,.16);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--navy);color:var(--text);font-family:'Sora',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(700px 420px at 12% 8%, rgba(56,189,248,.08), transparent 60%),
+    radial-gradient(620px 460px at 88% 82%, rgba(208,138,75,.07), transparent 60%);}
+.mono{font-family:'JetBrains Mono',monospace}
+/* ---- left edge node rail ---- */
+.rail{position:fixed;left:0;top:0;bottom:0;width:76px;z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;
+  background:rgba(5,11,26,.92);border-right:1px solid var(--line);backdrop-filter:blur(6px)}
+.rail::before{content:"";position:absolute;left:50%;top:12%;bottom:12%;width:2px;background:linear-gradient(var(--copper),var(--blue));opacity:.35;transform:translateX(-50%)}
+.rail a{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;margin:14px 0;padding:4px 0;z-index:1}
+.rail .node{width:16px;height:16px;border-radius:50%;border:2px solid var(--copper);background:var(--navy);transition:.25s}
+.rail a span.lbl{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+.rail a:hover .node{box-shadow:0 0 12px var(--copper)}
+.rail a.active .node{background:var(--blue);border-color:var(--blue);box-shadow:0 0 14px var(--blue)}
+.rail a.active span.lbl{color:var(--blue)}
+.rail .brandmark{position:absolute;top:18px;font-family:'JetBrains Mono',monospace;color:var(--copper);font-weight:600;font-size:14px;letter-spacing:.1em}
+/* ---- mobile topbar ---- */
+.topbar{display:none;position:fixed;top:0;left:0;right:0;z-index:70;align-items:center;justify-content:space-between;
+  padding:12px 18px;background:rgba(5,11,26,.95);border-bottom:1px solid var(--line)}
+.topbar .tbrand{font-weight:800;letter-spacing:.06em;font-size:15px}
+.topbar .tbrand em{font-style:normal;color:var(--copper)}
+.burger{background:none;border:1px solid var(--copper);color:var(--copper);width:42px;height:42px;border-radius:8px;font-size:18px;cursor:pointer}
+.mnav{display:none;position:fixed;top:66px;left:0;right:0;z-index:69;background:rgba(5,11,26,.98);border-bottom:1px solid var(--line);padding:10px 18px 18px}
+.mnav.open{display:block}
+.mnav a{display:flex;align-items:center;gap:12px;color:var(--text);text-decoration:none;padding:12px 6px;border-bottom:1px solid rgba(56,189,248,.08);font-weight:600}
+.mnav a .dot{width:10px;height:10px;border-radius:50%;border:2px solid var(--copper)}
+.mnav a.active{color:var(--blue)}
+.mnav a.active .dot{background:var(--blue);border-color:var(--blue)}
+/* ---- layout ---- */
+main{position:relative;z-index:1;margin-left:76px}
+.page{display:none;min-height:100vh;padding:48px clamp(20px,5vw,72px) 90px;max-width:1180px;margin:0 auto}
+.page.active{display:block;animation:fadein .35s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+section.block{margin-bottom:64px}
+.eyebrow{font-family:'JetBrains Mono',monospace;color:var(--copper);font-size:12px;letter-spacing:.28em;text-transform:uppercase;margin-bottom:14px}
+h1{font-size:clamp(34px,5.4vw,62px);line-height:1.06;font-weight:800;margin-bottom:18px}
+h1 .blue{color:var(--blue)}
+h2{font-size:clamp(24px,3.4vw,38px);font-weight:800;margin-bottom:14px}
+h2 .blue{color:var(--blue)}
+p.lede{color:var(--muted);font-size:clamp(15px,1.6vw,18px);line-height:1.7;max-width:640px;margin-bottom:26px}
+.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;padding:14px 26px;border-radius:10px;cursor:pointer;border:1px solid transparent;transition:.2s;font-size:15px}
+.btn-copper{background:linear-gradient(135deg,var(--copper-bright),var(--copper));color:#0a0f1e}
+.btn-copper:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(208,138,75,.35)}
+.btn-ghost{border-color:var(--blue);color:var(--blue);background:rgba(56,189,248,.06)}
+.btn-ghost:hover{background:rgba(56,189,248,.14)}
+.btnrow{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:8px}
+/* ---- hero circuit svg ---- */
+.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:36px;align-items:center}
+.hero-art{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:8px;position:relative;overflow:hidden}
+.hero-art svg{display:block;width:100%;height:auto}
+.trace{fill:none;stroke-width:2.5}
+.trace-copper{stroke:var(--copper);opacity:.85}
+.trace-blue{stroke:var(--blue);opacity:.85}
+.pad{fill:var(--navy);stroke-width:2.5}
+.pad-copper{stroke:var(--copper)}
+.pad-blue{stroke:var(--blue)}
+.glow{fill:var(--blue);filter:drop-shadow(0 0 8px var(--blue))}
+.flow{stroke-dasharray:14 10;animation:flow 2.6s linear infinite}
+.flow-slow{stroke-dasharray:10 14;animation:flow 4.2s linear infinite reverse}
+@keyframes flow{to{stroke-dashoffset:-240}}
+.pulse{animation:pulse 2.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.35}50%{opacity:1}}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:34px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;text-align:center}
+.stat b{display:block;font-size:26px;color:var(--copper)}
+.stat small{color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+/* ---- divider traces ---- */
+.trace-div{height:46px;margin:6px 0 40px;opacity:.8}
+/* ---- chip cards ---- */
+.chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:26px}
+.chip{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px 22px 22px;position:relative;transition:.25s}
+.chip::before,.chip::after{content:"";position:absolute;top:14px;bottom:14px;width:10px;
+  background:repeating-linear-gradient(to bottom,var(--copper) 0 6px,transparent 6px 12px);opacity:.75}
+.chip::before{left:-10px}.chip::after{right:-10px}
+.chip:hover{transform:translateY(-5px);border-color:rgba(56,189,248,.4);box-shadow:0 14px 34px rgba(14,165,233,.14)}
+.chip .pin{position:absolute;top:12px;right:14px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.1em}
+.chip i.fa-solid{font-size:26px;color:var(--blue);margin-bottom:14px}
+.chip h3{font-size:18px;margin-bottom:10px}
+.chip p{color:var(--muted);font-size:14px;line-height:1.65;margin-bottom:14px}
+.sample-tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:var(--copper-bright);
+  border:1px dashed var(--copper);border-radius:6px;padding:4px 10px;text-transform:uppercase}
+/* ---- about ---- */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:30px}
+.about-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:28px}
+.about-card h3{color:var(--copper);font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:14px}
+.about-card p,.about-card li{color:var(--muted);font-size:15px;line-height:1.75}
+.about-card ul{list-style:none}
+.about-card li{margin-bottom:10px;padding-left:26px;position:relative}
+.about-card li::before{content:"";position:absolute;left:4px;top:9px;width:8px;height:8px;border-radius:50%;background:var(--blue);box-shadow:0 0 8px var(--blue)}
+.hours-table{width:100%;border-collapse:collapse;font-size:14px}
+.hours-table td{padding:9px 4px;border-bottom:1px solid rgba(56,189,248,.1);color:var(--muted)}
+.hours-table td:last-child{text-align:right;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:13px}
+.photo-ph{background:repeating-linear-gradient(45deg,#0d1a38 0 14px,#0a1430 14px 28px);border:1px dashed rgba(56,189,248,.35);border-radius:14px;
+  min-height:220px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:.1em;text-align:center;padding:24px}
+/* ---- reviews ---- */
+.rating-hero{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:32px;display:flex;gap:28px;align-items:center;flex-wrap:wrap;margin-bottom:30px}
+.rating-num{font-size:64px;font-weight:800;color:var(--copper)}
+.stars{color:var(--copper-bright);font-size:20px;letter-spacing:4px}
+.stars .dim{color:#3a4a66}
+.rating-meta{color:var(--muted);font-size:14px;line-height:1.7}
+.sentiment{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:#0a0f1e;background:var(--copper-bright);border-radius:6px;padding:5px 12px;margin-top:8px}
+.rev-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px}
+.rev{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px}
+.rev .q{font-size:34px;color:var(--blue);line-height:1;font-family:Georgia,serif}
+.rev p.body{font-size:15px;line-height:1.7;margin:10px 0 16px}
+.rev .who{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)}
+.rev .who b{color:var(--copper)}
+.src-links{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+.note{margin-top:26px;padding:18px 20px;border-left:3px solid var(--copper);background:rgba(208,138,75,.07);border-radius:0 10px 10px 0;color:var(--muted);font-size:14px;line-height:1.7}
+/* ---- contact ---- */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:30px}
+.c-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:30px}
+.c-line{display:flex;gap:14px;align-items:flex-start;margin-bottom:20px}
+.c-line i{color:var(--copper);font-size:20px;margin-top:3px;min-width:24px}
+.c-line b{display:block;margin-bottom:4px}
+.c-line a{color:var(--blue);text-decoration:none}
+.c-line a:hover{text-decoration:underline}
+.c-line p{color:var(--muted);font-size:14px;line-height:1.65}
+label.mono{display:block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:16px 0 7px}
+input,textarea,select{width:100%;background:var(--navy2);border:1px solid var(--line);border-radius:8px;color:var(--text);
+  padding:12px 14px;font-family:'Sora',sans-serif;font-size:14px}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(56,189,248,.15)}
+textarea{min-height:120px;resize:vertical}
+footer{border-top:1px solid var(--line);text-align:center;padding:26px;color:var(--muted);font-size:14px;margin-left:76px;position:relative;z-index:1}
+@media(max-width:900px){
+  .rail{display:none}
+  .topbar{display:flex}
+  main{margin-left:0}
+  footer{margin-left:0}
+  .page{padding-top:110px}
+  .hero-grid,.about-grid,.contact-grid{grid-template-columns:1fr}
+  .stat-row{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:560px){.stat-row{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+
+<nav class="rail" aria-label="Site sections">
+  <div class="brandmark">TJ</div>
+  <a href="#home" data-nav="home" class="active"><span class="node"></span><span class="lbl">Home</span></a>
+  <a href="#services" data-nav="services"><span class="node"></span><span class="lbl">Services</span></a>
+  <a href="#about" data-nav="about"><span class="node"></span><span class="lbl">About</span></a>
+  <a href="#reviews" data-nav="reviews"><span class="node"></span><span class="lbl">Reviews</span></a>
+  <a href="#contact" data-nav="contact"><span class="node"></span><span class="lbl">Contact</span></a>
+</nav>
+
+
+<div class="topbar">
+  <div class="tbrand">T J Williams <em>Electric Co</em></div>
+  <button class="burger" id="burger" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+</div>
+<nav class="mnav" id="mnav" aria-label="Mobile sections">
+  <a href="#home" data-nav="home" class="active"><span class="dot"></span>Home</a>
+  <a href="#services" data-nav="services"><span class="dot"></span>Services</a>
+  <a href="#about" data-nav="about"><span class="dot"></span>About</a>
+  <a href="#reviews" data-nav="reviews"><span class="dot"></span>Reviews</a>
+  <a href="#contact" data-nav="contact"><span class="dot"></span>Contact</a>
+</nav>
+
+<main>
+
+<section class="page active" id="page-home" data-page="home">
+  <div class="block hero-grid">
+    <div>
+      <div class="eyebrow">// electrical contractor - harrison oh</div>
+      <h1>Power routed <span class="blue">the right way.</span></h1>
+      <p class="lede">T J Williams Electric Co is an electrical contractor based in Harrison, Ohio, serving the Cincinnati area. For service or a project estimate, call and talk to a real person.</p>
+      <div class="btnrow">
+        <a class="btn btn-copper" href="tel:+15137385366"><i class="fa-solid fa-phone"></i>(513) 738-5366</a>
+        <a class="btn btn-ghost" href="https://www.google.com/maps/search/?api=1&amp;query=T%20J%20Williams%20Electric%20Co%2C%207925%20New%20Haven%20Rd%2C%20Harrison%2C%20OH%2045030" target="_blank" rel="noopener"><i class="fa-solid fa-location-dot"></i>Get Directions</a>
+      </div>
+      <div class="btnrow">
+        <button class="btn btn-ghost" type="button" data-goto="services"><i class="fa-solid fa-microchip"></i>View Services</button>
+        <button class="btn btn-ghost" type="button" data-goto="reviews"><i class="fa-solid fa-star"></i>Read Reviews</button>
+      </div>
+    </div>
+    <div class="hero-art">
+      <svg viewBox="0 0 420 380" role="img" aria-label="Animated circuit board traces">
+        <rect x="8" y="8" width="404" height="364" rx="12" fill="none" stroke="rgba(56,189,248,.25)" stroke-width="1.5"/>
+        <path class="trace trace-copper flow" d="M40 60 H160 V140 H260 V220 H340"/>
+        <path class="trace trace-blue flow-slow" d="M40 120 H110 V220 H210 V300 H320"/>
+        <path class="trace trace-copper flow-slow" d="M40 180 H90 V260 H180 V320 H260"/>
+        <path class="trace trace-blue flow" d="M380 60 V140 H300 V200 H220"/>
+        <path class="trace trace-copper flow" d="M380 300 H300 V240 H180"/>
+        <circle class="pad pad-copper" cx="40" cy="60" r="8"/><circle class="pad pad-copper" cx="340" cy="220" r="8"/>
+        <circle class="pad pad-blue" cx="40" cy="120" r="8"/><circle class="pad pad-blue" cx="320" cy="300" r="8"/>
+        <circle class="pad pad-copper" cx="40" cy="180" r="8"/><circle class="pad pad-copper" cx="260" cy="320" r="8"/>
+        <circle class="pad pad-blue" cx="380" cy="60" r="8"/><circle class="pad pad-blue" cx="220" cy="200" r="8"/>
+        <circle class="pad pad-copper" cx="380" cy="300" r="8"/><circle class="pad pad-copper" cx="180" cy="240" r="8"/>
+        <circle class="glow pulse" cx="210" cy="140" r="10"/>
+        <circle class="glow pulse" cx="160" cy="260" r="10" style="animation-delay:.7s"/>
+        <circle class="glow pulse" cx="300" cy="140" r="10" style="animation-delay:1.2s"/>
+        <rect x="176" y="106" width="68" height="68" rx="8" fill="#0b1732" stroke="#d08a4b" stroke-width="2.5"/>
+        <text x="210" y="147" text-anchor="middle" fill="#d08a4b" font-family="JetBrains Mono, monospace" font-size="16" font-weight="600">TJ</text>
+        <rect x="126" y="226" width="68" height="68" rx="8" fill="#0b1732" stroke="#38bdf8" stroke-width="2.5"/>
+        <text x="160" y="267" text-anchor="middle" fill="#38bdf8" font-family="JetBrains Mono, monospace" font-size="16" font-weight="600">W</text>
+        <text x="40" y="356" fill="#8ea3c2" font-family="JetBrains Mono, monospace" font-size="11">BOARD REV 1.0 // HARRISON OH</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="stat-row">
+      <div class="stat"><b>(513) 738-5366</b><small>call the shop</small></div>
+      <div class="stat"><b>Mon - Fri</b><small>9:00 am to 6:00 pm</small></div>
+      <div class="stat"><b>Harrison, OH</b><small>7925 New Haven Rd</small></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="eyebrow">// what we do</div>
+    <h2>Electrical work, <span class="blue">end to end.</span></h2>
+    <p class="lede">The services below are typical for an electrical contractor. Call to confirm what T J Williams Electric Co currently offers.</p>
+    <div class="chips" style="margin-top:26px">
+      <div class="chip"><span class="pin">PIN-01</span><i class="fa-solid fa-plug-circle-bolt"></i><h3>Electrical Repairs</h3><p>Troubleshooting and repair of outlets, switches, fixtures, and faulty circuits.</p><span class="sample-tag">Sample - call to confirm</span></div>
+      <div class="chip"><span class="pin">PIN-02</span><i class="fa-solid fa-bolt"></i><h3>Panel Upgrades</h3><p>Breaker panel replacement and service upgrades for older homes and additions.</p><span class="sample-tag">Sample - call to confirm</span></div>
+      <div class="chip"><span class="pin">PIN-03</span><i class="fa-solid fa-lightbulb"></i><h3>Lighting Installation</h3><p>Indoor and outdoor lighting, including fixtures, landscape, and security lighting.</p><span class="sample-tag">Sample - call to confirm</span></div>
+    </div>
+    <div class="btnrow" style="margin-top:26px">
+      <button class="btn btn-ghost" type="button" data-goto="services">All Services <i class="fa-solid fa-arrow-right"></i></button>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="eyebrow">// public rating</div>
+    <h2>Rated <span class="blue">3.1 of 5</span> across 7 public reviews.</h2>
+    <p class="lede">An honest look at what customers have said online. Some longtime clients are very happy; overall sentiment is mixed.</p>
+    <div class="btnrow">
+      <button class="btn btn-copper" type="button" data-goto="reviews">See the Reviews</button>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-services" data-page="services">
+  <div class="block">
+    <div class="eyebrow">// service catalog</div>
+    <h1>Services on the <span class="blue">board.</span></h1>
+    <p class="lede">Each card below describes work typical of an electrical contractor. These service listings are samples for illustration; call <a class="mono" href="tel:+15137385366" style="color:var(--blue)">(513) 738-5366</a> to confirm current offerings and pricing.</p>
+  </div>
+  <svg class="trace-div" viewBox="0 0 600 46" preserveAspectRatio="none" aria-hidden="true">
+    <path class="trace trace-copper flow" d="M0 23 H180 V8 H300 V38 H440 V23 H600"/>
+    <circle class="pad pad-copper" cx="180" cy="23" r="5"/><circle class="pad pad-copper" cx="300" cy="8" r="5"/>
+    <circle class="pad pad-blue" cx="440" cy="23" r="5"/>
+  </svg>
+  <div class="block">
+    <div class="chips">
+      <div class="chip"><span class="pin">PIN-01</span><i class="fa-solid fa-plug-circle-bolt"></i><h3>Electrical Repairs</h3><p>Troubleshooting and repair of outlets, switches, fixtures, and faulty or dead circuits.</p><span class="sample-tag">Sample - call to confirm</span></div>
+      <div class="chip"><span class="pin">PIN-02</span><i class="fa-solid fa-bolt"></i><h3>Panel &amp; Service Upgrades</h3><p>Breaker panel replacement and electrical service upgrades for older homes, remodels, and additions.</p><span class="sample-tag">Sample - call to confirm</span></div>
+      <div class="chip"><span class="pin">PIN-03</span><i class="fa-solid fa-lightbulb"></i><h3>Lighting Installation</h3><p>Indoor fixtures, recessed lighting, landscape lighting, and outdoor security lighting.</p><span class="sample-tag">Sample - call to confirm</span></div>
+      <div class="chip"><span class="pin">PIN-04</span><i class="fa-solid fa-house-chimney"></i><h3>Residential Wiring</h3><p>New wiring, rewiring, and circuit additions for rooms, garages, and home improvements.</p><span class="sample-tag">Sample - call to confirm</span></div>
+      <div class="chip"><span class="pin">PIN-05</span><i class="fa-solid fa-building"></i><h3>Commercial &amp; Industrial</h3><p>Electrical work for business and industrial facilities, including larger renovation projects.</p><span class="sample-tag">Sample - call to confirm</span></div>
+      <div class="chip"><span class="pin">PIN-06</span><i class="fa-solid fa-triangle-exclamation"></i><h3>Safety Inspections</h3><p>Electrical safety checks and code-related corrections to keep a property up to standard.</p><span class="sample-tag">Sample - call to confirm</span></div>
+    </div>
+  </div>
+  <div class="block">
+    <div class="btnrow">
+      <a class="btn btn-copper" href="tel:+15137385366"><i class="fa-solid fa-phone"></i>Call (513) 738-5366</a>
+      <button class="btn btn-ghost" type="button" data-goto="contact">Request Service <i class="fa-solid fa-arrow-right"></i></button>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-about" data-page="about">
+  <div class="block">
+    <div class="eyebrow">// company profile</div>
+    <h1>About <span class="blue">T J Williams Electric Co</span></h1>
+    <p class="lede">An electrical contractor located at 7925 New Haven Rd in Harrison, Ohio, serving the Cincinnati area. Public directory listings describe the company as handling residential work as well as large-scale renovation and industrial electrical projects.</p>
+  </div>
+  <div class="block about-grid">
+    <div class="about-card">
+      <h3>// verified facts</h3>
+      <ul>
+        <li>Business name: T J Williams Electric Co</li>
+        <li>Address: 7925 New Haven Rd, Harrison, OH 45030</li>
+        <li>Phone: <a href="tel:+15137385366" style="color:var(--blue)">(513) 738-5366</a></li>
+        <li>Category: Electrician / Electrical contractor</li>
+        <li>Public reviews: 3.1 of 5 stars across 7 reviews (Birdeye, unclaimed profile)</li>
+        <li>BBB profile exists; the company is not BBB accredited</li>
+      </ul>
+    </div>
+    <div class="about-card">
+      <h3>// hours (as listed publicly)</h3>
+      <table class="hours-table">
+        <tr><td>Monday</td><td>9:00 am to 6:00 pm</td></tr>
+        <tr><td>Tuesday</td><td>9:00 am to 6:00 pm</td></tr>
+        <tr><td>Wednesday</td><td>9:00 am to 6:00 pm</td></tr>
+        <tr><td>Thursday</td><td>9:00 am to 6:00 pm</td></tr>
+        <tr><td>Friday</td><td>9:00 am to 6:00 pm</td></tr>
+        <tr><td>Saturday</td><td>Closed</td></tr>
+        <tr><td>Sunday</td><td>Closed</td></tr>
+      </table>
+      <p class="mono" style="font-size:11px;margin-top:14px;color:var(--copper-bright)">Hours from a public directory listing. Call to confirm.</p>
+    </div>
+  </div>
+  <div class="block">
+    <div class="photo-ph">PHOTO COMING SOON<br>shop / crew photo placeholder</div>
+  </div>
+  <div class="block">
+    <div class="btnrow">
+      <button class="btn btn-ghost" type="button" data-goto="reviews">Read Reviews</button>
+      <button class="btn btn-ghost" type="button" data-goto="contact">Contact Us</button>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-reviews" data-page="reviews">
+  <div class="block">
+    <div class="eyebrow">// customer feedback</div>
+    <h1>Honest <span class="blue">reviews.</span></h1>
+    <p class="lede">Public sentiment for T J Williams Electric Co is mixed. The summary below reflects what is actually published online; nothing here is invented.</p>
+  </div>
+  <div class="rating-hero">
+    <div class="rating-num mono">3.1</div>
+    <div>
+      <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star dim"></i><i class="fa-solid fa-star dim"></i></div>
+      <div class="rating-meta" style="margin-top:8px">7 public reviews on Birdeye<br>Profile not claimed by the business</div>
+      <span class="sentiment">overall sentiment: mixed</span>
+    </div>
+  </div>
+  <div class="block">
+    <div class="rev-grid">
+      <div class="rev">
+        <div class="q">&ldquo;</div>
+        <p class="body">We have been using TJ Williams for over 10 years and are very satisfied with their services and pricing. Jamie has been a pleasure to work with!</p>
+        <div class="who"><b>POSITIVE</b> - longtime customer, via Birdeye<br>(reviewer name not shown publicly)</div>
+      </div>
+      <div class="rev">
+        <div class="q">&ldquo;</div>
+        <p class="body">A 3.1 average across 7 reviews means not every experience was a good one. Full review texts are not published on the public profile, so the complete picture is limited.</p>
+        <div class="who"><b>MIXED PICTURE</b> - rating context, via Birdeye</div>
+      </div>
+      <div class="rev">
+        <div class="q">&ldquo;</div>
+        <p class="body">The business also holds a BBB profile, where it is listed as not accredited. No customer review content was available from the BBB listing.</p>
+        <div class="who"><b>NEUTRAL</b> - directory record, via BBB</div>
+      </div>
+    </div>
+    <div class="src-links">
+      <a class="btn btn-ghost" href="https://reviews.birdeye.com/t-j-williams-electric-co-167474344349829" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i>Read on Birdeye</a>
+      <a class="btn btn-ghost" href="https://www.bbb.org/us/oh/harrison/profile/electrician/t-j-williams-electric-co-0292-11027228" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i>BBB Profile</a>
+    </div>
+    <div class="note">
+      <b style="color:var(--copper-bright)">A note on honesty:</b> only one review text is publicly visible, so this page shows what exists rather than filling gaps. If you have worked with T J Williams Electric Co, the review sources above are where customers leave feedback. No reviewer names, ratings, or quotes have been invented for this page.
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-contact" data-page="contact">
+  <div class="block">
+    <div class="eyebrow">// get in touch</div>
+    <h1>Contact <span class="blue">T J Williams Electric Co</span></h1>
+    <p class="lede">The fastest way to reach the shop is by phone. Use the form to draft an email in your own mail app.</p>
+  </div>
+  <div class="block contact-grid">
+    <div class="c-card">
+      <div class="c-line"><i class="fa-solid fa-phone"></i><div><b>Phone</b><p><a href="tel:+15137385366">(513) 738-5366</a></p></div></div>
+      <div class="c-line"><i class="fa-solid fa-location-dot"></i><div><b>Address</b><p>T J Williams Electric Co<br>7925 New Haven Rd<br>Harrison, OH 45030</p></div></div>
+      <div class="c-line"><i class="fa-solid fa-clock"></i><div><b>Hours</b><p>Mon to Fri: 9:00 am to 6:00 pm<br>Sat and Sun: closed<br><span class="mono" style="font-size:11px;color:var(--copper-bright)">as listed publicly; call to confirm</span></p></div></div>
+      <div class="btnrow" style="margin-top:10px">
+        <a class="btn btn-copper" href="tel:+15137385366"><i class="fa-solid fa-phone"></i>Call Now</a>
+        <a class="btn btn-ghost" href="https://www.google.com/maps/search/?api=1&amp;query=T%20J%20Williams%20Electric%20Co%2C%207925%20New%20Haven%20Rd%2C%20Harrison%2C%20OH%2045030" target="_blank" rel="noopener"><i class="fa-solid fa-location-dot"></i>Directions</a>
+      </div>
+    </div>
+    <div class="c-card">
+      <h3 style="margin-bottom:4px">Send a message</h3>
+      <p style="color:var(--muted);font-size:13px">This opens a draft in your email app addressed for you to complete.</p>
+      <form id="contactForm">
+        <label class="mono" for="cf-name">Your name</label>
+        <input id="cf-name" name="name" type="text" required placeholder="Jane Smith">
+        <label class="mono" for="cf-phone">Your phone</label>
+        <input id="cf-phone" name="phone" type="tel" placeholder="(513) 555-0100">
+        <label class="mono" for="cf-service">Service needed</label>
+        <select id="cf-service" name="service">
+          <option>Electrical repair</option>
+          <option>Panel / service upgrade</option>
+          <option>Lighting installation</option>
+          <option>Residential wiring</option>
+          <option>Commercial / industrial</option>
+          <option>Safety inspection</option>
+          <option>Other</option>
+        </select>
+        <label class="mono" for="cf-msg">Message</label>
+        <textarea id="cf-msg" name="message" required placeholder="Describe the job..."></textarea>
+        <div class="btnrow" style="margin-top:20px">
+          <button class="btn btn-copper" type="submit"><i class="fa-solid fa-paper-plane"></i>Draft Email</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>© T J Williams Electric Co</footer>
+
+<script>
+var PAGES = ['home','services','about','reviews','contact'];
+function setActive(page){
+  document.querySelectorAll('.page').forEach(function(s){
+    s.classList.toggle('active', s.getAttribute('data-page') === page);
+  });
+  document.querySelectorAll('[data-nav]').forEach(function(a){
+    a.classList.toggle('active', a.getAttribute('data-nav') === page);
+  });
+}
+function navigateTo(page, push){
+  if(PAGES.indexOf(page) === -1){ page = 'home'; }
+  setActive(page);
+  if(push !== false){
+    try{ history.pushState({page:page}, '', '#' + page); }catch(e){}
+  }
+  window.scrollTo(0,0);
+  var mnav = document.getElementById('mnav');
+  if(mnav){ mnav.classList.remove('open'); }
+}
+document.querySelectorAll('[data-nav]').forEach(function(a){
+  a.addEventListener('click', function(e){
+    e.preventDefault();
+    navigateTo(a.getAttribute('data-nav'));
+  });
+});
+document.querySelectorAll('[data-goto]').forEach(function(b){
+  b.addEventListener('click', function(){
+    navigateTo(b.getAttribute('data-goto'));
+  });
+});
+window.addEventListener('popstate', function(e){
+  var page = (e.state && e.state.page) || (location.hash || '#home').replace('#','');
+  navigateTo(page, false);
+});
+(function(){
+  var initial = (location.hash || '#home').replace('#','');
+  if(PAGES.indexOf(initial) === -1){ initial = 'home'; }
+  setActive(initial);
+  try{ history.replaceState({page:initial}, '', '#' + initial); }catch(e){}
+})();
+document.getElementById('burger').addEventListener('click', function(){
+  document.getElementById('mnav').classList.toggle('open');
+});
+document.getElementById('contactForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  var name = document.getElementById('cf-name').value;
+  var phone = document.getElementById('cf-phone').value;
+  var service = document.getElementById('cf-service').value;
+  var msg = document.getElementById('cf-msg').value;
+  var subject = 'Website inquiry from ' + name;
+  var body = 'Name: ' + name + '\nPhone: ' + phone + '\nService needed: ' + service + '\n\nMessage:\n' + msg;
+  window.location.href = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+});
+</script>
+</body>
+</html>

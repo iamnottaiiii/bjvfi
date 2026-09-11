@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leo J Brielmaier Co | General Contractor, Cincinnati OH</title>
+<meta name="description" content="Leo J Brielmaier Co, general contractor at 5848 Winton Ridge Ln, Cincinnati, OH 45232. Call (513) 541-0458.">
+<style>
+  :root{
+    --paper:#F4F1EA;
+    --ink:#1C222B;
+    --steel:#33404F;
+    --blue:#174E7C;
+    --orange:#F26419;
+    --hazard:#FFC82E;
+    --concrete:#D8D4CC;
+    --white:#FFFFFF;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:Georgia,'Times New Roman',serif;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.6;
+  }
+  h1,h2,h3,.display{font-family:'Arial Black',Impact,'Franklin Gothic Medium',sans-serif;letter-spacing:.5px;text-transform:uppercase;line-height:1.15}
+  .mono{font-family:'Courier New',Courier,monospace}
+
+  /* ============ HAMBURGER ONLY TOP BAR ============ */
+  .topbar{
+    position:sticky;top:0;z-index:60;
+    display:flex;align-items:center;justify-content:space-between;
+    background:var(--ink);color:var(--white);
+    padding:.7rem 1rem;
+    border-bottom:5px solid var(--orange);
+  }
+  .brand{display:flex;align-items:center;gap:.6rem;font-family:'Arial Black',Impact,sans-serif;font-size:1rem;text-transform:uppercase;letter-spacing:1px}
+  .brand .mark{width:34px;height:34px;background:var(--orange);color:var(--ink);display:grid;place-items:center;font-weight:900;border-radius:3px}
+  .hamburger{background:transparent;border:2px solid var(--hazard);border-radius:4px;width:46px;height:42px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+  .hamburger span{display:block;width:24px;height:3px;background:var(--hazard);transition:.25s}
+  .hamburger.open span:nth-child(1){transform:translateY(9px) rotate(45deg)}
+  .hamburger.open span:nth-child(2){opacity:0}
+  .hamburger.open span:nth-child(3){transform:translateY(-9px) rotate(-45deg)}
+  .menu{display:none;background:var(--steel);padding:.5rem 1rem 1rem}
+  .menu.open{display:block}
+  .menu a{display:block;color:var(--white);text-decoration:none;font-family:'Courier New',monospace;font-weight:bold;text-transform:uppercase;letter-spacing:1px;padding:.7rem .2rem;border-bottom:1px dashed #5a6a7d;cursor:pointer}
+  .menu a:hover,.menu a.active{color:var(--hazard)}
+  .menu a:last-child{border-bottom:none}
+
+  /* ============ PAGES / ROUTER ============ */
+  .page{display:none;padding:2rem 1rem;max-width:1100px;margin:0 auto}
+  .page.active{display:block;animation:fadein .35s ease}
+  @keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  /* ============ MARQUEE TICKER HERO ============ */
+  .ticker{background:var(--hazard);color:var(--ink);overflow:hidden;white-space:nowrap;border-top:4px solid var(--ink);border-bottom:4px solid var(--ink);padding:.55rem 0}
+  .ticker-inner{display:inline-block;animation:tick 28s linear infinite;font-family:'Courier New',monospace;font-weight:bold;text-transform:uppercase;letter-spacing:2px}
+  @keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  .hero{
+    background:var(--blue);color:var(--white);
+    background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 1px,transparent 1px 40px),repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 1px,transparent 1px 40px);
+    padding:3.5rem 1.5rem;text-align:center;border-bottom:6px solid var(--ink);
+  }
+  .hero h1{font-size:clamp(2rem,6vw,3.6rem);margin-bottom:.6rem}
+  .hero h1 .accent{color:var(--hazard)}
+  .hero .tagline{font-family:'Courier New',monospace;letter-spacing:2px;text-transform:uppercase;color:var(--hazard);margin-bottom:1rem;font-size:.95rem}
+  .hero p.lead{max-width:640px;margin:0 auto 1.6rem;font-size:1.08rem}
+  .btn{display:inline-block;background:var(--orange);color:#fff;text-decoration:none;font-family:'Arial Black',Impact,sans-serif;text-transform:uppercase;letter-spacing:1px;padding:.9rem 1.8rem;border-radius:4px;border:3px solid var(--ink);box-shadow:4px 4px 0 var(--ink);cursor:pointer;margin:.4rem}
+  .btn:hover{transform:translate(-1px,-1px);box-shadow:6px 6px 0 var(--ink)}
+  .btn.ghost{background:var(--white);color:var(--ink)}
+  .badge{display:inline-block;font-family:'Courier New',monospace;font-size:.7rem;font-weight:bold;text-transform:uppercase;letter-spacing:1px;background:var(--ink);color:var(--hazard);padding:.25rem .6rem;border-radius:3px;margin:.2rem .2rem .2rem 0}
+  .badge.sample{background:#fff;color:#8a6d00;border:2px dashed #8a6d00}
+  .badge.confirm{background:var(--steel);color:#fff}
+
+  .section-title{font-size:1.9rem;margin-bottom:1.2rem;border-left:12px solid var(--orange);padding-left:.8rem}
+  .card{background:var(--white);border:3px solid var(--ink);border-radius:6px;padding:1.4rem;margin-bottom:1.2rem;box-shadow:5px 5px 0 var(--concrete)}
+
+  /* ============ SNAP SCROLL GALLERY ============ */
+  .snaprow{display:flex;gap:1rem;overflow-x:auto;scroll-snap-type:x mandatory;padding:.5rem .2rem 1.2rem;-webkit-overflow-scrolling:touch}
+  .snapcard{flex:0 0 82%;max-width:420px;scroll-snap-align:center;background:var(--white);border:3px solid var(--ink);border-radius:6px;overflow:hidden}
+  .snapcard .face{height:150px;display:grid;place-items:center;background:var(--steel);color:var(--white);font-family:'Arial Black',Impact,sans-serif;font-size:2.2rem;text-transform:uppercase;text-align:center;padding:1rem}
+  .snapcard .body{padding:1.1rem}
+  .snapcard .body h3{margin-bottom:.4rem;font-size:1.05rem}
+  .snapcard .body p{font-size:.95rem}
+  .snapcard .src{font-family:'Courier New',monospace;font-size:.72rem;color:#5a6572;display:block;margin-top:.6rem}
+
+  /* ============ FLIP CARDS ============ */
+  .flipgrid{display:grid;grid-template-columns:1fr;gap:1.2rem}
+  @media(min-width:640px){.flipgrid{grid-template-columns:1fr 1fr}}
+  @media(min-width:960px){.flipgrid{grid-template-columns:1fr 1fr 1fr}}
+  .flip{perspective:1200px;min-height:300px;cursor:pointer}
+  .flip-inner{position:relative;width:100%;height:100%;min-height:300px;transform-style:preserve-3d;transition:transform .6s}
+  .flip.flipped .flip-inner{transform:rotateY(180deg)}
+  @media(hover:hover){.flip:hover .flip-inner{transform:rotateY(180deg)}}
+  .flip-face{position:absolute;inset:0;backface-visibility:hidden;border:3px solid var(--ink);border-radius:6px;padding:1.3rem;display:flex;flex-direction:column;justify-content:center}
+  .flip-front{background:var(--blue);color:#fff;text-align:center}
+  .flip-front .num{font-family:'Courier New',monospace;color:var(--hazard);font-weight:bold;letter-spacing:2px;margin-bottom:.6rem}
+  .flip-front h3{font-size:1.2rem;margin-bottom:.5rem}
+  .flip-front .hint{font-family:'Courier New',monospace;font-size:.75rem;color:var(--hazard);margin-top:.8rem;letter-spacing:1px}
+  .flip-back{background:var(--white);transform:rotateY(180deg)}
+  .flip-back h3{font-size:1.05rem;margin-bottom:.5rem}
+  .flip-back p{font-size:.92rem}
+  .flip-back .backbtn{margin-top:auto;padding-top:.8rem}
+
+  /* ============ HOURS TABLE ============ */
+  .hours{width:100%;border-collapse:collapse;font-family:'Courier New',monospace;background:var(--white)}
+  .hours th,.hours td{border:2px solid var(--ink);padding:.6rem .8rem;text-align:left}
+  .hours th{background:var(--ink);color:var(--hazard);text-transform:uppercase;letter-spacing:1px;font-size:.85rem}
+  .hours td.closed{background:var(--concrete)}
+
+  .formgrid{display:grid;gap:.9rem;max-width:560px}
+  .formgrid label{font-family:'Courier New',monospace;font-weight:bold;text-transform:uppercase;font-size:.8rem;letter-spacing:1px}
+  .formgrid input,.formgrid textarea{font-family:Georgia,serif;font-size:1rem;padding:.7rem;border:3px solid var(--ink);border-radius:4px;background:#fff;width:100%}
+  .facts{list-style:none}
+  .facts li{padding:.5rem 0;border-bottom:1px dashed var(--concrete)}
+  .facts strong{font-family:'Courier New',monospace;text-transform:uppercase;font-size:.85rem;letter-spacing:1px}
+  .review{border-left:6px solid var(--hazard);padding:.8rem 1rem;margin-bottom:1rem;background:#fff}
+  footer{background:var(--ink);color:var(--white);text-align:center;padding:1.4rem;border-top:6px solid var(--hazard);font-family:'Courier New',monospace;letter-spacing:1px}
+  .hazard-strip{height:12px;background:repeating-linear-gradient(45deg,var(--hazard) 0 16px,var(--ink) 16px 32px)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><span class="mark">LB</span><span>Leo J Brielmaier Co</span></div>
+  <button class="hamburger" id="menuBtn" aria-label="Open menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</div>
+<nav class="menu" id="mainMenu">
+  <a data-page="home">Home</a>
+  <a data-page="services">Services</a>
+  <a data-page="about">About</a>
+  <a data-page="reviews">Reviews</a>
+  <a data-page="contact">Contact</a>
+</nav>
+
+
+<section class="page" id="page-home">
+  <div class="ticker"><div class="ticker-inner" id="tickerText">General Contractor *** Cincinnati, Ohio *** 5848 Winton Ridge Ln *** Call (513) 541-0458 *** General Contractor *** Cincinnati, Ohio *** 5848 Winton Ridge Ln *** Call (513) 541-0458 ***&nbsp;</div></div>
+
+  <div class="hero">
+    <div class="tagline">Licensed General Contractor</div>
+    <h1>Leo J <span class="accent">Brielmaier</span> Co</h1>
+    <p class="lead">A Cincinnati general contracting company based on Winton Ridge Lane. Public bid records show the company competing for public construction work across the region.</p>
+    <a class="btn" href="tel:+15135410458">Call (513) 541-0458</a>
+    <a class="btn ghost" data-page="services">See Services</a>
+    <div style="margin-top:1rem">
+      <span class="badge">Public record sourced</span>
+      <span class="badge confirm">Call to confirm</span>
+    </div>
+  </div>
+
+  <h2 class="section-title" style="margin-top:2rem">What the record shows</h2>
+  <div class="snaprow">
+    <div class="snapcard">
+      <div class="face">GC</div>
+      <div class="body">
+        <h3>General Contractor</h3>
+        <p>Listed in business directories as a general contractor in Cincinnati, Ohio.</p>
+        <span class="src">Source: Birdeye business directory listing</span>
+      </div>
+    </div>
+    <div class="snapcard">
+      <div class="face">$11M</div>
+      <div class="body">
+        <h3>Public Bid: Filager Campus Phase 2</h3>
+        <p>Public bid results show Leo J Brielmaier, Co. of 5848 Winton Ridge Lane bidding $11,085,000.00 on the Clermont County Filager Campus Phase 2 project.</p>
+        <span class="src">Source: Clermont County bid results, public document</span>
+      </div>
+    </div>
+    <div class="snapcard">
+      <div class="face">ADA</div>
+      <div class="body">
+        <h3>Public Bid: Greenhills Restrooms and Pathway</h3>
+        <p>A 2017 Village of Greenhills resolution authorized an agreement with the company for ADA restroom and pathway construction, about $147,000.00. Note: that document spells the name "Brielmeier".</p>
+        <span class="src">Source: Village of Greenhills Resolution 2017-30-S and S, public document</span>
+      </div>
+    </div>
+    <div class="snapcard">
+      <div class="face">6</div>
+      <div class="body">
+        <h3>Building Permits on Record</h3>
+        <p>BuildZoom reports the company has pulled 6.0 building permits since 2014 and holds license CBRC005573, AEC1475 (General, Contractor), listed as Active when last checked.</p>
+        <span class="src">Source: BuildZoom contractor profile</span>
+      </div>
+    </div>
+    <div class="snapcard">
+      <div class="face">Call</div>
+      <div class="body">
+        <h3>Get In Touch</h3>
+        <p>Call <a href="tel:+15135410458">(513) 541-0458</a> or visit the contact page for directions to 5848 Winton Ridge Ln, Cincinnati, OH 45232.</p>
+        <a class="btn" data-page="contact" style="margin-top:.6rem">Contact</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-services">
+  <h2 class="section-title">Services</h2>
+  <p style="margin-bottom:1.2rem">Tap or hover a card to flip it. <span class="badge sample">Sample</span> services are typical of a general contractor and are not confirmed for this company. Call to confirm what is offered.</p>
+  <div class="flipgrid">
+    <div class="flip" tabindex="0" role="button" aria-label="Service: General Contracting">
+      <div class="flip-inner">
+        <div class="flip-face flip-front">
+          <div class="num">01</div>
+          <h3>General Contracting</h3>
+          <div class="hint">FLIP FOR DETAILS</div>
+        </div>
+        <div class="flip-face flip-back">
+          <h3>General Contracting</h3>
+          <p>Full responsibility for a construction project from permits to final walkthrough, managing trades, schedule, and budget.</p>
+          <div class="backbtn"><span class="badge sample">Sample</span><span class="badge confirm">Call to confirm</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="flip" tabindex="0" role="button" aria-label="Service: Public and Municipal Bid Work">
+      <div class="flip-inner">
+        <div class="flip-face flip-front">
+          <div class="num">02</div>
+          <h3>Public and Municipal Bid Work</h3>
+          <div class="hint">FLIP FOR DETAILS</div>
+        </div>
+        <div class="flip-face flip-back">
+          <h3>Public and Municipal Bid Work</h3>
+          <p>Public bid records show this company bidding on county and village construction projects, including campus and ADA facility work.</p>
+          <div class="backbtn"><span class="badge">Public record sourced</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="flip" tabindex="0" role="button" aria-label="Service: Commercial Construction">
+      <div class="flip-inner">
+        <div class="flip-face flip-front">
+          <div class="num">03</div>
+          <h3>Commercial Construction</h3>
+          <div class="hint">FLIP FOR DETAILS</div>
+        </div>
+        <div class="flip-face flip-back">
+          <h3>Commercial Construction</h3>
+          <p>Build outs and renovations for commercial spaces, coordinated across subcontractors and inspections.</p>
+          <div class="backbtn"><span class="badge sample">Sample</span><span class="badge confirm">Call to confirm</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="flip" tabindex="0" role="button" aria-label="Service: Concrete and Site Work">
+      <div class="flip-inner">
+        <div class="flip-face flip-front">
+          <div class="num">04</div>
+          <h3>Concrete and Site Work</h3>
+          <div class="hint">FLIP FOR DETAILS</div>
+        </div>
+        <div class="flip-face flip-back">
+          <h3>Concrete and Site Work</h3>
+          <p>Pathways, flatwork, and site improvements such as those in the company's municipal project record.</p>
+          <div class="backbtn"><span class="badge sample">Sample</span><span class="badge confirm">Call to confirm</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="flip" tabindex="0" role="button" aria-label="Service: ADA and Accessibility Work">
+      <div class="flip-inner">
+        <div class="flip-face flip-front">
+          <div class="num">05</div>
+          <h3>ADA and Accessibility Work</h3>
+          <div class="hint">FLIP FOR DETAILS</div>
+        </div>
+        <div class="flip-face flip-back">
+          <h3>ADA and Accessibility Work</h3>
+          <p>A Village of Greenhills resolution ties the company to ADA compliant restroom and pathway construction.</p>
+          <div class="backbtn"><span class="badge">Public record sourced</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="flip" tabindex="0" role="button" aria-label="Service: Project Estimates">
+      <div class="flip-inner">
+        <div class="flip-face flip-front">
+          <div class="num">06</div>
+          <h3>Project Estimates</h3>
+          <div class="hint">FLIP FOR DETAILS</div>
+        </div>
+        <div class="flip-face flip-back">
+          <h3>Project Estimates</h3>
+          <p>Competitive bidding experience on projects up to eight figures. Call to ask about an estimate for your job.</p>
+          <div class="backbtn"><span class="badge sample">Sample</span><span class="badge confirm">Call to confirm</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-about">
+  <h2 class="section-title">About</h2>
+  <div class="card">
+    <h3 style="margin-bottom:.6rem">The Company</h3>
+    <p>Leo J Brielmaier Co is listed in business directories as a general contractor at 5848 Winton Ridge Ln, Cincinnati, OH 45232, with phone (513) 541-0458.</p>
+  </div>
+  <div class="card">
+    <h3 style="margin-bottom:.6rem">On the Public Record</h3>
+    <ul class="facts">
+      <li><strong>County bid record:</strong> Appeared as a bidder on the Clermont County Filager Campus Phase 2 project at $11,085,000.00.</li>
+      <li><strong>Municipal project:</strong> Named in a 2017 Village of Greenhills resolution for ADA restroom and pathway facilities, about $147,000.00. That document spells the name "Brielmeier".</li>
+      <li><strong>Permits and license:</strong> BuildZoom reports 6 building permits pulled since 2014 and license CBRC005573, AEC1475 (General, Contractor), shown as Active when last checked.</li>
+      <li><strong>Hours as listed:</strong> Business directories list Monday to Friday, 9:00 AM to 6:00 PM. <span class="badge confirm">Call to confirm</span></li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3 style="margin-bottom:.6rem">What We Could Not Verify</h3>
+    <p>Founding year, ownership, team size, and project photos could not be confirmed from public sources. <span class="badge">Photo coming soon</span></p>
+  </div>
+</section>
+
+
+<section class="page" id="page-reviews">
+  <h2 class="section-title">Reviews</h2>
+  <div class="card">
+    <h3 style="margin-bottom:.6rem">Published Rating</h3>
+    <p>Birdeye shows <strong>5.0 stars from 1 published review</strong> for Leo J Brielmaier Co. No review text was published, so there are no quotes to show here, and no reviewer names are available.</p>
+    <p style="margin-top:.6rem"><a href="https://reviews.birdeye.com/leo-j-brielmaier-co-165993325399933" target="_blank" rel="noopener">See the rating on Birdeye</a></p>
+  </div>
+  <div class="card">
+    <h3 style="margin-bottom:.6rem">Google Reviews</h3>
+    <p>We could not verify the business's Google Maps listing from the provided link, so no "See reviews on Google" link is included. Search for the business name on Google Maps to read any Google reviews directly.</p>
+  </div>
+</section>
+
+
+<section class="page" id="page-contact">
+  <h2 class="section-title">Contact</h2>
+  <div class="card">
+    <h3 style="margin-bottom:.6rem">Reach the Office</h3>
+    <ul class="facts">
+      <li><strong>Phone:</strong> <a href="tel:+15135410458">(513) 541-0458</a></li>
+      <li><strong>Address:</strong> 5848 Winton Ridge Ln, Cincinnati, OH 45232</li>
+      <li><strong>Website listed in directories:</strong> <a href="https://www.brielmaier.com/en" target="_blank" rel="noopener">brielmaier.com</a> <span class="badge confirm">Call to confirm</span></li>
+    </ul>
+    <div style="margin-top:1rem">
+      <a class="btn" href="https://www.google.com/maps/search/?api=1&query=5848%20Winton%20Ridge%20Ln%2C%20Cincinnati%2C%20OH%2045232" target="_blank" rel="noopener">Get Directions</a>
+      <a class="btn ghost" href="tel:+15135410458">Call Now</a>
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="margin-bottom:.6rem">Listed Hours <span class="badge confirm">Call to confirm</span></h3>
+    <table class="hours">
+      <tr><th>Day</th><th>Hours</th></tr>
+      <tr><td>Monday</td><td>9:00 AM to 6:00 PM</td></tr>
+      <tr><td>Tuesday</td><td>9:00 AM to 6:00 PM</td></tr>
+      <tr><td>Wednesday</td><td>9:00 AM to 6:00 PM</td></tr>
+      <tr><td>Thursday</td><td>9:00 AM to 6:00 PM</td></tr>
+      <tr><td>Friday</td><td>9:00 AM to 6:00 PM</td></tr>
+      <tr><td class="closed">Saturday</td><td class="closed">Closed</td></tr>
+      <tr><td class="closed">Sunday</td><td class="closed">Closed</td></tr>
+    </table>
+    <p class="mono" style="font-size:.78rem;margin-top:.6rem">Hours as listed on business directories, not confirmed by the business.</p>
+  </div>
+  <div class="card">
+    <h3 style="margin-bottom:.6rem">Send a Message</h3>
+    <p style="margin-bottom:1rem">Fill this out and your email app will open with your message ready. No email address for the business is published, so you will address it yourself or call instead.</p>
+    <form id="contactForm" class="formgrid">
+      <label for="fName">Your name</label>
+      <input id="fName" name="name" type="text" required>
+      <label for="fPhone">Your phone</label>
+      <input id="fPhone" name="phone" type="tel" required>
+      <label for="fMsg">Project details</label>
+      <textarea id="fMsg" name="message" rows="5" required></textarea>
+      <button class="btn" type="submit">Draft Email</button>
+    </form>
+  </div>
+</section>
+
+<div class="hazard-strip"></div>
+<footer>&copy; Leo J Brielmaier Co</footer>
+
+<script>
+var pageMap = {
+  home: 'page-home',
+  services: 'page-services',
+  about: 'page-about',
+  reviews: 'page-reviews',
+  contact: 'page-contact'
+};
+
+function navigateTo(page) {
+  if (!pageMap[page]) { page = 'home'; }
+  var sections = document.querySelectorAll('.page');
+  for (var i = 0; i < sections.length; i++) {
+    sections[i].classList.remove('active');
+  }
+  document.getElementById(pageMap[page]).classList.add('active');
+  var links = document.querySelectorAll('[data-page]');
+  for (var j = 0; j < links.length; j++) {
+    if (links[j].getAttribute('data-page') === page) {
+      links[j].classList.add('active');
+    } else {
+      links[j].classList.remove('active');
+    }
+  }
+  var hash = '#' + page;
+  if (window.location.hash !== hash) {
+    history.pushState({page: page}, '', hash);
+  }
+  closeMenu();
+  window.scrollTo(0, 0);
+}
+
+function closeMenu() {
+  document.getElementById('mainMenu').classList.remove('open');
+  var btn = document.getElementById('menuBtn');
+  btn.classList.remove('open');
+  btn.setAttribute('aria-expanded', 'false');
+}
+
+document.getElementById('menuBtn').addEventListener('click', function () {
+  var menu = document.getElementById('mainMenu');
+  var isOpen = menu.classList.toggle('open');
+  this.classList.toggle('open', isOpen);
+  this.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+});
+
+document.addEventListener('click', function (e) {
+  var el = e.target.closest('[data-page]');
+  if (el) {
+    e.preventDefault();
+    navigateTo(el.getAttribute('data-page'));
+  }
+});
+
+window.addEventListener('popstate', function (e) {
+  var page = (e.state && e.state.page) || window.location.hash.replace('#', '') || 'home';
+  if (!pageMap[page]) { page = 'home'; }
+  var sections = document.querySelectorAll('.page');
+  for (var i = 0; i < sections.length; i++) { sections[i].classList.remove('active'); }
+  document.getElementById(pageMap[page]).classList.add('active');
+  window.scrollTo(0, 0);
+});
+
+var flips = document.querySelectorAll('.flip');
+for (var k = 0; k < flips.length; k++) {
+  flips[k].addEventListener('click', function () { this.classList.toggle('flipped'); });
+  flips[k].addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.classList.toggle('flipped'); }
+  });
+}
+
+var ticker = document.getElementById('tickerText');
+ticker.innerHTML = ticker.innerHTML + ticker.innerHTML;
+
+document.getElementById('contactForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var name = document.getElementById('fName').value.trim();
+  var phone = document.getElementById('fPhone').value.trim();
+  var msg = document.getElementById('fMsg').value.trim();
+  var subject = encodeURIComponent('Project inquiry from ' + name);
+  var body = encodeURIComponent('Name: ' + name + '\nPhone: ' + phone + '\n\nProject details:\n' + msg);
+  window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
+});
+
+(function init() {
+  var page = window.location.hash.replace('#', '') || 'home';
+  if (!pageMap[page]) { page = 'home'; }
+  document.getElementById(pageMap[page]).classList.add('active');
+})();
+</script>
+</body>
+</html>
