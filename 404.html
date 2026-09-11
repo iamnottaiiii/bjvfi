@@ -1,20 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>bjvfi</title>
 <script>
 (function () {
   try {
     var host = location.hostname.toLowerCase();
-    if (!host.endsWith(".bjvfi.com")) return;
+    if (!host.endsWith(".bjvfi.com")) {
+      // normal unknown path on apex → home
+      location.replace("https://bjvfi.com/");
+      return;
+    }
     var sub = host.slice(0, -".bjvfi.com".length);
-    if (!sub || sub === "www" || sub === "sitedesk") return;
-
-    // Stay on https://sub.bjvfi.com/ — load that business page in place (no redirect)
+    if (!sub || sub === "www" || sub === "sitedesk") {
+      location.replace("https://bjvfi.com/");
+      return;
+    }
     var slug = sub;
     var src = "https://bjvfi.com/" + encodeURIComponent(slug) + "/";
-
-    // Avoid loops if someone already put a path on the subdomain
     var path = location.pathname || "/";
     if (path !== "/" && path !== "") return;
 
@@ -26,19 +31,14 @@
         return r.text();
       })
       .then(function (html) {
-        // Ensure relative assets resolve against the business folder
         if (!/<base\s/i.test(html)) {
-          html = html.replace(
-            /<head([^>]*)>/i,
-            '<head$1><base href="' + src + '">'
-          );
+          html = html.replace(/<head([^>]*)>/i, '<head$1><base href="' + src + '">');
         }
         document.open();
         document.write(html);
         document.close();
       })
       .catch(function () {
-        // Fallback: embed so the subdomain URL still stays put
         document.documentElement.innerHTML =
           "<head><meta charset=UTF-8><meta name=viewport content=\"width=device-width,initial-scale=1\"><title>" +
           slug +
@@ -51,28 +51,6 @@
   } catch (e) {}
 })();
 </script>
-
-
-<script>
-(function () {
-  try {
-    var host = location.hostname.toLowerCase();
-    if (!host.endsWith(".bjvfi.com")) return;
-    var sub = host.slice(0, -".bjvfi.com".length);
-    if (!sub || sub === "www" || sub === "sitedesk") return;
-    // already on a path for this business
-    var path = location.pathname || "/";
-    if (path === "/" || path === "") {
-      location.replace("https://bjvfi.com/" + encodeURIComponent(sub) + "/");
-    }
-  } catch (e) {}
-})();
-</script>
-
-<meta charset="UTF-8">
-<meta http-equiv="refresh" content="0; URL='https://bjvfi.com/'">
-<title>Redirecting...</title>
 </head>
-<body>
-</body>
+<body></body>
 </html>
