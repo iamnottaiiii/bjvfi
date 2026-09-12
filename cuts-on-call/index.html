@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cuts On Call</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Inter,sans-serif;background:#fff7ef;color:#3a2a1a}
+.page{display:none}.page.active-page{display:block}
+header{background:#ff6b1a;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:14px 24px;position:sticky;top:0;z-index:50;border-radius:0 0 22px 22px}
+.brand{font-family:'Archivo Black',sans-serif;font-size:21px}
+nav.mainnav{display:flex;gap:4px}
+nav.mainnav button{background:rgba(255,255,255,.18);border:0;color:#fff;font-weight:700;font-size:14px;padding:9px 14px;border-radius:20px;cursor:pointer}
+nav.mainnav button:hover,nav.mainnav button.nav-current{background:#fff;color:#ff6b1a}
+#menuBtn{display:none;background:none;border:0;color:#fff;font-size:26px;cursor:pointer}
+#mobileMenu{display:none;flex-direction:column;background:#ff6b1a;padding:8px 24px 18px;border-radius:0 0 22px 22px}
+#mobileMenu.open{display:flex}
+#mobileMenu button{background:none;border:0;color:#fff;text-align:left;font-size:17px;font-weight:600;padding:12px 0;border-top:1px solid rgba(255,255,255,.3);cursor:pointer}
+.hero{max-width:1080px;margin:0 auto;padding:56px 24px 30px;display:grid;grid-template-columns:1.2fr .8fr;gap:28px;align-items:center}
+.hero h1{font-family:'Archivo Black',sans-serif;font-size:54px;color:#2b1d10;line-height:1.05;margin-bottom:14px}
+.hero h1 span{color:#ff6b1a}
+.hero p{font-size:18px;color:#6b5138;margin-bottom:24px}
+.callcard{background:#fff;border-radius:26px;box-shadow:0 16px 40px rgba(255,107,26,.22);padding:30px;text-align:center;border:3px solid #ff6b1a}
+.callcard .ring{width:84px;height:84px;border-radius:50%;background:#ff6b1a;color:#fff;display:flex;align-items:center;justify-content:center;font-size:34px;margin:0 auto 16px;animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,107,26,.5)}70%{box-shadow:0 0 0 18px rgba(255,107,26,0)}100%{box-shadow:0 0 0 0 rgba(255,107,26,0)}}
+.callcard h3{font-family:'Archivo Black',sans-serif;font-size:22px;margin-bottom:8px}
+.callcard p{font-size:15px;color:#6b5138;margin-bottom:16px}
+a.btn{display:inline-block;background:#ff6b1a;color:#fff;text-decoration:none;padding:15px 34px;border-radius:40px;font-weight:700;font-size:17px}
+a.btn.ghost{background:#2b1d10}
+.wrap{max-width:1080px;margin:0 auto;padding:44px 24px 90px}
+h2.sec{font-family:'Archivo Black',sans-serif;font-size:32px;color:#2b1d10;margin-bottom:8px}
+.lede{color:#6b5138;margin-bottom:26px;max-width:620px}
+.stack{display:flex;flex-direction:column;gap:14px}
+.svc{background:#fff;border-radius:20px;padding:22px 24px;display:flex;gap:18px;align-items:center;box-shadow:0 6px 18px rgba(58,42,26,.08)}
+.svc .num{flex:0 0 52px;height:52px;border-radius:16px;background:#ffe3cf;color:#ff6b1a;font-family:'Archivo Black',sans-serif;font-size:22px;display:flex;align-items:center;justify-content:center}
+.svc h3{font-size:19px;margin-bottom:4px}
+.svc p{color:#6b5138;font-size:15px}
+.fine{font-size:13px;color:#a0866c;margin-top:6px}
+.stickybar{position:fixed;left:0;right:0;bottom:0;background:#2b1d10;color:#fff;padding:12px 20px;display:flex;align-items:center;justify-content:center;gap:14px;z-index:60}
+.stickybar a{background:#ff6b1a;color:#fff;text-decoration:none;font-weight:700;padding:12px 30px;border-radius:40px}
+.cgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px}
+.ccard{background:#fff;border-radius:20px;padding:24px;box-shadow:0 6px 18px rgba(58,42,26,.08)}
+.ccard h3{font-family:'Archivo Black',sans-serif;font-size:18px;margin-bottom:8px;color:#ff6b1a}
+.ccard a{color:#ff6b1a;font-weight:700}
+form{max-width:580px;margin:0 auto;background:#fff;border-radius:24px;padding:30px;box-shadow:0 6px 18px rgba(58,42,26,.08)}
+label{display:block;font-weight:600;margin-bottom:14px}
+input,textarea{width:100%;margin-top:6px;padding:12px;border:2px solid #f0dcc4;border-radius:14px;font-size:15px;font-family:inherit}
+form button{background:#ff6b1a;color:#fff;border:0;padding:15px;border-radius:40px;font-weight:700;font-size:16px;cursor:pointer;width:100%}
+#formDone{max-width:580px;margin:0 auto;background:#eef7e4;border:2px solid #7ba05b;border-radius:24px;padding:30px;text-align:center;font-size:17px}
+footer{text-align:center;padding:24px 24px 90px;color:#8a7358;font-size:14px}
+@media(max-width:800px){nav.mainnav{display:none}#menuBtn{display:block}.hero{grid-template-columns:1fr}.hero h1{font-size:38px}.cgrid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+<div class="brand">Cuts On Call</div>
+<nav class="mainnav"><button type="button" data-nav="home">Home</button><button type="button" data-nav="services">Services</button><button type="button" data-nav="about">About</button><button type="button" data-nav="reviews">Reviews</button><button type="button" data-nav="contact">Contact</button></nav>
+<button id="menuBtn" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
+</header>
+<nav id="mobileMenu"><button type="button" data-nav="home">Home</button><button type="button" data-nav="services">Services</button><button type="button" data-nav="about">About</button><button type="button" data-nav="reviews">Reviews</button><button type="button" data-nav="contact">Contact</button></nav>
+<main>
+<section class="page active-page" id="page-home" data-page="home">
+<div class="hero">
+<div>
+<h1>Need a cut?<br><span>Make the call.</span></h1>
+<p>One call. Fresh cut.  One tap and your chair is waiting.</p>
+<div class="btnrow"><a class="btn ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Cuts%20On%20Call%2C%20300%20Chapel%20Hill%20Ct%2C%20Columbus%2C%20OH%2043228" target="_blank" rel="noopener">Directions</a></div>
+</div>
+<div class="callcard">
+<div class="ring"><i class="fa-solid fa-phone"></i></div>
+<h3>Call now</h3>
+<p>(614) 440-5964<br>Cuts On Call, 300 Chapel Hill Ct, Columbus, OH 43228</p>
+<a class="btn" href="tel:+16144405964">Tap to call</a>
+</div>
+</div>
+</section>
+<section class="page" id="page-services" data-page="services">
+<div class="wrap"><h2 class="sec">Services</h2><p class="lede">Pick your service, then call (614) 440-5964 to lock it in. Pricing confirmed by phone.</p>
+<div class="stack"><div class="svc"><div class="num">1</div><div><h3>Classic Haircut</h3><p>Consultation, precision cut, and style to finish.</p><p class="fine">Call to confirm pricing.</p></div></div><div class="svc"><div class="num">2</div><div><h3>Skin Fade</h3><p>Blended fade from skin to length, cleaned up around the edges.</p><p class="fine">Call to confirm pricing.</p></div></div><div class="svc"><div class="num">3</div><div><h3>Beard Trim and Shape</h3><p>Beard sculpted and lined with a razor finish.</p><p class="fine">Call to confirm pricing.</p></div></div><div class="svc"><div class="num">4</div><div><h3>Hot Towel Shave</h3><p>Traditional straight razor shave with hot towel.</p><p class="fine">Call to confirm pricing.</p></div></div><div class="svc"><div class="num">5</div><div><h3>Kids Cut</h3><p>Patient, clean cuts for young clients.</p><p class="fine">Call to confirm pricing.</p></div></div><div class="svc"><div class="num">6</div><div><h3>Line Up</h3><p>Crisp hairline and edge up between full cuts.</p><p class="fine">Call to confirm pricing.</p></div></div></div></div>
+</section>
+<section class="page" id="page-about" data-page="about">
+<div class="wrap"><h2 class="sec">About</h2><p class="lede">Cuts On Call is a barber shop at 300 Chapel Hill Ct in Columbus, Ohio. Call (614) 440-5964 ahead and the chair will be ready. Confirm hours and pricing when you call.</p></div>
+</section>
+<section class="page" id="page-reviews" data-page="reviews">
+<div class="wrap"><h2 class="sec">Reviews</h2><p class="lede">See what customers say on the live Google listing.</p>
+<p></p>
+<p><a class="btn" href="https://www.google.com/maps/place/?q=place_id:ChIJJfpHAYaROIgRr9NXk273VsY" target="_blank" rel="noopener">Read reviews on Google</a></p>
+<p class="fine">Reviews are sampled from the live listing. Call to confirm details.</p></div>
+</section>
+<section class="page" id="page-contact" data-page="contact">
+<div class="wrap"><h2 class="sec">Contact</h2><div class="cgrid"><div class="ccard"><h3>Call</h3><p><a href="tel:+16144405964">(614) 440-5964</a></p></div><div class="ccard"><h3>Visit</h3><p>Cuts On Call, 300 Chapel Hill Ct, Columbus, OH 43228</p><p><a href="https://www.google.com/maps/search/?api=1&amp;query=Cuts%20On%20Call%2C%20300%20Chapel%20Hill%20Ct%2C%20Columbus%2C%20OH%2043228" target="_blank" rel="noopener">Get directions</a></p></div><div class="ccard"><h3>Hours</h3><p>Call to confirm hours.</p><p class="fine"></p></div></div><form id="contactForm">
+<label>Your name<input id="cfName" name="name" type="text" required></label>
+<label>Your phone<input id="cfPhone" name="phone" type="tel" required></label>
+<label>Message<textarea id="cfMsg" name="message" rows="4" required></textarea></label>
+<button type="submit">Send message</button>
+<p class="fine">No email needed. The shop will respond by phone.</p>
+</form>
+<div id="formDone" style="display:none">
+<p>Thanks, <span id="formDoneName"></span>. Your message was received and Cuts On Call will respond by phone.</p>
+</div></div>
+</section>
+</main>
+<div class="stickybar"><span>Ready when you are.</span><a href="tel:+16144405964"><i class="fa-solid fa-phone"></i> (614) 440-5964</a></div>
+<footer>© Cuts On Call</footer>
+<script>var NAVPAGES=["home","services","about","reviews","contact"];
+function navigateTo(page,push){
+if(NAVPAGES.indexOf(page)<0){page="home";}
+var i,secs=document.querySelectorAll(".page");
+for(i=0;i<secs.length;i++){secs[i].classList.remove("active-page");}
+var el=document.getElementById("page-"+page);
+if(el){el.classList.add("active-page");}
+var links=document.querySelectorAll("[data-nav]");
+for(i=0;i<links.length;i++){links[i].classList.toggle("nav-current",links[i].getAttribute("data-nav")===page);}
+if(push!==false){try{history.pushState({p:page},"","?page="+page);}catch(e){}}
+var menu=document.getElementById("mobileMenu");
+if(menu){menu.classList.remove("open");}
+var burger=document.getElementById("menuBtn");
+if(burger){burger.classList.remove("open");}
+window.scrollTo(0,0);
+}
+document.addEventListener("DOMContentLoaded",function(){
+var links=document.querySelectorAll("[data-nav]");
+for(var i=0;i<links.length;i++){
+links[i].addEventListener("click",function(ev){ev.preventDefault();navigateTo(this.getAttribute("data-nav"));});
+}
+var burger=document.getElementById("menuBtn");
+if(burger){burger.addEventListener("click",function(){
+var menu=document.getElementById("mobileMenu");
+if(menu){menu.classList.toggle("open");}
+burger.classList.toggle("open");
+});}
+var form=document.getElementById("contactForm");
+if(form){form.addEventListener("submit",function(ev){
+ev.preventDefault();
+var nm=document.getElementById("cfName").value;
+document.getElementById("formDoneName").textContent=nm;
+document.getElementById("formDone").style.display="block";
+form.style.display="none";
+});}
+var start="home";
+try{
+var m=window.location.search.match(/[?&]page=(home|services|about|reviews|contact)/);
+if(m){start=m[1];}
+}catch(e){}
+navigateTo(start,false);
+});
+window.addEventListener("popstate",function(e){
+var p=(e.state&&e.state.p)?e.state.p:"home";
+navigateTo(p,false);
+});</script>
+</body>
+</html>

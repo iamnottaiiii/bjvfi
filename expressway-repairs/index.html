@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home | Expressway Repairs</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Roboto',sans-serif;background:#0e141b;color:#dfe7ee;line-height:1.6}
+.app{display:flex;min-height:100vh}
+.rail{width:280px;flex-shrink:0;background:#0a0f15;border-right:1px solid #1d2833;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;padding:36px 24px}
+.rail .sign{font-family:'Roboto Condensed',sans-serif;font-weight:700;font-size:1.5rem;text-transform:uppercase;letter-spacing:.04em}
+.rail .sign span{color:#ffb400}
+.rail .exit{font-size:.7rem;letter-spacing:.3em;text-transform:uppercase;color:#5b6b7c;margin-top:8px}
+.rail nav{display:flex;flex-direction:column;gap:8px;margin:44px 0 auto}
+.rail nav button{background:none;border:1px solid #1d2833;border-radius:8px;color:#9fb0c0;font-family:'Roboto Condensed',sans-serif;font-weight:600;font-size:1.02rem;letter-spacing:.1em;text-transform:uppercase;padding:14px 16px;cursor:pointer;text-align:left;display:flex;align-items:center;gap:12px}
+.rail nav button i{color:#ffb400;width:20px;text-align:center}
+.rail nav button.active{background:#ffb400;border-color:#ffb400;color:#0a0f15;font-weight:700}
+.rail nav button.active i{color:#0a0f15}
+.rail nav button:hover{border-color:#ffb400}
+.rail .mile{border-top:1px solid #1d2833;padding-top:18px;font-size:.85rem;color:#5b6b7c}
+.rail .mile a{color:#ffb400;font-weight:700;text-decoration:none;font-size:1.05rem}
+.main{flex:1;min-width:0}
+.mobtop{display:none;justify-content:space-between;align-items:center;background:#0a0f15;border-bottom:1px solid #1d2833;padding:14px 18px}
+.mobtop strong{font-family:'Roboto Condensed',sans-serif;font-size:1.25rem;text-transform:uppercase}
+.mobtop strong span{color:#ffb400}
+#menuToggle{background:#ffb400;border:none;color:#0a0f15;padding:10px 14px;border-radius:8px;font-size:1.1rem;cursor:pointer}
+#mobileMenu{display:none;background:#0a0f15;border-bottom:1px solid #1d2833;padding:10px 18px 16px}
+#mobileMenu.open{display:block}
+#mobileMenu button{display:block;width:100%;background:none;border:none;color:#dfe7ee;text-align:left;font-family:'Roboto Condensed',sans-serif;font-weight:600;letter-spacing:.1em;text-transform:uppercase;font-size:1.05rem;padding:13px 4px;border-bottom:1px solid #1d2833;cursor:pointer}
+#mobileMenu button.active{color:#ffb400}
+.page{display:none}
+.page.active{display:block}
+.lane{max-width:860px;padding:70px 44px}
+.marker{display:inline-flex;align-items:center;gap:10px;background:#152030;border:1px solid #243445;border-radius:8px;padding:8px 16px;font-family:'Roboto Condensed',sans-serif;font-weight:600;letter-spacing:.22em;text-transform:uppercase;font-size:.75rem;color:#ffb400;margin-bottom:22px}
+h1{font-family:'Roboto Condensed',sans-serif;font-weight:700;font-size:clamp(2.4rem,6vw,4.2rem);line-height:1;text-transform:uppercase;margin-bottom:18px}
+h1 .y{color:#ffb400}
+p.lead{color:#9fb0c0;font-size:1.08rem;max-width:600px;margin-bottom:32px}
+.btn{display:inline-block;background:#ffb400;color:#0a0f15;border:none;border-radius:8px;padding:15px 34px;font-family:'Roboto Condensed',sans-serif;font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:1rem;cursor:pointer;text-decoration:none}
+.btn:hover{background:#e0a300}
+.btn.line{background:transparent;color:#dfe7ee;border:2px solid #243445}
+.stops{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:36px}
+.stop{background:#111a24;border:1px solid #1d2833;border-radius:12px;padding:26px}
+.stop .ic{color:#ffb400;font-size:1.4rem;margin-bottom:12px}
+.stop h3{font-family:'Roboto Condensed',sans-serif;font-size:1.15rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.stop p{font-size:.9rem;color:#9fb0c0}
+.stop a{color:#ffb400;font-weight:700}
+h2{font-family:'Roboto Condensed',sans-serif;font-size:2.2rem;font-weight:700;text-transform:uppercase;margin-bottom:10px}
+h2 .y{color:#ffb400}
+.caution{background:rgba(255,180,0,.07);border:1px solid #4a3a10;border-radius:10px;padding:14px 20px;font-size:.9rem;color:#d8b45a;margin:22px 0;max-width:660px}
+ul.route{list-style:none;margin-top:24px}
+ul.route li{background:#111a24;border:1px solid #1d2833;border-radius:12px;padding:20px 24px;margin-bottom:12px;display:flex;gap:16px;align-items:flex-start}
+ul.route li .mp{flex-shrink:0;width:44px;height:44px;border-radius:50%;background:#152030;border:1px solid #243445;color:#ffb400;display:flex;align-items:center;justify-content:center;font-family:'Roboto Condensed',sans-serif;font-weight:700}
+ul.route li b{display:block;font-family:'Roboto Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em}
+ul.route li p{font-size:.88rem;color:#9fb0c0}
+ul.route li .sm{margin-left:auto;flex-shrink:0;align-self:center;font-size:.62rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#ffb400;border:1px solid #ffb400;border-radius:14px;padding:4px 12px}
+form.fuel{background:#111a24;border:1px solid #1d2833;border-radius:14px;padding:34px;margin-top:28px;max-width:620px}
+label{display:block;font-family:'Roboto Condensed',sans-serif;font-weight:600;letter-spacing:.14em;text-transform:uppercase;font-size:.78rem;color:#9fb0c0;margin:16px 0 6px}
+input,textarea{width:100%;background:#0a0f15;border:1px solid #243445;border-radius:8px;color:#dfe7ee;padding:13px 14px;font-family:'Roboto',sans-serif;font-size:1rem}
+input:focus,textarea:focus{outline:none;border-color:#ffb400}
+textarea{min-height:120px;resize:vertical}
+#formMsg{display:none;margin-top:16px;background:#122b14;border:1px solid #2f7a35;color:#a9e2ae;padding:14px 18px;border-radius:8px;font-weight:700}
+footer{border-top:1px solid #1d2833;text-align:center;padding:24px;color:#5b6b7c;font-size:.88rem;font-family:'Roboto Condensed',sans-serif;letter-spacing:.12em;text-transform:uppercase}
+@media(max-width:880px){.rail{display:none}.mobtop{display:flex}.lane{padding:48px 22px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="rail">
+    <div class="sign">Expressway <span>Repairs</span></div>
+    <div class="exit">Exit 50 Kingston Ave</div>
+    <nav aria-label="Primary">
+      <button data-nav="home" class="active"><i class="fa-solid fa-house"></i>Home</button>
+      <button data-nav="services"><i class="fa-solid fa-wrench"></i>Services</button>
+      <button data-nav="about"><i class="fa-solid fa-circle-info"></i>About</button>
+      <button data-nav="reviews"><i class="fa-solid fa-star"></i>Reviews</button>
+      <button data-nav="contact"><i class="fa-solid fa-envelope"></i>Contact</button>
+    </nav>
+    <div class="mile">Next services:<br><a href="tel:+16144395214">(614) 439-5214</a></div>
+  </aside>
+  <div class="main">
+    <div class="mobtop">
+      <strong>Expressway <span>Repairs</span></strong>
+      <button id="menuToggle" aria-expanded="false" aria-label="Toggle menu"><i class="fa-solid fa-bars"></i></button>
+    </div>
+    <nav id="mobileMenu" aria-label="Mobile">
+      <button data-nav="home" class="active">Home</button>
+      <button data-nav="services">Services</button>
+      <button data-nav="about">About</button>
+      <button data-nav="reviews">Reviews</button>
+      <button data-nav="contact">Contact</button>
+    </nav>
+
+    <section class="page active" id="page-home" data-page="home">
+      <div class="lane">
+        <span class="marker"><i class="fa-solid fa-road"></i> Truck repair shop</span>
+        <h1>Back on the <span class="y">road</span>, fast.</h1>
+        <p class="lead">Expressway Repairs is a truck repair shop at 50 Kingston Ave in Columbus, Ohio. Call to describe the problem and schedule service.</p>
+        <button class="btn" data-nav="contact">Schedule Service</button>
+        <div class="stops">
+          <div class="stop"><div class="ic"><i class="fa-solid fa-phone"></i></div><h3>Call ahead</h3><p><a href="tel:+16144395214">(614) 439-5214</a><br>Call to confirm services and hours.</p></div>
+          <div class="stop"><div class="ic"><i class="fa-solid fa-location-dot"></i></div><h3>Pull in</h3><p>50 Kingston Ave<br>Columbus, OH 43207</p></div>
+          <div class="stop"><div class="ic"><i class="fa-solid fa-truck"></i></div><h3>Roll out</h3><p>Truck repair and maintenance. Call to confirm scope.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="page-services" data-page="services">
+      <div class="lane">
+        <span class="marker"><i class="fa-solid fa-list"></i> Services</span>
+        <h2>Service <span class="y">stops</span></h2>
+        <div class="caution">Sample list of typical truck repair services. Call to confirm what Expressway Repairs offers.</div>
+        <ul class="route">
+          <li><span class="mp">E1</span><div><b>Engine Repair</b><p>Diagnostics and mechanical engine work.</p></div><span class="sm">Sample</span></li>
+          <li><span class="mp">E2</span><div><b>Brake Systems</b><p>Air and hydraulic brake service.</p></div><span class="sm">Sample</span></li>
+          <li><span class="mp">E3</span><div><b>Electrical</b><p>Wiring, lighting, and charging systems.</p></div><span class="sm">Sample</span></li>
+          <li><span class="mp">E4</span><div><b>Preventive Maintenance</b><p>Scheduled upkeep to avoid downtime.</p></div><span class="sm">Sample</span></li>
+          <li><span class="mp">E5</span><div><b>Tire Service</b><p>Truck tire mounting and replacement.</p></div><span class="sm">Sample</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="page" id="page-about" data-page="about">
+      <div class="lane">
+        <span class="marker"><i class="fa-solid fa-circle-info"></i> About</span>
+        <h2>The shop at <span class="y">Kingston Ave</span></h2>
+        <p class="lead">Expressway Repairs is a truck repair shop serving Columbus, Ohio. For team details, history, and hours, call to confirm.</p>
+        <div class="stops">
+          <div class="stop"><div class="ic"><i class="fa-solid fa-map"></i></div><h3>Address</h3><p>50 Kingston Ave, Columbus, OH 43207</p></div>
+          <div class="stop"><div class="ic"><i class="fa-solid fa-clock"></i></div><h3>Hours</h3><p>Not published. Call <a href="tel:+16144395214">(614) 439-5214</a> to confirm.</p></div>
+          <div class="stop"><div class="ic"><i class="fa-solid fa-truck"></i></div><h3>Category</h3><p>Truck repair shop</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="page-reviews" data-page="reviews">
+      <div class="lane">
+        <span class="marker"><i class="fa-solid fa-star"></i> Reviews</span>
+        <h2>Driver <span class="y">feedback</span></h2>
+        <p class="lead">We link only to verified sources. No invented names, no sample reviews.</p>
+        <div class="stop" style="max-width:600px"><div class="ic"><i class="fa-brands fa-google"></i></div><h3>Google Reviews</h3><p>Read real customer reviews for Expressway Repairs on Google.</p><p style="margin-top:16px"><a class="btn" href="https://www.google.com/maps/place/?q=place_id:ChIJWeazaveHOIgRfJf_uavGw4c" target="_blank" rel="noopener">Read Reviews on Google</a></p></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-contact" data-page="contact">
+      <div class="lane">
+        <span class="marker"><i class="fa-solid fa-envelope"></i> Contact</span>
+        <h2>Signal <span class="y">us</span></h2>
+        <p class="lead">Call, get directions, or send a message and we will call you back to confirm.</p>
+        <div class="stops">
+          <div class="stop"><div class="ic"><i class="fa-solid fa-phone"></i></div><h3>Phone</h3><p><a href="tel:+16144395214">(614) 439-5214</a></p></div>
+          <div class="stop"><div class="ic"><i class="fa-solid fa-diamond-turn-right"></i></div><h3>Directions</h3><p>50 Kingston Ave, Columbus, OH 43207<br><a href="https://www.google.com/maps/search/?api=1&query=Expressway%20Repairs%2C%2050%20Kingston%20Ave%2C%20Columbus%2C%20OH%2043207" target="_blank" rel="noopener">Get directions</a></p></div>
+        </div>
+        <form class="fuel" id="contactForm">
+          <label for="cname">Name</label>
+          <input id="cname" name="name" type="text" required placeholder="Your name">
+          <label for="cphone">Phone or Email</label>
+          <input id="cphone" name="contact" type="text" required placeholder="How do we reach you">
+          <label for="cmsg">Message</label>
+          <textarea id="cmsg" name="message" required placeholder="Tell us about your truck"></textarea>
+          <p style="margin-top:18px"><button class="btn" type="submit">Send Message</button></p>
+          <div id="formMsg" role="status"></div>
+        </form>
+      </div>
+    </section>
+    <footer>© Expressway Repairs</footer>
+  </div>
+</div>
+
+<script>
+function navigateTo(page){
+  var pages=document.querySelectorAll(".page");
+  for(var i=0;i<pages.length;i++){pages[i].classList.toggle("active",pages[i].getAttribute("data-page")===page);}
+  var links=document.querySelectorAll("[data-nav]");
+  for(var j=0;j<links.length;j++){links[j].classList.toggle("active",links[j].getAttribute("data-nav")===page);}
+  var titles={home:"Home",services:"Services",about:"About",reviews:"Reviews",contact:"Contact"};
+  document.title=titles[page]+" | Expressway Repairs";
+  if(history&&history.pushState){history.pushState({page:page},"",page+".html");}
+  window.scrollTo(0,0);
+  var m=document.getElementById("mobileMenu");
+  if(m){m.classList.remove("open");}
+  var t=document.getElementById("menuToggle");
+  if(t){t.setAttribute("aria-expanded","false");}
+}
+var navBtns=document.querySelectorAll("[data-nav]");
+for(var k=0;k<navBtns.length;k++){navBtns[k].addEventListener("click",function(ev){ev.preventDefault();navigateTo(this.getAttribute("data-nav"));});}
+window.addEventListener("popstate",function(e){
+  var p="home";
+  if(e.state&&e.state.page){p=e.state.page;}
+  var pages=document.querySelectorAll(".page");
+  for(var i=0;i<pages.length;i++){pages[i].classList.toggle("active",pages[i].getAttribute("data-page")===p);}
+  var links=document.querySelectorAll("[data-nav]");
+  for(var j=0;j<links.length;j++){links[j].classList.toggle("active",links[j].getAttribute("data-nav")===p);}
+  window.scrollTo(0,0);
+});
+var toggle=document.getElementById("menuToggle");
+if(toggle){toggle.addEventListener("click",function(){
+  var m=document.getElementById("mobileMenu");
+  var open=m.classList.toggle("open");
+  toggle.setAttribute("aria-expanded",open?"true":"false");
+});}
+var form=document.getElementById("contactForm");
+if(form){form.addEventListener("submit",function(ev){
+  ev.preventDefault();
+  var msg=document.getElementById("formMsg");
+  msg.textContent="Thanks, we will call you back to confirm.";
+  msg.style.display="block";
+  form.reset();
+});}
+</script>
+</body>
+</html>

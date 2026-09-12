@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Excel Electrical Contractor</title>
+<meta name="description" content="Excel Electrical Contractor, Contractor serving Central Ohio.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Mukta:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--navy:#0b1628;--navy2:#111f36;--cyan:#22d3ee;--lt:#f2f6fa;--ink:#141c2b}
+body{font-family:'Mukta',sans-serif;color:var(--ink);background:var(--lt)}
+.topbar{background:var(--navy);color:#fff;display:flex;justify-content:space-between;align-items:center;padding:12px 24px;position:sticky;top:0;z-index:50;border-bottom:2px solid var(--cyan)}
+.brand{display:flex;align-items:center;gap:12px}
+.brand .chip{width:48px;height:36px;background:var(--navy2);border:2px solid var(--cyan);display:flex;align-items:center;justify-content:center;font-family:'Chakra Petch';font-weight:700;color:var(--cyan);font-size:15px}
+.brand b{font-family:'Chakra Petch';font-weight:700;font-size:20px;letter-spacing:1px}
+.brand small{display:block;font-size:10px;letter-spacing:3px;color:var(--cyan)}
+nav.main{display:flex;gap:2px}
+nav.main button{background:none;border:2px solid transparent;color:#fff;font-family:'Chakra Petch';font-weight:600;font-size:14px;letter-spacing:1px;padding:8px 14px;cursor:pointer;text-transform:uppercase}
+nav.main button.nav-active{border-color:var(--cyan);color:var(--cyan)}
+nav.main button:hover{color:var(--cyan)}
+#menuToggle{display:none;background:var(--cyan);border:none;color:var(--navy);font-size:20px;padding:8px 14px;cursor:pointer;font-weight:700}
+#mobileMenu{display:none;flex-direction:column;background:var(--navy)}
+#mobileMenu.open{display:flex}
+#mobileMenu button{background:none;border:none;border-top:1px solid var(--navy2);color:#fff;font-family:'Chakra Petch';font-weight:600;padding:14px;font-size:14px;cursor:pointer;text-transform:uppercase;text-align:left;letter-spacing:1px}
+.hero{background:var(--navy);color:#fff;padding:80px 24px 70px;position:relative;overflow:hidden}
+.hero svg.traces{position:absolute;inset:0;width:100%;height:100%;opacity:.35}
+.hero .in{position:relative;z-index:1;max-width:1080px;margin:0 auto;text-align:center}
+.hero .kick{font-family:'Chakra Petch';letter-spacing:4px;color:var(--cyan);font-size:13px;font-weight:600}
+.hero h1{font-family:'Chakra Petch';font-weight:700;font-size:clamp(36px,6vw,60px);margin:14px 0 10px;line-height:1.05}
+.hero p{max-width:620px;margin:0 auto;color:#b9c6da;line-height:1.7}
+.btnrow{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:28px;position:relative;z-index:1}
+.btn{display:inline-block;background:var(--cyan);color:var(--navy);font-family:'Chakra Petch';font-weight:700;font-size:15px;letter-spacing:1px;padding:14px 32px;text-decoration:none;border:none;cursor:pointer;text-transform:uppercase}
+.btn.ghost{background:transparent;color:#fff;border:2px solid var(--cyan)}
+.wrap{max-width:1120px;margin:0 auto;padding:60px 24px}
+.sec-head{margin-bottom:30px}
+.sec-head h2{font-family:'Chakra Petch';font-size:32px;font-weight:700}
+.sec-head .kick{font-family:'Chakra Petch';letter-spacing:4px;color:#0e7490;font-size:13px;font-weight:600}
+.nodes{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.node{background:#fff;border:1px solid #d5dee9;padding:28px;position:relative}
+.node::before{content:"";position:absolute;top:-7px;left:28px;width:12px;height:12px;border-radius:50%;background:var(--cyan);border:3px solid #fff;box-shadow:0 0 0 1px var(--cyan)}
+.node h3{font-family:'Chakra Petch';font-size:19px;font-weight:700;margin-bottom:8px}
+.node p{font-size:14px;color:#4a5568;line-height:1.65}
+.panel{background:var(--navy);color:#fff;border-radius:6px;padding:44px;margin-top:44px;display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:center}
+.panel h2{font-family:'Chakra Petch';font-size:30px;margin-bottom:10px}
+.panel p{color:#b9c6da;line-height:1.7;margin-bottom:20px}
+.panel .volt{font-family:'Chakra Petch';font-size:64px;font-weight:700;color:var(--cyan);text-align:center}
+.badge{display:inline-block;font-size:11px;letter-spacing:1px;border:1px solid #0e7490;color:#0e7490;padding:4px 10px;margin-top:10px;font-weight:700}
+.note{font-size:12px;color:#7a8799;margin-top:16px}
+.page{display:none}
+.page.active-page{display:block;animation:fade .3s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px}
+.kv div{background:#fff;border:1px solid #d5dee9;padding:20px}
+.kv b{display:block;font-family:'Chakra Petch';font-size:12px;letter-spacing:2px;color:#0e7490;margin-bottom:6px}
+.kv a{color:var(--ink)}
+form.contact label{display:block;font-family:'Chakra Petch';font-weight:600;font-size:14px;letter-spacing:1px;margin:16px 0 6px}
+form.contact input,form.contact textarea{width:100%;border:1px solid #c3ccd9;padding:12px;font-size:15px;font-family:'Mukta',sans-serif;background:#fff}
+#formError{color:#c0392b;font-size:13px;margin-top:10px;min-height:18px;font-weight:600}
+#formSuccess{display:none;background:#fff;border:2px solid var(--cyan);padding:22px;margin-top:18px}
+#formSuccess h3{font-family:'Chakra Petch';margin-bottom:8px}
+footer{background:var(--navy);color:#7f8da3;text-align:center;padding:26px;font-size:14px;border-top:2px solid var(--cyan)}
+@media(max-width:760px){nav.main{display:none}#menuToggle{display:block}.nodes{grid-template-columns:1fr}.kv{grid-template-columns:1fr}.panel{grid-template-columns:1fr}}
+
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand"><div class="chip">EX</div><div><b>Excel Electrical Contractor</b><small>ELECTRICAL CONTRACTOR</small></div></div>
+  <nav class="main" aria-label="Primary">
+    <button data-nav="home">Home</button><button data-nav="services">Services</button><button data-nav="about">About</button><button data-nav="reviews">Reviews</button><button data-nav="contact">Contact</button>
+  </nav>
+  <button id="menuToggle" aria-label="Open menu" aria-expanded="false">☰</button>
+</header>
+<div id="mobileMenu">
+  <button data-nav="home">Home</button><button data-nav="services">Services</button><button data-nav="about">About</button><button data-nav="reviews">Reviews</button><button data-nav="contact">Contact</button>
+</div>
+<section class="page" id="page-home" data-page="home">
+  <div class="hero"><svg class="traces" viewBox="0 0 1200 400" preserveAspectRatio="none" aria-hidden="true">
+<path d="M0 60 H300 L360 120 H600 L660 60 H900 L960 120 H1200" stroke="#22d3ee" stroke-width="2" fill="none"/>
+<path d="M0 340 H200 L260 280 H520 L580 340 H820 L880 280 H1200" stroke="#22d3ee" stroke-width="2" fill="none"/>
+<path d="M120 0 V120 L180 180 V400" stroke="#22d3ee" stroke-width="2" fill="none"/>
+<path d="M1080 0 V100 L1020 160 V400" stroke="#22d3ee" stroke-width="2" fill="none"/>
+<circle cx="300" cy="60" r="6" fill="#22d3ee"/><circle cx="660" cy="60" r="6" fill="#22d3ee"/><circle cx="200" cy="340" r="6" fill="#22d3ee"/><circle cx="580" cy="340" r="6" fill="#22d3ee"/><circle cx="120" cy="120" r="6" fill="#22d3ee"/><circle cx="1080" cy="100" r="6" fill="#22d3ee"/>
+</svg><div class="in">
+    <div class="kick">WORTHINGTON, OHIO // ELECTRICAL CONTRACTOR</div>
+    <h1>CONNECTED RIGHT.<br>EVERY CIRCUIT.</h1>
+    <p>Excel Electrical Contractor is a Worthington electrical contractor serving residential and commercial clients with installations, repairs, and service work across Central Ohio.</p>
+    <div class="btnrow">
+      <a class="btn" href="tel:+16142070899">Call (614) 207-0899</a>
+      <button class="btn ghost" data-nav="services">Services</button>
+    </div>
+  </div></div>
+  <div class="wrap">
+    <div class="sec-head"><div class="kick">SYSTEM NODES</div><h2>Electrical Services</h2></div>
+    <div class="nodes">
+      <div class="node"><h3>Installations</h3><p>New electrical installations for homes and businesses, permitted and inspected.</p></div>
+      <div class="node"><h3>Repairs</h3><p>Troubleshooting and repair for electrical problems of every kind.</p></div>
+      <div class="node"><h3>Service Work</h3><p>Ongoing electrical service and maintenance for commercial clients.</p><span class="badge">CALL TO CONFIRM</span></div>
+    </div>
+    <div class="panel">
+      <div><h2>Power you can trust</h2><p>From panel changes to complete wiring, get electrical work done to code by a listed local contractor.</p><a class="btn" href="tel:+16142070899">Call (614) 207-0899</a></div>
+      <div class="volt">120/240V</div>
+    </div>
+  </div>
+</section>
+<section class="page" id="page-services" data-page="services">
+  <div class="wrap">
+    <div class="sec-head"><div class="kick">SERVICES</div><h2>What We Wire</h2></div>
+    <div class="nodes">
+      <div class="node"><h3>Electrical Installation</h3><p>New circuits, fixtures, and complete system installations.</p><span class="badge">CALL TO CONFIRM</span></div>
+      <div class="node"><h3>Electrical Repair</h3><p>Diagnosis and repair of faults, outages, and hazards.</p><span class="badge">CALL TO CONFIRM</span></div>
+      <div class="node"><h3>Panel and Service Work</h3><p>Panel upgrades and electrical service changes.</p><span class="badge">CALL TO CONFIRM</span></div>
+      <div class="node"><h3>Commercial Electrical</h3><p>Electrical contracting for commercial projects.</p><span class="badge">CALL TO CONFIRM</span></div>
+      <div class="node"><h3>Lighting</h3><p>Interior and exterior lighting installation.</p><span class="badge">CALL TO CONFIRM</span></div>
+      <div class="node"><h3>Safety Inspections</h3><p>Electrical safety checks for homes and businesses.</p><span class="badge">CALL TO CONFIRM</span></div>
+    </div>
+    <p class="note">Specific service details: call to confirm current offerings.</p>
+  </div>
+</section>
+<section class="page" id="page-about" data-page="about">
+  <div class="wrap">
+    <div class="sec-head"><div class="kick">ABOUT</div><h2>About Excel Electrical</h2></div>
+    <p style="max-width:700px;line-height:1.8">Excel Electrical Contractor is an electrical contractor based at 7484 Reliance St in Worthington, Ohio, reachable at (614) 207-0899. Public industrial directories list the company as an electrical contractor serving the Central Ohio area. Weekday hours are listed as 7:00 AM to 5:00 PM, Monday through Friday.</p>
+    <div class="kv">
+      <div><b>SHOP</b>Excel Electrical Contractor, 7484 Reliance St, Worthington, OH 43085</div>
+      <div><b>PHONE</b><a href="tel:+16142070899">(614) 207-0899</a></div>
+      <div><b>HOURS</b>Mon to Fri, 7:00 AM to 5:00 PM <span class="badge">CALL TO CONFIRM</span></div>
+      <div><b>TRADE</b>Contractor</div>
+    </div>
+  </div>
+</section>
+<section class="page" id="page-reviews" data-page="reviews">
+  <div class="wrap">
+    <div class="sec-head"><div class="kick">REVIEWS</div><h2>Customer Reviews</h2></div>
+    <p style="max-width:640px;line-height:1.8">Reviews for Excel Electrical Contractor are posted on the verified Google business listing.</p>
+    <div class="btnrow" style="justify-content:flex-start"><a class="btn" href="https://www.google.com/maps/place/?q=place_id:ChIJD8TUDKL0OIgRBcVKevFH6qo" target="_blank" rel="noopener">Read Reviews on Google</a></div>
+    <p class="note">Review counts and comments change over time. Call to confirm recent feedback.</p>
+  </div>
+</section>
+<section class="page" id="page-contact" data-page="contact">
+  <div class="wrap">
+    <div class="sec-head"><div class="kick">CONTACT</div><h2>Request Electrical Work</h2></div>
+    <div class="kv">
+      <div><b>PHONE</b><a href="tel:+16142070899">(614) 207-0899</a></div>
+      <div><b>ADDRESS</b>Excel Electrical Contractor, 7484 Reliance St, Worthington, OH 43085<br><a href="https://www.google.com/maps/search/?api=1&query=Excel%20Electrical%20Contractor%2C%207484%20Reliance%20St%2C%20Worthington%2C%20OH%2043085" target="_blank" rel="noopener">Get Directions</a></div>
+    </div>
+    <form class="contact" id="contactForm" novalidate>
+      <label for="cfName">Your name</label><input id="cfName" name="name" type="text" autocomplete="name">
+      <label for="cfPhone">Your phone</label><input id="cfPhone" name="phone" type="tel" autocomplete="tel">
+      <label for="cfMsg">Describe the work needed</label><textarea id="cfMsg" name="message" rows="5"></textarea>
+      <div id="formError" role="alert"></div>
+      <div class="btnrow" style="justify-content:flex-start"><button class="btn" type="submit">Send Request</button></div>
+    </form>
+    <div id="formSuccess" role="status"></div>
+    <p class="note">No email on file. The team responds by phone.</p>
+  </div>
+</section>
+
+<footer>© Excel Electrical Contractor</footer>
+<script>
+
+var SITE_NAME = "Excel Electrical Contractor";
+var VALID_PAGES = ["home","services","about","reviews","contact"];
+function cleanPage(p){
+  if(VALID_PAGES.indexOf(p)===-1){return "home";}
+  return p;
+}
+function showPage(page){
+  page = cleanPage(page);
+  var pages = document.querySelectorAll(".page");
+  for(var i=0;i<pages.length;i++){pages[i].classList.remove("active-page");}
+  var t = document.getElementById("page-"+page);
+  if(t){t.classList.add("active-page");}
+  var navs = document.querySelectorAll("[data-nav]");
+  for(var j=0;j<navs.length;j++){
+    if(navs[j].getAttribute("data-nav")===page){navs[j].classList.add("nav-active");}
+    else{navs[j].classList.remove("nav-active");}
+  }
+  try{document.title = page.charAt(0).toUpperCase()+page.slice(1)+" | "+SITE_NAME;}catch(e){}
+}
+function navigateTo(page){
+  page = cleanPage(page);
+  showPage(page);
+  try{history.pushState({page:page},"","?page="+page);}catch(e){}
+  var m = document.getElementById("mobileMenu");
+  if(m){m.classList.remove("open");}
+  var b = document.getElementById("menuToggle");
+  if(b){b.setAttribute("aria-expanded","false");}
+  window.scrollTo(0,0);
+}
+window.addEventListener("popstate",function(e){
+  var p = "home";
+  if(e && e.state && e.state.page){p = e.state.page;}
+  else{
+    try{
+      var q = new URLSearchParams(window.location.search).get("page");
+      if(q){p = q;}
+    }catch(err){}
+  }
+  showPage(p);
+  window.scrollTo(0,0);
+});
+document.addEventListener("DOMContentLoaded",function(){
+  var start = "home";
+  try{
+    var q = new URLSearchParams(window.location.search).get("page");
+    if(q){start = q;}
+  }catch(e){}
+  showPage(start);
+  try{history.replaceState({page:cleanPage(start)},"","?page="+cleanPage(start));}catch(e){}
+  var burger = document.getElementById("menuToggle");
+  var menu = document.getElementById("mobileMenu");
+  if(burger && menu){
+    burger.addEventListener("click",function(){
+      var open = menu.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+  var navs = document.querySelectorAll("[data-nav]");
+  for(var k=0;k<navs.length;k++){
+    navs[k].addEventListener("click",function(){navigateTo(this.getAttribute("data-nav"));});
+  }
+  var f = document.getElementById("contactForm");
+  if(f){
+    f.addEventListener("submit",function(ev){
+      ev.preventDefault();
+      var n = document.getElementById("cfName").value.trim();
+      var ph = document.getElementById("cfPhone").value.trim();
+      var ms = document.getElementById("cfMsg").value.trim();
+      var err = document.getElementById("formError");
+      if(!n || !ph || !ms){
+        err.textContent = "Please fill in your name, phone, and message so the team can reach you.";
+        return;
+      }
+      err.textContent = "";
+      f.style.display = "none";
+      var ok = document.getElementById("formSuccess");
+      ok.innerHTML = "";
+      var h = document.createElement("h3");
+      h.textContent = "Request received";
+      ok.appendChild(h);
+      var p1 = document.createElement("p");
+      p1.textContent = "Thanks " + n + ". Your message is on its way.";
+      ok.appendChild(p1);
+      var p2 = document.createElement("p");
+      p2.textContent = "Expect a call back by phone at " + ph + ". For anything urgent, call directly.";
+      ok.appendChild(p2);
+      ok.style.display = "block";
+    });
+  }
+});
+
+</script>
+</body>
+</html>
