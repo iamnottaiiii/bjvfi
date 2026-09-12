@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ariel's Improvements · Plumber &amp; Electrician in Tujunga, CA</title>
+<meta name="description" content="Ariel's Improvements: plumbing, electrical and home improvement in Tujunga, CA since 1997. Licensed CSLB 662972. Drain cleaning, repiping, water heaters, gas lines. Call (818) 353-4646.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F7F3EA; --paper-2:#EFE8D8; --card:#FFFDF8;
+  --ink:#122A3D; --ink-soft:#4C6072;
+  --navy:#0E2A45; --navy-deep:#081A2C;
+  --copper:#C47A36; --copper-deep:#9A5D24; --copper-soft:#F5E4CE;
+  --teal:#2E7D74;
+  --radius:18px;
+  --shadow:0 18px 40px -18px rgba(14,42,69,.30);
+  --shadow-sm:0 8px 22px -10px rgba(14,42,69,.24);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Inter",system-ui,sans-serif;
+  background:var(--paper);color:var(--ink);line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%}
+a{color:var(--copper-deep)}
+::selection{background:var(--copper);color:#fff}
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+
+/* ---------- side-drawer header ---------- */
+header.site{
+  position:sticky;top:0;z-index:60;background:var(--navy);color:#fff;
+  box-shadow:0 6px 20px -8px rgba(8,26,44,.5);
+}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0}
+.drawer-btn{
+  display:inline-flex;align-items:center;gap:10px;background:none;border:0;cursor:pointer;
+  color:#fff;font-weight:700;font-size:.95rem;padding:10px 4px;letter-spacing:.5px;
+}
+.drawer-btn .lines{display:inline-block}
+.drawer-btn .lines span{display:block;width:26px;height:3px;border-radius:3px;background:#fff;margin:5px 0;transition:.25s}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:#fff}
+.brand svg{width:44px;height:44px;flex:none}
+.brand-name{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:1.25rem;line-height:1.05}
+.brand-name small{display:block;font-family:"Inter",sans-serif;font-weight:600;font-size:.62rem;letter-spacing:3px;text-transform:uppercase;color:#E9B978}
+.call-btn{
+  display:inline-flex;align-items:center;gap:8px;background:var(--copper);color:#fff;
+  text-decoration:none;font-weight:700;padding:11px 20px;border-radius:999px;box-shadow:var(--shadow-sm);
+  transition:transform .18s,background .18s;white-space:nowrap;
+}
+.call-btn:hover{background:var(--copper-deep);transform:translateY(-2px)}
+.scrim{
+  position:fixed;inset:0;background:rgba(8,26,44,.55);opacity:0;pointer-events:none;
+  transition:opacity .25s;z-index:70;
+}
+.scrim.show{opacity:1;pointer-events:auto}
+.drawer{
+  position:fixed;top:0;left:0;bottom:0;width:min(340px,86vw);background:var(--navy-deep);color:#fff;
+  z-index:80;transform:translateX(-105%);transition:transform .3s cubic-bezier(.22,.8,.3,1);
+  display:flex;flex-direction:column;padding:28px 26px;overflow-y:auto;
+}
+.drawer.open{transform:translateX(0)}
+.drawer .d-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.drawer .d-head strong{font-family:"Bricolage Grotesque",sans-serif;font-size:1.15rem}
+.drawer-close{background:none;border:0;color:#fff;font-size:1.8rem;cursor:pointer;line-height:1;padding:6px}
+.drawer a.d-link{
+  display:flex;align-items:center;justify-content:space-between;color:#fff;text-decoration:none;
+  font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:1.3rem;
+  padding:13px 6px;border-bottom:1px solid rgba(255,255,255,.12);transition:padding .2s,color .2s;
+}
+.drawer a.d-link:hover,.drawer a.d-link.active{color:#E9B978;padding-left:14px}
+.drawer a.d-link .arr{color:var(--copper)}
+.drawer .d-call{
+  margin-top:auto;display:block;text-align:center;background:var(--copper);color:#fff;
+  text-decoration:none;font-weight:700;padding:14px;border-radius:12px;margin-top:26px;
+}
+.drawer .d-call:hover{background:var(--copper-deep)}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- editorial hero (typography-led) ---------- */
+.hero{padding:84px 0 64px;position:relative;overflow:hidden}
+.hero::before{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(196,122,54,.14), transparent 34%),
+    radial-gradient(circle at 88% 82%, rgba(46,125,116,.12), transparent 36%);
+}
+.hero-kicker{
+  display:inline-flex;align-items:center;gap:10px;background:var(--navy);color:#fff;
+  font-weight:700;font-size:.78rem;letter-spacing:2.6px;text-transform:uppercase;
+  padding:9px 22px;border-radius:999px;margin-bottom:26px;
+}
+.hero-kicker .dot{width:9px;height:9px;border-radius:50%;background:#7BC47F}
+h1{
+  font-family:"Bricolage Grotesque",sans-serif;font-weight:800;
+  font-size:clamp(2.9rem,7vw,5.6rem);line-height:.98;letter-spacing:-1.5px;margin-bottom:22px;
+}
+h1 .accent{color:var(--copper-deep)}
+.hero-sub{font-size:1.2rem;color:var(--ink-soft);max-width:42rem;margin-bottom:30px}
+.hero-meta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:32px}
+.meta-chip{
+  display:inline-flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--paper-2);
+  padding:10px 18px;border-radius:999px;font-weight:600;font-size:.92rem;box-shadow:var(--shadow-sm);
+}
+.meta-chip b{font-family:"Bricolage Grotesque",sans-serif;color:var(--navy)}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:30px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;
+  padding:14px 28px;border-radius:999px;font-size:1rem;transition:transform .18s,box-shadow .18s,background .18s;
+}
+.btn-solid{background:var(--copper);color:#fff;box-shadow:var(--shadow-sm)}
+.btn-solid:hover{background:var(--copper-deep);transform:translateY(-2px)}
+.btn-ghost{background:var(--card);color:var(--ink);border:2px solid rgba(18,42,61,.22)}
+.btn-ghost:hover{border-color:var(--copper);color:var(--copper-deep);transform:translateY(-2px)}
+.hours-pill{
+  display:inline-flex;align-items:center;gap:10px;background:var(--navy);color:#fff;
+  padding:10px 20px;border-radius:999px;font-weight:600;font-size:.95rem;box-shadow:var(--shadow-sm);
+}
+.hours-pill .dot{width:10px;height:10px;border-radius:50%;background:#7BC47F;box-shadow:0 0 0 4px rgba(123,196,127,.25);animation:pulse 2s infinite}
+.hours-pill.closed .dot{background:#E4658F;box-shadow:0 0 0 4px rgba(228,101,143,.25)}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+
+/* ---------- card wall ---------- */
+section.block{padding:64px 0}
+.sec-head{margin-bottom:38px;max-width:46rem}
+.sec-head.center{margin-left:auto;margin-right:auto;text-align:center}
+.sec-head .eyebrow{font-weight:700;font-size:.78rem;letter-spacing:3px;text-transform:uppercase;color:var(--copper-deep);display:block;margin-bottom:10px}
+h2{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:clamp(1.9rem,3.6vw,2.7rem);line-height:1.08;margin-bottom:12px;letter-spacing:-.5px}
+.sec-head p{color:var(--ink-soft)}
+.card-wall{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.wcard{
+  background:var(--card);border-radius:var(--radius);padding:30px 26px;box-shadow:var(--shadow-sm);
+  border:1px solid var(--paper-2);transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden;
+}
+.wcard:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+.wcard::after{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--copper)}
+.wcard.teal::after{background:var(--teal)}
+.wcard.navy::after{background:var(--navy)}
+.wcard .icon{width:54px;height:54px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;background:var(--copper-soft)}
+.wcard.teal .icon{background:#DCEDEA}
+.wcard.navy .icon{background:#DDE3E8}
+.wcard .icon svg{width:30px;height:30px}
+.wcard h3{font-family:"Bricolage Grotesque",sans-serif;font-size:1.3rem;margin-bottom:8px}
+.wcard p{color:var(--ink-soft);font-size:.96rem}
+.trust-band{background:var(--navy);color:#fff;border-radius:24px;padding:44px 40px;margin-top:56px;box-shadow:var(--shadow);display:grid;grid-template-columns:repeat(4,1fr);gap:28px}
+.trust-band .t b{font-family:"Bricolage Grotesque",sans-serif;font-size:2.2rem;color:#E9B978;display:block;line-height:1.1}
+.trust-band .t small{color:#B9C8D4;font-weight:600;font-size:.8rem;letter-spacing:1px;text-transform:uppercase}
+
+/* ---------- services tabs ---------- */
+.tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:30px}
+.tab-btn{
+  border:2px solid rgba(18,42,61,.18);background:var(--card);color:var(--ink);font-weight:700;
+  padding:12px 22px;border-radius:999px;cursor:pointer;font-size:.95rem;transition:.2s;font-family:"Inter",sans-serif;
+}
+.tab-btn:hover{border-color:var(--copper);color:var(--copper-deep)}
+.tab-btn.active{background:var(--navy);border-color:var(--navy);color:#fff}
+.tab-panel{display:none}
+.tab-panel.active{display:block;animation:fadeIn .3s ease}
+.svc-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.svc{background:var(--card);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow-sm);border:1px solid var(--paper-2)}
+.svc h3{font-family:"Bricolage Grotesque",sans-serif;font-size:1.25rem;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.svc h3 svg{width:26px;height:26px;flex:none}
+.svc p{color:var(--ink-soft);font-size:.96rem;margin-bottom:10px}
+.svc .sample{
+  display:inline-block;background:var(--paper-2);color:#5B4A2E;font-size:.72rem;font-weight:700;
+  letter-spacing:1.4px;text-transform:uppercase;padding:5px 14px;border-radius:999px;margin-right:8px;
+}
+.svc .price{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;color:var(--copper-deep)}
+.strip{padding:56px 0 8px;margin-bottom:36px}
+.strip .eyebrow{font-weight:700;font-size:.78rem;letter-spacing:3px;text-transform:uppercase;color:var(--copper-deep);display:block;margin-bottom:10px}
+.strip h2{font-size:clamp(2.2rem,4.4vw,3.2rem)}
+.strip p{color:var(--ink-soft);max-width:42rem;font-size:1.08rem}
+.price-note{background:var(--copper-soft);border:2px dashed rgba(154,93,36,.5);border-radius:var(--radius);padding:18px 24px;margin-top:26px;font-size:.95rem;color:#6B4A1E}
+.price-note strong{color:var(--copper-deep)}
+
+/* ---------- carousel gallery ---------- */
+.carousel{position:relative}
+.caro-track{display:flex;gap:22px;overflow-x:auto;padding:6px 6px 26px;scroll-snap-type:x mandatory;scroll-behavior:smooth}
+.caro-track::-webkit-scrollbar{height:10px}
+.caro-track::-webkit-scrollbar-thumb{background:var(--copper);border-radius:99px}
+.caro-track::-webkit-scrollbar-track{background:rgba(18,42,61,.12);border-radius:99px}
+.ccard{
+  flex:0 0 min(420px,84vw);scroll-snap-align:center;background:var(--navy);color:#fff;
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);display:grid;grid-template-columns:150px 1fr;
+}
+.ccard .art{background:linear-gradient(150deg,var(--copper),var(--copper-deep));display:flex;align-items:center;justify-content:center;padding:22px}
+.ccard .art svg{width:100%;height:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.3))}
+.ccard .cap{padding:26px}
+.ccard .cap .badge{
+  display:inline-block;background:rgba(255,255,255,.14);font-size:.68rem;font-weight:700;letter-spacing:1.6px;
+  text-transform:uppercase;padding:5px 14px;border-radius:999px;margin-bottom:12px;color:#E9B978;
+}
+.ccard .cap strong{font-family:"Bricolage Grotesque",sans-serif;font-size:1.25rem;display:block;margin-bottom:6px}
+.ccard .cap p{color:#B9C8D4;font-size:.94rem}
+.caro-btns{display:flex;gap:12px;margin-top:6px}
+.caro-btn{
+  width:52px;height:52px;border-radius:50%;border:2px solid rgba(18,42,61,.25);background:var(--card);
+  cursor:pointer;font-size:1.3rem;color:var(--ink);transition:.2s;
+}
+.caro-btn:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+/* ---------- reviews ---------- */
+.rs-strip{margin:0 auto 36px;max-width:700px;background:var(--card);border:1px solid var(--paper-2);border-radius:var(--radius);padding:20px 24px;text-align:center}
+.rs-note{margin:0 0 14px;font-size:.95rem;color:var(--ink-soft);line-height:1.55}
+.rs-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rs-btn{display:inline-block;background:var(--navy);color:#fff;padding:10px 24px;border-radius:999px;font-weight:700;text-decoration:none;font-size:.95rem;line-height:1.2}
+.rs-btn:hover{background:var(--copper)}
+.rev-list{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.rev{background:var(--card);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow-sm);border-top:6px solid var(--copper)}
+.rev .stars{color:var(--copper);font-size:1.15rem;letter-spacing:3px;margin-bottom:12px}
+.rev p{font-size:1rem;margin-bottom:12px}
+.rev cite{font-style:normal;font-weight:700;font-size:.84rem;color:var(--copper-deep);letter-spacing:.4px}
+.cta-band{background:linear-gradient(120deg,var(--navy),var(--navy-deep));border-radius:24px;color:#fff;padding:48px;text-align:center;margin-top:48px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.cta-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 20%, rgba(196,122,54,.28), transparent 50%)}
+.cta-band h2{color:#fff;position:relative}
+.cta-band p{color:#B9C8D4;position:relative;max-width:36rem;margin:0 auto 24px}
+.cta-band .btn-solid{position:relative}
+
+/* ---------- contact ---------- */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
+.info-card{background:var(--card);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm);border:1px solid var(--paper-2)}
+.info-card h3{font-family:"Bricolage Grotesque",sans-serif;font-size:1.35rem;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.info-card h3 svg{width:28px;height:28px}
+.info-card p{color:var(--ink-soft);margin-bottom:8px}
+.info-card a.big{font-family:"Bricolage Grotesque",sans-serif;font-size:1.5rem;font-weight:700;color:var(--copper-deep);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.hours-table{width:100%;border-collapse:collapse;font-size:.98rem}
+.hours-table td{padding:10px 6px;border-bottom:1px dashed rgba(18,42,61,.22)}
+.hours-table tr.today td{font-weight:800;color:var(--copper-deep)}
+.hours-table td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.map-card{
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:340px;
+  background:
+    linear-gradient(rgba(46,125,116,.08), rgba(46,125,116,.08)),
+    repeating-linear-gradient(0deg, transparent 0 46px, rgba(46,125,116,.20) 46px 48px),
+    repeating-linear-gradient(90deg, transparent 0 46px, rgba(46,125,116,.20) 46px 48px),
+    linear-gradient(140deg,#EFE8D8,#DECFAC);
+  display:flex;align-items:center;justify-content:center;
+}
+.map-pin{text-align:center;background:var(--card);padding:26px 34px;border-radius:20px;box-shadow:var(--shadow);max-width:78%;position:relative}
+.map-pin::after{content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);border:14px solid transparent;border-top-color:var(--card);border-bottom:0}
+.map-pin svg{width:44px;height:44px;margin-bottom:8px}
+.map-pin strong{font-family:"Bricolage Grotesque",sans-serif;font-size:1.15rem;display:block}
+.map-pin small{color:var(--ink-soft)}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- minimal footer ---------- */
+footer{background:var(--navy-deep);color:#B9C8D4;margin-top:20px}
+.foot-line{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;padding:34px 0}
+.foot-brand{display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none}
+.foot-brand svg{width:38px;height:38px}
+.foot-brand span{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:1.1rem}
+.foot-nav{display:flex;gap:4px;flex-wrap:wrap}
+.foot-nav a{color:#B9C8D4;text-decoration:none;font-weight:600;font-size:.9rem;padding:8px 12px;border-radius:8px}
+.foot-nav a:hover{color:#E9B978;background:rgba(255,255,255,.06)}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.1);padding:18px 0 24px;display:flex;justify-content:center;font-size:.85rem;color:#8FA1B0}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:940px){
+  .card-wall{grid-template-columns:1fr 1fr}
+  .trust-band{grid-template-columns:1fr 1fr}
+  .rev-list{grid-template-columns:1fr}
+  .svc-grid{grid-template-columns:1fr}
+  .contact-grid{grid-template-columns:1fr}
+  .hero{padding:56px 0 48px}
+}
+@media(max-width:600px){
+  .card-wall{grid-template-columns:1fr}
+  .bar .call-btn{display:none}
+}
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="wrap bar">
+    <button class="drawer-btn" id="drawerBtn" aria-label="Open menu" aria-expanded="false" aria-controls="drawer">
+      <span class="lines"><span></span><span></span><span></span></span> MENU
+    </button>
+    <a class="brand" href="#home" data-page="home" aria-label="Ariel's Improvements, home">
+      <svg viewBox="0 0 64 64" role="img" aria-label="Wrench and pipe logo"><path d="M14 50 L38 26" stroke="#C47A36" stroke-width="9" stroke-linecap="round"/><path d="M38 26 l-7 -7 6 -8 9 9 -8 6" fill="#E9B978"/><circle cx="46" cy="14" r="9" fill="none" stroke="#E9B978" stroke-width="5"/><path d="M10 58 q12 2 20 -6" stroke="#E9B978" stroke-width="6" fill="none" stroke-linecap="round"/></svg>
+      <span class="brand-name">Ariel's Improvements<small>Plumbing · Electrical</small></span>
+    </a>
+    <a class="call-btn" href="tel:+18183534646">☎ (818) 353-4646</a>
+  </div>
+</header>
+
+<div class="scrim" id="scrim"></div>
+<nav class="drawer" id="drawer" aria-label="Main navigation">
+  <div class="d-head">
+    <strong>Ariel's Improvements</strong>
+    <button class="drawer-close" id="drawerClose" aria-label="Close menu">×</button>
+  </div>
+  <a class="d-link active" href="#home" data-page="home">Home <span class="arr">→</span></a>
+  <a class="d-link" href="#services" data-page="services">Services <span class="arr">→</span></a>
+  <a class="d-link" href="#about" data-page="about">About Us <span class="arr">→</span></a>
+  <a class="d-link" href="#projects" data-page="projects">Projects <span class="arr">→</span></a>
+  <a class="d-link" href="#reviews" data-page="reviews">Reviews <span class="arr">→</span></a>
+  <a class="d-link" href="#contact" data-page="contact">Contact <span class="arr">→</span></a>
+  <a class="d-call" href="tel:+18183534646">☎ Call (818) 353-4646</a>
+</nav>
+
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="wrap">
+      <span class="hero-kicker"><span class="dot"></span>Licensed plumber &amp; electrician · Tujunga, CA</span>
+      <h1>One call fixes <span class="accent">the leak, the wiring, and the remodel.</span></h1>
+      <p class="hero-sub">Ariel's Improvements is owned and operated by Ariel Badano, with crews on plumbing, electrical and home improvement jobs across Tujunga and the San Fernando Valley since 1997. Most of the team has been here over 10 years.</p>
+      <div class="hero-meta">
+        <span class="meta-chip"><b>CSLB 662972</b> Licensed</span>
+        <span class="meta-chip"><b>209+</b> permits pulled</span>
+        <span class="meta-chip"><b>5.0</b> on Birdeye (11 reviews)</span>
+        <span class="meta-chip"><b>4.5</b> on Yelp (22 reviews)</span>
+      </div>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="tel:+18183534646">☎ Call (818) 353-4646</a>
+        <a class="btn btn-ghost" href="#services" data-page="services">Browse services →</a>
+      </div>
+      <span class="hours-pill" id="hoursPill"><span class="dot"></span><span id="hoursText">Checking today's hours…</span></span>
+    </div>
+  </div>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow">What we handle</span>
+        <h2>Plumbing, electrical and everything in between</h2>
+        <p>One licensed crew for the jobs other companies make you split across three contractors.</p>
+      </div>
+      <div class="card-wall">
+        <div class="wcard reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#9A5D24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.7l5.7 5.7a8 8 0 11-11.4 0z"/><path d="M9.5 14a2.5 2.5 0 002.5 2.5"/></svg></div>
+          <h3>Plumbing repairs</h3>
+          <p>Leaks, clogs, running toilets, low pressure and burst pipes. Fast response, tidy work, fair pricing.</p>
+        </div>
+        <div class="wcard teal reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#2E7D74" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16c2-1 2-3 0-4 3 0 4-2 4-5 2 3 5 3 5 0 1 3 3 4 5 4-2 2-1 4 1 5-3 1-4 3-4 6-2-3-6-3-7 0-1-2-2-4-4-6z"/></svg></div>
+          <h3>Drains and sewers</h3>
+          <p>Maintenance snaking, main line clearing, sewer repair and camera inspection. Next-day service on routine calls.</p>
+        </div>
+        <div class="wcard navy reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0E2A45" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12z"/></svg></div>
+          <h3>Electrical</h3>
+          <p>Panel work, troubleshooting, lighting, outlets and small installs, from the same licensed crew.</p>
+        </div>
+        <div class="wcard navy reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0E2A45" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M7 8V6a2 2 0 012-2h6a2 2 0 012 2v2M12 12v4M10 14h4"/></svg></div>
+          <h3>Water heaters</h3>
+          <p>Repair and replacement of tank and tankless units, sized right for your home and your water use.</p>
+        </div>
+        <div class="wcard reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#9A5D24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 00-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 005.4-5.4L14 13l-3-3z"/></svg></div>
+          <h3>Repiping</h3>
+          <p>Copper repipes and galvanized pipe replacement for older Tujunga homes. One and done, with clean drywall patching.</p>
+        </div>
+        <div class="wcard teal reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#2E7D74" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4"/></svg></div>
+          <h3>Kitchens and baths</h3>
+          <p>Full remodels and fixture updates: faucets, toilets, showers, tile work and the plumbing behind it all.</p>
+        </div>
+      </div>
+
+      <div class="trust-band reveal">
+        <div class="t"><b>29</b><small>Years in business</small></div>
+        <div class="t"><b>10+</b><small>Years, most crew members</small></div>
+        <div class="t"><b>209</b><small>Permits pulled since 1997</small></div>
+        <div class="t"><b>1</b><small>Owner on every job</small></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="cta-band reveal">
+      <h2>Water where it shouldn't be? Call now.</h2>
+      <p>Leaks don't wait, and neither should you. Ariel answers his own phone, and his crews are known for showing up on time.</p>
+      <a class="btn btn-solid" href="tel:+18183534646">☎ Call (818) 353-4646</a>
+    </div>
+    <div style="height:64px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div class="strip">
+      <span class="eyebrow">Services</span>
+      <h2>Every service, one licensed crew</h2>
+      <p>CSLB license 662972: General Building, Electrical and Plumbing. Pick a category to see what we do.</p>
+    </div>
+    <div class="tabs reveal" role="tablist" aria-label="Service categories">
+      <button class="tab-btn active" data-tab="plumbing" role="tab">Plumbing</button>
+      <button class="tab-btn" data-tab="drain" role="tab">Drains &amp; Sewer</button>
+      <button class="tab-btn" data-tab="water" role="tab">Water Heaters &amp; Repipe</button>
+      <button class="tab-btn" data-tab="electrical" role="tab">Electrical</button>
+    </div>
+
+    <div class="tab-panel active" id="tab-plumbing">
+      <div class="svc-grid">
+        <div class="svc reveal">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="#9A5D24" stroke-width="2" stroke-linecap="round"><path d="M12 2.7l5.7 5.7a8 8 0 11-11.4 0z"/></svg>Leak detection and repair</h3>
+          <p>Fast galvanized pipes in older homes are our specialty. We find the source and fix it right, not just patch the symptom.</p>
+          <span class="sample">Sample pricing</span> <span class="price">Leak repairs from about $250</span>
+        </div>
+        <div class="svc reveal">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="#9A5D24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v7a6 6 0 0012 0V3M6 3h4M14 3h4M12 16v5"/></svg>Fixture installs</h3>
+          <p>Faucets, toilets, shower valves, garbage disposals and supply lines. Clean installs with no drips left behind.</p>
+          <span class="sample">Sample pricing</span> <span class="price">Toilet install from about $350</span>
+        </div>
+        <div class="svc reveal">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="#9A5D24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17H7a5 5 0 010-10h2M15 7h2a5 5 0 010 10h-2M8 12h8"/></svg>Gas lines</h3>
+          <p>Gas line repair, extensions and new runs for ranges, dryers and water heaters, permitted and pressure-tested.</p>
+          <span class="sample">Sample pricing</span> <span class="price">Call for a quote</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-drain">
+      <div class="svc-grid">
+        <div class="svc reveal">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="#2E7D74" stroke-width="2" stroke-linecap="round"><path d="M4 16c2-1 2-3 0-4 3 0 4-2 4-5 2 3 5 3 5 0 1 3 3 4 5 4-2 2-1 4 1 5-3 1-4 3-4 6-2-3-6-3-7 0-1-2-2-4-4-6z"/></svg>Drain cleaning</h3>
+          <p>Kitchen, bath and laundry drains cleared fast. Maintenance snaking of the main sewer line, often next day.</p>
+          <span class="sample">Sample pricing</span> <span class="price">Drain snaking from about $175</span>
+        </div>
+        <div class="svc reveal">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="#2E7D74" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg>Sewer line repair</h3>
+          <p>Root intrusion, bellies and breaks. Camera inspection first, then the right fix: spot repair or full replacement.</p>
+          <span class="sample">Sample pricing</span> <span class="price">Camera inspection from about $299</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-water">
+      <div class="svc-grid">
+        <div class="svc reveal">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="#0E2A45" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="16" rx="3"/><path d="M9 9h6M9 13h6M12 16v3"/></svg>Water heater service</h3>
+          <p>Repair and replacement of tank and tankless heaters. We stock common sizes and size the unit to your household.</p>
+          <span class="sample">Sample pricing</span> <span class="price">Tank replacement from about $1,600</span>
+        </div>
+        <div class="svc reveal">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="#0E2A45" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 00-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 005.4-5.4L14 13l-3-3z"/></svg>Copper repiping</h3>
+          <p>Whole-house repipes replacing old galvanized pipe. Cleaner water, better pressure, and no more surprise leaks.</p>
+          <span class="sample">Sample pricing</span> <span class="price">Repipes from about $4,500</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-electrical">
+      <div class="svc-grid">
+        <div class="svc reveal">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="#C47A36" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12z"/></svg>Electrical repairs</h3>
+          <p>Troubleshooting, dead outlets, flickering lights, breaker issues. Diagnosed properly and fixed safely.</p>
+          <span class="sample">Sample pricing</span> <span class="price">Service calls from about $150</span>
+        </div>
+        <div class="svc reveal">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="#C47A36" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 00-4 10.5c.8.7 1 1.5 1 2.5h6c0-1 .2-1.8 1-2.5A6 6 0 0012 3z"/></svg>Lighting and installs</h3>
+          <p>Recessed lighting, ceiling fans, new outlets and small panel upgrades, from the same crew that does your plumbing.</p>
+          <span class="sample">Sample pricing</span> <span class="price">Call for a quote</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="price-note reveal">
+      <strong>Good to know:</strong> prices above are samples to give you a ballpark. Every job is different, so call <strong>(818) 353-4646</strong> for an exact quote. Emergency? Call now, don't wait.
+    </div>
+    <div style="height:64px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-about">
+  <div class="wrap">
+    <div class="strip">
+      <span class="eyebrow">About us</span>
+      <h2>Ariel is on the job, not in an office</h2>
+      <p>Owned and operated by Ariel Badano since 1997. Nearly three decades, 209 building permits, and a crew that mostly goes back more than ten years.</p>
+    </div>
+    <div class="card-wall">
+      <div class="wcard reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#9A5D24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div>
+        <h3>Owner on every job</h3>
+        <p>Ariel has his hands in all of the jobs. He has stayed in business this long, customers say, simply because he cares about them.</p>
+      </div>
+      <div class="wcard teal reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#2E7D74" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg></div>
+        <h3>Licensed and permitted</h3>
+        <p>CSLB license 662972 covering General Building, Electrical and Plumbing. 209 permits pulled since 1997, all above board.</p>
+      </div>
+      <div class="wcard navy reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0E2A45" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+        <h3>Crews you can trust</h3>
+        <p>All employees have been with the company over 3 years, most over 10. Customers describe them as punctual, professional, tidy and thorough.</p>
+      </div>
+    </div>
+    <div class="trust-band reveal" style="margin-top:48px">
+      <div class="t"><b>1997</b><small>Founded in Tujunga</small></div>
+      <div class="t"><b>662972</b><small>CA contractor license</small></div>
+      <div class="t"><b>5.0</b><small>Birdeye rating, 11 reviews</small></div>
+      <div class="t"><b>4.5</b><small>Yelp rating, 22 reviews</small></div>
+    </div>
+    <div class="wrap" style="padding:0">
+      <div class="cta-band reveal">
+        <h2>Meet the crew that shows up.</h2>
+        <p>Call and see why neighbors keep Ariel's number saved in their phones.</p>
+        <a class="btn btn-solid" href="tel:+18183534646">☎ Call (818) 353-4646</a>
+      </div>
+      <div style="height:64px"></div>
+    </div>
+  </div>
+</section>
+<section class="page" id="page-projects">
+  <div class="wrap">
+    <div class="strip">
+      <span class="eyebrow">Projects</span>
+      <h2>Typical jobs, illustrated</h2>
+      <p>Previews of the work we do every week. Real photos of finished jobs are coming soon.</p>
+    </div>
+    <div class="carousel reveal">
+      <div class="caro-track" id="caroTrack">
+        <div class="ccard">
+          <div class="art"><svg viewBox="0 0 100 100"><path d="M30 20 h40 v60 h-40 z" fill="#fff" opacity=".9"/><path d="M38 20 v60 M50 20 v60 M62 20 v60" stroke="#9A5D24" stroke-width="3"/><circle cx="50" cy="80" r="8" fill="#fff"/></svg></div>
+          <div class="cap"><span class="badge">Illustration</span><strong>Drain and sewer clearing</strong><p>Maintenance snaking of main lines and clogged drains, often next day.</p></div>
+        </div>
+        <div class="ccard">
+          <div class="art" style="background:linear-gradient(150deg,#2E7D74,#1E5A53)"><svg viewBox="0 0 100 100"><rect x="32" y="18" width="36" height="56" rx="8" fill="#fff" opacity=".9"/><circle cx="50" cy="40" r="8" fill="#2E7D74"/><path d="M40 60 h20 M40 66 h14" stroke="#2E7D74" stroke-width="3" stroke-linecap="round"/></svg></div>
+          <div class="cap"><span class="badge">Illustration</span><strong>Water heater replacement</strong><p>Tank and tankless units, sized right and installed to code.</p></div>
+        </div>
+        <div class="ccard">
+          <div class="art" style="background:linear-gradient(150deg,#0E2A45,#081A2C)"><svg viewBox="0 0 100 100"><rect x="24" y="30" width="52" height="40" rx="6" fill="#fff" opacity=".9"/><path d="M32 44 h36 M32 54 h24" stroke="#0E2A45" stroke-width="4" stroke-linecap="round"/><circle cx="50" cy="80" r="6" fill="#E9B978"/></svg></div>
+          <div class="cap"><span class="badge">Illustration</span><strong>Electrical panel and wiring</strong><p>Troubleshooting, outlets, lighting and safe panel work.</p></div>
+        </div>
+        <div class="ccard">
+          <div class="art" style="background:linear-gradient(150deg,#7FB3D9,#1F6FA8)"><svg viewBox="0 0 100 100"><path d="M20 50 h60 M50 20 v60" stroke="#fff" stroke-width="10" stroke-linecap="round" opacity=".9"/><circle cx="50" cy="50" r="10" fill="#fff"/></svg></div>
+          <div class="cap"><span class="badge">Illustration</span><strong>Copper repiping</strong><p>Whole-house repipes replacing old galvanized pipe for good.</p></div>
+        </div>
+        <div class="ccard">
+          <div class="art" style="background:linear-gradient(150deg,#B4834D,#7A5A30)"><svg viewBox="0 0 100 100"><rect x="22" y="34" width="56" height="32" rx="6" fill="#fff" opacity=".9"/><path d="M30 50 h40 M30 58 h28" stroke="#7A5A30" stroke-width="4" stroke-linecap="round"/><path d="M50 34 q0 -10 10 -12" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round"/></svg></div>
+          <div class="cap"><span class="badge">Illustration</span><strong>Kitchen and bath remodels</strong><p>Fixtures, tile, and all the plumbing behind the walls.</p></div>
+        </div>
+      </div>
+      <div class="caro-btns">
+        <button class="caro-btn" id="caroPrev" aria-label="Previous project">←</button>
+        <button class="caro-btn" id="caroNext" aria-label="Next project">→</button>
+      </div>
+    </div>
+    <div class="price-note reveal" style="margin-top:26px">
+      <strong>Coming soon:</strong> real photos of finished plumbing and electrical jobs around Tujunga. The illustrations above show typical project types.
+    </div>
+    <div style="height:64px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div class="strip">
+      <span class="eyebrow">Reviews</span>
+      <h2>Neighbors keep our number saved</h2>
+      <p>Rated 5.0 on Birdeye across 11 reviews and 4.5 on Yelp across 22 reviews. Themes below are paraphrased from public feedback.</p>
+    </div>
+    <div class="rs-strip">
+      <p class="rs-note">Review themes on this page are paraphrased from public feedback. Open the source to read current reviews and ratings.</p>
+      <div class="rs-links">
+        <a class="rs-btn" href="https://reviews.birdeye.com/ariels-improvements-167633638449197" target="_blank" rel="noopener">See reviews on Birdeye</a>
+        <a class="rs-btn" href="https://www.mapquest.com/us/california/ariels-improvements-634073069" target="_blank" rel="noopener">See reviews on MapQuest</a>
+        <a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJ9UnfoFfrwoARXAUcJHJl-Vo" target="_blank" rel="noopener">See reviews on Google</a>
+      </div>
+    </div>
+    <div class="rev-list">
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>"Amazing service at a fair price. The workers are on time, nicely dressed, and extremely knowledgeable. Call and you will be very pleased."</p>
+        <cite>Paraphrased from a Yelp review by Allison A., August 2025</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>"Called about a clogged bathroom sink and a main sewer line snaking. The team came out the next day, punctual, professional and efficient."</p>
+        <cite>Paraphrased from a Yelp review by Sara H., October 2023</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>"We have used Ariel's service for years. His crews are some of the most competent people I have ever experienced, whether electrical, plumbing or cement work."</p>
+        <cite>Paraphrased from a Yelp review by Bob M., April 2022</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>"Used Ariel's Improvements more than once. Each time they have been quick to respond, tidy, thorough, and completed the job to my satisfaction, most recently an emergency call."</p>
+        <cite>Paraphrased from a Yelp review by Richard M., November 2019</cite>
+      </div>
+    </div>
+    <div class="cta-band reveal">
+      <h2>Had great service? Tell the neighborhood.</h2>
+      <p>Your review keeps a local, family-run company thriving. It takes a minute, and it means a lot.</p>
+      <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJ9UnfoFfrwoARXAUcJHJl-Vo" target="_blank" rel="noopener">★ Leave a Google review</a>
+    </div>
+    <div style="height:64px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-contact">
+  <div class="wrap">
+    <div class="strip">
+      <span class="eyebrow">Contact</span>
+      <h2>Call Ariel directly</h2>
+      <p>No call center. You call, Ariel answers, and a real crew shows up on time.</p>
+    </div>
+    <div class="contact-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#9A5D24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg> Call now</h3>
+        <a class="big" href="tel:+18183534646">(818) 353-4646</a>
+        <p style="margin-top:10px">Leaks, clogs, electrical trouble or a remodel in mind? Call for a quote. Emergency? Call now, don't wait.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#9A5D24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Find us</h3>
+        <p><strong>Ariel's Improvements</strong><br>10438 Hillhaven Ave<br>Tujunga, CA 91042</p>
+        <p>Serving Tujunga, Sunland, and the San Fernando Valley.</p>
+      </div>
+    </div>
+    <div class="contact-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#9A5D24" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Hours</h3>
+        <table class="hours-table" id="hoursTable">
+          <tr><td>Monday</td><td>7:00 AM - 5:00 PM</td></tr>
+          <tr><td>Tuesday</td><td>7:00 AM - 5:00 PM</td></tr>
+          <tr><td>Wednesday</td><td>7:00 AM - 5:00 PM</td></tr>
+          <tr><td>Thursday</td><td>7:00 AM - 5:00 PM</td></tr>
+          <tr><td>Friday</td><td>7:00 AM - 5:00 PM</td></tr>
+          <tr><td>Saturday</td><td>Closed</td></tr>
+          <tr><td>Sunday</td><td>Closed</td></tr>
+        </table>
+        <p style="margin-top:10px;font-size:.9rem">Typical hours from directory listings. Please call to confirm.</p>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <svg viewBox="0 0 24 24" fill="#9A5D24"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#FFFDF8"/></svg>
+          <strong>10438 Hillhaven Ave</strong>
+          <small>Tujunga, CA 91042</small><br>
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJ9UnfoFfrwoARXAUcJHJl-Vo" target="_blank" rel="noopener">Get Directions →</a>
+        </div>
+      </div>
+    </div>
+    <div style="height:64px"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-line">
+      <a class="foot-brand" href="#home" data-page="home">
+        <svg viewBox="0 0 64 64" role="img" aria-label="Wrench and pipe logo"><path d="M14 50 L38 26" stroke="#C47A36" stroke-width="9" stroke-linecap="round"/><circle cx="46" cy="14" r="9" fill="none" stroke="#E9B978" stroke-width="5"/><path d="M10 58 q12 2 20 -6" stroke="#E9B978" stroke-width="6" fill="none" stroke-linecap="round"/></svg>
+        <span>Ariel's Improvements</span>
+      </a>
+      <nav class="foot-nav" aria-label="Footer navigation">
+        <a href="#home" data-page="home">Home</a>
+        <a href="#services" data-page="services">Services</a>
+        <a href="#about" data-page="about">About</a>
+        <a href="#projects" data-page="projects">Projects</a>
+        <a href="#reviews" data-page="reviews">Reviews</a>
+        <a href="#contact" data-page="contact">Contact</a>
+      </nav>
+    </div>
+    <div class="foot-bottom">
+      <span>© Ariel's Improvements</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "projects", "reviews", "contact"];
+  var drawer = document.getElementById("drawer");
+  var drawerBtn = document.getElementById("drawerBtn");
+  var drawerClose = document.getElementById("drawerClose");
+  var scrim = document.getElementById("scrim");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function openDrawer(){
+    if(drawer){ drawer.classList.add("open"); }
+    if(scrim){ scrim.classList.add("show"); }
+    if(drawerBtn){ drawerBtn.setAttribute("aria-expanded", "true"); }
+  }
+  function closeMenu(){
+    if(drawer){ drawer.classList.remove("open"); }
+    if(scrim){ scrim.classList.remove("show"); }
+    if(drawerBtn){ drawerBtn.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll(".drawer a[data-page], .foot-nav a[data-page], .brand[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(drawerBtn){ drawerBtn.addEventListener("click", openDrawer); }
+  if(drawerClose){ drawerClose.addEventListener("click", closeMenu); }
+  if(scrim){ scrim.addEventListener("click", closeMenu); }
+
+  /* ---------- service tabs ---------- */
+  var tabBtns = document.querySelectorAll(".tab-btn");
+  function activateTab(name){
+    for(var i = 0; i < tabBtns.length; i++){
+      tabBtns[i].classList.toggle("active", tabBtns[i].getAttribute("data-tab") === name);
+    }
+    var panels = document.querySelectorAll(".tab-panel");
+    for(var j = 0; j < panels.length; j++){
+      panels[j].classList.toggle("active", panels[j].id === "tab-" + name);
+    }
+    observeReveals();
+  }
+  for(var t = 0; t < tabBtns.length; t++){
+    tabBtns[t].addEventListener("click", function(){
+      activateTab(this.getAttribute("data-tab"));
+    });
+  }
+
+  /* ---------- projects carousel ---------- */
+  var caro = document.getElementById("caroTrack");
+  var prev = document.getElementById("caroPrev");
+  var next = document.getElementById("caroNext");
+  function caroStep(dir){
+    if(!caro) return;
+    var card = caro.querySelector(".ccard");
+    var w = card ? card.offsetWidth + 22 : 442;
+    caro.scrollBy({left: dir * w, behavior: "smooth"});
+  }
+  if(prev){ prev.addEventListener("click", function(){ caroStep(-1); }); }
+  if(next){ next.addEventListener("click", function(){ caroStep(1); }); }
+
+  /* ---------- live hours (America/Los_Angeles) ---------- */
+  var HOURS = {1:[7,17],2:[7,17],3:[7,17],4:[7,17],5:[7,17]};
+  var DOW = {"Sun":0,"Mon":1,"Tue":2,"Wed":3,"Thu":4,"Fri":5,"Sat":6};
+  function fmt(h){
+    var ap = h < 12 ? "AM" : "PM";
+    var hh = h % 12;
+    if(hh === 0){ hh = 12; }
+    return hh + ":00 " + ap;
+  }
+  try{
+    var parts = new Intl.DateTimeFormat("en-US",{timeZone:"America/Los_Angeles",weekday:"short",hour:"numeric",hour12:false}).formatToParts(new Date());
+    var wd = "Mon", hr = 12;
+    parts.forEach(function(p){
+      if(p.type === "weekday"){ wd = p.value; }
+      if(p.type === "hour"){ hr = parseInt(p.value, 10) % 24; }
+    });
+    var day = DOW[wd] !== undefined ? DOW[wd] : 1;
+    var span = HOURS[day];
+    var pill = document.getElementById("hoursPill");
+    var txt = document.getElementById("hoursText");
+    if(pill && txt){
+      if(span && hr >= span[0] && hr < span[1]){
+        txt.textContent = "Open now · until " + fmt(span[1]) + " today";
+      } else {
+        pill.classList.add("closed");
+        txt.textContent = "Call for hours";
+      }
+    }
+    var rows = document.querySelectorAll("#hoursTable tr");
+    var idx = (day + 6) % 7; /* rows run Mon..Sun */
+    if(rows[idx]){ rows[idx].classList.add("today"); }
+  }catch(e){ /* leave default pill text */ }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

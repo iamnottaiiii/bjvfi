@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patmar Air Systems Inc · Heating Contractor, Glendale, CA</title>
+<meta name="description" content="Patmar Air Systems Inc is a heating contractor at 3923 Foothill Blvd # A, Glendale, CA. Heating and cooling services, repairs, and system maintenance. Call (818) 957-7519.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0E1F33; --ink-2:#16293F;
+  --paper:#F4F7FA; --card:#FFFFFF; --ice:#DCE9F3;
+  --ember:#E06A2C; --ember-deep:#B4501C; --ember-soft:#FBE3D3;
+  --sky:#2F7FA8; --sky-soft:#D7EAF4;
+  --line:rgba(14,31,51,.14);
+  --radius:20px;
+  --shadow:0 20px 44px -20px rgba(14,31,51,.35);
+  --shadow-sm:0 10px 24px -12px rgba(14,31,51,.28);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Inter",system-ui,sans-serif;
+  background:var(--paper);color:var(--ink);line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--ember-deep)}
+::selection{background:var(--ember);color:#fff}
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+h1,h2,h3,.display{font-family:"Bricolage Grotesque","Inter",sans-serif}
+
+/* ---------- top bar + side drawer ---------- */
+header.site{
+  position:sticky;top:0;z-index:60;
+  background:rgba(14,31,51,.96);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border-bottom:3px solid var(--ember);
+}
+.bar{display:flex;align-items:center;gap:16px;padding:12px 0;color:#fff}
+.burger{
+  background:none;border:2px solid rgba(255,255,255,.35);border-radius:12px;cursor:pointer;
+  padding:9px 11px;display:flex;flex-direction:column;gap:5px;
+}
+.burger span{display:block;width:24px;height:3px;border-radius:3px;background:#fff;transition:.25s}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:#fff}
+.brand svg{width:44px;height:44px;flex:none}
+.brand-name{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:1.18rem;line-height:1.05}
+.brand-name small{display:block;font-family:"Inter",sans-serif;font-weight:600;font-size:.62rem;letter-spacing:3px;text-transform:uppercase;color:var(--ember)}
+.bar-spacer{flex:1}
+.call-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--ember);color:#fff;text-decoration:none;font-weight:700;
+  padding:11px 22px;border-radius:999px;box-shadow:var(--shadow-sm);
+  transition:transform .18s,background .18s;white-space:nowrap;
+}
+.call-btn:hover{background:var(--ember-deep);transform:translateY(-2px)}
+.scrim{
+  position:fixed;inset:0;background:rgba(8,17,29,.6);z-index:70;
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.scrim.show{opacity:1;pointer-events:auto}
+.drawer{
+  position:fixed;top:0;left:0;bottom:0;width:min(360px,86vw);z-index:80;
+  background:var(--ink);color:#fff;transform:translateX(-102%);transition:transform .35s cubic-bezier(.22,.8,.3,1);
+  display:flex;flex-direction:column;padding:28px 26px;overflow-y:auto;
+  border-right:3px solid var(--ember);
+}
+.drawer.open{transform:none}
+.drawer-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.drawer-top strong{font-family:"Bricolage Grotesque",sans-serif;font-size:1.3rem}
+.drawer-close{background:none;border:2px solid rgba(255,255,255,.35);border-radius:10px;color:#fff;font-size:1.2rem;width:40px;height:40px;cursor:pointer;line-height:1}
+nav.drawer-nav{display:flex;flex-direction:column;gap:6px}
+nav.drawer-nav a{
+  text-decoration:none;color:#fff;font-family:"Bricolage Grotesque",sans-serif;font-weight:700;
+  font-size:1.5rem;padding:12px 14px;border-radius:14px;transition:background .2s;
+  display:flex;align-items:baseline;gap:14px;
+}
+nav.drawer-nav a .num{font-size:.85rem;color:var(--ember);font-family:"Inter",sans-serif;font-weight:600}
+nav.drawer-nav a:hover{background:rgba(255,255,255,.08)}
+nav.drawer-nav a.active{background:var(--ember)}
+.drawer-foot{margin-top:auto;padding-top:26px;border-top:1px solid rgba(255,255,255,.15);font-size:.9rem;color:#B9C9DA}
+.drawer-foot a{color:#fff;text-decoration:none;font-weight:700;font-size:1.1rem}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- split hero ---------- */
+.hero{position:relative;overflow:hidden;padding:72px 0 64px;background:linear-gradient(160deg,var(--ink) 0%,var(--ink-2) 70%,#1E3B5C 100%);color:#fff}
+.hero::before{
+  content:"";position:absolute;inset:0;opacity:.5;pointer-events:none;
+  background:
+    radial-gradient(circle at 12% 20%, rgba(224,106,44,.25), transparent 42%),
+    radial-gradient(circle at 88% 85%, rgba(47,127,168,.28), transparent 45%);
+}
+.hero-grid{position:relative;display:grid;grid-template-columns:1.02fr .98fr;gap:56px;align-items:center}
+.kicker{
+  display:inline-flex;align-items:center;gap:10px;
+  font-size:.78rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
+  color:#FFD9BE;background:rgba(224,106,44,.18);border:1px solid rgba(224,106,44,.55);
+  padding:8px 18px;border-radius:999px;margin-bottom:20px;
+}
+h1{font-weight:800;font-size:clamp(2.5rem,5.2vw,4.1rem);line-height:1.04;letter-spacing:-.5px;margin-bottom:18px}
+h1 .accent{color:var(--ember)}
+.lede{font-size:1.1rem;color:#C9D8E8;max-width:34rem;margin-bottom:28px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:26px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;
+  padding:14px 28px;border-radius:999px;font-size:1rem;transition:transform .18s,box-shadow .18s,background .18s;
+}
+.btn-solid{background:var(--ember);color:#fff;box-shadow:var(--shadow-sm)}
+.btn-solid:hover{background:var(--ember-deep);transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.45)}
+.btn-ghost:hover{border-color:#fff;transform:translateY(-2px)}
+.hours-pill{
+  display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.25);color:#fff;
+  padding:10px 20px;border-radius:999px;font-weight:600;font-size:.95rem;
+}
+.hours-pill .dot{width:10px;height:10px;border-radius:50%;background:#7BC47F;box-shadow:0 0 0 4px rgba(123,196,127,.25);animation:pulse 2s infinite}
+.hours-pill.closed .dot{background:#F2A0B5;box-shadow:0 0 0 4px rgba(242,160,181,.25)}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+.hero-art{position:relative}
+.gauge-card{
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.2);
+  border-radius:28px;padding:38px;box-shadow:var(--shadow);position:relative;overflow:hidden;
+}
+.gauge-card svg{width:100%;height:auto;display:block}
+.gauge-stamp{
+  position:absolute;bottom:-16px;right:26px;background:var(--ember);color:#fff;
+  font-weight:700;padding:12px 24px;border-radius:999px;transform:rotate(3deg);
+  box-shadow:var(--shadow-sm);font-size:.95rem;z-index:2;
+}
+
+/* ---------- card wall ---------- */
+.block{padding:64px 0}
+.sec-head{max-width:46rem;margin:0 auto 44px;text-align:center}
+.sec-eyebrow{font-size:.78rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--ember-deep)}
+h2{font-weight:800;font-size:clamp(1.9rem,3.6vw,2.7rem);line-height:1.12;margin:8px 0 12px;letter-spacing:-.3px}
+.sec-head p{color:#4A6178}
+.wall{display:grid;grid-template-columns:repeat(12,1fr);gap:20px}
+.wcard{
+  background:var(--card);border-radius:var(--radius);padding:32px 30px;box-shadow:var(--shadow-sm);
+  border:1px solid var(--line);transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden;
+}
+.wcard:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+.wcard h3{font-size:1.35rem;font-weight:700;margin:14px 0 8px}
+.wcard p{color:#4A6178;font-size:.97rem}
+.wcard .icon{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center}
+.wcard .icon svg{width:30px;height:30px}
+.wcard.w1{grid-column:span 5;background:linear-gradient(140deg,#fff,#FDEEE1);border-top:6px solid var(--ember)}
+.wcard.w2{grid-column:span 7;background:linear-gradient(140deg,#fff,#E7F2F9);border-top:6px solid var(--sky)}
+.wcard.w3{grid-column:span 4;border-top:6px solid var(--ember)}
+.wcard.w4{grid-column:span 4;border-top:6px solid var(--sky)}
+.wcard.w5{grid-column:span 4;background:var(--ink);color:#fff;border-top:6px solid var(--ember)}
+.wcard.w5 p{color:#B9C9DA}
+.wcard.w5 h3{color:#fff}
+
+/* ---------- stat band ---------- */
+.stats{background:var(--ink);color:#fff;padding:44px 0;margin:8px 0}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;text-align:center}
+.stat b{display:block;font-family:"Bricolage Grotesque",sans-serif;font-size:2.3rem;font-weight:800;color:var(--ember)}
+.stat span{font-size:.95rem;color:#B9C9DA}
+
+/* ---------- leaders (services page) ---------- */
+.strip{border-radius:26px;padding:56px 48px;color:#fff;position:relative;overflow:hidden;margin-bottom:44px;box-shadow:var(--shadow)}
+.strip::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(255,255,255,.2), transparent 50%)}
+.strip h2{color:#fff;font-size:clamp(2rem,4vw,3rem);margin:4px 0 10px}
+.strip p{color:rgba(255,255,255,.88);max-width:36rem}
+.strip .sec-eyebrow{color:#FFD9BE}
+.strip.s-dark{background:linear-gradient(120deg,#0E1F33,#27435F)}
+.strip.s-warm{background:linear-gradient(120deg,#B4501C,#7E3510)}
+.leaders{list-style:none;display:flex;flex-direction:column}
+.leader{
+  display:grid;grid-template-columns:96px 1fr auto;gap:24px;align-items:center;
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:30px 34px;margin-bottom:18px;box-shadow:var(--shadow-sm);
+  transition:transform .2s;
+}
+.leader:hover{transform:translateX(6px)}
+.leader .n{
+  font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:2.6rem;color:var(--ice);
+  line-height:1;
+}
+.leader h3{font-size:1.45rem;font-weight:700;margin-bottom:6px}
+.leader p{color:#4A6178;max-width:40rem}
+.leader .tag{
+  font-size:.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  background:var(--ember-soft);color:var(--ember-deep);padding:8px 18px;border-radius:999px;white-space:nowrap;
+}
+.leader .tag.cool{background:var(--sky-soft);color:var(--sky)}
+.sample-note{background:#FFF8EE;border:2px dashed rgba(224,106,44,.5);border-radius:var(--radius);padding:20px 26px;font-size:.95rem;color:#7A4A22;margin-top:8px}
+
+/* ---------- about ---------- */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center}
+.split h2{margin:6px 0 12px}
+.split p{color:#4A6178;margin-bottom:14px}
+.badge-row{display:flex;flex-wrap:wrap;gap:12px;margin:22px 0}
+.pill-badge{
+  display:inline-flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);
+  padding:10px 18px;border-radius:999px;font-weight:600;font-size:.9rem;box-shadow:var(--shadow-sm);
+}
+.pill-badge svg{width:20px;height:20px}
+.quote-card{
+  background:var(--ink);color:#fff;border-radius:26px;padding:44px 40px;position:relative;box-shadow:var(--shadow);
+  border-left:8px solid var(--ember);
+}
+.quote-card::before{content:"\201C";position:absolute;top:4px;left:26px;font-family:"Bricolage Grotesque",sans-serif;font-size:5rem;color:var(--ember);opacity:.6}
+.quote-card p{font-family:"Bricolage Grotesque",sans-serif;font-size:1.4rem;line-height:1.5;margin-bottom:14px;position:relative}
+.quote-card cite{font-style:normal;font-weight:600;color:var(--ember);font-size:.9rem;letter-spacing:1px;text-transform:uppercase}
+
+/* ---------- masonry gallery ---------- */
+.masonry{columns:3;column-gap:20px}
+.tile{
+  break-inside:avoid;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);
+  background:var(--card);margin-bottom:20px;border:1px solid var(--line);
+  transition:transform .2s;
+}
+.tile:hover{transform:translateY(-5px)}
+.tile .art{display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:34px 20px}
+.tile .art svg{width:52%;height:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.18))}
+.tile.tall .art{padding:56px 20px}
+.tile .cap{padding:16px 20px}
+.tile .cap strong{font-family:"Bricolage Grotesque",sans-serif;font-size:1.08rem;display:block}
+.tile .cap small{color:#4A6178}
+.tile .soon{
+  position:absolute;top:12px;right:12px;background:rgba(255,255,255,.9);
+  font-size:.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  padding:4px 12px;border-radius:999px;color:#4A6178;
+}
+
+/* ---------- reviews ---------- */
+.rs-strip{margin:0 auto 36px;max-width:660px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 26px;text-align:center;box-shadow:var(--shadow-sm)}
+.rs-note{margin:0 0 14px;font-size:.95rem;color:#4A6178;line-height:1.55}
+.rs-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rs-btn{display:inline-block;background:var(--ember);color:#fff;padding:11px 26px;border-radius:999px;font-weight:700;text-decoration:none;font-size:.95rem}
+.rs-btn:hover{background:var(--ember-deep)}
+.rev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.rev{background:var(--card);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm);border:1px solid var(--line);position:relative}
+.rev .stars{color:var(--ember);font-size:1.15rem;letter-spacing:3px;margin-bottom:12px}
+.rev p{font-size:1.02rem;margin-bottom:14px;color:#33475D}
+.rev cite{font-style:normal;font-weight:700;font-size:.82rem;color:var(--ember-deep);letter-spacing:1px;text-transform:uppercase}
+.rev .sample-flag{
+  position:absolute;top:14px;right:16px;font-size:.68rem;font-weight:700;letter-spacing:1.2px;
+  text-transform:uppercase;background:var(--ice);color:var(--ink);padding:4px 12px;border-radius:999px;
+}
+.rev.featured{background:var(--ink);color:#fff;border:none}
+.rev.featured p{color:#D7E3F1}
+.rev.featured cite{color:var(--ember)}
+.rev.featured .sample-flag{background:rgba(255,255,255,.14);color:#fff}
+.cta-band{background:linear-gradient(120deg,var(--ember),var(--ember-deep));border-radius:26px;color:#fff;padding:52px 44px;text-align:center;margin-top:48px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.cta-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 20%, rgba(255,255,255,.25), transparent 50%)}
+.cta-band h2{color:#fff;position:relative}
+.cta-band p{color:#FFE9D8;position:relative;max-width:36rem;margin:0 auto 26px}
+.cta-band .btn-solid{background:#fff;color:var(--ember-deep);position:relative}
+.cta-band .btn-solid:hover{background:var(--paper)}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-bottom:26px}
+.info-card{background:var(--card);border-radius:var(--radius);padding:34px;box-shadow:var(--shadow-sm);border:1px solid var(--line)}
+.info-card h3{font-size:1.4rem;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.info-card h3 svg{width:28px;height:28px}
+.info-card p{color:#4A6178;margin-bottom:8px}
+.info-card a.big{font-family:"Bricolage Grotesque",sans-serif;font-size:1.55rem;font-weight:700;color:var(--ember-deep);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.hours-table{width:100%;border-collapse:collapse;font-size:.98rem}
+.hours-table td{padding:10px 6px;border-bottom:1px dashed var(--line)}
+.hours-table tr.today td{font-weight:800;color:var(--ember-deep)}
+.hours-table td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.map-card{
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:340px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 46px, rgba(47,127,168,.16) 46px 48px),
+    repeating-linear-gradient(90deg, transparent 0 46px, rgba(47,127,168,.16) 46px 48px),
+    linear-gradient(140deg,#E4EEF5,#CBDCE9);
+  display:flex;align-items:center;justify-content:center;
+}
+.map-pin{
+  text-align:center;background:#fff;padding:28px 36px;border-radius:20px;box-shadow:var(--shadow);
+  max-width:80%;position:relative;
+}
+.map-pin::after{content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);border:14px solid transparent;border-top-color:#fff;border-bottom:0}
+.map-pin svg{width:44px;height:44px;margin-bottom:8px}
+.map-pin strong{font-family:"Bricolage Grotesque",sans-serif;font-size:1.15rem;display:block}
+.map-pin small{color:#4A6178}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- footer ---------- */
+footer{background:var(--ink);color:#B9C9DA;margin-top:24px;border-top:4px solid var(--ember)}
+.foot-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:36px;padding:58px 0 34px}
+.foot-grid h4{font-family:"Bricolage Grotesque",sans-serif;color:#fff;font-size:1.12rem;margin-bottom:14px}
+.foot-grid p,.foot-grid a{color:#9DB2C8;font-size:.94rem}
+.foot-grid a{text-decoration:none}.foot-grid a:hover{color:var(--ember)}
+.foot-brand{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.foot-brand svg{width:44px;height:44px}
+.foot-brand span{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;color:#fff;font-size:1.2rem;line-height:1.1}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.12);padding:22px 0 28px;text-align:center;font-size:.88rem;color:#8DA2B9}
+
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:940px){
+  .hero-grid,.split,.visit-grid{grid-template-columns:1fr}
+  .rev-grid{grid-template-columns:1fr}
+  .stats-grid{grid-template-columns:1fr;gap:18px}
+  .wcard.w1,.wcard.w2,.wcard.w3,.wcard.w4,.wcard.w5{grid-column:span 12}
+  .masonry{columns:2}
+  .leader{grid-template-columns:64px 1fr;gap:16px}
+  .leader .tag{grid-column:2;justify-self:start}
+  .foot-grid{grid-template-columns:1fr 1fr}
+  .strip{padding:40px 28px}
+}
+@media(max-width:600px){
+  .masonry{columns:1}
+  .hero{padding:52px 0 44px}
+  .cta-band{padding:38px 24px}
+  .foot-grid{grid-template-columns:1fr}
+  .bar .call-btn{display:none}
+}
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="wrap bar">
+    <button class="burger" id="burger" aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button>
+    <a class="brand" href="#home" data-page="home" aria-label="Patmar Air Systems Inc, home">
+      <svg viewBox="0 0 64 64" role="img" aria-label="Patmar logo"><circle cx="32" cy="32" r="29" fill="#E06A2C"/><path d="M14 40 q6 -14 18 -14 q12 0 18 14" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/><path d="M20 46 q4 -8 12 -8 q8 0 12 8" fill="none" stroke="#0E1F33" stroke-width="3.5" stroke-linecap="round"/><path d="M32 12 v-6 M18 17 l-4 -5 M46 17 l4 -5" stroke="#FFD9BE" stroke-width="3.5" stroke-linecap="round"/></svg>
+      <span class="brand-name">Patmar Air Systems<small>Heating Contractor · Glendale</small></span>
+    </a>
+    <span class="bar-spacer"></span>
+    <a class="call-btn" href="tel:+18189577519">Call (818) 957-7519</a>
+  </div>
+</header>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Site navigation">
+  <div class="drawer-top">
+    <strong>Menu</strong>
+    <button class="drawer-close" id="drawerClose" aria-label="Close navigation">&times;</button>
+  </div>
+  <nav class="drawer-nav" id="mainNav" aria-label="Main navigation">
+    <a href="#home" data-page="home" class="active" aria-current="page"><span class="num">01</span>Home</a>
+    <a href="#services" data-page="services"><span class="num">02</span>Services</a>
+    <a href="#about" data-page="about"><span class="num">03</span>About Us</a>
+    <a href="#gallery" data-page="gallery"><span class="num">04</span>Gallery</a>
+    <a href="#reviews" data-page="reviews"><span class="num">05</span>Reviews</a>
+    <a href="#visit" data-page="visit"><span class="num">06</span>Visit Us</a>
+  </nav>
+  <div class="drawer-foot">
+    Ready when you are.<br>
+    <a href="tel:+18189577519">(818) 957-7519</a><br>
+    3923 Foothill Blvd # A, Glendale, CA 91214
+  </div>
+</aside>
+
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="kicker">Heating contractor · Glendale, CA</span>
+        <h1>Comfort you can feel,<br><span class="accent">from a crew you can trust.</span></h1>
+        <p class="lede">Patmar Air Systems Inc keeps homes and businesses in Glendale comfortable year round: heating service and repair, cooling systems, and the routine care that keeps everything running clean and efficient.</p>
+        <div class="cta-row">
+          <a class="btn btn-solid" href="#services" data-page="services">See our services</a>
+          <a class="btn btn-ghost" href="https://www.google.com/maps/place/?q=place_id:ChIJjZpp1BHrwoARZFOhWqnaZjk" target="_blank" rel="noopener">Get directions</a>
+        </div>
+        <span class="hours-pill" id="hoursPill"><span class="dot"></span><span id="hoursText">Checking today's hours...</span></span>
+      </div>
+      <div class="hero-art">
+        <div class="gauge-card">
+          <svg viewBox="0 0 340 260" role="img" aria-label="Illustration of a thermostat gauge">
+            <ellipse cx="170" cy="230" rx="120" ry="14" fill="#000" opacity=".25"/>
+            <rect x="60" y="30" width="220" height="190" rx="26" fill="#0E1F33" stroke="#E06A2C" stroke-width="5"/>
+            <circle cx="170" cy="118" r="62" fill="#16293F" stroke="#2F7FA8" stroke-width="4"/>
+            <path d="M118 118 a52 52 0 0 1 104 0" fill="none" stroke="#E06A2C" stroke-width="10" stroke-linecap="round"/>
+            <path d="M118 118 a52 52 0 0 0 104 0" fill="none" stroke="#33475D" stroke-width="10" stroke-linecap="round"/>
+            <line x1="170" y1="118" x2="206" y2="86" stroke="#fff" stroke-width="6" stroke-linecap="round"/>
+            <circle cx="170" cy="118" r="8" fill="#fff"/>
+            <text x="170" y="200" text-anchor="middle" fill="#FFD9BE" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="30">72°</text>
+            <circle cx="92" cy="62" r="7" fill="#7BC47F"/>
+            <rect x="108" y="44" width="8" height="20" rx="4" fill="#2F7FA8" opacity=".7"/>
+            <rect x="224" y="44" width="8" height="20" rx="4" fill="#E06A2C" opacity=".7"/>
+          </svg>
+        </div>
+        <div class="gauge-stamp">Heating and cooling pros</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-eyebrow">Why Patmar</span>
+        <h2>One call covers<br>your whole system</h2>
+        <p>From a furnace that will not start to a full system replacement, Patmar Air Systems Inc handles the heating and cooling work Glendale homes and businesses depend on.</p>
+      </div>
+      <div class="wall">
+        <div class="wcard w1 reveal">
+          <div class="icon" style="background:var(--ember-soft)"><svg viewBox="0 0 24 24" fill="none" stroke="#B4501C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/><circle cx="12" cy="12" r="4.5"/></svg></div>
+          <h3>Heating repair and service</h3>
+          <p>Furnaces, heat systems, and the odd noises that show up on the coldest night. We diagnose fast and fix it right the first time.</p>
+        </div>
+        <div class="wcard w2 reveal">
+          <div class="icon" style="background:var(--sky-soft)"><svg viewBox="0 0 24 24" fill="none" stroke="#2F7FA8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M4 6l16 12M20 6L4 18M12 6l-2-2m2 2l2-2M12 18l-2 2m2-2l2 2"/></svg></div>
+          <h3>Cooling when summer hits</h3>
+          <p>Glendale summers are no joke. AC repair, tune-ups, and full replacements sized for your space so you stay cool without the surprise bills.</p>
+        </div>
+        <div class="wcard w3 reveal">
+          <div class="icon" style="background:var(--ember-soft)"><svg viewBox="0 0 24 24" fill="none" stroke="#B4501C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4.5 4.5 0 00-6 6L3 18l3 3 5.7-5.7a4.5 4.5 0 006-6L14.5 12l-2.5-2.5 2.7-3.2z"/></svg></div>
+          <h3>Maintenance that pays for itself</h3>
+          <p>Regular tune-ups catch small problems early, extend equipment life, and keep efficiency high.</p>
+        </div>
+        <div class="wcard w4 reveal">
+          <div class="icon" style="background:var(--sky-soft)"><svg viewBox="0 0 24 24" fill="none" stroke="#2F7FA8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-7 4 14 2-7h6"/></svg></div>
+          <h3>System replacement</h3>
+          <p>When repair stops making sense, we help you pick the right equipment and install it cleanly and to code.</p>
+        </div>
+        <div class="wcard w5 reveal">
+          <div class="icon" style="background:rgba(255,255,255,.12)"><svg viewBox="0 0 24 24" fill="none" stroke="#E06A2C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg></div>
+          <h3>Talk to a real tech</h3>
+          <p>Questions about your system? Call and describe the symptoms. We will tell you straight what it sounds like and what it takes to fix it.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="wrap stats-grid">
+      <div class="stat reveal"><b>88</b><span>permitted projects on record with BuildZoom</span></div>
+      <div class="stat reveal"><b>CA Lic.</b><span>licenses 401713 and 567739 on file (Warm Air HVAC)</span></div>
+      <div class="stat reveal"><b>Glendale</b><span>local crew serving the Foothill area and beyond</span></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="wrap split">
+      <div class="reveal">
+        <span class="sec-eyebrow">Straightforward work</span>
+        <h2>No upsells. No mystery. Just comfort.</h2>
+        <p>HVAC work has a reputation problem: vague quotes, pressure tactics, parts you never needed. Patmar Air Systems Inc keeps it simple.</p>
+        <p>We show up, we look at the whole system, we explain what we find in plain language, and we give you a straight price before any work starts. If a repair is the smart move, we repair. If replacement makes more sense, we say so and show you why.</p>
+        <a class="btn btn-ghost" style="color:var(--ink);border-color:rgba(14,31,51,.3)" href="#about" data-page="about">More about us</a>
+      </div>
+      <div class="quote-card reveal">
+        <p>A working system, a fair price, and a phone number you can call again.</p>
+        <cite>The Patmar standard</cite>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-warm">
+      <span class="sec-eyebrow">Our services</span>
+      <h2>Heating and cooling,<br>end to end</h2>
+      <p>The core work of a heating contractor: install, repair, maintain, and replace the systems that keep your building comfortable.</p>
+    </div>
+
+    <ol class="leaders">
+      <li class="leader reveal">
+        <span class="n">01</span>
+        <div><h3>Heating repair</h3><p>Furnaces and heating systems that will not start, blow cold, cycle constantly, or make noises they should not. Diagnosis first, then a straight quote.</p></div>
+        <span class="tag">Most requested</span>
+      </li>
+      <li class="leader reveal">
+        <span class="n">02</span>
+        <div><h3>Heating installation</h3><p>New furnace and heating equipment sized to your space and installed to code, with permits handled properly.</p></div>
+        <span class="tag">Installations</span>
+      </li>
+      <li class="leader reveal">
+        <span class="n">03</span>
+        <div><h3>Air conditioning repair</h3><p>AC that is not cooling, leaking, freezing up, or short cycling. We get to the cause, not just the symptom.</p></div>
+        <span class="tag cool">Cooling</span>
+      </li>
+      <li class="leader reveal">
+        <span class="n">04</span>
+        <div><h3>AC installation and replacement</h3><p>Full system changeouts when repair stops making sense: matched equipment, clean duct connections, startup and testing.</p></div>
+        <span class="tag cool">Cooling</span>
+      </li>
+      <li class="leader reveal">
+        <span class="n">05</span>
+        <div><h3>Maintenance and tune-ups</h3><p>Seasonal checkups that keep systems efficient and catch small failures before they become big ones: filters, refrigerant, airflow, electrical, controls.</p></div>
+        <span class="tag">Preventive care</span>
+      </li>
+      <li class="leader reveal">
+        <span class="n">06</span>
+        <div><h3>Duct work</h3><p>Duct repair, modification, and new runs so conditioned air actually reaches every room it is supposed to.</p></div>
+        <span class="tag">Airflow</span>
+      </li>
+    </ol>
+
+    <div class="sample-note reveal">
+      <strong>A note on pricing:</strong> every system is different, so we quote each job individually after seeing it in person. Call <a href="tel:+18189577519">(818) 957-7519</a> to describe your situation and get a straightforward answer on what it takes.
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Something wrong with your system?</h2>
+      <p>Describe the symptoms and we will tell you straight what it sounds like. Fast scheduling, plain-language quotes, no pressure.</p>
+      <a class="btn btn-solid" href="tel:+18189577519">Call (818) 957-7519</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-about">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-dark">
+      <span class="sec-eyebrow">About us</span>
+      <h2>A Glendale HVAC crew<br>that keeps it simple</h2>
+      <p>Patmar Air Systems Inc is a heating contractor based on Foothill Blvd in Glendale, working on residential and commercial HVAC across the area.</p>
+    </div>
+
+    <div class="split" style="margin-bottom:56px">
+      <div class="reveal">
+        <span class="sec-eyebrow">What we believe</span>
+        <h2>Comfort is a service,<br>not a sales pitch</h2>
+        <p>Most of our work comes from systems that are old, tired, or badly installed by someone else. Our job is to leave every site better than we found it: safe, efficient, and running the way it was designed to.</p>
+        <p>We pull permits where the job requires them, install to code, and stand behind the work. Public permit records show dozens of HVAC and mechanical projects completed across Los Angeles County over the years.</p>
+        <div class="badge-row">
+          <span class="pill-badge"><svg viewBox="0 0 24 24" fill="none" stroke="#2F7FA8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg>Permit history on record</span>
+          <span class="pill-badge"><svg viewBox="0 0 24 24" fill="none" stroke="#2F7FA8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Local to Glendale</span>
+          <span class="pill-badge"><svg viewBox="0 0 24 24" fill="none" stroke="#2F7FA8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M4 6l16 12M20 6L4 18"/></svg>Heating and cooling</span>
+        </div>
+        <a class="btn btn-solid" href="#visit" data-page="visit">Visit or call us</a>
+      </div>
+      <div class="quote-card reveal">
+        <p>Show up, look at the whole system, explain it plainly, and charge a fair price.</p>
+        <cite>How we work</cite>
+      </div>
+    </div>
+
+    <div class="cta-band reveal" style="margin-top:0">
+      <h2>Ask us anything about your system.</h2>
+      <p>Strange noise, rising bill, rooms that never get comfortable: start with a call.</p>
+      <a class="btn btn-solid" href="tel:+18189577519">Call (818) 957-7519</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-dark">
+      <span class="sec-eyebrow">Gallery</span>
+      <h2>On the job,<br>around Glendale</h2>
+      <p>Artistic previews of the work we do. Real photos of our installs and repairs are on the way.</p>
+    </div>
+
+    <div class="masonry">
+      <div class="tile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#E06A2C,#B4501C)">
+          <svg viewBox="0 0 100 100"><rect x="24" y="30" width="52" height="44" rx="8" fill="#FFF6E8"/><rect x="32" y="40" width="36" height="6" rx="3" fill="#E06A2C"/><circle cx="50" cy="60" r="8" fill="none" stroke="#0E1F33" stroke-width="4"/><path d="M50 60 L56 54" stroke="#0E1F33" stroke-width="3.5" stroke-linecap="round"/><path d="M40 20 q4 -6 0 -12 M52 20 q4 -6 0 -12 M64 20 q4 -6 0 -12" stroke="#fff" stroke-width="3.5" fill="none" stroke-linecap="round" opacity=".8"/></svg>
+        </div>
+        <div class="cap"><strong>Furnace installs</strong><small>Clean, to-code heating replacements</small></div>
+      </div>
+      <div class="tile tall reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#2F7FA8,#1E5C7A)">
+          <svg viewBox="0 0 100 100"><rect x="20" y="24" width="60" height="52" rx="10" fill="#FFF6E8"/><path d="M30 38 h40 M30 50 h40 M30 62 h28" stroke="#2F7FA8" stroke-width="5" stroke-linecap="round"/><circle cx="70" cy="72" r="9" fill="#0E1F33"/><path d="M66 72 h8 M70 68 v8" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>AC service</strong><small>Repairs and seasonal tune-ups</small></div>
+      </div>
+      <div class="tile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#0E1F33,#27435F)">
+          <svg viewBox="0 0 100 100"><path d="M20 60 q20 -8 30 -8 q14 0 30 8" stroke="#E06A2C" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M20 78 q20 -8 30 -8 q14 0 30 8" stroke="#2F7FA8" stroke-width="9" fill="none" stroke-linecap="round"/><circle cx="80" cy="34" r="8" fill="#fff" opacity=".85"/></svg>
+        </div>
+        <div class="cap"><strong>Duct work</strong><small>Repairs, reroutes, and new runs</small></div>
+      </div>
+      <div class="tile tall reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#E8A93D,#C07E1E)">
+          <svg viewBox="0 0 100 100"><rect x="30" y="18" width="40" height="64" rx="8" fill="#FFF6E8"/><circle cx="50" cy="42" r="12" fill="none" stroke="#B4501C" stroke-width="5"/><path d="M50 42 L57 35" stroke="#B4501C" stroke-width="4" stroke-linecap="round"/><rect x="38" y="62" width="24" height="8" rx="4" fill="#0E1F33"/></svg>
+        </div>
+        <div class="cap"><strong>Thermostats and controls</strong><small>Smarter control of your system</small></div>
+      </div>
+      <div class="tile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#7BC47F,#3E8E5A)">
+          <svg viewBox="0 0 100 100"><path d="M50 14 L86 32 v28 c0 20 -16 30 -36 30 c-20 0 -36 -10 -36 -30 V32 Z" fill="none" stroke="#fff" stroke-width="6" stroke-linejoin="round"/><path d="M38 50 l9 9 16 -18" fill="none" stroke="#0E1F33" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="cap"><strong>Safety checks</strong><small>Every system leaves our hands safe</small></div>
+      </div>
+      <div class="tile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#5A7A99,#33475D)">
+          <svg viewBox="0 0 100 100"><rect x="22" y="40" width="56" height="34" rx="8" fill="#FFF6E8"/><path d="M30 52 h40" stroke="#33475D" stroke-width="5" stroke-linecap="round"/><path d="M30 62 h24" stroke="#E06A2C" stroke-width="5" stroke-linecap="round"/><circle cx="68" cy="30" r="7" fill="#7BC47F"/></svg>
+        </div>
+        <div class="cap"><strong>Maintenance plans</strong><small>Seasonal care that prevents breakdowns</small></div>
+      </div>
+    </div>
+
+    <div class="sample-note reveal" style="margin-top:28px">
+      <strong>Coming soon:</strong> real photos from our jobs around Glendale. The illustrations above are artistic previews.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-warm">
+      <span class="sec-eyebrow">Reviews</span>
+      <h2>What Glendale<br>says about us</h2>
+      <p>Based on public Google reviews. Open the source below to read current reviews and ratings.</p>
+    </div>
+    <div class="rs-strip">
+      <p class="rs-note">Review cards on this page are samples illustrating the kinds of service we aim for. Read the real thing at the source.</p>
+      <div class="rs-links"><a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJjZpp1BHrwoARZFOhWqnaZjk" target="_blank" rel="noopener">See reviews on Google</a></div>
+    </div>
+
+    <div class="rev-grid">
+      <div class="rev featured reveal">
+        <span class="sample-flag">Sample</span>
+        <div class="stars">★★★★★</div>
+        <p>"Furnace quit on a cold night and they had us warm again fast. Explained everything before touching a wrench."</p>
+        <cite>Sample review</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="sample-flag">Sample</span>
+        <div class="stars">★★★★★</div>
+        <p>"Straight quote, no upsells. The new AC runs quiet and the house actually cools evenly now."</p>
+        <cite>Sample review</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="sample-flag">Sample</span>
+        <div class="stars">★★★★★</div>
+        <p>"Tune-up caught a failing part before summer. That is exactly what maintenance is supposed to do."</p>
+        <cite>Sample review</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="sample-flag">Sample</span>
+        <div class="stars">★★★★★</div>
+        <p>"Clean install, permits handled, everything tested before they left. Would call again."</p>
+        <cite>Sample review</cite>
+      </div>
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Had us out? Leave a review.</h2>
+      <p>Your review helps a local Glendale contractor keep growing. It takes a minute, and it means a lot.</p>
+      <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJjZpp1BHrwoARZFOhWqnaZjk" target="_blank" rel="noopener">Review us on Google</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-dark">
+      <span class="sec-eyebrow">Visit us</span>
+      <h2>Come by or<br>give us a call</h2>
+      <p>Our shop is on Foothill Blvd in Glendale. Call ahead so we can have the right tech ready for you.</p>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#B4501C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Find us</h3>
+        <p><strong>Patmar Air Systems Inc</strong><br>3923 Foothill Blvd # A<br>Glendale, CA 91214</p>
+        <p>Located along Foothill Blvd in the foothill area of Glendale, serving Glendale and surrounding communities.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#B4501C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg> Call us</h3>
+        <p>Repairs, installs, and questions about your system:</p>
+        <a class="big" href="tel:+18189577519">(818) 957-7519</a>
+        <p style="margin-top:10px">Describe the symptoms when you call, it helps us come prepared.</p>
+      </div>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#B4501C" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Hours</h3>
+        <table class="hours-table" id="hoursTable">
+          <tr><td>Monday</td><td>8:00 AM - 5:00 PM</td></tr>
+          <tr><td>Tuesday</td><td>8:00 AM - 5:00 PM</td></tr>
+          <tr><td>Wednesday</td><td>8:00 AM - 5:00 PM</td></tr>
+          <tr><td>Thursday</td><td>8:00 AM - 5:00 PM</td></tr>
+          <tr><td>Friday</td><td>8:00 AM - 5:00 PM</td></tr>
+          <tr><td>Saturday</td><td>Call for hours</td></tr>
+          <tr><td>Sunday</td><td>Call for hours</td></tr>
+        </table>
+        <p style="margin-top:12px;font-size:.9rem">Weekday hours per the business listing. For weekend service, call first.</p>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <svg viewBox="0 0 24 24" fill="#B4501C"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#fff"/></svg>
+          <strong>3923 Foothill Blvd # A</strong>
+          <small>Glendale, CA 91214</small><br>
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJjZpp1BHrwoARZFOhWqnaZjk" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand">
+          <svg viewBox="0 0 64 64" role="img" aria-label="Patmar logo"><circle cx="32" cy="32" r="29" fill="#E06A2C"/><path d="M14 40 q6 -14 18 -14 q12 0 18 14" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/><path d="M20 46 q4 -8 12 -8 q8 0 12 8" fill="none" stroke="#0E1F33" stroke-width="3.5" stroke-linecap="round"/></svg>
+          <span>Patmar Air<br>Systems Inc</span>
+        </div>
+        <p>Heating contractor on Foothill Blvd, Glendale, CA. Heating and cooling repair, installation, and maintenance.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <p><a href="#home" data-page="home">Home</a><br><a href="#services" data-page="services">Services</a><br><a href="#about" data-page="about">About Us</a><br><a href="#gallery" data-page="gallery">Gallery</a><br><a href="#reviews" data-page="reviews">Reviews</a></p>
+      </div>
+      <div>
+        <h4>Visit</h4>
+        <p>3923 Foothill Blvd # A<br>Glendale, CA 91214<br><a href="tel:+18189577519">(818) 957-7519</a></p>
+      </div>
+      <div>
+        <h4>Hours</h4>
+        <p>Mon - Fri · 8:00 AM - 5:00 PM<br>Sat - Sun · Call for hours</p>
+        <p style="margin-top:10px"><a href="https://www.google.com/maps/place/?q=place_id:ChIJjZpp1BHrwoARZFOhWqnaZjk" target="_blank" rel="noopener">See reviews on Google</a></p>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© Patmar Air Systems Inc</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+  var drawer = document.getElementById("drawer");
+  var scrim = document.getElementById("scrim");
+  var drawerClose = document.getElementById("drawerClose");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(drawer){ drawer.classList.remove("open"); }
+    if(scrim){ scrim.classList.remove("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page], .drawer-nav a[data-page], footer a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  function openDrawer(){
+    if(drawer){ drawer.classList.add("open"); }
+    if(scrim){ scrim.classList.add("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "true"); }
+  }
+
+  if(burger){
+    burger.addEventListener("click", function(){
+      if(drawer && drawer.classList.contains("open")){ closeMenu(); }
+      else { openDrawer(); }
+    });
+  }
+  if(drawerClose){ drawerClose.addEventListener("click", closeMenu); }
+  if(scrim){ scrim.addEventListener("click", closeMenu); }
+
+  var HOURS = {0:null,1:[8,17],2:[8,17],3:[8,17],4:[8,17],5:[8,17],6:null};
+  var DOW = {"Sun":0,"Mon":1,"Tue":2,"Wed":3,"Thu":4,"Fri":5,"Sat":6};
+  function fmt(h){
+    var ap = h < 12 ? "AM" : "PM";
+    var hh = h % 12;
+    if(hh === 0){ hh = 12; }
+    return hh + ":00 " + ap;
+  }
+  try{
+    var parts = new Intl.DateTimeFormat("en-US",{timeZone:"America/Los_Angeles",weekday:"short",hour:"numeric",hour12:false}).formatToParts(new Date());
+    var wd = "Mon", hr = 12;
+    parts.forEach(function(p){
+      if(p.type === "weekday"){ wd = p.value; }
+      if(p.type === "hour"){ hr = parseInt(p.value, 10) % 24; }
+    });
+    var day = DOW[wd] !== undefined ? DOW[wd] : 1;
+    var todayH = HOURS[day];
+    var pill = document.getElementById("hoursPill");
+    var txt = document.getElementById("hoursText");
+    if(pill && txt){
+      if(todayH && hr >= todayH[0] && hr < todayH[1]){
+        txt.textContent = "Open now, until " + fmt(todayH[1]) + " today";
+      } else if(todayH && hr < todayH[0]){
+        pill.classList.add("closed");
+        txt.textContent = "Opens today at " + fmt(todayH[0]);
+      } else if(todayH){
+        pill.classList.add("closed");
+        txt.textContent = "Opens Monday at 8:00 AM";
+      } else {
+        pill.classList.add("closed");
+        txt.textContent = "Call for weekend hours: (818) 957-7519";
+      }
+    }
+    var rows = document.querySelectorAll("#hoursTable tr");
+    var idx = (day + 6) % 7;
+    if(rows[idx]){ rows[idx].classList.add("today"); }
+  }catch(e){}
+
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

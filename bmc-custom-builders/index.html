@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BMC Custom Builders · General Contractor, Glendale, CA</title>
+<meta name="description" content="BMC Custom Builders is a full service general contractor in Glendale, CA offering design/build services for homes and businesses. Rated 4.5 stars. Call (818) 355-9254.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pine:#14402f; --pine-deep:#0c2b21; --pine-ink:#10261d;
+  --copper:#d1762a; --copper-deep:#a8581a; --copper-soft:#f9e7cb;
+  --cream:#faf5ea; --paper:#fffdf7; --ink:#22302a; --ink-soft:#5c6d63;
+  --line:rgba(20,64,47,.16);
+  --radius:14px;
+  --shadow:0 16px 38px -16px rgba(12,43,33,.28);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Barlow",system-ui,sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3,.display{font-family:"Barlow Condensed",sans-serif;letter-spacing:.4px;line-height:1.04;text-transform:uppercase}
+a{color:var(--copper-deep)}
+::selection{background:var(--copper);color:#fff}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+img{max-width:100%}
+
+/* ---------- top bar ---------- */
+header.top{position:sticky;top:0;z-index:60;background:var(--pine-deep);color:#fff;box-shadow:0 6px 18px -8px rgba(0,0,0,.4)}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:#fff}
+.brand svg{width:44px;height:44px;flex:none}
+.brand-name{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:1.35rem;line-height:1;letter-spacing:1px;text-transform:uppercase}
+.brand-name small{display:block;font-family:"Barlow",sans-serif;font-weight:600;font-size:.62rem;letter-spacing:3px;color:var(--copper);text-transform:uppercase}
+.top-actions{display:flex;align-items:center;gap:12px}
+.call-btn{display:inline-flex;align-items:center;gap:8px;background:var(--copper);color:#fff;text-decoration:none;font-weight:700;padding:11px 20px;border-radius:999px;transition:background .18s,transform .18s;white-space:nowrap}
+.call-btn:hover{background:var(--copper-deep);transform:translateY(-2px)}
+.burger{display:inline-flex;flex-direction:column;gap:5px;background:none;border:2px solid rgba(255,255,255,.35);border-radius:10px;padding:10px 12px;cursor:pointer}
+.burger span{display:block;width:24px;height:3px;border-radius:3px;background:#fff}
+.burger small{font-size:.6rem;letter-spacing:2px;color:#fff;font-weight:700}
+
+/* ---------- drawer ---------- */
+.scrim{position:fixed;inset:0;background:rgba(10,25,20,.55);opacity:0;pointer-events:none;transition:opacity .25s;z-index:70}
+.scrim.show{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:min(340px,86vw);background:var(--pine-ink);color:#fff;z-index:80;transform:translateX(-105%);transition:transform .3s ease;display:flex;flex-direction:column;padding:26px 24px}
+.drawer.open{transform:translateX(0)}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.drawer-head .display{font-size:1.5rem;color:#fff}
+.drawer-close{background:none;border:2px solid rgba(255,255,255,.3);color:#fff;border-radius:10px;font-size:1.1rem;padding:6px 12px;cursor:pointer}
+nav.drawer-nav{display:flex;flex-direction:column;gap:4px}
+nav.drawer-nav a{display:flex;align-items:center;justify-content:space-between;text-decoration:none;color:#fff;font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:1.45rem;letter-spacing:1px;text-transform:uppercase;padding:12px 10px;border-radius:10px;border-bottom:1px solid rgba(255,255,255,.08)}
+nav.drawer-nav a:hover{background:rgba(209,118,42,.18)}
+nav.drawer-nav a.active{background:var(--copper);color:#fff}
+nav.drawer-nav a .n{font-family:"Barlow",sans-serif;font-size:.7rem;color:rgba(255,255,255,.55);letter-spacing:2px}
+.drawer-foot{margin-top:auto;padding-top:20px;border-top:1px solid rgba(255,255,255,.12);font-size:.9rem;color:rgba(255,255,255,.75)}
+.drawer-foot a{color:#fff;font-weight:700}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- hero ---------- */
+.hero{background:linear-gradient(135deg,var(--pine) 0%,var(--pine-deep) 70%);color:#fff;overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:44px;align-items:center;padding:64px 0 56px}
+.kicker{display:inline-block;background:var(--copper);color:#fff;font-weight:700;font-size:.72rem;letter-spacing:3px;text-transform:uppercase;padding:8px 16px;border-radius:999px;margin-bottom:18px}
+.hero h1{font-size:clamp(2.8rem,6vw,4.6rem);color:#fff;font-weight:700}
+.hero h1 .accent{color:var(--copper)}
+.lede{font-size:1.12rem;color:rgba(255,255,255,.85);max-width:32rem;margin:16px 0 26px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:26px}
+.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;padding:14px 26px;border-radius:999px;font-size:1rem;transition:transform .18s,background .18s,border-color .18s;cursor:pointer;border:0}
+.btn-solid{background:var(--copper);color:#fff}
+.btn-solid:hover{background:var(--copper-deep);transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.5)}
+.btn-ghost:hover{border-color:#fff;transform:translateY(-2px)}
+.hero-art{background:var(--paper);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.hero-art svg{display:block;width:100%;height:auto}
+.hero-art figcaption{padding:10px 16px;font-size:.82rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--ink-soft);background:var(--paper)}
+
+/* ---------- stat strip ---------- */
+.stats{background:var(--pine-ink);color:#fff}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;padding:26px 0}
+.stat{text-align:center;padding:6px 10px;border-left:1px solid rgba(255,255,255,.14)}
+.stat:first-child{border-left:0}
+.stat .v{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:2.1rem;color:var(--copper);letter-spacing:.5px}
+.stat .l{font-size:.82rem;color:rgba(255,255,255,.72);letter-spacing:.5px;margin-top:2px}
+
+/* ---------- sections ---------- */
+section.block{padding:64px 0}
+.eyebrow{font-weight:700;font-size:.74rem;letter-spacing:3px;text-transform:uppercase;color:var(--copper-deep);margin-bottom:10px}
+h2.section-title{font-size:clamp(2rem,4vw,3rem);font-weight:700;color:var(--pine-deep);margin-bottom:12px}
+.section-sub{color:var(--ink-soft);max-width:44rem;margin-bottom:32px;font-size:1.05rem}
+
+/* ---------- card wall ---------- */
+.card-wall{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:28px 24px;box-shadow:0 8px 24px -14px rgba(12,43,33,.3);transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden}
+.card:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+.card::before{content:"";position:absolute;top:0;left:0;right:0;height:6px;background:linear-gradient(90deg,var(--copper),var(--pine))}
+.card .icon{width:52px;height:52px;border-radius:12px;background:var(--pine);color:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.card .icon svg{width:28px;height:28px}
+.card h3{font-size:1.55rem;font-weight:700;color:var(--pine-deep);margin-bottom:8px}
+.card p{color:var(--ink-soft);font-size:.97rem}
+.card .more{display:inline-block;margin-top:14px;font-weight:700;text-decoration:none}
+.stars{color:var(--copper);letter-spacing:2px;font-size:1.05rem}
+
+/* ---------- price table ---------- */
+.price-note{background:var(--copper-soft);border:2px dashed rgba(168,88,26,.45);border-radius:var(--radius);padding:16px 20px;margin-bottom:26px;font-size:.95rem;color:#6b4416}
+.price-table{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+.price-row{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;padding:20px 24px;border-bottom:1px solid var(--line)}
+.price-row:last-child{border-bottom:0}
+.price-row.head{background:var(--pine-deep);color:#fff}
+.price-row.head h3{color:#fff}
+.price-row h3{font-size:1.4rem;color:var(--pine-deep)}
+.price-row p{color:var(--ink-soft);font-size:.95rem;margin-top:4px}
+.price-tag{text-align:right}
+.price-tag .amt{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:1.7rem;color:var(--copper-deep);white-space:nowrap}
+.price-tag .lbl{font-size:.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--ink-soft);font-weight:700}
+
+/* ---------- story ---------- */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.fact-list{list-style:none;margin:22px 0;display:grid;gap:14px}
+.fact-list li{background:var(--paper);border:1px solid var(--line);border-left:6px solid var(--copper);border-radius:10px;padding:14px 18px}
+.fact-list strong{color:var(--pine-deep)}
+.check-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+.check{display:flex;gap:10px;align-items:flex-start;background:var(--pine);color:#fff;border-radius:10px;padding:14px 16px;font-size:.95rem}
+.check svg{width:22px;height:22px;flex:none;margin-top:2px}
+
+/* ---------- masonry gallery ---------- */
+.masonry{columns:3;column-gap:20px}
+.tile{break-inside:avoid;margin-bottom:20px;border-radius:var(--radius);overflow:hidden;background:var(--paper);border:1px solid var(--line);box-shadow:0 10px 26px -16px rgba(12,43,33,.35);position:relative}
+.tile svg{display:block;width:100%;height:auto}
+.badge{position:absolute;top:12px;left:12px;background:rgba(12,43,33,.85);color:#fff;font-size:.68rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:6px 12px;border-radius:999px}
+.tile figcaption{padding:12px 16px;font-size:.92rem;color:var(--ink-soft);font-weight:500}
+
+/* ---------- reviews ---------- */
+.review-hero{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:34px 30px;display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center;margin-bottom:28px;box-shadow:var(--shadow)}
+.score{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:4.6rem;color:var(--pine-deep);line-height:1;text-align:center}
+.score small{display:block;font-family:"Barlow",sans-serif;font-weight:600;font-size:.8rem;color:var(--ink-soft);letter-spacing:1px;margin-top:6px}
+.themes{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:24px 0}
+.theme{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:16px 18px;font-size:.95rem;color:var(--ink-soft)}
+.theme strong{display:block;color:var(--pine-deep);margin-bottom:4px;font-size:1rem}
+.sample-tag{display:inline-block;background:var(--pine);color:#fff;font-size:.66rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:4px 10px;border-radius:999px;margin-bottom:8px}
+.review-card{background:var(--paper);border:1px dashed rgba(20,64,47,.4);border-radius:var(--radius);padding:24px;margin-bottom:18px}
+.review-card p{font-style:italic;color:var(--ink-soft)}
+.src-row{display:flex;flex-wrap:wrap;gap:14px;margin-top:26px}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.visit-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:30px 28px;box-shadow:var(--shadow)}
+.visit-card h3{font-size:1.6rem;color:var(--pine-deep);margin-bottom:14px}
+.hours-table{width:100%;border-collapse:collapse;font-size:.95rem}
+.hours-table td{padding:8px 0;border-bottom:1px dashed var(--line)}
+.hours-table td:last-child{text-align:right;font-weight:600}
+.hours-src{font-size:.8rem;color:var(--ink-soft);margin-top:10px}
+
+/* ---------- cta band ---------- */
+.cta-band{background:linear-gradient(135deg,var(--copper) 0%,var(--copper-deep) 100%);color:#fff;text-align:center;padding:56px 24px;border-radius:var(--radius);margin:20px 0 64px}
+.cta-band h2{font-size:clamp(1.9rem,4vw,2.8rem);color:#fff;margin-bottom:10px}
+.cta-band p{color:rgba(255,255,255,.88);margin-bottom:24px}
+.cta-band .btn-solid{background:#fff;color:var(--copper-deep)}
+.cta-band .btn-ghost{border-color:rgba(255,255,255,.7)}
+
+/* ---------- footer ---------- */
+footer.site{background:var(--pine-ink);color:rgba(255,255,255,.8);padding:34px 0 26px;text-align:center;font-size:.92rem}
+footer.site nav{margin-bottom:14px}
+footer.site nav a{color:#fff;text-decoration:none;font-weight:600;margin:0 10px;font-size:.88rem}
+footer.site nav a:hover{color:var(--copper)}
+footer.site .copy{color:rgba(255,255,255,.9);font-weight:600}
+
+@media(max-width:900px){
+  .hero-grid{grid-template-columns:1fr}
+  .card-wall{grid-template-columns:1fr 1fr}
+  .stats-row{grid-template-columns:1fr 1fr}
+  .stat:nth-child(3){border-left:0}
+  .split,.visit-grid{grid-template-columns:1fr}
+  .masonry{columns:2}
+  .review-hero{grid-template-columns:1fr;text-align:center}
+}
+@media(max-width:600px){
+  .card-wall{grid-template-columns:1fr}
+  .masonry{columns:1}
+  .themes{grid-template-columns:1fr}
+  .check-grid{grid-template-columns:1fr}
+  .call-btn span.ph{display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap topbar">
+    <a class="brand" href="#home" data-page="home" aria-label="BMC Custom Builders, home">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="4" y="20" width="40" height="22" rx="3" fill="#d1762a"/><path d="M2 22 L24 6 L46 22 Z" fill="#fff"/><rect x="20" y="30" width="8" height="12" fill="#0c2b21"/><rect x="9" y="26" width="8" height="6" fill="#0c2b21"/><rect x="31" y="26" width="8" height="6" fill="#0c2b21"/></svg>
+      <span class="brand-name">BMC Custom Builders<small>General Contractor</small></span>
+    </a>
+    <div class="top-actions">
+      <a class="call-btn" href="tel:+18183559254"><span aria-hidden="true">☎</span><span class="ph">(818) 355-9254</span></a>
+      <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="drawer"><span></span><span></span><span></span><small>MENU</small></button>
+    </div>
+  </div>
+</header>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Site menu">
+  <div class="drawer-head">
+    <span class="display">Menu</span>
+    <button class="drawer-close" id="drawerClose" aria-label="Close menu">✕</button>
+  </div>
+  <nav class="drawer-nav" id="drawerNav">
+    <a href="#home" data-page="home" class="active">Home <span class="n">01</span></a>
+    <a href="#services" data-page="services">Services <span class="n">02</span></a>
+    <a href="#about" data-page="about">Our Story <span class="n">03</span></a>
+    <a href="#gallery" data-page="gallery">Gallery <span class="n">04</span></a>
+    <a href="#reviews" data-page="reviews">Reviews <span class="n">05</span></a>
+    <a href="#visit" data-page="visit">Contact <span class="n">06</span></a>
+  </nav>
+  <div class="drawer-foot">
+    <p>BMC Custom Builders<br>3714 Foothill Blvd<br>Glendale, CA 91214</p>
+    <p style="margin-top:10px"><a href="tel:+18183559254">(818) 355-9254</a></p>
+  </div>
+</aside>
+
+<main>
+
+<section class="page" id="page-home">
+  <div class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="kicker">General Contractor · Glendale, CA</span>
+        <h1>Custom building, <span class="accent">done right</span> the first time</h1>
+        <p class="lede">BMC Custom Builders is a full service general contractor offering design/build services for homes and businesses across Glendale and the Foothill communities. From earthquake foundation retrofitting to finish carpentry, one crew handles your project start to finish.</p>
+        <div class="cta-row">
+          <a class="btn btn-solid" href="tel:+18183559254">Call (818) 355-9254</a>
+          <a class="btn btn-ghost" href="#services" data-page="services">See services →</a>
+        </div>
+        <p style="font-size:.9rem;color:rgba(255,255,255,.7)">Mon to Fri 8 AM to 6 PM · Sat 9 AM to 4 PM, as listed in public directories</p>
+      </div>
+      <figure class="hero-art">
+        <svg viewBox="0 0 520 380" role="img" aria-label="Illustration of a house under construction">
+          <rect width="520" height="380" fill="#faf5ea"/>
+          <rect x="0" y="300" width="520" height="80" fill="#14402f"/>
+          <rect x="150" y="150" width="220" height="150" fill="#f9e7cb" stroke="#0c2b21" stroke-width="6"/>
+          <path d="M120 165 L260 60 L400 165 Z" fill="#d1762a" stroke="#0c2b21" stroke-width="6"/>
+          <rect x="235" y="225" width="50" height="75" fill="#0c2b21"/>
+          <rect x="170" y="190" width="50" height="40" fill="#0c2b21"/>
+          <rect x="300" y="190" width="50" height="40" fill="#0c2b21"/>
+          <line x1="420" y1="120" x2="420" y2="300" stroke="#0c2b21" stroke-width="8"/>
+          <line x1="380" y1="170" x2="460" y2="170" stroke="#0c2b21" stroke-width="8"/>
+          <line x1="380" y1="230" x2="460" y2="230" stroke="#0c2b21" stroke-width="8"/>
+          <rect x="40" y="240" width="60" height="60" fill="#14402f"/>
+          <rect x="48" y="248" width="44" height="44" fill="#faf5ea"/>
+          <text x="260" y="345" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-size="22" letter-spacing="4" fill="#faf5ea">DESIGN / BUILD</text>
+        </svg>
+        <figcaption>Design/build · Homes and businesses</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="wrap stats-row">
+      <div class="stat"><div class="v">4.5 ★</div><div class="l">rating across 4 reviews on Birdeye</div></div>
+      <div class="stat"><div class="v">Top 6%</div><div class="l">BuildZoom score of 107 among CA licensed contractors</div></div>
+      <div class="stat"><div class="v">Design/Build</div><div class="l">full service general contracting for homes and businesses</div></div>
+      <div class="stat"><div class="v">Active</div><div class="l">CA license verified active, per BuildZoom records</div></div>
+    </div>
+  </div>
+
+  <section class="block">
+    <div class="wrap">
+      <p class="eyebrow">What we do</p>
+      <h2 class="section-title">One contractor for the whole project</h2>
+      <p class="section-sub">BMC Custom Builders holds a California General Building license plus Cabinet, Millwork and Finish Carpentry licensing, so structural work and fine finish work stay under one roof.</p>
+      <div class="card-wall">
+        <div class="card">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg></div>
+          <h3>Design/Build</h3>
+          <p>Full service general contracting for homes and businesses, from plans to final walkthrough.</p>
+          <a class="more" href="#services" data-page="services">Service details →</a>
+        </div>
+        <div class="card">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10l8-6 8 6v10M4 20h16M12 4v4"/></svg></div>
+          <h3>Foundation Retrofitting</h3>
+          <p>Earthquake foundation retrofitting done cleanly and on schedule, guided step by step.</p>
+          <a class="more" href="#services" data-page="services">Service details →</a>
+        </div>
+        <div class="card">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 12h16M12 4v16"/></svg></div>
+          <h3>Finish Carpentry</h3>
+          <p>Cabinet, millwork and finish carpentry with a licensed specialty behind it.</p>
+          <a class="more" href="#services" data-page="services">Service details →</a>
+        </div>
+        <div class="card">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-6 9 6M5 9v10h14V9M9 19v-5h6v5"/></svg></div>
+          <h3>Home Remodeling</h3>
+          <p>Kitchens, baths and whole home updates managed by one accountable crew.</p>
+          <a class="more" href="#services" data-page="services">Service details →</a>
+        </div>
+        <div class="card">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V4h8v3"/></svg></div>
+          <h3>Commercial Work</h3>
+          <p>Build outs and improvements for businesses, with minimal disruption to your operation.</p>
+          <a class="more" href="#services" data-page="services">Service details →</a>
+        </div>
+        <div class="card">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+          <h3>On Time Delivery</h3>
+          <p>Reviewers highlight clear communication and projects finished when promised.</p>
+          <a class="more" href="#reviews" data-page="reviews">Read reviews →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="cta-band">
+      <h2>Have a project in mind?</h2>
+      <p>Call for a straightforward conversation about scope, timeline and budget.</p>
+      <a class="btn btn-solid" href="tel:+18183559254">Call (818) 355-9254</a>
+      <a class="btn btn-ghost" href="#visit" data-page="visit" style="margin-left:10px">Visit us</a>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-services">
+  <section class="block">
+    <div class="wrap">
+      <p class="eyebrow">Services</p>
+      <h2 class="section-title">What BMC builds</h2>
+      <p class="section-sub">Every project starts with a conversation and a written quote. Ranges below are samples for planning only. Call for an exact number on your job.</p>
+      <div class="price-note"><strong>A note on pricing:</strong> sample ranges shown for illustration. Every project is quoted individually after a site visit. No surprises, no pressure.</div>
+      <div class="price-table">
+        <div class="price-row head">
+          <div><h3>Service</h3></div>
+          <div class="price-tag"><span class="lbl">Typical range</span></div>
+        </div>
+        <div class="price-row">
+          <div><h3>Design/Build Projects</h3><p>Full service general contracting for homes and businesses, plans through final walkthrough.</p></div>
+          <div class="price-tag"><div class="amt">Quoted</div><div class="lbl">sample</div></div>
+        </div>
+        <div class="price-row">
+          <div><h3>Kitchen Remodel</h3><p>Layout, cabinets, counters, tile and fixtures coordinated by one crew.</p></div>
+          <div class="price-tag"><div class="amt">$25k+</div><div class="lbl">sample</div></div>
+        </div>
+        <div class="price-row">
+          <div><h3>Bathroom Remodel</h3><p>Full bath updates from demo to finish work.</p></div>
+          <div class="price-tag"><div class="amt">$12k+</div><div class="lbl">sample</div></div>
+        </div>
+        <div class="price-row">
+          <div><h3>Earthquake Foundation Retrofit</h3><p>Seismic retrofitting with clear guidance through each step, a reviewer favorite.</p></div>
+          <div class="price-tag"><div class="amt">Quoted</div><div class="lbl">sample</div></div>
+        </div>
+        <div class="price-row">
+          <div><h3>Cabinet, Millwork and Finish Carpentry</h3><p>Licensed specialty work: built ins, trim, doors and fine woodwork.</p></div>
+          <div class="price-tag"><div class="amt">Quoted</div><div class="lbl">sample</div></div>
+        </div>
+        <div class="price-row">
+          <div><h3>Room Additions</h3><p>Permitted additions planned, framed and finished to match your home.</p></div>
+          <div class="price-tag"><div class="amt">$60k+</div><div class="lbl">sample</div></div>
+        </div>
+        <div class="price-row">
+          <div><h3>Commercial Build Outs</h3><p>Tenant improvements and business spaces built around your schedule.</p></div>
+          <div class="price-tag"><div class="amt">Quoted</div><div class="lbl">sample</div></div>
+        </div>
+      </div>
+      <div style="margin-top:30px;text-align:center">
+        <a class="btn btn-solid" href="tel:+18183559254">Call (818) 355-9254 for a quote</a>
+      </div>
+    </div>
+  </section>
+</section>
+
+
+<section class="page" id="page-about">
+  <section class="block">
+    <div class="wrap split">
+      <div>
+        <p class="eyebrow">Our story</p>
+        <h2 class="section-title">Built on straight answers</h2>
+        <p class="section-sub">BMC Custom Builders is owned by Benjamin Mc Creary and based at 3714 Foothill Blvd in Glendale, serving homes and businesses across the Foothill communities.</p>
+        <ul class="fact-list">
+          <li><strong>Full service general contractor.</strong> Public contractor records describe BMC as offering design/build services for homes and businesses.</li>
+          <li><strong>Licensed twice over.</strong> Holds a California General Building license plus Cabinet, Millwork and Finish Carpentry licensing.</li>
+          <li><strong>Top rated among peers.</strong> A BuildZoom score of 107 places BMC in the top 6% of California licensed contractors, with the license verified active.</li>
+          <li><strong>Known for guidance.</strong> Reviewers describe Ben as informative, walking clients through the whole process and finishing on time.</li>
+        </ul>
+        <div class="check-grid">
+          <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M4 12l5 5 11-11"/></svg><span>One crew from plans to punch list</span></div>
+          <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M4 12l5 5 11-11"/></svg><span>Written quotes before work starts</span></div>
+          <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M4 12l5 5 11-11"/></svg><span>Structural and finish work in house</span></div>
+          <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M4 12l5 5 11-11"/></svg><span>Jobs finished when promised</span></div>
+        </div>
+      </div>
+      <div>
+        <figure class="hero-art">
+          <svg viewBox="0 0 520 480" role="img" aria-label="Illustration of framing and tools">
+            <rect width="520" height="480" fill="#faf5ea"/>
+            <rect x="60" y="60" width="400" height="300" fill="none" stroke="#0c2b21" stroke-width="8"/>
+            <line x1="60" y1="160" x2="460" y2="160" stroke="#0c2b21" stroke-width="6"/>
+            <line x1="60" y1="260" x2="460" y2="260" stroke="#0c2b21" stroke-width="6"/>
+            <line x1="160" y1="60" x2="160" y2="360" stroke="#0c2b21" stroke-width="6"/>
+            <line x1="260" y1="60" x2="260" y2="360" stroke="#0c2b21" stroke-width="6"/>
+            <line x1="360" y1="60" x2="360" y2="360" stroke="#0c2b21" stroke-width="6"/>
+            <rect x="200" y="400" width="120" height="24" fill="#d1762a"/>
+            <rect x="212" y="376" width="24" height="24" fill="#0c2b21"/>
+            <rect x="284" y="376" width="24" height="24" fill="#0c2b21"/>
+            <circle cx="420" cy="410" r="26" fill="none" stroke="#0c2b21" stroke-width="8"/>
+            <line x1="402" y1="392" x2="438" y2="428" stroke="#0c2b21" stroke-width="8"/>
+            <text x="260" y="40" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-size="24" letter-spacing="5" fill="#0c2b21">FRAMED RIGHT</text>
+          </svg>
+          <figcaption>Structural work and finish work, one crew</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+</section>
+
+
+<section class="page" id="page-gallery">
+  <section class="block">
+    <div class="wrap">
+      <p class="eyebrow">Gallery</p>
+      <h2 class="section-title">Recent work</h2>
+      <p class="section-sub">Project photos are being added. Placeholders below show the kinds of jobs BMC takes on.</p>
+      <div class="masonry">
+        <figure class="tile"><span class="badge">Photo coming soon.</span>
+          <svg viewBox="0 0 400 300" role="img" aria-label="Kitchen remodel placeholder"><rect width="400" height="300" fill="#f9e7cb"/><rect x="40" y="90" width="120" height="140" fill="#14402f"/><rect x="180" y="90" width="180" height="60" fill="#d1762a"/><rect x="180" y="160" width="180" height="70" fill="#14402f" opacity=".5"/><rect x="40" y="240" width="320" height="20" fill="#0c2b21"/></svg>
+          <figcaption>Kitchen remodel</figcaption>
+        </figure>
+        <figure class="tile"><span class="badge">Photo coming soon.</span>
+          <svg viewBox="0 0 400 420" role="img" aria-label="Foundation retrofit placeholder"><rect width="400" height="420" fill="#14402f"/><rect x="60" y="60" width="280" height="200" fill="#faf5ea"/><line x1="60" y1="260" x2="340" y2="260" stroke="#d1762a" stroke-width="14"/><rect x="100" y="290" width="60" height="90" fill="#d1762a"/><rect x="240" y="290" width="60" height="90" fill="#d1762a"/></svg>
+          <figcaption>Earthquake foundation retrofit</figcaption>
+        </figure>
+        <figure class="tile"><span class="badge">Photo coming soon.</span>
+          <svg viewBox="0 0 400 260" role="img" aria-label="Finish carpentry placeholder"><rect width="400" height="260" fill="#faf5ea"/><rect x="30" y="40" width="340" height="180" fill="none" stroke="#0c2b21" stroke-width="8"/><line x1="30" y1="130" x2="370" y2="130" stroke="#d1762a" stroke-width="10"/><circle cx="200" cy="175" r="18" fill="#14402f"/></svg>
+          <figcaption>Custom millwork and built ins</figcaption>
+        </figure>
+        <figure class="tile"><span class="badge">Photo coming soon.</span>
+          <svg viewBox="0 0 400 380" role="img" aria-label="Bathroom remodel placeholder"><rect width="400" height="380" fill="#f9e7cb"/><rect x="120" y="60" width="160" height="200" rx="12" fill="#14402f"/><rect x="140" y="80" width="120" height="160" fill="#faf5ea"/><rect x="60" y="290" width="280" height="40" fill="#d1762a"/></svg>
+          <figcaption>Bathroom remodel</figcaption>
+        </figure>
+        <figure class="tile"><span class="badge">Photo coming soon.</span>
+          <svg viewBox="0 0 400 300" role="img" aria-label="Room addition placeholder"><rect width="400" height="300" fill="#faf5ea"/><rect x="60" y="110" width="150" height="120" fill="#14402f"/><rect x="210" y="110" width="130" height="120" fill="#d1762a"/><path d="M40 115 L135 50 L230 115 Z" fill="#0c2b21"/><path d="M195 115 L275 60 L355 115 Z" fill="#0c2b21"/></svg>
+          <figcaption>Room addition</figcaption>
+        </figure>
+        <figure class="tile"><span class="badge">Photo coming soon.</span>
+          <svg viewBox="0 0 400 340" role="img" aria-label="Commercial build out placeholder"><rect width="400" height="340" fill="#0c2b21"/><rect x="50" y="70" width="300" height="180" fill="#faf5ea"/><rect x="70" y="90" width="90" height="60" fill="#d1762a"/><rect x="180" y="90" width="150" height="60" fill="#14402f" opacity=".6"/><rect x="70" y="160" width="260" height="70" fill="#14402f" opacity=".35"/></svg>
+          <figcaption>Commercial build out</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+</section>
+
+
+<section class="page" id="page-reviews">
+  <section class="block">
+    <div class="wrap">
+      <p class="eyebrow">Reviews</p>
+      <h2 class="section-title">What clients say</h2>
+      <p class="section-sub">Based on 4 reviews on Birdeye, BMC Custom Builders holds a 4.5 star rating. A public directory also shows a 5.0 rating from 1 review.</p>
+      <div class="review-hero">
+        <div class="score">4.5<small>out of 5 · 4 reviews<br>on Birdeye</small></div>
+        <div>
+          <div class="stars" aria-label="4.5 out of 5 stars">★★★★★</div>
+          <h3 class="display" style="font-size:1.6rem;color:var(--pine-deep);margin:8px 0">Review themes from public listings</h3>
+          <p style="color:var(--ink-soft)">Summarized from publicly posted reviews. Full reviews live on the listing sites linked below.</p>
+          <div class="src-row">
+            <a class="btn btn-solid" href="https://reviews.birdeye.com/bmc-custom-builders-167618372136239">See reviews on Birdeye</a>
+            <a class="btn btn-ghost" style="color:var(--pine-deep);border-color:var(--pine-deep)" href="https://www.google.com/maps/place/?q=place_id:ChIJdamPlQXrwoARgWgrHfODS3Q">See reviews on Google</a>
+          </div>
+        </div>
+      </div>
+      <div class="themes">
+        <div class="theme"><strong>Earthquake foundation retrofitting</strong>One reviewer calls it the easiest construction project they have had, with Ben guiding them through the whole process.</div>
+        <div class="theme"><strong>Informative and clear</strong>Reviewers describe Ben as very informative, explaining each step so clients always know what is happening.</div>
+        <div class="theme"><strong>On time delivery</strong>Projects finished when promised, with everything done on schedule.</div>
+        <div class="theme"><strong>Fantastic service</strong>Reviewers praise the service quality and say they would recommend the company.</div>
+      </div>
+      <div class="review-card">
+        <span class="sample-tag">Sample</span>
+        <p>"Ben and his crew walked us through our foundation retrofit from start to finish. Everything was done on time and exactly as explained."</p>
+        <p style="margin-top:10px;font-style:normal;font-weight:700;color:var(--pine-deep)">Illustrative sample based on public review themes</p>
+      </div>
+      <p style="color:var(--ink-soft);font-size:.92rem">Worked with BMC? <a href="https://www.google.com/maps/place/?q=place_id:ChIJdamPlQXrwoARgWgrHfODS3Q">Leave a review on Google</a> to help future clients.</p>
+    </div>
+  </section>
+</section>
+
+
+<section class="page" id="page-visit">
+  <section class="block">
+    <div class="wrap">
+      <p class="eyebrow">Contact</p>
+      <h2 class="section-title">Get in touch</h2>
+      <p class="section-sub">Call for a quote or stop by the Foothill Blvd office.</p>
+      <div class="visit-grid">
+        <div class="visit-card">
+          <h3>Find us</h3>
+          <p><strong>BMC Custom Builders</strong><br>3714 Foothill Blvd<br>Glendale, CA 91214</p>
+          <p style="margin-top:12px"><strong>Phone:</strong> <a href="tel:+18183559254">(818) 355-9254</a></p>
+          <div style="margin-top:20px;display:flex;flex-wrap:wrap;gap:12px">
+            <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJdamPlQXrwoARgWgrHfODS3Q">Get directions</a>
+            <a class="btn btn-ghost" style="color:var(--pine-deep);border-color:var(--pine-deep)" href="tel:+18183559254">Call now</a>
+          </div>
+        </div>
+        <div class="visit-card">
+          <h3>Hours</h3>
+          <table class="hours-table">
+            <tr><td>Monday</td><td>8:00 AM to 6:00 PM</td></tr>
+            <tr><td>Tuesday</td><td>8:00 AM to 6:00 PM</td></tr>
+            <tr><td>Wednesday</td><td>8:00 AM to 6:00 PM</td></tr>
+            <tr><td>Thursday</td><td>8:00 AM to 6:00 PM</td></tr>
+            <tr><td>Friday</td><td>8:00 AM to 6:00 PM</td></tr>
+            <tr><td>Saturday</td><td>9:00 AM to 4:00 PM</td></tr>
+            <tr><td>Sunday</td><td>Closed</td></tr>
+          </table>
+          <p class="hours-src">Hours as reported by public business directories. Call to confirm before visiting.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <nav>
+      <a href="#home" data-page="home">Home</a>
+      <a href="#services" data-page="services">Services</a>
+      <a href="#about" data-page="about">Our Story</a>
+      <a href="#gallery" data-page="gallery">Gallery</a>
+      <a href="#reviews" data-page="reviews">Reviews</a>
+      <a href="#visit" data-page="visit">Contact</a>
+    </nav>
+    <p><a href="tel:+18183559254" style="color:#fff">(818) 355-9254</a> · 3714 Foothill Blvd, Glendale, CA 91214</p>
+    <p class="copy">© BMC Custom Builders</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "visit"];
+  var burger = document.getElementById("burger");
+  var drawer = document.getElementById("drawer");
+  var scrim = document.getElementById("scrim");
+  var drawerClose = document.getElementById("drawerClose");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(drawer){ drawer.classList.remove("open"); }
+    if(scrim){ scrim.classList.remove("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.drawer-nav a[data-page], footer.site nav a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger){
+    burger.addEventListener("click", function(){
+      var open = drawer.classList.toggle("open");
+      scrim.classList.toggle("show", open);
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+  if(drawerClose){ drawerClose.addEventListener("click", closeMenu); }
+  if(scrim){ scrim.addEventListener("click", closeMenu); }
+
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JNA BUILD & DEVELOPMENT INC. | Construction Company in San Fernando, CA</title>
+<meta name="description" content="JNA BUILD & DEVELOPMENT INC., a San Fernando, CA construction company at 660 Arroyo St. Remodels, additions, renovations. Call (310) 272-3251.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --char:#1b1c1e;
+  --char2:#121315;
+  --conc:#2a2c30;
+  --copper:#c97b3d;
+  --amber:#e8a24a;
+  --paper:#f7f5f0;
+  --card:#ffffff;
+  --ink:#232425;
+  --muted:#6f6a61;
+  --line:#e2ded4;
+  --disp:"Anton", Impact, sans-serif;
+  --sans:"Inter", system-ui, sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--sans);color:var(--ink);background:var(--paper);line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+h1,h2,h3{font-family:var(--disp);font-weight:400;letter-spacing:.01em;line-height:1.05;color:var(--char);text-transform:uppercase}
+.eyebrow{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--copper);margin-bottom:14px}
+.btn{display:inline-block;background:var(--copper);color:#fff;padding:15px 30px;font-weight:700;font-size:15px;text-decoration:none;border:2px solid var(--copper);transition:transform .15s ease, box-shadow .15s ease}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(201,123,61,.35)}
+.btn.ghost{background:transparent;color:var(--char);border-color:var(--char)}
+.btn.ghost.light{color:#fff;border-color:#fff}
+.badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;background:var(--amber);color:var(--char2);padding:6px 12px}
+/* slim bar + fullscreen overlay nav */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:70;display:flex;align-items:center;justify-content:space-between;padding:14px 22px;background:rgba(18,19,21,.9);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.08)}
+.brand{font-family:var(--disp);color:#fff;font-size:19px;letter-spacing:.04em;text-decoration:none;text-transform:uppercase}
+.brand span{color:var(--copper)}
+.topbar .callbtn{color:#fff;text-decoration:none;font-weight:700;font-size:14px;border:2px solid var(--copper);padding:9px 18px}
+.burger{background:var(--copper);color:#fff;border:0;padding:10px 16px;font-size:18px;cursor:pointer;font-family:var(--sans);font-weight:700;letter-spacing:.08em}
+nav.main{position:fixed;inset:0;z-index:65;background:var(--char2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;opacity:0;pointer-events:none;transition:opacity .25s ease}
+nav.main.open{opacity:1;pointer-events:auto}
+nav.main a.nl{color:#fff;text-decoration:none;font-family:var(--disp);font-size:clamp(38px,7vw,72px);text-transform:uppercase;line-height:1.15;letter-spacing:.02em}
+nav.main a.nl:hover{color:var(--amber)}
+nav.main a.nl.active{color:var(--copper)}
+nav.main .ov-call{margin-top:22px;color:var(--amber);font-weight:700;font-size:18px;text-decoration:none;border-bottom:2px solid var(--amber)}
+/* full-bleed hero */
+.hero{position:relative;background:var(--char2);color:#fff;min-height:96vh;display:flex;align-items:flex-end;overflow:hidden;padding:140px 0 0}
+.hero .scene{position:absolute;inset:0}
+.hero .scene svg{width:100%;height:100%;display:block}
+.hero .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(18,19,21,.55) 0%,rgba(18,19,21,.25) 45%,rgba(18,19,21,.92) 100%)}
+.hero .wrap{position:relative;z-index:2;padding-bottom:70px;width:100%}
+.hero h1{color:#fff;font-size:clamp(52px,8vw,118px);max-width:900px}
+.hero h1 span{color:var(--amber)}
+.hero p.lede{color:#d9d4c8;max-width:600px;font-size:17px;margin:20px 0 30px}
+.hero .cta-row{display:flex;gap:14px;flex-wrap:wrap}
+.statband{background:var(--copper);color:#fff}
+.statband .wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:22px 24px}
+.statband b{font-family:var(--disp);font-size:30px;display:block;letter-spacing:.02em}
+.statband span{font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;opacity:.92}
+/* magazine chapter rhythm */
+.chapter{padding:90px 0;background:var(--paper)}
+.chapter.dark{background:var(--char);color:#e8e4d9}
+.chapter.dark h2,.chapter.dark h3{color:#fff}
+.mag{display:grid;grid-template-columns:1fr 1fr;gap:54px;align-items:start}
+.mag h2{font-size:clamp(34px,3.8vw,52px);margin-bottom:14px}
+.mag .body p{color:var(--muted);margin-bottom:16px}
+.chapter.dark .mag .body p{color:#b9b3a6}
+.chap-num{font-family:var(--disp);font-size:18px;color:var(--copper);letter-spacing:.2em;margin-bottom:18px;text-transform:uppercase}
+.cap-card{background:var(--card);border:1px solid var(--line);padding:34px}
+.chapter.dark .cap-card{background:var(--conc);border-color:#3a3d42}
+.cap-card h3{font-size:24px;margin:10px 0 12px}
+.checklist{list-style:none;margin-top:16px}
+.checklist li{padding:11px 0 11px 32px;position:relative;border-bottom:1px dashed var(--line);font-size:15px}
+.chapter.dark .checklist li{border-color:#3a3d42}
+.checklist li::before{content:"\25A0";position:absolute;left:2px;top:12px;color:var(--copper);font-size:13px}
+/* price-table offerings */
+.pricelist{background:var(--card);border:1px solid var(--line);margin-top:40px}
+.prow{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:baseline;padding:24px 30px;border-bottom:1px solid var(--line)}
+.prow:last-child{border-bottom:0}
+.prow .t b{font-family:var(--disp);font-size:20px;letter-spacing:.03em;text-transform:uppercase;display:block;color:var(--char)}
+.prow .t p{font-size:14px;color:var(--muted);margin-top:4px;max-width:620px}
+.prow .dots{flex:1;border-bottom:2px dotted var(--line);margin:0 6px;min-width:30px;transform:translateY(-6px)}
+.prow .p{text-align:right}
+.prow .p b{font-family:var(--disp);font-size:19px;color:var(--copper);white-space:nowrap}
+.prow .p .badge{display:block;margin-top:8px}
+/* carousel */
+.car{position:relative;margin-top:40px;background:var(--char);padding:34px}
+.car-view{overflow:hidden;border-radius:4px}
+.car-track{display:flex;transition:transform .45s ease}
+.cslide{min-width:100%;padding:10px}
+.cslide .ph{height:320px;display:flex;align-items:center;justify-content:center;position:relative;background:linear-gradient(150deg,#2a2c30,#1b1c1e)}
+.cslide .ph svg{width:150px;height:150px}
+.cslide .cap{background:#242628;color:#d9d4c8;padding:18px 22px;font-size:14.5px}
+.cslide .cap b{color:var(--amber);font-family:var(--disp);letter-spacing:.04em;text-transform:uppercase}
+.car-btns{display:flex;gap:12px;margin-top:22px;align-items:center}
+.car-btns button{background:transparent;border:2px solid var(--copper);color:var(--copper);font-weight:700;padding:12px 22px;cursor:pointer;font-size:14px;font-family:var(--sans);letter-spacing:.06em}
+.car-btns button:hover{background:var(--copper);color:#fff}
+.car-dots{display:flex;gap:8px;margin-left:auto}
+.car-dots span{width:10px;height:10px;border-radius:50%;background:#3a3d42;cursor:pointer}
+.car-dots span.on{background:var(--amber)}
+/* reviews */
+.rev-hero{background:var(--char2);color:#e8e4d9;padding:150px 0 80px}
+.rev-hero h2{color:#fff;font-size:clamp(34px,4vw,54px);margin-bottom:14px}
+.glink-row{display:flex;gap:14px;flex-wrap:wrap;margin:30px 0 44px}
+.glink{background:var(--amber);color:var(--char2);font-weight:700;text-decoration:none;padding:15px 30px;font-size:15px}
+.glink.alt{background:transparent;color:#fff;border:2px solid #3a3d42}
+.revgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.revcard{background:#242628;padding:30px;color:#d9d4c8}
+.revcard .stars{color:var(--amber);letter-spacing:3px;margin-bottom:10px;font-size:18px}
+.revcard p{font-size:14.5px}
+.revcard .who{margin-top:14px;font-size:12.5px;color:#8f897c;font-weight:600}
+/* visit */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start;margin-top:40px}
+.vcard{background:var(--card);border:1px solid var(--line);padding:36px}
+.vrow{display:flex;gap:14px;padding:13px 0;border-bottom:1px dashed var(--line);font-size:15px}
+.vrow:last-child{border:0}
+.mapbox{background:var(--char);color:#e8e4d9;padding:44px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:380px}
+.mapbox h3{color:#fff;font-size:24px;margin:16px 0 8px}
+/* footer minimal stacked */
+footer{background:var(--char2);color:#8f897c;text-align:center;padding:70px 24px 0}
+footer .fmark{font-family:var(--disp);font-size:clamp(30px,4vw,46px);color:#fff;text-transform:uppercase;letter-spacing:.03em}
+footer .fmark span{color:var(--copper)}
+footer .flinks{margin:26px 0;display:flex;gap:22px;justify-content:center;flex-wrap:wrap}
+footer .flinks a{color:#b9b3a6;text-decoration:none;font-size:14px;font-weight:600}
+footer .flinks a:hover{color:var(--amber)}
+footer .fcontact{font-size:14px}
+footer .fcontact a{color:var(--amber);font-weight:700;text-decoration:none}
+.foot-bottom{border-top:1px solid #2a2c30;margin-top:46px;padding:22px 0;font-size:14px;color:#6f6a61}
+.foot-bottom span{display:block}
+/* reveal */
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .5s ease,transform .5s ease}
+.reveal.in{opacity:1;transform:none}
+@media(max-width:920px){
+  .mag,.visit-grid{grid-template-columns:1fr}
+  .statband .wrap{grid-template-columns:repeat(2,1fr)}
+  .revgrid{grid-template-columns:1fr}
+  .prow{grid-template-columns:1fr}
+  .prow .p{text-align:left}
+  .topbar .callbtn{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="brand" href="#home" data-page="home">JNA <span>Build</span></a>
+  <div style="display:flex;gap:12px;align-items:center">
+    <a class="callbtn" href="tel:+13102723251">(310) 272-3251</a>
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false">MENU &#9776;</button>
+  </div>
+</div>
+
+<nav class="main" id="mainNav" aria-label="Main navigation">
+  <a class="nl" href="#home" data-page="home">Home</a>
+  <a class="nl" href="#services" data-page="services">Services</a>
+  <a class="nl" href="#story" data-page="story">Our Story</a>
+  <a class="nl" href="#gallery" data-page="gallery">Gallery</a>
+  <a class="nl" href="#reviews" data-page="reviews">Reviews</a>
+  <a class="nl" href="#visit" data-page="visit">Visit</a>
+  <a class="ov-call" href="tel:+13102723251">Call (310) 272-3251</a>
+</nav>
+
+<section class="page" id="page-home">
+  <div class="hero">
+    <div class="scene" aria-hidden="true">
+      <svg viewBox="0 0 1440 800" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#121315"/>
+            <stop offset="0.55" stop-color="#2b2118"/>
+            <stop offset="0.75" stop-color="#7a4a22"/>
+            <stop offset="1" stop-color="#c97b3d"/>
+          </linearGradient>
+        </defs>
+        <rect width="1440" height="800" fill="url(#sky)"/>
+        <circle cx="1080" cy="560" r="90" fill="#e8a24a" opacity="0.9"/>
+        <g stroke="#0d0e10" stroke-width="14" fill="none">
+          <line x1="300" y1="620" x2="300" y2="180"/>
+          <line x1="300" y1="180" x2="900" y2="180"/>
+          <line x1="900" y1="180" x2="900" y2="300"/>
+          <line x1="300" y1="230" x2="300" y2="620" opacity="0"/>
+        </g>
+        <g stroke="#0d0e10" stroke-width="6">
+          <line x1="300" y1="230" x2="880" y2="230"/>
+          <line x1="300" y1="280" x2="880" y2="280"/>
+        </g>
+        <rect x="860" y="300" width="70" height="50" fill="#0d0e10"/>
+        <line x1="895" y1="350" x2="895" y2="560" stroke="#0d0e10" stroke-width="8"/>
+        <rect x="860" y="560" width="70" height="40" fill="#0d0e10"/>
+        <g fill="#0d0e10">
+          <rect x="150" y="480" width="240" height="140"/>
+          <rect x="150" y="430" width="240" height="50"/>
+          <rect x="180" y="450" width="40" height="30" fill="#e8a24a" opacity="0.85"/>
+          <rect x="240" y="450" width="40" height="30" fill="#e8a24a" opacity="0.85"/>
+          <rect x="300" y="450" width="40" height="30" fill="#e8a24a" opacity="0.85"/>
+          <rect x="1150" y="500" width="180" height="120"/>
+          <polygon points="1150,500 1240,440 1330,500" />
+          <rect x="1200" y="540" width="50" height="80" fill="#e8a24a" opacity="0.7"/>
+        </g>
+        <rect y="620" width="1440" height="180" fill="#121315"/>
+        <g stroke="#c97b3d" stroke-width="3" opacity="0.5">
+          <line x1="0" y1="680" x2="1440" y2="680"/>
+          <line x1="0" y1="740" x2="1440" y2="740"/>
+        </g>
+      </svg>
+    </div>
+    <div class="shade"></div>
+    <div class="wrap">
+      <span class="eyebrow" style="color:var(--amber)">Construction Company · San Fernando, CA</span>
+      <h1>Built right. <span>Built to last.</span></h1>
+      <p class="lede">JNA BUILD &amp; DEVELOPMENT INC. is a construction company based at 660 Arroyo St in San Fernando. Remodels, additions and renovations, managed start to finish.</p>
+      <div class="cta-row">
+        <a class="btn" href="#services" data-page="services">Our Services</a>
+        <a class="btn ghost light" href="tel:+13102723251">Call (310) 272-3251</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="statband"><div class="wrap">
+    <div><b>2021</b><span>CA corp filed</span></div>
+    <div><b>Active</b><span>CA Secretary of State</span></div>
+    <div><b>660 Arroyo</b><span>San Fernando shop</span></div>
+    <div><b>1 Call</b><span>Start to finish</span></div>
+  </div></div>
+
+  <div class="chapter">
+    <div class="wrap">
+      <div class="chap-num reveal">01 / What we build</div>
+      <div class="mag">
+        <div class="reveal">
+          <h2>One contractor for the whole project</h2>
+          <div class="body">
+            <p>Remodels stall when trades do not talk to each other. We run the job as one team: scope, schedule, permits coordination and finish work, under a single point of contact.</p>
+            <p>From kitchen and bath remodels to full additions, every project gets a written scope and a schedule you can hold us to.</p>
+          </div>
+          <a class="btn" href="#services" data-page="services" style="margin-top:10px">See Scope of Work</a>
+        </div>
+        <div class="reveal">
+          <div class="cap-card">
+            <span class="badge">Core divisions</span>
+            <h3>Where we work best</h3>
+            <ul class="checklist">
+              <li>Kitchen and bathroom remodels</li>
+              <li>Room additions and ADU groundwork</li>
+              <li>Whole-home renovations</li>
+              <li>Flooring, drywall and finish carpentry</li>
+              <li>Exterior upgrades and stucco repair</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chapter dark">
+    <div class="wrap">
+      <div class="chap-num reveal">02 / How we work</div>
+      <div class="mag">
+        <div class="reveal">
+          <div class="cap-card">
+            <span class="badge">Process</span>
+            <h3>From first call to final walkthrough</h3>
+            <ul class="checklist">
+              <li><b>Site visit:</b> we walk the property and listen first</li>
+              <li><b>Written scope:</b> line-item estimate, no vague allowances</li>
+              <li><b>Schedule:</b> start date and milestones in writing</li>
+              <li><b>Build:</b> managed crew, tidy site, weekly updates</li>
+              <li><b>Walkthrough:</b> punch list closed before final payment</li>
+            </ul>
+          </div>
+        </div>
+        <div class="reveal">
+          <h2>No surprises, just progress</h2>
+          <div class="body">
+            <p>Construction has a trust problem, and we know it. That is why the scope is written down before work starts, the schedule is shared, and changes are priced before they happen, never after.</p>
+            <p>Our San Fernando shop shares its address with our sister stone fabrication operation, so countertops and custom stonework can stay in-house on the same schedule.</p>
+          </div>
+          <a class="btn ghost light" href="#story" data-page="story" style="margin-top:10px">Our Story</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="chapter" style="padding-top:130px">
+    <div class="wrap">
+      <div class="chap-num reveal">Scope of work</div>
+      <h2 class="reveal" style="font-size:clamp(34px,4vw,54px);margin-bottom:12px">What a project looks like</h2>
+      <p class="reveal" style="color:var(--muted);max-width:700px">Every job is priced from a site visit. The ranges below are samples to help you plan, not quotes. Final numbers come in a written, line-item estimate.</p>
+      <div class="pricelist reveal">
+        <div class="prow">
+          <div class="t"><b>Kitchen Remodel</b><p>Cabinets, counters, tile, plumbing and electrical coordination, finish to paint-ready.</p></div>
+          <div class="p"><b>$25k - $60k</b><span class="badge">Sample range</span></div>
+        </div>
+        <div class="prow">
+          <div class="t"><b>Bathroom Remodel</b><p>Demo to tile, fixtures, vanity, glass and lighting. Guest baths to primary suites.</p></div>
+          <div class="p"><b>$12k - $35k</b><span class="badge">Sample range</span></div>
+        </div>
+        <div class="prow">
+          <div class="t"><b>Room Addition</b><p>Foundation to roof tie-in, permitted and inspected, finished to match the home.</p></div>
+          <div class="p"><b>$80k+</b><span class="badge">Sample range</span></div>
+        </div>
+        <div class="prow">
+          <div class="t"><b>Flooring &amp; Interior Refresh</b><p>LVP, tile or hardwood, interior paint, baseboards and door updates.</p></div>
+          <div class="p"><b>$8k - $25k</b><span class="badge">Sample range</span></div>
+        </div>
+        <div class="prow">
+          <div class="t"><b>Exterior &amp; Stucco Repair</b><p>Stucco patch and recoat, fascia, exterior paint and small structural fixes.</p></div>
+          <div class="p"><b>$5k - $20k</b><span class="badge">Sample range</span></div>
+        </div>
+        <div class="prow">
+          <div class="t"><b>Custom Stone &amp; Countertops</b><p>Fabrication and install through our sister stone shop at the same address.</p></div>
+          <div class="p"><b>Quoted</b><span class="badge">Sample</span></div>
+        </div>
+      </div>
+      <p class="reveal" style="margin-top:26px;color:var(--muted);font-size:14px">Sample pricing only. Call <a href="tel:+13102723251" style="font-weight:700;color:var(--copper)">(310) 272-3251</a> for a site visit and a written estimate.</p>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-story">
+  <div class="chapter dark" style="padding-top:130px">
+    <div class="wrap">
+      <div class="chap-num reveal">Our story</div>
+      <div class="mag">
+        <div class="reveal">
+          <h2>Filed in California. Rooted in San Fernando.</h2>
+          <div class="body">
+            <p>JNA BUILD &amp; DEVELOPMENT INC. was filed as a California corporation on March 11, 2021, and keeps an active standing with the California Secretary of State. We operate from our shop at 660 Arroyo Street in San Fernando.</p>
+            <p>The JNA name covers two sides of the same trade: construction and development here, and marble and granite fabrication through our sister operation at the same address and phone number. That pairing means stonework does not have to leave the job or the schedule.</p>
+            <p>We are a working contractor, not a sales office. When you call, you talk to the people who will be on your site.</p>
+          </div>
+        </div>
+        <div class="reveal">
+          <div class="cap-card">
+            <span class="badge">On the record</span>
+            <h3>Corporate facts</h3>
+            <ul class="checklist">
+              <li>California corporation, filed March 11, 2021</li>
+              <li>Active standing, CA Secretary of State</li>
+              <li>Principal address: 660 Arroyo St, San Fernando, CA 91340</li>
+              <li>Sister operation: marble and granite fabrication, same shop</li>
+            </ul>
+            <div style="margin-top:22px"><a class="btn" href="tel:+13102723251">Call (310) 272-3251</a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="chapter" style="padding-top:130px">
+    <div class="wrap">
+      <div class="chap-num reveal">Gallery</div>
+      <h2 class="reveal" style="font-size:clamp(34px,4vw,54px);margin-bottom:12px">The work, in stages</h2>
+      <p class="reveal" style="color:var(--muted);max-width:640px">Illustrated placeholders showing typical project phases. Real project photography coming soon.</p>
+      <div class="car reveal">
+        <div class="car-view">
+          <div class="car-track" id="carTrack">
+            <div class="cslide"><div class="ph"><svg viewBox="0 0 150 150"><rect x="30" y="60" width="90" height="60" fill="none" stroke="#e8a24a" stroke-width="6"/><line x1="30" y1="60" x2="75" y2="30" stroke="#e8a24a" stroke-width="6"/><line x1="120" y1="60" x2="75" y2="30" stroke="#e8a24a" stroke-width="6"/><rect x="60" y="85" width="30" height="35" fill="#c97b3d"/></svg><span class="badge" style="position:absolute;top:16px;left:16px">Placeholder</span></div><div class="cap"><b>Framing</b><br>Structure goes up: walls, roof lines and rough openings squared and true.</div></div>
+            <div class="cslide"><div class="ph"><svg viewBox="0 0 150 150"><rect x="35" y="45" width="80" height="70" fill="none" stroke="#e8a24a" stroke-width="6"/><line x1="35" y1="68" x2="115" y2="68" stroke="#e8a24a" stroke-width="4"/><line x1="35" y1="92" x2="115" y2="92" stroke="#e8a24a" stroke-width="4"/><circle cx="75" cy="115" r="8" fill="#c97b3d"/></svg><span class="badge" style="position:absolute;top:16px;left:16px">Placeholder</span></div><div class="cap"><b>Rough-In</b><br>Plumbing, electrical and HVAC set before walls close.</div></div>
+            <div class="cslide"><div class="ph"><svg viewBox="0 0 150 150"><rect x="40" y="40" width="70" height="70" rx="4" fill="none" stroke="#e8a24a" stroke-width="6"/><rect x="55" y="55" width="40" height="25" fill="#c97b3d" opacity="0.8"/><rect x="55" y="88" width="40" height="8" fill="#e8a24a"/></svg><span class="badge" style="position:absolute;top:16px;left:16px">Placeholder</span></div><div class="cap"><b>Tile &amp; Stone</b><br>Showers, backsplashes and countertops set by our sister stone shop.</div></div>
+            <div class="cslide"><div class="ph"><svg viewBox="0 0 150 150"><path d="M30 110 L75 40 L120 110 Z" fill="none" stroke="#e8a24a" stroke-width="6"/><rect x="65" y="85" width="20" height="25" fill="#c97b3d"/><circle cx="105" cy="45" r="10" fill="#e8a24a"/></svg><span class="badge" style="position:absolute;top:16px;left:16px">Placeholder</span></div><div class="cap"><b>Finish &amp; Walkthrough</b><br>Paint, fixtures, punch list, then keys back in your hand.</div></div>
+          </div>
+        </div>
+        <div class="car-btns">
+          <button id="carPrev" aria-label="Previous slide">&#8592; Prev</button>
+          <button id="carNext" aria-label="Next slide">Next &#8594;</button>
+          <div class="car-dots" id="carDots"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="rev-hero">
+    <div class="wrap">
+      <span class="eyebrow" style="color:var(--amber)">Reviews</span>
+      <h2>Be our first review</h2>
+      <p style="max-width:640px;color:#b9b3a6">We could not find published reviews for JNA BUILD &amp; DEVELOPMENT INC. yet. If we have built for you, your words here would mean everything to a young company.</p>
+      <div class="glink-row">
+        <a class="glink" href="https://www.google.com/maps/place/?q=place_id:ChIJhTlKPS2RwoARACzCz87wx3M" target="_blank" rel="noopener">See reviews on Google</a>
+      </div>
+      <div class="revgrid">
+        <div class="revcard reveal">
+          <div class="stars">★★★★★</div>
+          <p>Sample review: "They remodeled our kitchen and kept the site clean every day. The written schedule actually held."</p>
+          <div class="who">Illustrative example · <span class="badge">Sample</span></div>
+        </div>
+        <div class="revcard reveal">
+          <div class="stars">★★★★★</div>
+          <p>Sample review: "Addition came in on the timeline they promised. Communication was clear the whole way."</p>
+          <div class="who">Illustrative example · <span class="badge">Sample</span></div>
+        </div>
+        <div class="revcard reveal">
+          <div class="stars">★★★★★</div>
+          <p>Sample review: "Bathroom demo to tile in three weeks. Fair price, no surprise charges."</p>
+          <div class="who">Illustrative example · <span class="badge">Sample</span></div>
+        </div>
+      </div>
+      <p style="margin-top:30px;font-size:13.5px;color:#8f897c">Worked with us? <a href="https://www.google.com/maps/place/?q=place_id:ChIJhTlKPS2RwoARACzCz87wx3M" target="_blank" rel="noopener" style="color:var(--amber);font-weight:700">Leave a review on Google</a>.</p>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="chapter" style="padding-top:130px">
+    <div class="wrap">
+      <div class="chap-num reveal">Visit / Contact</div>
+      <h2 class="reveal" style="font-size:clamp(34px,4vw,54px);margin-bottom:12px">Start with a site visit</h2>
+      <p class="reveal" style="color:var(--muted);max-width:640px">Call for hours and scheduling. We visit the property, listen first, then put the scope in writing.</p>
+      <div class="visit-grid">
+        <div class="vcard reveal">
+          <h3 style="font-size:24px;margin-bottom:12px">JNA BUILD &amp; DEVELOPMENT INC.</h3>
+          <div class="vrow"><span style="min-width:90px;font-weight:700">Address</span><span>660 Arroyo St<br>San Fernando, CA 91340</span></div>
+          <div class="vrow"><span style="min-width:90px;font-weight:700">Phone</span><a href="tel:+13102723251" style="font-weight:700;color:var(--copper)">(310) 272-3251</a></div>
+          <div class="vrow"><span style="min-width:90px;font-weight:700">Hours</span><span>Call for hours</span></div>
+          <div class="vrow"><span style="min-width:90px;font-weight:700">Service area</span><span>San Fernando and the San Fernando Valley</span></div>
+          <div style="margin-top:22px;display:flex;gap:12px;flex-wrap:wrap">
+            <a class="btn" href="tel:+13102723251">Call Now</a>
+            <a class="btn ghost" href="https://www.google.com/maps/place/?q=place_id:ChIJhTlKPS2RwoARACzCz87wx3M" target="_blank" rel="noopener">Directions</a>
+          </div>
+        </div>
+        <div class="mapbox reveal">
+          <svg viewBox="0 0 120 120" width="84" height="84"><path d="M60 10 C34 10 18 30 18 54 C18 88 60 112 60 112 C60 112 102 88 102 54 C102 30 86 10 60 10 Z" fill="#c97b3d"/><circle cx="60" cy="54" r="16" fill="#121315"/></svg>
+          <h3>660 Arroyo St<br>San Fernando, CA 91340</h3>
+          <p style="color:#8f897c;font-size:14px;margin:8px 0 20px">Our shop and yard in San Fernando.</p>
+          <a class="btn" href="https://www.google.com/maps/place/?q=place_id:ChIJhTlKPS2RwoARACzCz87wx3M" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap" style="max-width:900px">
+    <div class="fmark">JNA <span>Build</span> &amp; Development</div>
+    <div class="flinks">
+      <a href="#home" data-page="home">Home</a>
+      <a href="#services" data-page="services">Services</a>
+      <a href="#story" data-page="story">Our Story</a>
+      <a href="#gallery" data-page="gallery">Gallery</a>
+      <a href="#reviews" data-page="reviews">Reviews</a>
+      <a href="#visit" data-page="visit">Visit</a>
+    </div>
+    <p class="fcontact">660 Arroyo St, San Fernando, CA 91340 · <a href="tel:+13102723251">(310) 272-3251</a></p>
+    <div class="foot-bottom">
+      <span>© JNA BUILD & DEVELOPMENT INC.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "story", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+
+  var track = document.getElementById("carTrack");
+  var dotsBox = document.getElementById("carDots");
+  var slides = track ? track.children.length : 0;
+  var idx = 0;
+  function paintDots(){
+    if(!dotsBox){ return; }
+    dotsBox.innerHTML = "";
+    for(var d = 0; d < slides; d++){
+      var s = document.createElement("span");
+      if(d === idx){ s.className = "on"; }
+      (function(n){
+        s.addEventListener("click", function(){ go(n); });
+      })(d);
+      dotsBox.appendChild(s);
+    }
+  }
+  function go(n){
+    if(slides === 0){ return; }
+    idx = (n + slides) % slides;
+    track.style.transform = "translateX(-" + (idx * 100) + "%)";
+    paintDots();
+  }
+  var prev = document.getElementById("carPrev");
+  var next = document.getElementById("carNext");
+  if(prev){ prev.addEventListener("click", function(){ go(idx - 1); }); }
+  if(next){ next.addEventListener("click", function(){ go(idx + 1); }); }
+  paintDots();
+
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Headlinerz Barbershop · Old Town Torrance Barbers</title>
+<meta name="description" content="Headlinerz Barbershop, a 4.8 rated barbershop in Old Town Torrance at 1217 El Prado Ave. Clean fades, hot towel shaves, and kids cuts. Call (310) 986-4788.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Archivo+Black&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#14100B; --ink-2:#241B11;
+  --paper:#F6F1E7; --card:#FFFDF7;
+  --red:#C8321E; --red-deep:#96210F;
+  --gold:#D9A441; --gold-soft:#F3E2BE;
+  --line:rgba(20,16,11,.14);
+  --radius:16px;
+  --shadow:0 22px 48px -22px rgba(20,16,11,.35);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:"Archivo",system-ui,sans-serif;
+  background:var(--paper);
+  background-image:repeating-linear-gradient(-45deg, transparent 0 22px, rgba(20,16,11,.025) 22px 24px);
+  color:var(--ink); line-height:1.65; -webkit-font-smoothing:antialiased;
+}
+a{color:var(--red)}
+::selection{background:var(--gold);color:var(--ink)}
+.wrap{max-width:1060px;margin:0 auto;padding:0 22px}
+.page{display:none}
+.page.active{display:block;animation:fadeIn .45s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ---------- top bar + side drawer ---------- */
+header.site{
+  position:sticky;top:0;z-index:60;
+  background:var(--ink);color:var(--paper);
+  box-shadow:0 4px 18px rgba(20,16,11,.3);
+}
+.topbar{display:flex;align-items:center;gap:14px;padding:12px 0}
+.burger{
+  background:none;border:0;cursor:pointer;padding:8px;display:flex;flex-direction:column;gap:5px;
+}
+.burger span{display:block;width:26px;height:3px;background:var(--gold);border-radius:2px;transition:transform .25s,opacity .25s}
+.burger[aria-expanded="true"] span:nth-child(1){transform:translateY(8px) rotate(45deg)}
+.burger[aria-expanded="true"] span:nth-child(2){opacity:0}
+.burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-8px) rotate(-45deg)}
+.brand-mini{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--paper)}
+.brand-mini .pole{width:30px;height:30px;border-radius:50%;flex:none;
+  background:repeating-linear-gradient(-45deg,var(--red) 0 6px,#fff 6px 12px,var(--ink) 12px 18px,#fff 18px 24px);
+  border:2px solid var(--gold)}
+.brand-mini strong{font-family:"Archivo Black",sans-serif;font-size:1rem;letter-spacing:.5px}
+.brand-mini small{display:block;font-size:.62rem;letter-spacing:3px;color:var(--gold);font-weight:700}
+.top-call{margin-left:auto;color:var(--paper);text-decoration:none;font-weight:700;font-size:.9rem;
+  border:2px solid var(--gold);border-radius:999px;padding:8px 16px}
+.top-call:hover{background:var(--gold);color:var(--ink)}
+
+.drawer{
+  position:fixed;top:0;left:0;bottom:0;width:300px;max-width:84vw;z-index:70;
+  background:var(--ink-2);color:var(--paper);
+  transform:translateX(-105%);transition:transform .32s cubic-bezier(.2,.8,.25,1);
+  display:flex;flex-direction:column;padding:22px;overflow-y:auto;
+}
+.drawer.open{transform:none;box-shadow:20px 0 60px rgba(0,0,0,.4)}
+.drawer .d-brand{display:flex;align-items:center;gap:12px;margin-bottom:8px;text-decoration:none;color:var(--paper)}
+.drawer .d-brand .pole{width:40px;height:40px;border-radius:50%;flex:none;
+  background:repeating-linear-gradient(-45deg,var(--red) 0 8px,#fff 8px 16px,var(--ink) 16px 24px,#fff 24px 32px);
+  border:2px solid var(--gold)}
+.drawer .d-brand strong{font-family:"Archivo Black",sans-serif;font-size:1.15rem}
+.drawer .d-brand small{display:block;font-size:.62rem;letter-spacing:3px;color:var(--gold);font-weight:700}
+.drawer .d-tag{color:var(--gold-soft);font-size:.85rem;margin-bottom:18px;opacity:.8}
+.drawer nav{display:flex;flex-direction:column;gap:2px}
+.drawer nav a{
+  color:var(--paper);text-decoration:none;font-weight:700;font-size:1.05rem;
+  padding:13px 14px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;
+}
+.drawer nav a:hover{background:rgba(217,164,65,.14)}
+.drawer nav a.active,.drawer nav a[aria-current="page"]{background:var(--red);color:#fff}
+.drawer nav a .arr{opacity:.5}
+.scrim{
+  position:fixed;inset:0;background:rgba(10,8,5,.55);z-index:65;
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.scrim.show{opacity:1;pointer-events:auto}
+.drawer .d-foot{margin-top:auto;padding-top:18px;border-top:1px solid rgba(246,241,231,.15);font-size:.85rem;color:var(--gold-soft)}
+.drawer .d-foot a{color:var(--gold)}
+
+/* ---------- card hero ---------- */
+.hero-stage{
+  padding:56px 0 64px;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(200,50,30,.10), transparent 45%),
+    radial-gradient(circle at 85% 80%, rgba(217,164,65,.14), transparent 45%);
+}
+.hero-card{
+  background:var(--card);border-radius:28px;box-shadow:var(--shadow);
+  border:1px solid var(--line);overflow:hidden;
+}
+.hero-card .stripe{
+  height:14px;
+  background:repeating-linear-gradient(-45deg,var(--red) 0 22px,#fff 22px 44px,var(--ink) 44px 66px,#fff 66px 88px);
+}
+.hero-inner{padding:44px 40px;display:grid;grid-template-columns:1.15fr .85fr;gap:36px;align-items:center}
+.eyebrow{display:inline-block;background:var(--ink);color:var(--gold);font-size:.7rem;font-weight:800;
+  letter-spacing:3px;text-transform:uppercase;padding:7px 14px;border-radius:999px;margin-bottom:16px}
+.hero-inner h1{font-family:"Archivo Black",sans-serif;font-size:clamp(2.1rem,4.6vw,3.4rem);line-height:1.04;margin-bottom:14px}
+.hero-inner h1 .hl{color:var(--red)}
+.hero-inner p.lead{font-size:1.06rem;color:#4a3c2b;margin-bottom:22px;max-width:46ch}
+.rating-line{display:flex;align-items:center;gap:10px;margin-bottom:24px;font-weight:600;font-size:.95rem}
+.stars{color:var(--gold);font-size:1.15rem;letter-spacing:2px;text-shadow:0 1px 0 rgba(0,0,0,.15)}
+.btn{display:inline-block;text-decoration:none;font-weight:800;padding:14px 26px;border-radius:999px;border:2px solid transparent;cursor:pointer;font-size:1rem}
+.btn-red{background:var(--red);color:#fff}
+.btn-red:hover{background:var(--red-deep)}
+.btn-ghost{background:transparent;color:var(--ink);border-color:var(--ink)}
+.btn-ghost:hover{background:var(--ink);color:var(--paper)}
+.btn-row{display:flex;gap:12px;flex-wrap:wrap}
+.hero-art{
+  background:var(--ink);border-radius:18px;min-height:320px;display:flex;align-items:center;justify-content:center;
+  padding:26px;position:relative;overflow:hidden;
+}
+.hero-art .pole-big{
+  width:130px;height:220px;border-radius:20px;
+  background:repeating-linear-gradient(-45deg,var(--red) 0 26px,#fff 26px 52px,var(--ink) 52px 78px,#fff 78px 104px);
+  border:6px solid var(--gold);box-shadow:0 18px 40px rgba(0,0,0,.45);
+}
+.hero-art .badge{
+  position:absolute;top:14px;right:14px;background:var(--gold);color:var(--ink);
+  font-size:.68rem;font-weight:800;letter-spacing:1.5px;padding:6px 12px;border-radius:999px;text-transform:uppercase;
+}
+
+/* ---------- single-column rhythm ---------- */
+.band{padding:54px 0}
+.band h2{font-family:"Archivo Black",sans-serif;font-size:clamp(1.6rem,3.4vw,2.4rem);margin-bottom:8px}
+.band .sub{color:#5b4a35;margin-bottom:30px;max-width:64ch}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:28px;box-shadow:0 10px 26px -18px rgba(20,16,11,.4)}
+
+/* leaders list */
+.leaders{list-style:none;display:flex;flex-direction:column;gap:14px}
+.leaders li{
+  display:flex;gap:18px;align-items:flex-start;background:var(--card);border:1px solid var(--line);
+  border-radius:var(--radius);padding:20px 22px;box-shadow:0 10px 26px -20px rgba(20,16,11,.5);
+}
+.leaders .rank{
+  flex:none;width:46px;height:46px;border-radius:12px;background:var(--ink);color:var(--gold);
+  font-family:"Archivo Black",sans-serif;font-size:1.2rem;display:flex;align-items:center;justify-content:center;
+}
+.leaders .rank.top{background:var(--red);color:#fff}
+.leaders h3{font-size:1.12rem;margin-bottom:4px}
+.leaders p{font-size:.95rem;color:#5b4a35}
+.leaders .price{margin-left:auto;flex:none;font-weight:800;background:var(--gold-soft);border-radius:999px;padding:6px 14px;font-size:.9rem;white-space:nowrap}
+.sample-tag{display:inline-block;font-size:.66rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;
+  background:#eee;color:#777;border:1px dashed #bbb;border-radius:6px;padding:3px 8px;margin-top:8px}
+.price-note{font-size:.85rem;color:#7a6750;margin-top:12px;font-style:italic}
+
+/* review cards */
+.rev-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.rev{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px}
+.rev .stars{font-size:.95rem}
+.rev p{margin:10px 0;font-size:.95rem}
+.rev .who{font-size:.82rem;color:#7a6750;font-weight:600}
+.src-link{display:inline-block;margin-top:18px;font-weight:800}
+
+/* carousel */
+.car{position:relative;background:var(--ink);border-radius:24px;overflow:hidden;box-shadow:var(--shadow)}
+.car-track{display:flex;transition:transform .45s cubic-bezier(.2,.8,.25,1)}
+.car-slide{flex:0 0 100%;padding:38px;display:flex;align-items:center;justify-content:center;min-height:340px}
+.car-art{
+  width:100%;max-width:520px;aspect-ratio:16/9;border-radius:14px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:10px;color:#fff;font-weight:800;font-size:1.2rem;text-align:center;padding:20px;
+}
+.car-nav{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:rgba(0,0,0,.35)}
+.car-nav button{
+  background:var(--gold);border:0;color:var(--ink);font-weight:800;font-size:1rem;cursor:pointer;
+  border-radius:999px;padding:10px 20px;
+}
+.car-dots{display:flex;gap:8px}
+.car-dots button{width:12px;height:12px;border-radius:50%;border:0;background:rgba(255,255,255,.35);cursor:pointer;padding:0}
+.car-dots button.on{background:var(--gold)}
+.car .badge{position:absolute;top:14px;left:14px;background:#fff;color:var(--ink);font-size:.66rem;font-weight:800;
+  letter-spacing:1.5px;padding:6px 12px;border-radius:999px;text-transform:uppercase}
+
+/* visit */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.info-row{display:flex;gap:12px;margin-bottom:16px}
+.info-row .ico{flex:none;width:42px;height:42px;border-radius:12px;background:var(--ink);color:var(--gold);
+  display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+.hours-table{width:100%;border-collapse:collapse;font-size:.95rem}
+.hours-table td{padding:8px 4px;border-bottom:1px dashed var(--line)}
+
+/* multi-column footer */
+footer.site{background:var(--ink);color:var(--paper);margin-top:40px}
+.foot-cols{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:32px;padding:48px 0 30px}
+.foot-cols h4{color:var(--gold);font-size:.78rem;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:14px}
+.foot-cols a{color:var(--paper);text-decoration:none;display:block;margin-bottom:8px;font-size:.95rem}
+.foot-cols a:hover{color:var(--gold)}
+.foot-brand strong{font-family:"Archivo Black",sans-serif;font-size:1.3rem}
+.foot-brand p{font-size:.9rem;color:#cbbfa8;margin-top:8px;max-width:34ch}
+.copy-line{border-top:1px solid rgba(246,241,231,.15);padding:18px 0;text-align:center;font-size:.9rem;color:#cbbfa8}
+
+@media(max-width:820px){
+  .hero-inner{grid-template-columns:1fr;padding:30px 24px}
+  .visit-grid{grid-template-columns:1fr}
+  .foot-cols{grid-template-columns:1fr;gap:22px}
+  .top-call{display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap topbar">
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="drawer">
+      <span></span><span></span><span></span>
+    </button>
+    <a class="brand-mini" href="#home" data-page="home">
+      <span class="pole" aria-hidden="true"></span>
+      <span><strong>HEADLINERZ</strong><small>BARBERSHOP</small></span>
+    </a>
+    <a class="top-call" href="tel:+13109864788">(310) 986-4788</a>
+  </div>
+</header>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Site menu">
+  <a class="d-brand" href="#home" data-page="home">
+    <span class="pole" aria-hidden="true"></span>
+    <span><strong>HEADLINERZ</strong><small>BARBERSHOP</small></span>
+  </a>
+  <p class="d-tag">Old Town Torrance, CA · Est. 2016</p>
+  <nav>
+    <a href="#home" data-page="home" class="active" aria-current="page">Home <span class="arr">→</span></a>
+    <a href="#services" data-page="services">Services <span class="arr">→</span></a>
+    <a href="#story" data-page="story">Our Story <span class="arr">→</span></a>
+    <a href="#gallery" data-page="gallery">Gallery <span class="arr">→</span></a>
+    <a href="#reviews" data-page="reviews">Reviews <span class="arr">→</span></a>
+    <a href="#visit" data-page="visit">Visit Us <span class="arr">→</span></a>
+  </nav>
+  <div class="d-foot">
+    1217 El Prado Ave, Torrance, CA 90501<br>
+    <a href="tel:+13109864788">(310) 986-4788</a>
+  </div>
+</aside>
+
+<main>
+<section class="page" id="page-home">
+  <div class="hero-stage">
+    <div class="wrap">
+      <div class="hero-card">
+        <div class="stripe"></div>
+        <div class="hero-inner">
+          <div>
+            <span class="eyebrow">Old Town Torrance</span>
+            <h1>Clean fades. <span class="hl">Good vibes.</span> Every chair, every time.</h1>
+            <p class="lead">Headlinerz Barbershop has served Old Town Torrance since 2016 with sharp, professional cuts, hot towel shaves, and a laid-back shop where walk-ins are always welcome.</p>
+            <div class="rating-line"><span class="stars">★★★★★</span> 4.8 on Google · 100+ reviews</div>
+            <div class="btn-row">
+              <a class="btn btn-red" href="#visit" data-page="visit">Book Your Chair</a>
+              <a class="btn btn-ghost" href="#services" data-page="services">See Services</a>
+            </div>
+          </div>
+          <div class="hero-art">
+            <span class="badge">Barber pole</span>
+            <div class="pole-big" role="img" aria-label="Decorative barber pole"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap band">
+    <h2>The Headlinerz way</h2>
+    <p class="sub">A neighborhood shop with real craft: barbers known for fades, sharp finishes, and taking the time to get it right. Walk-ins welcome, appointments encouraged, kids welcome too.</p>
+    <div class="card">
+      <div class="rev-grid">
+        <div><h3 style="margin-bottom:6px">✂ Precise cuts</h3><p style="color:#5b4a35;font-size:.95rem">Fades, tapers, and classic styles finished with a razor-sharp lineup.</p></div>
+        <div><h3 style="margin-bottom:6px">🧔 Beard work</h3><p style="color:#5b4a35;font-size:.95rem">Sculpting and detailing that frames the face and finishes the look.</p></div>
+        <div><h3 style="margin-bottom:6px">👦 Kid friendly</h3><p style="color:#5b4a35;font-size:.95rem">Patient with younger clients, a shop the whole family can visit.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap band">
+    <h2>What clients say</h2>
+    <p class="sub">Based on 100+ Google reviews, clients keep coming back for the craft and the welcome.</p>
+    <div class="rev-grid">
+      <div class="rev"><div class="stars">★★★★★</div><p>Clean fades, good vibes, and attention to detail every time.</p><div class="who">Sample review, paraphrased from Google reviews</div></div>
+      <div class="rev"><div class="stars">★★★★★</div><p>Walked in on a Friday morning and was taken care of right away. Felt welcomed the whole time.</p><div class="who">Sample review, paraphrased from Google reviews</div></div>
+      <div class="rev"><div class="stars">★★★★★</div><p>Friendly barbers, quick and affordable. My new go-to shop.</p><div class="who">Sample review, paraphrased from Google reviews</div></div>
+    </div>
+    <a class="src-link" href="#reviews" data-page="reviews">Read more reviews →</a>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap band">
+    <h2>Services</h2>
+    <p class="sub">The lineup clients ask for most, ranked by popularity. Walk-ins welcome; appointments get you in right on time.</p>
+    <ol class="leaders">
+      <li>
+        <span class="rank top">1</span>
+        <div><h3>The Headliner Cut</h3><p>Consult, precision cut, hot lather neckline, and styled finish. The signature service.</p><span class="sample-tag">Sample price</span></div>
+        <span class="price">from $35</span>
+      </li>
+      <li>
+        <span class="rank">2</span>
+        <div><h3>Cut + Beard Detail</h3><p>Full haircut plus beard sculpt, line-up, and hot towel finish for a complete look.</p><span class="sample-tag">Sample price</span></div>
+        <span class="price">from $55</span>
+      </li>
+      <li>
+        <span class="rank">3</span>
+        <div><h3>Skin Fade</h3><p>Seamless blend from skin to length with a crisp lineup. The shop specialty.</p><span class="sample-tag">Sample price</span></div>
+        <span class="price">from $38</span>
+      </li>
+      <li>
+        <span class="rank">4</span>
+        <div><h3>Hot Towel Shave</h3><p>Classic straight-razor shave with hot towels and a cooling finish.</p><span class="sample-tag">Sample price</span></div>
+        <span class="price">from $40</span>
+      </li>
+      <li>
+        <span class="rank">5</span>
+        <div><h3>Kids Cut</h3><p>Patient, friendly cuts for young gentlemen. A shop the kids actually enjoy.</p><span class="sample-tag">Sample price</span></div>
+        <span class="price">from $28</span>
+      </li>
+      <li>
+        <span class="rank">6</span>
+        <div><h3>Lineup / Edge Up</h3><p>Quick cleanup between cuts: hairline, beard line, and neckline refresh.</p><span class="sample-tag">Sample price</span></div>
+        <span class="price">from $15</span>
+      </li>
+    </ol>
+    <p class="price-note">Prices shown are samples for illustration. Call <a href="tel:+13109864788">(310) 986-4788</a> for current pricing and to book.</p>
+  </div>
+</section>
+
+<section class="page" id="page-story">
+  <div class="wrap band">
+    <h2>Our Story</h2>
+    <p class="sub">How a small shop in Old Town Torrance became the neighborhood chair of choice.</p>
+    <div class="card">
+      <p><strong>Headlinerz Barbershop</strong> opened its doors in <strong>2016</strong> in the heart of Old Town Torrance, at 1217 El Prado Ave, and has been a local fixture ever since. The mission was simple: professional, clean fades and shaves in a shop where everyone feels like a regular.</p>
+      <p style="margin-top:14px">Over the years the shop has earned a 4.8 rating across more than 100 Google reviews. Clients mention the welcoming atmosphere, the reggae on the sound system, the friendly shop dog, and barbers who take their time and get the details right. Walk-ins stumble in during the Old Town antique fair and leave as regulars.</p>
+      <p style="margin-top:14px">Today Headlinerz remains what it set out to be: a skilled, affordable, family-friendly barbershop in the heart of Torrance.</p>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap band">
+    <h2>Gallery</h2>
+    <p class="sub">A look inside the shop. Photos shown are artistic placeholders.</p>
+    <div class="car">
+      <span class="badge">Sample photos</span>
+      <div class="car-track" id="carTrack">
+        <div class="car-slide"><div class="car-art" style="background:linear-gradient(135deg,#C8321E,#96210F)">✂ Fresh fades, razor-sharp lineups</div></div>
+        <div class="car-slide"><div class="car-art" style="background:linear-gradient(135deg,#241B11,#14100B)">🧔 Beard sculpting and hot towel finishes</div></div>
+        <div class="car-slide"><div class="car-art" style="background:linear-gradient(135deg,#D9A441,#8f6b24)">💈 The Old Town Torrance shop floor</div></div>
+        <div class="car-slide"><div class="car-art" style="background:linear-gradient(135deg,#2b4a6b,#141c26)">🪒 Classic straight-razor shaves</div></div>
+      </div>
+      <div class="car-nav">
+        <button id="carPrev" aria-label="Previous photo">← Prev</button>
+        <div class="car-dots" id="carDots"></div>
+        <button id="carNext" aria-label="Next photo">Next →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap band">
+    <h2>Reviews</h2>
+    <p class="sub">Based on 100+ Google reviews with a 4.8 rating. Themes from real clients: clean fades, friendly barbers, quick affordable service, and a welcoming shop.</p>
+    <div class="rev-grid">
+      <div class="rev"><div class="stars">★★★★★</div><p>Top of the line service and the best haircuts in town. Price is right too.</p><div class="who">Paraphrased from Google reviews</div><span class="sample-tag">Sample card</span></div>
+      <div class="rev"><div class="stars">★★★★★</div><p>Greatest establishment. Friendly and clean, what more can you ask for?</p><div class="who">Paraphrased from Google reviews</div><span class="sample-tag">Sample card</span></div>
+      <div class="rev"><div class="stars">★★★★★</div><p>Brought my grandson for his haircut, the staff showed amazing patience.</p><div class="who">Paraphrased from Google reviews</div><span class="sample-tag">Sample card</span></div>
+      <div class="rev"><div class="stars">★★★★★</div><p>An uncommon hairstyle request, cut exactly the way I pictured it. Will be back.</p><div class="who">Paraphrased from Google reviews</div><span class="sample-tag">Sample card</span></div>
+      <div class="rev"><div class="stars">★★★★★</div><p>Great customer service, welcoming vibe, prompt, and quality craftsmanship.</p><div class="who">Paraphrased from Google reviews</div><span class="sample-tag">Sample card</span></div>
+      <div class="rev"><div class="stars">★★★★★</div><p>$35 for an excellent, clean fade. Professional, chill barber. Highly recommended.</p><div class="who">Paraphrased from Google reviews</div><span class="sample-tag">Sample card</span></div>
+    </div>
+    <div class="btn-row" style="margin-top:26px">
+      <a class="btn btn-red" href="https://www.google.com/maps/place/?q=place_id:ChIJlfGv9mc13YARvYOaOL8mN6I" target="_blank" rel="noopener">See reviews on Google</a>
+      <a class="btn btn-ghost" href="https://booksy.com/en-us/1334308_elusive-cuts-headlinerz-barbershop_barber-shop_119308_torrance?do=invite&_branch_match_id=1608347615374297923&utm_medium=profile_share_from_profile&_branch_referrer=H4sIAAAAAAAAA8soKSkottLXT07J0UvKz88urtRLzs%2FVz7SsDPdODc4xC0qyrytKTUstKsrMS49PKsovL04tsnXOKMrPTQUA6IJRwjwAAAA%3D" target="_blank" rel="noopener">Book on Booksy</a>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="wrap band">
+    <h2>Visit Us</h2>
+    <p class="sub">Walk-ins welcome. Find us in Old Town Torrance, next to In-N-Out.</p>
+    <div class="visit-grid">
+      <div class="card">
+        <div class="info-row"><span class="ico">📍</span><div><strong>Address</strong><br>1217 El Prado Ave<br>Torrance, CA 90501</div></div>
+        <div class="info-row"><span class="ico">📞</span><div><strong>Phone</strong><br><a href="tel:+13109864788">(310) 986-4788</a></div></div>
+        <div class="info-row"><span class="ico">🕐</span><div><strong>Hours</strong><br>Call for hours, walk-ins welcome</div></div>
+        <div class="btn-row" style="margin-top:8px">
+          <a class="btn btn-red" href="https://www.google.com/maps/place/?q=place_id:ChIJlfGv9mc13YARvYOaOL8mN6I" target="_blank" rel="noopener">Get Directions</a>
+          <a class="btn btn-ghost" href="tel:+13109864788">Call Now</a>
+        </div>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:12px">Typical week</h3>
+        <p style="font-size:.9rem;color:#7a6750;margin-bottom:10px">Hours vary by source; please call ahead to confirm.</p>
+        <table class="hours-table">
+          <tr><td>Monday</td><td style="text-align:right">Call for hours</td></tr>
+          <tr><td>Tuesday</td><td style="text-align:right">Call for hours</td></tr>
+          <tr><td>Wednesday</td><td style="text-align:right">Call for hours</td></tr>
+          <tr><td>Thursday</td><td style="text-align:right">Call for hours</td></tr>
+          <tr><td>Friday</td><td style="text-align:right">Call for hours</td></tr>
+          <tr><td>Saturday</td><td style="text-align:right">Call for hours</td></tr>
+          <tr><td>Sunday</td><td style="text-align:right">Call for hours</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-cols">
+      <div class="foot-brand">
+        <strong>HEADLINERZ</strong>
+        <p>Clean fades and classic shaves in the heart of Old Town Torrance since 2016.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <a href="#home" data-page="home">Home</a>
+        <a href="#services" data-page="services">Services</a>
+        <a href="#story" data-page="story">Our Story</a>
+        <a href="#gallery" data-page="gallery">Gallery</a>
+        <a href="#reviews" data-page="reviews">Reviews</a>
+        <a href="#visit" data-page="visit">Visit Us</a>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <a href="tel:+13109864788">(310) 986-4788</a>
+        <a href="https://www.google.com/maps/place/?q=place_id:ChIJlfGv9mc13YARvYOaOL8mN6I" target="_blank" rel="noopener">1217 El Prado Ave, Torrance, CA 90501</a>
+        <a href="https://www.google.com/maps/place/?q=place_id:ChIJlfGv9mc13YARvYOaOL8mN6I" target="_blank" rel="noopener">See reviews on Google</a>
+      </div>
+    </div>
+    <div class="copy-line">© HEADLINERZ BARBERSHOP</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var PAGES = ["home","services","story","gallery","reviews","visit"];
+  var drawer = document.getElementById("drawer");
+  var burger = document.getElementById("burger");
+  var scrim = document.getElementById("scrim");
+
+  function cleanHash(){
+    var h = location.hash.replace(/^#\/?/, "");
+    return h.split("?")[0].split("/")[0];
+  }
+
+  function closeMenu(){
+    if(drawer){ drawer.classList.remove("open"); }
+    if(scrim){ scrim.classList.remove("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll(".drawer nav a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger){
+    burger.addEventListener("click", function(){
+      var open = drawer.classList.toggle("open");
+      scrim.classList.toggle("show", open);
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+  if(scrim){
+    scrim.addEventListener("click", closeMenu);
+  }
+
+  /* ---------- carousel ---------- */
+  var track = document.getElementById("carTrack");
+  var dotsBox = document.getElementById("carDots");
+  var prev = document.getElementById("carPrev");
+  var next = document.getElementById("carNext");
+  var idx = 0, total = 0;
+  if(track){
+    total = track.children.length;
+    for(var d = 0; d < total; d++){
+      (function(n){
+        var b = document.createElement("button");
+        b.setAttribute("aria-label", "Go to photo " + (n + 1));
+        b.addEventListener("click", function(){ go(n); });
+        dotsBox.appendChild(b);
+      })(d);
+    }
+  }
+  function go(n){
+    idx = (n + total) % total;
+    track.style.transform = "translateX(-" + (idx * 100) + "%)";
+    var dots = dotsBox.children;
+    for(var k = 0; k < dots.length; k++){
+      dots[k].classList.toggle("on", k === idx);
+    }
+  }
+  if(prev){ prev.addEventListener("click", function(){ go(idx - 1); }); }
+  if(next){ next.addEventListener("click", function(){ go(idx + 1); }); }
+  go(0);
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
