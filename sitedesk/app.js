@@ -857,7 +857,6 @@ async function renderQueueInto(el){
     }
     const active = activeClaimCount();
     const atCap = active >= MAX_ACTIVE_CLAIMS;
-    const cats = allCategories();
     const shown = state.boardOrder
       .map(function(s){ return state.catalog.find(function(l){ return l.slug === s; }); })
       .filter(Boolean)
@@ -873,13 +872,7 @@ async function renderQueueInto(el){
     html += '<p class="review-note"><strong>Review first.</strong> Open the business page and understand who they are, what they do, how they sound, before you call or send a message.</p>';
     html += '<div class="card"><h2>Board</h2><div class="filters">' +
       '<input id="queue-q" value="' + esc(state.q) + '" placeholder="Name, slug, phone"/>' +
-      '<div class="chiprow scroll">' +
-      '<button type="button" class="chip' + (state.cat === '' ? ' on' : '') + '" data-cat="">All</button>' +
-      cats.slice(0, 24).map(function(c){
-        return '<button type="button" class="chip' + (state.cat === c ? ' on' : '') + '" data-cat="' + esc(c) + '">' + esc(c) + '</button>';
-      }).join('') + '</div>' +
-      '<div class="chiprow"><button type="button" class="chip' + (state.hasPhoneOnly ? ' on' : '') + '" id="chip-phone">Has phone</button>' +
-      '<button type="button" class="btn sm" id="btn-filter">Apply</button></div></div>';
+      '</div>';
     if(shown.length){
       html += '<div class="open-board">' + shown.map(leadRowHtml).join('') + '</div>' +
         '<p class="muted" style="font-size:11px;margin:10px 0">' + list.length + ' open match' + (list.length === 1 ? '' : 'es') + '</p>' +
