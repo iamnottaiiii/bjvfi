@@ -319,6 +319,21 @@ function toast(msg){
   toastTimer = setTimeout(function(){ el.classList.remove('show'); }, 2600);
 }
 
+/* Generic modal. showModal(html) renders content, closeModal() dismisses. */
+function showModal(html){
+  closeModal();
+  const ov = document.createElement('div');
+  ov.id = 'modal-ov';
+  ov.className = 'modal-back';
+  ov.innerHTML = '<div class="modal">' + html + '</div>';
+  ov.addEventListener('click', function(e){ if(e.target === ov) closeModal(); });
+  document.body.appendChild(ov);
+}
+function closeModal(){
+  const ov = document.getElementById('modal-ov');
+  if(ov) ov.remove();
+}
+
 function openModal(html){
   const root = document.getElementById('modal-root');
   root.innerHTML = '<div class="modal-back" id="modal-back"><div class="modal" role="dialog" aria-modal="true">' +
@@ -858,6 +873,30 @@ function wireQueue(el){
   if(gr) gr.addEventListener('click', grabRandom);
 }
 
+/* Pre-grab preview: caller must view the business site before grabbing. */
+function showGrabPreview(slug){
+  const bySlug = catalogBySlug();
+  const l = bySlug[slug] || normalizeLead({ s: slug, n: slug, p: '' });
+  const url = siteUrlFor(l);
+  let html = '<h2>Review before you grab</h2>' +
+    '<p class="muted" style="font-size:13px;line-height:1.55;margin-bottom:14px">Look at their site first. Know who they are before you claim this lead.</p>' +
+    '<div style="font-size:15px;font-weight:600;margin-bottom:4px">' + esc(l.name) + '</div>' +
+    (l.category ? '<div class="muted" style="font-size:12px;margin-bottom:2px">' + esc(l.category) + '</div>' : '') +
+    (hasPhone(l.phone) ? '<div style="font-size:13px;margin-bottom:2px">' + esc(l.phone) + '</div>' : '') +
+    (l.address ? '<div class="muted" style="font-size:12px;margin-bottom:10px">' + esc(l.address) + '</div>' : '<div style="margin-bottom:10px"></div>') +
+    '<a class="btn block" href="' + esc(url) + '" target="_blank" rel="noopener" style="margin-bottom:10px">Open their site</a>' +
+    '<div class="row" style="margin-top:14px">' +
+    '<button class="btn ghost" id="grab-preview-cancel" type="button" style="flex:1">Cancel</button>' +
+    '<button class="btn" id="grab-preview-confirm" type="button" style="flex:2">Grab this lead</button>' +
+    '</div>';
+  showModal(html);
+  document.getElementById('grab-preview-cancel').addEventListener('click', closeModal);
+  document.getElementById('grab-preview-confirm').addEventListener('click', function(){
+    closeModal();
+    grabLead(slug);
+  });
+}
+
 async function grabLead(slug){
   if(activeClaimCount() >= MAX_ACTIVE_CLAIMS){ toast('Claim cap reached. Release a lead first.'); return; }
   const lead = state.catalog.find(function(l){ return l.slug === slug; });
@@ -1069,7 +1108,10 @@ async function releaseLead(claim, silent){
   }
   clearTreeCache();
   delete state.claimsBySlug[claim.slug];
+  if(state.treeSlugs) state.treeSlugs = state.treeSlugs.filter(function(s){ return s !== claim.slug; });
+  state.boardOrder = [];
   await refreshMyClaims();
+  closeModal();
   if(!silent) toast('Lead released');
   renderApp();
 }
@@ -1133,13 +1175,11 @@ async function renderMineInto(el){
   if(!list.length){
     html += '<div class="empty">No leads match.<br/><button class="btn" data-tab="queue" type="button">Grab from queue</button></div>';
   } else {
-    html += '<div class="pick compact" style="margin-bottom:14px">' + list.map(function(c){
-      return '<button type="button" class="' + (state.meSlug === c.slug ? 'on' : '') + '" data-open-mine="' + esc(c.slug) + '">' +
-        esc(c.business_name || c.slug) + ' <span class="muted" style="font-size:10px">' + esc(c.status) + '</span></button>';
+    html += '<div class="mine-list">' + list.map(function(c){
+      return '<button type="button" class="mine-row" data-open-mine="' + esc(c.slug) + '">' +
+        '<span class="mine-row-name">' + esc(c.business_name || c.slug) + '</span>' +
+        '<span class="muted" style="font-size:11px">' + esc(c.status) + '</span></button>';
     }).join('') + '</div>';
-    const me = list.find(function(c){ return c.slug === state.meSlug; }) || list[0];
-    state.meSlug = me.slug;
-    html += leadCard(me);
   }
   html += '</div>';
   el.innerHTML = html;
@@ -1155,8 +1195,13 @@ async function renderMineInto(el){
   });
   el.querySelectorAll('[data-open-mine]').forEach(function(b){
     b.addEventListener('click', function(){
-      state.meSlug = b.getAttribute('data-open-mine');
-      renderMineInto(el);
+      const slug = b.getAttribute('data-open-mine');
+      const claim = state.myClaims.find(function(c){ return c.slug === slug; });
+      if(!claim) return;
+      showModal('<div style="text-align:right;margin-bottom:8px"><button class="btn ghost sm" id="modal-close" type="button">Close</button></div>' + leadCard(claim));
+      wireLeadCard(claim);
+      const mc = document.getElementById('modal-close');
+      if(mc) mc.addEventListener('click', closeModal);
     });
   });
   const meClaim = list.find(function(c){ return c.slug === state.meSlug; }) || list[0];
@@ -1606,7 +1651,7 @@ function bindGlobal(){
       return;
     }
     const grab = e.target.closest('[data-grab]');
-    if(grab){ grabLead(grab.getAttribute('data-grab')); }
+    if(grab){ showGrabPreview(grab.getAttribute('data-grab')); return; }
   });
 }
 
@@ -1630,7 +1675,9 @@ function isStandalone(){
 }
 
 function isIOS(){
-  return /iphone|ipad|ipod/i.test(navigator.userAgent || '');
+  const ua = navigator.userAgent || '';
+  if(/iphone|ipad|ipod/i.test(ua)) return true;
+  return (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 }
 
 function registerServiceWorker(){
@@ -1681,27 +1728,32 @@ function renderInstallGate(){
     '<div id="gate-action"></div>';
   if(ios){
     inner += '<ol class="gate-steps">' +
-      '<li>Tap the <b>Share</b> button in Safari.</li>' +
-      '<li>Tap <b>Add to Home Screen</b>.</li>' +
+      '<li>Tap the <b>Share</b> button in Safari (square with an arrow).</li>' +
+      '<li>Scroll down and tap <b>Add to Home Screen</b>.</li>' +
       '<li>Tap <b>Add</b>, then open SiteDesk from your home screen.</li>' +
+      '</ol>' +
+      '<p class="muted gate-note">On iPhone and iPad there is no install button. Use the Share menu above, it always works.</p>';
+  } else {
+    inner += '<ol class="gate-steps">' +
+      '<li>Tap <b>Install SiteDesk</b> below.</li>' +
+      '<li>If nothing happens, open your browser menu (&#8942;) and choose <b>Install app</b> or <b>Add to Home screen</b>.</li>' +
+      '<li>Open SiteDesk from your home screen or app list.</li>' +
       '</ol>';
   }
   inner += '</div>';
   gate.innerHTML = inner;
   document.body.appendChild(gate);
-  if(!ios){
-    var action = gate.querySelector('#gate-action');
-    var btn = document.createElement('button');
-    btn.className = 'btn block';
-    btn.textContent = 'Install SiteDesk';
-    btn.addEventListener('click', triggerInstall);
-    action.appendChild(btn);
-    var note = document.createElement('p');
-    note.className = 'muted gate-note';
-    note.id = 'gate-note';
-    action.appendChild(note);
-    updateGateNote();
-  }
+  var action = gate.querySelector('#gate-action');
+  var btn = document.createElement('button');
+  btn.className = 'btn block';
+  btn.textContent = 'Install SiteDesk';
+  btn.addEventListener('click', triggerInstall);
+  action.appendChild(btn);
+  var note = document.createElement('p');
+  note.className = 'muted gate-note';
+  note.id = 'gate-note';
+  action.appendChild(note);
+  updateGateNote();
 }
 
 function bootMain(){
