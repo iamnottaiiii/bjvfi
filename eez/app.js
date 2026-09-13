@@ -2016,9 +2016,9 @@ var lastSendAt = 0;
              <div class="ask-extra" id="poll-fields" hidden>
                <div class="poll-compose" id="poll-compose">
                  <label class="sr-only">option 1</label>
-                 <input name="opt" maxlength="80" placeholder="option one" required />
+                 <input name="opt" maxlength="80" placeholder="option one" />
                  <label class="sr-only">option 2</label>
-                 <input name="opt" maxlength="80" placeholder="option two" required />
+                 <input name="opt" maxlength="80" placeholder="option two" />
                </div>
                <button type="button" class="btn ghost sm" id="poll-add-opt">+ add option</button>
              </div>
@@ -2092,6 +2092,7 @@ var lastSendAt = 0;
           inp.required = on && i < 2;
         });
       };
+      syncPollRequired(false);
       if (pollAdd && pollCompose) {
         pollAdd.addEventListener("click", () => {
           const n = pollCompose.querySelectorAll('input[name="opt"]').length;
@@ -2139,11 +2140,9 @@ var lastSendAt = 0;
       }
       askForm.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const DBG = /[?&]dbg=1/.test(location.search);
         const fd = new FormData(askForm);
         const kind = String(fd.get("kind") || "text");
         const payload = { body: fd.get("body"), kind };
-        if (DBG) alert("DBG submit fired kind=" + kind + " bodylen=" + String(payload.body||"").length);
         try {
           if (kind === "poll") {
             const options = fd.getAll("opt")
@@ -2160,9 +2159,7 @@ var lastSendAt = 0;
             const uploaded = await api("/api/upload", { method: "POST", body: up });
             payload.image_key = uploaded.key;
           }
-          if (DBG) alert("DBG calling api");
           await api("/api/questions", { method: "POST", body: JSON.stringify(payload) });
-          if (DBG) alert("DBG api ok");
           showToast("saved");
           renderQa();
         } catch (err) {
