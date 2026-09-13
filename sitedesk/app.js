@@ -533,12 +533,72 @@ function renderLogin(){
     '<div class="field"><label>Password</label><input id="login-pass" type="password" autocomplete="current-password"/></div>' +
     '<button class="btn block" id="login-go" type="button">Login</button>' +
     '<div class="err" id="login-err"></div>' +
-    '<p class="muted" style="margin-top:14px;font-size:12px">Need an account? Ask your admin.</p>' +
+    '<p class="muted" style="margin-top:14px;font-size:12px">Need an account? <a href="#" id="login-signup" style="color:var(--amber)">Create one</a></p>' +
     '</div></div>';
   document.getElementById('login-go').addEventListener('click', doLogin);
   document.getElementById('login-pass').addEventListener('keydown', function(e){
     if(e.key === 'Enter') doLogin();
   });
+  document.getElementById('login-signup').addEventListener('click', function(e){
+    e.preventDefault(); renderSignup();
+  });
+}
+
+function renderSignup(){
+  document.getElementById('app').innerHTML =
+    '<header class="top"><div class="brand">sitedesk<div class="brand-sub">bjvfi</div></div></header>' +
+    '<div class="main auth-main"><div class="card"><h2>Create account</h2>' +
+    '<p class="muted" style="margin-bottom:16px;font-size:12px">Your admin approves new accounts before you can log in.</p>' +
+    '<div class="field"><label>Your name *</label><input id="su-name" autocomplete="name"/></div>' +
+    '<div class="field"><label>Username *</label><input id="su-user" autocapitalize="none" autocomplete="username" placeholder="lowercase, no spaces"/></div>' +
+    '<div class="field"><label>Phone</label><input id="su-phone" type="tel" autocomplete="tel"/></div>' +
+    '<div class="field"><label>Password * <span class="muted">(8+ characters)</span></label><input id="su-pass" type="password" autocomplete="new-password"/></div>' +
+    '<div class="field"><label>Confirm password *</label><input id="su-pass2" type="password" autocomplete="new-password"/></div>' +
+    '<button class="btn block" id="su-go" type="button">Create account</button>' +
+    '<div class="err" id="su-err"></div>' +
+    '<p class="muted" style="margin-top:14px;font-size:12px">Already have an account? <a href="#" id="su-login" style="color:var(--amber)">Log in</a></p>' +
+    '</div></div>';
+  document.getElementById('su-go').addEventListener('click', doSignup);
+  document.getElementById('su-pass2').addEventListener('keydown', function(e){
+    if(e.key === 'Enter') doSignup();
+  });
+  document.getElementById('su-login').addEventListener('click', function(e){
+    e.preventDefault(); renderLogin();
+  });
+}
+
+async function doSignup(){
+  const err = document.getElementById('su-err');
+  err.textContent = '';
+  const name = (document.getElementById('su-name').value || '').trim();
+  const username = (document.getElementById('su-user').value || '').trim().toLowerCase().replace(/[^a-z0-9._-]/g,'');
+  const phone = (document.getElementById('su-phone').value || '').trim();
+  const pw1 = document.getElementById('su-pass').value || '';
+  const pw2 = document.getElementById('su-pass2').value || '';
+  if(!name || !username){ err.textContent = 'Name and username are required.'; return; }
+  if(username.length < 3){ err.textContent = 'Username must be at least 3 characters.'; return; }
+  if(pw1.length < 8){ err.textContent = 'Password must be at least 8 characters.'; return; }
+  if(pw1 !== pw2){ err.textContent = 'Passwords do not match.'; return; }
+  const btn = document.getElementById('su-go');
+  btn.disabled = true; btn.textContent = 'Creating...';
+  try{
+    await loadUsers();
+    if(state.users[username]){ err.textContent = 'That username is taken.'; return; }
+    const pass = await pbkdf2Hash(pw1);
+    state.users[username] = { name: name, role: 'caller', status: 'pending', phone: phone, pass: pass };
+    await ghPutJson('users.json', state.users, state.usersSha, 'sitedesk: signup @' + username);
+    document.getElementById('app').innerHTML =
+      '<header class="top"><div class="brand">sitedesk<div class="brand-sub">bjvfi</div></div></header>' +
+      '<div class="main auth-main"><div class="card"><h2>Request sent</h2>' +
+      '<p style="margin:16px 0;font-size:13px">Account <b>@' + esc(username) + '</b> created. Your admin needs to approve it, then you can log in.</p>' +
+      '<button class="btn block" id="su-done" type="button">Back to login</button>' +
+      '</div></div>';
+    document.getElementById('su-done').addEventListener('click', renderLogin);
+  }catch(e){
+    err.textContent = 'Could not create the account. Please try again.';
+  }finally{
+    btn.disabled = false; btn.textContent = 'Create account';
+  }
 }
 
 async function doLogin(){
