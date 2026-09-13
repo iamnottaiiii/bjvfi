@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hair2toe · Hair Salon, Fayetteville, NY</title>
+<meta name="description" content="Hair2toe is a neighborhood hair salon at 6875 E Genesee St, Fayetteville, NY. Cuts, color, highlights and styling for all ages. Call (315) 446-4273.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FAF5EC; --cream-2:#F2EAD9; --paper:#FFFDF8;
+  --teal:#0E6B5E; --teal-deep:#0A4A42; --teal-soft:#DCEDE8;
+  --ink:#17302B; --ink-soft:#54706A;
+  --coral:#E07856; --coral-soft:#F9E2D6;
+  --gold:#D9A441; --gold-soft:#F6E8C9;
+  --radius:18px;
+  --shadow:0 20px 44px -20px rgba(23,48,43,.3);
+  --shadow-sm:0 10px 24px -12px rgba(23,48,43,.25);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Outfit",system-ui,sans-serif;
+  background:var(--cream);
+  background-image:radial-gradient(rgba(14,107,94,.07) 1.2px, transparent 1.3px);
+  background-size:24px 24px;
+  color:var(--ink);
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%}
+a{color:var(--teal)}
+::selection{background:var(--gold);color:var(--teal-deep)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.serif{font-family:"DM Serif Display",serif}
+
+/* ---------- minimal header + side drawer ---------- */
+header.site{
+  position:sticky;top:0;z-index:60;
+  background:rgba(250,245,236,.94);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-bottom:2px solid rgba(14,107,94,.16);
+}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
+.brand svg{width:48px;height:48px;flex:none}
+.brand-name{font-family:"DM Serif Display",serif;font-size:1.5rem;line-height:1;letter-spacing:.5px}
+.brand-name small{display:block;font-family:"Outfit",sans-serif;font-weight:700;font-size:.62rem;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-top:3px}
+.bar-right{display:flex;align-items:center;gap:10px}
+.call-pill{
+  display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:700;
+  background:var(--teal);color:#fff;padding:11px 22px;border-radius:999px;box-shadow:var(--shadow-sm);
+  transition:transform .18s,background .18s;white-space:nowrap;
+}
+.call-pill:hover{background:var(--teal-deep);transform:translateY(-2px)}
+.burger{background:var(--paper);border:2px solid rgba(14,107,94,.25);border-radius:12px;cursor:pointer;padding:10px 12px;display:flex;flex-direction:column;gap:0}
+.burger span{display:block;width:26px;height:3px;border-radius:3px;background:var(--teal-deep);margin:3px 0;transition:.25s}
+nav.main{
+  position:fixed;top:0;right:0;bottom:0;width:min(360px,86vw);z-index:70;
+  background:var(--teal-deep);color:#fff;padding:28px;
+  transform:translateX(105%);transition:transform .32s cubic-bezier(.22,.8,.3,1);
+  display:flex;flex-direction:column;gap:4px;box-shadow:-20px 0 50px rgba(10,74,66,.4);
+}
+nav.main.open{transform:none}
+nav.main .drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+nav.main .drawer-head strong{font-family:"DM Serif Display",serif;font-size:1.4rem;color:#fff}
+.drawer-close{background:none;border:2px solid rgba(255,255,255,.35);color:#fff;border-radius:10px;font-size:1.1rem;line-height:1;padding:6px 12px;cursor:pointer}
+.drawer-close:hover{border-color:var(--gold);color:var(--gold)}
+nav.main a.dlink{
+  text-decoration:none;color:#EAF3F0;font-weight:600;font-size:1.25rem;
+  padding:13px 16px;border-radius:12px;transition:background .2s,color .2s;
+  font-family:"DM Serif Display",serif;
+}
+nav.main a.dlink:hover{background:rgba(255,255,255,.1)}
+nav.main a.dlink[aria-current="page"],nav.main a.dlink.active{background:var(--gold);color:var(--teal-deep)}
+nav.main .drawer-foot{margin-top:auto;padding-top:20px;border-top:1px solid rgba(255,255,255,.18);color:#BFD4CE;font-size:.92rem}
+nav.main .drawer-foot a{color:var(--gold);font-weight:700;text-decoration:none;font-size:1.15rem}
+.scrim{position:fixed;inset:0;background:rgba(10,40,36,.5);z-index:65;opacity:0;pointer-events:none;transition:opacity .3s}
+.scrim.on{opacity:1;pointer-events:auto}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- card hero ---------- */
+.hero{padding:64px 0 72px;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:linear-gradient(140deg,var(--teal-deep),var(--teal));z-index:0}
+.hero-bg::after{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(250,245,236,.13) 1.6px, transparent 1.7px);background-size:30px 30px}
+.hero-card{
+  position:relative;z-index:2;max-width:760px;margin:0 auto;background:var(--paper);
+  border-radius:28px;padding:56px 52px;box-shadow:var(--shadow);text-align:center;
+  border-top:8px solid var(--gold);
+}
+.hero-card .kicker{
+  display:inline-block;font-size:.76rem;font-weight:800;letter-spacing:4px;text-transform:uppercase;
+  color:var(--teal);background:var(--teal-soft);border-radius:999px;padding:8px 20px;margin-bottom:20px;
+}
+.hero-card h1{font-family:"DM Serif Display",serif;font-weight:400;font-size:clamp(2.6rem,6vw,4.4rem);line-height:1.05;letter-spacing:-.5px;margin-bottom:18px}
+.hero-card h1 em{font-style:italic;color:var(--teal)}
+.hero-card .lede{font-size:1.12rem;color:var(--ink-soft);max-width:36rem;margin:0 auto 28px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-bottom:24px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;
+  padding:15px 30px;border-radius:999px;font-size:1rem;transition:transform .18s,background .18s,box-shadow .18s;
+}
+.btn-solid{background:var(--teal);color:#fff;box-shadow:var(--shadow-sm)}
+.btn-solid:hover{background:var(--teal-deep);transform:translateY(-2px)}
+.btn-ghost{background:var(--paper);color:var(--ink);border:2px solid rgba(23,48,43,.22)}
+.btn-ghost:hover{border-color:var(--teal);color:var(--teal-deep);transform:translateY(-2px)}
+.hero-card .rating{font-size:.95rem;color:var(--ink-soft)}
+.hero-card .rating .stars{color:var(--gold);letter-spacing:2px;font-size:1.05rem}
+.hero-card .rating strong{color:var(--ink)}
+
+/* ---------- card wall rhythm ---------- */
+section.block{padding:60px 0}
+.sec-head{text-align:center;max-width:44rem;margin:0 auto 40px}
+.sec-head .eyebrow{font-size:.76rem;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:var(--coral)}
+h2{font-family:"DM Serif Display",serif;font-weight:400;font-size:clamp(1.9rem,3.6vw,2.7rem);line-height:1.12;margin:8px 0 12px;letter-spacing:-.3px}
+.sec-head p{color:var(--ink-soft)}
+.wall{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.wcard{background:var(--paper);border-radius:var(--radius);padding:32px 28px;box-shadow:var(--shadow-sm);border:1px solid rgba(14,107,94,.14);transition:transform .2s,box-shadow .2s}
+.wcard:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+.wcard .num{font-family:"DM Serif Display",serif;font-size:2.4rem;color:var(--gold);line-height:1;margin-bottom:10px}
+.wcard h3{font-family:"DM Serif Display",serif;font-size:1.35rem;margin-bottom:8px}
+.wcard p{color:var(--ink-soft);font-size:.97rem}
+
+/* ---------- split quote ---------- */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:stretch}
+.panel{background:var(--teal-deep);color:#EAF3F0;border-radius:24px;padding:44px 40px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.panel::before{content:"";position:absolute;inset:0;background:radial-gradient(500px 240px at 85% 15%, rgba(217,164,65,.25), transparent 60%)}
+.panel h2{color:#fff;position:relative}
+.panel p{color:#C9DCD6;position:relative}
+.panel .hand{font-family:"DM Serif Display",serif;font-style:italic;font-size:1.3rem;color:var(--gold);position:relative}
+.quote-stack{display:flex;flex-direction:column;gap:20px}
+.mini-quote{background:var(--paper);border-radius:var(--radius);padding:28px;border-left:6px solid var(--coral);box-shadow:var(--shadow-sm)}
+.mini-quote .stars{color:var(--gold);letter-spacing:2px;margin-bottom:8px}
+.mini-quote p{margin-bottom:10px}
+.mini-quote cite{font-style:normal;font-weight:700;font-size:.85rem;color:var(--teal)}
+
+/* ---------- leaders service menu ---------- */
+.strip{border-radius:26px;padding:56px 48px;color:#fff;position:relative;overflow:hidden;margin-bottom:40px;box-shadow:var(--shadow);text-align:center}
+.strip::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(255,255,255,.2), transparent 50%)}
+.strip .eyebrow{font-size:.76rem;font-weight:800;letter-spacing:4px;text-transform:uppercase;position:relative;color:var(--gold-soft)}
+.strip h2{color:#fff;font-size:clamp(2rem,4vw,3rem);position:relative;margin:6px 0 10px}
+.strip p{color:rgba(255,255,255,.88);max-width:38rem;margin:0 auto;position:relative}
+.strip.s-services{background:linear-gradient(120deg,#0A4A42,#0E6B5E)}
+.strip.s-about{background:linear-gradient(120deg,#17302B,#2E5A4E)}
+.strip.s-gal{background:linear-gradient(120deg,#8A5A1E,#0A4A42)}
+.strip.s-rev{background:linear-gradient(120deg,#B45A36,#0A4A42)}
+.strip.s-visit{background:linear-gradient(120deg,#0A4A42,#123B45)}
+.svc-group{margin-bottom:36px}
+.svc-group h3{font-family:"DM Serif Display",serif;font-size:1.55rem;margin-bottom:4px}
+.svc-group .sub{color:var(--ink-soft);font-size:.95rem;margin-bottom:16px}
+.leader-list{background:var(--paper);border-radius:var(--radius);padding:10px 30px;box-shadow:var(--shadow-sm);border:1px solid rgba(14,107,94,.14)}
+.leader{display:flex;align-items:baseline;gap:12px;padding:16px 0;border-bottom:1px dashed rgba(23,48,43,.18)}
+.leader:last-child{border-bottom:0}
+.leader .name{font-weight:700;font-size:1.05rem}
+.leader .name small{display:block;font-weight:400;color:var(--ink-soft);font-size:.9rem}
+.leader .dots{flex:1;border-bottom:2px dotted rgba(14,107,94,.4);transform:translateY(-5px)}
+.leader .price{font-family:"DM Serif Display",serif;color:var(--teal-deep);white-space:nowrap}
+.price-note{background:var(--gold-soft);border:2px dashed rgba(14,107,94,.4);border-radius:var(--radius);padding:18px 24px;margin-top:12px;font-size:.95rem;color:#5C4A1E}
+
+/* ---------- horizontal carousel gallery ---------- */
+.car-wrap{position:relative}
+.carousel{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 4px 22px;scrollbar-width:thin}
+.cslide{
+  flex:0 0 300px;scroll-snap-align:start;background:var(--paper);border-radius:var(--radius);
+  overflow:hidden;box-shadow:var(--shadow-sm);border:1px solid rgba(14,107,94,.14);
+}
+.cslide .art{height:220px;display:flex;align-items:center;justify-content:center}
+.cslide .art svg{width:44%;height:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.18))}
+.cslide .cap{padding:18px 20px 22px}
+.cslide .cap strong{font-family:"DM Serif Display",serif;font-size:1.1rem;display:block}
+.cslide .cap small{color:var(--ink-soft)}
+.cslide .soon{display:inline-block;background:var(--coral-soft);color:var(--coral);font-size:.68rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 12px;border-radius:999px;margin-top:10px}
+.car-hint{text-align:center;color:var(--ink-soft);font-size:.9rem;margin-top:6px}
+
+/* ---------- reviews ---------- */
+.rev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.rev{background:var(--paper);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm);border-left:6px solid var(--gold)}
+.rev .stars{color:var(--gold);font-size:1.15rem;letter-spacing:3px;margin-bottom:12px}
+.rev p{font-size:1.02rem;margin-bottom:14px}
+.rev cite{font-style:normal;font-weight:700;font-size:.85rem;color:var(--teal)}
+.rev.featured{background:var(--teal-deep);color:#EAF3F0;border-left-color:var(--coral)}
+.rev.featured p{color:#EAF3F0}
+.rev.featured cite{color:var(--gold)}
+.rs-strip{margin:0 auto 34px;max-width:720px;background:var(--paper);border:1px solid rgba(14,107,94,.3);border-radius:16px;padding:20px 24px;text-align:center;box-shadow:var(--shadow-sm)}
+.rs-note{margin:0 0 14px;font-size:.95rem;color:var(--ink-soft);line-height:1.55}
+.rs-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rs-btn{display:inline-block;background:var(--teal);color:#fff;padding:11px 26px;border-radius:999px;font-weight:700;text-decoration:none;font-size:.95rem;line-height:1.2}
+.rs-btn:hover{background:var(--teal-deep)}
+.cta-band{background:linear-gradient(120deg,var(--teal),var(--teal-deep));border-radius:26px;color:#fff;padding:52px;text-align:center;margin-top:44px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.cta-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 20%, rgba(217,164,65,.35), transparent 50%)}
+.cta-band h2{color:#fff;position:relative}
+.cta-band p{color:#DCEDE8;position:relative;max-width:36rem;margin:0 auto 24px}
+.cta-band .btn-solid{background:#fff;color:var(--teal-deep);position:relative}
+.cta-band .btn-solid:hover{background:var(--gold-soft)}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
+.info-card{background:var(--paper);border-radius:var(--radius);padding:34px;box-shadow:var(--shadow-sm);border:1px solid rgba(14,107,94,.14)}
+.info-card h3{font-family:"DM Serif Display",serif;font-size:1.45rem;margin-bottom:14px}
+.info-card p{color:var(--ink-soft);margin-bottom:8px}
+.info-card a.big{font-family:"DM Serif Display",serif;font-size:1.55rem;color:var(--teal);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.hours-table{width:100%;border-collapse:collapse;font-size:.98rem;margin-top:6px}
+.hours-table td{padding:10px 6px;border-bottom:1px dashed rgba(23,48,43,.18)}
+.hours-table td:last-child{text-align:right}
+.map-card{
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:340px;
+  background:
+    linear-gradient(rgba(14,107,94,.08), rgba(14,107,94,.08)),
+    repeating-linear-gradient(0deg, transparent 0 46px, rgba(14,107,94,.2) 46px 48px),
+    repeating-linear-gradient(90deg, transparent 0 46px, rgba(14,107,94,.2) 46px 48px),
+    linear-gradient(140deg,#F2EAD9,#E4D3B4);
+  display:flex;align-items:center;justify-content:center;
+}
+.map-pin{text-align:center;background:var(--paper);padding:26px 34px;border-radius:20px;box-shadow:var(--shadow);max-width:80%}
+.map-pin svg{width:44px;height:44px;margin-bottom:8px}
+.map-pin strong{font-family:"DM Serif Display",serif;font-size:1.15rem;display:block}
+.map-pin small{color:var(--ink-soft)}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- minimal footer ---------- */
+footer{background:var(--teal-deep);color:#BFD4CE;margin-top:20px}
+.foot-min{padding:48px 0 0;text-align:center}
+.foot-min .fbrand{font-family:"DM Serif Display",serif;font-size:1.9rem;color:#fff;margin-bottom:8px}
+.foot-min p{font-size:.95rem;max-width:34rem;margin:0 auto 18px}
+.foot-min .flinks{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin-bottom:8px}
+.foot-min .flinks a{color:var(--gold);text-decoration:none;font-weight:600;font-size:.95rem}
+.foot-min .flinks a:hover{text-decoration:underline}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.14);margin-top:34px;padding:18px 0 24px;display:flex;justify-content:center;font-size:.85rem;color:#8FA9A2}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:940px){
+  .wall{grid-template-columns:1fr 1fr}
+  .split{grid-template-columns:1fr}
+  .rev-grid{grid-template-columns:1fr}
+  .visit-grid{grid-template-columns:1fr}
+  .hero-card{padding:44px 28px}
+  .strip{padding:42px 28px}
+  .call-pill span.num{display:none}
+}
+@media(max-width:600px){
+  .wall{grid-template-columns:1fr}
+  .hero{padding:44px 0 52px}
+  .cta-band{padding:38px 24px}
+}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap bar">
+    <a class="brand" href="#home" data-page="home" aria-label="Hair2toe, home">
+      <svg viewBox="0 0 64 64" role="img" aria-label="Comb logo"><circle cx="32" cy="32" r="29" fill="#0E6B5E"/><rect x="22" y="14" width="20" height="10" rx="3" fill="#D9A441"/><path d="M24 26v22M30 26v16M36 26v22M42 26v16" stroke="#D9A441" stroke-width="4" stroke-linecap="round"/><circle cx="32" cy="32" r="29" fill="none" stroke="#0A4A42" stroke-width="2" opacity=".5"/></svg>
+      <span class="brand-name">Hair2toe<small>Hair Salon · Fayetteville</small></span>
+    </a>
+    <div class="bar-right">
+      <a class="call-pill" href="tel:+13154464273">Call <span class="num">(315) 446-4273</span></a>
+      <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="scrim" id="scrim"></div>
+<nav class="main" id="mainNav" aria-label="Main navigation">
+  <div class="drawer-head">
+    <strong>Hair2toe</strong>
+    <button class="drawer-close" id="drawerClose" aria-label="Close menu">✕</button>
+  </div>
+  <a class="dlink active" aria-current="page" href="#home" data-page="home">Home</a>
+  <a class="dlink" href="#services" data-page="services">Services</a>
+  <a class="dlink" href="#about" data-page="about">About</a>
+  <a class="dlink" href="#gallery" data-page="gallery">Gallery</a>
+  <a class="dlink" href="#reviews" data-page="reviews">Reviews</a>
+  <a class="dlink" href="#visit" data-page="visit">Visit Us</a>
+  <div class="drawer-foot">
+    6875 E Genesee St, Fayetteville, NY<br>
+    <a href="tel:+13154464273">(315) 446-4273</a>
+  </div>
+</nav>
+
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-bg"></div>
+    <div class="wrap">
+      <div class="hero-card">
+        <span class="kicker">Neighborhood hair salon · Fayetteville, NY</span>
+        <h1>Great hair, <em>without</em> the chain salon wait.</h1>
+        <p class="lede">Hair2toe is a local hair salon on East Genesee Street in Fayetteville. Simple, good looking cuts, color and styling from stylists clients keep for years.</p>
+        <div class="cta-row">
+          <a class="btn btn-solid" href="#services" data-page="services">See Services</a>
+          <a class="btn btn-ghost" href="tel:+13154464273">Call (315) 446-4273</a>
+        </div>
+        <p class="rating"><span class="stars">★★★★★</span> <strong>4.9</strong> from 35 reviews</p>
+      </div>
+    </div>
+  </div>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow">Why Hair2toe</span>
+        <h2>The anti chain salon</h2>
+        <p>No long lines, no rushed chairs, no guessing. Just an appointment, a skilled stylist, and a cut you actually like.</p>
+      </div>
+      <div class="wall">
+        <div class="wcard reveal">
+          <div class="num">01</div>
+          <h3>Cuts for all ages</h3>
+          <p>Men, women and kids. Classic cuts to trendy styles, tailored to what suits you, never a one size fits all chop.</p>
+        </div>
+        <div class="wcard reveal">
+          <div class="num">02</div>
+          <h3>Color and highlights</h3>
+          <p>Full color, highlights and refreshes that look natural and grow out gracefully. Ask your stylist what works for your hair.</p>
+        </div>
+        <div class="wcard reveal">
+          <div class="num">03</div>
+          <h3>Quick in, quick out</h3>
+          <p>Make an appointment and you will be seen pretty quickly. Clients love that there is no long waiting line like the chains.</p>
+        </div>
+        <div class="wcard reveal">
+          <div class="num">04</div>
+          <h3>Honest prices</h3>
+          <p>Reviewers call the prices amazing and very competitive. Top quality service without the premium salon markup.</p>
+        </div>
+        <div class="wcard reveal">
+          <div class="num">05</div>
+          <h3>Special occasions</h3>
+          <p>Styling for weddings, proms and nights out. Tell us the event and we will shape the look around it.</p>
+        </div>
+        <div class="wcard reveal">
+          <div class="num">06</div>
+          <h3>Relaxing atmosphere</h3>
+          <p>A calm, welcoming shop where the staff is friendly and accommodating. Sit back, it is your time.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" style="padding-top:0">
+    <div class="wrap split">
+      <div class="panel reveal">
+        <span class="hand">Our way of doing things</span>
+        <h2>Personal, not corporate</h2>
+        <p>Hair2toe has been cutting hair on East Genesee Street since 2015. It is the kind of shop where the stylist learns your hair, remembers your last visit, and cuts it the way you like, every time.</p>
+        <p>No upsell scripts, no assembly line chairs. Just straightforward, skilled haircuts at prices regular people can afford.</p>
+        <div class="cta-row" style="justify-content:flex-start;margin:26px 0 0">
+          <a class="btn btn-solid" style="background:var(--gold);color:var(--teal-deep)" href="#about" data-page="about">More about us</a>
+        </div>
+      </div>
+      <div class="quote-stack">
+        <div class="mini-quote reveal">
+          <div class="stars">★★★★★</div>
+          <p>Amazing price alongside amazing cuts, what more can you ask for? Simple but good looking cuts, exactly what I wanted.</p>
+          <cite>via BestProsInTown</cite>
+        </div>
+        <div class="mini-quote reveal">
+          <div class="stars">★★★★★</div>
+          <p>Really great cut, with exceptional attention to detail and friendly service.</p>
+          <cite>via public feedback</cite>
+        </div>
+        <div class="mini-quote reveal">
+          <div class="stars">★★★★★</div>
+          <p>Prices are very competitive and people are very pleasant and accommodating.</p>
+          <cite>via public feedback</cite>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="cta-band reveal">
+      <h2>Ready for a better haircut?</h2>
+      <p>6875 E Genesee St, Fayetteville, NY 13066 · Open Monday to Saturday, 10 AM to 3 PM.</p>
+      <a class="btn btn-solid" href="tel:+13154464273">Call (315) 446-4273</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-services">
+      <span class="eyebrow">Services</span>
+      <h2>Cuts, color and care</h2>
+      <p>Everything on the menu, done by experienced stylists. Call for current pricing and to book your chair.</p>
+    </div>
+
+    <div class="svc-group reveal">
+      <h3>Haircuts</h3>
+      <p class="sub">For men, women and kids</p>
+      <div class="leader-list">
+        <div class="leader"><div class="name">Adult haircut<small>Cut, wash and style consultation</small></div><span class="dots"></span><span class="price">Call for pricing</span></div>
+        <div class="leader"><div class="name">Kids haircut<small>Patient, friendly cuts for little ones</small></div><span class="dots"></span><span class="price">Call for pricing</span></div>
+        <div class="leader"><div class="name">Senior haircut<small>Classic, easy to maintain styles</small></div><span class="dots"></span><span class="price">Call for pricing</span></div>
+        <div class="leader"><div class="name">Beard trim and lineup<small>Sharp edges, clean finish</small></div><span class="dots"></span><span class="price">Call for pricing</span></div>
+      </div>
+    </div>
+
+    <div class="svc-group reveal">
+      <h3>Color</h3>
+      <p class="sub">Natural looking, expertly applied</p>
+      <div class="leader-list">
+        <div class="leader"><div class="name">Full color<small>One process, root to tip</small></div><span class="dots"></span><span class="price">Call for pricing</span></div>
+        <div class="leader"><div class="name">Partial highlights<small>Face framing brightness</small></div><span class="dots"></span><span class="price">Call for pricing</span></div>
+        <div class="leader"><div class="name">Full highlights<small>Dimension all over</small></div><span class="dots"></span><span class="price">Call for pricing</span></div>
+        <div class="leader"><div class="name">Root touch up<small>Keep your color fresh between visits</small></div><span class="dots"></span><span class="price">Call for pricing</span></div>
+      </div>
+    </div>
+
+    <div class="svc-group reveal">
+      <h3>Styling and Treatments</h3>
+      <p class="sub">For every day and big days</p>
+      <div class="leader-list">
+        <div class="leader"><div class="name">Blowout and style<small>Smooth, bouncy, event ready</small></div><span class="dots"></span><span class="price">Call for pricing</span></div>
+        <div class="leader"><div class="name">Special occasion styling<small>Weddings, proms and formal events</small></div><span class="dots"></span><span class="price">Call for pricing</span></div>
+        <div class="leader"><div class="name">Deep conditioning treatment<small>Repair and shine for dry or damaged hair</small></div><span class="dots"></span><span class="price">Call for pricing</span></div>
+        <div class="leader"><div class="name">Perms and texture<small>Curls and waves that last</small></div><span class="dots"></span><span class="price">Call for pricing</span></div>
+      </div>
+    </div>
+
+    <div class="price-note reveal">
+      <strong>A note on pricing:</strong> our prices are kept deliberately friendly and can change. <strong>Call (315) 446-4273 for current pricing and to book.</strong>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-about">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-about">
+      <span class="eyebrow">About us</span>
+      <h2>A Fayetteville staple since 2015</h2>
+      <p>Hair2toe is a locally owned hair salon on East Genesee Street, built on repeat clients and word of mouth.</p>
+    </div>
+
+    <section class="block" style="padding-top:8px">
+      <div class="wrap">
+        <div class="wall">
+          <div class="wcard reveal">
+            <div class="num">★</div>
+            <h3>Stylists you keep</h3>
+            <p>One regular says it is the first shop in ten years where he found a stylist to return to. That is the whole business model: earn the second visit.</p>
+          </div>
+          <div class="wcard reveal">
+            <div class="num">★</div>
+            <h3>No chain nonsense</h3>
+            <p>Clients switched from Supercuts and the other nearby chains because here the stylist actually knows what to do with their hair. No long lines, no roulette.</p>
+          </div>
+          <div class="wcard reveal">
+            <div class="num">★</div>
+            <h3>Fair prices, honest work</h3>
+            <p>Reviewers keep using the same words: amazing price, very competitive, professional and well done. Quality cuts should not require a luxury budget.</p>
+          </div>
+        </div>
+        <div class="cta-band reveal">
+          <h2>Come see the difference.</h2>
+          <p>6875 E Genesee St, Fayetteville, NY 13066 · Call ahead and you will be seen quickly.</p>
+          <a class="btn btn-solid" href="#visit" data-page="visit">Plan your visit</a>
+        </div>
+        <div style="height:56px"></div>
+      </div>
+    </section>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-gal">
+      <span class="eyebrow">Gallery</span>
+      <h2>Fresh from the chair</h2>
+      <p>Artistic previews of our most requested looks. Real photos of our work are on the way. Swipe to browse.</p>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="car-wrap">
+      <div class="carousel reveal" id="galCarousel">
+        <div class="cslide">
+          <div class="art" style="background:linear-gradient(150deg,#DCEDE8,#A9CDBF)">
+            <svg viewBox="0 0 100 100"><circle cx="50" cy="38" r="22" fill="#17302B"/><path d="M28 38 q22 -30 44 0 q-4 26 -22 34 q-18 -8 -22 -34" fill="#17302B"/><path d="M34 30 q16 -12 32 0" stroke="#D9A441" stroke-width="3" fill="none" stroke-linecap="round"/><rect x="38" y="58" width="24" height="26" rx="8" fill="#E8B98A"/></svg>
+          </div>
+          <div class="cap"><strong>Classic Cut</strong><small>Clean, tailored, timeless</small><span class="soon">Photo coming soon</span></div>
+        </div>
+        <div class="cslide">
+          <div class="art" style="background:linear-gradient(150deg,#F6E8C9,#E3C57E)">
+            <svg viewBox="0 0 100 100"><circle cx="50" cy="38" r="22" fill="#E8B98A"/><path d="M28 40 C24 22 34 12 50 12 C66 12 76 22 72 42 C70 50 66 54 62 50 C64 38 58 28 50 28 C42 28 36 38 38 50 C34 54 30 50 28 40Z" fill="#8A5A1E"/><rect x="38" y="58" width="24" height="26" rx="8" fill="#E8B98A"/></svg>
+          </div>
+          <div class="cap"><strong>Highlights</strong><small>Natural dimension and shine</small><span class="soon">Photo coming soon</span></div>
+        </div>
+        <div class="cslide">
+          <div class="art" style="background:linear-gradient(150deg,#F9E2D6,#EEB795)">
+            <svg viewBox="0 0 100 100"><circle cx="50" cy="38" r="22" fill="#E8B98A"/><path d="M28 38 C28 24 36 14 50 14 C64 14 72 24 72 38 L70 66 C62 58 58 44 50 44 C42 44 38 58 30 66 Z" fill="#B45A36"/><rect x="38" y="58" width="24" height="26" rx="8" fill="#E8B98A"/></svg>
+          </div>
+          <div class="cap"><strong>Full Color</strong><small>Rich, even, vibrant</small><span class="soon">Photo coming soon</span></div>
+        </div>
+        <div class="cslide">
+          <div class="art" style="background:linear-gradient(150deg,#DCEDE8,#0E6B5E)">
+            <svg viewBox="0 0 100 100"><circle cx="50" cy="36" r="20" fill="#E8B98A"/><path d="M32 36 q18 -24 36 0 q-2 20 -8 30 l-4 -8 q2 12 -6 18 q-10 -6 -8 -18 l-4 8 q-6 -10 -6 -30" fill="#17302B"/><rect x="39" y="54" width="22" height="28" rx="8" fill="#E8B98A"/></svg>
+          </div>
+          <div class="cap"><strong>Kids Cuts</strong><small>Patient and friendly</small><span class="soon">Photo coming soon</span></div>
+        </div>
+        <div class="cslide">
+          <div class="art" style="background:linear-gradient(150deg,#F6E8C9,#D9A441)">
+            <svg viewBox="0 0 100 100"><circle cx="50" cy="38" r="22" fill="#E8B98A"/><path d="M26 34 C30 18 70 18 74 34 C76 44 70 46 66 40 C64 30 36 30 34 40 C30 46 24 44 26 34Z" fill="#D9A441"/><circle cx="38" cy="22" r="4" fill="#FFFDF8"/><circle cx="62" cy="20" r="4" fill="#FFFDF8"/><rect x="38" y="58" width="24" height="26" rx="8" fill="#E8B98A"/></svg>
+          </div>
+          <div class="cap"><strong>Event Styling</strong><small>Weddings, proms, nights out</small><span class="soon">Photo coming soon</span></div>
+        </div>
+        <div class="cslide">
+          <div class="art" style="background:linear-gradient(150deg,#DCEDE8,#7FA89B)">
+            <svg viewBox="0 0 100 100"><path d="M30 30 q20 -18 40 0 q4 26 -6 40 q-14 8 -28 0 q-10 -14 -6 -40" fill="#17302B"/><path d="M40 34 q10 -8 20 0" stroke="#D9A441" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M38 52 q12 10 24 0" stroke="#D9A441" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+          </div>
+          <div class="cap"><strong>Blowouts</strong><small>Smooth and bouncy</small><span class="soon">Photo coming soon</span></div>
+        </div>
+      </div>
+      <p class="car-hint">Swipe or scroll sideways to browse</p>
+    </div>
+
+    <div class="price-note reveal" style="margin-top:28px">
+      <strong>Coming soon:</strong> real photos of our salon and our work. The illustrations above are artistic previews. The real thing looks even better in the chair.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-rev">
+      <span class="eyebrow">Reviews</span>
+      <h2>Clients say it best</h2>
+      <p>Rated 4.9 stars from 35 reviews, with regulars who have been coming for years.</p>
+    </div>
+    <div class="rs-strip">
+      <p class="rs-note">Review themes on this page are paraphrased from public feedback. Open a source below to read current reviews and ratings.</p>
+      <div class="rs-links">
+        <a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJp6DTt4yM2YkRQ66xj0OZqcI" target="_blank" rel="noopener">See reviews on Google</a>
+        <a class="rs-btn" href="https://reviews.birdeye.com/hair2toe-170094882939438" target="_blank" rel="noopener">See reviews on Birdeye</a>
+        <a class="rs-btn" href="https://www.bestprosintown.com/ny/fayetteville/hair2toe-/" target="_blank" rel="noopener">See reviews on BestProsInTown</a>
+      </div>
+    </div>
+
+    <div class="rev-grid">
+      <div class="rev featured reveal">
+        <div class="stars">★★★★★</div>
+        <p>Been going here for several years. Stop wasting your money at chains where they are never sure what to do with your hair. Always professional and well done, and no long waiting lines.</p>
+        <cite>via BestProsInTown</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>First time in ten years I found a person to cut my hair regularly. I was almost afraid to compliment this place too much, but it deserves it. Give it a try.</p>
+        <cite>via BestProsInTown</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>Amazing price alongside amazing cuts, what more can you ask for? I tried the other nearby salon and it does not fit. Simple but good looking cuts, my kind of place.</p>
+        <cite>via Birdeye</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>Super friendly staff. Prices are very competitive and people are very pleasant and accommodating. Really great cut with exceptional attention to detail.</p>
+        <cite>via public feedback</cite>
+      </div>
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Had a great cut? Tell Fayetteville.</h2>
+      <p>Your review helps a local salon keep growing. It takes a minute, and it means the world to us.</p>
+      <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJp6DTt4yM2YkRQ66xj0OZqcI" target="_blank" rel="noopener">Leave us a Google review</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-visit">
+      <span class="eyebrow">Visit us</span>
+      <h2>Come take a seat</h2>
+      <p>Find us on East Genesee Street in Fayetteville. Call ahead and you will be seen quickly.</p>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3>Find us</h3>
+        <p><strong>Hair2toe</strong><br>6875 E Genesee St<br>Fayetteville, NY 13066</p>
+        <p>Easy to reach from Manlius, De Witt and East Syracuse.<br>Parking available on site.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3>Call us</h3>
+        <p>To book or ask about services:</p>
+        <a class="big" href="tel:+13154464273">(315) 446-4273</a>
+        <p style="margin-top:10px">Appointments recommended. You will be seen pretty quickly.</p>
+      </div>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3>Hours</h3>
+        <table class="hours-table">
+          <tr><td>Monday</td><td>10:00 AM - 3:00 PM</td></tr>
+          <tr><td>Tuesday</td><td>10:00 AM - 3:00 PM</td></tr>
+          <tr><td>Wednesday</td><td>10:00 AM - 3:00 PM</td></tr>
+          <tr><td>Thursday</td><td>10:00 AM - 3:00 PM</td></tr>
+          <tr><td>Friday</td><td>10:00 AM - 3:00 PM</td></tr>
+          <tr><td>Saturday</td><td>10:00 AM - 3:00 PM</td></tr>
+          <tr><td>Sunday</td><td>Closed</td></tr>
+        </table>
+        <p style="margin-top:12px;font-size:.9rem">Typical hours from public listings. Call to confirm before you visit.</p>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <svg viewBox="0 0 24 24" fill="#0E6B5E"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#FFFDF8"/></svg>
+          <strong>6875 E Genesee St</strong>
+          <small>Fayetteville, NY 13066</small><br>
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJp6DTt4yM2YkRQ66xj0OZqcI" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-min">
+      <div class="fbrand">Hair2toe</div>
+      <p>Neighborhood hair salon at 6875 E Genesee St, Fayetteville, NY. <a href="tel:+13154464273" style="color:var(--gold);font-weight:700;text-decoration:none">(315) 446-4273</a></p>
+      <div class="flinks">
+        <a href="#services" data-page="services">Services</a>
+        <a href="#gallery" data-page="gallery">Gallery</a>
+        <a href="#reviews" data-page="reviews">Reviews</a>
+        <a href="#visit" data-page="visit">Visit Us</a>
+      </div>
+      <div class="foot-bottom">
+        <span>© Hair2toe</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+
+  var scrim = document.getElementById("scrim");
+  var drawerClose = document.getElementById("drawerClose");
+  function syncScrim(){
+    if(!scrim || !nav){ return; }
+    scrim.classList.toggle("on", nav.classList.contains("open"));
+  }
+  if(burger){
+    burger.addEventListener("click", function(){ syncScrim(); });
+  }
+  if(scrim){
+    scrim.addEventListener("click", function(){ closeMenu(); syncScrim(); });
+  }
+  if(drawerClose){
+    drawerClose.addEventListener("click", function(){ closeMenu(); syncScrim(); });
+  }
+
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
