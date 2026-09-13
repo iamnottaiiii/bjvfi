@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fresh Barbershop | Skin Fades and Sharp Cuts in Pennsburg, PA</title>
+<meta name="description" content="Fresh Barbershop at 351 Main St, Pennsburg, PA. Skin fades, blow outs, haircuts, designs, and shape ups. Call (267) 902-0621.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --black:#0d0d0e;
+    --paper:#f7f5f1;
+    --lime:#d4f542;
+    --ink:#141414;
+    --gray:#6b6b6b;
+    --line:#e3dfd6;
+    --radius:16px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Space Grotesk',system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.6}
+  h1,h2,h3{font-family:'Anton',sans-serif;font-weight:400;letter-spacing:.01em;line-height:1.05;text-transform:uppercase}
+  a{color:inherit}
+  .wrap{max-width:1160px;margin:0 auto;padding:0 24px}
+
+  /* ---------- pages / router ---------- */
+  .page{display:none}
+  .page.active{display:block;animation:fadeIn .35s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  /* ---------- minimal nav ---------- */
+  header.minimal{position:fixed;top:0;left:0;right:0;z-index:60;mix-blend-mode:normal;transition:background .25s,box-shadow .25s}
+  header.minimal.scrolled{background:rgba(13,13,14,.92);backdrop-filter:blur(10px);box-shadow:0 2px 16px rgba(0,0,0,.3)}
+  .min-inner{max-width:1160px;margin:0 auto;padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+  .min-brand{font-family:'Anton',sans-serif;font-size:1.35rem;color:#fff;text-decoration:none;letter-spacing:.03em}
+  .min-brand span{color:var(--lime)}
+  nav.main{display:flex;gap:4px;align-items:center}
+  nav.main a{color:#fff;text-decoration:none;font-size:.88rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:10px 14px;border-radius:8px;transition:color .2s}
+  nav.main a:hover{color:var(--lime)}
+  nav.main a.active{color:var(--lime)}
+  nav.main a.call{border:1px solid var(--lime);color:var(--lime);margin-left:8px}
+  #burger{display:none;background:none;border:0;color:#fff;font-size:1.6rem;cursor:pointer;padding:6px 10px}
+
+  /* ---------- buttons ---------- */
+  .btn{display:inline-block;padding:14px 30px;border-radius:999px;font-weight:700;text-decoration:none;border:2px solid transparent;cursor:pointer;font-size:.95rem;letter-spacing:.04em;transition:transform .15s}
+  .btn:hover{transform:translateY(-2px)}
+  .btn-lime{background:var(--lime);color:#111}
+  .btn-line{border-color:#fff;color:#fff}
+  .btn-dark{background:var(--black);color:#fff}
+  .btn-ghostline{border-color:var(--black);color:var(--black)}
+
+  /* ---------- full-bleed hero ---------- */
+  .hero-full{min-height:100vh;display:flex;align-items:flex-end;color:#fff;position:relative;overflow:hidden;
+    background:radial-gradient(1200px 600px at 80% -10%, #2a2a2e 0%, transparent 60%),
+               radial-gradient(900px 500px at 10% 110%, #1e1e22 0%, transparent 55%),
+               var(--black)}
+  .hero-full::before{content:"";position:absolute;inset:0;opacity:.35;
+    background:repeating-linear-gradient(115deg,transparent 0 46px,rgba(212,245,66,.12) 46px 48px)}
+  .hero-full::after{content:"FRESH";position:absolute;top:12%;left:50%;transform:translateX(-50%) rotate(-4deg);
+    font-family:'Anton',sans-serif;font-size:clamp(6rem,22vw,20rem);color:transparent;
+    -webkit-text-stroke:2px rgba(255,255,255,.10);pointer-events:none;white-space:nowrap}
+  .hero-content{position:relative;z-index:2;padding:140px 0 70px;width:100%}
+  .hero-content .kicker{display:inline-block;background:var(--lime);color:#111;font-weight:700;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;padding:8px 16px;border-radius:999px;margin-bottom:20px}
+  .hero-content h1{font-size:clamp(3rem,8vw,6.5rem);max-width:14ch;margin-bottom:18px}
+  .hero-content h1 em{font-style:normal;color:var(--lime)}
+  .hero-content p{max-width:34rem;color:#cfcfcf;font-size:1.08rem;margin-bottom:30px}
+  .hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:40px}
+  .hero-meta{display:flex;gap:34px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.16);padding-top:22px}
+  .hero-meta div strong{font-family:'Anton',sans-serif;font-size:1.6rem;color:#fff;display:block;letter-spacing:.03em}
+  .hero-meta div span{font-size:.82rem;color:#a9a9a9}
+
+  /* ---------- alternating bands ---------- */
+  .band{padding:84px 0}
+  .band.dark{background:var(--black);color:#fff}
+  .band.light{background:var(--paper);color:var(--ink)}
+  .band h2{font-size:clamp(2.2rem,5vw,3.6rem);margin-bottom:14px}
+  .band.dark h2{color:#fff}
+  .band .lede{max-width:38rem;color:var(--gray);margin-bottom:40px}
+  .band.dark .lede{color:#a9a9a9}
+  .band-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:40px}
+  .band-num{font-family:'Anton',sans-serif;font-size:1rem;color:var(--lime);letter-spacing:.3em}
+  .band.dark .lede{color:#a9a9a9}
+  .split2{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+  .big-fact{background:var(--lime);color:#111;border-radius:var(--radius);padding:34px}
+  .big-fact strong{font-family:'Anton',sans-serif;font-size:2.6rem;display:block;letter-spacing:.02em}
+  .big-fact p{font-weight:600;margin-top:6px}
+  .check-list{list-style:none;display:grid;gap:16px}
+  .check-list li{display:flex;gap:14px;align-items:flex-start;font-size:1.02rem}
+  .check-list .tick{flex:0 0 30px;height:30px;border-radius:50%;background:var(--lime);color:#111;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .band.dark .check-list .tick{background:var(--lime)}
+
+  /* ---------- editorial offerings ---------- */
+  .ed-list{border-top:1px solid rgba(255,255,255,.16)}
+  .ed-item{display:grid;grid-template-columns:90px 1fr auto;gap:26px;align-items:center;padding:30px 10px;border-bottom:1px solid rgba(255,255,255,.16);transition:background .2s,padding .2s}
+  .ed-item:hover{background:rgba(212,245,66,.06);padding-left:22px}
+  .ed-item .num{font-family:'Anton',sans-serif;font-size:2.2rem;color:var(--lime)}
+  .ed-item h3{font-size:clamp(1.5rem,3vw,2.2rem);margin-bottom:6px}
+  .ed-item p{color:#a9a9a9;max-width:36rem}
+  .ed-item .price{font-family:'Anton',sans-serif;font-size:1.4rem;color:#fff;white-space:nowrap}
+  .ed-item .price small{display:block;font-family:'Space Grotesk',sans-serif;font-size:.72rem;color:#a9a9a9;font-weight:400;text-transform:none}
+  .ed-note{margin-top:22px;font-size:.85rem;color:#8f8f8f}
+
+  /* ---------- carousel gallery ---------- */
+  .carousel{position:relative;overflow:hidden;border-radius:var(--radius)}
+  .car-track{display:flex;transition:transform .45s ease}
+  .car-slide{flex:0 0 100%;position:relative;min-height:420px;display:flex;align-items:flex-end}
+  .car-slide svg{position:absolute;inset:0;width:100%;height:100%}
+  .car-cap{position:relative;z-index:2;padding:30px;color:#fff}
+  .car-cap .ph{display:inline-block;background:rgba(0,0,0,.6);font-size:.72rem;letter-spacing:.08em;padding:6px 12px;border-radius:999px;margin-bottom:10px}
+  .car-cap h3{font-size:2rem;text-shadow:0 2px 12px rgba(0,0,0,.5)}
+  .car-btn{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:54px;height:54px;border-radius:50%;border:0;background:var(--lime);color:#111;font-size:1.4rem;font-weight:700;cursor:pointer}
+  .car-btn.prev{left:16px}.car-btn.next{right:16px}
+  .car-dots{display:flex;gap:10px;justify-content:center;margin-top:18px}
+  .car-dots button{width:12px;height:12px;border-radius:50%;border:0;background:#c9c4b8;cursor:pointer}
+  .car-dots button.on{background:var(--black)}
+
+  /* ---------- reviews ---------- */
+  .rev-band{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:22px}
+  .rev-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:30px}
+  .rev-card .stars{color:#b98a1d;font-size:1.15rem;letter-spacing:.12em;margin-bottom:12px}
+  .rev-card p{font-size:1.02rem}
+  .rev-card .who{margin-top:16px;font-weight:700}
+  .rev-card .src{font-size:.78rem;color:#a09a8b}
+  .review-cta{margin-top:34px;display:flex;gap:14px;flex-wrap:wrap}
+
+  /* ---------- contact ---------- */
+  .contact-wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+  .info-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:34px}
+  .info-card h3{font-size:1.5rem;margin-bottom:14px}
+  .info-card p{margin-bottom:10px}
+  .hours-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);font-size:.95rem}
+  .hours-row:last-child{border-bottom:0}
+  .hours-row strong{font-weight:700}
+
+  /* ---------- big-type footer ---------- */
+  footer.bigfoot{background:var(--black);color:#fff;padding:70px 0 0;margin-top:0;overflow:hidden}
+  footer.bigfoot .giant{font-family:'Anton',sans-serif;font-size:clamp(3.4rem,12vw,10rem);line-height:.95;color:#fff;text-transform:uppercase;letter-spacing:.01em}
+  footer.bigfoot .giant span{color:var(--lime)}
+  .foot-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:30px;padding:44px 0;border-top:1px solid rgba(255,255,255,.14);margin-top:34px}
+  .foot-grid h4{font-family:'Space Grotesk',sans-serif;font-size:.8rem;letter-spacing:.24em;text-transform:uppercase;color:var(--lime);margin-bottom:14px}
+  .foot-grid p,.foot-grid a{color:#bdbdbd;font-size:.94rem;text-decoration:none}
+  .foot-grid a:hover{color:var(--lime)}
+  .copy-strip{border-top:1px solid rgba(255,255,255,.14);padding:18px 0 26px;text-align:center;color:#8f8f8f;font-size:.88rem}
+
+  /* ---------- reveal ---------- */
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .5s ease,transform .5s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  @media(max-width:900px){
+    nav.main{position:fixed;top:0;right:-260px;width:240px;height:100vh;background:#111;flex-direction:column;align-items:stretch;justify-content:flex-start;padding:80px 18px 18px;transition:right .25s;gap:4px}
+    nav.main.open{right:0}
+    nav.main a{padding:13px 16px}
+    #burger{display:block;position:relative;z-index:70}
+    .split2,.contact-wrap{grid-template-columns:1fr}
+    .ed-item{grid-template-columns:60px 1fr;grid-template-rows:auto auto}
+    .ed-item .price{grid-column:2;justify-self:start}
+    .car-slide{min-height:340px}
+  }
+</style>
+</head>
+<body>
+
+<header class="minimal" id="siteHeader">
+  <div class="min-inner">
+    <a class="min-brand" href="#home" data-page="home">FRESH<span>.</span></a>
+    <nav class="main" id="mainNav" aria-label="Main navigation">
+      <a href="#home" data-page="home">Home</a>
+      <a href="#services" data-page="services">Cuts</a>
+      <a href="#about" data-page="about">About</a>
+      <a href="#gallery" data-page="gallery">Gallery</a>
+      <a href="#reviews" data-page="reviews">Reviews</a>
+      <a href="#contact" data-page="contact">Visit</a>
+      <a class="call" href="tel:+12679020621">(267) 902-0621</a>
+    </nav>
+    <button id="burger" aria-label="Open menu" aria-expanded="false">&#9776;</button>
+  </div>
+</header>
+
+<main>
+<section class="page" id="page-home">
+  <div class="hero-full">
+    <div class="wrap hero-content">
+      <span class="kicker">Pennsburg, PA</span>
+      <h1>Stay <em>fresh.</em> Look sharp.</h1>
+      <p>Fresh Barbershop on Main Street delivers precision skin fades, blow outs, designs, and shape ups with a modern touch. Walk in or book ahead. Leave looking brand new.</p>
+      <div class="hero-cta">
+        <a class="btn btn-lime" href="tel:+12679020621">Call (267) 902-0621</a>
+        <a class="btn btn-line" href="#services" data-page="services">View Cuts</a>
+      </div>
+      <div class="hero-meta">
+        <div><strong>4.8 / 5</strong><span>Google rating</span></div>
+        <div><strong>351 Main St</strong><span>Pennsburg, PA 18073</span></div>
+        <div><strong>Mon - Sat</strong><span>10 AM - 7 PM</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="band light">
+    <div class="wrap">
+      <div class="split2">
+        <div class="reveal">
+          <div class="band-num">01</div>
+          <h2>Modern cuts, classic craft</h2>
+          <p class="lede">A barbershop built for the way you actually wear your hair: sharp fades, clean designs, and blow outs that hold.</p>
+          <ul class="check-list">
+            <li><span class="tick">&#10003;</span><span><strong>Skin fades and tapers</strong> blended to perfection, from low to high.</span></li>
+            <li><span class="tick">&#10003;</span><span><strong>Designs, lines, and shape ups</strong> for a signature finish.</span></li>
+            <li><span class="tick">&#10003;</span><span><strong>Blow outs and regular haircuts</strong> for every hair type.</span></li>
+          </ul>
+        </div>
+        <div class="big-fact reveal">
+          <strong>58+ Google reviews</strong>
+          <p>Customers rate Fresh Barbershop 4.8 out of 5 for precision fades and friendly service on Main Street.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="band dark">
+    <div class="wrap">
+      <div class="band-head reveal">
+        <div>
+          <div class="band-num">02</div>
+          <h2>The fresh standard</h2>
+        </div>
+        <a class="btn btn-lime" href="#contact" data-page="contact">Get Directions</a>
+      </div>
+      <p class="lede reveal">Every appointment starts with a consultation and ends with the details dialed in: crisp edges, clean neckline, styled finish.</p>
+      <div class="split2">
+        <div class="reveal">
+          <ul class="check-list">
+            <li><span class="tick">&#10003;</span><span><strong>Consultation first.</strong> We talk through the cut before the clippers come out.</span></li>
+            <li><span class="tick">&#10003;</span><span><strong>Detail finish.</strong> Hot lather neckline and styling to lock in the look.</span></li>
+            <li><span class="tick">&#10003;</span><span><strong>Honest pricing.</strong> Clear prices before you sit down.</span></li>
+          </ul>
+        </div>
+        <div class="reveal">
+          <p style="font-size:1.15rem;color:#d5d5d5">Located at 351 Main St in the heart of Pennsburg, Fresh Barbershop serves the Upper Perkiomen Valley with walk-in friendly service six days a week.</p>
+          <div style="margin-top:26px"><a class="btn btn-line" href="#services" data-page="services">See the Menu</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="band light">
+    <div class="wrap">
+      <div class="band-head reveal">
+        <div>
+          <div class="band-num">03</div>
+          <h2>Ready when you are</h2>
+        </div>
+      </div>
+      <div class="split2">
+        <div class="reveal">
+          <p class="lede" style="margin-bottom:20px">Call or text to book your chair. Walk-ins welcome when a chair is open.</p>
+          <div style="display:flex;gap:14px;flex-wrap:wrap">
+            <a class="btn btn-dark" href="tel:+12679020621">Call Now</a>
+            <a class="btn btn-ghostline" href="#reviews" data-page="reviews">Read Reviews</a>
+          </div>
+        </div>
+        <div class="big-fact reveal" style="background:var(--black);color:#fff">
+          <strong style="color:var(--lime)">(267) 902-0621</strong>
+          <p style="color:#cfcfcf">351 Main St, Pennsburg, PA 18073</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="band dark" style="padding-top:130px">
+    <div class="wrap">
+      <div class="band-num">The Menu</div>
+      <h2>Every cut, dialed in</h2>
+      <p class="lede">Editorial picks from the chair. Prices below come from the shop's published booking listings.</p>
+      <div class="ed-list">
+        <div class="ed-item reveal">
+          <div class="num">01</div>
+          <div><h3>Skin Fade</h3><p>The signature cut. A seamless blend from skin to length with razor sharp edges. About 30 minutes.</p></div>
+          <div class="price">$35<small>published listing</small></div>
+        </div>
+        <div class="ed-item reveal">
+          <div class="num">02</div>
+          <div><h3>Regular Haircut</h3><p>Clean, classic, and versatile. Scissor and clipper work tailored to your style. About 30 minutes.</p></div>
+          <div class="price">$30<small>published listing</small></div>
+        </div>
+        <div class="ed-item reveal">
+          <div class="num">03</div>
+          <div><h3>Haircut and Beard</h3><p>The full service: precision cut plus beard sculpting and line up. About 40 minutes.</p></div>
+          <div class="price">$40<small>published listing</small></div>
+        </div>
+        <div class="ed-item reveal">
+          <div class="num">04</div>
+          <div><h3>Blow Out</h3><p>Volume, texture, and movement. A styled blow out that keeps its shape for days.</p></div>
+          <div class="price">Call<small>for pricing</small></div>
+        </div>
+        <div class="ed-item reveal">
+          <div class="num">05</div>
+          <div><h3>Design and Lines</h3><p>Custom hair designs, hard parts, and artistic line work for a one of a kind finish.</p></div>
+          <div class="price">Call<small>for pricing</small></div>
+        </div>
+        <div class="ed-item reveal">
+          <div class="num">06</div>
+          <div><h3>Shape Up</h3><p>Crisp hairline, temples, and neckline. Keeps any cut looking fresh between visits.</p></div>
+          <div class="price">Call<small>for pricing</small></div>
+        </div>
+      </div>
+      <p class="ed-note">Prices shown from the shop's published booking listings and may change. Call (267) 902-0621 to confirm.</p>
+      <div style="margin-top:30px"><a class="btn btn-lime" href="tel:+12679020621">Book: (267) 902-0621</a></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-about">
+  <div class="band light" style="padding-top:130px">
+    <div class="wrap">
+      <div class="band-num">About</div>
+      <h2>Pennsburg's fresh cut</h2>
+      <div class="split2" style="margin-top:30px">
+        <div class="reveal">
+          <p class="lede">Fresh Barbershop sits at 351 Main St in Pennsburg, PA, serving the Upper Perkiomen Valley with modern barbering: skin fades, blow outs, regular haircuts, designs, shape ups, and clean lines.</p>
+          <p class="lede">The shop describes itself simply: skin fade, blow out, regular haircut, design, shape up, lines. That focus shows in the work, and in a 4.8 star Google rating across 58 reviews.</p>
+          <div style="margin-top:24px"><a class="btn btn-dark" href="#contact" data-page="contact">Plan Your Visit</a></div>
+        </div>
+        <div class="big-fact reveal">
+          <strong>4.8 out of 5</strong>
+          <p>Google rating from 58 reviews. Open Monday through Saturday, 10 AM to 7 PM.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="band light" style="padding-top:130px">
+    <div class="wrap">
+      <div class="band-num">Gallery</div>
+      <h2>The work, up close</h2>
+      <p class="lede">Swipe through. Placeholder artwork the shop can swap for real photos anytime.</p>
+      <div class="carousel" id="carousel">
+        <div class="car-track" id="carTrack">
+          <div class="car-slide">
+            <svg viewBox="0 0 800 420" preserveAspectRatio="xMidYMid slice" aria-label="Skin fade placeholder"><rect width="800" height="420" fill="#0d0d0e"/><circle cx="400" cy="200" r="110" fill="#d4f542"/><rect x="300" y="300" width="200" height="90" rx="16" fill="#f7f5f1"/></svg>
+            <div class="car-cap"><span class="ph">Placeholder</span><h3>Signature skin fade</h3></div>
+          </div>
+          <div class="car-slide">
+            <svg viewBox="0 0 800 420" preserveAspectRatio="xMidYMid slice" aria-label="Hair design placeholder"><rect width="800" height="420" fill="#d4f542"/><path d="M100 320 L400 80 L700 320" stroke="#0d0d0e" stroke-width="26" fill="none"/><circle cx="400" cy="190" r="44" fill="#0d0d0e"/></svg>
+            <div class="car-cap"><span class="ph">Placeholder</span><h3>Designs and lines</h3></div>
+          </div>
+          <div class="car-slide">
+            <svg viewBox="0 0 800 420" preserveAspectRatio="xMidYMid slice" aria-label="Beard work placeholder"><rect width="800" height="420" fill="#1c1c1e"/><rect x="280" y="60" width="240" height="300" rx="24" fill="#f7f5f1"/><rect x="330" y="220" width="140" height="80" rx="12" fill="#0d0d0e"/></svg>
+            <div class="car-cap"><span class="ph">Placeholder</span><h3>Beard sculpting</h3></div>
+          </div>
+          <div class="car-slide">
+            <svg viewBox="0 0 800 420" preserveAspectRatio="xMidYMid slice" aria-label="Blow out placeholder"><rect width="800" height="420" fill="#f7f5f1"/><circle cx="400" cy="180" r="120" fill="#0d0d0e"/><rect x="340" y="300" width="120" height="70" rx="14" fill="#d4f542"/></svg>
+            <div class="car-cap"><span class="ph">Placeholder</span><h3>Blow outs</h3></div>
+          </div>
+        </div>
+        <button class="car-btn prev" id="carPrev" aria-label="Previous slide">&#8592;</button>
+        <button class="car-btn next" id="carNext" aria-label="Next slide">&#8594;</button>
+      </div>
+      <div class="car-dots" id="carDots"></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="band light" style="padding-top:130px">
+    <div class="wrap">
+      <div class="band-num">Reviews</div>
+      <h2>Word on Main Street</h2>
+      <p class="lede">Based on 58 Google reviews with an average rating of 4.8 out of 5.</p>
+      <div class="rev-band">
+        <div class="rev-card reveal"><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p>"Cleanest fade I have gotten in the area. Precise, fast, and the design work is next level."</p><div class="who">Sample review</div><div class="src">Illustrative only, see Google for real reviews</div></div>
+        <div class="rev-card reveal"><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p>"Walked in for a shape up and left looking brand new. Great attention to detail."</p><div class="who">Sample review</div><div class="src">Illustrative only, see Google for real reviews</div></div>
+        <div class="rev-card reveal"><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p>"My go to shop in Pennsburg. Fair prices, friendly service, and my cut always looks sharp."</p><div class="who">Sample review</div><div class="src">Illustrative only, see Google for real reviews</div></div>
+      </div>
+      <div class="review-cta">
+        <a class="btn btn-dark" href="https://www.google.com/maps/place/?q=place_id:ChIJ0bcSyxcnxIkRfEuQPvaUYaE" target="_blank" rel="noopener">See reviews on Google</a>
+        <a class="btn btn-ghostline" href="#contact" data-page="contact">Visit the Shop</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-contact">
+  <div class="band light" style="padding-top:130px">
+    <div class="wrap">
+      <div class="band-num">Visit</div>
+      <h2>Find us on Main Street</h2>
+      <p class="lede">Fresh Barbershop, 351 Main St, Pennsburg, PA 18073</p>
+      <div class="contact-wrap">
+        <div class="info-card reveal">
+          <h3>Contact</h3>
+          <p><strong>Phone:</strong> <a href="tel:+12679020621">(267) 902-0621</a></p>
+          <p><strong>Address:</strong> 351 Main St, Pennsburg, PA 18073</p>
+          <div style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap">
+            <a class="btn btn-dark" href="tel:+12679020621">Call Now</a>
+            <a class="btn btn-ghostline" href="https://www.google.com/maps/place/?q=place_id:ChIJ0bcSyxcnxIkRfEuQPvaUYaE" target="_blank" rel="noopener">Get Directions</a>
+          </div>
+        </div>
+        <div class="info-card reveal">
+          <h3>Hours</h3>
+          <div class="hours-row"><span>Monday - Saturday</span><strong>10:00 AM - 7:00 PM</strong></div>
+          <div class="hours-row"><span>Sunday</span><strong>Closed</strong></div>
+          <p style="font-size:.85rem;color:#6b6b6b;margin-top:12px">Hours reported by directory listings. Call to confirm.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="bigfoot">
+  <div class="wrap">
+    <div class="giant reveal">Fresh<span>.</span><br>Barbershop</div>
+    <div class="foot-grid">
+      <div>
+        <h4>Visit</h4>
+        <p>351 Main St<br>Pennsburg, PA 18073<br><a href="tel:+12679020621">(267) 902-0621</a></p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <p><a href="#home" data-page="home">Home</a><br><a href="#services" data-page="services">Cuts</a><br><a href="#about" data-page="about">About</a><br><a href="#gallery" data-page="gallery">Gallery</a><br><a href="#reviews" data-page="reviews">Reviews</a></p>
+      </div>
+      <div>
+        <h4>Hours</h4>
+        <p>Mon - Sat: 10:00 AM - 7:00 PM<br>Sun: Closed</p>
+      </div>
+      <div>
+        <h4>Follow</h4>
+        <p><a href="https://www.google.com/maps/place/?q=place_id:ChIJ0bcSyxcnxIkRfEuQPvaUYaE" target="_blank" rel="noopener">Google Maps</a><br><a href="#reviews" data-page="reviews">Reviews</a></p>
+      </div>
+    </div>
+    <div class="copy-strip">© Fresh Barbershop</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "contact"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+
+  /* ---------- header background on scroll ---------- */
+  var header = document.getElementById("siteHeader");
+  function onScroll(){
+    if(header){ header.classList.toggle("scrolled", window.scrollY > 40); }
+  }
+  window.addEventListener("scroll", onScroll);
+  onScroll();
+
+  /* ---------- carousel ---------- */
+  var track = document.getElementById("carTrack");
+  var dotsWrap = document.getElementById("carDots");
+  var slides = track ? track.children.length : 0;
+  var idx = 0;
+  function go(n){
+    if(slides === 0){ return; }
+    idx = (n + slides) % slides;
+    track.style.transform = "translateX(-" + (idx * 100) + "%)";
+    var dots = dotsWrap.children;
+    for(var d = 0; d < dots.length; d++){ dots[d].classList.toggle("on", d === idx); }
+  }
+  if(track && dotsWrap){
+    for(var s = 0; s < slides; s++){
+      (function(k){
+        var b = document.createElement("button");
+        b.setAttribute("aria-label", "Go to slide " + (k + 1));
+        b.addEventListener("click", function(){ go(k); });
+        dotsWrap.appendChild(b);
+      })(s);
+    }
+    document.getElementById("carPrev").addEventListener("click", function(){ go(idx - 1); });
+    document.getElementById("carNext").addEventListener("click", function(){ go(idx + 1); });
+    go(0);
+  }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

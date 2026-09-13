@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flatworx Concrete and Land Services · Concrete Contractor, Jacksonville, FL</title>
+<meta name="description" content="Flatworx Concrete and Land Services: driveways, patios, walkways, stamped concrete, concrete removal and land services in Jacksonville, FL. Free written quotes. Call (904) 383-2876.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FAFAF7; --concrete:#ECECE7; --ink:#22262B; --ink-soft:#5B6169;
+  --steel:#3B424B; --rust:#D8552A; --rust-deep:#A93F1C; --rust-soft:#F8E2D5;
+  --amber:#F5A524; --line:rgba(34,38,43,.14);
+  --radius:14px;
+  --shadow:0 18px 40px -18px rgba(34,38,43,.28);
+  --shadow-sm:0 8px 22px -10px rgba(34,38,43,.22);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Barlow",system-ui,sans-serif;
+  background:var(--paper);
+  background-image:repeating-linear-gradient(0deg, transparent 0 34px, rgba(34,38,43,.028) 34px 35px);
+  color:var(--ink);
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%}
+a{color:var(--rust)}
+::selection{background:var(--amber);color:var(--ink)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.cond{font-family:"Barlow Condensed",sans-serif}
+
+/* ---------- top bar ---------- */
+header.topbar{
+  position:sticky;top:0;z-index:60;
+  background:rgba(34,38,43,.97);color:#fff;
+  border-bottom:3px solid var(--rust);
+}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 0}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:#fff}
+.brand svg{width:44px;height:44px;flex:none}
+.brand-name{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:1.45rem;line-height:1;letter-spacing:.5px;text-transform:uppercase}
+.brand-name small{display:block;font-family:"Barlow",sans-serif;font-weight:600;font-size:.62rem;letter-spacing:2.6px;color:var(--amber)}
+.call-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--rust);color:#fff;text-decoration:none;font-weight:700;
+  padding:11px 20px;border-radius:10px;transition:background .18s,transform .18s;white-space:nowrap;
+}
+.call-btn:hover{background:var(--rust-deep);transform:translateY(-2px)}
+.burger{background:none;border:0;cursor:pointer;padding:10px;display:flex;flex-direction:column;gap:5px}
+.burger span{display:block;width:28px;height:3px;border-radius:3px;background:#fff;transition:.25s}
+
+/* ---------- side drawer ---------- */
+.nav-overlay{
+  position:fixed;inset:0;background:rgba(20,22,25,.55);z-index:70;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+.nav-overlay.show{opacity:1;pointer-events:auto}
+.drawer{
+  position:fixed;top:0;left:0;bottom:0;width:min(340px,86vw);z-index:71;
+  background:#22262B;color:#fff;transform:translateX(-102%);transition:transform .3s cubic-bezier(.22,.8,.3,1);
+  display:flex;flex-direction:column;box-shadow:var(--shadow);
+  border-right:4px solid var(--rust);
+}
+.drawer.open{transform:translateX(0)}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid rgba(255,255,255,.12)}
+.drawer-head .brand-name{font-size:1.25rem}
+.drawer-close{background:none;border:0;color:#fff;font-size:2rem;cursor:pointer;line-height:1;padding:4px 8px}
+.drawer nav.main{display:flex;flex-direction:column;gap:4px;padding:20px 18px;flex:1}
+.drawer nav.main a{
+  text-decoration:none;color:#E9E9E6;font-family:"Barlow Condensed",sans-serif;
+  font-weight:600;font-size:1.35rem;letter-spacing:.6px;text-transform:uppercase;
+  padding:13px 16px;border-radius:10px;transition:background .2s,color .2s;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.drawer nav.main a .n{font-size:.85rem;color:var(--amber);font-family:"Barlow",sans-serif;font-weight:700}
+.drawer nav.main a:hover{background:rgba(255,255,255,.08)}
+.drawer nav.main a.active{background:var(--rust);color:#fff}
+.drawer nav.main a.active .n{color:#fff}
+.drawer-foot{padding:20px 22px 26px;border-top:1px solid rgba(255,255,255,.12)}
+.drawer-foot .call-btn{width:100%;justify-content:center;font-size:1.1rem}
+.drawer-foot p{font-size:.85rem;color:#9AA1A9;margin-top:12px;text-align:center}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- hero full-bleed ---------- */
+.hero{
+  position:relative;overflow:hidden;color:#fff;
+  background:
+    linear-gradient(rgba(20,22,25,.78), rgba(20,22,25,.55)),
+    repeating-linear-gradient(45deg, #3B424B 0 26px, #333941 26px 52px),
+    #333941;
+  padding:96px 0 96px;
+}
+.hero::before{
+  content:"";position:absolute;inset:0;opacity:.14;pointer-events:none;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 90px, #F5A524 90px 94px),
+    repeating-linear-gradient(90deg, transparent 0 90px, #F5A524 90px 94px);
+}
+.hero-inner{position:relative;max-width:1120px;margin:0 auto;padding:0 24px}
+.kicker{
+  display:inline-block;background:var(--amber);color:var(--ink);
+  font-family:"Barlow Condensed",sans-serif;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
+  font-size:.95rem;padding:8px 20px;border-radius:6px;margin-bottom:20px;
+}
+.hero h1{
+  font-family:"Barlow Condensed",sans-serif;font-weight:700;text-transform:uppercase;
+  font-size:clamp(3rem,7vw,5.6rem);line-height:.98;letter-spacing:.5px;margin-bottom:20px;
+}
+.hero h1 .accent{color:var(--amber)}
+.hero .lede{font-size:1.15rem;color:#D7DBDF;max-width:38rem;margin-bottom:30px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:30px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;
+  padding:15px 28px;border-radius:10px;font-size:1.02rem;transition:transform .18s,background .18s;
+}
+.btn-solid{background:var(--rust);color:#fff}
+.btn-solid:hover{background:var(--rust-deep);transform:translateY(-2px)}
+.btn-ghost{background:rgba(255,255,255,.08);color:#fff;border:2px solid rgba(255,255,255,.35)}
+.btn-ghost:hover{border-color:var(--amber);color:var(--amber);transform:translateY(-2px)}
+.hours-pill{
+  display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.25);
+  padding:10px 20px;border-radius:999px;font-weight:600;font-size:.95rem;color:#fff;
+}
+.hours-pill .dot{width:10px;height:10px;border-radius:50%;background:#7BC47F;box-shadow:0 0 0 4px rgba(123,196,127,.25);animation:pulse 2s infinite}
+.hours-pill.closed .dot{background:#E4658F;box-shadow:0 0 0 4px rgba(228,101,143,.25)}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+
+/* ---------- trust strip ---------- */
+.trust{background:var(--rust);color:#fff;padding:14px 0}
+.trust .wrap{display:flex;flex-wrap:wrap;gap:8px 34px;justify-content:center;align-items:center}
+.trust span{font-family:"Barlow Condensed",sans-serif;font-weight:600;letter-spacing:1.4px;text-transform:uppercase;font-size:1.02rem}
+.trust i{font-style:normal;color:var(--amber)}
+
+/* ---------- sections / card wall ---------- */
+section.block{padding:64px 0}
+.sec-head{max-width:46rem;margin:0 auto 42px;text-align:center}
+.sec-head .over{font-family:"Barlow Condensed",sans-serif;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--rust);font-size:1rem}
+h2{font-family:"Barlow Condensed",sans-serif;font-weight:700;text-transform:uppercase;font-size:clamp(2rem,4vw,2.9rem);line-height:1.02;letter-spacing:.4px;margin:8px 0 12px}
+.sec-head p{color:var(--ink-soft)}
+.cardwall{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.tcard{
+  background:#fff;border-radius:var(--radius);padding:32px 28px;box-shadow:var(--shadow-sm);
+  border:1px solid var(--line);border-bottom:6px solid var(--rust);
+  transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden;
+}
+.tcard:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+.tcard .icon{width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;background:var(--rust-soft)}
+.tcard .icon svg{width:32px;height:32px}
+.tcard h3{font-family:"Barlow Condensed",sans-serif;font-size:1.55rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px}
+.tcard p{color:var(--ink-soft);font-size:.98rem}
+.tcard .step{position:absolute;top:14px;right:18px;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:2.4rem;color:rgba(34,38,43,.08)}
+
+.split{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center}
+.split p{color:var(--ink-soft);margin-bottom:14px}
+.check-list{list-style:none;margin:22px 0;display:grid;gap:12px}
+.check-list li{display:flex;gap:12px;align-items:flex-start;font-weight:600}
+.check-list svg{flex:none;width:24px;height:24px;margin-top:2px}
+.quote-card{
+  background:var(--ink);color:#fff;border-radius:18px;padding:44px 40px;position:relative;box-shadow:var(--shadow);
+  border-left:8px solid var(--amber);
+}
+.quote-card::before{content:"\201C";position:absolute;top:2px;left:24px;font-family:"Barlow Condensed",sans-serif;font-size:5.5rem;color:var(--amber);opacity:.5}
+.quote-card p{font-family:"Barlow Condensed",sans-serif;font-size:1.7rem;font-weight:600;line-height:1.3;margin-bottom:14px;position:relative;text-transform:none}
+.quote-card cite{font-style:normal;font-weight:700;color:var(--amber);font-size:.9rem;letter-spacing:2px;text-transform:uppercase}
+
+/* ---------- services (leaders) ---------- */
+.svc-leaders{max-width:820px;margin:0 auto 18px}
+.svc{padding:18px 4px;border-bottom:2px dotted rgba(216,85,42,.45)}
+.svc-top{display:flex;align-items:baseline;gap:12px}
+.svc-top strong{font-family:"Barlow Condensed",sans-serif;font-size:1.5rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.svc-top .dots{flex:1;border-bottom:3px dotted rgba(34,38,43,.35);transform:translateY(-5px)}
+.svc-top .price{font-family:"Barlow Condensed",sans-serif;font-weight:700;color:var(--rust-deep);white-space:nowrap;font-size:1.25rem}
+.svc small{color:var(--ink-soft)}
+.svc .flag{display:inline-block;background:var(--concrete);color:var(--ink-soft);font-size:.7rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 12px;border-radius:999px;margin-left:10px;vertical-align:3px}
+.sample-note{background:#FFFDF6;border:2px dashed rgba(216,85,42,.5);border-radius:var(--radius);padding:20px 26px;margin-top:26px;font-size:.96rem;color:#6B4423;max-width:820px;margin-left:auto;margin-right:auto}
+.sample-note strong{color:var(--rust-deep)}
+
+/* ---------- gallery strip ---------- */
+.strip-scroll{
+  display:flex;gap:18px;overflow-x:auto;padding:6px 4px 22px;
+  scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
+}
+.gtile{
+  flex:0 0 min(320px,80vw);border-radius:var(--radius);overflow:hidden;background:#fff;
+  box-shadow:var(--shadow-sm);border:1px solid var(--line);scroll-snap-align:start;
+  transition:transform .2s;
+}
+.gtile:hover{transform:translateY(-5px)}
+.gtile .art{aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.gtile .art svg{width:40%;height:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.2))}
+.gtile .cap{padding:14px 18px}
+.gtile .cap strong{font-family:"Barlow Condensed",sans-serif;font-size:1.2rem;font-weight:700;text-transform:uppercase;display:block;letter-spacing:.4px}
+.gtile .cap small{color:var(--ink-soft)}
+.gtile .soon{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.9);font-size:.68rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 12px;border-radius:999px;color:var(--ink-soft)}
+
+/* ---------- reviews ---------- */
+.rev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.rev{background:#fff;border-radius:var(--radius);padding:30px;box-shadow:var(--shadow-sm);border:1px solid var(--line);border-left:6px solid var(--amber);position:relative}
+.rev .stars{color:var(--amber);font-size:1.2rem;letter-spacing:3px;margin-bottom:12px}
+.rev p{font-size:1.02rem;margin-bottom:14px}
+.rev cite{font-style:normal;font-weight:700;font-size:.85rem;color:var(--rust-deep);letter-spacing:.8px}
+.rev .sample-badge{position:absolute;top:16px;right:16px;background:var(--concrete);color:var(--ink-soft);font-size:.68rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 12px;border-radius:999px}
+.cta-band{background:linear-gradient(120deg,var(--rust),var(--rust-deep));border-radius:22px;color:#fff;padding:52px 40px;text-align:center;margin-top:44px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.cta-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 20%, rgba(245,165,36,.35), transparent 50%)}
+.cta-band h2{color:#fff;position:relative}
+.cta-band p{color:#F8E2D5;position:relative;max-width:36rem;margin:0 auto 24px}
+.cta-band .btn-solid{background:#fff;color:var(--rust-deep);position:relative}
+.cta-band .btn-solid:hover{background:var(--concrete)}
+.rs-strip{margin:0 auto 36px;max-width:640px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 24px;text-align:center;box-shadow:var(--shadow-sm)}
+.rs-note{margin:0 0 14px;font-size:.96rem;color:var(--ink-soft);line-height:1.55}
+.rs-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rs-btn{display:inline-block;background:var(--rust);color:#fff;padding:12px 28px;border-radius:10px;font-weight:700;text-decoration:none;font-size:1rem}
+.rs-btn:hover{background:var(--rust-deep)}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-bottom:26px}
+.info-card{background:#fff;border-radius:var(--radius);padding:34px;box-shadow:var(--shadow-sm);border:1px solid var(--line)}
+.info-card h3{font-family:"Barlow Condensed",sans-serif;font-size:1.6rem;font-weight:700;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:12px;letter-spacing:.4px}
+.info-card h3 svg{width:28px;height:28px;flex:none}
+.info-card p{color:var(--ink-soft);margin-bottom:8px}
+.info-card a.big{font-family:"Barlow Condensed",sans-serif;font-size:1.9rem;font-weight:700;color:var(--rust-deep);text-decoration:none;letter-spacing:.4px}
+.info-card a.big:hover{text-decoration:underline}
+.hours-table{width:100%;border-collapse:collapse;font-size:.98rem}
+.hours-table td{padding:10px 6px;border-bottom:1px dashed var(--line)}
+.hours-table tr.today td{font-weight:800;color:var(--rust-deep)}
+.hours-table tr.today td:first-child::after{content:"\00B7 today";font-size:.85rem;font-weight:700;color:var(--rust);margin-left:6px}
+.hours-table td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.map-card{
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:340px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 46px, rgba(216,85,42,.16) 46px 48px),
+    repeating-linear-gradient(90deg, transparent 0 46px, rgba(216,85,42,.16) 46px 48px),
+    linear-gradient(140deg,#EDEDE8,#DBDBD4);
+  display:flex;align-items:center;justify-content:center;
+}
+.map-pin{text-align:center;background:#fff;padding:26px 34px;border-radius:16px;box-shadow:var(--shadow);max-width:80%;position:relative}
+.map-pin::after{content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);border:14px solid transparent;border-top-color:#fff;border-bottom:0}
+.map-pin svg{width:44px;height:44px;margin-bottom:8px}
+.map-pin strong{font-family:"Barlow Condensed",sans-serif;font-size:1.3rem;font-weight:700;text-transform:uppercase;display:block;letter-spacing:.4px}
+.map-pin small{color:var(--ink-soft)}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- page hero strips ---------- */
+.strip{border-radius:20px;padding:54px 46px;color:#fff;position:relative;overflow:hidden;margin-bottom:44px;box-shadow:var(--shadow)}
+.strip::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(255,255,255,.16), transparent 50%)}
+.strip h2{color:#fff;font-size:clamp(2.1rem,4.4vw,3.2rem);position:relative;margin:6px 0 10px}
+.strip p{color:rgba(255,255,255,.9);max-width:38rem;position:relative}
+.strip .over{font-family:"Barlow Condensed",sans-serif;font-weight:700;letter-spacing:3px;text-transform:uppercase;font-size:1rem;position:relative;color:var(--amber)}
+.strip.s-svc{background:linear-gradient(120deg,#3B424B,#22262B)}
+.strip.s-story{background:linear-gradient(120deg,#A93F1C,#6E280F)}
+.strip.s-gal{background:linear-gradient(120deg,#4A5058,#2A2E34)}
+.strip.s-rev{background:linear-gradient(120deg,#B97A1B,#7E520E)}
+.strip.s-visit{background:linear-gradient(120deg,#3B424B,#1E2126)}
+
+/* ---------- footer minimal ---------- */
+footer{background:var(--ink);color:#C9CDD2;margin-top:20px;padding:34px 0}
+.foot-mini{display:flex;flex-wrap:wrap;gap:8px 30px;align-items:center;justify-content:space-between}
+.foot-mini .fbrand{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:1.25rem;color:#fff;text-transform:uppercase;letter-spacing:.6px}
+.foot-mini nav a{color:#9AA1A9;text-decoration:none;font-weight:600;font-size:.95rem;margin-left:22px}
+.foot-mini nav a:hover{color:var(--amber)}
+.foot-mini .fphone{color:#fff;text-decoration:none;font-weight:700}
+.foot-copy{border-top:1px solid rgba(255,255,255,.12);margin-top:22px;padding-top:18px;text-align:center;font-size:.9rem;color:#8A9098}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:940px){
+  .split,.visit-grid{grid-template-columns:1fr}
+  .cardwall{grid-template-columns:1fr 1fr}
+  .bar .call-btn{display:none}
+}
+@media(max-width:600px){
+  .cardwall{grid-template-columns:1fr}
+  .rev-grid{grid-template-columns:1fr}
+  .hero{padding:64px 0}
+  .strip{padding:40px 28px}
+  .foot-mini{flex-direction:column;text-align:center}
+  .foot-mini nav a{margin:0 11px}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap bar">
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    <a class="brand" href="#home" data-page="home" aria-label="Flatworx Concrete and Land Services, home">
+      <svg viewBox="0 0 64 64" role="img" aria-label="Concrete mixer logo"><circle cx="32" cy="32" r="26" fill="#D8552A"/><circle cx="32" cy="32" r="26" fill="none" stroke="#F5A524" stroke-width="3"/><path d="M32 12 v40 M12 32 h40" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".9"/><circle cx="32" cy="32" r="8" fill="#F5A524"/><circle cx="32" cy="32" r="3.4" fill="#22262B"/></svg>
+      <span class="brand-name">Flatworx<small>Concrete and Land Services</small></span>
+    </a>
+    <a class="call-btn" href="tel:+19043832876">(904) 383-2876</a>
+  </div>
+</header>
+
+<div class="nav-overlay" id="navOverlay"></div>
+<aside class="drawer" id="drawerNav" aria-hidden="true">
+  <div class="drawer-head">
+    <span class="brand-name" style="font-size:1.25rem">Flatworx</span>
+    <button class="drawer-close" id="drawerClose" aria-label="Close menu">×</button>
+  </div>
+  <nav class="main" id="mainNav" aria-label="Main navigation">
+    <a href="#home" data-page="home" class="active" aria-current="page">Home <span class="n">01</span></a>
+    <a href="#services" data-page="services">Services <span class="n">02</span></a>
+    <a href="#story" data-page="story">Our Story <span class="n">03</span></a>
+    <a href="#gallery" data-page="gallery">Gallery <span class="n">04</span></a>
+    <a href="#reviews" data-page="reviews">Reviews <span class="n">05</span></a>
+    <a href="#visit" data-page="visit">Contact <span class="n">06</span></a>
+  </nav>
+  <div class="drawer-foot">
+    <a class="call-btn" href="tel:+19043832876">(904) 383-2876</a>
+    <p>Free written quotes. Serving Jacksonville and St. Johns County.</p>
+  </div>
+</aside>
+
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-inner">
+      <span class="kicker">Concrete Contractor · Jacksonville, FL</span>
+      <h1>Concrete that<br>holds its <span class="accent">ground.</span></h1>
+      <p class="lede">Flatworx Concrete and Land Services pours driveways, patios, walkways and slabs built for Florida weather, plus land services that get your site ready. One crew, one call, done right the first time.</p>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="#services" data-page="services">See Services</a>
+        <a class="btn btn-ghost" href="tel:+19043832876">Call (904) 383-2876</a>
+      </div>
+      <span class="hours-pill" id="hoursPill"><span class="dot"></span><span id="hoursText">Checking today's hours…</span></span>
+    </div>
+  </div>
+
+  <div class="trust" aria-hidden="true">
+    <div class="wrap">
+      <span><i>■</i> Free written quotes</span>
+      <span><i>■</i> Residential and commercial</span>
+      <span><i>■</i> Driveways, patios and slabs</span>
+      <span><i>■</i> Land services and grading</span>
+    </div>
+  </div>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="over">Why Flatworx</span>
+        <h2>Two trades.<br>One contractor.</h2>
+        <p>Most concrete crews pour on whatever dirt they find. We shape the land first, then pour on it, so your slab stays level and your driveway drains right.</p>
+      </div>
+      <div class="cardwall">
+        <div class="tcard reveal">
+          <span class="step">01</span>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#D8552A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V9l7-5 7 5v12"/><path d="M9 21v-6h6v6"/></svg></div>
+          <h3>Concrete Flatwork</h3>
+          <p>Driveways, patios, walkways and slabs poured level, finished clean and built to take Florida heat and heavy rain.</p>
+        </div>
+        <div class="tcard reveal">
+          <span class="step">02</span>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#D8552A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-4 0-8-2.5-8-7 0-5 4-8 8-11 4 3 8 6 8 11 0 4.5-4 7-8 7z"/><path d="M12 21V9"/></svg></div>
+          <h3>Land Services</h3>
+          <p>Grading, land clearing and site prep that give every pour a solid base and every yard proper drainage.</p>
+        </div>
+        <div class="tcard reveal">
+          <span class="step">03</span>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#D8552A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4.5 4.5 0 00-6 6L3 18l3 3 5.7-5.7a4.5 4.5 0 006-6L14 13l-3-3 3.7-3.7z"/></svg></div>
+          <h3>Repair and Removal</h3>
+          <p>Cracked slab? Sunken walkway? We tear out the bad concrete and replace it so it looks like it was never broken.</p>
+        </div>
+        <div class="tcard reveal">
+          <span class="step">04</span>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#D8552A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v5"/></svg></div>
+          <h3>Decorative Options</h3>
+          <p>Stamped and textured finishes that give a patio the look of stone or brick without the stone-or-brick price.</p>
+        </div>
+        <div class="tcard reveal">
+          <span class="step">05</span>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#D8552A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <h3>Straightforward Pricing</h3>
+          <p>Free written quotes before we start, and the price we agree on is the price you pay. No surprises at the end.</p>
+        </div>
+        <div class="tcard reveal">
+          <span class="step">06</span>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#D8552A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+          <h3>Local and Accountable</h3>
+          <p>Based at 1404 Sherbrooke Ct in Jacksonville, serving Northeast Florida. When you call, you reach the crew that shows up.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" style="padding-top:0">
+    <div class="wrap split">
+      <div class="reveal">
+        <span class="over">How we work</span>
+        <h2>From bare dirt to finished slab</h2>
+        <p>We start every job with a free on-site look and a written quote. Then our crew handles the prep, the pour and the cleanup.</p>
+        <ul class="check-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#D8552A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Free written quote before any work starts</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#D8552A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Proper base prep and grading for drainage</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#D8552A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Clean finish work and full site cleanup</li>
+        </ul>
+        <a class="btn btn-solid" href="#visit" data-page="visit">Get a Free Quote</a>
+      </div>
+      <div class="quote-card reveal">
+        <p>Measure twice, pour once. A slab is only as good as the ground under it.</p>
+        <cite>The Flatworx crew</cite>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="cta-band reveal">
+      <h2>Need concrete? Start with a free quote.</h2>
+      <p>Call (904) 383-2876, tell us about your project, and we will come take a look. Driveways, patios, slabs and land work across Jacksonville and St. Johns County.</p>
+      <a class="btn btn-solid" href="tel:+19043832876">Call (904) 383-2876</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-svc">
+      <span class="over">What we do</span>
+      <h2>Concrete and land services</h2>
+      <p>Every project starts with a free on-site visit and a written quote. Sample starting prices below give a rough idea; your quote depends on the job.</p>
+    </div>
+
+    <div class="svc-leaders reveal">
+      <div class="svc">
+        <div class="svc-top"><strong>Concrete Driveways <span class="flag">Sample price</span></strong><span class="dots"></span><span class="price">from $12 / sq ft</span></div>
+        <small>New pours and full replacements. Thick enough for daily trucks, finished for curb appeal.</small>
+      </div>
+      <div class="svc">
+        <div class="svc-top"><strong>Patios and Outdoor Slabs <span class="flag">Sample price</span></strong><span class="dots"></span><span class="price">from $14 / sq ft</span></div>
+        <small>Backyard patios, shed pads, equipment slabs. Level, sloped to drain, ready for furniture or a grill.</small>
+      </div>
+      <div class="svc">
+        <div class="svc-top"><strong>Walkways and Sidewalks <span class="flag">Sample price</span></strong><span class="dots"></span><span class="price">from $11 / sq ft</span></div>
+        <small>Clean, even paths from the driveway to the door, or around the side of the house.</small>
+      </div>
+      <div class="svc">
+        <div class="svc-top"><strong>Stamped and Decorative Concrete</strong><span class="dots"></span><span class="price">ask us</span></div>
+        <small>Stone, brick and slate patterns with color. Big visual upgrade without a paver budget.</small>
+      </div>
+      <div class="svc">
+        <div class="svc-top"><strong>Concrete Removal and Replacement <span class="flag">Sample price</span></strong><span class="dots"></span><span class="price">from $9 / sq ft</span></div>
+        <small>Cracked, sunken or spalling concrete torn out, hauled away and replaced properly.</small>
+      </div>
+      <div class="svc">
+        <div class="svc-top"><strong>Concrete Repair and Resurfacing <span class="flag">Sample price</span></strong><span class="dots"></span><span class="price">from $6 / sq ft</span></div>
+        <small>For slabs that are sound but ugly: resurfacing, patching and finish repairs.</small>
+      </div>
+      <div class="svc">
+        <div class="svc-top"><strong>Grading and Site Prep</strong><span class="dots"></span><span class="price">ask us</span></div>
+        <small>Leveling, shaping and drainage correction before a pour or a build.</small>
+      </div>
+      <div class="svc">
+        <div class="svc-top"><strong>Land Clearing</strong><span class="dots"></span><span class="price">ask us</span></div>
+        <small>Brush, roots and debris cleared so your project can start on a clean lot.</small>
+      </div>
+    </div>
+
+    <div class="sample-note reveal">
+      <strong>About these prices:</strong> they are samples only, to give you a ballpark. Every property is different, so every real number comes from a free on-site visit and a written quote. No charge, no pressure.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-story">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-story">
+      <span class="over">Our story</span>
+      <h2>Concrete people,<br>land people.</h2>
+      <p>Flatworx Concrete and Land Services is a Jacksonville, Florida company doing both halves of the job: the ground work and the concrete work.</p>
+    </div>
+
+    <div class="split" style="margin-bottom:56px">
+      <div class="reveal">
+        <span class="over">Who we are</span>
+        <h2>A local crew that does it all</h2>
+        <p>Flatworx Concrete and Land Services is registered as a Florida limited liability company and operates out of Jacksonville at 1404 Sherbrooke Ct. We serve homeowners and businesses across Northeast Florida, including St. Johns County.</p>
+        <p>The idea is simple: most concrete problems start under the concrete. Bad base, bad drainage, bad compaction. Because our crew also does land work, grading, clearing and site prep, we fix the ground first and then pour on top of it.</p>
+        <p>That means fewer callbacks, fewer cracks and driveways that still look right years later. Call (904) 383-2876 and talk to the people who will actually do the work.</p>
+      </div>
+      <div class="quote-card reveal">
+        <p>A slab is only as good as the ground under it. So we take care of both.</p>
+        <cite>The Flatworx crew</cite>
+      </div>
+    </div>
+
+    <div class="cardwall" style="margin-bottom:56px">
+      <div class="tcard reveal">
+        <span class="step">01</span>
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#D8552A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg></div>
+        <h3>One call covers it</h3>
+        <p>Land prep, concrete pour, cleanup. You do not have to coordinate two contractors or wait on one crew to finish for the next.</p>
+      </div>
+      <div class="tcard reveal">
+        <span class="step">02</span>
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#D8552A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div>
+        <h3>Owner-operated</h3>
+        <p>A registered Florida LLC with the people who own the company on the job. When you call, you reach someone who knows your project.</p>
+      </div>
+      <div class="tcard reveal">
+        <span class="step">03</span>
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#D8552A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 109-9M3 12V4m0 8h8"/></svg></div>
+        <h3>Built for Florida</h3>
+        <p>Heat, afternoon storms, sandy soil. We pour and grade for Northeast Florida conditions, not for somewhere else.</p>
+      </div>
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Let us look at your project.</h2>
+      <p>Free on-site visit, free written quote, honest opinion on what your concrete or your land actually needs.</p>
+      <a class="btn btn-solid" href="#visit" data-page="visit">Contact Us</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-gal">
+      <span class="over">Gallery</span>
+      <h2>Recent work, up close</h2>
+      <p>Artistic previews of the kind of projects we take on. Real project photos from Jacksonville job sites are on the way.</p>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="strip-scroll">
+      <div class="gtile reveal">
+        <div class="art" style="background:linear-gradient(140deg,#C9C9C2,#9A9A92)"><span class="soon">Photo soon</span>
+          <svg viewBox="0 0 100 100"><rect x="10" y="46" width="80" height="40" rx="4" fill="#8A8A82"/><rect x="10" y="46" width="80" height="12" rx="4" fill="#B5B5AC"/><path d="M50 46v40M10 66h80" stroke="#6E6E66" stroke-width="2"/></svg>
+        </div>
+        <div class="cap"><strong>Driveway Pour</strong><small>New driveway, control joints cut</small></div>
+      </div>
+      <div class="gtile reveal">
+        <div class="art" style="background:linear-gradient(140deg,#D8552A,#A93F1C)"><span class="soon">Photo soon</span>
+          <svg viewBox="0 0 100 100"><rect x="14" y="52" width="72" height="34" rx="4" fill="#F0E4D4"/><rect x="14" y="52" width="72" height="10" fill="#D9C4A8"/><path d="M32 62h8M52 62h8M72 62h8" stroke="#B98F5E" stroke-width="3"/></svg>
+        </div>
+        <div class="cap"><strong>Stamped Patio</strong><small>Stone pattern, colored finish</small></div>
+      </div>
+      <div class="gtile reveal">
+        <div class="art" style="background:linear-gradient(140deg,#5B6169,#333941)"><span class="soon">Photo soon</span>
+          <svg viewBox="0 0 100 100"><path d="M20 70 L50 30 L80 70" stroke="#F5A524" stroke-width="6" fill="none" stroke-linecap="round"/><rect x="46" y="60" width="8" height="18" fill="#F5A524"/></svg>
+        </div>
+        <div class="cap"><strong>Grading Work</strong><small>Site leveled and shaped for drainage</small></div>
+      </div>
+      <div class="gtile reveal">
+        <div class="art" style="background:linear-gradient(140deg,#8A8A82,#6E6E66)"><span class="soon">Photo soon</span>
+          <svg viewBox="0 0 100 100"><rect x="30" y="40" width="40" height="46" rx="4" fill="#B5B5AC"/><path d="M38 48h24M38 58h24M38 68h24" stroke="#8A8A82" stroke-width="3"/><path d="M30 40l6-8M70 40l-6-8" stroke="#B5B5AC" stroke-width="5"/></svg>
+        </div>
+        <div class="cap"><strong>Walkway</strong><small>New side walk, broom finish</small></div>
+      </div>
+      <div class="gtile reveal">
+        <div class="art" style="background:linear-gradient(140deg,#3B7A44,#2A5A32)"><span class="soon">Photo soon</span>
+          <svg viewBox="0 0 100 100"><circle cx="30" cy="58" r="14" fill="#2A5A32"/><circle cx="62" cy="52" r="18" fill="#3B7A44"/><circle cx="80" cy="62" r="12" fill="#2A5A32"/><rect x="0" y="72" width="100" height="28" fill="#6B5A3E"/></svg>
+        </div>
+        <div class="cap"><strong>Land Clearing</strong><small>Brush cleared, lot ready to build</small></div>
+      </div>
+      <div class="gtile reveal">
+        <div class="art" style="background:linear-gradient(140deg,#F5A524,#D98A10)"><span class="soon">Photo soon</span>
+          <svg viewBox="0 0 100 100"><rect x="14" y="56" width="72" height="30" rx="4" fill="#8A8A82"/><rect x="14" y="56" width="72" height="8" fill="#D8552A" opacity=".85"/><path d="M50 56v30" stroke="#6E6E66" stroke-width="3"/></svg>
+        </div>
+        <div class="cap"><strong>Slab Replacement</strong><small>Old concrete out, new slab in</small></div>
+      </div>
+    </div>
+    <div class="sample-note reveal" style="margin-top:18px">
+      <strong>Coming soon:</strong> real photos from our Jacksonville and St. Johns County job sites. The illustrations above are artistic placeholders. Ask us about any project when we visit, we are happy to show finished work.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-rev">
+      <span class="over">Reviews</span>
+      <h2>What customers say</h2>
+      <p>We are still collecting our public reviews in one place. Read what is out there now, and leave one after your job is done.</p>
+    </div>
+    <div class="rs-strip reveal">
+      <p class="rs-note">Public review count is not yet verified on this page. For the most current reviews and ratings, open our Google listing directly.</p>
+      <div class="rs-links"><a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJxQxeArivuI8RxACU3T875Xc" target="_blank" rel="noopener">See reviews on Google</a></div>
+    </div>
+
+    <div class="rev-grid">
+      <div class="rev reveal">
+        <span class="sample-badge">Sample</span>
+        <div class="stars">★★★★★</div>
+        <p>"Crew showed up on time, prepped the base properly and the new driveway looks great. Drainage is noticeably better than before."</p>
+        <cite>Sample review</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="sample-badge">Sample</span>
+        <div class="stars">★★★★★</div>
+        <p>"Got a written quote the same week, price stayed the same, and they left the yard cleaner than they found it."</p>
+        <cite>Sample review</cite>
+      </div>
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Had work done? Leave us a review.</h2>
+      <p>Reviews help a local crew keep growing. It takes a minute, and we read every single one.</p>
+      <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJxQxeArivuI8RxACU3T875Xc" target="_blank" rel="noopener">Review us on Google</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-visit">
+      <span class="over">Contact</span>
+      <h2>Get your free quote</h2>
+      <p>Call, and tell us about your project. We will schedule a free on-site visit and put the quote in writing.</p>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#D8552A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Find us</h3>
+        <p><strong>Flatworx Concrete and Land Services</strong><br>1404 Sherbrooke Ct<br>Jacksonville, FL 32259</p>
+        <p>Serving Jacksonville and St. Johns County.<br>On-site visits by appointment.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#D8552A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg> Call us</h3>
+        <p>Free quotes, questions, scheduling:</p>
+        <a class="big" href="tel:+19043832876">(904) 383-2876</a>
+        <p style="margin-top:10px">Call during business hours for the fastest answer. Leave a message any time and we will call back.</p>
+      </div>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#D8552A" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Hours</h3>
+        <table class="hours-table" id="hoursTable">
+          <tr><td>Monday</td><td>7:00 AM - 6:00 PM</td></tr>
+          <tr><td>Tuesday</td><td>7:00 AM - 6:00 PM</td></tr>
+          <tr><td>Wednesday</td><td>7:00 AM - 6:00 PM</td></tr>
+          <tr><td>Thursday</td><td>7:00 AM - 6:00 PM</td></tr>
+          <tr><td>Friday</td><td>7:00 AM - 6:00 PM</td></tr>
+          <tr><td>Saturday</td><td>7:00 AM - 5:00 PM</td></tr>
+          <tr><td>Sunday</td><td>Call for hours</td></tr>
+        </table>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <svg viewBox="0 0 24 24" fill="#D8552A"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#fff"/></svg>
+          <strong>1404 Sherbrooke Ct</strong>
+          <small>Jacksonville, FL 32259</small><br>
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJxQxeArivuI8RxACU3T875Xc" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-mini">
+      <span class="fbrand">Flatworx</span>
+      <nav>
+        <a href="#home" data-page="home">Home</a>
+        <a href="#services" data-page="services">Services</a>
+        <a href="#story" data-page="story">Our Story</a>
+        <a href="#gallery" data-page="gallery">Gallery</a>
+        <a href="#reviews" data-page="reviews">Reviews</a>
+        <a href="#visit" data-page="visit">Contact</a>
+      </nav>
+      <a class="fphone" href="tel:+19043832876">(904) 383-2876</a>
+    </div>
+    <div class="foot-copy">
+      <span>© Flatworx Concrete and Land Services</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "story", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var drawer = document.getElementById("drawerNav");
+  var overlay = document.getElementById("navOverlay");
+  var burger = document.getElementById("burger");
+  var drawerClose = document.getElementById("drawerClose");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(drawer){ drawer.classList.remove("open"); drawer.setAttribute("aria-hidden", "true"); }
+    if(overlay){ overlay.classList.remove("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  function openMenu(){
+    if(drawer){ drawer.classList.add("open"); drawer.setAttribute("aria-hidden", "false"); }
+    if(overlay){ overlay.classList.add("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "true"); }
+  }
+
+  if(burger){
+    burger.addEventListener("click", function(){
+      if(drawer && drawer.classList.contains("open")){ closeMenu(); }
+      else { openMenu(); }
+    });
+  }
+  if(drawerClose){ drawerClose.addEventListener("click", closeMenu); }
+  if(overlay){ overlay.addEventListener("click", closeMenu); }
+
+  /* ---------- live hours (America/New_York) ---------- */
+  var HOURS = {0:null,1:[7,18],2:[7,18],3:[7,18],4:[7,18],5:[7,18],6:[7,17]};
+  var DOW = {"Sun":0,"Mon":1,"Tue":2,"Wed":3,"Thu":4,"Fri":5,"Sat":6};
+  var DAYNAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  function fmt(h){
+    var ap = h < 12 ? "AM" : "PM";
+    var hh = h % 12;
+    if(hh === 0){ hh = 12; }
+    return hh + ":00 " + ap;
+  }
+  try{
+    var parts = new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",weekday:"short",hour:"numeric",hour12:false}).formatToParts(new Date());
+    var wd = "Mon", hr = 12;
+    parts.forEach(function(p){
+      if(p.type === "weekday"){ wd = p.value; }
+      if(p.type === "hour"){ hr = parseInt(p.value, 10) % 24; }
+    });
+    var day = DOW[wd] !== undefined ? DOW[wd] : 1;
+    var today = HOURS[day];
+    var pill = document.getElementById("hoursPill");
+    var txt = document.getElementById("hoursText");
+    if(pill && txt){
+      if(!today){
+        pill.classList.add("closed");
+        txt.textContent = "Closed today · call for hours";
+      } else if(hr >= today[0] && hr < today[1]){
+        txt.textContent = "Open now · until " + fmt(today[1]) + " today";
+      } else if(hr < today[0]){
+        pill.classList.add("closed");
+        txt.textContent = "Opens today at " + fmt(today[0]);
+      } else {
+        pill.classList.add("closed");
+        var nd = (day + 1) % 7;
+        if(!HOURS[nd]){ nd = 1; }
+        txt.textContent = "Opens " + (nd === (day + 1) % 7 ? "tomorrow" : DAYNAMES[nd]) + " at " + fmt(HOURS[nd][0]);
+      }
+    }
+    var rows = document.querySelectorAll("#hoursTable tr");
+    var idx = (day + 6) % 7; /* rows run Mon..Sun */
+    if(rows[idx]){ rows[idx].classList.add("today"); }
+  }catch(e){ /* leave default pill text */ }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
