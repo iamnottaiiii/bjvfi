@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Basin Nail Spa | Nail Salon, Staten Island, NY</title>
+<meta name="description" content="Basin Nail Spa at 650 Hylan Blvd, Staten Island, NY 10305. Manicures, pedicures, gel, acrylic, dip powder and nail art. Call (718) 447-2200.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blush:#FBF3EF; --blush-2:#F8E8E0; --paper:#FFFDFB;
+  --ink:#4A2E2B; --ink-soft:#8A6A64;
+  --rose:#C2496B; --rose-deep:#9E3353; --rose-soft:#F7DCE3;
+  --gold:#C99A4B; --gold-soft:#F7EAD2;
+  --radius:20px;
+  --shadow:0 20px 44px -18px rgba(194,73,107,.28);
+  --shadow-sm:0 10px 24px -12px rgba(194,73,107,.25);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Montserrat",system-ui,sans-serif;
+  background:var(--blush);
+  color:var(--ink);
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%}
+a{color:var(--rose)}
+::selection{background:var(--rose);color:#fff}
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+.serif{font-family:"Cormorant Garamond",serif}
+
+/* ---------- header + side drawer ---------- */
+header.site{
+  position:sticky;top:0;z-index:60;
+  background:rgba(251,243,239,.94);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(194,73,107,.18);
+}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
+.brand-mark{width:46px;height:46px;flex:none}
+.brand-name{font-family:"Cormorant Garamond",serif;font-weight:700;font-size:1.4rem;line-height:1.05}
+.brand-name small{display:block;font-family:"Montserrat",sans-serif;font-weight:600;font-size:.6rem;letter-spacing:4px;text-transform:uppercase;color:var(--rose)}
+.burger{background:none;border:1px solid rgba(194,73,107,.35);border-radius:12px;cursor:pointer;padding:10px 12px;display:inline-flex;align-items:center;gap:10px;font-family:"Montserrat",sans-serif;font-weight:600;font-size:.85rem;color:var(--ink)}
+.burger .lines span{display:block;width:24px;height:2.5px;border-radius:2px;background:var(--rose-deep);margin:5px 0}
+.drawer-scrim{position:fixed;inset:0;background:rgba(74,46,43,.45);opacity:0;pointer-events:none;transition:opacity .3s;z-index:70}
+.drawer-scrim.show{opacity:1;pointer-events:auto}
+nav.main{
+  position:fixed;top:0;right:0;bottom:0;width:min(360px,86vw);z-index:71;
+  background:var(--paper);box-shadow:-20px 0 60px rgba(74,46,43,.2);
+  transform:translateX(105%);transition:transform .32s ease;
+  display:flex;flex-direction:column;padding:28px 30px;
+}
+nav.main.open{transform:translateX(0)}
+.drawer-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px}
+.drawer-close{background:none;border:0;cursor:pointer;font-size:1.6rem;color:var(--ink-soft);line-height:1;padding:6px}
+nav.main a.drawer-link{
+  display:block;text-decoration:none;color:var(--ink);font-weight:600;font-size:1.06rem;
+  padding:13px 6px;border-bottom:1px solid var(--blush-2);transition:color .2s,padding-left .2s;
+}
+nav.main a.drawer-link:hover{color:var(--rose);padding-left:12px}
+nav.main a.drawer-link.active{color:var(--rose-deep)}
+nav.main a.drawer-link.active::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--rose);margin-right:10px}
+.drawer-foot{margin-top:auto;padding-top:24px;display:grid;gap:12px}
+.call-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  background:var(--rose);color:#fff;text-decoration:none;font-weight:700;
+  padding:14px 22px;border-radius:999px;box-shadow:var(--shadow-sm);
+  transition:transform .18s,background .18s;
+}
+.call-btn:hover{background:var(--rose-deep);transform:translateY(-2px)}
+.hours-mini{font-size:.85rem;color:var(--ink-soft);text-align:center}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .32s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* ---------- full-bleed hero ---------- */
+.hero-full{
+  position:relative;overflow:hidden;
+  background:linear-gradient(160deg,#8C2F49 0%,#C2496B 52%,#E08AA0 100%);
+  color:#FFF7F4;min-height:88vh;display:flex;align-items:center;
+}
+.hero-full::before{
+  content:"";position:absolute;inset:0;
+  background-image:radial-gradient(rgba(255,255,255,.14) 1.5px, transparent 1.6px);
+  background-size:30px 30px;
+}
+.hero-blob{position:absolute;border-radius:50%;filter:blur(70px);opacity:.5}
+.hero-inner{position:relative;z-index:2;width:100%;padding:80px 0}
+.hero-kicker{
+  display:inline-block;font-weight:700;font-size:.78rem;letter-spacing:5px;text-transform:uppercase;
+  border:1.5px solid rgba(255,255,255,.55);padding:9px 22px;border-radius:999px;margin-bottom:26px;
+}
+.hero-full h1{
+  font-family:"Cormorant Garamond",serif;font-weight:700;
+  font-size:clamp(3rem,7.2vw,5.6rem);line-height:1.02;letter-spacing:-.5px;margin-bottom:20px;max-width:16ch;
+}
+.hero-full h1 em{font-style:italic;color:var(--gold-soft)}
+.hero-lede{font-size:1.15rem;max-width:38rem;opacity:.94;margin-bottom:32px}
+.hero-cta{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:34px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;
+  padding:15px 30px;border-radius:999px;font-size:1rem;transition:transform .18s,box-shadow .18s,background .18s;
+}
+.btn-light{background:#fff;color:var(--rose-deep);box-shadow:0 14px 30px -12px rgba(0,0,0,.35)}
+.btn-light:hover{transform:translateY(-2px)}
+.btn-outline{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.7)}
+.btn-outline:hover{background:rgba(255,255,255,.14);transform:translateY(-2px)}
+.hero-trust{display:flex;flex-wrap:wrap;gap:10px}
+.hero-trust span{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);padding:9px 18px;border-radius:999px;font-size:.88rem;font-weight:600}
+.hero-bottles{position:absolute;right:-40px;bottom:-60px;width:min(520px,44vw);opacity:.9;z-index:1;pointer-events:none}
+.hero-scroll-hint{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);font-size:.75rem;letter-spacing:3px;text-transform:uppercase;opacity:.8}
+
+/* ---------- section scaffolding ---------- */
+.section{padding:84px 0}
+.section-alt{background:var(--paper)}
+.eyebrow{display:inline-block;font-weight:700;font-size:.75rem;letter-spacing:4.5px;text-transform:uppercase;color:var(--rose);margin-bottom:16px}
+h2.title{font-family:"Cormorant Garamond",serif;font-weight:700;font-size:clamp(2.1rem,4.2vw,3.2rem);line-height:1.08;margin-bottom:16px}
+p.muted{color:var(--ink-soft)}
+.lead{font-size:1.12rem;color:var(--ink-soft);max-width:44rem}
+
+/* ---------- asymmetric grid ---------- */
+.asym{display:grid;grid-template-columns:repeat(12,1fr);gap:26px;align-items:stretch}
+.asym .cell-a{grid-column:span 7}
+.asym .cell-b{grid-column:span 5}
+.asym .cell-c{grid-column:span 4}
+.asym .cell-d{grid-column:span 8}
+@media(max-width:860px){.asym .cell-a,.asym .cell-b,.asym .cell-c,.asym .cell-d{grid-column:span 12}}
+.card{
+  background:var(--paper);border-radius:var(--radius);box-shadow:var(--shadow-sm);
+  padding:34px 32px;border:1px solid rgba(194,73,107,.1);
+}
+.card.tint{background:linear-gradient(150deg,var(--rose-soft),#FBEDF1)}
+.card .num{font-family:"Cormorant Garamond",serif;font-size:2.6rem;color:var(--gold);line-height:1;margin-bottom:8px}
+.card h3{font-family:"Cormorant Garamond",serif;font-size:1.55rem;margin-bottom:10px}
+.icon-dot{width:52px;height:52px;border-radius:16px;background:var(--rose);color:#fff;display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px}
+
+/* ---------- leaders-style offerings ---------- */
+.leaders{list-style:none;margin:0;padding:0}
+.leaders li{display:flex;align-items:baseline;gap:12px;padding:15px 2px;border-bottom:1px dashed rgba(194,73,107,.3)}
+.leaders .svc{font-weight:700;font-size:1.05rem}
+.leaders .dots{flex:1;border-bottom:2px dotted rgba(194,73,107,.4);transform:translateY(-5px);min-width:24px}
+.leaders .price{font-family:"Cormorant Garamond",serif;font-size:1.35rem;color:var(--rose-deep);white-space:nowrap}
+.leaders .note{font-size:.85rem;color:var(--ink-soft)}
+.sample-tag{font-family:"Montserrat",sans-serif;font-size:.68rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);border:1px solid var(--gold);border-radius:999px;padding:2px 9px;margin-left:8px;vertical-align:middle}
+.group-title{font-family:"Cormorant Garamond",serif;font-size:1.8rem;margin:38px 0 6px;color:var(--rose-deep)}
+
+/* ---------- arch-tile gallery ---------- */
+.arch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+@media(max-width:860px){.arch-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.arch-grid{grid-template-columns:1fr}}
+.arch{
+  border-radius:999px 999px var(--radius) var(--radius);
+  overflow:hidden;background:var(--blush-2);border:1px solid rgba(194,73,107,.16);
+  box-shadow:var(--shadow-sm);aspect-ratio:3/4.1;position:relative;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:28px;
+}
+.arch.alt{background:var(--rose-soft)}
+.arch.alt2{background:var(--gold-soft)}
+.ph-badge{
+  display:inline-block;background:var(--ink);color:#fff;font-size:.68rem;font-weight:700;
+  letter-spacing:2.5px;text-transform:uppercase;padding:7px 16px;border-radius:999px;margin-bottom:14px;
+}
+.arch svg{width:56%;height:auto;margin-bottom:12px}
+.arch .cap{font-family:"Cormorant Garamond",serif;font-size:1.3rem;font-weight:600}
+.arch .sub{font-size:.85rem;color:var(--ink-soft)}
+
+/* ---------- reviews ---------- */
+.stars{color:var(--gold);letter-spacing:4px;font-size:1.25rem;margin-bottom:12px}
+.quote-card{background:var(--paper);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:32px;border:1px solid rgba(194,73,107,.1)}
+.quote-card blockquote{font-family:"Cormorant Garamond",serif;font-size:1.35rem;font-style:italic;line-height:1.5;margin-bottom:16px}
+.quote-card .who{font-size:.88rem;color:var(--ink-soft)}
+.badge-sample{display:inline-block;font-size:.66rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fff;background:var(--gold);border-radius:999px;padding:4px 12px;margin-bottom:12px}
+.google-link{display:inline-flex;align-items:center;gap:10px;margin-top:8px;font-weight:700;text-decoration:none;color:var(--rose-deep);border:2px solid var(--rose);border-radius:999px;padding:13px 26px;transition:background .2s,color .2s}
+.google-link:hover{background:var(--rose);color:#fff}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+@media(max-width:860px){.visit-grid{grid-template-columns:1fr}}
+.visit-card h3{font-family:"Cormorant Garamond",serif;font-size:1.6rem;margin-bottom:12px}
+.big-tel{display:inline-block;font-family:"Cormorant Garamond",serif;font-size:2rem;font-weight:700;color:var(--rose-deep);text-decoration:none;margin:10px 0}
+.hours-row{display:flex;justify-content:space-between;gap:12px;padding:10px 2px;border-bottom:1px solid var(--blush-2);font-size:.95rem}
+
+/* ---------- big-type footer ---------- */
+footer.big{
+  background:linear-gradient(170deg,#5E1F33,#8C2F49);color:#FDECEF;
+  padding:70px 0 34px;overflow:hidden;
+}
+footer.big .giant{
+  font-family:"Cormorant Garamond",serif;font-weight:700;
+  font-size:clamp(3.2rem,10vw,8.5rem);line-height:.95;letter-spacing:-1px;
+  color:transparent;-webkit-text-stroke:1.5px rgba(253,236,239,.75);
+  margin-bottom:26px;user-select:none;
+}
+.foot-grid{display:flex;flex-wrap:wrap;gap:36px;justify-content:space-between;margin-bottom:40px}
+.foot-grid a{color:#FDECEF;text-decoration:none;font-weight:600;font-size:.95rem}
+.foot-grid a:hover{text-decoration:underline}
+.foot-grid .col h4{font-size:.72rem;letter-spacing:3.5px;text-transform:uppercase;color:var(--gold-soft);margin-bottom:12px}
+.foot-grid .col p,.foot-grid .col li{list-style:none;font-size:.95rem;margin-bottom:8px;color:rgba(253,236,239,.85)}
+.copy-line{border-top:1px solid rgba(253,236,239,.25);padding-top:22px;text-align:center;font-size:.95rem}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap bar">
+    <a class="brand" href="#home" data-page="home" aria-label="Basin Nail Spa home">
+      <svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true"><ellipse cx="24" cy="26" rx="14" ry="16" fill="#C2496B"/><ellipse cx="24" cy="26" rx="9" ry="11" fill="#E08AA0"/><rect x="19" y="4" width="10" height="8" rx="2" fill="#4A2E2B"/><rect x="22" y="0" width="4" height="6" rx="2" fill="#C99A4B"/></svg>
+      <span class="brand-name">Basin Nail Spa<small>Nail Salon · SI, NY</small></span>
+    </a>
+    <button class="burger" id="burger" aria-expanded="false" aria-label="Open menu">
+      <span class="lines" aria-hidden="true"><span></span><span></span><span></span></span>
+      <span>Menu</span>
+    </button>
+  </div>
+</header>
+
+<div class="drawer-scrim" id="drawerScrim"></div>
+<nav class="main" id="mainNav" aria-label="Site navigation">
+  <div class="drawer-top">
+    <span class="brand-name serif" style="font-size:1.2rem">Basin Nail Spa</span>
+    <button class="drawer-close" id="drawerClose" aria-label="Close menu">×</button>
+  </div>
+  <a class="drawer-link" href="#home" data-page="home">Home</a>
+  <a class="drawer-link" href="#services" data-page="services">Services</a>
+  <a class="drawer-link" href="#story" data-page="story">Our Story</a>
+  <a class="drawer-link" href="#gallery" data-page="gallery">Gallery</a>
+  <a class="drawer-link" href="#reviews" data-page="reviews">Reviews</a>
+  <a class="drawer-link" href="#visit" data-page="visit">Visit Us</a>
+  <div class="drawer-foot">
+    <a class="call-btn" href="tel:+17184472200">Call (718) 447-2200</a>
+    <p class="hours-mini">Call for hours · Walk-ins welcome</p>
+  </div>
+</nav>
+
+<main>
+<section class="page" id="page-home">
+  <div class="hero-full">
+    <div class="hero-blob" style="width:420px;height:420px;background:#F7C6D3;top:-120px;left:-120px"></div>
+    <div class="hero-blob" style="width:360px;height:360px;background:#C99A4B;bottom:-100px;right:24%"></div>
+    <svg class="hero-bottles" viewBox="0 0 300 300" aria-hidden="true">
+      <ellipse cx="90" cy="200" rx="34" ry="56" fill="rgba(255,255,255,.22)"/>
+      <ellipse cx="90" cy="212" rx="24" ry="42" fill="rgba(255,255,255,.18)"/>
+      <rect x="78" y="130" width="24" height="18" rx="4" fill="rgba(255,255,255,.55)"/>
+      <ellipse cx="205" cy="215" rx="26" ry="46" fill="rgba(255,255,255,.2)"/>
+      <ellipse cx="205" cy="224" rx="18" ry="34" fill="rgba(255,255,255,.16)"/>
+      <rect x="195" y="152" width="20" height="16" rx="4" fill="rgba(255,255,255,.5)"/>
+    </svg>
+    <div class="wrap hero-inner">
+      <span class="hero-kicker">Staten Island Nail Spa</span>
+      <h1>Pretty nails, <em>zero</em> stress.</h1>
+      <p class="hero-lede">Basin Nail Spa is your neighborhood stop for fresh manicures, soothing pedicures and nail art that lasts. Clean tools, steady hands and a chair with your name on it at 650 Hylan Blvd.</p>
+      <div class="hero-cta">
+        <a class="btn btn-light" href="tel:+17184472200">Book by Phone</a>
+        <a class="btn btn-outline" href="#services" data-page="services">See Services</a>
+      </div>
+      <div class="hero-trust">
+        <span>Clean, sanitized tools</span>
+        <span>Walk-ins welcome</span>
+        <span>Call for hours</span>
+      </div>
+    </div>
+    <div class="hero-scroll-hint" aria-hidden="true">Scroll</div>
+  </div>
+
+  <div class="section">
+    <div class="wrap">
+      <span class="eyebrow reveal">Why Basin</span>
+      <h2 class="title reveal">A calmer kind of nail appointment</h2>
+      <p class="lead reveal">No rushed chairs, no assembly line. Sit down, pick your color, and leave with nails you keep looking at.</p>
+      <div class="asym" style="margin-top:44px">
+        <div class="card tint cell-a reveal">
+          <div class="icon-dot"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 6.2 6.6.4-5.1 4.2 1.6 6.4L12 15.7 6.5 19.2l1.6-6.4L3 8.6l6.6-.4z"/></svg></div>
+          <h3>Polish that lasts</h3>
+          <p class="muted">Gel, dip powder and acrylic options built for real life, from typing at a desk to chasing kids around the block.</p>
+        </div>
+        <div class="card cell-b reveal">
+          <div class="num">01</div>
+          <h3>Detail first</h3>
+          <p class="muted">Careful cuticle work and even shaping before the color ever touches the nail.</p>
+        </div>
+        <div class="card cell-c reveal">
+          <div class="num">02</div>
+          <h3>Spa pedicures</h3>
+          <p class="muted">Soak, exfoliate and massage. The chair reclines and the week melts off.</p>
+        </div>
+        <div class="card tint cell-d reveal">
+          <div class="icon-dot"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+          <h3>On your schedule</h3>
+          <p class="muted">Walk-ins are welcome and appointments are one quick call away at (718) 447-2200. Call ahead for same-day openings.</p>
+          <p style="margin-top:14px"><a class="btn btn-light" href="tel:+17184472200" style="background:var(--rose);color:#fff">Call Now</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section section-alt">
+    <div class="wrap">
+      <span class="eyebrow reveal">Popular Services</span>
+      <h2 class="title reveal">The greatest hits</h2>
+      <ul class="leaders reveal">
+        <li><span class="svc">Gel Manicure</span><span class="dots"></span><span class="price">$35<span class="sample-tag">Sample</span></span></li>
+        <li><span class="svc">Spa Pedicure</span><span class="dots"></span><span class="price">$45<span class="sample-tag">Sample</span></span></li>
+        <li><span class="svc">Dip Powder</span><span class="dots"></span><span class="price">$45<span class="sample-tag">Sample</span></span></li>
+      </ul>
+      <p class="muted reveal" style="margin-top:14px;font-size:.88rem">Prices shown are samples. Call (718) 447-2200 for current pricing.</p>
+      <p class="reveal" style="margin-top:26px"><a class="google-link" href="#services" data-page="services">See the full service list</a></p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="wrap">
+      <span class="eyebrow reveal">Find Us</span>
+      <h2 class="title reveal">On Hylan Blvd, ready when you are</h2>
+      <p class="lead reveal">650 Hylan Blvd, Staten Island, NY 10305. Easy to reach, easy to park, easy to love.</p>
+      <div class="hero-cta reveal" style="margin-top:28px;margin-bottom:0">
+        <a class="btn btn-light" href="https://www.google.com/maps/search/?api=1&query=Basin+Nail+Spa+650+Hylan+Blvd+Staten+Island+NY" target="_blank" rel="noopener" style="background:var(--rose);color:#fff">Get Directions</a>
+        <a class="btn btn-outline" href="#visit" data-page="visit" style="color:var(--rose-deep);border-color:var(--rose)">Visit Page</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="section">
+    <div class="wrap">
+      <span class="eyebrow reveal">Services</span>
+      <h2 class="title reveal">Every service, done with care</h2>
+      <p class="lead reveal">Pick your treatment, then pick from walls of color. Prices below are samples to help you plan. Call (718) 447-2200 for exact pricing and same-day openings.</p>
+
+      <h3 class="group-title reveal">Manicures</h3>
+      <ul class="leaders reveal">
+        <li><span class="svc">Classic Manicure</span><span class="dots"></span><span class="price">$25<span class="sample-tag">Sample</span></span></li>
+        <li><span class="svc">Gel Manicure</span><span class="dots"></span><span class="price">$35<span class="sample-tag">Sample</span></span></li>
+        <li><span class="svc">Dip Powder Manicure</span><span class="dots"></span><span class="price">$45<span class="sample-tag">Sample</span></span></li>
+        <li><span class="svc">Acrylic Full Set</span><span class="dots"></span><span class="price">$55<span class="sample-tag">Sample</span></span></li>
+        <li><span class="svc">Acrylic Fill</span><span class="dots"></span><span class="price">$35<span class="sample-tag">Sample</span></span></li>
+        <li><span class="svc">Gel-X Extensions</span><span class="dots"></span><span class="price">$60<span class="sample-tag">Sample</span></span></li>
+      </ul>
+
+      <h3 class="group-title reveal">Pedicures</h3>
+      <ul class="leaders reveal">
+        <li><span class="svc">Classic Pedicure</span><span class="dots"></span><span class="price">$35<span class="sample-tag">Sample</span></span></li>
+        <li><span class="svc">Spa Pedicure <span class="note">with massage and scrub</span></span><span class="dots"></span><span class="price">$45<span class="sample-tag">Sample</span></span></li>
+        <li><span class="svc">Gel Pedicure</span><span class="dots"></span><span class="price">$55<span class="sample-tag">Sample</span></span></li>
+        <li><span class="svc">Deluxe Jelly Pedicure</span><span class="dots"></span><span class="price">$65<span class="sample-tag">Sample</span></span></li>
+      </ul>
+
+      <h3 class="group-title reveal">Finishing Touches</h3>
+      <ul class="leaders reveal">
+        <li><span class="svc">Nail Art <span class="note">per nail, from</span></span><span class="dots"></span><span class="price">$5<span class="sample-tag">Sample</span></span></li>
+        <li><span class="svc">French Tips</span><span class="dots"></span><span class="price">$10<span class="sample-tag">Sample</span></span></li>
+        <li><span class="svc">Gel Polish Change</span><span class="dots"></span><span class="price">$25<span class="sample-tag">Sample</span></span></li>
+        <li><span class="svc">Nail Repair <span class="note">per nail</span></span><span class="dots"></span><span class="price">$8<span class="sample-tag">Sample</span></span></li>
+        <li><span class="svc">Polish Removal</span><span class="dots"></span><span class="price">$10<span class="sample-tag">Sample</span></span></li>
+      </ul>
+
+      <div class="card tint reveal" style="margin-top:44px">
+        <h3>Not sure what you need?</h3>
+        <p class="muted">Call and describe your nails. We will match you with the right service and the right tech, and quote you before we start.</p>
+        <p style="margin-top:16px"><a class="btn btn-light" href="tel:+17184472200" style="background:var(--rose);color:#fff">Call (718) 447-2200</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-story">
+  <div class="section">
+    <div class="wrap">
+      <span class="eyebrow reveal">Our Story</span>
+      <h2 class="title reveal">A neighborhood spa on Hylan Blvd</h2>
+      <div class="asym" style="margin-top:36px">
+        <div class="cell-a reveal">
+          <p class="lead">Basin Nail Spa opened its doors on Hylan Blvd to give Staten Island a calmer place to get nails done. The idea was simple: a clean, welcoming shop where the techs take their time and the chairs feel like a break, not a chore.</p>
+          <p class="muted" style="margin-top:18px">Every appointment starts with sanitized tools and a fresh setup. Cuticles are cared for, shapes are evened, and color goes on smooth. Whether you want a natural nude for the office or chrome that catches the light, the goal is the same: nails you love when you walk out the door.</p>
+          <p class="muted" style="margin-top:18px">Walk-ins are welcome whenever there is an open chair, and regulars know a quick call to (718) 447-2200 is the fastest way to lock in a favorite time.</p>
+        </div>
+        <div class="cell-b reveal">
+          <div class="card tint" style="text-align:center">
+            <svg viewBox="0 0 200 200" aria-hidden="true" style="width:70%;height:auto;margin:0 auto 12px"><ellipse cx="100" cy="110" rx="52" ry="64" fill="#C2496B"/><ellipse cx="100" cy="118" rx="36" ry="48" fill="#E08AA0"/><rect x="86" y="28" width="28" height="22" rx="5" fill="#4A2E2B"/><rect x="95" y="12" width="10" height="20" rx="5" fill="#C99A4B"/><circle cx="140" cy="60" r="10" fill="#F7DCE3"/><circle cx="60" cy="150" r="7" fill="#F7EAD2"/></svg>
+            <h3 class="serif">Sanitized. Steady. Friendly.</h3>
+            <p class="muted">The three promises behind every set.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="section">
+    <div class="wrap">
+      <span class="eyebrow reveal">Gallery</span>
+      <h2 class="title reveal">Fresh from the chair</h2>
+      <p class="lead reveal">A peek at the looks we love. Bring a photo of your dream set, or let the techs surprise you.</p>
+      <div class="arch-grid" style="margin-top:40px">
+        <div class="arch reveal"><span class="ph-badge">Photo placeholder</span><svg viewBox="0 0 100 100" aria-hidden="true"><ellipse cx="50" cy="55" rx="30" ry="36" fill="#E08AA0"/><ellipse cx="50" cy="60" rx="19" ry="26" fill="#F7DCE3"/></svg><p class="cap">Blush Gel Set</p><p class="sub">Soft pink, high shine</p></div>
+        <div class="arch alt reveal"><span class="ph-badge">Photo placeholder</span><svg viewBox="0 0 100 100" aria-hidden="true"><ellipse cx="50" cy="55" rx="30" ry="36" fill="#9E3353"/><ellipse cx="50" cy="60" rx="19" ry="26" fill="#C2496B"/></svg><p class="cap">Deep Wine</p><p class="sub">Bold fall favorite</p></div>
+        <div class="arch alt2 reveal"><span class="ph-badge">Photo placeholder</span><svg viewBox="0 0 100 100" aria-hidden="true"><ellipse cx="50" cy="55" rx="30" ry="36" fill="#C99A4B"/><ellipse cx="50" cy="60" rx="19" ry="26" fill="#F7EAD2"/></svg><p class="cap">Golden Chrome</p><p class="sub">Mirror finish</p></div>
+        <div class="arch alt2 reveal"><span class="ph-badge">Photo placeholder</span><svg viewBox="0 0 100 100" aria-hidden="true"><ellipse cx="50" cy="55" rx="30" ry="36" fill="#8A6A64"/><ellipse cx="50" cy="60" rx="19" ry="26" fill="#FBF3EF"/><path d="M30 45 Q50 30 70 45" stroke="#C2496B" stroke-width="4" fill="none"/></svg><p class="cap">French Classic</p><p class="sub">Crisp white tips</p></div>
+        <div class="arch reveal"><span class="ph-badge">Photo placeholder</span><svg viewBox="0 0 100 100" aria-hidden="true"><ellipse cx="50" cy="55" rx="30" ry="36" fill="#C2496B"/><circle cx="42" cy="52" r="4" fill="#fff"/><circle cx="58" cy="60" r="4" fill="#fff"/><circle cx="50" cy="70" r="4" fill="#fff"/></svg><p class="cap">Floral Art</p><p class="sub">Hand-painted detail</p></div>
+        <div class="arch alt reveal"><span class="ph-badge">Photo placeholder</span><svg viewBox="0 0 100 100" aria-hidden="true"><rect x="28" y="30" width="44" height="52" rx="20" fill="#4A2E2B"/><rect x="34" y="38" width="32" height="36" rx="14" fill="#F7DCE3"/></svg><p class="cap">Spa Pedicure</p><p class="sub">Soak, scrub, massage</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="section">
+    <div class="wrap">
+      <span class="eyebrow reveal">Reviews</span>
+      <h2 class="title reveal">What neighbors say</h2>
+      <p class="lead reveal">The kind of feedback that keeps our chairs full.</p>
+      <div class="asym" style="margin-top:36px">
+        <div class="quote-card cell-a reveal">
+          <span class="badge-sample">Sample review</span>
+          <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <blockquote>My gel manicure still looks perfect two weeks later. Clean shop, friendly techs, and they never rush.</blockquote>
+          <p class="who">Sample quote written for this site. Read real reviews on Google.</p>
+        </div>
+        <div class="quote-card cell-b reveal">
+          <span class="badge-sample">Sample review</span>
+          <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <blockquote>The spa pedicure is the best hour of my month. My feet have never felt better.</blockquote>
+          <p class="who">Sample quote written for this site. Read real reviews on Google.</p>
+        </div>
+      </div>
+      <div class="card reveal" style="margin-top:30px;text-align:center">
+        <h3 class="serif" style="font-size:1.6rem;margin-bottom:10px">See what real clients are saying</h3>
+        <p class="muted">Unfiltered reviews from Google, straight from the people who sat in our chairs.</p>
+        <a class="google-link" href="https://www.google.com/maps/search/?api=1&query=Basin+Nail+Spa+650+Hylan+Blvd+Staten+Island+NY" target="_blank" rel="noopener">See reviews on Google</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="section">
+    <div class="wrap">
+      <span class="eyebrow reveal">Visit / Contact</span>
+      <h2 class="title reveal">Come sit with us</h2>
+      <div class="visit-grid" style="margin-top:36px">
+        <div class="card visit-card reveal">
+          <h3>Call or stop by</h3>
+          <p class="muted">The fastest way to book is a quick call.</p>
+          <a class="big-tel" href="tel:+17184472200">(718) 447-2200</a>
+          <p class="muted" style="margin-top:12px"><strong>Basin Nail Spa</strong><br>650 Hylan Blvd<br>Staten Island, NY 10305</p>
+          <div class="hero-cta" style="margin-top:22px;margin-bottom:0">
+            <a class="btn btn-light" href="https://www.google.com/maps/search/?api=1&query=Basin+Nail+Spa+650+Hylan+Blvd+Staten+Island+NY" target="_blank" rel="noopener" style="background:var(--rose);color:#fff">Get Directions</a>
+          </div>
+        </div>
+        <div class="card visit-card reveal">
+          <h3>Hours</h3>
+          <p class="muted" style="margin-bottom:12px">Hours can change with the season. Please call to confirm before you visit.</p>
+          <div class="hours-row"><span>Monday to Friday</span><span><a href="tel:+17184472200">Call for hours</a></span></div>
+          <div class="hours-row"><span>Saturday</span><span><a href="tel:+17184472200">Call for hours</a></span></div>
+          <div class="hours-row"><span>Sunday</span><span><a href="tel:+17184472200">Call for hours</a></span></div>
+          <div class="hours-row" style="border-bottom:0"><span>Walk-ins</span><span>Welcome</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="big">
+  <div class="wrap">
+    <div class="giant" aria-hidden="true">Basin Nail Spa</div>
+    <div class="foot-grid">
+      <div class="col">
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="#home" data-page="home">Home</a></li>
+          <li><a href="#services" data-page="services">Services</a></li>
+          <li><a href="#story" data-page="story">Our Story</a></li>
+          <li><a href="#gallery" data-page="gallery">Gallery</a></li>
+          <li><a href="#reviews" data-page="reviews">Reviews</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Visit</h4>
+        <p>650 Hylan Blvd<br>Staten Island, NY 10305</p>
+        <p><a href="tel:+17184472200">(718) 447-2200</a></p>
+      </div>
+      <div class="col">
+        <h4>Book</h4>
+        <p>Call for hours<br>and same-day openings.</p>
+        <p><a class="google-link" href="https://www.google.com/maps/search/?api=1&query=Basin+Nail+Spa+650+Hylan+Blvd+Staten+Island+NY" target="_blank" rel="noopener" style="color:#fff;border-color:#fff">Get Directions</a></p>
+      </div>
+    </div>
+    <div class="copy-line">© Basin Nail Spa</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "story", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+  var scrim = document.getElementById("drawerScrim");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(scrim){ scrim.classList.remove("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      if(scrim){ scrim.classList.toggle("show", open); }
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+
+  var drawerClose = document.getElementById("drawerClose");
+  if(drawerClose){
+    drawerClose.addEventListener("click", closeMenu);
+  }
+  if(scrim){
+    scrim.addEventListener("click", closeMenu);
+  }
+
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
