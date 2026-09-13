@@ -2139,9 +2139,11 @@ var lastSendAt = 0;
       }
       askForm.addEventListener("submit", async (e) => {
         e.preventDefault();
+        const DBG = /[?&]dbg=1/.test(location.search);
         const fd = new FormData(askForm);
         const kind = String(fd.get("kind") || "text");
         const payload = { body: fd.get("body"), kind };
+        if (DBG) alert("DBG submit fired kind=" + kind + " bodylen=" + String(payload.body||"").length);
         try {
           if (kind === "poll") {
             const options = fd.getAll("opt")
@@ -2158,7 +2160,9 @@ var lastSendAt = 0;
             const uploaded = await api("/api/upload", { method: "POST", body: up });
             payload.image_key = uploaded.key;
           }
+          if (DBG) alert("DBG calling api");
           await api("/api/questions", { method: "POST", body: JSON.stringify(payload) });
+          if (DBG) alert("DBG api ok");
           showToast("saved");
           renderQa();
         } catch (err) {
