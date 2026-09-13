@@ -1308,7 +1308,10 @@ async function ghApi(path, opts){
       var mv = pvotes.find(function(v){ return v.question_id === qq.id && v.voter_key === vkey; });
       var qans = ans.filter(function(a){ return a.question_id === qq.id; })
         .sort(function(a,b){ return a.created_at - b.created_at; })
-        .map(function(a){ return {id: a.id, body: a.body}; });
+        .map(function(a){
+          var mine = (meQ && a.author_id === meQ.id) || (a.guest_key && a.guest_key === guestKey());
+          return {id: a.id, body: a.body, mine: !!mine, parent_id: a.parent_id || null};
+        });
       out.push({
         id: qq.id, kind: qq.kind || 'text', body: qq.body,
         image_url: qq.image_key ? await resolveImageUrl(qq.image_key) : null,
@@ -1362,14 +1365,46 @@ async function ghApi(path, opts){
     if(!abody) throw bad('write something first');
     if(abody.length > 1000) throw bad('keep it under 1000 characters');
     var qidA = ansM[1];
+    var parentIdA = String((json||{}).parent_id || '') || null;
     var qsA = (await ghGetJson('questions.json', true) || {data: []}).data;
     var qa = qsA.find(function(x){ return x.id === qidA; });
     if(!qa) throw bad('question gone', 404);
+    var gkA = meA ? '' : guestKey();
     await mutateJson('answers.json', function(an){
-      an.push({id: newId(), question_id: qidA, author_id: meA ? meA.id : null, guest_name: '', body: abody, created_at: nowS()});
+      if(!parentIdA){
+        // one top-level answer per person per question — edit it instead of posting again
+        var dup = an.some(function(x){
+          return x.question_id === qidA && !x.parent_id &&
+            (meA ? x.author_id === meA.id : (x.guest_key && x.guest_key === gkA));
+        });
+        if(dup) throw bad('you already answered this — edit your answer instead', 409);
+      }else{
+        var parent = an.find(function(x){ return x.id === parentIdA && x.question_id === qidA; });
+        if(!parent) throw bad('that answer is gone', 404);
+        if(parent.parent_id) throw bad('replies go one level deep', 400);
+      }
+      an.push({id: newId(), question_id: qidA, parent_id: parentIdA, author_id: meA ? meA.id : null, guest_key: gkA, guest_name: '', body: abody, created_at: nowS()});
     }, 'eez: answer');
     if(qa.author_id) feedPush(qa.author_id, 'answer', 'someone answered your question', qidA);
     if(meA) await touchSeen(meA);
+    return {};
+  }
+  var ansEditM = /^\/api\/answers\/([^/]+)$/.exec(p);
+  if(ansEditM && method === 'PATCH'){
+    var sessE = loadSession();
+    var meE = sessE ? await findUserById(sessE.uid) : null;
+    var ebody = String((json||{}).body || '').trim();
+    if(!ebody) throw bad('write something first');
+    if(ebody.length > 1000) throw bad('keep it under 1000 characters');
+    var aidE = ansEditM[1];
+    await mutateJson('answers.json', function(an){
+      var tgt = an.find(function(x){ return x.id === aidE; });
+      if(!tgt) throw bad('answer gone', 404);
+      var own = meE ? (tgt.author_id === meE.id) : (tgt.guest_key && tgt.guest_key === guestKey());
+      if(!own) throw bad('not yours', 403);
+      tgt.body = ebody;
+    }, 'eez: edit answer');
+    if(meE) await touchSeen(meE);
     return {};
   }
 
@@ -2230,11 +2265,41 @@ var lastSendAt = 0;
             ? `<div class="q-media"><img src="${escapeHtml(q.image_url)}" alt="" loading="lazy" /></div>`
             : "";
         const poll = (q.kind === "poll" || (q.options && q.options.length)) ? pollHtml(q) : "";
-        const answers = (q.answers || [])
-          .map((a) => `<div class="q-answer">${escapeHtml(a.body)}</div>`)
+        const allAns = q.answers || [];
+        const tops = allAns.filter((a) => !a.parent_id);
+        const repliesBy = {};
+        allAns.filter((a) => a.parent_id).forEach((r) => {
+          (repliesBy[r.parent_id] = repliesBy[r.parent_id] || []).push(r);
+        });
+        const myTop = tops.find((a) => a.mine);
+        const ansActions = (a, isReply) => {
+          const edit = a.mine
+            ? `<button type="button" class="linklike" data-ans-edit="${escapeHtml(a.id)}">edit</button>`
+            : "";
+          const rep = !isReply
+            ? `<button type="button" class="linklike" data-ans-reply="${escapeHtml(a.id)}">reply</button>`
+            : "";
+          return edit || rep ? `<div class="ans-actions">${edit}${rep}</div>` : "";
+        };
+        const answers = tops
+          .map((a) => {
+            const reps = (repliesBy[a.id] || [])
+              .map(
+                (r) => `<div class="q-answer q-reply" data-answer="${escapeHtml(r.id)}">
+              <div class="q-answer-body">${escapeHtml(r.body)}</div>
+              ${ansActions(r, true)}
+            </div>`,
+              )
+              .join("");
+            return `<div class="q-answer" data-answer="${escapeHtml(a.id)}">
+              <div class="q-answer-body">${escapeHtml(a.body)}</div>
+              ${ansActions(a, false)}
+              ${reps ? `<div class="q-replies">${reps}</div>` : ""}
+            </div>`;
+          })
           .join("");
         const reply =
-          q.kind === "poll"
+          q.kind === "poll" || myTop
             ? ""
             : `<form class="reply-row ans-form" data-qid="${escapeHtml(q.id)}">
             <label class="sr-only" for="ans-${escapeHtml(q.id)}">answer</label>
@@ -2245,7 +2310,7 @@ var lastSendAt = 0;
           q.kind === "poll"
             ? ""
             : `<div class="q-answers">${answers || `<p class="q-empty">no answers yet</p>`}</div>`;
-        return `<article class="q-card">
+        return `<article class="q-card" data-qid="${escapeHtml(q.id)}">
           <div class="q-meta">${kindLabel}</div>
           <div class="q-body">${escapeHtml(q.body)}</div>
           ${media}
@@ -2395,6 +2460,78 @@ var lastSendAt = 0;
         } catch (err) {
           alert(err.message);
         }
+      });
+    });
+
+    // edit my own answer inline
+    app.querySelectorAll("[data-ans-edit]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const box = btn.closest("[data-answer]");
+        const bodyEl = box ? box.querySelector(":scope > .q-answer-body") : null;
+        const actionsEl = btn.closest(".ans-actions");
+        if (!box || !bodyEl || box.querySelector(".ans-edit-form")) return;
+        const form = document.createElement("form");
+        form.className = "ans-edit-form";
+        form.innerHTML = `<textarea required maxlength="1000" rows="3"></textarea>
+          <div class="row-btns"><button class="btn sm primary" type="submit">save</button>
+          <button class="btn sm ghost" type="button" data-cancel>cancel</button></div>`;
+        form.querySelector("textarea").value = bodyEl.textContent;
+        bodyEl.hidden = true;
+        if (actionsEl) actionsEl.hidden = true;
+        box.insertBefore(form, bodyEl);
+        form.querySelector("[data-cancel]").addEventListener("click", () => {
+          form.remove();
+          bodyEl.hidden = false;
+          if (actionsEl) actionsEl.hidden = false;
+        });
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          try {
+            await api(`/api/answers/${btn.getAttribute("data-ans-edit")}`, {
+              method: "PATCH",
+              body: JSON.stringify({ body: form.querySelector("textarea").value }),
+            });
+            showToast("saved");
+            renderQa();
+          } catch (err) {
+            alert(err.message);
+          }
+        });
+      });
+    });
+
+    // reply to someone's answer (one level deep)
+    app.querySelectorAll("[data-ans-reply]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const box = btn.closest("[data-answer]");
+        if (!box) return;
+        const existing = box.querySelector(":scope > .ans-reply-form");
+        if (existing) {
+          existing.remove();
+          return;
+        }
+        const card = btn.closest(".q-card");
+        const qid = card ? card.getAttribute("data-qid") : "";
+        const aid = btn.getAttribute("data-ans-reply");
+        const form = document.createElement("form");
+        form.className = "ans-reply-form";
+        form.innerHTML = `<textarea required maxlength="1000" rows="2" placeholder="reply…"></textarea>
+          <div class="row-btns"><button class="btn sm primary" type="submit">reply</button></div>`;
+        box.appendChild(form);
+        form.querySelector("textarea").focus();
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          try {
+            await api(`/api/questions/${qid}/answers`, {
+              method: "POST",
+              body: JSON.stringify({ body: form.querySelector("textarea").value, parent_id: aid }),
+            });
+            showToast("saved");
+            renderQa();
+          } catch (err) {
+            alert(err.message);
+          }
+        });
       });
     });
   }
