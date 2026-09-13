@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roberto Electric Co · Electrician in Shelton, CT</title>
+<meta name="description" content="Roberto Electric Co, an electrician serving Shelton, CT. Residential and commercial electrical services with free estimates. Call (203) 944-9126.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0d1626; --ink-2:#16233a; --paper:#f7f5ef; --paper-2:#efe9db;
+  --volt:#ffc526; --volt-deep:#e0a100; --steel:#8b99ae; --white:#ffffff;
+  --radius:14px;
+  --shadow:0 20px 44px -18px rgba(13,22,38,.35);
+  --shadow-sm:0 10px 24px -12px rgba(13,22,38,.3);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Archivo",system-ui,sans-serif;
+  background:var(--paper);color:var(--ink);line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:#0a4fa8}
+::selection{background:var(--volt);color:var(--ink)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+.mono{font-family:"Space Mono",monospace}
+
+/* ---------- side drawer nav ---------- */
+.topbar{
+  position:sticky;top:0;z-index:60;background:var(--ink);color:var(--paper);
+  border-bottom:3px solid var(--volt);
+}
+.topbar .wrap{display:flex;align-items:center;gap:18px;padding:12px 28px}
+.menu-btn{
+  background:var(--volt);border:0;border-radius:10px;cursor:pointer;
+  width:46px;height:46px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;flex:none;
+}
+.menu-btn span{display:block;width:24px;height:3px;border-radius:2px;background:var(--ink);transition:.25s}
+.brandline{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--paper)}
+.brandline svg{width:42px;height:42px;flex:none}
+.brandline .bt{font-weight:800;letter-spacing:.4px;line-height:1.1;font-size:1.12rem}
+.brandline .bt small{display:block;font-family:"Space Mono",monospace;font-weight:400;font-size:.66rem;letter-spacing:3px;color:var(--volt);text-transform:uppercase}
+.top-call{
+  margin-left:auto;display:inline-flex;align-items:center;gap:10px;
+  background:var(--volt);color:var(--ink);text-decoration:none;font-weight:800;
+  padding:11px 22px;border-radius:999px;white-space:nowrap;transition:transform .18s;
+}
+.top-call:hover{transform:translateY(-2px)}
+.drawer-scrim{
+  position:fixed;inset:0;background:rgba(13,22,38,.55);z-index:70;
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.drawer-scrim.show{opacity:1;pointer-events:auto}
+.drawer{
+  position:fixed;top:0;left:0;bottom:0;width:min(360px,88vw);z-index:71;
+  background:var(--ink);color:var(--paper);transform:translateX(-105%);transition:transform .34s cubic-bezier(.22,.8,.3,1);
+  display:flex;flex-direction:column;padding:28px 26px;overflow-y:auto;
+}
+.drawer.open{transform:none}
+.drawer .d-brand{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.drawer .d-brand svg{width:48px;height:48px}
+.drawer .d-brand .bt{font-weight:800;font-size:1.2rem;line-height:1.1}
+.drawer .d-brand .bt small{display:block;font-family:"Space Mono",monospace;font-size:.64rem;letter-spacing:3px;color:var(--volt);font-weight:400}
+.drawer .d-close{align-self:flex-end;background:none;border:1px solid var(--steel);color:var(--paper);border-radius:8px;padding:6px 14px;cursor:pointer;font-family:"Space Mono",monospace;font-size:.8rem;margin-bottom:16px}
+.drawer nav{display:flex;flex-direction:column;gap:4px;margin:8px 0 24px}
+.drawer nav a{
+  text-decoration:none;color:var(--paper);font-weight:700;font-size:1.35rem;
+  padding:12px 14px;border-radius:10px;display:flex;align-items:center;gap:14px;
+}
+.drawer nav a .num{font-family:"Space Mono",monospace;font-size:.75rem;color:var(--volt);font-weight:400}
+.drawer nav a:hover{background:var(--ink-2)}
+.drawer nav a.active{background:var(--volt);color:var(--ink)}
+.drawer nav a.active .num{color:var(--ink)}
+.drawer .d-foot{margin-top:auto;border-top:1px solid rgba(139,153,174,.35);padding-top:18px;font-size:.9rem;color:var(--steel)}
+.drawer .d-foot a{color:var(--volt);text-decoration:none;font-weight:700;font-size:1.05rem}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- editorial hero ---------- */
+.hero{background:var(--ink);color:var(--paper);position:relative;overflow:hidden}
+.hero::before{
+  content:"";position:absolute;inset:0;
+  background-image:repeating-linear-gradient(135deg, rgba(255,197,38,.06) 0 2px, transparent 2px 26px);
+  pointer-events:none;
+}
+.hero .wrap{position:relative;padding:84px 28px 76px}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:10px;font-family:"Space Mono",monospace;
+  font-size:.78rem;letter-spacing:3px;text-transform:uppercase;color:var(--volt);
+  border:1px solid rgba(255,197,38,.5);border-radius:999px;padding:8px 18px;margin-bottom:28px;
+}
+.ed-head{
+  font-weight:900;line-height:.98;letter-spacing:-1px;
+  font-size:clamp(3rem,8.5vw,6.8rem);margin-bottom:26px;font-stretch:125%;
+}
+.ed-head .volt{color:var(--volt)}
+.ed-head .outline{color:transparent;-webkit-text-stroke:2px var(--paper)}
+.ed-sub{max-width:38rem;color:#c8d2e0;font-size:1.14rem;margin-bottom:34px}
+.ed-meta{display:flex;flex-wrap:wrap;gap:12px 28px;font-family:"Space Mono",monospace;font-size:.82rem;color:var(--steel)}
+.ed-meta b{color:var(--paper)}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-top:30px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:800;
+  padding:15px 28px;border-radius:10px;font-size:1rem;transition:transform .18s;
+}
+.btn-solid{background:var(--volt);color:var(--ink)}
+.btn-solid:hover{transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:var(--paper);border:2px solid var(--steel)}
+.btn-ghost:hover{border-color:var(--volt);color:var(--volt);transform:translateY(-2px)}
+.bolt-strip{background:var(--volt);overflow:hidden;padding:12px 0}
+.bolt-track{display:flex;width:max-content;animation:scroll 26s linear infinite}
+.bolt-track span{font-family:"Space Mono",monospace;font-weight:700;font-size:.95rem;color:var(--ink);padding:0 30px;white-space:nowrap;text-transform:uppercase;letter-spacing:2px}
+@keyframes scroll{to{transform:translateX(-50%)}}
+
+/* ---------- card wall rhythm ---------- */
+.block{padding:72px 0}
+.sec-kick{font-family:"Space Mono",monospace;font-size:.78rem;letter-spacing:3px;text-transform:uppercase;color:#0a4fa8;margin-bottom:12px}
+h2.sec{font-size:clamp(2rem,4.4vw,3rem);font-weight:900;letter-spacing:-.5px;line-height:1.05;margin-bottom:14px;font-stretch:110%}
+.sec-sub{color:#4a5a72;max-width:40rem;margin-bottom:38px;font-size:1.08rem}
+.cardwall{display:grid;grid-template-columns:repeat(12,1fr);gap:20px}
+.wcard{
+  background:var(--white);border-radius:var(--radius);padding:32px 28px;box-shadow:var(--shadow-sm);
+  border:1px solid rgba(13,22,38,.08);position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;
+}
+.wcard:hover{transform:translateY(-5px);box-shadow:var(--shadow)}
+.wcard .idx{font-family:"Space Mono",monospace;font-size:.72rem;letter-spacing:2px;color:var(--volt-deep);margin-bottom:12px;display:block}
+.wcard h3{font-size:1.32rem;font-weight:800;margin-bottom:10px}
+.wcard p{color:#4a5a72;font-size:.98rem}
+.wcard .tick{width:52px;height:52px;border-radius:14px;background:var(--ink);display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+.wcard .tick svg{width:28px;height:28px}
+.wcard.span7{grid-column:span 7}.wcard.span5{grid-column:span 5}
+.wcard.span4{grid-column:span 4}.wcard.span6{grid-column:span 6}.wcard.span8{grid-column:span 8}
+.wcard.span12{grid-column:span 12}
+.wcard.dark{background:var(--ink);color:var(--paper);border:0}
+.wcard.dark p{color:#c8d2e0}
+.wcard.dark h3{color:var(--volt)}
+.stat-row{display:flex;gap:36px;flex-wrap:wrap;margin-top:18px}
+.stat b{font-size:2rem;font-weight:900;display:block;color:var(--volt)}
+.stat span{font-family:"Space Mono",monospace;font-size:.74rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--steel)}
+
+/* ---------- price table ---------- */
+.ptable{border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);background:var(--white)}
+.ptable table{width:100%;border-collapse:collapse}
+.ptable th{background:var(--ink);color:var(--paper);text-align:left;padding:16px 22px;font-family:"Space Mono",monospace;font-size:.76rem;letter-spacing:2px;text-transform:uppercase}
+.ptable th:last-child,.ptable td:last-child{text-align:right}
+.ptable td{padding:18px 22px;border-bottom:1px solid rgba(13,22,38,.1);vertical-align:top}
+.ptable tr:last-child td{border-bottom:0}
+.ptable td.svc{font-weight:800;font-size:1.05rem}
+.ptable td.svc small{display:block;font-weight:400;color:#4a5a72;font-size:.88rem;margin-top:4px}
+.ptable td.prc{font-family:"Space Mono",monospace;font-weight:700;color:#0a4fa8;white-space:nowrap}
+.badge{display:inline-block;background:var(--volt);color:var(--ink);font-family:"Space Mono",monospace;font-size:.66rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:999px;margin-left:10px;vertical-align:2px}
+.note{margin-top:22px;background:var(--paper-2);border:2px dashed rgba(13,22,38,.3);border-radius:var(--radius);padding:20px 24px;color:#3c4a61;font-size:.96rem}
+
+/* ---------- carousel gallery ---------- */
+.car{position:relative;border-radius:var(--radius);overflow:hidden;background:var(--ink);box-shadow:var(--shadow)}
+.car-track{display:flex;transition:transform .45s cubic-bezier(.22,.8,.3,1)}
+.slide{min-width:100%;display:grid;grid-template-columns:1.1fr .9fr;align-items:center}
+.slide .sart{min-height:380px;display:flex;align-items:center;justify-content:center;position:relative}
+.slide .sart svg{width:46%;max-width:230px;height:auto;filter:drop-shadow(0 16px 20px rgba(0,0,0,.3))}
+.slide .scap{padding:44px 44px 44px 8px;color:var(--paper)}
+.slide .scap .idx{font-family:"Space Mono",monospace;font-size:.72rem;letter-spacing:2px;color:var(--volt);margin-bottom:10px;display:block}
+.slide .scap h3{font-size:1.7rem;font-weight:800;margin-bottom:10px}
+.slide .scap p{color:#c8d2e0}
+.ph{position:absolute;top:18px;left:18px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.35);color:#fff;font-family:"Space Mono",monospace;font-size:.66rem;letter-spacing:1.5px;text-transform:uppercase;padding:6px 14px;border-radius:999px}
+.car-btns{position:absolute;bottom:20px;right:24px;display:flex;gap:10px;z-index:3}
+.car-btns button{
+  width:52px;height:52px;border-radius:50%;border:0;cursor:pointer;
+  background:var(--volt);color:var(--ink);font-size:1.3rem;font-weight:800;transition:transform .18s;
+}
+.car-btns button:hover{transform:scale(1.08)}
+.car-dots{position:absolute;bottom:36px;left:28px;display:flex;gap:8px;z-index:3}
+.car-dots button{width:12px;height:12px;border-radius:50%;border:0;background:rgba(255,255,255,.3);cursor:pointer;padding:0}
+.car-dots button.on{background:var(--volt)}
+
+/* ---------- reviews ---------- */
+.revwall{display:grid;grid-template-columns:repeat(12,1fr);gap:20px}
+.rev{background:var(--white);border-radius:var(--radius);padding:30px 28px;box-shadow:var(--shadow-sm);grid-column:span 6;border:1px solid rgba(13,22,38,.08)}
+.rev .stars{color:var(--volt-deep);font-size:1.2rem;letter-spacing:4px;margin-bottom:12px}
+.rev p{font-size:1.02rem;margin-bottom:12px}
+.rev cite{font-style:normal;font-family:"Space Mono",monospace;font-size:.78rem;color:#4a5a72;letter-spacing:1px}
+.rs-strip{background:var(--ink);color:var(--paper);border-radius:var(--radius);padding:30px;text-align:center;margin:0 0 30px;box-shadow:var(--shadow-sm)}
+.rs-strip p{color:#c8d2e0;margin-bottom:18px;font-size:.96rem}
+.rs-links{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.rs-btn{display:inline-block;background:var(--volt);color:var(--ink);padding:12px 28px;border-radius:999px;font-weight:800;text-decoration:none;transition:transform .18s}
+.rs-btn:hover{transform:translateY(-2px)}
+.rs-btn.alt{background:transparent;color:var(--volt);border:2px solid var(--volt)}
+
+/* ---------- contact ---------- */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.cinfo{background:var(--ink);color:var(--paper);border-radius:var(--radius);padding:38px 34px;box-shadow:var(--shadow)}
+.cinfo h3{font-size:1.4rem;font-weight:800;margin-bottom:6px;color:var(--volt)}
+.cinfo .big{display:block;font-size:1.7rem;font-weight:800;color:var(--paper);text-decoration:none;margin:8px 0 18px}
+.cinfo .big:hover{color:var(--volt)}
+.cinfo p{color:#c8d2e0;margin-bottom:10px}
+.cinfo a.addr{color:#c8d2e0;text-decoration:none}
+.cinfo a.addr:hover{color:var(--volt)}
+.csteps{background:var(--white);border-radius:var(--radius);padding:38px 34px;box-shadow:var(--shadow-sm);border:1px solid rgba(13,22,38,.08)}
+.csteps ol{list-style:none;counter-reset:st;display:grid;gap:18px;margin-top:6px}
+.csteps li{counter-increment:st;display:flex;gap:16px;align-items:flex-start}
+.csteps li::before{content:counter(st,decimal-leading-zero);font-family:"Space Mono",monospace;font-weight:700;color:var(--volt-deep);font-size:1rem;background:var(--ink);color:var(--volt);width:46px;height:46px;flex:none;display:flex;align-items:center;justify-content:center;border-radius:12px}
+.csteps strong{display:block;font-size:1.06rem}
+.csteps small{color:#4a5a72}
+
+/* ---------- multi-column footer ---------- */
+footer{background:var(--ink);color:var(--steel);margin-top:0}
+.foot-cols{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:36px;padding:60px 0 36px}
+.foot-cols h4{color:var(--paper);font-size:1rem;font-weight:800;margin-bottom:14px;letter-spacing:.5px}
+.foot-cols p,.foot-cols a{color:var(--steel);font-size:.93rem;text-decoration:none}
+.foot-cols a:hover{color:var(--volt)}
+.foot-brand{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.foot-brand svg{width:44px;height:44px}
+.foot-brand .bt{color:var(--paper);font-weight:800;font-size:1.15rem;line-height:1.1}
+.foot-brand .bt small{display:block;font-family:"Space Mono",monospace;font-size:.62rem;letter-spacing:3px;color:var(--volt);font-weight:400}
+.foot-cols ul{list-style:none;display:grid;gap:8px}
+.foot-legal{border-top:1px solid rgba(139,153,174,.25);padding:22px 0 28px;text-align:center;font-size:.86rem}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+/* page strip */
+.strip{border-radius:var(--radius);padding:52px 46px;color:var(--paper);position:relative;overflow:hidden;margin-bottom:44px;box-shadow:var(--shadow)}
+.strip::before{content:"";position:absolute;inset:0;background-image:repeating-linear-gradient(135deg, rgba(255,255,255,.07) 0 2px, transparent 2px 24px)}
+.strip h2{font-size:clamp(2rem,4.4vw,3.1rem);font-weight:900;letter-spacing:-.5px;position:relative;margin-bottom:10px;font-stretch:112%}
+.strip p{color:#d8e0ec;max-width:38rem;position:relative}
+.strip .kick{font-family:"Space Mono",monospace;font-size:.76rem;letter-spacing:3px;text-transform:uppercase;color:var(--volt);position:relative;display:block;margin-bottom:10px}
+.strip.s-serv{background:linear-gradient(120deg,#101d33,#24385c)}
+.strip.s-about{background:linear-gradient(120deg,#3a2c05,#8a6a00)}
+.strip.s-gal{background:linear-gradient(120deg,#062a4e,#0a4fa8)}
+.strip.s-rev{background:linear-gradient(120deg,#101d33,#31435f)}
+.strip.s-contact{background:linear-gradient(120deg,#4d3400,#a67c00)}
+
+@media(max-width:960px){
+  .cardwall .wcard{grid-column:span 12 !important}
+  .slide{grid-template-columns:1fr}
+  .slide .sart{min-height:280px}
+  .slide .scap{padding:8px 34px 90px}
+  .rev{grid-column:span 12}
+  .contact-grid{grid-template-columns:1fr}
+  .foot-cols{grid-template-columns:1fr 1fr}
+  .top-call{display:none}
+}
+@media(max-width:600px){
+  .foot-cols{grid-template-columns:1fr}
+  .ed-head{font-size:clamp(2.6rem,11vw,3.6rem)}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <button class="menu-btn" id="menuBtn" aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button>
+    <a class="brandline" href="#home" data-page="home" aria-label="Roberto Electric Co, home">
+      <svg viewBox="0 0 48 48" role="img" aria-label="Lightning bolt logo"><rect x="4" y="4" width="40" height="40" rx="10" fill="#ffc526"/><path d="M27 8 L15 27 h9 L20 40 L34 20 h-10 Z" fill="#0d1626"/></svg>
+      <span class="bt">Roberto Electric Co<small>Shelton, CT</small></span>
+    </a>
+    <a class="top-call" href="tel:+12039449126">Call (203) 944-9126</a>
+  </div>
+</div>
+
+<div class="drawer-scrim" id="drawerScrim"></div>
+<aside class="drawer" id="drawer" aria-label="Site navigation">
+  <button class="d-close" id="drawerClose">Close X</button>
+  <div class="d-brand">
+    <svg viewBox="0 0 48 48" role="img" aria-label="Lightning bolt logo"><rect x="4" y="4" width="40" height="40" rx="10" fill="#ffc526"/><path d="M27 8 L15 27 h9 L20 40 L34 20 h-10 Z" fill="#0d1626"/></svg>
+    <span class="bt">Roberto Electric Co<small>Shelton, CT</small></span>
+  </div>
+  <nav id="drawerNav">
+    <a href="#home" data-page="home" class="active"><span class="num">01</span> Home</a>
+    <a href="#services" data-page="services"><span class="num">02</span> Services</a>
+    <a href="#about" data-page="about"><span class="num">03</span> About</a>
+    <a href="#gallery" data-page="gallery"><span class="num">04</span> Work</a>
+    <a href="#reviews" data-page="reviews"><span class="num">05</span> Reviews</a>
+    <a href="#contact" data-page="contact"><span class="num">06</span> Contact</a>
+  </nav>
+  <div class="d-foot">
+    Prefer to talk? Call us.<br>
+    <a href="tel:+12039449126">(203) 944-9126</a><br><br>
+    30 Hamilton Dr, Shelton, CT 06484
+  </div>
+</aside>
+
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="wrap">
+      <span class="eyebrow">Shelton, CT · Electrician</span>
+      <h1 class="ed-head">POWER,<br><span class="volt">DONE RIGHT</span><br><span class="outline">THE FIRST TIME.</span></h1>
+      <p class="ed-sub">Roberto Electric Co has served Shelton homes and businesses for 37 years, per local listings. Residential and commercial electrical work, free estimates, and a 5-star customer record.</p>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="tel:+12039449126">Call (203) 944-9126</a>
+        <a class="btn btn-ghost" href="#services" data-page="services">See Services</a>
+      </div>
+      <div class="ed-meta" style="margin-top:34px">
+        <span><b>5.0</b> customer rating</span>
+        <span><b>37</b> years in the trade</span>
+        <span><b>Free</b> estimates</span>
+        <span>Hours: call for current hours</span>
+      </div>
+    </div>
+  </div>
+  <div class="bolt-strip" aria-hidden="true">
+    <div class="bolt-track" id="boltTrack">
+      <span>Residential Wiring</span><span>Panel Upgrades</span><span>Lighting</span><span>Troubleshooting</span><span>Commercial Work</span><span>Safety Checks</span><span>Free Estimates</span>
+    </div>
+  </div>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="sec-kick reveal">Why Roberto Electric Co</div>
+      <h2 class="sec reveal">One crew. Decades of know-how.<br>Zero guesswork.</h2>
+      <p class="sec-sub reveal">Electrical problems do not wait, and neither should you. Here is what working with a long-running local electrician gets you.</p>
+      <div class="cardwall">
+        <div class="wcard span7 dark reveal">
+          <span class="idx">01 / EXPERIENCE</span>
+          <h3>37 years serving Shelton</h3>
+          <p>Local business listings credit Roberto Electric Co with 37 years in the electrical trade. That is decades of panels, fixtures, and fixes across Shelton homes and businesses, done by people who know the local housing stock.</p>
+          <div class="stat-row">
+            <div class="stat"><b>37</b><span>Years listed</span></div>
+            <div class="stat"><b>5.0</b><span>Rating</span></div>
+            <div class="stat"><b>Free</b><span>Estimates</span></div>
+          </div>
+        </div>
+        <div class="wcard span5 reveal">
+          <div class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="#ffc526" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg></div>
+          <span class="idx">02 / RESPONSE</span>
+          <h3>Straight talk, fast answers</h3>
+          <p>Call and describe the problem. You get a plain-English plan and a free estimate, not a sales pitch.</p>
+        </div>
+        <div class="wcard span4 reveal">
+          <div class="tick"><svg viewBox="0 0 24 48" viewBox="0 0 24 24" fill="none" stroke="#ffc526" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h7l-1 8 11-14h-7l1-6z"/></svg></div>
+          <span class="idx">03 / RANGE</span>
+          <h3>Home and business</h3>
+          <p>Residential repairs and commercial electrical work, from a dead outlet to a full panel upgrade.</p>
+        </div>
+        <div class="wcard span4 reveal">
+          <div class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="#ffc526" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <span class="idx">04 / SAFETY</span>
+          <h3>Safety-first work</h3>
+          <p>Electrical work is not a DIY project. Get it wired to code by someone who has done it thousands of times.</p>
+        </div>
+        <div class="wcard span4 reveal">
+          <div class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="#ffc526" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <span class="idx">05 / VALUE</span>
+          <h3>Fair, upfront pricing</h3>
+          <p>Free estimates and sample pricing right on this site, so there are no surprises on the invoice.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-kick reveal">What customers say</div>
+      <h2 class="sec reveal">5 stars, and the word<br>that keeps coming up: experienced</h2>
+      <p class="sec-sub reveal">Based on 2 Birdeye reviews. Read the real feedback below.</p>
+      <div class="revwall">
+        <div class="rev reveal">
+          <div class="stars">★★★★★</div>
+          <p>"Wonderful an experienced."</p>
+          <cite>BEVERLY C. · VIA BIRDEYE</cite>
+        </div>
+        <div class="rev reveal">
+          <div class="stars">★★★★★</div>
+          <p>Sample review: a happy customer praising quick, clean, professional electrical work. The owner can replace this with a real quote once more reviews come in.</p>
+          <cite>SAMPLE · PENDING REAL REVIEWS</cite>
+        </div>
+      </div>
+      <div style="margin-top:26px" class="reveal">
+        <a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJmSvGvwYK6IkR02aFFa486fM" target="_blank" rel="noopener" style="display:inline-block;background:var(--ink);color:var(--volt);padding:13px 30px;border-radius:999px;font-weight:800;text-decoration:none">See reviews on Google →</a>
+      </div>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-serv">
+      <span class="kick">Services</span>
+      <h2>Electrical work, top to bottom</h2>
+      <p>Residential and commercial electrical services for Shelton and the surrounding area. Free estimates on every job. Call (203) 944-9126 to describe your project.</p>
+    </div>
+
+    <div class="ptable reveal">
+      <table>
+        <tr><th>Service</th><th>Typical range</th></tr>
+        <tr><td class="svc">Electrical panel upgrade<small>Replace an outdated or overloaded panel, add capacity for new circuits.</small></td><td class="prc">call for quote</td></tr>
+        <tr><td class="svc">Outlet and switch repair or install<span class="badge">Common</span><small>Dead outlets, loose switches, GFCI protection where it belongs.</small></td><td class="prc">$120 - $280 <small style="font-weight:400;color:#8b99ae">sample</small></td></tr>
+        <tr><td class="svc">Ceiling fan and light fixture install<span class="badge">Common</span><small>Swap dated fixtures, hang fans, brighten any room.</small></td><td class="prc">$150 - $350 <small style="font-weight:400;color:#8b99ae">sample</small></td></tr>
+        <tr><td class="svc">Troubleshooting and diagnostics<small>Breakers tripping, flickering lights, mystery outages, traced to the source.</small></td><td class="prc">$95 - $200 <small style="font-weight:400;color:#8b99ae">sample</small></td></tr>
+        <tr><td class="svc">Whole-home safety inspection<small>A careful look at panel, wiring, and devices, with a written findings list.</small></td><td class="prc">$150 - $300 <small style="font-weight:400;color:#8b99ae">sample</small></td></tr>
+        <tr><td class="svc">Commercial electrical work<small>Office, retail, and small-business wiring, lighting, and repairs.</small></td><td class="prc">call for quote</td></tr>
+      </table>
+    </div>
+    <div class="note reveal">
+      <strong>Sample pricing:</strong> the ranges above are samples to help you plan, not firm quotes. Every job is different, which is why estimates are free. Call <a href="tel:+12039449126"><strong>(203) 944-9126</strong></a> and describe the work for an exact number.
+    </div>
+
+    <div class="cardwall" style="margin-top:40px">
+      <div class="wcard span6 reveal">
+        <span class="idx">RESIDENTIAL</span>
+        <h3>For your home</h3>
+        <p>Outlets, switches, lighting, fans, panel upgrades, and troubleshooting. If it runs on electricity and lives in your house, it is our kind of job.</p>
+      </div>
+      <div class="wcard span6 reveal">
+        <span class="idx">COMMERCIAL</span>
+        <h3>For your business</h3>
+        <p>Lighting, wiring, and electrical repairs for offices, shops, and commercial spaces around Shelton. Call to discuss your space and schedule.</p>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-about">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-about">
+      <span class="kick">About</span>
+      <h2>A Shelton electrician with<br>decades under the belt</h2>
+      <p>Roberto Electric Co is an electrical contractor based at 30 Hamilton Dr in Shelton, CT, serving local homes and businesses.</p>
+    </div>
+
+    <div class="cardwall">
+      <div class="wcard span8 reveal">
+        <span class="idx">THE SHORT VERSION</span>
+        <h3>Local, experienced, and easy to reach</h3>
+        <p>Local listings credit Roberto Electric Co with 37 years of experience in the electrical trade, and the business offers free estimates on residential and commercial work. Customers rate the company 5 stars. It is the kind of shop where the person who answers the phone knows the work, because they have been doing it for decades.</p>
+        <p style="margin-top:12px">No call centers, no runaround. Call <a href="tel:+12039449126"><strong>(203) 944-9126</strong></a>, describe the problem, and get a straight answer.</p>
+      </div>
+      <div class="wcard span4 dark reveal">
+        <span class="idx">AT A GLANCE</span>
+        <h3>Quick facts</h3>
+        <div class="stat-row">
+          <div class="stat"><b>37</b><span>Years listed</span></div>
+          <div class="stat"><b>5.0</b><span>Rating</span></div>
+        </div>
+        <p style="margin-top:16px">Residential and commercial electrical services. Free estimates. Based in Shelton, CT.</p>
+      </div>
+      <div class="wcard span12 reveal">
+        <span class="idx">HOW A JOB GOES</span>
+        <h3>Simple, from first call to final switch</h3>
+        <p>1. You call <a href="tel:+12039449126"><strong>(203) 944-9126</strong></a> and describe the work. 2. You get a free estimate. 3. The work gets done cleanly and to code. 4. You flip the switch and it just works. That is the whole process.</p>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-gal">
+      <span class="kick">Work</span>
+      <h2>A look at the trade</h2>
+      <p>Artistic previews of typical electrical work. The owner can swap in real job photos anytime.</p>
+    </div>
+
+    <div class="car reveal">
+      <div class="car-track" id="carTrack">
+        <div class="slide">
+          <div class="sart" style="background:linear-gradient(140deg,#1b2b47,#0d1626)"><span class="ph">Photo placeholder</span>
+            <svg viewBox="0 0 100 100"><rect x="28" y="14" width="44" height="72" rx="6" fill="#16233a" stroke="#ffc526" stroke-width="3"/><rect x="36" y="24" width="12" height="16" rx="2" fill="#0d1626" stroke="#ffc526" stroke-width="2"/><rect x="52" y="24" width="12" height="16" rx="2" fill="#0d1626" stroke="#ffc526" stroke-width="2"/><rect x="36" y="44" width="12" height="16" rx="2" fill="#0d1626" stroke="#ffc526" stroke-width="2"/><rect x="52" y="44" width="12" height="16" rx="2" fill="#ffc526"/><rect x="36" y="64" width="28" height="10" rx="2" fill="#0d1626" stroke="#8b99ae" stroke-width="2"/></svg>
+          </div>
+          <div class="scap"><span class="idx">01 / 05</span><h3>Panel upgrades</h3><p>Old fuse boxes and undersized panels replaced with modern breaker panels, sized for today's loads.</p></div>
+        </div>
+        <div class="slide">
+          <div class="sart" style="background:linear-gradient(140deg,#24385c,#101d33)"><span class="ph">Photo placeholder</span>
+            <svg viewBox="0 0 100 100"><circle cx="50" cy="38" r="18" fill="#ffc526"/><path d="M50 56 v18 M38 74 h24" stroke="#8b99ae" stroke-width="5" stroke-linecap="round"/><path d="M40 30 q10 -12 20 0" stroke="#fff3c4" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="50" cy="38" r="26" fill="none" stroke="#ffc526" stroke-width="2" opacity=".4"/></svg>
+          </div>
+          <div class="scap"><span class="idx">02 / 05</span><h3>Lighting and fixtures</h3><p>Recessed lights, fixtures, and fans installed cleanly, with switches right where you want them.</p></div>
+        </div>
+        <div class="slide">
+          <div class="sart" style="background:linear-gradient(140deg,#3a2c05,#101d33)"><span class="ph">Photo placeholder</span>
+            <svg viewBox="0 0 100 100"><rect x="30" y="34" width="40" height="30" rx="6" fill="#f7f5ef"/><circle cx="42" cy="46" r="4" fill="#0d1626"/><circle cx="58" cy="46" r="4" fill="#0d1626"/><rect x="46" y="54" width="8" height="6" rx="2" fill="#0d1626"/><path d="M38 22 q4 -8 0 -14 M50 22 q4 -8 0 -14 M62 22 q4 -8 0 -14" stroke="#ffc526" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+          </div>
+          <div class="scap"><span class="idx">03 / 05</span><h3>Outlets and switches</h3><p>Dead outlets revived, GFCI protection added, and dimmers that actually dim.</p></div>
+        </div>
+        <div class="slide">
+          <div class="sart" style="background:linear-gradient(140deg,#0d1626,#062a4e)"><span class="ph">Photo placeholder</span>
+            <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="26" fill="none" stroke="#ffc526" stroke-width="4"/><path d="M50 30 v20 l14 10" stroke="#ffc526" stroke-width="4" stroke-linecap="round" fill="none"/><circle cx="50" cy="50" r="4" fill="#ffc526"/></svg>
+          </div>
+          <div class="scap"><span class="idx">04 / 05</span><h3>Troubleshooting</h3><p>Flickers, trips, and dead circuits traced to the source and fixed at the root, not patched over.</p></div>
+        </div>
+        <div class="slide">
+          <div class="sart" style="background:linear-gradient(140deg,#101d33,#24385c)"><span class="ph">Photo placeholder</span>
+            <svg viewBox="0 0 100 100"><rect x="22" y="40" width="56" height="36" rx="4" fill="#16233a" stroke="#8b99ae" stroke-width="3"/><rect x="30" y="48" width="40" height="8" rx="2" fill="#ffc526"/><rect x="30" y="60" width="26" height="8" rx="2" fill="#8b99ae"/><path d="M78 40 v36" stroke="#ffc526" stroke-width="3"/></svg>
+          </div>
+          <div class="scap"><span class="idx">05 / 05</span><h3>Commercial work</h3><p>Lighting, wiring, and repairs for offices and storefronts, scheduled around your business hours.</p></div>
+        </div>
+      </div>
+      <div class="car-dots" id="carDots"></div>
+      <div class="car-btns">
+        <button id="carPrev" aria-label="Previous slide">&#8592;</button>
+        <button id="carNext" aria-label="Next slide">&#8594;</button>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-rev">
+      <span class="kick">Reviews</span>
+      <h2>Rated 5 stars by customers</h2>
+      <p>Based on 2 Birdeye reviews. Review themes here are paraphrased from public feedback. Open the source to read current reviews and ratings.</p>
+    </div>
+    <div class="rs-strip">
+      <p>Real reviews live on Google and Birdeye. Click through to read them and leave your own.</p>
+      <div class="rs-links">
+        <a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJmSvGvwYK6IkR02aFFa486fM" target="_blank" rel="noopener">See reviews on Google</a>
+        <a class="rs-btn alt" href="https://reviews.birdeye.com/roberto-electric-co-166951962600400" target="_blank" rel="noopener">See reviews on Birdeye</a>
+      </div>
+    </div>
+    <div class="revwall">
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>"Wonderful an experienced."</p>
+        <cite>BEVERLY C. · VIA BIRDEYE</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>"A real 5-star review from a Google customer will appear here. Roberto Electric Co holds a 5.0 rating, and this page updates as new reviews come in."</p>
+        <cite>SAMPLE PLACEHOLDER · NOT A REAL REVIEW</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>"Another sample slot: customer praise for on-time arrival and tidy workmanship. The owner can replace this with a genuine quote."</p>
+        <cite>SAMPLE PLACEHOLDER · NOT A REAL REVIEW</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>"One more sample slot waiting for a real review. Good reviews are the best advertising an electrician can get."</p>
+        <cite>SAMPLE PLACEHOLDER · NOT A REAL REVIEW</cite>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-contact">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-contact">
+      <span class="kick">Contact</span>
+      <h2>Get your free estimate</h2>
+      <p>Call, describe the job, and get a straight answer. That is the whole process.</p>
+    </div>
+
+    <div class="contact-grid">
+      <div class="cinfo reveal">
+        <h3>Call us</h3>
+        <a class="big" href="tel:+12039449126">(203) 944-9126</a>
+        <h3>Find us</h3>
+        <p><a class="addr" href="https://www.google.com/maps/place/?q=place_id:ChIJmSvGvwYK6IkR02aFFa486fM" target="_blank" rel="noopener">Roberto Electric Co, 30 Hamilton Dr, Shelton, CT 06484</a></p>
+        <h3>Hours</h3>
+        <p>Call for current hours. Estimates are free.</p>
+        <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJmSvGvwYK6IkR02aFFa486fM" target="_blank" rel="noopener" style="margin-top:14px">Get Directions</a>
+      </div>
+      <div class="csteps reveal">
+        <h3 style="font-size:1.3rem;font-weight:800;margin-bottom:8px">How it works</h3>
+        <ol>
+          <li><div><strong>Call and describe the job</strong><small>Flickering lights, dead outlet, panel upgrade, new fixture. Whatever it is, just say it plainly.</small></div></li>
+          <li><div><strong>Get a free estimate</strong><small>No charge to find out what it will cost. No pressure either way.</small></div></li>
+          <li><div><strong>We do the work</strong><small>Clean, code-conscious electrical work from a crew with 37 years in the trade.</small></div></li>
+          <li><div><strong>Flip the switch</strong><small>Test everything with us, then enjoy power that just works.</small></div></li>
+        </ol>
+        <a class="btn btn-solid" href="tel:+12039449126" style="margin-top:22px">Call (203) 944-9126</a>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-cols">
+      <div>
+        <div class="foot-brand">
+          <svg viewBox="0 0 48 48" role="img" aria-label="Lightning bolt logo"><rect x="4" y="4" width="40" height="40" rx="10" fill="#ffc526"/><path d="M27 8 L15 27 h9 L20 40 L34 20 h-10 Z" fill="#0d1626"/></svg>
+          <span class="bt">Roberto Electric Co<small>Shelton, CT</small></span>
+        </div>
+        <p>Residential and commercial electrical services in Shelton, CT. 37 years in the trade, free estimates, 5-star customer rating.</p>
+      </div>
+      <div>
+        <h4>Pages</h4>
+        <ul>
+          <li><a href="#home" data-page="home">Home</a></li>
+          <li><a href="#services" data-page="services">Services</a></li>
+          <li><a href="#about" data-page="about">About</a></li>
+          <li><a href="#gallery" data-page="gallery">Work</a></li>
+          <li><a href="#reviews" data-page="reviews">Reviews</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="tel:+12039449126">(203) 944-9126</a></li>
+          <li><a href="https://www.google.com/maps/place/?q=place_id:ChIJmSvGvwYK6IkR02aFFa486fM" target="_blank" rel="noopener">Get Directions</a></li>
+          <li>30 Hamilton Dr<br>Shelton, CT 06484</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Services</h4>
+        <ul>
+          <li><a href="#services" data-page="services">Panel Upgrades</a></li>
+          <li><a href="#services" data-page="services">Lighting and Fixtures</a></li>
+          <li><a href="#services" data-page="services">Troubleshooting</a></li>
+          <li><a href="#services" data-page="services">Commercial Work</a></li>
+          <li><a href="#contact" data-page="contact">Free Estimates</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-legal">
+      <span>© Roberto Electric Co</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "contact"];
+  var drawer = document.getElementById("drawer");
+  var scrim = document.getElementById("drawerScrim");
+  var menuBtn = document.getElementById("menuBtn");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeDrawer(){
+    if(drawer){ drawer.classList.remove("open"); }
+    if(scrim){ scrim.classList.remove("show"); }
+    if(menuBtn){ menuBtn.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("#drawerNav a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeDrawer();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(menuBtn){
+    menuBtn.addEventListener("click", function(){
+      var open = drawer.classList.toggle("open");
+      scrim.classList.toggle("show", open);
+      menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+  if(scrim){ scrim.addEventListener("click", closeDrawer); }
+  var dc = document.getElementById("drawerClose");
+  if(dc){ dc.addEventListener("click", closeDrawer); }
+
+  var track = document.getElementById("boltTrack");
+  if(track){ track.innerHTML += track.innerHTML; }
+
+  var carTrack = document.getElementById("carTrack");
+  var carDots = document.getElementById("carDots");
+  var carPrev = document.getElementById("carPrev");
+  var carNext = document.getElementById("carNext");
+  var carIdx = 0, carCount = 0;
+  if(carTrack){
+    carCount = carTrack.children.length;
+    for(var d = 0; d < carCount; d++){
+      (function(n){
+        var b = document.createElement("button");
+        b.setAttribute("aria-label", "Go to slide " + (n + 1));
+        b.addEventListener("click", function(){ carGo(n); });
+        carDots.appendChild(b);
+      })(d);
+    }
+  }
+  function carGo(n){
+    if(!carTrack || carCount === 0){ return; }
+    carIdx = (n + carCount) % carCount;
+    carTrack.style.transform = "translateX(-" + (carIdx * 100) + "%)";
+    var dots = carDots.children;
+    for(var k = 0; k < dots.length; k++){
+      dots[k].classList.toggle("on", k === carIdx);
+    }
+  }
+  if(carPrev){ carPrev.addEventListener("click", function(){ carGo(carIdx - 1); }); }
+  if(carNext){ carNext.addEventListener("click", function(){ carGo(carIdx + 1); }); }
+  carGo(0);
+
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

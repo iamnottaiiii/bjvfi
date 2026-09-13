@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Richbar Inc · Landscaping &amp; Gardening, Whippany, NJ</title>
+<meta name="description" content="Richbar Inc, a landscaping company at 144 Parsippany Rd, Whippany, NJ. Lawn care, garden beds, plantings, cleanups and more across Morris County. Call (973) 884-1374 for a free estimate.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --forest:#1E4634; --forest-deep:#14301F; --forest-soft:#E4EEE6;
+  --moss:#4E7A52; --moss-soft:#DCE9DA;
+  --sage:#8BA888;
+  --cream:#F8F5EB; --cream-2:#EFE8D5; --paper:#FFFDF6;
+  --ink:#22301F; --ink-soft:#5B6753;
+  --clay:#B4713A; --clay-deep:#8C5527; --clay-soft:#F3E2C9;
+  --gold:#C9A227;
+  --radius:14px;
+  --shadow:0 18px 40px -18px rgba(20,48,31,.28);
+  --shadow-sm:0 8px 22px -10px rgba(20,48,31,.2);
+  --serif:"Fraunces",Georgia,serif;
+  --sans:"Inter",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--cream);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased}
+img{max-width:100%}
+a{color:var(--forest)}
+::selection{background:var(--gold);color:var(--forest-deep)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+
+/* ---------- top bar + side drawer ---------- */
+header.site{position:sticky;top:0;z-index:60;background:rgba(248,245,235,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:2px solid rgba(30,70,52,.14)}
+.bar{display:flex;align-items:center;gap:16px;padding:12px 0}
+.drawer-btn{display:inline-flex;align-items:center;gap:10px;background:var(--forest);color:var(--cream);border:0;cursor:pointer;font-family:var(--mono);font-size:.78rem;letter-spacing:1.5px;text-transform:uppercase;font-weight:500;padding:12px 18px;border-radius:999px;transition:background .2s,transform .18s}
+.drawer-btn:hover{background:var(--forest-deep);transform:translateY(-1px)}
+.drawer-btn svg{width:20px;height:20px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);margin-right:auto}
+.brand svg{width:44px;height:44px;flex:none}
+.brand-name{font-family:var(--serif);font-weight:900;font-size:1.25rem;line-height:1.05}
+.brand-name small{display:block;font-family:var(--mono);font-weight:500;font-size:.64rem;letter-spacing:3px;text-transform:uppercase;color:var(--moss)}
+.bar .call-btn{display:inline-flex;align-items:center;gap:8px;background:var(--clay);color:#fff;text-decoration:none;font-weight:700;padding:11px 20px;border-radius:999px;box-shadow:var(--shadow-sm);white-space:nowrap;transition:background .18s,transform .18s}
+.bar .call-btn:hover{background:var(--clay-deep);transform:translateY(-2px)}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:min(360px,88vw);background:var(--forest-deep);color:var(--cream);z-index:100;transform:translateX(-105%);transition:transform .32s cubic-bezier(.22,.8,.3,1);display:flex;flex-direction:column;box-shadow:var(--shadow)}
+.drawer.open{transform:translateX(0)}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid rgba(248,245,235,.14)}
+.drawer-head strong{font-family:var(--serif);font-size:1.15rem;font-weight:700}
+.drawer-close{background:none;border:0;color:var(--cream);font-size:1.9rem;line-height:1;cursor:pointer;padding:4px 8px}
+.drawer nav{flex:1;overflow-y:auto;padding:12px 12px}
+.drawer nav a{display:flex;align-items:baseline;gap:14px;text-decoration:none;color:var(--cream);padding:14px 12px;border-radius:10px;font-family:var(--serif);font-size:1.3rem;font-weight:600;transition:background .18s}
+.drawer nav a:hover{background:rgba(248,245,235,.1)}
+.drawer nav a .num{font-family:var(--mono);font-size:.72rem;color:var(--gold);letter-spacing:1px;min-width:30px}
+.drawer nav a.active{background:rgba(248,245,235,.14)}
+.drawer nav a.active .num{color:#fff}
+.drawer-foot{padding:20px 24px;border-top:1px solid rgba(248,245,235,.14);font-size:.9rem;color:#D8DCCB}
+.drawer-foot a{color:#fff;font-weight:700;text-decoration:none}
+.scrim{position:fixed;inset:0;background:rgba(20,32,20,.45);z-index:90;opacity:0;pointer-events:none;transition:opacity .3s}
+.scrim.show{opacity:1;pointer-events:auto}
+
+/* ---------- router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- editorial hero ---------- */
+.hero{padding:64px 0 56px;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;top:-120px;right:-120px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(139,168,136,.35),transparent 70%)}
+.hero-kicker{font-family:var(--mono);font-size:.75rem;letter-spacing:3px;text-transform:uppercase;color:var(--clay-deep);display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.hero-kicker::before{content:"";width:44px;height:2px;background:var(--clay)}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:clamp(2.8rem,6vw,4.6rem);line-height:1.02;letter-spacing:-.5px;margin-bottom:20px}
+.hero h1 .thin{font-weight:500;font-style:italic;color:var(--moss)}
+.hero .lede{font-size:1.12rem;color:var(--ink-soft);max-width:36rem;margin-bottom:28px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:30px}
+.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;padding:14px 26px;border-radius:999px;font-size:1rem;transition:transform .18s,background .18s,box-shadow .18s}
+.btn-solid{background:var(--forest);color:#fff;box-shadow:var(--shadow-sm)}
+.btn-solid:hover{background:var(--forest-deep);transform:translateY(-2px)}
+.btn-ghost{background:var(--paper);color:var(--forest);border:2px solid rgba(30,70,52,.3)}
+.btn-ghost:hover{border-color:var(--forest);transform:translateY(-2px)}
+.hero-index{list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:2px solid var(--ink);margin-top:8px}
+.hero-index li{padding:20px 18px 24px;border-bottom:2px solid var(--ink);border-right:1px solid rgba(34,48,31,.2)}
+.hero-index li:last-child{border-right:0}
+.hero-index .n{font-family:var(--mono);font-size:.72rem;letter-spacing:2px;color:var(--clay-deep);display:block;margin-bottom:6px}
+.hero-index strong{font-family:var(--serif);font-size:1.12rem;display:block;margin-bottom:4px}
+.hero-index small{color:var(--ink-soft);font-size:.88rem}
+.hours-pill{display:inline-flex;align-items:center;gap:10px;background:var(--forest-deep);color:var(--cream);padding:10px 20px;border-radius:999px;font-weight:600;font-size:.95rem;box-shadow:var(--shadow-sm);margin-top:26px}
+.hours-pill .dot{width:10px;height:10px;border-radius:50%;background:#7BC47F;box-shadow:0 0 0 4px rgba(123,196,127,.25);animation:pulse 2s infinite}
+.hours-pill.closed .dot{background:#E4658F;box-shadow:0 0 0 4px rgba(228,101,143,.25)}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+
+/* ---------- sections ---------- */
+section.block{padding:60px 0}
+.sec-head{max-width:46rem;margin-bottom:40px}
+.sec-head .mono{font-family:var(--mono);font-size:.75rem;letter-spacing:3px;text-transform:uppercase;color:var(--clay-deep)}
+h2{font-family:var(--serif);font-weight:900;font-size:clamp(2rem,3.8vw,2.9rem);line-height:1.08;letter-spacing:-.3px;margin:8px 0 12px}
+.sec-head p{color:var(--ink-soft)}
+
+/* ---------- numbered editorial service rows ---------- */
+.svc-rows{border-top:2px solid var(--ink)}
+.svc-row{display:grid;grid-template-columns:90px 1fr 1.4fr auto;gap:28px;align-items:center;padding:30px 8px;border-bottom:2px solid var(--ink);transition:background .2s;text-decoration:none;color:var(--ink)}
+.svc-row:hover{background:rgba(30,70,52,.05)}
+.svc-row .num{font-family:var(--mono);font-size:1rem;color:var(--clay-deep);letter-spacing:1px}
+.svc-row h3{font-family:var(--serif);font-size:clamp(1.4rem,2.4vw,2rem);font-weight:700;line-height:1.15}
+.svc-row p{color:var(--ink-soft);font-size:.98rem}
+.svc-row .go{width:52px;height:52px;border-radius:50%;border:2px solid var(--forest);display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:var(--forest);transition:background .2s,color .2s;flex:none}
+.svc-row:hover .go{background:var(--forest);color:#fff}
+.svc-note{background:var(--clay-soft);border:2px dashed rgba(180,113,58,.5);border-radius:var(--radius);padding:18px 24px;margin-top:26px;font-size:.95rem;color:#5A3A1A}
+.svc-note strong{color:var(--clay-deep)}
+
+/* ---------- trust strip ---------- */
+.trust{background:var(--forest);color:var(--cream);padding:44px 0;margin:20px 0}
+.trust-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:30px}
+.trust-item .mono{font-family:var(--mono);font-size:.72rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:8px}
+.trust-item h3{font-family:var(--serif);font-size:1.35rem;margin-bottom:6px}
+.trust-item p{color:#D9DDC9;font-size:.95rem}
+
+/* ---------- carousel gallery ---------- */
+.car{position:relative;background:var(--forest-deep);border-radius:20px;overflow:hidden;box-shadow:var(--shadow)}
+.car-track{display:flex;transition:transform .45s cubic-bezier(.22,.8,.3,1)}
+.car-slide{min-width:100%;display:grid;grid-template-columns:1fr 1fr;min-height:380px}
+.car-art{display:flex;align-items:center;justify-content:center;padding:48px;position:relative;overflow:hidden}
+.car-art svg{width:56%;max-width:280px;height:auto;filter:drop-shadow(0 14px 18px rgba(0,0,0,.25))}
+.car-cap{display:flex;flex-direction:column;justify-content:center;padding:48px;color:var(--cream)}
+.car-cap .n{font-family:var(--mono);font-size:.75rem;letter-spacing:2.5px;color:var(--gold);margin-bottom:10px}
+.car-cap h3{font-family:var(--serif);font-size:2rem;margin-bottom:10px}
+.car-cap p{color:#D9DDC9;font-size:.98rem;margin-bottom:16px}
+.car-cap .soon{align-self:flex-start;background:rgba(248,245,235,.14);border:1px dashed rgba(248,245,235,.5);font-size:.7rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:6px 14px;border-radius:999px;color:var(--cream)}
+.car-btn{position:absolute;top:50%;transform:translateY(-50%);width:52px;height:52px;border-radius:50%;border:0;background:var(--cream);color:var(--forest-deep);font-size:1.4rem;cursor:pointer;box-shadow:var(--shadow-sm);transition:transform .18s,background .18s;z-index:2}
+.car-btn:hover{transform:translateY(-50%) scale(1.08);background:var(--gold)}
+.car-btn.prev{left:18px}
+.car-btn.next{right:18px}
+.car-dots{display:flex;gap:10px;justify-content:center;padding:18px;background:var(--forest-deep)}
+.car-dots button{width:12px;height:12px;border-radius:50%;border:0;background:rgba(248,245,235,.3);cursor:pointer;padding:0;transition:background .2s,transform .2s}
+.car-dots button.on{background:var(--gold);transform:scale(1.25)}
+
+/* ---------- reviews ---------- */
+.rev-strip{background:var(--paper);border:2px solid rgba(30,70,52,.18);border-radius:var(--radius);padding:28px 30px;text-align:center;margin-bottom:34px;box-shadow:var(--shadow-sm)}
+.rev-strip .stars{color:var(--gold);font-size:1.4rem;letter-spacing:4px;margin-bottom:8px}
+.rev-strip p{color:var(--ink-soft);font-size:.98rem;max-width:38rem;margin:0 auto 18px}
+.rs-btn{display:inline-block;background:var(--forest);color:#fff;padding:12px 30px;border-radius:999px;font-weight:700;text-decoration:none;font-size:1rem}
+.rs-btn:hover{background:var(--forest-deep)}
+.rev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.rev{background:var(--paper);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow-sm);border-top:6px solid var(--moss);position:relative}
+.rev.featured{border-top-color:var(--gold)}
+.rev .stars{color:var(--gold);font-size:1.15rem;letter-spacing:3px;margin-bottom:12px}
+.rev p{font-size:1.02rem;margin-bottom:14px}
+.rev cite{font-style:normal;font-weight:700;font-size:.85rem;color:var(--forest);letter-spacing:.5px}
+.sample-badge{display:inline-block;background:var(--clay-soft);color:var(--clay-deep);font-size:.68rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 12px;border-radius:999px;margin-bottom:12px}
+.cta-band{background:linear-gradient(120deg,var(--forest),var(--forest-deep));border-radius:22px;color:#fff;padding:52px 44px;text-align:center;margin-top:44px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.cta-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 82% 18%,rgba(201,162,39,.3),transparent 50%)}
+.cta-band h2{color:#fff;position:relative}
+.cta-band p{color:#D9DDC9;position:relative;max-width:36rem;margin:0 auto 24px}
+.cta-band .btn-solid{background:#fff;color:var(--forest-deep);position:relative}
+.cta-band .btn-solid:hover{background:var(--clay-soft)}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-bottom:26px}
+.info-card{background:var(--paper);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm)}
+.info-card h3{font-family:var(--serif);font-size:1.4rem;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.info-card h3 svg{width:28px;height:28px}
+.info-card p{color:var(--ink-soft);margin-bottom:8px}
+.info-card a.big{font-family:var(--serif);font-size:1.5rem;font-weight:700;color:var(--forest);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.hours-table{width:100%;border-collapse:collapse;font-size:.98rem}
+.hours-table td{padding:10px 6px;border-bottom:1px dashed rgba(34,48,31,.2)}
+.hours-table tr.today td{font-weight:800;color:var(--forest)}
+.hours-table tr.today td:first-child::after{content:" · today";font-family:var(--mono);font-size:.75rem;color:var(--clay-deep);margin-left:6px}
+.hours-table td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.map-card{border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:340px;background:repeating-linear-gradient(0deg,transparent 0 46px,rgba(30,70,52,.12) 46px 48px),repeating-linear-gradient(90deg,transparent 0 46px,rgba(30,70,52,.12) 46px 48px),linear-gradient(140deg,#EFE8D5,#E4DCC2);display:flex;align-items:center;justify-content:center}
+.map-pin{text-align:center;background:var(--paper);padding:26px 34px;border-radius:18px;box-shadow:var(--shadow);max-width:80%;position:relative}
+.map-pin::after{content:"";position:absolute;left:50%;bottom:-13px;transform:translateX(-50%);border:13px solid transparent;border-top-color:var(--paper);border-bottom:0}
+.map-pin svg{width:44px;height:44px;margin-bottom:8px}
+.map-pin strong{font-family:var(--serif);font-size:1.15rem;display:block}
+.map-pin small{color:var(--ink-soft)}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- page hero strips ---------- */
+.strip{border-radius:20px;padding:52px 44px;color:#fff;position:relative;overflow:hidden;margin-bottom:40px;box-shadow:var(--shadow)}
+.strip::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%,rgba(255,255,255,.2),transparent 50%)}
+.strip h2{color:#fff;font-size:clamp(2rem,4vw,3rem);position:relative;margin:4px 0 10px}
+.strip p{color:rgba(255,255,255,.88);max-width:36rem;position:relative}
+.strip .mono{font-family:var(--mono);font-size:.75rem;letter-spacing:3px;text-transform:uppercase;position:relative;color:#F3E2C9}
+.strip.s-svc{background:linear-gradient(120deg,#2C5A3E,#14301F)}
+.strip.s-story{background:linear-gradient(120deg,#4E7A52,#243318)}
+.strip.s-gal{background:linear-gradient(120deg,#8C5527,#4A2C12)}
+.strip.s-rev{background:linear-gradient(120deg,#3B5F4E,#1A2E24)}
+.strip.s-visit{background:linear-gradient(120deg,#1E4634,#0F2418)}
+
+/* ---------- footer ---------- */
+footer{background:var(--forest-deep);color:#D8DCCB;margin-top:20px}
+.foot-grid{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:36px;padding:56px 0 32px}
+.foot-grid h4{font-family:var(--serif);color:#fff;font-size:1.15rem;margin-bottom:14px}
+.foot-grid h4 .mono{font-family:var(--mono);font-size:.68rem;letter-spacing:2px;color:var(--gold);display:block;margin-bottom:6px;text-transform:uppercase}
+.foot-grid p,.foot-grid a{color:#C4C9B2;font-size:.95rem}
+.foot-grid a{text-decoration:none}.foot-grid a:hover{color:#fff}
+.foot-brand{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.foot-brand svg{width:44px;height:44px}
+.foot-brand span{font-family:var(--serif);font-weight:900;color:#fff;font-size:1.25rem}
+.foot-bottom{border-top:1px solid rgba(248,245,235,.12);padding:20px 0 26px;text-align:center;font-size:.85rem;color:#A9AE92}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:940px){
+  .hero-index{grid-template-columns:1fr}
+  .hero-index li{border-right:0}
+  .svc-row{grid-template-columns:64px 1fr;gap:8px 16px}
+  .svc-row p{grid-column:2}
+  .svc-row .go{display:none}
+  .trust-grid{grid-template-columns:1fr}
+  .car-slide{grid-template-columns:1fr;min-height:0}
+  .car-art{padding:36px 24px}
+  .car-cap{padding:8px 28px 36px}
+  .visit-grid,.rev-grid{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr}
+  .bar .call-btn{display:none}
+  .strip{padding:40px 28px}
+}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap bar">
+    <button class="drawer-btn" id="drawerBtn" aria-label="Open navigation menu" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h12"/></svg>
+      Menu
+    </button>
+    <a class="brand" href="#home" data-page="home" aria-label="Richbar Inc, home">
+      <svg viewBox="0 0 64 64" role="img" aria-label="Richbar tree logo"><circle cx="32" cy="32" r="30" fill="#1E4634"/><path d="M32 8 L44 26 L38 26 L48 40 L40 40 L46 50 L18 50 L24 40 L16 40 L26 26 L20 26 Z" fill="#8BA888"/><rect x="29" y="48" width="6" height="10" fill="#B4713A"/><path d="M32 8 L38 22 L32 20 L26 22 Z" fill="#C9A227"/></svg>
+      <span class="brand-name">Richbar Inc<small>Landscaping · Whippany</small></span>
+    </a>
+    <a class="call-btn" href="tel:+19738841374">Call (973) 884-1374</a>
+  </div>
+</header>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Site navigation">
+  <div class="drawer-head">
+    <strong>Richbar Inc</strong>
+    <button class="drawer-close" id="drawerClose" aria-label="Close navigation menu">×</button>
+  </div>
+  <nav id="drawerNav">
+    <a href="#home" data-page="home" class="active" aria-current="page"><span class="num">01</span>Home</a>
+    <a href="#services" data-page="services"><span class="num">02</span>Services</a>
+    <a href="#about" data-page="about"><span class="num">03</span>Our Story</a>
+    <a href="#gallery" data-page="gallery"><span class="num">04</span>Gallery</a>
+    <a href="#reviews" data-page="reviews"><span class="num">05</span>Reviews</a>
+    <a href="#contact" data-page="contact"><span class="num">06</span>Contact</a>
+  </nav>
+  <div class="drawer-foot">
+    144 Parsippany Rd, Whippany, NJ 07981<br>
+    <a href="tel:+19738841374">(973) 884-1374</a><br>
+    Mon - Fri · 9 AM - 6 PM
+  </div>
+</aside>
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="wrap">
+      <div class="hero-kicker">Landscaping &amp; gardening · Morris County, NJ</div>
+      <h1>Yards kept<br><span class="thin">the way they should be.</span></h1>
+      <p class="lede">Richbar Inc is a landscaping company in Whippany, NJ. Lawn care, garden beds, plantings, and seasonal cleanups for homes across Morris County. One call, one crew, a yard you are proud of.</p>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="tel:+19738841374">Call (973) 884-1374</a>
+        <a class="btn btn-ghost" href="#services" data-page="services">See services</a>
+      </div>
+      <ul class="hero-index">
+        <li class="reveal"><span class="n">01</span><strong>Lawn care</strong><small>Mowing, edging, and healthy turf through every season.</small></li>
+        <li class="reveal"><span class="n">02</span><strong>Garden beds</strong><small>Plantings, mulch, and beds that look cared for.</small></li>
+        <li class="reveal"><span class="n">03</span><strong>Cleanups</strong><small>Spring wake-ups and fall leaf removal, done right.</small></li>
+      </ul>
+      <span class="hours-pill" id="hoursPill"><span class="dot"></span><span id="hoursText">Checking today's hours…</span></span>
+    </div>
+  </div>
+
+  <div class="trust">
+    <div class="wrap trust-grid">
+      <div class="trust-item reveal">
+        <span class="mono">Local roots</span>
+        <h3>Based in Whippany</h3>
+        <p>From our shop on Parsippany Rd we serve Whippany, Hanover Township, and the surrounding Morris County towns.</p>
+      </div>
+      <div class="trust-item reveal">
+        <span class="mono">Simple process</span>
+        <h3>Call, walk, done</h3>
+        <p>Call (973) 884-1374, tell us what the yard needs, and get a free estimate. No forms, no waiting games.</p>
+      </div>
+      <div class="trust-item reveal">
+        <span class="mono">Steady care</span>
+        <h3>One crew, every visit</h3>
+        <p>Regular lawn care works best with familiar hands. We keep the same crew on your property so nothing is missed.</p>
+      </div>
+    </div>
+  </div>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="mono">What we do</span>
+        <h2>The full season, covered</h2>
+        <p>From the first spring cleanup to the last fall leaf, Richbar handles the outdoor work so your weekends stay yours.</p>
+      </div>
+      <div class="svc-rows">
+        <a class="svc-row reveal" href="#services" data-page="services">
+          <span class="num">01</span>
+          <h3>Lawn care</h3>
+          <p>Regular mowing, crisp edging, and the kind of turf that makes the block look better.</p>
+          <span class="go">→</span>
+        </a>
+        <a class="svc-row reveal" href="#services" data-page="services">
+          <span class="num">02</span>
+          <h3>Garden beds &amp; planting</h3>
+          <p>Flowers, shrubs, and perennials placed with care, plus fresh mulch to finish the look.</p>
+          <span class="go">→</span>
+        </a>
+        <a class="svc-row reveal" href="#services" data-page="services">
+          <span class="num">03</span>
+          <h3>Seasonal cleanups</h3>
+          <p>Spring wake-ups that clear winter damage, and fall cleanups that put the yard to bed right.</p>
+          <span class="go">→</span>
+        </a>
+      </div>
+      <div class="wrap" style="max-width:none;padding:0">
+        <div class="cta-band reveal">
+          <h2>Ready when the yard is.</h2>
+          <p>Free estimates across Whippany and Morris County. Call (973) 884-1374 Monday through Friday, 9 AM to 6 PM.</p>
+          <a class="btn btn-solid" href="tel:+19738841374">Call (973) 884-1374</a>
+        </div>
+        <div style="height:56px"></div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-svc">
+      <span class="mono">Our services</span>
+      <h2>Everything the outside<br>of your home needs</h2>
+      <p>Residential landscaping and gardening in Whippany and across Morris County. Free estimates on every job.</p>
+    </div>
+    <div class="svc-rows">
+      <div class="svc-row reveal" style="cursor:default">
+        <span class="num">01</span>
+        <h3>Lawn care &amp; mowing</h3>
+        <p>Routine mowing, trimming, and edging on a schedule that keeps the lawn neat from spring through fall.</p>
+        <span class="go" aria-hidden="true">→</span>
+      </div>
+      <div class="svc-row reveal" style="cursor:default">
+        <span class="num">02</span>
+        <h3>Garden bed design &amp; planting</h3>
+        <p>Flowers, shrubs, and perennials chosen for New Jersey weather, planted and finished with fresh mulch.</p>
+        <span class="go" aria-hidden="true">→</span>
+      </div>
+      <div class="svc-row reveal" style="cursor:default">
+        <span class="num">03</span>
+        <h3>Hedge &amp; shrub trimming</h3>
+        <p>Shaped hedges and tidy shrubs that keep the property looking sharp and let the light in.</p>
+        <span class="go" aria-hidden="true">→</span>
+      </div>
+      <div class="svc-row reveal" style="cursor:default">
+        <span class="num">04</span>
+        <h3>Mulch &amp; soil</h3>
+        <p>Fresh mulch beds that hold moisture, block weeds, and give the yard a clean, finished edge.</p>
+        <span class="go" aria-hidden="true">→</span>
+      </div>
+      <div class="svc-row reveal" style="cursor:default">
+        <span class="num">05</span>
+        <h3>Spring cleanups</h3>
+        <p>Winter debris cleared, beds turned, edges re-cut. The yard wakes up the way it should.</p>
+        <span class="go" aria-hidden="true">→</span>
+      </div>
+      <div class="svc-row reveal" style="cursor:default">
+        <span class="num">06</span>
+        <h3>Fall cleanups &amp; leaf removal</h3>
+        <p>Leaves cleared, beds put to bed, and the property ready before the first snow.</p>
+        <span class="go" aria-hidden="true">→</span>
+      </div>
+    </div>
+    <div class="svc-note reveal">
+      <strong>Free estimates:</strong> every job starts with a call and a look at the property. Pricing depends on the size of the yard and the work involved, so call <strong>(973) 884-1374</strong> and we will quote it honestly.
+    </div>
+    <div class="wrap" style="max-width:none;padding:0">
+      <div class="cta-band reveal">
+        <h2>Tell us about your yard.</h2>
+        <p>One call is all it takes to get started. We serve Whippany, Hanover Township, and nearby Morris County towns.</p>
+        <a class="btn btn-solid" href="tel:+19738841374">Call (973) 884-1374</a>
+      </div>
+      <div style="height:56px"></div>
+    </div>
+  </div>
+</section>
+<section class="page" id="page-about">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-story">
+      <span class="mono">Our story</span>
+      <h2>A Whippany company,<br>built on good work</h2>
+      <p>Richbar Inc is a landscaping and gardening company based at 144 Parsippany Rd in Whippany, NJ, serving homes across Morris County.</p>
+    </div>
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#1E4634" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-4-3.5-8-7.2-8-11a5 5 0 019-3 5 5 0 019 3c0 3.8-4 7.5-8 11z"/><circle cx="12" cy="10" r="2"/></svg> Local and accountable</h3>
+        <p>Richbar is listed as a landscaping and gardening business right here in Whippany, in the heart of Hanover Township. When you hire us, you are hiring neighbors, not a call center.</p>
+        <p>If something is not right, you call the same number and talk to the people who did the work.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#1E4634" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> What you can expect</h3>
+        <p><strong>Straight talk.</strong> We quote what we see and do what we said we would.</p>
+        <p><strong>Clean finish.</strong> Clippings picked up, edges crisp, beds swept. We leave the property neater than we found it.</p>
+        <p><strong>Seasonal sense.</strong> New Jersey yards have a rhythm. We work with it, not against it.</p>
+      </div>
+    </div>
+    <div class="wrap" style="max-width:none;padding:0">
+      <div class="cta-band reveal">
+        <h2>Meet the crew. Start with a call.</h2>
+        <p>We are at 144 Parsippany Rd, Whippany, NJ 07981. Call (973) 884-1374 Monday through Friday, 9 AM to 6 PM.</p>
+        <a class="btn btn-solid" href="tel:+19738841374">Call (973) 884-1374</a>
+      </div>
+      <div style="height:56px"></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-gal">
+      <span class="mono">Gallery</span>
+      <h2>The kind of work<br>we are proud of</h2>
+      <p>Artistic previews of typical Richbar work. Real photos of our jobs are on the way.</p>
+    </div>
+
+    <div class="car reveal">
+      <div class="car-track" id="carTrack">
+        <div class="car-slide">
+          <div class="car-art" style="background:linear-gradient(140deg,#4E7A52,#1E4634)">
+            <svg viewBox="0 0 120 120"><rect x="0" y="88" width="120" height="32" fill="#2E5A2E"/><rect x="0" y="88" width="120" height="6" fill="#3E7A3E"/><g stroke="#5C945C" stroke-width="2"><path d="M10 88v-14M22 88v-18M34 88v-12M46 88v-16M58 88v-14M70 88v-18M82 88v-12M94 88v-16M106 88v-14"/></g><path d="M60 88 L60 50 M60 62 L44 48 M60 62 L76 48 M60 74 L46 62 M60 74 L74 62" stroke="#3E5A2B" stroke-width="5" stroke-linecap="round"/><circle cx="60" cy="40" r="22" fill="#6FA86F"/><circle cx="44" cy="50" r="12" fill="#7FBA7F"/><circle cx="76" cy="50" r="12" fill="#7FBA7F"/></svg>
+          </div>
+          <div class="car-cap">
+            <span class="n">01 / 05</span>
+            <h3>Fresh-mowed lawns</h3>
+            <p>Stripes, clean edges, and clippings hauled away. The whole street notices.</p>
+            <span class="soon">Photo soon</span>
+          </div>
+        </div>
+        <div class="car-slide">
+          <div class="car-art" style="background:linear-gradient(140deg,#8BA888,#3B5F4E)">
+            <svg viewBox="0 0 120 120"><ellipse cx="60" cy="92" rx="48" ry="12" fill="#4A3423"/><rect x="24" y="80" width="72" height="10" fill="#6B4E2E"/><g><path d="M40 80 q2 -18 10 -22 M80 80 q-2 -18 -10 -22 M60 80 q0 -20 0 -26" stroke="#3E7A3E" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="50" cy="56" r="9" fill="#E4658F"/><circle cx="70" cy="56" r="9" fill="#C9A227"/><circle cx="60" cy="50" r="9" fill="#FFF6E8"/></g></svg>
+          </div>
+          <div class="car-cap">
+            <span class="n">02 / 05</span>
+            <h3>Garden beds &amp; plantings</h3>
+            <p>Flowers and shrubs set with room to grow, finished with dark, fresh mulch.</p>
+            <span class="soon">Photo soon</span>
+          </div>
+        </div>
+        <div class="car-slide">
+          <div class="car-art" style="background:linear-gradient(140deg,#B4713A,#6B3F1A)">
+            <svg viewBox="0 0 120 120"><path d="M30 100 q30 -8 60 0 l-6 -46 q-24 -8 -48 0 Z" fill="#7A4A20"/><path d="M24 58 q36 -12 72 0 l-4 -14 q-32 -10 -64 0 Z" fill="#5A3616"/><g stroke="#8BA888" stroke-width="6" stroke-linecap="round"><path d="M40 40 q-4 -14 4 -22 M60 38 q0 -14 8 -20 M80 40 q4 -14 -4 -22"/></g></svg>
+          </div>
+          <div class="car-cap">
+            <span class="n">03 / 05</span>
+            <h3>Mulch that finishes the job</h3>
+            <p>A clean mulch line turns a tired bed into the best-looking part of the yard.</p>
+            <span class="soon">Photo soon</span>
+          </div>
+        </div>
+        <div class="car-slide">
+          <div class="car-art" style="background:linear-gradient(140deg,#5B6753,#22301F)">
+            <svg viewBox="0 0 120 120"><rect x="20" y="70" width="80" height="8" rx="4" fill="#4A3423"/><g stroke="#C9A227" stroke-width="3" stroke-linecap="round"><path d="M30 70 l-8 -18 M44 70 l-4 -20 M58 70 l0 -20 M72 70 l4 -20 M86 70 l8 -18"/></g><path d="M20 78 l0 22 M100 78 l0 22" stroke="#B4713A" stroke-width="5"/><path d="M20 92 q40 10 80 0" stroke="#B4713A" stroke-width="5" fill="none"/></svg>
+          </div>
+          <div class="car-cap">
+            <span class="n">04 / 05</span>
+            <h3>Fall leaf removal</h3>
+            <p>Leaves, branches, and beds cleared before winter. The yard goes to sleep clean.</p>
+            <span class="soon">Photo soon</span>
+          </div>
+        </div>
+        <div class="car-slide">
+          <div class="car-art" style="background:linear-gradient(140deg,#2E5A2E,#14301F)">
+            <svg viewBox="0 0 120 120"><path d="M60 100 L60 56 M60 70 L40 56 M60 70 L80 56 M60 84 L44 72 M60 84 L76 72" stroke="#3E5A2B" stroke-width="6" stroke-linecap="round"/><g fill="#5C945C"><circle cx="60" cy="42" r="26"/><circle cx="38" cy="56" r="16"/><circle cx="82" cy="56" r="16"/></g><path d="M30 100 h60" stroke="#8BA888" stroke-width="6" stroke-linecap="round"/><path d="M40 100 l-6 -14 M50 100 l-3 -14 M70 100 l3 -14 M80 100 l6 -14" stroke="#8BA888" stroke-width="4" stroke-linecap="round"/></svg>
+          </div>
+          <div class="car-cap">
+            <span class="n">05 / 05</span>
+            <h3>Trimmed hedges &amp; shrubs</h3>
+            <p>Shaped, healthy, and letting the light back in. Curb appeal you can measure.</p>
+            <span class="soon">Photo soon</span>
+          </div>
+        </div>
+      </div>
+      <button class="car-btn prev" id="carPrev" aria-label="Previous gallery image">‹</button>
+      <button class="car-btn next" id="carNext" aria-label="Next gallery image">›</button>
+      <div class="car-dots" id="carDots" aria-hidden="true"></div>
+    </div>
+
+    <div class="svc-note reveal" style="margin-top:28px">
+      <strong>Coming soon:</strong> real photos of Richbar jobs in Whippany and Morris County. The illustrations above are artistic previews of the work we do.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-rev">
+      <span class="mono">Reviews</span>
+      <h2>What customers<br>say about us</h2>
+      <p>Rated 5.0 on Birdeye. Here is what people have said, and how to share your own experience.</p>
+    </div>
+
+    <div class="rev-strip reveal">
+      <div class="stars">★★★★★</div>
+      <p>Based on 1 review on Birdeye, Richbar Inc holds a 5.0 star rating. Review sentiments on this page are paraphrased from public feedback. Open the source to read the current listing.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJtXGK1Nynw4kRntjND3opFiU" target="_blank" rel="noopener">See reviews on Google</a>
+        <a class="btn btn-ghost" href="https://reviews.birdeye.com/richbar-inc-144615498748546" target="_blank" rel="noopener">See our Birdeye listing</a>
+      </div>
+    </div>
+
+    <div class="rev-grid">
+      <div class="rev featured reveal">
+        <div class="stars">★★★★★</div>
+        <p>"Great service! The staff was friendly."</p>
+        <cite>via Birdeye</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="sample-badge">Sample review</span>
+        <div class="stars">★★★★★</div>
+        <p>"They got the lawn back in shape and kept it that way all season. Reliable and easy to reach."</p>
+        <cite>Sample of the kind of feedback we aim for</cite>
+      </div>
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Had us out? Tell Morris County.</h2>
+      <p>Your review helps a local Whippany business grow. It takes a minute, and it means a lot to us.</p>
+      <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJtXGK1Nynw4kRntjND3opFiU" target="_blank" rel="noopener">Leave us a Google review</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-contact">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-visit">
+      <span class="mono">Contact</span>
+      <h2>Get your free estimate</h2>
+      <p>Call (973) 884-1374 or stop by. We are in Whippany, ready when the yard is.</p>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#1E4634" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Find us</h3>
+        <p><strong>Richbar Inc</strong><br>144 Parsippany Rd<br>Whippany, NJ 07981</p>
+        <p>Serving Whippany, Hanover Township, and Morris County.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#1E4634" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg> Call us</h3>
+        <p>Free estimates, Monday through Friday:</p>
+        <a class="big" href="tel:+19738841374">(973) 884-1374</a>
+        <p style="margin-top:10px">Tell us what the yard needs. We will take it from there.</p>
+      </div>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#1E4634" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Hours</h3>
+        <table class="hours-table" id="hoursTable">
+          <tr><td>Monday</td><td>9:00 AM - 6:00 PM</td></tr>
+          <tr><td>Tuesday</td><td>9:00 AM - 6:00 PM</td></tr>
+          <tr><td>Wednesday</td><td>9:00 AM - 6:00 PM</td></tr>
+          <tr><td>Thursday</td><td>9:00 AM - 6:00 PM</td></tr>
+          <tr><td>Friday</td><td>9:00 AM - 6:00 PM</td></tr>
+          <tr><td>Saturday</td><td>Closed</td></tr>
+          <tr><td>Sunday</td><td>Closed</td></tr>
+        </table>
+        <p style="margin-top:10px;font-size:.85rem">Hours from our directory listings. Call to confirm holiday hours.</p>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <svg viewBox="0 0 24 24" fill="#1E4634"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#F8F5EB"/></svg>
+          <strong>144 Parsippany Rd</strong>
+          <small>Whippany, NJ 07981</small><br>
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJtXGK1Nynw4kRntjND3opFiU" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand">
+          <svg viewBox="0 0 64 64" role="img" aria-label="Richbar tree logo"><circle cx="32" cy="32" r="30" fill="#F8F5EB"/><path d="M32 10 L43 26 L37 26 L46 38 L39 38 L44 47 L20 47 L25 38 L18 38 L27 26 L21 26 Z" fill="#4E7A52"/><rect x="29" y="45" width="6" height="10" fill="#B4713A"/></svg>
+          <span>Richbar Inc</span>
+        </div>
+        <p>Landscaping and gardening in Whippany, NJ. Lawns, beds, plantings, and seasonal cleanups across Morris County.</p>
+      </div>
+      <div>
+        <h4><span class="mono">01</span>Visit</h4>
+        <p>144 Parsippany Rd<br>Whippany, NJ 07981<br><a href="tel:+19738841374">(973) 884-1374</a></p>
+      </div>
+      <div>
+        <h4><span class="mono">02</span>Explore</h4>
+        <p><a href="#services" data-page="services">Services</a><br><a href="#gallery" data-page="gallery">Gallery</a><br><a href="#reviews" data-page="reviews">Reviews</a><br><a href="#contact" data-page="contact">Contact</a></p>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© Richbar Inc</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "contact"];
+  var drawer = document.getElementById("drawer");
+  var scrim = document.getElementById("scrim");
+  var drawerBtn = document.getElementById("drawerBtn");
+  var drawerClose = document.getElementById("drawerClose");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(drawer){ drawer.classList.remove("open"); }
+    if(scrim){ scrim.classList.remove("show"); }
+    if(drawerBtn){ drawerBtn.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("#drawerNav a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(drawerBtn && drawer){
+    drawerBtn.addEventListener("click", function(){
+      var open = drawer.classList.toggle("open");
+      scrim.classList.toggle("show", open);
+      drawerBtn.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+  if(drawerClose){ drawerClose.addEventListener("click", closeMenu); }
+  if(scrim){ scrim.addEventListener("click", closeMenu); }
+
+  /* ---------- carousel ---------- */
+  var track = document.getElementById("carTrack");
+  var dotsWrap = document.getElementById("carDots");
+  var idx = 0, total = 0;
+  if(track){
+    total = track.children.length;
+    for(var d = 0; d < total; d++){
+      var dot = document.createElement("button");
+      dot.setAttribute("type", "button");
+      dot.setAttribute("aria-label", "Go to slide " + (d + 1));
+      (function(n){ dot.addEventListener("click", function(){ goTo(n); }); })(d);
+      dotsWrap.appendChild(dot);
+    }
+  }
+  function goTo(n){
+    if(total === 0){ return; }
+    idx = ((n % total) + total) % total;
+    track.style.transform = "translateX(-" + (idx * 100) + "%)";
+    var dots = dotsWrap.children;
+    for(var k = 0; k < dots.length; k++){
+      dots[k].classList.toggle("on", k === idx);
+    }
+  }
+  var prev = document.getElementById("carPrev");
+  var next = document.getElementById("carNext");
+  if(prev){ prev.addEventListener("click", function(){ goTo(idx - 1); }); }
+  if(next){ next.addEventListener("click", function(){ goTo(idx + 1); }); }
+  goTo(0);
+
+  /* ---------- live hours (America/New_York) ---------- */
+  var HOURS = {0:null,1:[9,18],2:[9,18],3:[9,18],4:[9,18],5:[9,18],6:null};
+  var DOW = {"Sun":0,"Mon":1,"Tue":2,"Wed":3,"Thu":4,"Fri":5,"Sat":6};
+  function fmt(h){
+    var ap = h < 12 ? "AM" : "PM";
+    var hh = h % 12;
+    if(hh === 0){ hh = 12; }
+    return hh + ":00 " + ap;
+  }
+  try{
+    var parts = new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",weekday:"short",hour:"numeric",hour12:false}).formatToParts(new Date());
+    var wd = "Mon", hr = 12;
+    parts.forEach(function(p){
+      if(p.type === "weekday"){ wd = p.value; }
+      if(p.type === "hour"){ hr = parseInt(p.value, 10) % 24; }
+    });
+    var day = DOW[wd] !== undefined ? DOW[wd] : 1;
+    var pill = document.getElementById("hoursPill");
+    var txt = document.getElementById("hoursText");
+    var today = HOURS[day];
+    if(pill && txt){
+      if(today && hr >= today[0] && hr < today[1]){
+        txt.textContent = "Open now · until " + fmt(today[1]) + " today";
+      } else {
+        pill.classList.add("closed");
+        var found = false, nd = day;
+        for(var s = 1; s <= 7; s++){
+          nd = (day + s) % 7;
+          if(HOURS[nd]){ found = true; break; }
+        }
+        var dayName = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][nd];
+        txt.textContent = found ? "Opens " + (s === 1 ? "tomorrow" : dayName) + " at " + fmt(HOURS[nd][0]) : "Call for hours";
+      }
+    }
+    var rows = document.querySelectorAll("#hoursTable tr");
+    var rowIdx = (day + 6) % 7; /* rows run Mon..Sun */
+    if(rows[rowIdx]){ rows[rowIdx].classList.add("today"); }
+  }catch(e){ /* leave default pill text */ }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Route 1 Auto Care · Honest Auto Repair, Alexandria VA</title>
+<meta name="description" content="Route 1 Auto Care is a small, independent auto repair shop at 6817 Richmond Hwy, Alexandria, VA. Honest diagnostics, fair prices, fast turnaround. Call (703) 660-2334.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --asphalt:#191D22; --steel:#232A31; --line:#303943;
+  --signal:#FF6B1A; --signal-deep:#D9530C; --signal-soft:#FFE4D1;
+  --sign:#FFC400; --sign-soft:#FFF3C9;
+  --paper:#F7F4ED; --paper-2:#EFEBE1; --card:#FFFFFF;
+  --ink:#1E2429; --ink-soft:#5B646D;
+  --radius:16px;
+  --shadow:0 18px 40px -18px rgba(0,0,0,.32);
+  --shadow-sm:0 8px 22px -10px rgba(0,0,0,.25);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Barlow",system-ui,sans-serif;
+  background:var(--paper);
+  background-image:repeating-linear-gradient(-45deg, transparent 0 18px, rgba(25,29,34,.022) 18px 20px);
+  color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;
+}
+img{max-width:100%}
+a{color:var(--signal-deep)}
+::selection{background:var(--sign);color:var(--ink)}
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+.cond{font-family:"Barlow Condensed",sans-serif}
+
+/* ---------- top bar + side drawer ---------- */
+header.site{position:sticky;top:0;z-index:60;background:var(--asphalt);border-bottom:4px solid var(--signal)}
+.bar{display:flex;align-items:center;gap:14px;padding:10px 0}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:#fff}
+.brand svg{width:48px;height:48px;flex:none}
+.brand-name{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:1.45rem;letter-spacing:.5px;line-height:1;text-transform:uppercase}
+.brand-name small{display:block;font-family:"Barlow",sans-serif;font-weight:600;font-size:.62rem;letter-spacing:3px;color:var(--sign);text-transform:uppercase;margin-top:3px}
+.burger{margin-left:auto;background:var(--signal);border:0;border-radius:12px;cursor:pointer;padding:11px 12px;display:flex;flex-direction:column;gap:5px}
+.burger span{display:block;width:26px;height:3px;border-radius:3px;background:#fff;transition:.25s}
+.burger[aria-expanded="true"] span:nth-child(1){transform:translateY(8px) rotate(45deg)}
+.burger[aria-expanded="true"] span:nth-child(2){opacity:0}
+.burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-8px) rotate(-45deg)}
+.drawer{
+  position:fixed;top:0;left:0;bottom:0;width:320px;max-width:86vw;z-index:70;
+  background:var(--steel);border-right:4px solid var(--signal);
+  transform:translateX(-105%);transition:transform .3s cubic-bezier(.22,.8,.3,1);
+  display:flex;flex-direction:column;padding:22px;
+}
+.drawer.open{transform:none}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.drawer-head strong{font-family:"Barlow Condensed",sans-serif;color:#fff;font-size:1.2rem;text-transform:uppercase;letter-spacing:1px}
+.drawer-close{background:none;border:2px solid var(--line);color:#fff;border-radius:10px;width:38px;height:38px;font-size:1.1rem;cursor:pointer}
+nav.drawer-links{display:flex;flex-direction:column;gap:6px}
+nav.drawer-links a{
+  color:#fff;text-decoration:none;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:1.35rem;
+  letter-spacing:.5px;text-transform:uppercase;padding:12px 16px;border-radius:12px;
+  border-left:5px solid transparent;transition:background .18s,border-color .18s;
+}
+nav.drawer-links a:hover{background:rgba(255,255,255,.06)}
+nav.drawer-links a.active{background:rgba(255,107,26,.14);border-left-color:var(--signal);color:var(--sign)}
+.drawer .call-btn{margin-top:auto}
+.scrim{position:fixed;inset:0;background:rgba(15,18,22,.55);z-index:65;opacity:0;pointer-events:none;transition:opacity .25s}
+.scrim.show{opacity:1;pointer-events:auto}
+.call-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  background:var(--signal);color:#fff;text-decoration:none;font-weight:700;
+  padding:13px 24px;border-radius:999px;box-shadow:var(--shadow-sm);
+  transition:transform .18s,background .18s;white-space:nowrap;
+}
+.call-btn:hover{background:var(--signal-deep);transform:translateY(-2px)}
+.top-call{margin-left:0}
+@media(max-width:560px){.top-call{display:none}}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- hero (split) ---------- */
+.hero{background:var(--asphalt);color:#fff;position:relative;overflow:hidden}
+.hero::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(90deg, transparent 0 90px, rgba(255,196,0,.07) 90px 94px);
+}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center;padding:76px 0 64px;position:relative;z-index:1}
+.kicker{
+  display:inline-block;background:var(--sign);color:var(--ink);
+  font-weight:800;font-size:.78rem;letter-spacing:2.5px;text-transform:uppercase;
+  padding:8px 18px;border-radius:6px;margin-bottom:20px;transform:skewX(-8deg);
+}
+h1{
+  font-family:"Barlow Condensed",sans-serif;font-weight:800;text-transform:uppercase;
+  font-size:clamp(2.8rem,5.6vw,4.6rem);line-height:.98;letter-spacing:.5px;margin-bottom:18px;
+}
+h1 .accent{color:var(--signal)}
+.lede{font-size:1.12rem;color:#C9D1D8;max-width:34rem;margin-bottom:26px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:26px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;
+  padding:14px 26px;border-radius:999px;font-size:1rem;transition:transform .18s,box-shadow .18s,background .18s;
+}
+.btn-solid{background:var(--signal);color:#fff;box-shadow:var(--shadow-sm)}
+.btn-solid:hover{background:var(--signal-deep);transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.35)}
+.btn-ghost:hover{border-color:var(--sign);color:var(--sign);transform:translateY(-2px)}
+.hours-pill{
+  display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.18);color:#fff;
+  padding:10px 20px;border-radius:999px;font-weight:600;font-size:.95rem;
+}
+.hours-pill .dot{width:10px;height:10px;border-radius:50%;background:#7BC47F;box-shadow:0 0 0 4px rgba(123,196,127,.25);animation:pulse 2s infinite}
+.hours-pill.closed .dot{background:#E4658F;box-shadow:0 0 0 4px rgba(228,101,143,.25)}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+.hero-art{position:relative}
+.shop-stage{
+  position:relative;background:linear-gradient(150deg,#2A3139,#191D22);
+  border-radius:24px;padding:34px;box-shadow:var(--shadow);
+  border:3px solid var(--line);overflow:hidden;
+}
+.shop-stage::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(circle at 85% 12%, rgba(255,107,26,.28), transparent 45%);
+}
+.shop-stage svg{width:100%;height:auto;display:block}
+.stamp{
+  position:absolute;bottom:-18px;right:22px;background:var(--sign);color:var(--ink);
+  font-family:"Barlow Condensed",sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:1px;
+  padding:12px 22px;border-radius:10px;transform:rotate(-3deg) skewX(-8deg);
+  box-shadow:var(--shadow-sm);font-size:1rem;z-index:2;
+}
+
+/* ---------- marquee ---------- */
+.marquee{background:var(--signal);color:#fff;overflow:hidden;padding:15px 0;transform:skewY(-1deg) scale(1.02);margin:26px 0}
+.marquee-track{display:flex;width:max-content;animation:scroll 30s linear infinite}
+.marquee-track span{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:1.3rem;letter-spacing:1px;text-transform:uppercase;padding:0 28px;white-space:nowrap}
+.marquee-track span i{font-style:normal;padding-right:28px;color:var(--asphalt)}
+@keyframes scroll{to{transform:translateX(-50%)}}
+
+/* ---------- sections ---------- */
+section.block{padding:60px 0}
+.sec-head{max-width:46rem;margin:0 auto 44px}
+.sec-head.left{text-align:left;margin:0 0 36px}
+.sec-head .tagline{font-family:"Barlow Condensed",sans-serif;font-weight:700;color:var(--signal-deep);font-size:1rem;letter-spacing:3px;text-transform:uppercase}
+h2{font-family:"Barlow Condensed",sans-serif;font-weight:800;text-transform:uppercase;font-size:clamp(2rem,3.8vw,2.9rem);line-height:1.02;margin:8px 0 14px;letter-spacing:.5px}
+.sec-head p{color:var(--ink-soft)}
+
+/* ---------- asymmetric grid ---------- */
+.asym{display:grid;grid-template-columns:repeat(12,1fr);gap:22px}
+.acard{background:var(--card);border-radius:var(--radius);padding:32px 30px;box-shadow:var(--shadow-sm);border-left:7px solid var(--signal);position:relative;overflow:hidden}
+.acard h3{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:1.7rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.acard p{color:var(--ink-soft)}
+.acard .num{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:4.2rem;line-height:1;color:var(--signal-soft);position:absolute;top:14px;right:20px}
+.a1{grid-column:span 7}.a2{grid-column:span 5}.a3{grid-column:span 5}.a4{grid-column:span 7}
+.a2{border-left-color:var(--sign)}.a3{border-left-color:var(--asphalt)}.a4{border-left-color:var(--signal)}
+.acard.dark{background:var(--asphalt);color:#fff}
+.acard.dark p{color:#C9D1D8}
+.acard.dark .num{color:rgba(255,255,255,.09)}
+
+/* ---------- split ---------- */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.split p{color:var(--ink-soft);margin-bottom:14px}
+.check-list{list-style:none;margin:20px 0;display:grid;gap:12px}
+.check-list li{display:flex;gap:12px;align-items:flex-start;font-weight:600}
+.check-list svg{flex:none;width:24px;height:24px;margin-top:2px}
+.stat-wall{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.stat{background:var(--asphalt);color:#fff;border-radius:var(--radius);padding:28px 24px;box-shadow:var(--shadow-sm)}
+.stat:nth-child(2){background:var(--signal)}
+.stat:nth-child(3){background:var(--sign);color:var(--ink)}
+.stat:nth-child(4){background:var(--card);color:var(--ink);border:2px solid var(--line)}
+.stat .v{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:2.6rem;line-height:1}
+.stat .l{font-size:.9rem;opacity:.85;margin-top:6px}
+
+/* ---------- page strip ---------- */
+.strip{background:var(--asphalt);color:#fff;border-radius:24px;padding:56px 48px;position:relative;overflow:hidden;margin-bottom:44px;box-shadow:var(--shadow)}
+.strip::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg, transparent 0 70px, rgba(255,196,0,.09) 70px 73px)}
+.strip h2{color:#fff;font-size:clamp(2.1rem,4vw,3.1rem);position:relative;margin:8px 0 12px}
+.strip p{color:#C9D1D8;max-width:38rem;position:relative}
+.strip .tagline{font-family:"Barlow Condensed",sans-serif;font-weight:700;color:var(--sign);font-size:1rem;letter-spacing:3px;text-transform:uppercase;position:relative}
+
+/* ---------- tabs ---------- */
+.tabbar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:26px}
+.tab-btn{
+  font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:1.05rem;text-transform:uppercase;letter-spacing:1px;
+  background:var(--card);border:2px solid var(--line);color:var(--ink);
+  padding:11px 22px;border-radius:999px;cursor:pointer;transition:all .18s;
+}
+.tab-btn:hover{border-color:var(--signal)}
+.tab-btn.active{background:var(--asphalt);border-color:var(--asphalt);color:#fff;box-shadow:var(--shadow-sm)}
+.tab-panel{display:none}
+.tab-panel.active{display:block;animation:fadeIn .25s ease}
+.svc-list{display:grid;grid-template-columns:1fr 1fr;gap:10px 36px}
+.svc{padding:16px 6px;border-bottom:2px dashed rgba(30,36,41,.18)}
+.svc-top{display:flex;align-items:baseline;gap:10px}
+.svc-top strong{font-size:1.08rem}
+.svc-top .dots{flex:1;border-bottom:2px dotted rgba(217,83,12,.5);transform:translateY(-4px)}
+.svc-top .price{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:1.15rem;color:var(--signal-deep);white-space:nowrap}
+.svc small{color:var(--ink-soft)}
+.svc .sample{display:inline-block;background:var(--sign-soft);color:#7A5B00;font-size:.68rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:999px;margin-left:8px;vertical-align:2px}
+.price-note{background:var(--sign-soft);border:2px dashed rgba(217,83,12,.45);border-radius:var(--radius);padding:18px 24px;margin-top:26px;font-size:.95rem;color:#6B4423}
+
+/* ---------- carousel ---------- */
+.car{position:relative;max-width:860px;margin:0 auto}
+.car-view{overflow:hidden;border-radius:24px;box-shadow:var(--shadow);border:3px solid var(--line)}
+.car-track{display:flex;transition:transform .45s cubic-bezier(.22,.8,.3,1)}
+.slide{flex:0 0 100%;position:relative;background:var(--steel);min-height:420px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.slide svg.art{width:46%;max-width:340px;height:auto;filter:drop-shadow(0 14px 18px rgba(0,0,0,.35))}
+.slide .cap{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(transparent, rgba(15,18,22,.92));color:#fff;padding:44px 28px 22px}
+.slide .cap strong{font-family:"Barlow Condensed",sans-serif;font-size:1.5rem;text-transform:uppercase;letter-spacing:1px;display:block}
+.slide .cap small{color:#C9D1D8}
+.slide .soon{position:absolute;top:18px;right:18px;background:rgba(255,255,255,.9);font-size:.7rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:6px 14px;border-radius:999px;color:var(--ink-soft)}
+.car-btn{
+  position:absolute;top:50%;transform:translateY(-50%);z-index:3;
+  width:52px;height:52px;border-radius:50%;border:0;cursor:pointer;
+  background:var(--signal);color:#fff;font-size:1.4rem;font-weight:800;box-shadow:var(--shadow-sm);transition:background .18s;
+}
+.car-btn:hover{background:var(--signal-deep)}
+.car-btn.prev{left:-26px}.car-btn.next{right:-26px}
+.car-dots{display:flex;justify-content:center;gap:10px;margin-top:20px}
+.car-dot{width:12px;height:12px;border-radius:50%;border:0;background:var(--line);cursor:pointer;opacity:.5;transition:.2s}
+.car-dot.active{opacity:1;background:var(--signal);transform:scale(1.25)}
+
+/* ---------- reviews ---------- */
+.rev-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.rev{background:var(--card);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow-sm);border-top:6px solid var(--signal);position:relative}
+.rev .stars{color:var(--signal);font-size:1.2rem;letter-spacing:3px;margin-bottom:12px}
+.rev p{font-size:1.02rem;margin-bottom:14px}
+.rev cite{font-style:normal;font-weight:700;font-size:.85rem;color:var(--signal-deep);letter-spacing:.5px}
+.rev .badge{position:absolute;top:16px;right:16px;background:var(--paper-2);color:var(--ink-soft);font-size:.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 12px;border-radius:999px}
+.cta-band{background:var(--asphalt);border-radius:26px;color:#fff;padding:52px 40px;text-align:center;margin-top:44px;box-shadow:var(--shadow);position:relative;overflow:hidden;border-top:6px solid var(--signal)}
+.cta-band h2{color:#fff}
+.cta-band p{color:#C9D1D8;max-width:36rem;margin:0 auto 24px}
+.balanced{background:var(--card);border:2px solid var(--line);border-radius:var(--radius);padding:20px 26px;margin-top:26px;font-size:.95rem;color:var(--ink-soft)}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
+.info-card{background:var(--card);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm);border-top:6px solid var(--asphalt)}
+.info-card h3{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:1.5rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.info-card h3 svg{width:28px;height:28px}
+.info-card p{color:var(--ink-soft);margin-bottom:8px}
+.info-card a.big{font-family:"Barlow Condensed",sans-serif;font-size:1.7rem;font-weight:800;color:var(--signal-deep);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.hours-table{width:100%;border-collapse:collapse;font-size:.98rem}
+.hours-table td{padding:10px 6px;border-bottom:2px dashed rgba(30,36,41,.15)}
+.hours-table tr.today td{font-weight:800;color:var(--signal-deep)}
+.hours-table tr.today td:first-child::after{content:" · today";font-family:"Barlow Condensed",sans-serif;letter-spacing:1px;color:var(--signal-deep);margin-left:6px}
+.hours-table td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.map-card{
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:340px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 46px, rgba(255,255,255,.05) 46px 48px),
+    repeating-linear-gradient(90deg, transparent 0 46px, rgba(255,255,255,.05) 46px 48px),
+    linear-gradient(140deg,#2A3139,#191D22);
+  display:flex;align-items:center;justify-content:center;
+}
+.map-pin{text-align:center;background:var(--card);padding:26px 34px;border-radius:20px;box-shadow:var(--shadow);max-width:78%;position:relative}
+.map-pin::after{content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);border:14px solid transparent;border-top-color:var(--card);border-bottom:0}
+.map-pin svg{width:44px;height:44px;margin-bottom:8px}
+.map-pin strong{font-family:"Barlow Condensed",sans-serif;font-size:1.2rem;text-transform:uppercase;letter-spacing:.5px;display:block}
+.map-pin small{color:var(--ink-soft)}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- footer (minimal) ---------- */
+footer{background:var(--asphalt);color:#C9D1D8;margin-top:20px;border-top:4px solid var(--signal)}
+.foot-min{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;padding:26px 0}
+.foot-min .fbrand{display:flex;align-items:center;gap:10px;font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:1.2rem;text-transform:uppercase;letter-spacing:1px;color:#fff;text-decoration:none}
+.foot-min .fbrand svg{width:36px;height:36px}
+.foot-min nav{display:flex;flex-wrap:wrap;gap:4px}
+.foot-min nav a{color:#C9D1D8;text-decoration:none;font-weight:600;font-size:.92rem;padding:8px 12px;border-radius:8px}
+.foot-min nav a:hover{color:var(--sign)}
+.foot-bottom{border-top:1px solid var(--line);padding:18px 0 22px;display:flex;justify-content:center;font-size:.85rem;color:#8A939B}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+.rs-strip{margin:0 auto 30px;max-width:680px;background:var(--card);border:2px solid var(--line);border-radius:var(--radius);padding:22px 26px;text-align:center;box-shadow:var(--shadow-sm)}
+.rs-note{margin:0 0 14px;font-size:.95rem;color:var(--ink-soft);line-height:1.55}
+.rs-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rs-btn{display:inline-block;background:var(--signal);color:#fff;padding:11px 26px;border-radius:999px;font-weight:700;text-decoration:none;font-size:.95rem;line-height:1.2}
+.rs-btn:hover{background:var(--signal-deep)}
+.rs-btn.alt{background:var(--asphalt)}
+
+@media(max-width:940px){
+  .hero-grid,.split,.visit-grid{grid-template-columns:1fr}
+  .a1,.a2,.a3,.a4{grid-column:span 12}
+  .svc-list{grid-template-columns:1fr}
+  .rev-grid{grid-template-columns:1fr}
+  .strip{padding:40px 28px}
+  .car-btn.prev{left:10px}.car-btn.next{right:10px}
+}
+@media(max-width:600px){
+  .stat-wall{grid-template-columns:1fr}
+  .hero-grid{padding:52px 0 48px}
+  .cta-band{padding:36px 24px}
+}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap bar">
+    <a class="brand" href="#home" data-page="home" aria-label="Route 1 Auto Care, home">
+      <svg viewBox="0 0 64 64" role="img" aria-label="Highway shield with number 1"><path d="M32 4 L58 12 V32 C58 47 46 57 32 61 C18 57 6 47 6 32 V12 Z" fill="#191D22" stroke="#FF6B1A" stroke-width="3.5"/><path d="M32 4 L58 12 V32 C58 47 46 57 32 61 C18 57 6 47 6 32 V12 Z" fill="none" stroke="#FFC400" stroke-width="1.2" transform="translate(0,0)"/><text x="32" y="42" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="30" fill="#FFC400">1</text></svg>
+      <span class="brand-name">Route 1 Auto Care<small>Alexandria, VA</small></span>
+    </a>
+    <button class="burger" id="burger" aria-label="Open navigation menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Site navigation">
+  <div class="drawer-head">
+    <strong>Menu</strong>
+    <button class="drawer-close" id="drawerClose" aria-label="Close navigation menu">✕</button>
+  </div>
+  <nav class="drawer-links" aria-label="Main navigation">
+    <a href="#home" data-page="home" class="active" aria-current="page">Home</a>
+    <a href="#services" data-page="services">Services</a>
+    <a href="#story" data-page="story">Our Story</a>
+    <a href="#gallery" data-page="gallery">Gallery</a>
+    <a href="#reviews" data-page="reviews">Reviews</a>
+    <a href="#visit" data-page="visit">Visit Us</a>
+  </nav>
+  <a class="call-btn" href="tel:+17036602334">Call (703) 660-2334</a>
+</aside>
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="kicker">Richmond Hwy · Alexandria, VA</span>
+        <h1>The <span class="accent">honest</span> shop on Route 1</h1>
+        <p class="lede">Route 1 Auto Care is a small, independent auto repair shop at 6817 Richmond Hwy. Straight talk about your car: what needs fixing now, what can wait, and a fair price for the work.</p>
+        <div class="cta-row">
+          <a class="btn btn-solid" href="#services" data-page="services">See Services →</a>
+          <a class="btn btn-ghost" href="https://www.google.com/maps/place/?q=place_id:ChIJQ-3nWOCxt4kROtaJvpPTxL8" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+        <span class="hours-pill" id="hoursPill"><span class="dot"></span><span id="hoursText">Checking today's hours…</span></span>
+      </div>
+      <div class="hero-art">
+        <div class="shop-stage">
+          <svg viewBox="0 0 400 300" role="img" aria-label="Illustration of a highway and a repair shop">
+            <rect x="0" y="200" width="400" height="100" fill="#101418"/>
+            <path d="M180 300 L200 200 L200 200 L220 300 Z" fill="#FFC400" opacity=".9"/>
+            <path d="M200 300 L200 200 L200 200 L200 300 Z" fill="#101418"/>
+            <g stroke="#FFC400" stroke-width="6" stroke-dasharray="26 20"><line x1="200" y1="208" x2="200" y2="292"/></g>
+            <rect x="52" y="96" width="150" height="104" rx="6" fill="#232A31" stroke="#FF6B1A" stroke-width="4"/>
+            <rect x="66" y="110" width="50" height="40" rx="3" fill="#3E6E8C"/>
+            <rect x="124" y="110" width="64" height="40" rx="3" fill="#3E6E8C"/>
+            <rect x="96" y="162" width="62" height="38" rx="3" fill="#101418"/>
+            <rect x="40" y="84" width="174" height="14" rx="4" fill="#FF6B1A"/>
+            <text x="127" y="96" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="11" fill="#191D22" letter-spacing="2">AUTO CARE</text>
+            <rect x="300" y="120" width="52" height="80" rx="4" fill="#232A31" stroke="#303943" stroke-width="3"/>
+            <circle cx="316" cy="186" r="10" fill="#101418" stroke="#8A939B" stroke-width="3"/>
+            <circle cx="336" cy="186" r="10" fill="#101418" stroke="#8A939B" stroke-width="3"/>
+            <rect x="300" y="132" width="52" height="26" rx="3" fill="#3E6E8C"/>
+            <circle cx="330" cy="60" r="26" fill="#FFC400" opacity=".85"/>
+            <g stroke="#8A939B" stroke-width="3" opacity=".7"><line x1="260" y1="30" x2="260" y2="70"/><line x1="286" y1="18" x2="286" y2="58"/></g>
+            <g transform="translate(330,205) rotate(-24)" stroke="#FFC400" stroke-width="9" stroke-linecap="round">
+              <line x1="0" y1="0" x2="52" y2="52"/><circle cx="13" cy="13" r="11" fill="none" stroke="#FFC400" stroke-width="9"/>
+            </g>
+            <g transform="translate(352,190) rotate(24)" stroke="#FF6B1A" stroke-width="9" stroke-linecap="round">
+              <line x1="0" y1="52" x2="52" y2="0"/><circle cx="39" cy="13" r="11" fill="none" stroke="#FF6B1A" stroke-width="9"/>
+            </g>
+          </svg>
+        </div>
+        <div class="stamp">No upsells · No pressure</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track" id="marqueeTrack">
+      <span><i>▮</i>Oil Changes</span><span><i>▮</i>Brakes</span><span><i>▮</i>Diagnostics</span><span><i>▮</i>Tires</span><span><i>▮</i>A/C Repair</span><span><i>▮</i>Electrical</span><span><i>▮</i>Inspections</span><span><i>▮</i>Suspension</span>
+    </div>
+  </div>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="sec-head left reveal">
+        <span class="tagline">Why drivers keep coming back</span>
+        <h2>A small shop with a big reputation for honesty</h2>
+        <p>Drivers say the same thing about this place: Ray tells you what your car actually needs, skips what it does not, and charges a fair price.</p>
+      </div>
+      <div class="asym">
+        <div class="acard a1 reveal"><span class="num">01</span><h3>Honest, up front</h3><p>Customers praise Ray for being straight about what parts need replacing and what can be saved, with clear prices before any work starts.</p></div>
+        <div class="acard a2 dark reveal"><span class="num">02</span><h3>Fast turnaround</h3><p>Oil changes in about 20 minutes, same-week fixes for wipers and trunk latches. A small shop that fits you in.</p></div>
+        <div class="acard a3 reveal"><span class="num">03</span><h3>High-mileage heroes</h3><p>Drivers credit this shop with keeping their cars running past 300,000 miles, with smart advice that protects your budget.</p></div>
+        <div class="acard a4 dark reveal"><span class="num">04</span><h3>A real dealer alternative</h3><p>Many customers say they quit the dealership for good. Fair pricing, no pressure, and follow-up calls to make sure you are happy.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" style="padding-top:0">
+    <div class="wrap split">
+      <div class="reveal">
+        <span class="tagline">Straight talk</span>
+        <h2>No pressure, no mystery charges</h2>
+        <p>Walk in, get a real diagnosis, and hear exactly what the repair will cost before a single bolt turns. That is the whole business model.</p>
+        <ul class="check-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#D9530C" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>What needs fixing now vs. what can wait, spelled out</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#D9530C" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Upfront pricing, no surprise line items</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#D9530C" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Quick work, often the same day you call</li>
+        </ul>
+        <a class="btn btn-solid" href="tel:+17036602334">Call (703) 660-2334</a>
+      </div>
+      <div class="stat-wall reveal">
+        <div class="stat"><div class="v">4.5★</div><div class="l">Average rating across Google and Yelp</div></div>
+        <div class="stat"><div class="v">80+</div><div class="l">Public reviews and counting</div></div>
+        <div class="stat"><div class="v">Rt. 1</div><div class="l">Right on Richmond Hwy, easy in and out</div></div>
+        <div class="stat"><div class="v">360k</div><div class="l">Miles one customer's Accord hit with Ray's care</div></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="cta-band reveal">
+      <h2>Car making a noise it should not?</h2>
+      <p>6817 Richmond Hwy, Alexandria, VA · Mon-Fri 8:00 AM - 5:30 PM, Sat 8:00 AM - 1:00 PM. Call ahead and they will fit you in.</p>
+      <a class="btn btn-solid" href="tel:+17036602334">Call (703) 660-2334</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip">
+      <span class="tagline">What we fix</span>
+      <h2>Full-service repair,<br>zero guesswork</h2>
+      <p>From routine maintenance to engine diagnostics, one small crew handles it all. Pick a category to see typical services and sample starting prices.</p>
+    </div>
+
+    <div class="tabbar reveal" role="tablist" aria-label="Service categories">
+      <button class="tab-btn active" data-tab="tab-maint" role="tab" aria-selected="true">Maintenance</button>
+      <button class="tab-btn" data-tab="tab-brakes" role="tab" aria-selected="false">Brakes, Tires &amp; Steering</button>
+      <button class="tab-btn" data-tab="tab-engine" role="tab" aria-selected="false">Engine &amp; Electrical</button>
+      <button class="tab-btn" data-tab="tab-ac" role="tab" aria-selected="false">A/C &amp; Heating</button>
+      <button class="tab-btn" data-tab="tab-inspect" role="tab" aria-selected="false">Inspections</button>
+    </div>
+
+    <div class="tab-panel active" id="tab-maint" role="tabpanel">
+      <div class="svc-list">
+        <div class="svc"><div class="svc-top"><strong>Oil change</strong><span class="sample">Sample</span><span class="dots"></span><span class="price">from $45</span></div><small>Conventional or synthetic. In and out in about 20 minutes.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Air &amp; cabin filter replacement</strong><span class="sample">Sample</span><span class="dots"></span><span class="price">from $25</span></div><small>Better airflow, cleaner air in the cabin.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Battery testing &amp; replacement</strong><span class="sample">Sample</span><span class="dots"></span><span class="price">from $179</span></div><small>Free battery check before you spend a dime.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Fluid checks &amp; top-offs</strong><span class="sample">Sample</span><span class="dots"></span><span class="price">from $19</span></div><small>Coolant, brake, power steering and washer fluid.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Tire rotation</strong><span class="sample">Sample</span><span class="dots"></span><span class="price">from $25</span></div><small>Even wear, longer tire life.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Scheduled maintenance</strong><span class="sample">Sample</span><span class="dots"></span><span class="price">call us</span></div><small>Factory-interval service without the dealer markup.</small></div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-brakes" role="tabpanel">
+      <div class="svc-list">
+        <div class="svc"><div class="svc-top"><strong>Brake pads &amp; rotors</strong><span class="sample">Sample</span><span class="dots"></span><span class="price">from $149</span></div><small>Squealing, grinding or soft pedal? Get them checked.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Wheel bearings</strong><span class="sample">Sample</span><span class="dots"></span><span class="price">from $199</span></div><small>Humming at speed often means a bad bearing.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Tires: sales &amp; mounting</strong><span class="sample">Sample</span><span class="dots"></span><span class="price">call us</span></div><small>New tires, mounted and balanced.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Wheel alignment</strong><span class="sample">Sample</span><span class="dots"></span><span class="price">from $89</span></div><small>Pulling to one side or uneven wear.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Steering &amp; suspension</strong><span class="sample">Sample</span><span class="dots"></span><span class="price">call us</span></div><small>Shocks, struts, tie rods and steering racks.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Vibration diagnosis</strong><span class="sample">Sample</span><span class="dots"></span><span class="price">from $59</span></div><small>Track down shakes, shimmies and rattles.</small></div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-engine" role="tabpanel">
+      <div class="svc-list">
+        <div class="svc"><div class="svc-top"><strong>Engine diagnostics</strong><span class="sample">Sample</span><span class="dots"></span><span class="price">from $89</span></div><small>Check-engine light? Find the real cause, not a guess.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Engine tune-up</strong><span class="sample">Sample</span><span class="dots"></span><span class="price">from $129</span></div><small>Spark plugs, filters and adjustments for smooth running.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Electrical repair</strong><span class="sample">Sample</span><span class="dots"></span><span class="price">call us</span></div><small>Starters, alternators, wiring and power accessories.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Transmission service</strong><span class="sample">Sample</span><span class="dots"></span><span class="price">call us</span></div><small>Fluid service and shifting problems diagnosed.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Exhaust repair</strong><span class="sample">Sample</span><span class="dots"></span><span class="price">call us</span></div><small>Mufflers, pipes and catalytic converter work.</small></div>
+        <div class="svc"><div class="svc-top"><strong>High-mileage care plans</strong><span class="sample">Sample</span><span class="dots"></span><span class="price">call us</span></div><small>Keep a 200k+ mile car reliable, the shop specialty.</small></div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-ac" role="tabpanel">
+      <div class="svc-list">
+        <div class="svc"><div class="svc-top"><strong>A/C recharge</strong><span class="sample">Sample</span><span class="dots"></span><span class="price">from $129</span></div><small>Blowing warm? Get cold air back fast.</small></div>
+        <div class="svc"><div class="svc-top"><strong>A/C repair &amp; installation</strong><span class="sample">Sample</span><span class="dots"></span><span class="price">call us</span></div><small>Compressors, condensers and full system work.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Heater &amp; defroster repair</strong><span class="sample">Sample</span><span class="dots"></span><span class="price">call us</span></div><small>No heat in winter is a safety issue. Fix it.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Cooling system service</strong><span class="sample">Sample</span><span class="dots"></span><span class="price">from $99</span></div><small>Radiators, thermostats, hoses and coolant flushes.</small></div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-inspect" role="tabpanel">
+      <div class="svc-list">
+        <div class="svc"><div class="svc-top"><strong>Virginia safety inspection</strong><span class="sample">Sample</span><span class="dots"></span><span class="price">call us</span></div><small>Annual state inspection, done right the first time.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Pre-purchase inspection</strong><span class="sample">Sample</span><span class="dots"></span><span class="price">from $99</span></div><small>Buying used? Customers say this saved them from lemons.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Re-inspection after a fail</strong><span class="sample">Sample</span><span class="dots"></span><span class="price">call us</span></div><small>Failed elsewhere? Get a second, honest opinion.</small></div>
+        <div class="svc"><div class="svc-top"><strong>General vehicle checkup</strong><span class="sample">Sample</span><span class="dots"></span><span class="price">from $49</span></div><small>A full once-over before a road trip or a new season.</small></div>
+      </div>
+    </div>
+
+    <div class="price-note reveal">
+      <strong>Please note:</strong> prices shown are samples to give you a ballpark. Every car is different, so call <a href="tel:+17036602334"><strong>(703) 660-2334</strong></a> for an exact quote on your vehicle. You will hear the number before any work begins.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-story">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip">
+      <span class="tagline">Our story</span>
+      <h2>A small shop on the highway,<br>built on straight talk</h2>
+      <p>Route 1 Auto Care is an independent repair shop on Richmond Highway in Alexandria, the kind of place where the mechanic knows your car by heart.</p>
+    </div>
+
+    <div class="split" style="margin-bottom:56px">
+      <div class="reveal">
+        <span class="tagline">Who we are</span>
+        <h2>Small crew, big standards</h2>
+        <p>Route 1 Auto Care sits right on Richmond Hwy (Route 1), a few minutes south of Old Town Alexandria. It is a small shop, and that is the point: fewer cars in the bays means your car gets real attention.</p>
+        <p>Ray, the mechanic customers mention by name, has built the shop's reputation one honest diagnosis at a time. People drive in from Fairfax and Southern Maryland just to have him look at their cars, and some have trusted him with their vehicles for eight years or more.</p>
+        <p>The philosophy is simple: tell the customer what is actually wrong, fix it for a fair price, and call back to make sure everything is right.</p>
+      </div>
+      <div class="stat-wall reveal">
+        <div class="stat"><div class="v">Small</div><div class="l">Independent shop, personal service</div></div>
+        <div class="stat"><div class="v">Rt. 1</div><div class="l">On Richmond Hwy in Alexandria</div></div>
+        <div class="stat"><div class="v">8+ yrs</div><div class="l">Customers who keep coming back</div></div>
+        <div class="stat"><div class="v">4.5★</div><div class="l">Across Google and Yelp reviews</div></div>
+      </div>
+    </div>
+
+    <div class="asym" style="margin-bottom:56px">
+      <div class="acard a1 reveal"><span class="num">A</span><h3>Honesty first</h3><p>Reviewers consistently say the same thing: Ray tells you what can be saved, not just what can be sold. No pressure, no upsells, no mystery charges.</p></div>
+      <div class="acard a2 reveal"><span class="num">B</span><h3>High-mileage expertise</h3><p>One customer's Accord passed 360,000 miles under this shop's care. If your car has six figures on the clock, you are in good hands.</p></div>
+      <div class="acard a3 dark reveal"><span class="num">C</span><h3>Quick when it counts</h3><p>Oil changes in about 20 minutes, wipers and latches fixed next day. Call ahead and they will fit you in.</p></div>
+      <div class="acard a4 reveal"><span class="num">D</span><h3>Follow-through</h3><p>Customers mention follow-up calls after the repair to make sure everything is right. That is how a shop earns eight-year customers.</p></div>
+    </div>
+
+    <div class="wrap">
+      <div class="cta-band reveal">
+        <h2>Come meet the shop.</h2>
+        <p>6817 Richmond Hwy, Alexandria, VA. Call first so they can get a bay ready for you.</p>
+        <a class="btn btn-solid" href="#visit" data-page="visit">Plan your visit →</a>
+      </div>
+      <div style="height:56px"></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip">
+      <span class="tagline">The shop</span>
+      <h2>Take a look around</h2>
+      <p>Placeholder illustrations for now. Real photos of the shop and the bays are on the way.</p>
+    </div>
+
+    <div class="car reveal">
+      <div class="car-view">
+        <div class="car-track" id="carTrack">
+          <div class="slide">
+            <span class="soon">Photo soon</span>
+            <svg class="art" viewBox="0 0 200 160"><rect x="30" y="50" width="140" height="80" rx="6" fill="#FF6B1A"/><rect x="42" y="62" width="44" height="30" rx="3" fill="#3E6E8C"/><rect x="94" y="62" width="64" height="30" rx="3" fill="#3E6E8C"/><rect x="70" y="102" width="60" height="28" rx="3" fill="#191D22"/><rect x="22" y="40" width="156" height="12" rx="4" fill="#FFC400"/><text x="100" y="50" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="10" fill="#191D22" letter-spacing="2">AUTO CARE</text></svg>
+            <div class="cap"><strong>The shop on Route 1</strong><small>6817 Richmond Hwy, Alexandria</small></div>
+          </div>
+          <div class="slide">
+            <span class="soon">Photo soon</span>
+            <svg class="art" viewBox="0 0 200 160"><rect x="60" y="90" width="80" height="14" rx="4" fill="#303943"/><rect x="70" y="60" width="60" height="34" rx="6" fill="#FF6B1A"/><rect x="76" y="66" width="48" height="14" rx="2" fill="#3E6E8C"/><circle cx="80" cy="104" r="9" fill="#101418" stroke="#8A939B" stroke-width="3"/><circle cx="120" cy="104" r="9" fill="#101418" stroke="#8A939B" stroke-width="3"/><rect x="92" y="20" width="16" height="42" fill="#8A939B"/><circle cx="100" cy="16" r="8" fill="#FFC400"/></svg>
+            <div class="cap"><strong>Service bays</strong><small>Small shop, focused work</small></div>
+          </div>
+          <div class="slide">
+            <span class="soon">Photo soon</span>
+            <svg class="art" viewBox="0 0 200 160"><rect x="70" y="90" width="60" height="44" rx="4" fill="#FFC400"/><rect x="78" y="70" width="44" height="24" rx="3" fill="#8A939B"/><rect x="92" y="52" width="16" height="20" rx="3" fill="#D9530C"/><ellipse cx="100" cy="140" rx="52" ry="8" fill="#101418" opacity=".6"/></svg>
+            <div class="cap"><strong>Oil changes</strong><small>In and out in about 20 minutes</small></div>
+          </div>
+          <div class="slide">
+            <span class="soon">Photo soon</span>
+            <svg class="art" viewBox="0 0 200 160"><circle cx="100" cy="80" r="44" fill="#101418" stroke="#8A939B" stroke-width="6"/><circle cx="100" cy="80" r="20" fill="#303943" stroke="#FF6B1A" stroke-width="4"/><circle cx="100" cy="80" r="6" fill="#8A939B"/><g stroke="#FFC400" stroke-width="6" stroke-linecap="round"><line x1="30" y1="140" x2="52" y2="118"/><line x1="170" y1="140" x2="148" y2="118"/></g></svg>
+            <div class="cap"><strong>Brakes &amp; wheels</strong><small>Pads, rotors, bearings, tires</small></div>
+          </div>
+          <div class="slide">
+            <span class="soon">Photo soon</span>
+            <svg class="art" viewBox="0 0 200 160"><rect x="55" y="50" width="90" height="60" rx="8" fill="#232A31" stroke="#FF6B1A" stroke-width="4"/><path d="M65 70 l20 20 l-20 0 l20 20" fill="none" stroke="#FFC400" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><rect x="80" y="116" width="40" height="10" rx="3" fill="#8A939B"/></svg>
+            <div class="cap"><strong>Engine diagnostics</strong><small>Find the real cause, not a guess</small></div>
+          </div>
+          <div class="slide">
+            <span class="soon">Photo soon</span>
+            <svg class="art" viewBox="0 0 200 160"><g transform="rotate(-24 100 80)" stroke="#FFC400" stroke-width="10" stroke-linecap="round"><line x1="70" y1="50" x2="130" y2="110"/><circle cx="86" cy="66" r="13" fill="none" stroke="#FFC400" stroke-width="10"/></g><g transform="rotate(24 100 80)" stroke="#FF6B1A" stroke-width="10" stroke-linecap="round"><line x1="70" y1="110" x2="130" y2="50"/><circle cx="114" cy="66" r="13" fill="none" stroke="#FF6B1A" stroke-width="10"/></g></svg>
+            <div class="cap"><strong>Tools of the trade</strong><small>Real wrenches, real answers</small></div>
+          </div>
+        </div>
+      </div>
+      <button class="car-btn prev" id="carPrev" aria-label="Previous photo">‹</button>
+      <button class="car-btn next" id="carNext" aria-label="Next photo">›</button>
+      <div class="car-dots" id="carDots" role="tablist" aria-label="Photo selector"></div>
+    </div>
+
+    <div class="price-note reveal" style="margin-top:28px">
+      <strong>Coming soon:</strong> real photos of the shop, the bays and the crew. The illustrations above are placeholders the owner can swap for actual photos.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip">
+      <span class="tagline">Word on the street</span>
+      <h2>Drivers rate it<br>about 4.5 stars</h2>
+      <p>Based on roughly 80 reviews across Google and Yelp. Here are the themes that come up again and again.</p>
+    </div>
+    <div class="rs-strip">
+      <p class="rs-note">Review themes on this page are paraphrased from public reviews. Open the source to read current reviews and ratings.</p>
+      <div class="rs-links">
+        <a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJQ-3nWOCxt4kROtaJvpPTxL8" target="_blank" rel="noopener">See reviews on Google</a>
+        <a class="rs-btn alt" href="https://reviews.birdeye.com/route-1-auto-care-richmond-highway-mechanic-166194408785017" target="_blank" rel="noopener">See reviews on Birdeye</a>
+      </div>
+    </div>
+
+    <div class="rev-grid">
+      <div class="rev reveal"><span class="badge">Sample</span><div class="stars">★★★★★</div><p>Ray is honest about what parts need replacing and what can be saved, and very upfront about prices and what needs to be done.</p><cite>Paraphrased from review themes</cite></div>
+      <div class="rev reveal"><span class="badge">Sample</span><div class="stars">★★★★★</div><p>Ray has been my mechanic for years and kept my Accord running past 360,000 miles. Even after moving away, I bring the car back to him.</p><cite>Paraphrased from review themes</cite></div>
+      <div class="rev reveal"><span class="badge">Sample</span><div class="stars">★★★★★</div><p>Got me in and out in 20 minutes for a much-needed oil change on a Friday afternoon. Quick, fair, no hassle.</p><cite>Paraphrased from review themes</cite></div>
+      <div class="rev reveal"><span class="badge">Sample</span><div class="stars">★★★★★</div><p>The best shop in the DMV. We quit the dealership years ago. Honest, personable, knowledgeable, fair pricing. We are in good hands.</p><cite>Paraphrased from review themes</cite></div>
+    </div>
+
+    <div class="balanced reveal">
+      <strong>A fair note:</strong> most reviews praise this shop's honesty and pricing, but a few recent ones do not. We link the live review sources above so you can read both sides before you decide.
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Had a good visit? Say so.</h2>
+      <p>Reviews keep a small independent shop like this one alive. It takes a minute and it matters.</p>
+      <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJQ-3nWOCxt4kROtaJvpPTxL8" target="_blank" rel="noopener">★ Leave a Google review</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip">
+      <span class="tagline">Visit us</span>
+      <h2>Right on Route 1,<br>easy in and out</h2>
+      <p>6817 Richmond Hwy, Alexandria, VA 22306. Call ahead so the crew can get a bay ready for you.</p>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#D9530C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Find us</h3>
+        <p><strong>Route 1 Auto Care</strong><br>6817 Richmond Hwy<br>Alexandria, VA 22306</p>
+        <p>On Richmond Highway (Route 1), south of Old Town Alexandria. Easy to reach, easy to park.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#D9530C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg> Call us</h3>
+        <p>Questions, quotes, or to book a bay:</p>
+        <a class="big" href="tel:+17036602334">(703) 660-2334</a>
+        <p style="margin-top:10px">Small shop, so calling ahead is the fastest way to get in.</p>
+      </div>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#D9530C" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Hours</h3>
+        <table class="hours-table" id="hoursTable">
+          <tr><td>Monday</td><td>8:00 AM - 5:30 PM</td></tr>
+          <tr><td>Tuesday</td><td>8:00 AM - 5:30 PM</td></tr>
+          <tr><td>Wednesday</td><td>8:00 AM - 5:30 PM</td></tr>
+          <tr><td>Thursday</td><td>8:00 AM - 5:30 PM</td></tr>
+          <tr><td>Friday</td><td>8:00 AM - 5:30 PM</td></tr>
+          <tr><td>Saturday</td><td>8:00 AM - 1:00 PM</td></tr>
+          <tr><td>Sunday</td><td>Closed</td></tr>
+        </table>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <svg viewBox="0 0 24 24" fill="#D9530C"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#F7F4ED"/></svg>
+          <strong>6817 Richmond Hwy</strong>
+          <small>Alexandria, VA 22306</small><br>
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJQ-3nWOCxt4kROtaJvpPTxL8" target="_blank" rel="noopener">Get Directions →</a>
+        </div>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-min">
+      <a class="fbrand" href="#home" data-page="home">
+        <svg viewBox="0 0 64 64" role="img" aria-label="Highway shield with number 1"><path d="M32 4 L58 12 V32 C58 47 46 57 32 61 C18 57 6 47 6 32 V12 Z" fill="#232A31" stroke="#FF6B1A" stroke-width="3.5"/><text x="32" y="42" text-anchor="middle" font-family="Barlow Condensed, sans-serif" font-weight="800" font-size="30" fill="#FFC400">1</text></svg>
+        Route 1 Auto Care
+      </a>
+      <nav aria-label="Footer navigation">
+        <a href="#services" data-page="services">Services</a>
+        <a href="#gallery" data-page="gallery">Gallery</a>
+        <a href="#reviews" data-page="reviews">Reviews</a>
+        <a href="#visit" data-page="visit">Visit Us</a>
+        <a href="tel:+17036602334">(703) 660-2334</a>
+      </nav>
+    </div>
+    <div class="foot-bottom">
+      <span>© Route 1 Auto Care</span>
+    </div>
+  </div>
+</footer>
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "story", "gallery", "reviews", "visit"];
+  var drawer = document.getElementById("drawer");
+  var burger = document.getElementById("burger");
+  var scrim = document.getElementById("scrim");
+  var drawerClose = document.getElementById("drawerClose");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(drawer){ drawer.classList.remove("open"); }
+    if(scrim){ scrim.classList.remove("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll(".drawer-links a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  function toggleDrawer(force){
+    var open = force !== undefined ? force : !drawer.classList.contains("open");
+    drawer.classList.toggle("open", open);
+    scrim.classList.toggle("show", open);
+    burger.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+  if(burger && drawer){
+    burger.addEventListener("click", function(){ toggleDrawer(); });
+  }
+  if(drawerClose){ drawerClose.addEventListener("click", function(){ toggleDrawer(false); }); }
+  if(scrim){ scrim.addEventListener("click", function(){ toggleDrawer(false); }); }
+
+  /* ---------- marquee: duplicate for seamless loop ---------- */
+  var track = document.getElementById("marqueeTrack");
+  if(track){ track.innerHTML += track.innerHTML; }
+
+  /* ---------- service tabs ---------- */
+  var tabBtns = document.querySelectorAll(".tab-btn");
+  for(var t = 0; t < tabBtns.length; t++){
+    tabBtns[t].addEventListener("click", function(){
+      var target = this.getAttribute("data-tab");
+      for(var a = 0; a < tabBtns.length; a++){
+        tabBtns[a].classList.remove("active");
+        tabBtns[a].setAttribute("aria-selected", "false");
+      }
+      this.classList.add("active");
+      this.setAttribute("aria-selected", "true");
+      var panels = document.querySelectorAll(".tab-panel");
+      for(var b = 0; b < panels.length; b++){
+        panels[b].classList.toggle("active", panels[b].id === target);
+      }
+    });
+  }
+
+  /* ---------- gallery carousel ---------- */
+  var carTrack = document.getElementById("carTrack");
+  var carPrev = document.getElementById("carPrev");
+  var carNext = document.getElementById("carNext");
+  var carDots = document.getElementById("carDots");
+  var carIndex = 0;
+  var carCount = carTrack ? carTrack.children.length : 0;
+  var dots = [];
+  if(carTrack && carDots){
+    for(var d = 0; d < carCount; d++){
+      var dot = document.createElement("button");
+      dot.className = "car-dot" + (d === 0 ? " active" : "");
+      dot.setAttribute("aria-label", "Show photo " + (d + 1));
+      dot.setAttribute("data-i", d);
+      dot.addEventListener("click", function(){ carGo(parseInt(this.getAttribute("data-i"), 10)); });
+      carDots.appendChild(dot);
+      dots.push(dot);
+    }
+  }
+  function carGo(i){
+    carIndex = (i + carCount) % carCount;
+    carTrack.style.transform = "translateX(-" + (carIndex * 100) + "%)";
+    for(var k = 0; k < dots.length; k++){
+      dots[k].classList.toggle("active", k === carIndex);
+    }
+  }
+  if(carPrev){ carPrev.addEventListener("click", function(){ carGo(carIndex - 1); }); }
+  if(carNext){ carNext.addEventListener("click", function(){ carGo(carIndex + 1); }); }
+
+  /* ---------- live hours (America/New_York) ---------- */
+  var HOURS = {0:null,1:[8,17.5],2:[8,17.5],3:[8,17.5],4:[8,17.5],5:[8,17.5],6:[8,13]};
+  var DOW = {"Sun":0,"Mon":1,"Tue":2,"Wed":3,"Thu":4,"Fri":5,"Sat":6};
+  function fmt(h){
+    var ap = h < 12 ? "AM" : "PM";
+    var hh = Math.floor(h % 12);
+    if(hh === 0){ hh = 12; }
+    var mm = (h % 1 === 0.5) ? ":30" : ":00";
+    return hh + mm + " " + ap;
+  }
+  try{
+    var parts = new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",weekday:"short",hour:"numeric",hour12:false}).formatToParts(new Date());
+    var wd = "Mon", hr = 12;
+    parts.forEach(function(p){
+      if(p.type === "weekday"){ wd = p.value; }
+      if(p.type === "hour"){ hr = parseInt(p.value, 10) % 24; }
+    });
+    var day = DOW[wd] !== undefined ? DOW[wd] : 1;
+    var todayH = HOURS[day];
+    var pill = document.getElementById("hoursPill");
+    var txt = document.getElementById("hoursText");
+    if(pill && txt){
+      if(todayH && hr >= todayH[0] && hr < todayH[1]){
+        txt.textContent = "Open now · until " + fmt(todayH[1]) + " today";
+      } else {
+        pill.classList.add("closed");
+        if(todayH && hr < todayH[0]){
+          txt.textContent = "Opens today at " + fmt(todayH[0]);
+        } else {
+          var nd = (day + 1) % 7, guard = 0;
+          while(!HOURS[nd] && guard < 8){ nd = (nd + 1) % 7; guard++; }
+          var dayName = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][nd];
+          txt.textContent = "Opens " + (nd === (day + 1) % 7 ? "tomorrow" : dayName) + " at " + fmt(HOURS[nd][0]);
+        }
+      }
+    }
+    var rows = document.querySelectorAll("#hoursTable tr");
+    var idx = (day + 6) % 7; /* rows run Mon..Sun */
+    if(rows[idx]){ rows[idx].classList.add("today"); }
+  }catch(e){ /* leave default pill text */ }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
