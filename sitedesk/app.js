@@ -1607,7 +1607,15 @@ function renderApp(){
   } else if(state.tab === 'notifs'){
     app.innerHTML = shell('<div id="view"></div>');
     bindApp(app);
-    fetchFeed(false).then(function(){ renderAlertsInto(app.querySelector('#view')); });
+    fetchFeed(false).then(function(){
+      renderAlertsInto(app.querySelector('#view'));
+      /* Viewing the alerts clears the unread/gold state. */
+      setLastRead(Date.now());
+      state.unread = 0;
+      renderBell();
+      const navAlerts = app.querySelector('[data-tab="notifs"]');
+      if(navAlerts) navAlerts.classList.remove('unread-alert');
+    });
   } else if(state.tab === 'profile'){
     app.innerHTML = shell('<div id="view"></div>');
     bindApp(app);
