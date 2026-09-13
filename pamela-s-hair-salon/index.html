@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pamela's Hair Salon · Beauty Salon, Syracuse, NY</title>
+<meta name="description" content="Pamela's Hair Salon, a neighborhood beauty salon at 2901 James St, Syracuse, NY. Haircuts, color and styling, Mon to Sat 10 AM to 7 PM. Call (315) 432-9922.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,500;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --plum:#3A1F2E; --plum-deep:#2B1521; --plum-ink:#241019;
+  --copper:#C07F5A; --copper-deep:#9E6239; --copper-soft:#F1DCCB;
+  --blush:#F7E9DA; --cream:#FCF7F0; --paper:#FFFDF9;
+  --rose:#E9BFA4; --sage:#8A9B7E;
+  --radius:16px;
+  --shadow:0 20px 44px -20px rgba(43,21,33,.28);
+  --shadow-sm:0 10px 24px -12px rgba(43,21,33,.22);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Jost",system-ui,sans-serif;
+  background:var(--cream);color:var(--plum);
+  line-height:1.7;-webkit-font-smoothing:antialiased;
+}
+a{color:var(--copper-deep)}
+::selection{background:var(--copper);color:#fff}
+.wrap{max-width:1160px;margin:0 auto;padding:0 26px}
+.serif{font-family:"Playfair Display",Georgia,serif}
+img{max-width:100%}
+
+/* ---------- centered header ---------- */
+header.site{
+  position:sticky;top:0;z-index:60;
+  background:rgba(252,247,240,.94);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(192,127,90,.35);
+}
+.brand-block{display:flex;flex-direction:column;align-items:center;padding:20px 0 6px;text-align:center}
+.brand{display:flex;flex-direction:column;align-items:center;text-decoration:none;color:var(--plum)}
+.brand-mark{width:54px;height:54px;margin-bottom:8px}
+.brand-name{font-family:"Playfair Display",serif;font-weight:800;font-size:1.55rem;letter-spacing:.4px;line-height:1.1}
+.brand-name em{font-style:italic;color:var(--copper-deep)}
+.brand-sub{font-size:.68rem;letter-spacing:4.5px;text-transform:uppercase;color:var(--copper-deep);font-weight:500;margin-top:6px}
+nav.main{display:flex;align-items:center;justify-content:center;gap:2px;padding:12px 0 16px;flex-wrap:wrap}
+nav.main a{
+  text-decoration:none;color:var(--plum);font-weight:500;font-size:.96rem;letter-spacing:.4px;
+  padding:9px 16px;border-radius:999px;transition:background .2s,color .2s;white-space:nowrap;
+}
+nav.main a:hover{background:var(--copper-soft)}
+nav.main a.active{background:var(--plum);color:var(--cream)}
+.head-call{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--copper-deep);color:#fff;text-decoration:none;font-weight:500;letter-spacing:.5px;
+  padding:10px 22px;border-radius:999px;margin-left:10px;box-shadow:var(--shadow-sm);
+  transition:transform .18s,background .18s;
+}
+.head-call:hover{background:var(--plum);transform:translateY(-2px)}
+.burger{display:none;background:none;border:0;cursor:pointer;padding:12px;position:absolute;top:14px;right:14px}
+.burger span{display:block;width:26px;height:3px;border-radius:3px;background:var(--plum);margin:5px 0;transition:.25s}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .35s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* ---------- editorial hero ---------- */
+.hero{position:relative;overflow:hidden;padding:88px 0 70px;text-align:center}
+.hero-word{
+  font-family:"Playfair Display",serif;font-weight:800;font-style:italic;
+  font-size:clamp(4.2rem,13vw,10.5rem);line-height:.95;letter-spacing:-1px;
+  color:transparent;-webkit-text-stroke:1.5px rgba(158,98,57,.5);
+  position:absolute;top:26px;left:50%;transform:translateX(-50%);
+  white-space:nowrap;pointer-events:none;user-select:none;z-index:0;
+}
+.hero-inner{position:relative;z-index:1}
+.kicker{
+  display:inline-block;font-size:.72rem;letter-spacing:5px;text-transform:uppercase;
+  color:var(--copper-deep);font-weight:600;border:1px solid rgba(158,98,57,.5);
+  padding:8px 20px;border-radius:999px;margin-bottom:26px;background:rgba(255,253,249,.7);
+}
+.hero h1{
+  font-family:"Playfair Display",serif;font-weight:700;
+  font-size:clamp(2.6rem,6.4vw,4.6rem);line-height:1.12;max-width:16ch;margin:0 auto 22px;
+}
+.hero h1 em{font-style:italic;color:var(--copper-deep)}
+.lede{font-size:1.18rem;font-weight:300;max-width:58ch;margin:0 auto 34px;color:#5b4250}
+.cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:30px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:500;letter-spacing:.4px;
+  padding:15px 32px;border-radius:999px;transition:transform .18s,box-shadow .18s,background .18s;
+}
+.btn-solid{background:var(--plum);color:#fff;box-shadow:var(--shadow-sm)}
+.btn-solid:hover{transform:translateY(-3px);background:var(--plum-deep)}
+.btn-ghost{border:1.5px solid var(--plum);color:var(--plum);background:transparent}
+.btn-ghost:hover{background:var(--plum);color:#fff;transform:translateY(-3px)}
+.hero-meta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;align-items:center}
+.pill{
+  display:inline-flex;align-items:center;gap:9px;background:var(--paper);
+  border:1px solid rgba(192,127,90,.4);border-radius:999px;padding:9px 18px;
+  font-size:.92rem;box-shadow:var(--shadow-sm);
+}
+.pill .dot{width:10px;height:10px;border-radius:50%;background:#5a9e5a;flex:none;animation:pulse 2s infinite}
+.pill.closed .dot{background:#c05a5a;animation:none}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.rating-line{font-size:.95rem;color:#5b4250}
+.rating-line strong{color:var(--plum)}
+.stars{color:var(--copper-deep);letter-spacing:2px}
+
+/* ---------- service chips ---------- */
+.strip{background:var(--plum);color:var(--cream);padding:26px 0;overflow:hidden}
+.strip-track{display:flex;gap:44px;justify-content:center;flex-wrap:wrap;font-family:"Playfair Display",serif;font-style:italic;font-size:1.35rem}
+.strip-track span{white-space:nowrap}
+.strip-track .sep{color:var(--copper)}
+
+/* ---------- magazine sections ---------- */
+.magazine{padding:84px 0}
+.sec-head{text-align:center;margin-bottom:56px}
+.sec-head .kicker{margin-bottom:18px}
+.sec-head h2{font-family:"Playfair Display",serif;font-weight:700;font-size:clamp(2rem,4.6vw,3.1rem);line-height:1.15;max-width:20ch;margin:0 auto}
+.sec-head p{max-width:56ch;margin:16px auto 0;color:#5b4250;font-weight:300;font-size:1.1rem}
+.mag-row{
+  display:grid;grid-template-columns:88px 1fr 1.4fr;gap:34px;align-items:center;
+  padding:44px 0;border-top:1px solid rgba(192,127,90,.35);
+}
+.mag-row:last-child{border-bottom:1px solid rgba(192,127,90,.35)}
+.mag-num{font-family:"Playfair Display",serif;font-style:italic;font-size:3.4rem;color:var(--copper);line-height:1}
+.mag-row h3{font-family:"Playfair Display",serif;font-size:1.9rem;font-weight:700;margin-bottom:10px}
+.mag-row p{color:#5b4250;font-weight:300}
+.mag-tag{
+  display:inline-block;font-size:.7rem;letter-spacing:2.5px;text-transform:uppercase;font-weight:600;
+  color:var(--copper-deep);background:var(--copper-soft);border-radius:999px;padding:6px 14px;margin-bottom:14px;
+}
+blockquote.pull{
+  font-family:"Playfair Display",serif;font-style:italic;font-size:1.35rem;line-height:1.5;
+  border-left:3px solid var(--copper);padding-left:22px;margin:18px 0 0;color:var(--plum-deep);
+}
+
+/* ---------- cards / feature grid ---------- */
+.cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+.card{
+  background:var(--paper);border:1px solid rgba(192,127,90,.3);border-radius:var(--radius);
+  padding:36px 30px;box-shadow:var(--shadow-sm);transition:transform .22s,box-shadow .22s;
+}
+.card:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+.card .icon{width:56px;height:56px;border-radius:50%;background:var(--blush);display:flex;align-items:center;justify-content:center;margin-bottom:20px}
+.card .icon svg{width:28px;height:28px;stroke:var(--copper-deep);fill:none;stroke-width:1.8}
+.card h3{font-family:"Playfair Display",serif;font-size:1.45rem;margin-bottom:10px}
+.card p{color:#5b4250;font-weight:300;font-size:1.02rem}
+.card .from{margin-top:14px;font-size:.85rem;color:var(--copper-deep);letter-spacing:1px}
+
+/* ---------- price table ---------- */
+.price-note{
+  background:var(--blush);border:1px dashed rgba(158,98,57,.6);border-radius:var(--radius);
+  padding:16px 22px;margin:0 auto 30px;max-width:640px;text-align:center;font-size:.98rem;
+}
+table.menu{width:100%;border-collapse:collapse;background:var(--paper);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm)}
+table.menu thead{background:var(--plum);color:var(--cream)}
+table.menu th{font-weight:500;letter-spacing:1.5px;text-transform:uppercase;font-size:.8rem;padding:16px 22px;text-align:left}
+table.menu td{padding:18px 22px;border-top:1px solid rgba(192,127,90,.25);vertical-align:top}
+table.menu td.svc{font-family:"Playfair Display",serif;font-size:1.18rem}
+table.menu td.svc small{display:block;font-family:"Jost",sans-serif;font-size:.9rem;color:#7a5f6c;font-weight:300;margin-top:4px}
+table.menu td.prc{font-weight:600;color:var(--copper-deep);white-space:nowrap;font-size:1.1rem}
+table.menu tr:hover td{background:#fdf6ee}
+
+/* ---------- gallery strip ---------- */
+.hstrip{display:flex;gap:22px;overflow-x:auto;padding:10px 4px 26px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+.tile{
+  position:relative;flex:0 0 300px;height:380px;border-radius:var(--radius);overflow:hidden;
+  scroll-snap-align:start;box-shadow:var(--shadow-sm);
+}
+.tile svg.art{position:absolute;inset:0;width:100%;height:100%}
+.badge{
+  position:absolute;top:14px;left:14px;background:rgba(36,16,25,.82);color:#fff;
+  font-size:.72rem;letter-spacing:2px;text-transform:uppercase;font-weight:500;
+  padding:7px 14px;border-radius:999px;
+}
+.tile .cap{position:absolute;left:0;right:0;bottom:0;padding:34px 18px 16px;color:#fff;
+  background:linear-gradient(transparent,rgba(36,16,25,.82));font-family:"Playfair Display",serif;font-style:italic;font-size:1.15rem}
+
+/* ---------- review cards ---------- */
+.rev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:26px}
+.rev{
+  background:var(--paper);border:1px solid rgba(192,127,90,.3);border-radius:var(--radius);
+  padding:34px 30px;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;gap:14px;
+}
+.rev .stars{font-size:1.05rem}
+.rev p{font-family:"Playfair Display",serif;font-style:italic;font-size:1.25rem;line-height:1.55;color:var(--plum-deep)}
+.rev .badge-line{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.rev .mini{font-size:.78rem;letter-spacing:1.8px;text-transform:uppercase;color:var(--copper-deep);font-weight:600}
+.rev .src{font-size:.85rem;color:#7a5f6c}
+.sources{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:44px}
+.src-btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:var(--plum);font-weight:500;
+  background:var(--paper);border:1.5px solid rgba(158,98,57,.55);border-radius:999px;padding:13px 26px;
+  transition:background .18s,color .18s,transform .18s;
+}
+.src-btn:hover{background:var(--plum);color:#fff;transform:translateY(-2px)}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:start}
+.info-card{background:var(--paper);border:1px solid rgba(192,127,90,.3);border-radius:var(--radius);padding:38px 34px;box-shadow:var(--shadow-sm)}
+.info-card h3{font-family:"Playfair Display",serif;font-size:1.6rem;margin-bottom:16px}
+.info-row{display:flex;gap:14px;align-items:flex-start;padding:13px 0;border-top:1px solid rgba(192,127,90,.22)}
+.info-row:first-of-type{border-top:0}
+.info-row .lbl{font-size:.75rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--copper-deep);font-weight:600;min-width:86px;padding-top:4px}
+.info-row a{color:var(--plum);font-weight:500}
+.hours-table{width:100%;border-collapse:collapse}
+.hours-table td{padding:11px 4px;border-top:1px solid rgba(192,127,90,.22)}
+.hours-table tr:first-child td{border-top:0}
+.hours-table tr.today td{font-weight:600;color:var(--copper-deep)}
+.hours-table td:last-child{text-align:right}
+
+/* ---------- big type footer ---------- */
+footer.site{background:var(--plum-deep);color:var(--cream);margin-top:90px}
+.foot-big{
+  font-family:"Playfair Display",serif;font-weight:800;font-size:clamp(2.6rem,8vw,5.6rem);
+  line-height:1.04;text-align:center;padding:64px 0 10px;letter-spacing:.5px;
+}
+.foot-big em{font-style:italic;color:var(--copper)}
+.foot-cols{display:flex;justify-content:space-between;gap:30px;flex-wrap:wrap;padding:40px 0;border-top:1px solid rgba(252,247,240,.16);border-bottom:1px solid rgba(252,247,240,.16);margin-top:40px}
+.foot-cols h4{font-size:.75rem;letter-spacing:3px;text-transform:uppercase;color:var(--rose);margin-bottom:14px;font-weight:600}
+.foot-cols a{color:var(--cream);text-decoration:none;display:block;padding:5px 0;opacity:.85}
+.foot-cols a:hover{opacity:1;color:var(--copper)}
+.foot-cols p{opacity:.85;font-size:.98rem}
+.copy{padding:22px 0 26px;text-align:center;font-size:.92rem;opacity:.75}
+
+/* ---------- responsive ---------- */
+@media(max-width:920px){
+  .cards3{grid-template-columns:1fr 1fr}
+  .rev-grid{grid-template-columns:1fr}
+  .mag-row{grid-template-columns:1fr;gap:14px;padding:34px 0}
+  .mag-num{font-size:2.6rem}
+  .visit-grid{grid-template-columns:1fr}
+}
+@media(max-width:760px){
+  .burger{display:block}
+  nav.main{
+    display:none;flex-direction:column;align-items:stretch;text-align:center;
+    padding:6px 18px 20px;gap:2px;
+  }
+  nav.main.open{display:flex}
+  nav.main a{padding:12px}
+  .head-call{margin:8px 0 0}
+  .brand-block{padding:16px 0 2px}
+  .cards3{grid-template-columns:1fr}
+  .hero{padding:64px 0 54px}
+}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap" style="position:relative">
+    <div class="brand-block">
+      <a class="brand" href="#home" data-page="home" aria-label="Pamela's Hair Salon, home">
+        <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true">
+          <circle cx="32" cy="32" r="29" fill="none" stroke="#9E6239" stroke-width="2.5"/>
+          <circle cx="32" cy="32" r="23" fill="none" stroke="#C07F5A" stroke-width="1.2" stroke-dasharray="4 5"/>
+          <path d="M20 44 L32 20 L44 44" fill="none" stroke="#3A1F2E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="32" cy="20" r="3.4" fill="#C07F5A"/>
+        </svg>
+        <span class="brand-name">Pamela's <em>Hair Salon</em></span>
+        <span class="brand-sub">Syracuse · New York</span>
+      </a>
+    </div>
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    <nav class="main" id="mainNav" aria-label="Main navigation">
+      <a href="#home" data-page="home">Home</a>
+      <a href="#services" data-page="services">Services</a>
+      <a href="#story" data-page="story">Our Story</a>
+      <a href="#gallery" data-page="gallery">Gallery</a>
+      <a href="#reviews" data-page="reviews">Reviews</a>
+      <a href="#visit" data-page="visit">Visit</a>
+      <a class="head-call" href="tel:+13154329922">Call (315) 432-9922</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<section class="page" id="page-home">
+  <div class="hero">
+    <div class="hero-word" aria-hidden="true">Pamela's</div>
+    <div class="hero-inner wrap">
+      <span class="kicker">Beauty Salon · James Street, Syracuse</span>
+      <h1>Beautiful hair starts with a <em>great listener</em>.</h1>
+      <p class="lede">Pamela's Hair Salon is a neighborhood beauty salon at 2901 James St in Syracuse, NY, known for cutting, coloring, and styling that keeps clients coming back for years.</p>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="tel:+13154329922">Call (315) 432-9922</a>
+        <a class="btn btn-ghost" href="#services" data-page="services">See services</a>
+      </div>
+      <div class="hero-meta">
+        <span class="pill" id="hoursPill"><span class="dot"></span><span id="hoursText">Mon to Sat · 10 AM to 7 PM</span></span>
+        <span class="rating-line"><span class="stars">★★★★★</span> <strong>4.9</strong> from 9 online reviews</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="strip"><div class="wrap"><div class="strip-track">
+    <span>Haircuts</span><span class="sep">·</span><span>Color</span><span class="sep">·</span><span>Highlights</span><span class="sep">·</span><span>Styling</span><span class="sep">·</span><span>Deep Conditioning</span>
+  </div></div></div>
+
+  <div class="magazine wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">Why neighbors keep coming back</span>
+      <h2>A small salon with a loyal following</h2>
+      <p>What clients say about their visits, paraphrased from online reviews. Read the full reviews on the Reviews page.</p>
+    </div>
+    <div class="mag-row reveal">
+      <div class="mag-num">01</div>
+      <div><span class="mag-tag">What reviewers say</span><h3>The color</h3><p>Clients call Pamela an outstanding colorist. Cuts and color come up again and again as the reason families return year after year.</p></div>
+      <div><blockquote class="pull">"Pamela does a great job cutting, styling and coloring. My family has been coming here for years."</blockquote></div>
+    </div>
+    <div class="mag-row reveal">
+      <div class="mag-num">02</div>
+      <div><span class="mag-tag">What reviewers say</span><h3>The cut</h3><p>Reviewers mention that she really listens to what they want and delivers the style beautifully, every visit.</p></div>
+      <div><blockquote class="pull">"Really listens to what I want and can achieve the style beautifully. Love it."</blockquote></div>
+    </div>
+    <div class="mag-row reveal">
+      <div class="mag-num">03</div>
+      <div><span class="mag-tag">What reviewers say</span><h3>The welcome</h3><p>A friendly, relaxed vibe where the stylists are experienced and professional, and guests feel right at home in the chair.</p></div>
+      <div><blockquote class="pull">"Very friendly and welcoming. The stylists are experienced and professional."</blockquote></div>
+    </div>
+  </div>
+
+  <div class="wrap" style="padding-bottom:90px">
+    <div class="sec-head reveal">
+      <span class="kicker">Signature services</span>
+      <h2>Everything your hair needs, in one chair</h2>
+    </div>
+    <div class="cards3">
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.6"/><circle cx="6" cy="18" r="2.6"/><path d="M8.2 7.6 20 19M8.2 16.4 20 5"/></svg></div>
+        <h3>Precision Cuts</h3>
+        <p>Consultation, wash, cut, and finish tailored to your hair type and face shape.</p>
+        <a class="from" href="#services" data-page="services">See service menu →</a>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 3c3.5 4.5 6 8 6 11.5A6 6 0 0 1 6 14.5C6 11 8.5 7.5 12 3z"/></svg></div>
+        <h3>Color and Highlights</h3>
+        <p>All-over color, partial and full highlights, and color paired with a fresh cut.</p>
+        <a class="from" href="#services" data-page="services">See service menu →</a>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M4 14c2-5 5-8 9-8 3 0 5 2 5 4.5S16 15 13.5 15H4z"/><path d="M18 9.5 20 7"/></svg></div>
+        <h3>Styling and Treatments</h3>
+        <p>Blowouts, special occasion styling, and deep conditioning treatments.</p>
+        <a class="from" href="#services" data-page="services">See service menu →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap" style="padding:70px 0 90px">
+    <div class="sec-head reveal">
+      <span class="kicker">Service menu</span>
+      <h2>Walk in. Walk out loving your hair.</h2>
+      <p>Every service starts with a consultation so you and your stylist agree on the look before a single snip.</p>
+    </div>
+    <div class="price-note reveal"><strong>Sample pricing.</strong> Prices vary by hair length and stylist. Call <a href="tel:+13154329922">(315) 432-9922</a> for exact prices and availability.</div>
+    <table class="menu reveal">
+      <thead><tr><th>Service</th><th>Sample price</th></tr></thead>
+      <tbody>
+        <tr><td class="svc">Haircut<small>Includes wash, cut, and style</small></td><td class="prc">$35+</td></tr>
+        <tr><td class="svc">All-Over Color<small>Single process color, root to ends</small></td><td class="prc">$75+</td></tr>
+        <tr><td class="svc">Partial Highlights<small>Face framing brightness and dimension</small></td><td class="prc">$95+</td></tr>
+        <tr><td class="svc">Full Highlights<small>Head to toe dimension</small></td><td class="prc">$130+</td></tr>
+        <tr><td class="svc">Color and Cut<small>Fresh color plus a precision cut and style</small></td><td class="prc">$110+</td></tr>
+        <tr><td class="svc">Shampoo, Blowout and Style<small>Polished finish for the day or night out</small></td><td class="prc">$40+</td></tr>
+        <tr><td class="svc">Deep Conditioning Treatment<small>Restores softness and shine</small></td><td class="prc">$25+</td></tr>
+        <tr><td class="svc">Special Occasion Styling<small>Updos and event styling</small></td><td class="prc">$55+</td></tr>
+      </tbody>
+    </table>
+    <div style="text-align:center;margin-top:38px" class="reveal">
+      <a class="btn btn-solid" href="tel:+13154329922">Call to book: (315) 432-9922</a>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-story">
+  <div class="wrap" style="padding:70px 0 90px">
+    <div class="sec-head reveal">
+      <span class="kicker">Our story</span>
+      <h2>Meet <span class="serif" style="font-style:italic;color:var(--copper-deep)">Pamela</span></h2>
+    </div>
+    <div class="visit-grid">
+      <div class="reveal">
+        <p style="font-family:'Playfair Display',serif;font-size:1.5rem;line-height:1.6;margin-bottom:22px">Pamela's Hair Salon is a neighborhood beauty salon on James Street in Syracuse, where the appointment feels personal and the results keep families returning for years.</p>
+        <p style="color:#5b4250;font-weight:300;margin-bottom:18px">Clients describe Pamela as an outstanding colorist and a stylist who truly listens. Whether it is a precision cut, a full color refresh, or styling for a big night out, the goal is the same: you leave the chair feeling like the best version of yourself.</p>
+        <p style="color:#5b4250;font-weight:300;margin-bottom:18px">The salon keeps things simple and welcoming. Friendly faces, experienced hands, and a relaxed chair where you are listened to first and styled second.</p>
+        <p style="color:#5b4250;font-weight:300">Find us at <strong>2901 James St, Syracuse, NY 13206</strong>, open Monday through Saturday from 10 AM to 7 PM. Call <a href="tel:+13154329922"><strong>(315) 432-9922</strong></a> to book your visit.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3>Good to know</h3>
+        <div class="info-row"><span class="lbl">Address</span><span>2901 James St<br>Syracuse, NY 13206</span></div>
+        <div class="info-row"><span class="lbl">Phone</span><a href="tel:+13154329922">(315) 432-9922</a></div>
+        <div class="info-row"><span class="lbl">Hours</span><span>Mon to Sat: 10 AM to 7 PM<br>Sunday: Closed</span></div>
+        <div class="info-row"><span class="lbl">Booking</span><span>Call ahead to reserve your chair</span></div>
+        <div style="margin-top:22px;display:flex;gap:12px;flex-wrap:wrap">
+          <a class="btn btn-solid" href="tel:+13154329922">Call now</a>
+          <a class="btn btn-ghost" href="#visit" data-page="visit">Plan your visit</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap" style="padding:70px 0 90px">
+    <div class="sec-head reveal">
+      <span class="kicker">Gallery</span>
+      <h2>The work speaks for itself</h2>
+      <p>Sample images shown below. Real salon photos coming soon.</p>
+    </div>
+    <div class="hstrip reveal">
+      <div class="tile"><svg class="art" viewBox="0 0 300 380" preserveAspectRatio="xMidYMid slice"><rect width="300" height="380" fill="#3A1F2E"/><circle cx="150" cy="150" r="90" fill="#C07F5A" opacity=".55"/><path d="M60 300 Q150 240 240 300" stroke="#F7E9DA" stroke-width="10" fill="none" stroke-linecap="round"/><circle cx="150" cy="150" r="46" fill="#F7E9DA" opacity=".85"/></svg><span class="badge">Sample photo</span><div class="cap">Precision cuts</div></div>
+      <div class="tile"><svg class="art" viewBox="0 0 300 380" preserveAspectRatio="xMidYMid slice"><rect width="300" height="380" fill="#9E6239"/><rect x="70" y="60" width="160" height="220" rx="80" fill="#F1DCCB" opacity=".8"/><path d="M110 120 q20 -34 40 0 q20 34 40 0" stroke="#3A1F2E" stroke-width="9" fill="none" stroke-linecap="round"/><circle cx="150" cy="320" r="26" fill="#3A1F2E" opacity=".35"/></svg><span class="badge">Sample photo</span><div class="cap">Rich, dimensional color</div></div>
+      <div class="tile"><svg class="art" viewBox="0 0 300 380" preserveAspectRatio="xMidYMid slice"><rect width="300" height="380" fill="#F7E9DA"/><path d="M40 330 L150 120 L260 330 Z" fill="#C07F5A" opacity=".5"/><path d="M90 330 L150 190 L210 330 Z" fill="#3A1F2E" opacity=".75"/><circle cx="150" cy="95" r="34" fill="#9E6239"/></svg><span class="badge">Sample photo</span><div class="cap">Highlights and balayage</div></div>
+      <div class="tile"><svg class="art" viewBox="0 0 300 380" preserveAspectRatio="xMidYMid slice"><rect width="300" height="380" fill="#2B1521"/><ellipse cx="150" cy="200" rx="110" ry="130" fill="none" stroke="#C07F5A" stroke-width="6"/><ellipse cx="150" cy="200" rx="70" ry="90" fill="#F1DCCB" opacity=".35"/><path d="M150 70 q60 60 0 130 q-60 -70 0 -130" fill="#E9BFA4" opacity=".9"/></svg><span class="badge">Sample photo</span><div class="cap">Blowouts and styling</div></div>
+      <div class="tile"><svg class="art" viewBox="0 0 300 380" preserveAspectRatio="xMidYMid slice"><rect width="300" height="380" fill="#8A9B7E"/><circle cx="150" cy="170" r="100" fill="#F7E9DA" opacity=".55"/><path d="M150 60 v220 M90 130 l120 80 M210 130 l-120 80" stroke="#2B1521" stroke-width="12" stroke-linecap="round"/><circle cx="150" cy="310" r="30" fill="#2B1521" opacity=".3"/></svg><span class="badge">Sample photo</span><div class="cap">Special occasion looks</div></div>
+      <div class="tile"><svg class="art" viewBox="0 0 300 380" preserveAspectRatio="xMidYMid slice"><rect width="300" height="380" fill="#C07F5A"/><path d="M0 260 Q75 210 150 260 T300 260 V380 H0 Z" fill="#3A1F2E" opacity=".8"/><circle cx="150" cy="140" r="60" fill="#FCF7F0"/><path d="M110 140 q15 -30 40 -18 q25 -12 40 18" stroke="#9E6239" stroke-width="8" fill="none" stroke-linecap="round"/></svg><span class="badge">Sample photo</span><div class="cap">In the chair</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap" style="padding:70px 0 90px">
+    <div class="sec-head reveal">
+      <span class="kicker">Client reviews</span>
+      <h2>Rated 4.9 out of 5</h2>
+      <p>Based on 9 reviews on Birdeye. Quotes below are paraphrased from real online reviews.</p>
+    </div>
+    <div class="rev-grid">
+      <div class="rev reveal"><div class="stars">★★★★★</div><p>"Pamela is an outstanding colorist. My wife and daughters have been coming here for years and are very happy with the results."</p><div class="badge-line"><span class="mini">Paraphrased review</span><span class="src">Birdeye</span></div></div>
+      <div class="rev reveal"><div class="stars">★★★★★</div><p>"The best salon around. Pam does an amazing job with cut and color."</p><div class="badge-line"><span class="mini">Paraphrased review</span><span class="src">Google review</span></div></div>
+      <div class="rev reveal"><div class="stars">★★★★★</div><p>"Very friendly and welcoming vibe. The stylists are experienced and professional, and you feel relaxed and right at home."</p><div class="badge-line"><span class="mini">Paraphrased review</span><span class="src">Google review</span></div></div>
+      <div class="rev reveal"><div class="stars">★★★★★</div><p>"She really listens to what you want and achieves the style beautifully. Love it."</p><div class="badge-line"><span class="mini">Paraphrased review</span><span class="src">Google review</span></div></div>
+    </div>
+    <div class="sources reveal">
+      <a class="src-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJ79RoScLy2YkRP0AlIzRrlUc" target="_blank" rel="noopener">See reviews on Google →</a>
+      <a class="src-btn" href="https://reviews.birdeye.com/pamelas-hair-salon-170094882838146" target="_blank" rel="noopener">See reviews on Birdeye →</a>
+      <a class="src-btn" href="https://www.loc8nearme.com/new-york/syracuse/pamelas-hair-salon/3951542/" target="_blank" rel="noopener">See reviews on Loc8NearMe →</a>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="wrap" style="padding:70px 0 90px">
+    <div class="sec-head reveal">
+      <span class="kicker">Visit us</span>
+      <h2>Come sit in the chair</h2>
+      <p>Call ahead to book, or stop by during open hours.</p>
+    </div>
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3>Find us</h3>
+        <div class="info-row"><span class="lbl">Address</span><span>2901 James St<br>Syracuse, NY 13206</span></div>
+        <div class="info-row"><span class="lbl">Phone</span><a href="tel:+13154329922">(315) 432-9922</a></div>
+        <div class="info-row"><span class="lbl">Booking</span><span>Call ahead to reserve your chair</span></div>
+        <div style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap">
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJ79RoScLy2YkRP0AlIzRrlUc" target="_blank" rel="noopener">Get directions</a>
+          <a class="btn btn-ghost" href="tel:+13154329922">Call now</a>
+        </div>
+      </div>
+      <div class="info-card reveal">
+        <h3>Hours</h3>
+        <table class="hours-table" id="hoursTable">
+          <tr><td>Monday</td><td>10:00 AM to 7:00 PM</td></tr>
+          <tr><td>Tuesday</td><td>10:00 AM to 7:00 PM</td></tr>
+          <tr><td>Wednesday</td><td>10:00 AM to 7:00 PM</td></tr>
+          <tr><td>Thursday</td><td>10:00 AM to 7:00 PM</td></tr>
+          <tr><td>Friday</td><td>10:00 AM to 7:00 PM</td></tr>
+          <tr><td>Saturday</td><td>10:00 AM to 7:00 PM</td></tr>
+          <tr><td>Sunday</td><td>Closed</td></tr>
+        </table>
+        <p style="margin-top:18px;color:#7a5f6c;font-size:.95rem">Hours from public listings. Call to confirm holiday hours.</p>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-big">Pamela's <em>Hair Salon</em></div>
+    <div class="foot-cols">
+      <div>
+        <h4>Explore</h4>
+        <a href="#home" data-page="home">Home</a>
+        <a href="#services" data-page="services">Services</a>
+        <a href="#story" data-page="story">Our Story</a>
+        <a href="#gallery" data-page="gallery">Gallery</a>
+        <a href="#reviews" data-page="reviews">Reviews</a>
+        <a href="#visit" data-page="visit">Visit</a>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <p>2901 James St<br>Syracuse, NY 13206</p>
+        <a href="tel:+13154329922">(315) 432-9922</a>
+      </div>
+      <div>
+        <h4>Hours</h4>
+        <p>Mon to Sat<br>10:00 AM to 7:00 PM<br>Sunday: Closed</p>
+      </div>
+    </div>
+    <div class="copy">© Pamela's Hair Salon</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var PAGES = ["home", "services", "story", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+
+  /* ---------- live hours (America/New_York) ---------- */
+  var HOURS = {0:[0,0],1:[10,19],2:[10,19],3:[10,19],4:[10,19],5:[10,19],6:[10,19]};
+  var DOW = {"Sun":0,"Mon":1,"Tue":2,"Wed":3,"Thu":4,"Fri":5,"Sat":6};
+  var DAYNAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  function fmt(h){
+    var ap = h < 12 ? "AM" : "PM";
+    var hh = h % 12;
+    if(hh === 0){ hh = 12; }
+    return hh + ":00 " + ap;
+  }
+  try{
+    var parts = new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",weekday:"short",hour:"numeric",hour12:false}).formatToParts(new Date());
+    var wd = "Mon", hr = 12;
+    parts.forEach(function(p){
+      if(p.type === "weekday"){ wd = p.value; }
+      if(p.type === "hour"){ hr = parseInt(p.value, 10) % 24; }
+    });
+    var day = DOW[wd] !== undefined ? DOW[wd] : 1;
+    var openH = HOURS[day][0], closeH = HOURS[day][1];
+    var pill = document.getElementById("hoursPill");
+    var txt = document.getElementById("hoursText");
+    if(pill && txt){
+      if(openH !== closeH && hr >= openH && hr < closeH){
+        txt.textContent = "Open now, until " + fmt(closeH) + " today";
+      } else {
+        pill.classList.add("closed");
+        var nd = day, label = "today";
+        if(openH === closeH || hr >= closeH){
+          var off = 1;
+          while(HOURS[(day + off) % 7][0] === HOURS[(day + off) % 7][1]){ off++; }
+          nd = (day + off) % 7;
+          label = off === 1 ? "tomorrow" : DAYNAMES[nd];
+        }
+        txt.textContent = "Opens " + label + " at " + fmt(HOURS[nd][0]);
+      }
+    }
+    var rows = document.querySelectorAll("#hoursTable tr");
+    var idx = (day + 6) % 7;
+    if(rows[idx]){ rows[idx].classList.add("today"); }
+  }catch(e){ /* leave default pill text */ }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
