@@ -203,6 +203,7 @@ async function ghFetch(path, opts){
   opts = opts || {};
   const res = await fetch(GH_API + path, {
     method: opts.method || 'GET',
+    cache: 'no-store',
     headers: ghHeaders(),
     body: opts.body ? JSON.stringify(opts.body) : undefined
   });
@@ -1580,7 +1581,14 @@ function wireAdminUsers(el){
 
 async function saveUsers(){
   const rec = await ghGetJson('users.json');
-  await ghPutJson('users.json', state.users, rec ? rec.sha : null, 'sitedesk: users update');
+  try{
+    await ghPutJson('users.json', state.users, rec ? rec.sha : null, 'sitedesk: users update');
+  }catch(e){
+    if(e.status !== 409) throw e;
+    /* Someone else saved between our read and write: re-read fresh and retry once. */
+    const fresh = await ghGetJson('users.json');
+    await ghPutJson('users.json', state.users, fresh ? fresh.sha : null, 'sitedesk: users update (retry)');
+  }
   await loadUsers();
 }
 
