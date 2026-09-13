@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auto Diagnosis Service | Auto Repair in Lorton, VA</title>
+<meta name="description" content="Auto Diagnosis Service is an auto repair shop in Lorton, VA specializing in accurate vehicle diagnostics. Call (571) 574-3008.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#151a20; --ink-soft:#4a525b; --paper:#f4f1ea; --paper-deep:#e9e4d8;
+  --accent:#ff6b1a; --accent-deep:#d6540d; --steel:#232b35; --line:rgba(21,26,32,.14);
+  --radius:18px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Archivo",system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.6;overflow-x:hidden}
+.mono{font-family:"IBM Plex Mono",monospace}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* side drawer nav */
+.topbar{position:sticky;top:0;z-index:60;display:flex;align-items:center;justify-content:space-between;
+  background:var(--ink);color:#fff;padding:14px 24px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:#fff}
+.brand .mark{width:38px;height:38px;border-radius:10px;background:var(--accent);display:grid;place-items:center;flex:none}
+.brand .mark svg{width:22px;height:22px}
+.brand .t{font-weight:800;font-size:.98rem;letter-spacing:.02em;line-height:1.1}
+.brand .t small{display:block;font-weight:500;font-size:.68rem;color:#b9c2cc;letter-spacing:.14em;text-transform:uppercase}
+#burger{background:none;border:1px solid rgba(255,255,255,.25);border-radius:10px;width:46px;height:42px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+#burger span{display:block;width:22px;height:2px;background:#fff;transition:.2s}
+#burger[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+#burger[aria-expanded="true"] span:nth-child(2){opacity:0}
+#burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+nav.main{position:fixed;inset:0 auto 0 0;width:min(340px,86vw);background:var(--steel);color:#fff;z-index:70;
+  transform:translateX(-105%);transition:transform .28s ease;display:flex;flex-direction:column;padding:28px 0}
+nav.main.open{transform:none;box-shadow:30px 0 60px rgba(0,0,0,.35)}
+nav.main .drawer-brand{padding:0 28px 22px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:14px}
+nav.main .drawer-brand .t{font-weight:800;font-size:1.15rem}
+nav.main .drawer-brand small{color:#9aa5b1;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase}
+nav.main a[data-page]{display:flex;align-items:center;justify-content:space-between;color:#dfe5ea;text-decoration:none;
+  padding:15px 28px;font-weight:600;font-size:1.02rem;border-left:4px solid transparent}
+nav.main a[data-page]:hover{background:rgba(255,255,255,.06)}
+nav.main a[data-page].active{border-left-color:var(--accent);background:rgba(255,107,26,.12);color:#fff}
+nav.main a[data-page] .num{font-family:"IBM Plex Mono",monospace;font-size:.75rem;color:#8a95a1}
+.scrim{position:fixed;inset:0;background:rgba(10,14,18,.55);z-index:65;opacity:0;pointer-events:none;transition:.25s}
+.scrim.show{opacity:1;pointer-events:auto}
+.drawer-foot{margin-top:auto;padding:22px 28px;border-top:1px solid rgba(255,255,255,.12);font-size:.9rem;color:#b9c2cc}
+.drawer-foot a{color:#fff;font-weight:700;text-decoration:none}
+
+/* editorial hero */
+.hero{padding:88px 0 70px;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;right:-120px;top:-120px;width:420px;height:420px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,107,26,.16),transparent 70%)}
+.kicker{display:inline-flex;align-items:center;gap:10px;font-family:"IBM Plex Mono",monospace;font-size:.78rem;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--accent-deep);margin-bottom:20px}
+.kicker::before{content:"";width:34px;height:2px;background:var(--accent)}
+.hero h1{font-size:clamp(2.8rem,7vw,5.2rem);font-weight:900;line-height:1.0;letter-spacing:-.02em;max-width:14ch}
+.hero h1 .hl{background:var(--ink);color:var(--paper);padding:0 .12em}
+.lede{font-size:1.15rem;color:var(--ink-soft);max-width:36rem;margin:22px 0 30px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px}
+.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;padding:15px 28px;
+  border-radius:999px;font-size:1rem;transition:transform .18s,background .18s}
+.btn-solid{background:var(--accent);color:#fff}
+.btn-solid:hover{background:var(--accent-deep);transform:translateY(-2px)}
+.btn-line{background:transparent;color:var(--ink);border:2px solid var(--ink)}
+.btn-line:hover{background:var(--ink);color:#fff}
+.hero-meta{margin-top:44px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.hero-meta div{background:var(--paper);padding:20px 22px}
+.hero-meta .mono{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-deep);display:block;margin-bottom:6px}
+.hero-meta strong{font-size:1.02rem}
+
+/* asymmetric rhythm */
+.band{padding:70px 0}
+.band.dark{background:var(--ink);color:#fff}
+.band.deep{background:var(--paper-deep)}
+.sec-head{display:flex;align-items:baseline;gap:18px;margin-bottom:34px;flex-wrap:wrap}
+.sec-head .idx{font-family:"IBM Plex Mono",monospace;color:var(--accent-deep);font-size:.85rem;letter-spacing:.14em}
+.band.dark .sec-head .idx{color:var(--accent)}
+h2{font-size:clamp(1.9rem,3.6vw,2.8rem);font-weight:800;letter-spacing:-.015em;line-height:1.1}
+.sec-head p{color:var(--ink-soft);max-width:32rem}
+.band.dark .sec-head p{color:#b9c2cc}
+
+.asym{display:grid;grid-template-columns:1.2fr .8fr;gap:26px;align-items:start}
+.asym.flip{grid-template-columns:.8fr 1.2fr}
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:32px;box-shadow:0 10px 30px rgba(21,26,32,.06)}
+.band.dark .card{background:var(--steel);border-color:rgba(255,255,255,.1)}
+.card h3{font-size:1.25rem;margin-bottom:10px}
+.card p{color:var(--ink-soft);font-size:.98rem}
+.band.dark .card p{color:#c3ccd4}
+.tick{list-style:none;margin-top:14px}
+.tick li{padding:10px 0 10px 32px;position:relative;border-top:1px dashed var(--line);font-weight:600}
+.tick li::before{content:"";position:absolute;left:2px;top:16px;width:14px;height:8px;
+  border-left:3px solid var(--accent);border-bottom:3px solid var(--accent);transform:rotate(-45deg)}
+
+/* scanner art */
+.scanner{background:var(--steel);border-radius:var(--radius);padding:30px;color:#fff;position:relative;overflow:hidden}
+.scanner .screen{background:#0d1117;border-radius:12px;padding:22px;font-family:"IBM Plex Mono",monospace;font-size:.82rem;line-height:2;position:relative;overflow:hidden}
+.scanner .screen::after{content:"";position:absolute;left:0;right:0;top:0;height:56px;
+  background:linear-gradient(rgba(255,107,26,.28),transparent);animation:scan 3.2s linear infinite}
+@keyframes scan{0%{top:-20%}100%{top:110%}}
+.scanner .ok{color:#7ddf9a}.scanner .warn{color:var(--accent)}
+
+/* editorial services */
+.svc-list{border-top:2px solid var(--ink)}
+.svc{display:grid;grid-template-columns:70px 1fr auto;gap:22px;align-items:center;padding:26px 6px;border-bottom:1px solid var(--line)}
+.svc .n{font-family:"IBM Plex Mono",monospace;font-size:1rem;color:var(--accent-deep)}
+.svc h3{font-size:1.35rem;font-weight:800}
+.svc p{color:var(--ink-soft);max-width:34rem;font-size:.95rem}
+.badge{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;
+  border:1px dashed var(--accent-deep);color:var(--accent-deep);border-radius:999px;padding:5px 12px;white-space:nowrap}
+
+/* masonry gallery */
+.masonry{columns:3 240px;column-gap:18px}
+.tile{break-inside:avoid;margin-bottom:18px;border-radius:var(--radius);overflow:hidden;background:var(--steel);
+  position:relative;min-height:190px;display:flex;align-items:flex-end}
+.tile.tall{min-height:300px}.tile.short{min-height:160px}
+.tile .art{position:absolute;inset:0}
+.tile .cap{position:relative;z-index:2;width:100%;padding:16px;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.72))}
+.tile .cap .badge{border-color:rgba(255,255,255,.6);color:#fff}
+
+/* reviews */
+.rev-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px;margin-bottom:30px}
+.rev-note{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:30px}
+.rev-note h3{margin-bottom:8px}.rev-note p{color:var(--ink-soft)}
+.glink{display:inline-flex;align-items:center;gap:10px;font-weight:700;color:var(--accent-deep);text-decoration:none;
+  border-bottom:2px solid var(--accent);padding-bottom:2px;font-size:1.05rem}
+
+/* visit */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+.info-row{display:flex;gap:16px;padding:16px 0;border-bottom:1px solid var(--line)}
+.info-row .ic{width:44px;height:44px;flex:none;border-radius:12px;background:var(--ink);display:grid;place-items:center}
+.info-row .ic svg{width:22px;height:22px;stroke:#fff}
+.info-row a{color:var(--accent-deep);font-weight:700}
+.mapcard{background:var(--ink);color:#fff;border-radius:var(--radius);padding:36px;display:flex;flex-direction:column;gap:16px;justify-content:center}
+
+/* multi column footer */
+footer{background:var(--ink);color:#cfd6dc;padding:60px 0 0;margin-top:0}
+.foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:36px;padding-bottom:44px}
+.foot-grid h4{color:#fff;font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;margin-bottom:16px}
+.foot-grid a{color:#cfd6dc;text-decoration:none;display:block;padding:5px 0}
+.foot-grid a:hover{color:var(--accent)}
+.foot-brand p{font-size:.94rem;color:#9aa5b1;max-width:26rem}
+.fine{border-top:1px solid rgba(255,255,255,.12);padding:22px 24px;text-align:center;color:#9aa5b1;font-size:.92rem}
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .5s,transform .5s}
+.reveal.in{opacity:1;transform:none}
+@media(max-width:860px){
+  .asym,.asym.flip{grid-template-columns:1fr}
+  .visit-grid{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr}
+  .svc{grid-template-columns:44px 1fr}
+  .svc .badge{grid-column:2}
+  .hero{padding:60px 0 48px}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="#home" data-page="home" aria-label="Auto Diagnosis Service home">
+    <span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M14 7a4 4 0 0 1 5.6 5.6L22 15l-3 3-2.4-2.4A4 4 0 0 1 11 10L4 3l3-3 7 7z" opacity="0"/><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21"/></svg></span>
+    <span class="t">Auto Diagnosis Service<small>Lorton, Virginia</small></span>
+  </a>
+  <button id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="mainNav"><span></span><span></span><span></span></button>
+</header>
+
+<nav id="mainNav" class="main" aria-label="Primary">
+  <div class="drawer-brand"><div class="t">Auto Diagnosis Service</div><small>Auto repair shop</small></div>
+  <a href="#home" data-page="home"><span class="num">01</span> Home</a>
+  <a href="#services" data-page="services"><span class="num">02</span> Services</a>
+  <a href="#story" data-page="story"><span class="num">03</span> Our Story</a>
+  <a href="#gallery" data-page="gallery"><span class="num">04</span> Gallery</a>
+  <a href="#reviews" data-page="reviews"><span class="num">05</span> Reviews</a>
+  <a href="#visit" data-page="visit"><span class="num">06</span> Visit Us</a>
+  <div class="drawer-foot">Call us<br><a href="tel:+15715743008">(571) 574-3008</a></div>
+</nav>
+<div class="scrim" id="scrim"></div>
+
+<main>
+
+<section class="page" id="page-home">
+  <div class="hero">
+    <div class="wrap">
+      <span class="kicker">Auto repair shop, Lorton VA</span>
+      <h1>We find what is wrong, <span class="hl">then fix it.</span></h1>
+      <p class="lede">Auto Diagnosis Service is an auto repair shop in Lorton, Virginia. The name says it all: every job starts with an accurate diagnosis, so you pay for the repair you actually need and nothing you do not.</p>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="tel:+15715743008">Call (571) 574-3008</a>
+        <a class="btn btn-line" href="#services" data-page="services">See services</a>
+      </div>
+      <div class="hero-meta">
+        <div><span class="mono">Address</span><strong>8409 Terminal Rd Ste A, Lorton, VA 22079</strong></div>
+        <div><span class="mono">Phone</span><strong><a href="tel:+15715743008" style="color:inherit">(571) 574-3008</a></strong></div>
+        <div><span class="mono">Hours</span><strong>Call for hours</strong></div>
+        <div><span class="mono">Focus</span><strong>Diagnostics first repair</strong></div>
+      </div>
+    </div>
+  </div>
+  <div class="band">
+    <div class="wrap">
+      <div class="sec-head reveal"><span class="idx">01</span><h2>Diagnose before you pay</h2><p>Guessing gets expensive. A real diagnosis points at the failed part, not the whole system.</p></div>
+      <div class="asym">
+        <div class="card reveal">
+          <h3>How we work</h3>
+          <ul class="tick">
+            <li>Listen to the symptom you describe</li>
+            <li>Run a full diagnostic scan and inspection</li>
+            <li>Explain the findings in plain language</li>
+            <li>Repair only what the diagnosis proves is broken</li>
+          </ul>
+        </div>
+        <div class="scanner reveal" aria-hidden="true">
+          <div class="screen">
+            <div>> connecting to vehicle...</div>
+            <div>> scanning modules <span class="ok">[OK]</span></div>
+            <div>> reading fault codes <span class="warn">[2 FOUND]</span></div>
+            <div>> pinpointing source...</div>
+            <div>> diagnosis <span class="ok">COMPLETE</span></div>
+          </div>
+          <p style="margin-top:16px;color:#c3ccd4;font-size:.9rem">Illustration: our diagnostic-first approach.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="band deep">
+    <div class="wrap">
+      <div class="sec-head reveal"><span class="idx">02</span><h2>One shop for the whole car</h2></div>
+      <div class="asym flip">
+        <div class="card reveal">
+          <h3>From warning lights to worn brakes</h3>
+          <p>Once the diagnosis is in, most common repairs are handled right here in the shop: brakes, batteries, electrical faults, and the maintenance that keeps small issues from becoming big ones.</p>
+          <p style="margin-top:12px"><a href="#services" data-page="services" class="glink">See the service list</a></p>
+        </div>
+        <div class="card reveal">
+          <h3>Plain-language estimates</h3>
+          <p>You will hear what is wrong, what it costs, and what can wait, before any work begins. No pressure, no jargon, no surprise line items.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="band">
+    <div class="wrap">
+      <div class="sec-head reveal"><span class="idx">02</span><h2>Services</h2><p>The list below covers work typical of a diagnostics-focused repair shop. Call <a href="tel:+15715743008" style="color:var(--accent-deep);font-weight:700">(571) 574-3008</a> to confirm current services.</p></div>
+      <div class="svc-list reveal">
+        <div class="svc"><span class="n">01</span><div><h3>Engine diagnostics</h3><p>Computer scanning and hands-on testing to trace performance problems to their source.</p></div><span class="badge">Sample</span></div>
+        <div class="svc"><span class="n">02</span><div><h3>Check engine light</h3><p>Code reading plus real troubleshooting, so the light stays off for the right reason.</p></div><span class="badge">Sample</span></div>
+        <div class="svc"><span class="n">03</span><div><h3>Brake service</h3><p>Pads, rotors, and calipers inspected and serviced for safe, quiet stopping.</p></div><span class="badge">Sample</span></div>
+        <div class="svc"><span class="n">04</span><div><h3>Batteries and electrical</h3><p>Starting, charging, and wiring faults diagnosed without the parts-guessing game.</p></div><span class="badge">Sample</span></div>
+        <div class="svc"><span class="n">05</span><div><h3>Oil and maintenance</h3><p>Routine service that keeps the car healthy between bigger jobs.</p></div><span class="badge">Sample</span></div>
+        <div class="svc"><span class="n">06</span><div><h3>Pre-purchase inspections</h3><p>A full diagnostic look at a used car before you buy it.</p></div><span class="badge">Sample</span></div>
+      </div>
+      <div style="margin-top:34px" class="reveal">
+        <a class="btn btn-solid" href="tel:+15715743008">Call (571) 574-3008 to book</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-story">
+  <div class="band">
+    <div class="wrap">
+      <div class="sec-head reveal"><span class="idx">03</span><h2>Our story</h2><p>An independent repair shop built around one idea: know before you fix.</p></div>
+      <div class="asym">
+        <div class="card reveal">
+          <h3>The shop on Terminal Road</h3>
+          <p>Auto Diagnosis Service operates out of 8409 Terminal Rd Ste A in Lorton, Virginia, in the heart of the area's automotive corridor. Drivers come in with noises, warning lights, and worries, and leave with a clear answer and a car that behaves.</p>
+          <p style="margin-top:12px">The approach is simple and it has not changed: diagnose first, explain in plain language, and repair only what the evidence points to. That is how a small shop earns repeat customers one accurate fix at a time.</p>
+        </div>
+        <div class="card reveal">
+          <h3>What we stand for</h3>
+          <ul class="tick">
+            <li>Diagnosis before dollars</li>
+            <li>Honest answers, even when the answer is "it can wait"</li>
+            <li>Clear estimates with no jargon</li>
+            <li>Respect for your time and your car</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="band deep">
+    <div class="wrap">
+      <div class="sec-head reveal"><span class="idx">04</span><h2>Gallery</h2><p>Real shop photos are on the way. For now, a look at the work zones.</p></div>
+      <div class="masonry reveal">
+        <div class="tile tall"><div class="art" style="background:linear-gradient(150deg,#2b3542,#151a20)"></div><div class="cap"><span class="badge">Photo soon</span><div style="margin-top:8px;font-weight:700">Diagnostic bay</div></div></div>
+        <div class="tile"><div class="art" style="background:linear-gradient(150deg,#3a4450,#232b35)"></div><div class="cap"><span class="badge">Photo soon</span><div style="margin-top:8px;font-weight:700">Lift and inspection</div></div></div>
+        <div class="tile short"><div class="art" style="background:linear-gradient(150deg,#ff6b1a,#d6540d)"></div><div class="cap"><span class="badge">Photo soon</span><div style="margin-top:8px;font-weight:700">Scan tools</div></div></div>
+        <div class="tile"><div class="art" style="background:linear-gradient(150deg,#232b35,#0d1117)"></div><div class="cap"><span class="badge">Photo soon</span><div style="margin-top:8px;font-weight:700">Engine work</div></div></div>
+        <div class="tile short"><div class="art" style="background:linear-gradient(150deg,#4a525b,#2b3542)"></div><div class="cap"><span class="badge">Photo soon</span><div style="margin-top:8px;font-weight:700">Brake service</div></div></div>
+        <div class="tile tall"><div class="art" style="background:linear-gradient(150deg,#1d232b,#151a20)"></div><div class="cap"><span class="badge">Photo soon</span><div style="margin-top:8px;font-weight:700">Shop floor</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="band">
+    <div class="wrap">
+      <div class="sec-head reveal"><span class="idx">05</span><h2>Reviews</h2><p>We are still collecting public reviews. Check our Google listing for the latest, or be the first to leave one after your visit.</p></div>
+      <div class="rev-summary">
+        <div class="rev-note reveal">
+          <h3>Google reviews</h3>
+          <p>Read what drivers say about Auto Diagnosis Service on our Google business listing, and add your own experience.</p>
+          <p style="margin-top:16px"><a class="glink" href="https://www.google.com/maps/place/?q=place_id:ChIJJ0tPx7itt4kRm-DxYzTsess" target="_blank" rel="noopener">See reviews on Google</a></p>
+        </div>
+        <div class="rev-note reveal">
+          <h3>Had a good visit?</h3>
+          <p>An accurate diagnosis and an honest repair are worth sharing. Your review helps the next driver with a mystery noise find us.</p>
+          <p style="margin-top:16px"><a class="glink" href="tel:+15715743008">Tell us about it: (571) 574-3008</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="band deep">
+    <div class="wrap">
+      <div class="sec-head reveal"><span class="idx">06</span><h2>Visit us</h2><p>Find us on Terminal Road in Lorton. Calling ahead is the fastest way to get on the schedule.</p></div>
+      <div class="visit-grid">
+        <div class="card reveal">
+          <div class="info-row"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></div><div><strong>Address</strong><br>8409 Terminal Rd Ste A<br>Lorton, VA 22079</div></div>
+          <div class="info-row"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.13.96.36 1.9.7 2.8a2 2 0 0 1-.45 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.25a2 2 0 0 1 2.1-.45c.9.34 1.84.57 2.8.7a2 2 0 0 1 1.7 2z"/></svg></div><div><strong>Phone</strong><br><a href="tel:+15715743008">(571) 574-3008</a></div></div>
+          <div class="info-row"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div><div><strong>Hours</strong><br>Call for hours</div></div>
+        </div>
+        <div class="mapcard reveal">
+          <h3 style="font-size:1.4rem">Get directions</h3>
+          <p style="color:#c3ccd4">We are in the automotive corridor off Terminal Road, minutes from I-95. Tap below for turn-by-turn directions from Google Maps.</p>
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJJ0tPx7itt4kRm-DxYzTsess" target="_blank" rel="noopener">Open in Google Maps</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <h4>Auto Diagnosis Service</h4>
+        <p>An auto repair shop in Lorton, Virginia, focused on accurate diagnostics and honest repairs. Call <a href="tel:+15715743008" style="display:inline;padding:0;color:#fff;font-weight:700">(571) 574-3008</a> to book.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <a href="#home" data-page="home">Home</a>
+        <a href="#services" data-page="services">Services</a>
+        <a href="#story" data-page="story">Our Story</a>
+        <a href="#gallery" data-page="gallery">Gallery</a>
+        <a href="#reviews" data-page="reviews">Reviews</a>
+        <a href="#visit" data-page="visit">Visit Us</a>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <a href="tel:+15715743008">(571) 574-3008</a>
+        <a href="https://www.google.com/maps/place/?q=place_id:ChIJJ0tPx7itt4kRm-DxYzTsess" target="_blank" rel="noopener">8409 Terminal Rd Ste A, Lorton, VA 22079</a>
+      </div>
+    </div>
+  </div>
+  <div class="fine">© Auto Diagnosis Service</div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var PAGES = ["home", "services", "story", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+  var scrim = document.getElementById("scrim");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(scrim){ scrim.classList.remove("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  var io = null;
+  function observeReveals(){
+    if(!("IntersectionObserver" in window)){ return; }
+    if(!io){
+      io = new IntersectionObserver(function(entries){
+        entries.forEach(function(en){
+          if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+        });
+      }, {threshold: 0.08});
+    }
+    var active = document.querySelector(".page.active");
+    var els = (active || document).querySelectorAll(".reveal:not(.in)");
+    for(var i = 0; i < els.length; i++){ io.observe(els[i]); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  function toggleMenu(){
+    var open = nav.classList.toggle("open");
+    if(scrim){ scrim.classList.toggle("show", open); }
+    burger.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      toggleMenu();
+    });
+  }
+  if(scrim){
+    scrim.addEventListener("click", closeMenu);
+  }
+
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
