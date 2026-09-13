@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tito's Flow | Barber Shop in Allentown, PA</title>
+<meta name="description" content="Tito's Flow is a walk-in friendly barber shop at 1932 S 4th St, Allentown, PA. Haircuts, beard trims, hot towel shaves. Call (484) 274-6832.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#12100d;
+  --paper:#f6f1e7;
+  --gold:#c9a227;
+  --gold-soft:#e6cf7d;
+  --char:#1d1a15;
+  --line:#e2d9c4;
+  --mut:#6f675a;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Archivo",Arial,sans-serif;background:var(--paper);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+img{max-width:100%}
+a{color:inherit}
+.page{display:none}
+.page.active{display:block;animation:fadeIn .35s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+.eyebrow{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);font-weight:700}
+.btn{display:inline-block;padding:14px 30px;border-radius:999px;font-weight:700;text-decoration:none;letter-spacing:.5px;transition:transform .15s ease, box-shadow .15s ease}
+.btn:hover{transform:translateY(-2px)}
+.btn-gold{background:var(--gold);color:#141109}
+.btn-ghost{border:2px solid var(--gold);color:var(--gold)}
+/* ---------- top bar + side drawer ---------- */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:60;background:rgba(18,16,13,.96);backdrop-filter:blur(6px);color:var(--paper);display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid rgba(201,162,39,.35)}
+.wordmark{font-family:"Playfair Display",serif;font-weight:900;font-size:22px;letter-spacing:1px}
+.wordmark .amp{color:var(--gold)}
+.hamburger{background:none;border:0;cursor:pointer;display:flex;flex-direction:column;gap:5px;padding:8px}
+.hamburger span{display:block;width:28px;height:3px;background:var(--gold);border-radius:2px;transition:.2s}
+.top-call{font-weight:700;color:var(--gold-soft);text-decoration:none;font-size:15px;white-space:nowrap}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:opacity .25s;z-index:70}
+.scrim.show{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:min(340px,88vw);background:var(--ink);color:var(--paper);z-index:80;transform:translateX(-105%);transition:transform .3s cubic-bezier(.2,.8,.25,1);display:flex;flex-direction:column;padding:26px 28px;box-shadow:8px 0 40px rgba(0,0,0,.4)}
+.drawer.open{transform:none}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.drawer-close{background:none;border:1px solid rgba(201,162,39,.5);color:var(--gold);width:38px;height:38px;border-radius:50%;font-size:18px;cursor:pointer}
+.drawer nav{display:flex;flex-direction:column;gap:4px}
+.drawer nav a{font-family:"Playfair Display",serif;font-size:26px;font-weight:700;text-decoration:none;padding:10px 4px;border-bottom:1px solid rgba(255,255,255,.08);transition:color .15s,padding-left .15s}
+.drawer nav a:hover,.drawer nav a.active{color:var(--gold);padding-left:12px}
+.drawer-foot{margin-top:auto;font-size:14px;color:#b7ad97}
+.drawer-foot a{color:var(--gold-soft);text-decoration:none;display:block;margin-top:8px}
+/* ---------- hero: editorial type ---------- */
+.hero{margin-top:64px;background:var(--ink);color:var(--paper);padding:110px 0 90px;position:relative;overflow:hidden}
+.hero::before{content:"FLOW";position:absolute;right:-30px;bottom:-40px;font-family:"Playfair Display",serif;font-weight:900;font-size:clamp(160px,28vw,340px);color:rgba(201,162,39,.07);line-height:1;pointer-events:none}
+.hero-kicker{display:flex;align-items:center;gap:14px;margin-bottom:26px}
+.hero-kicker .rule{flex:0 0 60px;height:2px;background:var(--gold)}
+.hero h1{font-family:"Playfair Display",serif;font-weight:900;font-size:clamp(44px,7.5vw,96px);line-height:1.02;letter-spacing:-1px;max-width:14ch}
+.hero h1 em{font-style:italic;color:var(--gold)}
+.hero-sub{margin-top:26px;font-size:18px;max-width:46ch;color:#cfc6b1}
+.hero-cta{margin-top:36px;display:flex;gap:14px;flex-wrap:wrap}
+.hero-meta{margin-top:44px;display:flex;gap:36px;flex-wrap:wrap;font-size:14px;color:#b7ad97}
+.hero-meta strong{color:var(--gold);display:block;font-size:20px}
+/* ---------- card wall ---------- */
+.cardwall{padding:90px 0;background:var(--paper)}
+.cardwall h2{font-family:"Playfair Display",serif;font-size:clamp(30px,4vw,46px);margin:10px 0 8px}
+.wall{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:44px}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:30px;box-shadow:0 10px 30px rgba(18,16,13,.06);transition:transform .18s ease,box-shadow .18s ease;display:flex;flex-direction:column}
+.card:hover{transform:translateY(-6px);box-shadow:0 20px 44px rgba(18,16,13,.12)}
+.card .glyph{width:52px;height:52px;border-radius:14px;background:var(--ink);color:var(--gold);display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+.card h3{font-size:20px;margin-bottom:10px;font-weight:800}
+.card p{color:var(--mut);font-size:15px;flex:1}
+.card .link{margin-top:18px;font-weight:700;color:var(--ink);text-decoration:underline;text-decoration-color:var(--gold);text-underline-offset:4px}
+/* ---------- band ---------- */
+.band{background:var(--gold);color:#141109;padding:26px 0;font-weight:800;font-size:18px}
+.band .wrap{display:flex;gap:18px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+/* ---------- carousel gallery ---------- */
+.galsec{padding:90px 0;background:var(--char);color:var(--paper)}
+.galsec h2{font-family:"Playfair Display",serif;font-size:clamp(30px,4vw,46px);margin:10px 0 8px}
+.carwrap{position:relative;margin-top:40px}
+.car{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 6px 18px;scrollbar-width:none}
+.car::-webkit-scrollbar{display:none}
+.slide{flex:0 0 clamp(240px,30vw,340px);scroll-snap-align:start;border-radius:16px;overflow:hidden;position:relative;aspect-ratio:4/5;background:#2a251d;border:1px solid rgba(201,162,39,.3);display:flex;align-items:center;justify-content:center}
+.slide svg{width:64px;height:64px;opacity:.7}
+.slide .badge{position:absolute;top:12px;left:12px;background:rgba(18,16,13,.85);color:var(--gold-soft);font-size:11px;letter-spacing:1.5px;padding:6px 12px;border-radius:999px;text-transform:uppercase}
+.slide .cap{position:absolute;bottom:0;left:0;right:0;padding:40px 18px 18px;background:linear-gradient(transparent,rgba(0,0,0,.8));font-weight:700}
+.carbtn{position:absolute;top:50%;transform:translateY(-50%);width:52px;height:52px;border-radius:50%;background:var(--gold);border:0;color:#141109;font-size:22px;font-weight:900;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.35);z-index:2}
+.carbtn.prev{left:-10px}
+.carbtn.next{right:-10px}
+/* ---------- editorial services ---------- */
+.edsec{padding:96px 0}
+.edsec h2{font-family:"Playfair Display",serif;font-size:clamp(32px,4.5vw,52px);margin:10px 0 10px}
+.svc{display:grid;grid-template-columns:90px 1fr auto;gap:26px;align-items:start;padding:38px 0;border-bottom:1px solid var(--line)}
+.svc-num{font-family:"Playfair Display",serif;font-size:44px;font-weight:900;color:var(--gold)}
+.svc h3{font-size:24px;font-weight:800;margin-bottom:8px}
+.svc p{color:var(--mut);max-width:60ch}
+.svc .price{background:var(--ink);color:var(--gold-soft);font-weight:800;padding:10px 20px;border-radius:999px;white-space:nowrap;align-self:center}
+.svc .price small{display:block;font-weight:400;color:#b7ad97;font-size:11px}
+.sample-note{margin-top:26px;font-size:13px;color:var(--mut);font-style:italic}
+/* ---------- about ---------- */
+.aboutsec{padding:96px 0;background:#fff}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.about-grid h2{font-family:"Playfair Display",serif;font-size:clamp(30px,4vw,44px);margin:10px 0 18px}
+.about-grid p{color:var(--mut);margin-bottom:16px}
+.about-grid p.lead{font-size:20px;color:var(--ink);font-weight:500}
+.portrait{aspect-ratio:4/5;border-radius:20px;background:linear-gradient(135deg,#2a251d,#12100d);border:1px solid rgba(201,162,39,.4);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.portrait .badge{position:absolute;top:14px;left:14px;background:rgba(18,16,13,.85);color:var(--gold-soft);font-size:11px;letter-spacing:1.5px;padding:6px 12px;border-radius:999px;text-transform:uppercase}
+/* ---------- reviews ---------- */
+.revsec{padding:96px 0;background:var(--paper)}
+.revhead{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.stars{color:var(--gold);font-size:26px;letter-spacing:4px}
+.rev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:40px}
+.rev{background:#fff;border:1px solid var(--line);border-radius:18px;padding:28px;display:flex;flex-direction:column}
+.rev p{color:var(--mut);font-style:italic;flex:1;margin:14px 0}
+.rev .who{font-weight:800}
+.rev .src{font-size:12px;color:#a39a85;letter-spacing:1px;text-transform:uppercase}
+.src-links{margin-top:40px;display:flex;gap:14px;flex-wrap:wrap}
+.src-links a{padding:12px 24px;border:2px solid var(--ink);border-radius:999px;font-weight:700;text-decoration:none;transition:.15s}
+.src-links a:hover{background:var(--ink);color:var(--paper)}
+/* ---------- contact ---------- */
+.consec{padding:96px 0;background:var(--ink);color:var(--paper)}
+.con-grid{display:grid;grid-template-columns:1fr 1fr;gap:50px;margin-top:44px}
+.con-card{background:#1d1a15;border:1px solid rgba(201,162,39,.3);border-radius:18px;padding:34px}
+.con-card h3{color:var(--gold);font-size:14px;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px}
+.con-card p,.con-card a{font-size:18px}
+.con-card a{color:var(--gold-soft);text-decoration:none}
+.con-card a:hover{text-decoration:underline}
+.bigcall{display:block;margin-top:30px;text-align:center;background:var(--gold);color:#141109;font-size:24px;font-weight:900;padding:22px;border-radius:16px;text-decoration:none}
+form .field{margin-bottom:18px}
+form label{display:block;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;color:#b7ad97;margin-bottom:8px}
+form input,form textarea{width:100%;padding:14px 16px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:#141210;color:var(--paper);font-family:inherit;font-size:16px}
+form textarea{min-height:120px;resize:vertical}
+form .btn{width:100%;border:0;cursor:pointer;font-size:17px}
+/* ---------- footer ---------- */
+footer{background:#0d0b09;color:#8f8672;padding:44px 0;text-align:center}
+footer .mini-nav{display:flex;gap:22px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
+footer .mini-nav a{text-decoration:none;font-size:14px}
+footer .mini-nav a:hover{color:var(--gold)}
+footer .copy{font-size:15px;color:#b7ad97}
+@media(max-width:900px){
+  .wall,.rev-grid{grid-template-columns:1fr 1fr}
+  .about-grid,.con-grid{grid-template-columns:1fr}
+  .svc{grid-template-columns:60px 1fr;grid-template-rows:auto auto}
+  .svc .price{grid-column:2;justify-self:start}
+}
+@media(max-width:620px){
+  .wall,.rev-grid{grid-template-columns:1fr}
+  .top-call{display:none}
+  .carbtn.prev{left:6px}.carbtn.next{right:6px}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <button class="hamburger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <div class="wordmark">Tito<span class="amp">'</span>s Flow</div>
+  <a class="top-call" href="tel:+14842746832">(484) 274-6832</a>
+</header>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="mainNav" aria-label="Site navigation">
+  <div class="drawer-head">
+    <div class="wordmark">Tito<span class="amp">'</span>s Flow</div>
+    <button class="drawer-close" id="drawerClose" aria-label="Close menu">x</button>
+  </div>
+  <nav>
+    <a href="#home" data-page="home" class="active">Home</a>
+    <a href="#services" data-page="services">Services</a>
+    <a href="#about" data-page="about">About</a>
+    <a href="#reviews" data-page="reviews">Reviews</a>
+    <a href="#contact" data-page="contact">Contact</a>
+  </nav>
+  <div class="drawer-foot">
+    <p>1932 S 4th St, Allentown, PA 18103</p>
+    <a href="tel:+14842746832">Call (484) 274-6832</a>
+  </div>
+</aside>
+
+<main>
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="wrap">
+      <div class="hero-kicker"><span class="rule"></span><span class="eyebrow">Barber Shop, Southside Allentown</span></div>
+      <h1>Fresh cuts. <em>No appointment.</em> Just walk in.</h1>
+      <p class="hero-sub">Tito's Flow is the Southside barber shop where walk-ins are welcome and every chair keeps a steady flow of sharp cuts. Come as you are, leave looking brand new.</p>
+      <div class="hero-cta">
+        <a class="btn btn-gold" href="tel:+14842746832">Call (484) 274-6832</a>
+        <a class="btn btn-ghost" href="#services" data-page="services">See Services</a>
+      </div>
+      <div class="hero-meta">
+        <div><strong>4.8</strong>star average on Google reviews</div>
+        <div><strong>Walk-ins</strong>welcome every day we are open</div>
+        <div><strong>Southside</strong>1932 S 4th St, Allentown</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cardwall">
+    <div class="wrap">
+      <span class="eyebrow">Why Tito's Flow</span>
+      <h2>The shop that keeps Allentown looking sharp</h2>
+      <div class="wall">
+        <div class="card">
+          <div class="glyph"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+          <h3>Walk-ins Welcome</h3>
+          <p>No booking apps, no waiting lists. Walk in, take a seat, and the crew gets to work. Regulars say there is little to no wait time.</p>
+          <a class="link" href="#contact" data-page="contact">Plan your visit</a>
+        </div>
+        <div class="card">
+          <div class="glyph"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V3h12v6M4 9h16v11H4z"/><path d="M9 14l2 2 4-4"/></svg></div>
+          <h3>Detail-Obsessed Barbers</h3>
+          <p>Clean lines, crisp fades, and a final mirror check before you stand up. Reviewers call the crew meticulous and truly legit.</p>
+          <a class="link" href="#about" data-page="about">Meet the shop</a>
+        </div>
+        <div class="card">
+          <div class="glyph"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.6 6.2L21 9l-5 4.4L17.5 20 12 16.4 6.5 20 8 13.4 3 9l6.4-.8z"/></svg></div>
+          <h3>Rated 4.8 Stars</h3>
+          <p>Based on Google reviews, clients call it the best barber shop in the city. Real ratings, real regulars, real results.</p>
+          <a class="link" href="#reviews" data-page="reviews">Read reviews</a>
+        </div>
+        <div class="card">
+          <div class="glyph"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 17c2-1 4 1 6 0s4 1 6 0 4 1 4 1"/><path d="M4 12c2-1 4 1 6 0s4 1 6 0 4 1 4 1"/><path d="M4 7c2-1 4 1 6 0s4 1 6 0 4 1 4 1"/></svg></div>
+          <h3>Fades, Beards, Shaves</h3>
+          <p>From classic scissor cuts to hot towel shaves and sharp beard sculpting, every service ends the same way: you looking like an artist.</p>
+          <a class="link" href="#services" data-page="services">Browse services</a>
+        </div>
+        <div class="card">
+          <div class="glyph"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-5.5-7-11a7 7 0 0114 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></div>
+          <h3>Easy to Find</h3>
+          <p>Right on S 4th St in Allentown's Southside, with a clean, tidy shop and a massage chair while you wait.</p>
+          <a class="link" href="https://www.google.com/maps/place/?q=place_id:ChIJi2E7nS87xIkR9IzocA3REL8" target="_blank" rel="noopener">Get directions</a>
+        </div>
+        <div class="card">
+          <div class="glyph"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"/></svg></div>
+          <h3>For the Whole Neighborhood</h3>
+          <p>English and Spanish speaking barbers, clients of every age. Everyone leaves happy with their cut.</p>
+          <a class="link" href="tel:+14842746832">Call the shop</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap">
+      <span>Walk in today. Leave with the flow.</span>
+      <a class="btn" style="background:#141109;color:#e6cf7d" href="tel:+14842746832">Call (484) 274-6832</a>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="edsec">
+    <div class="wrap">
+      <span class="eyebrow">Services</span>
+      <h2>The menu, cut by cut</h2>
+      <p style="color:var(--mut);max-width:62ch">Every service is done by an experienced barber who checks the details with you before you leave the chair. Walk-ins are welcome.</p>
+      <div style="margin-top:30px">
+        <div class="svc">
+          <div class="svc-num">01</div>
+          <div><h3>Men's Haircut</h3><p>Fades, tapers, scissor cuts, and classic styles. Your barber talks through the look first, then executes with precision and a final mirror check.</p></div>
+          <div class="price">$30<small>sample price</small></div>
+        </div>
+        <div class="svc">
+          <div class="svc-num">02</div>
+          <div><h3>Beard Trim and Sculpt</h3><p>Sharp lines, even length, and a shape that fits your face. Finished with detailing so the beard frames the cut.</p></div>
+          <div class="price">$15<small>sample price</small></div>
+        </div>
+        <div class="svc">
+          <div class="svc-num">03</div>
+          <div><h3>Hot Towel Shave</h3><p>The old-school treatment: hot towel, steady hand, and a close, comfortable shave that leaves skin smooth.</p></div>
+          <div class="price">$25<small>sample price</small></div>
+        </div>
+        <div class="svc">
+          <div class="svc-num">04</div>
+          <div><h3>Head Shave</h3><p>Clean, smooth, and even all the way around, with hot towel prep for comfort.</p></div>
+          <div class="price">$20<small>sample price</small></div>
+        </div>
+        <div class="svc">
+          <div class="svc-num">05</div>
+          <div><h3>Haircut plus Beard Combo</h3><p>The full reset: a fresh cut paired with a sculpted beard in one sitting. Walk out looking brand new.</p></div>
+          <div class="price">$40<small>sample price</small></div>
+        </div>
+        <div class="svc">
+          <div class="svc-num">06</div>
+          <div><h3>Kids' Cuts</h3><p>Patient, friendly service for young clients. A clean cut and a good first barber shop experience.</p></div>
+          <div class="price">$25<small>sample price</small></div>
+        </div>
+      </div>
+      <p class="sample-note">Prices shown are samples only. Call (484) 274-6832 for current pricing.</p>
+      <div style="margin-top:36px;display:flex;gap:14px;flex-wrap:wrap">
+        <a class="btn btn-gold" href="tel:+14842746832">Call to Book a Chair</a>
+        <a class="btn" style="border:2px solid var(--ink)" href="#contact" data-page="contact">Visit Us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-about">
+  <div class="aboutsec">
+    <div class="wrap">
+      <div class="about-grid">
+        <div>
+          <span class="eyebrow">About the shop</span>
+          <h2>A Southside shop built on flow and detail</h2>
+          <p class="lead">Tito's Flow is a walk-in barber shop at 1932 S 4th St in Allentown, PA, where the motto is simple: walk in welcome.</p>
+          <p>Clients describe experienced barbers, short waits, and cuts that hold their shape. The shop is clean and tidy, with a massage chair for customers, and reviewers regularly say they leave feeling like artists.</p>
+          <p>The crew serves Allentown's Southside in English and Spanish, and regulars keep coming back to the same chairs year after year.</p>
+          <div style="margin-top:28px;display:flex;gap:14px;flex-wrap:wrap">
+            <a class="btn btn-gold" href="#reviews" data-page="reviews">See What Clients Say</a>
+            <a class="btn" style="border:2px solid var(--ink)" href="#contact" data-page="contact">Find the Shop</a>
+          </div>
+        </div>
+        <div class="portrait">
+          <span class="badge">Photo placeholder</span>
+          <svg width="90" height="90" viewBox="0 0 24 24" fill="none" stroke="#c9a227" stroke-width="1.4"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="revsec">
+    <div class="wrap">
+      <div class="revhead">
+        <div>
+          <span class="eyebrow">Reviews</span>
+          <h2 style="font-family:'Playfair Display',serif;font-size:clamp(32px,4.5vw,52px);margin:10px 0">What Allentown is saying</h2>
+          <div class="stars">*****</div>
+          <p style="color:var(--mut)">Rated 4.8 stars. Based on Google reviews.</p>
+        </div>
+      </div>
+      <div class="rev-grid">
+        <div class="rev">
+          <div class="stars" style="font-size:20px">*****</div>
+          <p>"I recommend anyone in Allentown to visit this barbershop for a cut. They have very experienced barbers and every single chair is always available. Little to no wait time for walk-ins."</p>
+          <div class="who">Google Reviewer</div>
+          <div class="src">via Google reviews</div>
+        </div>
+        <div class="rev">
+          <div class="stars" style="font-size:20px">*****</div>
+          <p>"I got lucky with an immediate walk-in haircut. The barber was professional, courteous, and meticulous with detail. The shop was clean and tidy too."</p>
+          <div class="who">Google Reviewer</div>
+          <div class="src">via Google reviews</div>
+        </div>
+        <div class="rev">
+          <div class="stars" style="font-size:20px">*****</div>
+          <p>"Best barber shop in the city. Tito is him and the whole crew is truly legit. No need to search anymore."</p>
+          <div class="who">Google Reviewer</div>
+          <div class="src">via Google reviews</div>
+        </div>
+      </div>
+      <div class="src-links">
+        <a href="https://www.google.com/maps/place/?q=place_id:ChIJi2E7nS87xIkR9IzocA3REL8" target="_blank" rel="noopener">See reviews on Google</a>
+        <a href="https://reviews.birdeye.com/titos-flow-170238740287304" target="_blank" rel="noopener">See reviews on Birdeye</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="galsec">
+    <div class="wrap">
+      <span class="eyebrow">Gallery</span>
+      <h2>Fresh out of the chair</h2>
+      <div class="carwrap">
+        <button class="carbtn prev" id="carPrev1" aria-label="Previous photos">&#8249;</button>
+        <div class="car" id="car1">
+          <div class="slide"><span class="badge">Placeholder</span><svg viewBox="0 0 24 24" fill="none" stroke="#c9a227" stroke-width="1.4"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3.5"/><path d="M8 5l2-2h4l2 2"/></svg><div class="cap">Signature fade</div></div>
+          <div class="slide"><span class="badge">Placeholder</span><svg viewBox="0 0 24 24" fill="none" stroke="#c9a227" stroke-width="1.4"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3.5"/><path d="M8 5l2-2h4l2 2"/></svg><div class="cap">Beard sculpt</div></div>
+          <div class="slide"><span class="badge">Placeholder</span><svg viewBox="0 0 24 24" fill="none" stroke="#c9a227" stroke-width="1.4"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3.5"/><path d="M8 5l2-2h4l2 2"/></svg><div class="cap">Hot towel shave</div></div>
+          <div class="slide"><span class="badge">Placeholder</span><svg viewBox="0 0 24 24" fill="none" stroke="#c9a227" stroke-width="1.4"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3.5"/><path d="M8 5l2-2h4l2 2"/></svg><div class="cap">Classic taper</div></div>
+          <div class="slide"><span class="badge">Placeholder</span><svg viewBox="0 0 24 24" fill="none" stroke="#c9a227" stroke-width="1.4"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3.5"/><path d="M8 5l2-2h4l2 2"/></svg><div class="cap">Inside the shop</div></div>
+        </div>
+        <button class="carbtn next" id="carNext1" aria-label="Next photos">&#8250;</button>
+      </div>
+      <p style="margin-top:14px;font-size:13px;color:#8f8672;font-style:italic">Gallery tiles are placeholders the shop owner can swap with real photos.</p>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-contact">
+  <div class="consec">
+    <div class="wrap">
+      <span class="eyebrow">Contact</span>
+      <h2 style="font-family:'Playfair Display',serif;font-size:clamp(32px,4.5vw,52px);margin:10px 0">Walk in or call ahead</h2>
+      <div class="con-grid">
+        <div>
+          <div class="con-card" style="margin-bottom:20px">
+            <h3>Find Us</h3>
+            <p>Tito's Flow, 1932 S 4th St, Allentown, PA 18103</p>
+            <a href="https://www.google.com/maps/place/?q=place_id:ChIJi2E7nS87xIkR9IzocA3REL8" target="_blank" rel="noopener">Get directions on Google Maps</a>
+          </div>
+          <div class="con-card" style="margin-bottom:20px">
+            <h3>Call Us</h3>
+            <p><a href="tel:+14842746832">(484) 274-6832</a></p>
+          </div>
+          <div class="con-card">
+            <h3>Hours</h3>
+            <p>Call for hours</p>
+          </div>
+          <a class="bigcall" href="tel:+14842746832">Call (484) 274-6832</a>
+        </div>
+        <div class="con-card">
+          <h3>Send a Message</h3>
+          <form onsubmit="return false;">
+            <div class="field"><label for="n1">Name</label><input id="n1" type="text" placeholder="Your name"></div>
+            <div class="field"><label for="p1">Phone</label><input id="p1" type="tel" placeholder="Your phone number"></div>
+            <div class="field"><label for="m1">Message</label><textarea id="m1" placeholder="What can we do for you?"></textarea></div>
+            <button class="btn btn-gold" type="submit">Send Message</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="mini-nav">
+      <a href="#home" data-page="home">Home</a>
+      <a href="#services" data-page="services">Services</a>
+      <a href="#about" data-page="about">About</a>
+      <a href="#reviews" data-page="reviews">Reviews</a>
+      <a href="#contact" data-page="contact">Contact</a>
+    </div>
+    <div class="copy">© Tito's Flow</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "reviews", "contact"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+  var scrim = document.getElementById("scrim");
+  var drawerClose = document.getElementById("drawerClose");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(scrim){ scrim.classList.remove("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll(".drawer nav a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      if(scrim){ scrim.classList.toggle("show", open); }
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+  if(drawerClose){ drawerClose.addEventListener("click", closeMenu); }
+  if(scrim){ scrim.addEventListener("click", closeMenu); }
+
+  function hookCarousel(trackId, prevId, nextId){
+    var track = document.getElementById(trackId);
+    var prev = document.getElementById(prevId);
+    var next = document.getElementById(nextId);
+    if(!track || !prev || !next) return;
+    function step(){ var s = track.querySelector(".slide"); return s ? s.offsetWidth + 18 : 320; }
+    prev.addEventListener("click", function(){ track.scrollBy({left: -step(), behavior: "smooth"}); });
+    next.addEventListener("click", function(){ track.scrollBy({left: step(), behavior: "smooth"}); });
+  }
+  hookCarousel("car1", "carPrev1", "carNext1");
+
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

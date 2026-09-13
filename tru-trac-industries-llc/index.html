@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tru-Trac Industries, LLC | Paving &amp; Foundation Services in Carlisle, PA</title>
+<meta name="description" content="Tru-Trac Industries, LLC provides paving services, driveways, parking lots, repairs, and foundation work in Carlisle, PA. Call (717) 557-5537.">
+<style>
+:root{
+  --ink:#17181c; --ink2:#23252c; --paper:#f7f5f0; --card:#ffffff;
+  --line:#e4e0d6; --accent:#f5b301; --accent2:#d98200; --muted:#6b6f78;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--paper);color:var(--ink);line-height:1.6}
+a{color:inherit}
+/* ============ SIDE DRAWER NAV ============ */
+.drawer{position:fixed;top:0;left:0;bottom:0;width:290px;background:var(--ink);color:#f2f0ea;z-index:60;
+  transform:translateX(-100%);transition:transform .32s ease;display:flex;flex-direction:column}
+.drawer.open{transform:translateX(0)}
+.drawer .brand{padding:26px 24px 18px;border-bottom:1px solid #33353d}
+.drawer .brand .mark{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:10px;
+  background:var(--accent);color:var(--ink);font-weight:800;font-size:20px;margin-bottom:12px}
+.drawer .brand h2{font-size:19px;letter-spacing:.3px}
+.drawer .brand p{font-size:12px;color:#a7abb5;margin-top:4px}
+.drawer nav{display:flex;flex-direction:column;padding:14px 12px;gap:4px}
+.drawer nav a{text-decoration:none;padding:13px 14px;border-radius:9px;font-weight:600;font-size:15px;
+  display:flex;align-items:center;gap:12px;color:#e8e6df}
+.drawer nav a:hover{background:#262832}
+.drawer nav a.active{background:var(--accent);color:var(--ink)}
+.drawer nav a .dot{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.5}
+.drawer .drawer-foot{margin-top:auto;padding:20px 24px;border-top:1px solid #33353d;font-size:13px;color:#a7abb5}
+.drawer .drawer-foot a{color:var(--accent);text-decoration:none;font-weight:700}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:55;opacity:0;pointer-events:none;transition:opacity .3s}
+.scrim.show{opacity:1;pointer-events:auto}
+/* ============ TOP BAR ============ */
+.topbar{position:sticky;top:0;z-index:40;background:var(--ink);color:#f2f0ea;display:flex;align-items:center;
+  gap:16px;padding:12px 22px;box-shadow:0 2px 14px rgba(0,0,0,.25)}
+.hamb{background:var(--accent);border:0;border-radius:9px;width:44px;height:44px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+.hamb span{display:block;width:20px;height:3px;background:var(--ink);border-radius:2px}
+.topbar .tbrand{font-weight:800;letter-spacing:.3px;font-size:16px}
+.topbar .tbrand small{display:block;font-weight:400;color:#a7abb5;font-size:11px;letter-spacing:1.4px;text-transform:uppercase}
+.topbar .tcall{margin-left:auto;text-decoration:none;background:var(--accent);color:var(--ink);font-weight:800;
+  padding:10px 18px;border-radius:9px;font-size:14px;white-space:nowrap}
+/* ============ PAGES ============ */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .35s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.wrap{max-width:1120px;margin:0 auto;padding:0 22px}
+section.block{padding:70px 0}
+/* ============ SPLIT HERO ============ */
+.hero{background:var(--ink);color:#f2f0ea;overflow:hidden}
+.hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center;padding:76px 22px}
+.hero .kicker{display:inline-block;background:var(--accent);color:var(--ink);font-weight:800;font-size:12px;
+  letter-spacing:2px;text-transform:uppercase;padding:7px 14px;border-radius:999px;margin-bottom:20px}
+.hero h1{font-size:clamp(34px,5vw,56px);line-height:1.08;margin-bottom:18px;font-weight:800}
+.hero h1 .hl{color:var(--accent)}
+.hero p.lede{font-size:18px;color:#c9ccd4;max-width:46ch;margin-bottom:30px}
+.hero .cta-row{display:flex;gap:14px;flex-wrap:wrap}
+.btn{display:inline-block;text-decoration:none;font-weight:800;padding:15px 28px;border-radius:11px;font-size:15px;cursor:pointer;border:0}
+.btn-y{background:var(--accent);color:var(--ink)}
+.btn-ghost{background:transparent;color:#f2f0ea;border:2px solid #4a4d57}
+.hero .trust{margin-top:26px;font-size:13px;color:#9aa0ab}
+.hero-art{background:var(--ink2);border:1px solid #33353d;border-radius:18px;min-height:380px;position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center}
+.stripebar{position:absolute;left:0;right:0;top:0;height:14px;
+  background:repeating-linear-gradient(-45deg,var(--accent) 0 22px,var(--ink) 22px 44px)}
+.hero-art .road{position:absolute;left:-10%;right:-10%;bottom:60px;height:120px;background:#0e0f13;
+  transform:perspective(300px) rotateX(38deg);border-top:4px dashed var(--accent)}
+.hero-art .cone{position:absolute;bottom:190px}
+.hero-art figcaption{position:absolute;bottom:14px;right:16px;font-size:11px;color:#8b909b;
+  background:rgba(0,0,0,.5);padding:4px 10px;border-radius:999px}
+/* ============ BANDS ============ */
+.band-dark{background:var(--ink2);color:#eee}
+.band-light{background:var(--card)}
+.band-paper{background:var(--paper)}
+.band-split .wrap{display:grid;grid-template-columns:1fr 1fr;gap:54px;align-items:center}
+.band h2{font-size:clamp(26px,3.4vw,38px);line-height:1.15;margin-bottom:16px;font-weight:800}
+.band .eyebrow{color:var(--accent2);font-weight:800;font-size:12px;letter-spacing:2.2px;text-transform:uppercase;margin-bottom:10px;display:block}
+.band-dark .eyebrow{color:var(--accent)}
+.band p{margin-bottom:14px;color:inherit}
+.band-light p,.band-paper p{color:#3c3f47}
+.band-dark p{color:#c9ccd4}
+.checklist{list-style:none;margin-top:18px;display:grid;gap:12px}
+.checklist li{display:flex;gap:12px;align-items:flex-start;font-weight:600}
+.checklist .tick{flex:0 0 26px;height:26px;border-radius:50%;background:var(--accent);color:var(--ink);
+  display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:14px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:30px;box-shadow:0 8px 30px rgba(20,20,25,.07)}
+.band-dark .panel{background:#2b2d35;border-color:#3a3d47}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:24px}
+.stat{background:rgba(245,179,1,.12);border:1px solid rgba(245,179,1,.35);border-radius:12px;padding:18px 12px;text-align:center}
+.stat b{display:block;font-size:24px;color:var(--accent)}
+.stat span{font-size:12px;color:#a7abb5}
+/* ============ PRICE TABLE ============ */
+.pricetable{width:100%;border-collapse:collapse;background:var(--card);border-radius:16px;overflow:hidden;
+  box-shadow:0 8px 30px rgba(20,20,25,.08);font-size:15px}
+.pricetable thead{background:var(--ink);color:#f2f0ea}
+.pricetable th,.pricetable td{padding:16px 18px;text-align:left}
+.pricetable tbody tr{border-top:1px solid var(--line)}
+.pricetable tbody tr:nth-child(even){background:#faf8f3}
+.pricetable td.price{font-weight:800;color:var(--accent2);white-space:nowrap}
+.badge{display:inline-block;font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;
+  background:#f3ecd9;color:#8a5a00;border:1px solid #e2cf9e;padding:4px 10px;border-radius:999px;margin-left:8px;vertical-align:middle}
+.note{font-size:13px;color:var(--muted);margin-top:14px}
+/* ============ CAROUSEL ============ */
+.carousel{position:relative;overflow:hidden;border-radius:18px;background:var(--ink)}
+.slides{display:flex;transition:transform .45s ease}
+.slide{min-width:100%;height:380px;display:flex;align-items:center;justify-content:center;position:relative}
+.slide .cap{position:absolute;left:0;right:0;bottom:0;padding:22px;color:#f2f0ea;
+  background:linear-gradient(transparent,rgba(0,0,0,.75))}
+.slide .cap b{display:block;font-size:18px}
+.slide .cap span{font-size:13px;color:#c9ccd4}
+.car-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.55);color:#fff;border:0;
+  width:46px;height:46px;border-radius:50%;font-size:20px;cursor:pointer;z-index:2}
+.car-prev{left:14px}.car-next{right:14px}
+.car-dots{display:flex;gap:8px;justify-content:center;padding:16px 0 6px}
+.car-dots button{width:10px;height:10px;border-radius:50%;border:0;background:#c9c9c9;cursor:pointer}
+.car-dots button.on{background:var(--accent2)}
+/* ============ REVIEWS ============ */
+.rev-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-top:30px}
+.rev{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:26px}
+.rev .stars{color:var(--accent2);letter-spacing:3px;font-size:18px;margin-bottom:10px}
+.rev p{font-size:14.5px;color:#3c3f47}
+.rev .who{margin-top:14px;font-weight:700;font-size:13px}
+/* ============ CONTACT ============ */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:34px;margin-top:30px}
+.info-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:30px}
+.info-card h3{font-size:17px;margin-bottom:8px}
+.info-card p{color:#3c3f47;font-size:15px}
+.info-card a.big{font-size:22px;font-weight:800;color:var(--accent2);text-decoration:none}
+.form-card{background:var(--ink);color:#f2f0ea;border-radius:16px;padding:30px}
+.form-card label{display:block;font-size:13px;font-weight:700;margin:14px 0 6px;color:#c9ccd4}
+.form-card input,.form-card select,.form-card textarea{width:100%;padding:13px 14px;border-radius:9px;border:1px solid #3a3d47;
+  background:#24262d;color:#f2f0ea;font-size:15px}
+.form-card textarea{min-height:110px;resize:vertical}
+.hours-table{width:100%;border-collapse:collapse;margin-top:10px;font-size:15px}
+.hours-table td{padding:9px 0;border-bottom:1px dashed var(--line)}
+.hours-table td:last-child{text-align:right;font-weight:600}
+/* ============ FOOTER ============ */
+footer{background:var(--ink);color:#c9ccd4;margin-top:0}
+.foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:36px;padding:60px 0 40px}
+.foot-grid h4{color:#f2f0ea;font-size:14px;letter-spacing:1.6px;text-transform:uppercase;margin-bottom:16px}
+.foot-grid ul{list-style:none;display:grid;gap:10px;font-size:14.5px}
+.foot-grid a{color:#c9ccd4;text-decoration:none}
+.foot-grid a:hover{color:var(--accent)}
+.foot-brand p{font-size:14px;max-width:30ch;margin-top:10px}
+.foot-brand .fmark{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;
+  background:var(--accent);color:var(--ink);font-weight:800;font-size:18px}
+.copyright{border-top:1px solid #33353d;padding:20px 0 26px;text-align:center;color:#9aa0ab;font-size:14px}
+/* ============ RESPONSIVE ============ */
+@media(max-width:900px){
+  .hero .wrap{grid-template-columns:1fr;padding:54px 22px}
+  .band-split .wrap{grid-template-columns:1fr}
+  .band-split .flip{order:-1}
+  .contact-grid{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr 1fr}
+  .stat-grid{grid-template-columns:1fr 1fr 1fr}
+}
+@media(max-width:560px){.foot-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<aside class="drawer" id="drawer" aria-label="Site navigation">
+  <div class="brand">
+    <span class="mark">TT</span>
+    <h2>Tru-Trac Industries, LLC</h2>
+    <p>Carlisle, PA Paving &amp; Foundation</p>
+  </div>
+  <nav>
+    <a href="#home" data-page="home"><span class="dot"></span>Home</a>
+    <a href="#services" data-page="services"><span class="dot"></span>Services</a>
+    <a href="#about" data-page="about"><span class="dot"></span>About</a>
+    <a href="#gallery" data-page="gallery"><span class="dot"></span>Gallery</a>
+    <a href="#reviews" data-page="reviews"><span class="dot"></span>Reviews</a>
+    <a href="#contact" data-page="contact"><span class="dot"></span>Contact</a>
+  </nav>
+  <div class="drawer-foot">
+    <p>Call us today:<br><a href="tel:+17175575537">(717) 557-5537</a></p>
+  </div>
+</aside>
+<div class="scrim" id="scrim"></div>
+
+<header class="topbar">
+  <button class="hamb" id="hamb" aria-label="Open menu"><span></span><span></span><span></span></button>
+  <div class="tbrand">Tru-Trac Industries, LLC<small>Carlisle, PA</small></div>
+  <a class="tcall" href="tel:+17175575537">Call (717) 557-5537</a>
+</header>
+
+<main>
+<section class="page" id="page-home">
+  <div class="hero">
+    <div class="wrap">
+      <div>
+        <span class="kicker">Carlisle, Pennsylvania</span>
+        <h1>Paving that holds up. <span class="hl">Work you can trust.</span></h1>
+        <p class="lede">Tru-Trac Industries, LLC is an industry leader in paving services for the Carlisle area. From full driveways and parking lots to minor repairs and foundation work, our experienced team puts client satisfaction first.</p>
+        <div class="cta-row">
+          <a class="btn btn-y" href="tel:+17175575537">Call (717) 557-5537</a>
+          <a class="btn btn-ghost" href="#services" data-page="services">View Services</a>
+        </div>
+        <p class="trust">10 Kost Rd, Carlisle, PA 17015 &middot; Serving Cumberland County and beyond</p>
+      </div>
+      <figure class="hero-art">
+        <div class="stripebar"></div>
+        <svg width="300" height="230" viewBox="0 0 300 230" role="img" aria-label="Paving illustration">
+          <rect x="20" y="150" width="260" height="40" rx="6" fill="#0e0f13"/>
+          <line x1="30" y1="170" x2="270" y2="170" stroke="#f5b301" stroke-width="4" stroke-dasharray="16 12"/>
+          <polygon points="150,30 200,150 100,150" fill="#f5b301"/>
+          <polygon points="150,30 200,150 168,150" fill="#d98200"/>
+          <rect x="138" y="105" width="24" height="14" rx="3" fill="#fff"/>
+          <polygon points="150,52 178,110 122,110" fill="#fff" opacity="0.85"/>
+        </svg>
+        <div class="road"></div>
+        <figcaption>Illustration</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="band band-light block">
+    <div class="wrap band-split">
+      <div>
+        <span class="eyebrow">What we do</span>
+        <h2>Driveways, parking lots, repairs, and foundations.</h2>
+        <p>Whether you need a full new driveway, a commercial parking lot, or a smaller repair, our crew brings the same care to every job. We are also equipped to handle foundation work for homes and businesses across the Carlisle area.</p>
+        <ul class="checklist">
+          <li><span class="tick">&#10003;</span>Residential driveways built to last</li>
+          <li><span class="tick">&#10003;</span>Commercial parking lots and resurfacing</li>
+          <li><span class="tick">&#10003;</span>Patching and minor asphalt repairs</li>
+          <li><span class="tick">&#10003;</span>Foundation services</li>
+        </ul>
+        <p style="margin-top:24px"><a class="btn btn-y" href="#services" data-page="services">Explore Services</a></p>
+      </div>
+      <div class="panel flip">
+        <h3 style="margin-bottom:12px">Why neighbors call us</h3>
+        <p>Tru-Trac Industries, LLC is your trusted industry leader when it comes to paving services. Our experienced team strives to provide every client with the highest level of satisfaction, and we stand behind the work we do.</p>
+        <div class="stat-grid">
+          <div class="stat"><b>1</b><span>Local crew based in Carlisle</span></div>
+          <div class="stat"><b>100%</b><span>Focus on client satisfaction</span></div>
+          <div class="stat"><b>PA</b><span>Proudly serving Pennsylvania</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="band band-dark block">
+    <div class="wrap band-split">
+      <div class="panel flip">
+        <h3 style="margin-bottom:12px">Get a straight answer, fast</h3>
+        <p>Tell us what you need paved or repaired and we will talk through the options and pricing. No pressure, just a clear plan.</p>
+        <p style="margin-top:18px"><a class="btn btn-y" href="tel:+17175575537">Call (717) 557-5537</a></p>
+      </div>
+      <div>
+        <span class="eyebrow">How it works</span>
+        <h2>From first call to final rollout in four steps.</h2>
+        <ul class="checklist">
+          <li><span class="tick">1</span>Call us and describe the project</li>
+          <li><span class="tick">2</span>We assess the site and talk through options</li>
+          <li><span class="tick">3</span>You get a clear, honest price</li>
+          <li><span class="tick">4</span>Our crew paves, repairs, or builds</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="band band-paper block">
+    <div class="wrap">
+      <span class="eyebrow">Services</span>
+      <h2>What we can do for your property.</h2>
+      <p style="max-width:60ch">Tru-Trac Industries, LLC handles paving and foundation work for homes and businesses in Carlisle, PA and the surrounding area. Call <a href="tel:+17175575537" style="font-weight:800;color:var(--accent2)">(717) 557-5537</a> for a free, no-pressure conversation about your project.</p>
+      <div style="overflow-x:auto;margin-top:30px">
+      <table class="pricetable">
+        <thead>
+          <tr><th>Service</th><th>Details</th><th>Typical Range</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>New Driveway Paving</strong></td>
+            <td>Full residential driveway installation, graded and rolled</td>
+            <td class="price">Call for estimate<span class="badge">Sample</span></td>
+          </tr>
+          <tr>
+            <td><strong>Parking Lot Paving</strong></td>
+            <td>Commercial lots, new construction and full resurfacing</td>
+            <td class="price">Call for estimate<span class="badge">Sample</span></td>
+          </tr>
+          <tr>
+            <td><strong>Asphalt Repairs &amp; Patching</strong></td>
+            <td>Pothole repair, crack filling, and patch work</td>
+            <td class="price">Call for estimate<span class="badge">Sample</span></td>
+          </tr>
+          <tr>
+            <td><strong>Foundation Services</strong></td>
+            <td>Foundation work for residential and commercial properties</td>
+            <td class="price">Call for estimate<span class="badge">Sample</span></td>
+          </tr>
+          <tr>
+            <td><strong>Resurfacing &amp; Overlays</strong></td>
+            <td>New life for worn asphalt without a full tear-out</td>
+            <td class="price">Call for estimate<span class="badge">Sample</span></td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+      <p class="note">Prices shown are samples only. Every job is priced on site. Call (717) 557-5537 for an exact quote.</p>
+    </div>
+  </div>
+
+  <div class="band band-light block">
+    <div class="wrap band-split">
+      <div>
+        <span class="eyebrow">Repair first?</span>
+        <h2>Not every worn surface needs a full replacement.</h2>
+        <p>If your driveway or lot is structurally sound but tired looking, resurfacing or targeted patching can add years at a fraction of the cost. We will give you an honest read on what your pavement actually needs.</p>
+        <ul class="checklist">
+          <li><span class="tick">&#10003;</span>Crack sealing and patching</li>
+          <li><span class="tick">&#10003;</span>Overlay and resurfacing options</li>
+          <li><span class="tick">&#10003;</span>Drainage and grading review</li>
+        </ul>
+      </div>
+      <div class="panel flip">
+        <h3 style="margin-bottom:12px">Commercial properties</h3>
+        <p>Parking lots take a beating. We pave new lots and restore existing ones for businesses across the Carlisle area, with scheduling that works around your hours.</p>
+        <p style="margin-top:18px"><a class="btn btn-y" href="#contact" data-page="contact">Request a Quote</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-about">
+  <div class="band band-paper block">
+    <div class="wrap band-split">
+      <div>
+        <span class="eyebrow">About us</span>
+        <h2>A Carlisle crew built on solid ground.</h2>
+        <p>Tru-Trac Industries, LLC is based at 10 Kost Rd in Carlisle, Pennsylvania. We are a paving and foundation company with an experienced team focused on one thing: client satisfaction.</p>
+        <p>Our work covers the full range of paving services, from full driveways and parking lots to minor repair work, plus foundation services for homes and businesses. Whether the job is large or small, we bring the same standard to every project.</p>
+      </div>
+      <div class="panel flip">
+        <h3 style="margin-bottom:12px">What guides our work</h3>
+        <ul class="checklist">
+          <li><span class="tick">&#10003;</span>Honest pricing, explained up front</li>
+          <li><span class="tick">&#10003;</span>Careful prep and grading on every job</li>
+          <li><span class="tick">&#10003;</span>Clean, finished surfaces that last</li>
+          <li><span class="tick">&#10003;</span>A crew that treats your property with respect</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="band band-dark block">
+    <div class="wrap band-split">
+      <div class="panel flip">
+        <h3 style="margin-bottom:12px">Local and reachable</h3>
+        <p>We are easy to find and easy to reach. Stop by, call, or send a message through our contact page and we will get back to you.</p>
+        <p style="margin-top:14px;font-size:17px"><strong>10 Kost Rd, Carlisle, PA 17015</strong></p>
+        <p style="margin-top:6px"><a href="tel:+17175575537" style="color:var(--accent);font-weight:800;font-size:20px;text-decoration:none">(717) 557-5537</a></p>
+      </div>
+      <div>
+        <span class="eyebrow">Service area</span>
+        <h2>Serving Carlisle and Cumberland County.</h2>
+        <p>Based in Carlisle, we work with homeowners and businesses across the surrounding communities. If you are not sure whether we cover your area, just call and ask.</p>
+        <p style="margin-top:22px"><a class="btn btn-y" href="#contact" data-page="contact">Contact Us</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="band band-paper block">
+    <div class="wrap">
+      <span class="eyebrow">Gallery</span>
+      <h2>A look at the work.</h2>
+      <p style="max-width:60ch">Sample photos of paving and foundation work. <span class="badge">Sample photos</span></p>
+      <div class="carousel" style="margin-top:30px">
+        <div class="slides" id="slides">
+          <div class="slide">
+            <svg width="360" height="240" viewBox="0 0 360 240" role="img" aria-label="Driveway paving illustration">
+              <rect x="40" y="140" width="280" height="60" rx="8" fill="#23252c"/>
+              <line x1="55" y1="170" x2="305" y2="170" stroke="#f5b301" stroke-width="5" stroke-dasharray="20 14"/>
+              <rect x="90" y="60" width="180" height="70" rx="6" fill="#2b2d35"/>
+              <rect x="110" y="80" width="60" height="30" rx="4" fill="#f5b301"/>
+              <rect x="180" y="80" width="60" height="30" rx="4" fill="#3a3d47"/>
+            </svg>
+            <div class="cap"><b>Driveway Paving</b><span>Sample photo placeholder</span></div>
+          </div>
+          <div class="slide">
+            <svg width="360" height="240" viewBox="0 0 360 240" role="img" aria-label="Parking lot illustration">
+              <rect x="20" y="120" width="320" height="90" rx="8" fill="#23252c"/>
+              <g stroke="#f5b301" stroke-width="4">
+                <line x1="80" y1="140" x2="80" y2="195"/><line x1="140" y1="140" x2="140" y2="195"/>
+                <line x1="200" y1="140" x2="200" y2="195"/><line x1="260" y1="140" x2="260" y2="195"/>
+              </g>
+              <rect x="150" y="40" width="60" height="60" rx="8" fill="#2b2d35"/>
+              <circle cx="165" cy="115" r="10" fill="#0e0f13"/><circle cx="195" cy="115" r="10" fill="#0e0f13"/>
+            </svg>
+            <div class="cap"><b>Parking Lots</b><span>Sample photo placeholder</span></div>
+          </div>
+          <div class="slide">
+            <svg width="360" height="240" viewBox="0 0 360 240" role="img" aria-label="Asphalt repair illustration">
+              <rect x="40" y="140" width="280" height="60" rx="8" fill="#23252c"/>
+              <polygon points="120,140 200,140 170,180 90,180" fill="#f5b301"/>
+              <polygon points="130,150 185,150 165,172 108,172" fill="#d98200"/>
+              <rect x="230" y="70" width="14" height="90" fill="#6b6f78" transform="rotate(24 237 115)"/>
+            </svg>
+            <div class="cap"><b>Patching &amp; Repairs</b><span>Sample photo placeholder</span></div>
+          </div>
+          <div class="slide">
+            <svg width="360" height="240" viewBox="0 0 360 240" role="img" aria-label="Foundation work illustration">
+              <rect x="60" y="150" width="240" height="26" fill="#3a3d47"/>
+              <rect x="80" y="90" width="200" height="60" fill="#2b2d35"/>
+              <rect x="80" y="90" width="200" height="12" fill="#f5b301"/>
+              <line x1="80" y1="118" x2="280" y2="118" stroke="#4a4d57" stroke-width="3"/>
+              <rect x="150" y="30" width="60" height="60" rx="6" fill="#23252c"/>
+            </svg>
+            <div class="cap"><b>Foundation Work</b><span>Sample photo placeholder</span></div>
+          </div>
+        </div>
+        <button class="car-nav car-prev" id="carPrev" aria-label="Previous photo">&#10094;</button>
+        <button class="car-nav car-next" id="carNext" aria-label="Next photo">&#10095;</button>
+        <div class="car-dots" id="carDots"></div>
+      </div>
+      <p class="note">Real project photos coming soon. Call (717) 557-5537 to ask about recent work near you.</p>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="band band-paper block">
+    <div class="wrap">
+      <span class="eyebrow">Reviews</span>
+      <h2>What clients say.</h2>
+      <p style="max-width:60ch">Sample reviews below. Read verified reviews on our Google listing:</p>
+      <p style="margin-top:14px">
+        <a class="btn btn-y" href="https://www.google.com/maps/place/?q=place_id:ChIJDapA6WjnyIkRjWuwr61xum8" target="_blank" rel="noopener">See reviews on Google</a>
+        <a class="btn btn-ghost" style="color:var(--ink);border-color:#c9c4b5" href="https://www.google.com/maps/place/?q=place_id:ChIJDapA6WjnyIkRjWuwr61xum8" target="_blank" rel="noopener">Leave us a review</a>
+      </p>
+      <div class="rev-grid">
+        <div class="rev">
+          <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p>"They repaved our driveway and it looks great. Crew was on time, worked clean, and the price was exactly what they quoted."</p>
+          <p class="who">Sample review <span class="badge">Sample</span></p>
+        </div>
+        <div class="rev">
+          <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p>"Patched several bad spots in our parking lot and you can barely tell where the repairs were. Fast and professional."</p>
+          <p class="who">Sample review <span class="badge">Sample</span></p>
+        </div>
+        <div class="rev">
+          <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p>"Honest advice. They told us we did not need a full replacement and the resurfacing has held up perfectly."</p>
+          <p class="who">Sample review <span class="badge">Sample</span></p>
+        </div>
+      </div>
+      <p class="note">Reviews above are samples. Verified customer reviews live on Google.</p>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-contact">
+  <div class="band band-paper block">
+    <div class="wrap">
+      <span class="eyebrow">Contact</span>
+      <h2>Get in touch.</h2>
+      <p style="max-width:60ch">Call, visit, or send us a message. We will get back to you as soon as we can.</p>
+      <div class="contact-grid">
+        <div class="info-card">
+          <h3>Phone</h3>
+          <p><a class="big" href="tel:+17175575537">(717) 557-5537</a></p>
+          <h3 style="margin-top:22px">Address</h3>
+          <p>Tru-Trac Industries, LLC<br>10 Kost Rd, Carlisle, PA 17015</p>
+          <p style="margin-top:10px"><a href="https://www.google.com/maps/place/?q=place_id:ChIJDapA6WjnyIkRjWuwr61xum8" target="_blank" rel="noopener" style="font-weight:800;color:var(--accent2)">Get Directions</a></p>
+          <h3 style="margin-top:22px">Hours</h3>
+          <p>Call for hours: <a href="tel:+17175575537" style="font-weight:800;color:var(--accent2)">(717) 557-5537</a></p>
+        </div>
+        <div class="form-card">
+          <h3 style="margin-bottom:6px">Request a callback</h3>
+          <p style="font-size:13px;color:#9aa0ab">This form is a demo and does not send. Please call us directly.</p>
+          <form id="quoteForm">
+            <label for="qname">Name</label>
+            <input id="qname" name="name" type="text" required>
+            <label for="qphone">Phone</label>
+            <input id="qphone" name="phone" type="tel" required>
+            <label for="qservice">Service needed</label>
+            <select id="qservice" name="service">
+              <option>New driveway paving</option>
+              <option>Parking lot paving</option>
+              <option>Asphalt repair or patching</option>
+              <option>Foundation services</option>
+              <option>Resurfacing or overlay</option>
+              <option>Other</option>
+            </select>
+            <label for="qmsg">Project details</label>
+            <textarea id="qmsg" name="message"></textarea>
+            <p style="margin-top:18px"><button class="btn btn-y" type="submit" style="width:100%">Send Request</button></p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap foot-grid">
+    <div class="foot-brand">
+      <span class="fmark">TT</span>
+      <p><strong style="color:#f2f0ea">Tru-Trac Industries, LLC</strong><br>Paving and foundation services in Carlisle, PA. Experienced crew, honest pricing, work that holds up.</p>
+    </div>
+    <div>
+      <h4>Pages</h4>
+      <ul>
+        <li><a href="#home" data-page="home">Home</a></li>
+        <li><a href="#services" data-page="services">Services</a></li>
+        <li><a href="#about" data-page="about">About</a></li>
+        <li><a href="#gallery" data-page="gallery">Gallery</a></li>
+        <li><a href="#reviews" data-page="reviews">Reviews</a></li>
+        <li><a href="#contact" data-page="contact">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Services</h4>
+      <ul>
+        <li><a href="#services" data-page="services">Driveway Paving</a></li>
+        <li><a href="#services" data-page="services">Parking Lots</a></li>
+        <li><a href="#services" data-page="services">Repairs &amp; Patching</a></li>
+        <li><a href="#services" data-page="services">Foundation Services</a></li>
+        <li><a href="#services" data-page="services">Resurfacing</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Contact</h4>
+      <ul>
+        <li>10 Kost Rd, Carlisle, PA 17015</li>
+        <li><a href="tel:+17175575537">(717) 557-5537</a></li>
+        <li><a href="https://www.google.com/maps/place/?q=place_id:ChIJDapA6WjnyIkRjWuwr61xum8" target="_blank" rel="noopener">Get Directions</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="copyright">
+    <div class="wrap">&copy; Tru-Trac Industries, LLC</div>
+  </div>
+</footer>
+
+<script>
+function navigateTo(name){
+  var pages = document.querySelectorAll('.page');
+  for(var i = 0; i < pages.length; i++){ pages[i].classList.remove('active'); }
+  var el = document.getElementById('page-' + name);
+  if(el){ el.classList.add('active'); }
+  var links = document.querySelectorAll('[data-page]');
+  for(var j = 0; j < links.length; j++){
+    if(links[j].tagName === 'A' && links[j].closest('.drawer')){
+      links[j].classList.toggle('active', links[j].getAttribute('data-page') === name);
+    }
+  }
+  if(location.hash !== '#' + name){ location.hash = name; }
+  closeDrawer();
+  window.scrollTo(0, 0);
+}
+document.addEventListener('click', function(e){
+  var t = e.target.closest('a[data-page], button[data-page]');
+  if(!t){ return; }
+  e.preventDefault();
+  navigateTo(t.getAttribute('data-page'));
+});
+window.addEventListener('hashchange', function(){
+  var h = location.hash.replace('#', '') || 'home';
+  navigateTo(h);
+});
+var drawer = document.getElementById('drawer');
+var scrim = document.getElementById('scrim');
+function openDrawer(){ drawer.classList.add('open'); scrim.classList.add('show'); }
+function closeDrawer(){ drawer.classList.remove('open'); scrim.classList.remove('show'); }
+document.getElementById('hamb').addEventListener('click', openDrawer);
+scrim.addEventListener('click', closeDrawer);
+navigateTo((location.hash || '#home').replace('#', ''));
+var slidesEl = document.getElementById('slides');
+var slideCount = slidesEl.children.length;
+var cur = 0;
+var dotsEl = document.getElementById('carDots');
+for(var d = 0; d < slideCount; d++){
+  (function(idx){
+    var b = document.createElement('button');
+    b.setAttribute('aria-label', 'Go to photo ' + (idx + 1));
+    b.addEventListener('click', function(){ goSlide(idx); });
+    dotsEl.appendChild(b);
+  })(d);
+}
+function goSlide(i){
+  cur = (i + slideCount) % slideCount;
+  slidesEl.style.transform = 'translateX(-' + (cur * 100) + '%)';
+  var dots = dotsEl.children;
+  for(var k = 0; k < dots.length; k++){ dots[k].classList.toggle('on', k === cur); }
+}
+document.getElementById('carPrev').addEventListener('click', function(){ goSlide(cur - 1); });
+document.getElementById('carNext').addEventListener('click', function(){ goSlide(cur + 1); });
+goSlide(0);
+document.getElementById('quoteForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  alert('Thanks for reaching out. Please call (717) 557-5537 and we will help you right away.');
+});
+</script>
+</body>
+</html>
