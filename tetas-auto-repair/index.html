@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teta's Auto Repair | Clifton Park, NY</title>
+<meta name="description" content="Teta's Auto Repair in Clifton Park, NY. Honest, fair-priced auto repair by Bob. Mon-Fri 8 AM to 5 PM. Call (518) 280-1571.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1c1712;
+    --paper:#faf7f2;
+    --rust:#c2571b;
+    --amber:#f2a33c;
+    --steel:#2e2a24;
+    --line:#e4dccd;
+    --muted:#7a6f60;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Inter",system-ui,sans-serif;color:var(--ink);background:var(--paper);line-height:1.6}
+  h1,h2,h3,.disp{font-family:"Oswald",sans-serif;line-height:1.12;letter-spacing:.01em;text-transform:uppercase}
+  a{color:var(--rust)}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 22px}
+  .page{display:none}
+  .page.active{display:block;animation:fadeIn .45s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  /* ---------- side-drawer nav ---------- */
+  header.top{position:sticky;top:0;z-index:70;background:var(--ink);color:#fff}
+  .top-inner{display:flex;align-items:center;justify-content:space-between;padding:12px 22px;max-width:1120px;margin:0 auto}
+  .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:#fff}
+  .brand .mark{width:38px;height:38px;border-radius:10px;background:var(--rust);display:grid;place-items:center;font-family:"Oswald",sans-serif;font-weight:700;color:#fff;font-size:1.1rem}
+  .brand .name{font-family:"Oswald",sans-serif;font-weight:600;font-size:1.1rem;text-transform:uppercase;letter-spacing:.04em}
+  .brand .name small{display:block;font-family:"Inter",sans-serif;font-weight:500;font-size:.68rem;color:#cbbfa9;letter-spacing:.1em}
+  .top-right{display:flex;align-items:center;gap:14px}
+  .phone-link{color:var(--amber);text-decoration:none;font-weight:600;font-size:.95rem}
+  #burger{background:var(--rust);color:#fff;border:none;border-radius:10px;padding:10px 16px;font-size:1.15rem;cursor:pointer;font-family:"Oswald",sans-serif;letter-spacing:.05em}
+  #drawerScrim{position:fixed;inset:0;background:rgba(20,15,10,.55);opacity:0;pointer-events:none;transition:opacity .25s;z-index:78}
+  #drawerScrim.show{opacity:1;pointer-events:auto}
+  nav.main{position:fixed;top:0;right:-320px;width:min(320px,84vw);height:100vh;background:var(--steel);z-index:80;display:flex;flex-direction:column;padding:26px 30px;transition:right .28s ease;box-shadow:-12px 0 40px rgba(0,0,0,.3)}
+  nav.main.open{right:0}
+  nav.main .d-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px}
+  nav.main .d-head span{font-family:"Oswald",sans-serif;text-transform:uppercase;color:var(--amber);letter-spacing:.1em}
+  nav.main .d-head button{background:none;border:1px solid #4a4237;color:#fff;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:1rem}
+  nav.main a.drawer-link{color:#fff;text-decoration:none;font-family:"Oswald",sans-serif;font-size:1.3rem;text-transform:uppercase;letter-spacing:.04em;padding:13px 0;border-bottom:1px solid #3d362c}
+  nav.main a.drawer-link.active{color:var(--amber)}
+  nav.main .d-foot{margin-top:auto;color:#a89a83;font-size:.85rem}
+  /* ---------- full-bleed hero ---------- */
+  .hero-full{background:radial-gradient(1200px 500px at 70% 20%,#3a2c1a 0%,var(--ink) 60%),var(--ink);color:#fff;overflow:hidden}
+  .hero-inner{max-width:1120px;margin:0 auto;padding:96px 22px 90px;position:relative}
+  .hero-inner::after{content:"";position:absolute;right:-40px;bottom:-60px;width:340px;height:340px;border:46px solid rgba(242,163,60,.12);border-radius:50%}
+  .kicker{font-size:.78rem;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--amber);margin-bottom:16px}
+  .hero-inner h1{font-size:clamp(2.8rem,7vw,5.2rem);max-width:14ch}
+  .hero-inner h1 .rust{color:var(--amber)}
+  .lede{font-size:1.1rem;color:#d8cbb4;max-width:46ch;margin:18px 0 28px}
+  .cta-row{display:flex;gap:12px;flex-wrap:wrap}
+  .btn{display:inline-block;padding:13px 28px;border-radius:8px;font-weight:600;text-decoration:none;font-size:.95rem;text-transform:uppercase;letter-spacing:.05em;font-family:"Oswald",sans-serif}
+  .btn-solid{background:var(--rust);color:#fff}
+  .btn-line{border:2px solid var(--amber);color:var(--amber)}
+  .hero-badges{display:flex;gap:26px;margin-top:34px;flex-wrap:wrap}
+  .hero-badges div{font-size:.85rem;color:#cbbfa9}
+  .hero-badges strong{display:block;font-family:"Oswald",sans-serif;font-size:1.5rem;color:#fff}
+  /* ---------- card-wall rhythm ---------- */
+  .wall{padding:70px 0}
+  .wall h2{font-size:clamp(1.8rem,3.6vw,2.8rem);margin-bottom:8px}
+  .wall .sub{color:var(--muted);margin-bottom:30px;max-width:60ch}
+  .card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  @media(max-width:860px){.card-grid{grid-template-columns:1fr}}
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:26px;position:relative}
+  .card::before{content:"";position:absolute;top:0;left:26px;right:26px;height:4px;background:var(--rust);border-radius:0 0 4px 4px}
+  .card .icon{width:44px;height:44px;border-radius:12px;background:#f6e8d8;display:grid;place-items:center;font-size:1.3rem;margin-bottom:14px}
+  .card h3{font-size:1.15rem;margin-bottom:8px}
+  .card p{font-size:.94rem;color:#4a4237}
+  .strip{background:var(--steel);color:#fff;border-radius:16px;padding:36px;margin:54px 0;display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:center}
+  @media(max-width:860px){.strip{grid-template-columns:1fr}}
+  .strip h2{color:#fff;margin-bottom:10px}
+  .strip p{color:#cbbfa9}
+  .stars{color:var(--amber);font-size:1.3rem;letter-spacing:.1em}
+  /* ---------- dotted-leader offerings ---------- */
+  .svc{padding:64px 0}
+  .svc-row{display:flex;align-items:baseline;gap:12px;padding:20px 0;border-bottom:1px solid var(--line)}
+  .svc-row .nm{font-family:"Oswald",sans-serif;font-size:1.25rem;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap}
+  .svc-row .dots{flex:1;border-bottom:3px dotted #b9ab90;transform:translateY(-6px);min-width:24px}
+  .svc-row .val{text-align:right;white-space:nowrap}
+  .svc-row .val strong{font-family:"Oswald",sans-serif;font-size:1.15rem;color:var(--rust);display:block}
+  .svc-row .val span{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  .svc-row .d{font-size:.92rem;color:#4a4237;flex-basis:100%;margin-top:2px}
+  .svc-block{display:flex;flex-wrap:wrap}
+  .sample-note{font-size:.82rem;color:var(--muted);margin-top:22px}
+  /* ---------- arch-tile gallery ---------- */
+  .arches{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:30px}
+  @media(max-width:900px){.arches{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:520px){.arches{grid-template-columns:1fr}}
+  .arch{background:#fff;border:1px solid var(--line);border-radius:999px 999px 14px 14px;overflow:hidden;padding:12px 12px 20px;text-align:center}
+  .arch .tile{height:230px;border-radius:999px 999px 8px 8px;display:flex;align-items:center;justify-content:center;position:relative}
+  .arch .tile svg{width:64%;height:auto}
+  .arch h3{font-size:1rem;margin:14px 0 4px}
+  .arch p{font-size:.82rem;color:var(--muted)}
+  .t1{background:linear-gradient(170deg,#3a2c1a,#c2571b)}
+  .t2{background:linear-gradient(170deg,#2e2a24,#6b5b43)}
+  .t3{background:linear-gradient(170deg,#c2571b,#f2a33c)}
+  .t4{background:linear-gradient(170deg,#1c1712,#4a3a24)}
+  .t5{background:linear-gradient(170deg,#6b5b43,#f2a33c)}
+  .t6{background:linear-gradient(170deg,#2e2a24,#c2571b)}
+  .t7{background:linear-gradient(170deg,#3a2c1a,#8a5a2b)}
+  .t8{background:linear-gradient(170deg,#c2571b,#2e2a24)}
+  .tile-badge{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(28,23,18,.8);color:#fff;font-size:.68rem;letter-spacing:.06em;padding:5px 12px;border-radius:999px;white-space:nowrap}
+  /* ---------- reviews ---------- */
+  .rev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:28px}
+  @media(max-width:860px){.rev-grid{grid-template-columns:1fr}}
+  .rev-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:24px}
+  .rev-card p{font-size:.94rem;color:#4a4237;margin:10px 0}
+  .rev-card .who{font-weight:600;font-size:.85rem}
+  .sample-tag{display:inline-block;background:#fff3d6;border:1px solid #e3c46a;color:#8a6d1a;font-size:.72rem;font-weight:600;padding:4px 10px;border-radius:999px;margin-bottom:8px}
+  /* ---------- visit ---------- */
+  .visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:28px}
+  @media(max-width:860px){.visit-grid{grid-template-columns:1fr}}
+  .visit-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:28px}
+  .visit-card h3{margin-bottom:12px}
+  table.hours{width:100%;border-collapse:collapse;font-size:.94rem}
+  table.hours td{padding:8px 0;border-bottom:1px dashed var(--line)}
+  table.hours td:last-child{text-align:right;font-weight:600}
+  /* ---------- multi-column footer ---------- */
+  footer.multi{background:var(--ink);color:#d8cbb4;margin-top:70px}
+  .foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:26px;padding:52px 0 40px}
+  @media(max-width:860px){.foot-grid{grid-template-columns:1fr 1fr}}
+  @media(max-width:560px){.foot-grid{grid-template-columns:1fr}}
+  .foot-grid h4{font-family:"Oswald",sans-serif;font-size:.85rem;letter-spacing:.16em;text-transform:uppercase;color:var(--amber);margin-bottom:14px}
+  .foot-grid p,.foot-grid a{color:#cbbfa9;text-decoration:none;font-size:.92rem;display:block;margin-bottom:8px}
+  .foot-grid a:hover{color:#fff}
+  .copy{border-top:1px solid #3d362c;padding:20px 0;text-align:center;color:#8a7a63;font-size:.9rem}
+  .section-pad{padding:60px 0}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <a class="brand" href="#home" data-page="home" aria-label="Teta's Auto Repair, home">
+      <span class="mark">T</span>
+      <span class="name">Teta's<small>Auto Repair</small></span>
+    </a>
+    <div class="top-right">
+      <a class="phone-link" href="tel:+15182801571">(518) 280-1571</a>
+      <button id="burger" aria-expanded="false" aria-controls="mainNav">MENU &#9776;</button>
+    </div>
+  </div>
+</header>
+<div id="drawerScrim"></div>
+<nav class="main" id="mainNav" aria-label="Primary">
+  <div class="d-head"><span>Navigate</span><button id="drawerClose" aria-label="Close menu">&#10005;</button></div>
+  <a class="drawer-link active" href="#home" data-page="home" aria-current="page">Home</a>
+  <a class="drawer-link" href="#offerings" data-page="offerings">Services</a>
+  <a class="drawer-link" href="#story" data-page="story">Our Story</a>
+  <a class="drawer-link" href="#gallery" data-page="gallery">Gallery</a>
+  <a class="drawer-link" href="#reviews" data-page="reviews">Reviews</a>
+  <a class="drawer-link" href="#visit" data-page="visit">Visit Us</a>
+  <div class="d-foot">1720 US-9, Clifton Park, NY 12065<br><a href="tel:+15182801571" style="color:var(--amber)">(518) 280-1571</a></div>
+</nav>
+
+<main>
+<section class="page" id="page-home">
+  <div class="hero-full">
+    <div class="hero-inner">
+      <p class="kicker">Auto Repair · Clifton Park, NY</p>
+      <h1>Honest work.<br><span class="rust">Fair prices.</span></h1>
+      <p class="lede">Teta's Auto Repair is a Clifton Park shop built on straight answers and skilled wrench work. Bob, the owner and lead mechanic, has earned a loyal following for diagnosing it right the first time.</p>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="tel:+15182801571">Call (518) 280-1571</a>
+        <a class="btn btn-line" href="#offerings" data-page="offerings">See services</a>
+      </div>
+      <div class="hero-badges">
+        <div><strong>4.9</strong>Google rating stars</div>
+        <div><strong>Mon - Fri</strong>8 AM to 5 PM</div>
+        <div><strong>US-9</strong>Easy to reach</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap wall">
+    <h2>What the shop does best</h2>
+    <p class="sub">Reviewers keep coming back for the same reasons: honest diagnosis, clear communication, and fair pricing on everything from routine maintenance to major engine work.</p>
+    <div class="card-grid">
+      <div class="card">
+        <div class="icon">&#9881;</div>
+        <h3>Engine Diagnostics</h3>
+        <p>Trusted expertise in tracking down engine problems. Customers praise the shop for diagnosing tricky issues other places missed.</p>
+      </div>
+      <div class="card">
+        <div class="icon">&#128295;</div>
+        <h3>Brakes and Rotors</h3>
+        <p>Brake jobs, rotors, and wheel bearings done right, with pricing that reviewers say beats the quotes they got elsewhere.</p>
+      </div>
+      <div class="card">
+        <div class="icon">&#128667;</div>
+        <h3>Oil Changes</h3>
+        <p>Fast, friendly routine service. The shop explains the work being done and gets you back on the road on time.</p>
+      </div>
+      <div class="card">
+        <div class="icon">&#9673;</div>
+        <h3>Tires and Wheels</h3>
+        <p>Flat repairs and tire work with an honest eye: reviewers say the shop flags what is actually worn and prices it fairly.</p>
+      </div>
+      <div class="card">
+        <div class="icon">&#9889;</div>
+        <h3>Major Repairs</h3>
+        <p>From water pumps and transmission fluid service to full engine rebuilds, bigger jobs are handled with care and clear estimates.</p>
+      </div>
+      <div class="card">
+        <div class="icon">&#10003;</div>
+        <h3>NYS Inspections</h3>
+        <p>A licensed New York State vehicle safety facility. Inspection station services are available alongside repairs.</p>
+      </div>
+    </div>
+
+    <div class="strip">
+      <div>
+        <p class="kicker" style="margin-bottom:10px">Why drivers choose Teta's</p>
+        <h2>"Go see Bob"</h2>
+        <p>That line runs through review after review. Bob is described as experienced, honest, and patient: the kind of mechanic who takes time to explain the work, quotes it clearly, and finishes on time.</p>
+      </div>
+      <div>
+        <div class="stars" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p style="margin-top:12px;font-size:1.05rem;color:#fff">"Hands down one of the best repair experiences ever. Bob was courteous, came through even faster than expected, and was so honest and forthright."</p>
+        <p style="margin-top:8px;font-size:.85rem">Review themes, paraphrased from local reviews</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-offerings">
+  <div class="wrap svc">
+    <p class="kicker">Services</p>
+    <h1 style="font-size:clamp(2rem,4.6vw,3.4rem);margin-bottom:10px">Under the hood, covered</h1>
+    <p class="sub" style="color:var(--muted);max-width:62ch;margin-bottom:20px">A full-service independent shop on US-9. Every job starts with an honest diagnosis and a clear estimate. Pricing shown is sample pricing to illustrate typical ranges. Call for an exact quote.</p>
+
+    <div class="svc-block">
+      <div class="svc-row"><span class="nm">Oil Change</span><span class="dots"></span><span class="val"><strong>from $45</strong><span>Sample price</span></span><span class="d">Conventional or synthetic oil and filter, with a quick look over the basics.</span></div>
+      <div class="svc-row"><span class="nm">Brake Service</span><span class="dots"></span><span class="val"><strong>from $180</strong><span>Sample price</span></span><span class="d">Pads, rotors, and inspection. Reviewers report saving quite a bit versus other quotes.</span></div>
+      <div class="svc-row"><span class="nm">Engine Diagnostics</span><span class="dots"></span><span class="val"><strong>from $95</strong><span>Sample price</span></span><span class="d">Check-engine lights and running problems, diagnosed by an experienced mechanic.</span></div>
+      <div class="svc-row"><span class="nm">Tire Repair</span><span class="dots"></span><span class="val"><strong>from $30</strong><span>Sample price</span></span><span class="d">Flats patched or plugged, with an honest check of the rest of your tires.</span></div>
+      <div class="svc-row"><span class="nm">Wheel Bearings</span><span class="dots"></span><span class="val"><strong>call for quote</strong><span>Job dependent</span></span><span class="d">Hub and bearing replacement to quiet the hum and keep wheels rolling true.</span></div>
+      <div class="svc-row"><span class="nm">Water Pump</span><span class="dots"></span><span class="val"><strong>call for quote</strong><span>Job dependent</span></span><span class="d">Cooling system repairs done carefully, with clear communication throughout.</span></div>
+      <div class="svc-row"><span class="nm">Transmission Fluid Service</span><span class="dots"></span><span class="val"><strong>from $150</strong><span>Sample price</span></span><span class="d">Fluid exchange to keep shifts smooth. One reviewer had this done at half the dealer quote.</span></div>
+      <div class="svc-row"><span class="nm">Engine Rebuilds</span><span class="dots"></span><span class="val"><strong>call for quote</strong><span>Job dependent</span></span><span class="d">Major engine work, from installs to full rebuilds, handled in house.</span></div>
+      <div class="svc-row"><span class="nm">NYS Inspection</span><span class="dots"></span><span class="val"><strong>state rate</strong><span>Licensed station</span></span><span class="d">Official New York State safety inspections at a licensed facility.</span></div>
+    </div>
+
+    <p class="sample-note">Sample prices are illustrative only and vary by vehicle and job. Call (518) 280-1571 for an exact estimate before any work begins.</p>
+    <div class="cta-row" style="margin-top:26px">
+      <a class="btn btn-solid" href="tel:+15182801571">Call for a quote</a>
+      <a class="btn btn-line" href="#visit" data-page="visit">Get directions</a>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-story">
+  <div class="wrap section-pad">
+    <p class="kicker">Our Story</p>
+    <h1 style="font-size:clamp(2rem,4.6vw,3.4rem);margin-bottom:18px">One mechanic, one standard</h1>
+    <div class="card-grid" style="grid-template-columns:1fr 1fr;margin-bottom:34px">
+      <div class="card">
+        <h3>The shop</h3>
+        <p style="margin-bottom:12px">Teta's Auto Repair sits right on US-9 in Clifton Park, an independent shop where the person who diagnoses your car is the person who fixes it. Owner Robert Teta, known to customers simply as Bob, runs the bays with a simple rule: tell the truth about what a car needs, charge a fair price, and explain the work.</p>
+        <p>Teta's is a licensed New York State vehicle safety and repair facility, so inspections and repairs happen under one roof.</p>
+      </div>
+      <div class="card">
+        <h3>The reputation</h3>
+        <p style="margin-bottom:12px">With a 4.9 star rating across dozens of reviews, the shop has become a word-of-mouth favorite in the Clifton Park area. Customers describe years of service across multiple vehicles: routine oil changes, brakes and rotors, tire repairs, water pumps, transmission service, and even full engine rebuilds.</p>
+        <p>The recurring theme is trust. Drivers say Bob explains the work, quotes it clearly, and often comes in under the estimate.</p>
+      </div>
+    </div>
+    <div class="cta-row">
+      <a class="btn btn-solid" href="#reviews" data-page="reviews">Read the reviews</a>
+      <a class="btn btn-line" href="tel:+15182801571">Talk to Bob</a>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap section-pad">
+    <p class="kicker">Gallery</p>
+    <h1 style="font-size:clamp(2rem,4.6vw,3.4rem);margin-bottom:8px">Around the shop</h1>
+    <p style="color:var(--muted);max-width:60ch;margin-bottom:6px">A look at the work Teta's does every day. Images shown are placeholders the business can swap for real shop photos.</p>
+    <div class="arches">
+      <div class="arch"><div class="tile t1"><span class="tile-badge">Placeholder image</span><svg viewBox="0 0 120 90" role="img" aria-label="Wrench icon"><path d="M78 8 a30 30 0 0 0-38 38 L14 72 l16 16 26-26 a30 30 0 0 0 38-38 l-14 14-12-12 z" fill="#fff" opacity=".9"/></svg></div><h3>The Toolbox</h3><p>Pro-grade tools</p></div>
+      <div class="arch"><div class="tile t2"><span class="tile-badge">Placeholder image</span><svg viewBox="0 0 120 90" role="img" aria-label="Engine icon"><rect x="25" y="25" width="70" height="40" rx="8" fill="#fff" opacity=".85"/><rect x="40" y="12" width="40" height="16" rx="4" fill="#fff" opacity=".7"/><circle cx="45" cy="45" r="9" fill="none" stroke="#2e2a24" stroke-width="5"/><circle cx="75" cy="45" r="9" fill="none" stroke="#2e2a24" stroke-width="5"/></svg></div><h3>Engine Work</h3><p>Diagnostics to rebuilds</p></div>
+      <div class="arch"><div class="tile t3"><span class="tile-badge">Placeholder image</span><svg viewBox="0 0 120 90" role="img" aria-label="Brake disc icon"><circle cx="60" cy="45" r="30" fill="none" stroke="#fff" stroke-width="10"/><circle cx="60" cy="45" r="8" fill="#fff"/></svg></div><h3>Brakes</h3><p>Pads and rotors</p></div>
+      <div class="arch"><div class="tile t4"><span class="tile-badge">Placeholder image</span><svg viewBox="0 0 120 90" role="img" aria-label="Tire icon"><circle cx="60" cy="45" r="30" fill="none" stroke="#fff" stroke-width="12"/><circle cx="60" cy="45" r="10" fill="#fff" opacity=".8"/></svg></div><h3>Tires</h3><p>Repair and rotation</p></div>
+      <div class="arch"><div class="tile t5"><span class="tile-badge">Placeholder image</span><svg viewBox="0 0 120 90" role="img" aria-label="Oil can icon"><rect x="35" y="30" width="50" height="40" rx="6" fill="#fff" opacity=".85"/><rect x="70" y="18" width="22" height="10" rx="3" fill="#fff" opacity=".85"/><path d="M45 30 q0-12 14-12" stroke="#fff" stroke-width="7" fill="none" opacity=".85"/></svg></div><h3>Oil Service</h3><p>Fast maintenance</p></div>
+      <div class="arch"><div class="tile t6"><span class="tile-badge">Placeholder image</span><svg viewBox="0 0 120 90" role="img" aria-label="Checklist icon"><rect x="35" y="12" width="50" height="66" rx="8" fill="#fff" opacity=".85"/><path d="M45 34 l8 8 16-18 M45 56 l8 8 16-18" stroke="#c2571b" stroke-width="6" fill="none" stroke-linecap="round"/></svg></div><h3>Inspections</h3><p>NYS licensed station</p></div>
+      <div class="arch"><div class="tile t7"><span class="tile-badge">Placeholder image</span><svg viewBox="0 0 120 90" role="img" aria-label="Shop building icon"><path d="M20 78 V40 L60 14 L100 40 V78 Z" fill="#fff" opacity=".85"/><rect x="48" y="54" width="24" height="24" fill="#2e2a24"/></svg></div><h3>The Shop</h3><p>1720 US-9, Clifton Park</p></div>
+      <div class="arch"><div class="tile t8"><span class="tile-badge">Placeholder image</span><svg viewBox="0 0 120 90" role="img" aria-label="Handshake icon"><circle cx="42" cy="45" r="18" fill="#fff" opacity=".85"/><circle cx="78" cy="45" r="18" fill="#fff" opacity=".6"/><rect x="34" y="38" width="52" height="14" rx="7" fill="#fff"/></svg></div><h3>The Handshake</h3><p>Deals done honestly</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap section-pad">
+    <p class="kicker">Reviews</p>
+    <h1 style="font-size:clamp(2rem,4.6vw,3.4rem);margin-bottom:10px">Drivers trust Bob</h1>
+    <div class="stars" aria-label="4.9 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+    <p style="margin:10px 0 6px;font-size:1.05rem"><strong>4.9 stars · Based on 59 Google reviews</strong></p>
+    <p style="margin-bottom:20px"><a href="https://www.google.com/maps/place/?q=place_id:ChIJYSwa_9sT3okRn7T7-ZTyOV4">See reviews on Google</a> &nbsp;·&nbsp; <a href="https://www.loc8nearme.com/new-york/clifton-park/tetas-auto-repair/7158865/">See reviews on Loc8NearMe</a> &nbsp;·&nbsp; <a href="https://www.bestprosintown.com/ny/clifton-park/tetas-auto-repair-/">See reviews on BestProsInTown</a></p>
+    <div class="rev-grid">
+      <div class="rev-card">
+        <div class="stars" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p>"Bob is a very experienced and honest mechanic. He always takes great care servicing our vehicles, thank you!"</p>
+        <div class="who">Review themes, paraphrased</div>
+      </div>
+      <div class="rev-card">
+        <div class="stars" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p>"We always bring our vehicles to Teta's. Fast friendly service with a smile. Do you want or need an honest mechanic, go see Bob."</p>
+        <div class="who">Review themes, paraphrased</div>
+      </div>
+      <div class="rev-card">
+        <div class="stars" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p>One customer had rear brakes, a water pump, and a transmission fluid change done at half the dealer quote, with clear communication and a final bill under the estimate.</p>
+        <div class="who">Review themes, paraphrased</div>
+      </div>
+      <div class="rev-card">
+        <span class="sample-tag">Sample review</span>
+        <div class="stars" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p>Bob explained everything before touching the car and the final bill was less than the estimate. That is why I keep coming back.</p>
+        <div class="who">Sample reviewer</div>
+      </div>
+      <div class="rev-card">
+        <span class="sample-tag">Sample review</span>
+        <div class="stars" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p>Needed brakes and rotors on both cars. Done on time, priced fairly, and Bob walked me through what he found.</p>
+        <div class="who">Sample reviewer</div>
+      </div>
+      <div class="rev-card">
+        <span class="sample-tag">Sample review</span>
+        <div class="stars" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p>Got a flat on Route 9 and they fit me in fast. Honest about what else needed attention. Highly recommend.</p>
+        <div class="who">Sample reviewer</div>
+      </div>
+    </div>
+    <p class="sample-note">Sample reviews above are illustrative. Real reviews live on Google and the directory sites linked above.</p>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="wrap section-pad">
+    <p class="kicker">Visit Us</p>
+    <h1 style="font-size:clamp(2rem,4.6vw,3.4rem);margin-bottom:18px">Stop by the shop</h1>
+    <div class="visit-grid">
+      <div class="visit-card">
+        <h3>Location and contact</h3>
+        <p><strong>Teta's Auto Repair</strong><br>1720 US-9<br>Clifton Park, NY 12065</p>
+        <p style="margin-top:12px"><strong>Phone:</strong> <a href="tel:+15182801571">(518) 280-1571</a></p>
+        <div class="cta-row" style="margin-top:18px">
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJYSwa_9sT3okRn7T7-ZTyOV4">Get directions</a>
+          <a class="btn btn-line" href="tel:+15182801571">Call the shop</a>
+        </div>
+      </div>
+      <div class="visit-card">
+        <h3>Hours</h3>
+        <table class="hours" id="hoursTable">
+          <tr><td>Monday</td><td>8:00 AM - 5:00 PM</td></tr>
+          <tr><td>Tuesday</td><td>8:00 AM - 5:00 PM</td></tr>
+          <tr><td>Wednesday</td><td>8:00 AM - 5:00 PM</td></tr>
+          <tr><td>Thursday</td><td>8:00 AM - 5:00 PM</td></tr>
+          <tr><td>Friday</td><td>8:00 AM - 5:00 PM</td></tr>
+          <tr><td>Saturday</td><td>Closed</td></tr>
+          <tr><td>Sunday</td><td>Closed</td></tr>
+        </table>
+        <p class="sample-note">Hours from the business listing. Call ahead to schedule your visit.</p>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="multi">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <h4>Teta's Auto Repair</h4>
+        <p>Honest, fair-priced auto repair on US-9 in Clifton Park. Owner and lead mechanic Bob has been keeping local drivers on the road for years.</p>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <p>1720 US-9<br>Clifton Park, NY 12065</p>
+        <a href="tel:+15182801571">(518) 280-1571</a>
+      </div>
+      <div>
+        <h4>Hours</h4>
+        <p>Mon - Fri<br>8:00 AM - 5:00 PM</p>
+        <p>Sat - Sun<br>Closed</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <a href="#offerings" data-page="offerings">Services</a>
+        <a href="#reviews" data-page="reviews">Reviews</a>
+        <a href="#gallery" data-page="gallery">Gallery</a>
+        <a href="https://www.google.com/maps/place/?q=place_id:ChIJYSwa_9sT3okRn7T7-ZTyOV4">Directions</a>
+      </div>
+    </div>
+    <div class="copy"><span>© Teta's Auto Repair</span></div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "offerings", "story", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+  var scrim = document.getElementById("drawerScrim");
+  var closeBtn = document.getElementById("drawerClose");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+    if(scrim){ scrim.classList.remove("show"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+      if(scrim){ scrim.classList.toggle("show", open); }
+    });
+  }
+  if(closeBtn){ closeBtn.addEventListener("click", closeMenu); }
+  if(scrim){ scrim.addEventListener("click", closeMenu); }
+
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
