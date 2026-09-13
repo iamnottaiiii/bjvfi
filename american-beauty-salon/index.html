@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>American Beauty Salon | Borough Park, Brooklyn</title>
+<meta name="description" content="American Beauty Salon, 4829 New Utrecht Ave, Brooklyn NY 11219. Haircuts, barbering, color, facials and makeup. Call (718) 854-2540 to book.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#221419; --plum:#5b2a4a; --cream:#faf5ec; --paper:#fffdf8;
+  --gold:#c9a15a; --blush:#e9cdbd; --line:rgba(34,20,25,.14);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Inter",system-ui,sans-serif;background:var(--cream);color:var(--ink);line-height:1.6}
+h1,h2,h3,.serif{font-family:"Fraunces",Georgia,serif;font-weight:600;line-height:1.12}
+a{color:inherit}
+img,svg{display:block;max-width:100%}
+.page{display:none}
+.page.active{display:block;animation:fadeIn .45s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ---------- top bar (slim) + drawer nav ---------- */
+.topbar{position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:14px;padding:12px 20px;background:rgba(250,245,236,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.burger{background:none;border:0;cursor:pointer;width:42px;height:42px;display:grid;place-items:center;border-radius:10px}
+.burger span{display:block;width:22px;height:2px;background:var(--ink);position:relative}
+.burger span::before,.burger span::after{content:"";position:absolute;left:0;width:22px;height:2px;background:var(--ink)}
+.burger span::before{top:-7px}.burger span::after{top:7px}
+.brand{font-family:"Fraunces",serif;font-weight:700;font-size:1.15rem;letter-spacing:.02em;text-decoration:none}
+.topbar .call{margin-left:auto;background:var(--plum);color:#fff;text-decoration:none;padding:10px 18px;border-radius:999px;font-weight:600;font-size:.92rem}
+.scrim{position:fixed;inset:0;background:rgba(34,20,25,.5);opacity:0;pointer-events:none;transition:opacity .3s;z-index:70}
+.scrim.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:min(340px,86vw);background:var(--ink);color:var(--cream);z-index:80;transform:translateX(-105%);transition:transform .35s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;padding:28px 30px}
+.drawer.open{transform:none}
+.drawer .close{align-self:flex-end;background:none;border:1px solid rgba(250,245,236,.3);color:var(--cream);border-radius:10px;padding:8px 14px;cursor:pointer;font-size:.9rem}
+.drawer nav.main{display:flex;flex-direction:column;gap:4px;margin-top:22px}
+.drawer nav.main a{color:var(--cream);text-decoration:none;font-family:"Fraunces",serif;font-size:1.6rem;padding:10px 4px;border-bottom:1px solid rgba(250,245,236,.12);opacity:.85}
+.drawer nav.main a.active{opacity:1;color:var(--gold)}
+.drawer .dfoot{margin-top:auto;font-size:.85rem;opacity:.7}
+.drawer .dfoot a{color:var(--gold)}
+
+/* ---------- layout helpers ---------- */
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+.btn{display:inline-block;text-decoration:none;font-weight:600;border-radius:999px;padding:13px 28px;font-size:.98rem;cursor:pointer;border:0}
+.btn-solid{background:var(--plum);color:#fff}
+.btn-ghost{background:transparent;border:2px solid var(--plum);color:var(--plum)}
+.eyebrow{text-transform:uppercase;letter-spacing:.22em;font-size:.74rem;font-weight:700;color:var(--gold);margin-bottom:14px}
+.sec{padding:76px 0}
+
+/* ---------- split hero ---------- */
+.hero{display:grid;grid-template-columns:1fr 1fr;min-height:78vh}
+.hero-copy{background:var(--ink);color:var(--cream);padding:64px 46px;display:flex;flex-direction:column;justify-content:center}
+.hero-copy h1{font-size:clamp(2.4rem,5vw,4.2rem);margin:0 0 18px}
+.hero-copy h1 em{color:var(--gold);font-style:normal}
+.hero-copy p{opacity:.85;max-width:44ch;margin-bottom:28px}
+.hero-cta{display:flex;gap:12px;flex-wrap:wrap}
+.hero-cta .btn-ghost{border-color:var(--gold);color:var(--gold)}
+.rating{display:flex;align-items:center;gap:10px;margin-top:30px;font-size:.9rem;opacity:.85}
+.stars{color:var(--gold);letter-spacing:.1em}
+.hero-art{background:linear-gradient(160deg,var(--plum),#8a4a6e 55%,var(--blush));position:relative;overflow:hidden;display:grid;place-items:center;min-height:380px}
+.hero-art svg{width:min(78%,430px);height:auto}
+.hero-art .tag{position:absolute;bottom:18px;right:18px;background:rgba(34,20,25,.75);color:#fff;font-size:.75rem;padding:6px 12px;border-radius:999px}
+
+/* ---------- asymmetric magazine panels (story) ---------- */
+.mag{display:grid;grid-template-columns:repeat(12,1fr);gap:18px;margin-top:40px}
+.mag .panel{border:1px solid var(--line);border-radius:18px;padding:30px;background:var(--paper)}
+.mag .p1{grid-column:1/8}.mag .p2{grid-column:8/13;margin-top:56px;background:var(--plum);color:var(--cream);border:0}
+.mag .p3{grid-column:2/7;margin-top:-8px}.mag .p4{grid-column:7/13;margin-top:40px;background:var(--blush)}
+.mag h3{font-size:1.35rem;margin-bottom:10px}
+.mag .num{font-family:"Fraunces",serif;color:var(--gold);font-size:2.2rem;display:block;margin-bottom:8px}
+
+/* ---------- card grid services ---------- */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:36px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:28px;transition:transform .25s,box-shadow .25s}
+.card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(91,42,74,.14)}
+.card .ic{width:52px;height:52px;border-radius:14px;background:var(--plum);color:var(--gold);display:grid;place-items:center;margin-bottom:16px}
+.card h3{font-size:1.25rem;margin-bottom:8px}
+.card p{font-size:.94rem;opacity:.8;margin-bottom:14px}
+.card .sample{font-size:.82rem;background:var(--cream);border:1px dashed var(--gold);border-radius:10px;padding:10px 12px}
+.sample-note{margin-top:20px;font-size:.85rem;opacity:.7}
+
+/* ---------- scroll-snap gallery ---------- */
+.strip{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 4px 22px;margin-top:30px}
+.tile{flex:0 0 min(300px,78vw);scroll-snap-align:start;border-radius:16px;overflow:hidden;position:relative;aspect-ratio:4/5;background:linear-gradient(150deg,var(--plum),#8a4a6e)}
+.tile:nth-child(2n){background:linear-gradient(150deg,#3a2233,var(--plum))}
+.tile:nth-child(3n){background:linear-gradient(150deg,var(--blush),#d8a37e)}
+.tile svg{width:100%;height:100%}
+.badge{position:absolute;top:12px;left:12px;background:rgba(255,253,248,.94);color:var(--ink);font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:6px 12px;border-radius:999px}
+.tile .cap{position:absolute;bottom:0;left:0;right:0;padding:14px;background:linear-gradient(transparent,rgba(34,20,25,.7));color:#fff;font-size:.88rem}
+
+/* ---------- reviews ---------- */
+.rev-big{font-family:"Fraunces",serif;font-size:clamp(1.6rem,3.4vw,2.6rem);max-width:20ch;margin:26px 0 14px}
+.rev-src{font-size:.9rem;opacity:.7;margin-bottom:26px}
+.rev-list{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px}
+.rev{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:24px;font-size:.96rem}
+.rev .stars{font-size:.85rem;margin-bottom:10px}
+.google-link{display:inline-block;margin-top:30px;background:var(--ink);color:#fff;text-decoration:none;padding:14px 30px;border-radius:999px;font-weight:600}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:30px}
+.vcard{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:30px}
+.vcard h3{margin-bottom:10px}
+.vcard a{color:var(--plum);font-weight:600}
+.hours-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-size:.95rem}
+
+/* ---------- big-type footer ---------- */
+footer.site{background:var(--ink);color:var(--cream);margin-top:40px}
+footer .big{font-family:"Fraunces",serif;font-weight:700;font-size:clamp(2.6rem,9vw,7rem);line-height:1;padding:54px 22px 10px;max-width:1180px;margin:0 auto}
+footer .big span{color:var(--gold)}
+.fmeta{max-width:1180px;margin:0 auto;padding:26px 22px 40px;display:flex;gap:26px;flex-wrap:wrap;font-size:.92rem;opacity:.9}
+.fmeta a{color:var(--gold)}
+.copy{border-top:1px solid rgba(250,245,236,.15);text-align:center;padding:20px;font-size:.92rem;opacity:.85}
+
+/* ---------- reveal ---------- */
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s,transform .6s}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:860px){
+  .hero{grid-template-columns:1fr}
+  .cards{grid-template-columns:1fr}
+  .rev-list{grid-template-columns:1fr}
+  .visit-grid{grid-template-columns:1fr}
+  .mag .panel{grid-column:1/-1 !important;margin-top:0 !important}
+}
+</style>
+</head>
+<body>
+
+<div class="scrim" id="scrim"></div>
+
+<header class="topbar">
+  <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span></button>
+  <a class="brand" href="#home" data-page="home">American Beauty Salon</a>
+  <a class="call" href="tel:+17188542540">(718) 854-2540</a>
+</header>
+
+<aside class="drawer" id="drawer" aria-label="Site menu">
+  <button class="close" id="drawerClose">Close</button>
+  <nav class="main" id="mainNav">
+    <a href="#home" data-page="home" class="active" aria-current="page">Home</a>
+    <a href="#services" data-page="services">Services</a>
+    <a href="#story" data-page="story">Our Story</a>
+    <a href="#gallery" data-page="gallery">Gallery</a>
+    <a href="#reviews" data-page="reviews">Reviews</a>
+    <a href="#visit" data-page="visit">Visit Us</a>
+  </nav>
+  <div class="dfoot">
+    4829 New Utrecht Ave, Brooklyn, NY 11219<br>
+    <a href="tel:+17188542540">(718) 854-2540</a>
+  </div>
+</aside>
+
+<main>
+
+<section class="page" id="page-home">
+  <div class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow">Borough Park, Brooklyn</p>
+      <h1>Sharp looks, <em>gentle</em> care.</h1>
+      <p>American Beauty Salon is your neighborhood stop for haircuts, barbering, color, facials and makeup. Walk out looking your best, every visit.</p>
+      <div class="hero-cta">
+        <a class="btn btn-solid" href="tel:+17188542540">Call to Book</a>
+        <a class="btn btn-ghost" href="#services" data-page="services">See Services</a>
+      </div>
+      <div class="rating"><span class="stars">★★★★★</span><span>4.8 based on 8 reviews on Birdeye</span></div>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <svg viewBox="0 0 400 400" role="img"><circle cx="200" cy="200" r="150" fill="none" stroke="#faf5ec" stroke-width="3" opacity=".5"/><circle cx="200" cy="200" r="110" fill="none" stroke="#c9a15a" stroke-width="2" opacity=".7"/><path d="M120 260 Q200 120 280 260" fill="none" stroke="#faf5ec" stroke-width="8" stroke-linecap="round"/><circle cx="160" cy="150" r="16" fill="#c9a15a" opacity=".85"/><circle cx="244" cy="132" r="10" fill="#faf5ec" opacity=".7"/><circle cx="286" cy="186" r="8" fill="#c9a15a" opacity=".6"/><path d="M90 320 h220" stroke="#faf5ec" stroke-width="3" opacity=".4" stroke-linecap="round"/></svg>
+      <span class="tag">Photo placeholder: salon interior</span>
+    </div>
+  </div>
+  <div class="wrap sec">
+    <p class="eyebrow reveal">Why neighbors choose us</p>
+    <div class="cards">
+      <div class="card reveal"><h3>For men and women</h3><p>Listed as a beauty salon, barber shop and hair salon, so the whole household can book in one place.</p></div>
+      <div class="card reveal"><h3>Personal attention</h3><p>Reviewers describe focused, professional work and a calm visit without the rush.</p></div>
+      <div class="card reveal"><h3>Call to book</h3><p>Booking is simple: ring <a href="tel:+17188542540" style="color:var(--plum);font-weight:700">(718) 854-2540</a> and reserve your chair.</p></div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-services">
+  <div class="wrap sec">
+    <p class="eyebrow reveal">Services</p>
+    <h2 class="reveal" style="font-size:clamp(2rem,4.5vw,3.2rem);max-width:22ch">Everything for hair, skin and occasion.</h2>
+    <div class="cards">
+      <div class="card reveal"><div class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="6" r="2.4"/><circle cx="6" cy="18" r="2.4"/><path d="M8 7.5 20 19M8 16.5 20 5"/></svg></div><h3>Haircuts and Styling</h3><p>Precision cuts, blowouts and everyday styling for men and women.</p><div class="sample">Sample: cuts from $35, blowouts from $30</div></div>
+      <div class="card reveal"><div class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20c2-6 6-9 8-9s6 3 8 9"/><path d="M12 11V4M9 7l3-3 3 3"/></svg></div><h3>Barbering</h3><p>Classic barber cuts, fades, lineups and beard detailing.</p><div class="sample">Sample: barber cuts from $30</div></div>
+      <div class="card reveal"><div class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3c3 4 6 7 6 11a6 6 0 0 1-12 0c0-4 3-7 6-11z"/></svg></div><h3>Color and Highlights</h3><p>Full color, highlights and touch ups matched to your style.</p><div class="sample">Sample: color from $85, highlights from $110</div></div>
+      <div class="card reveal"><div class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path d="M12 4v4M12 16v4M4 12h4M16 12h4"/></svg></div><h3>Facials and Skincare</h3><p>Refreshing facials and skin treatments for a healthy glow.</p><div class="sample">Sample: facials from $60</div></div>
+      <div class="card reveal"><div class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 19c4 1 9 1 14-2l-2-8c-4 2-8 2-12 1z"/><path d="M5 19l-1 2M19 17l2 1"/></svg></div><h3>Makeup</h3><p>Event and occasion makeup, from natural looks to full glam.</p><div class="sample">Sample: makeup from $50</div></div>
+      <div class="card reveal"><div class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h16M6 8h12M8 16h8"/></svg></div><h3>Treatments</h3><p>Deep conditioning and care treatments that keep hair healthy.</p><div class="sample">Sample: treatments from $40</div></div>
+    </div>
+    <p class="sample-note reveal">Prices shown are samples only. Call <a href="tel:+17188542540" style="color:var(--plum);font-weight:700">(718) 854-2540</a> to confirm pricing and availability.</p>
+  </div>
+</section>
+
+
+<section class="page" id="page-story">
+  <div class="wrap sec">
+    <p class="eyebrow reveal">Our Story</p>
+    <h2 class="reveal" style="font-size:clamp(2rem,4.5vw,3.2rem);max-width:24ch">A neighborhood salon on New Utrecht Ave.</h2>
+    <div class="mag">
+      <div class="panel p1 reveal"><span class="num">01</span><h3>One chair, full attention</h3><p>American Beauty Salon serves Borough Park as a beauty salon, barber shop and hair salon. Reviewers describe the experience as focused and professional: stylists take their time, and clients leave feeling genuinely cared for.</p></div>
+      <div class="panel p2 reveal"><span class="num">02</span><h3>The barber clients ask for</h3><p>One client review puts it simply: Zalmen is an excellent barber and a gentleman. That kind of word of mouth is earned one haircut at a time.</p></div>
+      <div class="panel p3 reveal"><span class="num">03</span><h3>Hair, skin and makeup</h3><p>Beyond cuts and barbering, the salon offers facials, skincare and makeup, making it a single stop for everyday upkeep and special occasions alike.</p></div>
+      <div class="panel p4 reveal"><span class="num">04</span><h3>Easy to reach</h3><p>Find us at 4829 New Utrecht Ave, Brooklyn, NY 11219. Booking takes one phone call: <a href="tel:+17188542540" style="font-weight:700">(718) 854-2540</a>.</p></div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-gallery">
+  <div class="wrap sec">
+    <p class="eyebrow reveal">Gallery</p>
+    <h2 class="reveal" style="font-size:clamp(2rem,4.5vw,3.2rem)">Inside the salon.</h2>
+    <p class="reveal" style="opacity:.75;margin-top:10px">Photos are placeholders the owner can swap for real salon shots.</p>
+    <div class="strip">
+      <div class="tile reveal"><span class="badge">Photo placeholder</span><svg viewBox="0 0 300 375"><rect width="300" height="375" fill="none"/><circle cx="150" cy="150" r="70" fill="#faf5ec" opacity=".25"/><path d="M80 300 q70-60 140 0" stroke="#faf5ec" stroke-width="6" fill="none" opacity=".5"/></svg><div class="cap">Salon interior</div></div>
+      <div class="tile reveal"><span class="badge">Photo placeholder</span><svg viewBox="0 0 300 375"><rect x="60" y="60" width="180" height="180" rx="90" fill="#faf5ec" opacity=".2"/><path d="M150 90 q50 60 0 120 q-50-60 0-120" fill="#c9a15a" opacity=".5"/></svg><div class="cap">Hair styling</div></div>
+      <div class="tile reveal"><span class="badge">Photo placeholder</span><svg viewBox="0 0 300 375"><rect x="40" y="120" width="220" height="140" rx="20" fill="#faf5ec" opacity=".2"/><circle cx="150" cy="190" r="45" fill="#faf5ec" opacity=".3"/></svg><div class="cap">Barber detail</div></div>
+      <div class="tile reveal"><span class="badge">Photo placeholder</span><svg viewBox="0 0 300 375"><path d="M60 280 Q150 160 240 280" stroke="#faf5ec" stroke-width="8" fill="none" opacity=".45"/><circle cx="150" cy="150" r="30" fill="#c9a15a" opacity=".55"/></svg><div class="cap">Color work</div></div>
+      <div class="tile reveal"><span class="badge">Photo placeholder</span><svg viewBox="0 0 300 375"><rect x="80" y="100" width="140" height="180" rx="70" fill="#faf5ec" opacity=".22"/><circle cx="150" cy="150" r="18" fill="#faf5ec" opacity=".5"/></svg><div class="cap">Facials and skincare</div></div>
+      <div class="tile reveal"><span class="badge">Photo placeholder</span><svg viewBox="0 0 300 375"><path d="M50 250 h200 M80 250 q70-100 140 0" stroke="#faf5ec" stroke-width="6" fill="none" opacity=".45"/></svg><div class="cap">Event makeup</div></div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-reviews">
+  <div class="wrap sec">
+    <p class="eyebrow reveal">Reviews</p>
+    <h2 class="rev-big reveal">Loved by the neighborhood.</h2>
+    <p class="rev-src reveal">Based on 8 reviews on Birdeye, averaging 4.8 out of 5.</p>
+    <div class="rev-list">
+      <div class="rev reveal"><div class="stars">★★★★★</div><p>Clients describe Zalmen as an excellent barber and a gentleman, praising both the quality of the cut and the manner of the service.</p></div>
+      <div class="rev reveal"><div class="stars">★★★★★</div><p>Reviewers call out professional, focused styling and an overall experience that feels personal rather than rushed.</p></div>
+    </div>
+    <a class="google-link reveal" href="https://www.google.com/maps/place/?q=place_id:ChIJJ0cNYC1FwokRRrF8EZENJ5w" target="_blank" rel="noopener">See reviews on Google</a>
+  </div>
+</section>
+
+
+<section class="page" id="page-visit">
+  <div class="wrap sec">
+    <p class="eyebrow reveal">Visit Us</p>
+    <h2 class="reveal" style="font-size:clamp(2rem,4.5vw,3.2rem)">Come see us.</h2>
+    <div class="visit-grid">
+      <div class="vcard reveal">
+        <h3>Find us</h3>
+        <p>4829 New Utrecht Ave<br>Brooklyn, NY 11219</p>
+        <p style="margin-top:12px"><a href="https://www.google.com/maps/place/?q=place_id:ChIJJ0cNYC1FwokRRrF8EZENJ5w" target="_blank" rel="noopener">Get directions on Google Maps</a></p>
+      </div>
+      <div class="vcard reveal">
+        <h3>Book a visit</h3>
+        <p><a href="tel:+17188542540">(718) 854-2540</a></p>
+        <p style="margin-top:10px;opacity:.8">Call to book your appointment. Call for hours.</p>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="site">
+  <div class="big">Look <span>your best</span>,<br>every visit.</div>
+  <div class="fmeta">
+    <span>4829 New Utrecht Ave, Brooklyn, NY 11219</span>
+    <a href="tel:+17188542540">(718) 854-2540</a>
+    <a href="https://www.google.com/maps/place/?q=place_id:ChIJJ0cNYC1FwokRRrF8EZENJ5w" target="_blank" rel="noopener">Find us on Google Maps</a>
+  </div>
+  <div class="copy">© American Beauty Salon</div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "story", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+  var drawer = document.getElementById("drawer");
+  var scrim = document.getElementById("scrim");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(drawer){ drawer.classList.remove("open"); }
+    if(scrim){ scrim.classList.remove("on"); }
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = drawer.classList.toggle("open");
+      scrim.classList.toggle("on", open);
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+  var closeBtn = document.getElementById("drawerClose");
+  if(closeBtn){ closeBtn.addEventListener("click", closeMenu); }
+  if(scrim){ scrim.addEventListener("click", closeMenu); }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
