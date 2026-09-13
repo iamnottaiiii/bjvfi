@@ -1518,6 +1518,7 @@ async function renderAdminInto(el){
     if(r) r.addEventListener('click', function(){ renderAdminInto(el); });
     return;
   }
+  if(state.adminUser){ renderUserDashboardInto(el); return; }
   let html = '<div class="chiprow" style="margin-bottom:14px">' +
     [['users','Users'],['announce','Announcements'],['tools','Tools']].map(function(p){
       return '<button type="button" class="chip' + (state.adminSec === p[0] ? ' on' : '') + '" data-admin-sec="' + p[0] + '">' + p[1] + '</button>';
@@ -1529,6 +1530,7 @@ async function renderAdminInto(el){
   el.querySelectorAll('[data-admin-sec]').forEach(function(chip){
     chip.addEventListener('click', function(){
       state.adminSec = chip.getAttribute('data-admin-sec');
+      state.adminUser = null;
       renderAdminInto(el);
     });
   });
@@ -1569,6 +1571,7 @@ function adminUsersHtml(){
       badge(u.status) + '</div>' +
       '<div class="row" style="margin-bottom:8px">' + badge(u.role) + '</div>' +
       '<div class="row">' +
+      '<button class="btn ghost sm" data-udash="' + esc(r.username) + '" type="button">Dashboard</button>' +
       (u.status === 'pending' ? '<button class="btn sm" data-uact="approve" data-u="' + esc(r.username) + '" type="button">Approve</button>' +
         '<button class="btn ghost sm" data-uact="reject" data-u="' + esc(r.username) + '" type="button">Reject</button>' : '') +
       (u.status !== 'disabled' ? '<button class="btn danger sm" data-uact="disable" data-u="' + esc(r.username) + '" type="button">Disable</button>' :
@@ -1598,6 +1601,9 @@ function wireAdminUsers(el){
   el.querySelectorAll('[data-uact]').forEach(function(b){
     b.addEventListener('click', function(){ userAction(b.getAttribute('data-u'), b.getAttribute('data-uact'), el); });
   });
+  el.querySelectorAll('[data-udash]').forEach(function(b){
+    b.addEventListener('click', function(){ state.adminUser = b.getAttribute('data-udash'); renderAdminInto(el); });
+  });
   el.querySelectorAll('[data-urole]').forEach(function(sel){
     sel.addEventListener('change', function(){
       userAction(sel.getAttribute('data-urole'), 'role:' + sel.value, el);
@@ -1605,8 +1611,128 @@ function wireAdminUsers(el){
   });
 }
 
-async function saveUsers(){
-  const rec = await ghGetJson('users.json');
+/* Admin-only: every claim in the repo, for the per-user dashboard. */
+async function loadAllClaims(){
+  let tree = null;
+  try{ tree = await ghFetch('/git/trees/main:claims', { action: 'list claims' }); }
+  catch(e){ if(e.status === 404) return []; throw e; }
+  const files = (tree.tree || []).filter(function(n){ return n.type === 'blob' && n.path.slice(-5) === '.json'; });
+  const out = [];
+  for(let i = 0; i < files.length; i += 6){
+    const batch = files.slice(i, i + 6);
+    const recs = await Promise.all(batch.map(function(n){
+      return ghGetJson('claims/' + n.path).catch(function(){ return null; });
+    }));
+    recs.forEach(function(r){ if(r && r.data) out.push(r.data); });
+  }
+  return out;
+}
+
+async function renderUserDashboardInto(el){
+  const username = state.adminUser;
+  el.innerHTML = '<div class="card"><div class="empty">Loading dashboard...</div></div>';
+  let claims = [], intakes = [];
+  try{
+    await loadUsers();
+    claims = await loadAllClaims();
+    intakes = await loadIntakes('all');
+  }catch(e){
+    el.innerHTML = '<div class="card"><button class="btn ghost sm" id="ud-back" type="button">Back to users</button>' +
+      '<div class="empty" style="margin-top:10px">' + esc(e.message) + '</div></div>';
+    el.querySelector('#ud-back').addEventListener('click', function(){ state.adminUser = null; renderAdminInto(el); });
+    return;
+  }
+  const u = state.users[username];
+  if(!u){
+    el.innerHTML = '<div class="card"><button class="btn ghost sm" id="ud-back" type="button">Back to users</button>' +
+      '<div class="empty" style="margin-top:10px">User not found.</div></div>';
+    el.querySelector('#ud-back').addEventListener('click', function(){ state.adminUser = null; renderAdminInto(el); });
+    return;
+  }
+  const myClaims = claims.filter(function(c){ return c.claimer === username; })
+    .sort(function(a, b){ return String(b.claimed_at || '').localeCompare(String(a.claimed_at || '')); });
+  const myIntakes = intakes.filter(function(i){ return i.claimer === username; })
+    .sort(function(a, b){ return String(b.created_at || '').localeCompare(String(a.created_at || '')); });
+  const n = function(list, st){ return list.filter(function(c){ return c.status === st; }).length; };
+  const stat = function(label, val){
+    return '<div style="flex:1;min-width:70px;text-align:center;padding:10px 4px">' +
+      '<div style="font-size:20px;font-weight:700">' + val + '</div>' +
+      '<div class="muted" style="font-size:11px">' + label + '</div></div>';
+  };
+  let html = '<div class="card"><button class="btn ghost sm" id="ud-back" type="button">Back to users</button>' +
+    '<div style="margin-top:12px"><div style="font-size:18px;font-weight:700">' + esc(u.name || username) + '</div>' +
+    '<div class="muted" style="font-size:12px">@' + esc(username) + ' \xB7 ' + esc(u.phone || 'no phone') + '</div>' +
+    '<div class="row" style="margin-top:8px">' + badge(u.role) + ' ' + badge(u.status) + '</div></div>' +
+    '<div class="row" style="margin-top:12px">' +
+    stat('Claimed', myClaims.length) + stat('Interested', n(myClaims, 'interested')) +
+    stat('Sold', n(myClaims, 'sold')) + stat('Sites done', n(myIntakes, 'done')) + '</div></div>' +
+    '<div class="card" style="margin-top:14px"><h2>Payment method</h2>' +
+    '<p style="font-size:14px">' + esc(u.payment_method || 'Not set') + '</p></div>' +
+    '<div class="card" style="margin-top:14px"><h2>Payments</h2>' +
+    '<div id="ud-pays">' + udPaysHtml(u) + '</div>' +
+    '<button class="btn sm" id="ud-logpay" type="button" style="margin-top:10px">Log payment</button></div>' +
+    '<div class="card" style="margin-top:14px"><h2>Leads (' + myClaims.length + ')</h2>' +
+    (myClaims.length ? myClaims.map(function(c){
+      return '<div class="row" style="justify-content:space-between;padding:10px 0">' +
+        '<div><div style="font-weight:600;font-size:13px">' + esc(c.business_name || c.slug || c.id) + '</div>' +
+        '<div class="muted" style="font-size:11px">' + esc(fmtTime(c.claimed_at)) + '</div></div>' +
+        badge(c.status) + '</div>';
+    }).join('') : '<div class="empty">No leads claimed yet.</div>') + '</div>' +
+    '<div class="card" style="margin-top:14px"><h2>Intakes (' + myIntakes.length + ')</h2>' +
+    (myIntakes.length ? myIntakes.map(function(i){
+      return '<div class="row" style="justify-content:space-between;padding:10px 0">' +
+        '<div><div style="font-weight:600;font-size:13px">' + esc(i.business || i.slug || i.id) + '</div>' +
+        '<div class="muted" style="font-size:11px">' + esc(fmtTime(i.created_at)) + '</div></div>' +
+        badge(i.status) + '</div>';
+    }).join('') : '<div class="empty">No intakes yet.</div>') + '</div>';
+  el.innerHTML = html;
+  el.querySelector('#ud-back').addEventListener('click', function(){ state.adminUser = null; renderAdminInto(el); });
+  el.querySelector('#ud-logpay').addEventListener('click', function(){ logPaymentModal(username, el); });
+}
+
+function udPaysHtml(u){
+  const pays = (u && u.payments) || [];
+  if(!pays.length) return '<div class="empty">No payments logged yet.</div>';
+  return pays.slice().reverse().map(function(p){
+    return '<div class="row" style="justify-content:space-between;padding:10px 0">' +
+      '<div><div style="font-weight:600">$' + esc(String(p.amount)) + '</div>' +
+      (p.note ? '<div class="muted" style="font-size:12px">' + esc(p.note) + '</div>' : '') + '</div>' +
+      '<div class="muted" style="font-size:11px">' + esc(fmtTime(p.paid_at)) + '</div></div>';
+  }).join('');
+}
+
+function logPaymentModal(username, el){
+  openModal('<h2>Log payment</h2><p class="muted" style="font-size:12px;margin-bottom:10px;line-height:1.55">' +
+    'The caller gets an alert that they were paid.</p>' +
+    '<div class="field"><label>Amount *</label><input id="lp-amount" inputmode="decimal" placeholder="50"/></div>' +
+    '<div class="field"><label>Note</label><input id="lp-note" placeholder="e.g. Week 12 payouts"/></div>' +
+    '<div class="row"><button class="btn ghost" id="lp-cancel" type="button" style="flex:1">Cancel</button>' +
+    '<button class="btn" id="lp-go" type="button" style="flex:2">Log payment</button></div>' +
+    '<div class="err" id="lp-err"></div>');
+  document.getElementById('lp-cancel').addEventListener('click', closeModal);
+  document.getElementById('lp-go').addEventListener('click', async function(){
+    const err = document.getElementById('lp-err');
+    err.textContent = '';
+    const amount = (document.getElementById('lp-amount').value || '').trim();
+    const note = (document.getElementById('lp-note').value || '').trim();
+    if(!amount || isNaN(Number(amount)) || Number(amount) <= 0){ err.textContent = 'Enter a valid amount.'; return; }
+    const btn = document.getElementById('lp-go');
+    btn.disabled = true;
+    try{
+      const entry = { id: uid('pay'), amount: amount, note: note, paid_at: new Date().toISOString(), paid_by: state.user.username };
+      await updateUserRecord(username, function(u){
+        u.payments = u.payments || [];
+        u.payments.push(entry);
+      }, 'sitedesk: payment logged @' + username);
+      await postEvent(username, 'Payment sent', '$' + amount + (note ? ' \xB7 ' + note : ''), '');
+      closeModal();
+      toast('Payment logged');
+      renderUserDashboardInto(el);
+    }catch(e){ err.textContent = e.message; btn.disabled = false; }
+  });
+}
+
+async function saveUsers(){  const rec = await ghGetJson('users.json');
   try{
     await ghPutJson('users.json', state.users, rec ? rec.sha : null, 'sitedesk: users update');
   }catch(e){
@@ -1793,7 +1919,7 @@ function renderAlertsInto(el){
 }
 
 function renderProfileInto(el){
-  const u = state.user;
+  const u = (state.users && state.users[state.user.username]) || state.user;
   el.innerHTML = '<div class="card"><h2>Profile</h2>' +
     '<dl class="profile-dl">' +
     '<div><dt>Name</dt><dd>' + esc(u.name) + '</dd></div>' +
@@ -1803,8 +1929,57 @@ function renderProfileInto(el){
     '</dl>' +
     '<div class="row" style="margin-top:16px">' +
     '<button class="btn ghost block" id="btn-logout" type="button">Log out</button></div></div>' +
+    '<div class="card" style="margin-top:14px"><h2>Payment method</h2>' +
+    '<p class="muted" style="font-size:12px;margin-bottom:10px;line-height:1.55">How should we pay you? Put a payment handle (e.g. Cash App tag, Zelle), not full bank numbers.</p>' +
+    '<div class="field"><input id="pay-method" value="' + esc(u.payment_method || '') + '" placeholder="e.g. Cash App $yourtag" autocapitalize="none"/></div>' +
+    '<button class="btn sm" id="btn-save-pay" type="button">Save payment method</button>' +
+    '<div class="err" id="pay-err"></div></div>' +
+    '<div class="card" style="margin-top:14px"><h2>Payments received</h2>' +
+    '<div id="pay-history">' + payHistoryHtml(u) + '</div></div>' +
     helpHtml();
   el.querySelector('#btn-logout').addEventListener('click', logout);
+  el.querySelector('#btn-save-pay').addEventListener('click', saveOwnPaymentMethod);
+}
+
+function payHistoryHtml(u){
+  const pays = (u && u.payments) || [];
+  if(!pays.length) return '<div class="empty">No payments logged yet.</div>';
+  return pays.slice().reverse().map(function(p){
+    return '<div class="row" style="justify-content:space-between;padding:10px 0">' +
+      '<div><div style="font-weight:600">$' + esc(String(p.amount)) + '</div>' +
+      (p.note ? '<div class="muted" style="font-size:12px">' + esc(p.note) + '</div>' : '') + '</div>' +
+      '<div class="muted" style="font-size:11px">' + esc(fmtTime(p.paid_at)) + '</div></div>';
+  }).join('');
+}
+
+/* Targeted write to one user record with a 409 retry. fn mutates the user object. */
+async function updateUserRecord(username, fn, message){
+  for(let attempt = 0; attempt < 2; attempt++){
+    const rec = await ghGetJson('users.json');
+    const users = rec && rec.data ? rec.data : {};
+    if(!users[username]) throw new Error('User not found.');
+    fn(users[username]);
+    try{
+      await ghPutJson('users.json', users, rec ? rec.sha : null, message || ('sitedesk: user ' + username));
+      await loadUsers();
+      return;
+    }catch(e){ if(e.status !== 409) throw e; }
+  }
+  throw new Error('Could not save, please try again.');
+}
+
+async function saveOwnPaymentMethod(){
+  const err = document.getElementById('pay-err');
+  err.textContent = '';
+  const val = (document.getElementById('pay-method').value || '').trim();
+  const btn = document.getElementById('btn-save-pay');
+  btn.disabled = true;
+  try{
+    await updateUserRecord(state.user.username, function(u){ u.payment_method = val; },
+      'sitedesk: payment method @' + state.user.username);
+    toast('Payment method saved');
+  }catch(e){ err.textContent = e.message; }
+  btn.disabled = false;
 }
 
 /* How-to-use guide: how the app works, by role. */
