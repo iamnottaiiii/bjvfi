@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NU Nails &amp; Spa Dewiit · Nail Salon, Syracuse, NY</title>
+<meta name="description" content="NU Nails &amp; Spa Dewiit, a locally owned nail salon at 3216 Erie Blvd E, Syracuse, NY. Manicures, spa pedicures, acrylics, waxing and lash extensions. Walk-ins welcome. Call (315) 449-1641.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=Public+Sans:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FBF6EC; --paper:#FFFDF7; --cream-2:#F4EAD3;
+  --ink:#0F2E2B; --ink-soft:#46635F;
+  --coral:#E86A4A; --coral-deep:#C24E30; --coral-soft:#FADFD4;
+  --gold:#C99B3F; --gold-soft:#F7EACB;
+  --aqua:#9AD1C8; --aqua-deep:#3E7A72;
+  --radius:20px;
+  --shadow:0 18px 42px -18px rgba(15,46,43,.3);
+  --shadow-sm:0 8px 22px -10px rgba(15,46,43,.25);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Public Sans",system-ui,sans-serif;
+  background:var(--cream);color:var(--ink);line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--coral-deep)}
+::selection{background:var(--gold-soft);color:var(--ink)}
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+.hand{font-family:"Caveat",cursive}
+
+/* ---------- header + side drawer nav ---------- */
+header.site{
+  position:sticky;top:0;z-index:60;
+  background:rgba(251,246,236,.94);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-bottom:2px solid rgba(232,106,74,.18);
+}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
+.brand svg{width:46px;height:46px;flex:none}
+.brand-name{font-family:"Fraunces",serif;font-weight:900;font-size:1.28rem;line-height:1.05;letter-spacing:.2px}
+.brand-name small{display:block;font-family:"Public Sans",sans-serif;font-weight:700;font-size:.62rem;letter-spacing:3.5px;text-transform:uppercase;color:var(--coral-deep);margin-top:3px}
+.bar-right{display:flex;align-items:center;gap:10px}
+.call-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--coral);color:#fff;text-decoration:none;font-weight:700;
+  padding:11px 20px;border-radius:999px;box-shadow:var(--shadow-sm);
+  transition:transform .18s,background .18s;white-space:nowrap;font-size:.92rem;
+}
+.call-btn:hover{background:var(--coral-deep);transform:translateY(-2px)}
+.burger{background:var(--ink);border:0;cursor:pointer;padding:12px 11px;border-radius:12px;display:flex;flex-direction:column;gap:5px}
+.burger span{display:block;width:24px;height:3px;border-radius:3px;background:var(--cream);transition:.25s}
+nav.main{
+  position:fixed;top:0;right:0;bottom:0;z-index:70;
+  width:min(360px,88vw);background:var(--ink);color:var(--cream);
+  display:flex;flex-direction:column;gap:4px;padding:84px 30px 30px;
+  transform:translateX(102%);transition:transform .32s cubic-bezier(.22,.8,.3,1);
+  box-shadow:-20px 0 50px rgba(15,46,43,.35);
+}
+nav.main.open{transform:none}
+nav.main a{
+  text-decoration:none;color:var(--cream);font-weight:600;font-size:1.25rem;
+  font-family:"Fraunces",serif;padding:13px 16px;border-radius:14px;
+  transition:background .2s,color .2s;display:flex;align-items:center;justify-content:space-between;
+}
+nav.main a::after{content:"→";opacity:0;transition:opacity .2s}
+nav.main a:hover{background:rgba(255,255,255,.08)}
+nav.main a:hover::after{opacity:1}
+nav.main a[aria-current="page"],nav.main a.active{background:var(--coral);color:#fff}
+nav.main a[aria-current="page"]::after,nav.main a.active::after{opacity:1}
+.drawer-close{
+  position:absolute;top:22px;right:24px;background:rgba(255,255,255,.1);border:0;color:#fff;
+  width:44px;height:44px;border-radius:50%;font-size:1.3rem;cursor:pointer;line-height:1;
+}
+.drawer-close:hover{background:rgba(255,255,255,.22)}
+.drawer-foot{margin-top:auto;padding-top:24px;border-top:1px solid rgba(255,255,255,.14);color:#B9CFCB;font-size:.9rem}
+.drawer-foot a{color:#fff;font-weight:700;text-decoration:none;font-size:1.1rem}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- full-bleed hero ---------- */
+.hero-full{
+  position:relative;overflow:hidden;color:#fff;
+  background:
+    radial-gradient(circle at 88% 18%, rgba(201,155,63,.35), transparent 46%),
+    radial-gradient(circle at 12% 85%, rgba(154,209,200,.28), transparent 44%),
+    linear-gradient(140deg,#0F2E2B 20%,#1C4A44 65%,#2A5A51);
+  min-height:calc(100vh - 76px);display:flex;align-items:center;
+}
+.hero-full .wrap{position:relative;z-index:2;width:100%;padding:70px 24px}
+.hero-kicker{
+  display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:3.5px;text-transform:uppercase;
+  color:var(--gold-soft);border:1px solid rgba(247,234,203,.45);border-radius:999px;
+  padding:8px 20px;margin-bottom:24px;
+}
+.hero-full h1{
+  font-family:"Fraunces",serif;font-weight:900;
+  font-size:clamp(2.8rem,7vw,5.2rem);line-height:1.02;letter-spacing:-1px;margin-bottom:18px;max-width:14ch;
+}
+.hero-full h1 .it{font-style:italic;color:var(--gold-soft)}
+.hero-full .lede{color:#DCEBE8;font-size:1.14rem;max-width:34rem;margin-bottom:30px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:30px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;
+  padding:14px 28px;border-radius:999px;font-size:1rem;transition:transform .18s,box-shadow .18s,background .18s;
+}
+.btn-solid{background:var(--coral);color:#fff;box-shadow:var(--shadow-sm)}
+.btn-solid:hover{background:var(--coral-deep);transform:translateY(-2px)}
+.btn-ghost{background:rgba(255,255,255,.08);color:#fff;border:2px solid rgba(255,255,255,.35)}
+.btn-ghost:hover{border-color:#fff;transform:translateY(-2px)}
+.hours-pill{
+  display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.12);color:#fff;
+  padding:10px 22px;border-radius:999px;font-weight:600;font-size:.95rem;
+  border:1px solid rgba(255,255,255,.25);
+}
+.hours-pill .dot{width:10px;height:10px;border-radius:50%;background:#7BC47F;box-shadow:0 0 0 4px rgba(123,196,127,.25);animation:pulse 2s infinite}
+.hours-pill.closed .dot{background:#F08CA0;box-shadow:0 0 0 4px rgba(240,140,160,.25)}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+.hero-art{position:absolute;right:-40px;top:50%;transform:translateY(-50%);width:min(44vw,560px);opacity:.9;z-index:1}
+.hero-scroll{
+  position:absolute;bottom:26px;left:50%;transform:translateX(-50%);z-index:2;
+  color:#DCEBE8;font-size:.75rem;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+}
+.hero-scroll::after{content:"";width:2px;height:34px;background:linear-gradient(#DCEBE8,transparent);border-radius:2px}
+
+/* ---------- sections ---------- */
+section.block{padding:64px 0}
+.sec-head{max-width:44rem;margin:0 auto 42px}
+.sec-head.center{text-align:center}
+.sec-head .hand{font-size:1.6rem;color:var(--coral-deep)}
+h2{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(1.9rem,3.6vw,2.7rem);line-height:1.1;margin:6px 0 12px;letter-spacing:-.3px}
+.sec-head p{color:var(--ink-soft)}
+
+/* alternating bands */
+.band-row{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center;margin-bottom:64px}
+.band-row:last-child{margin-bottom:0}
+.band-row.flip>.band-text{order:2}
+.band-row.flip>.band-visual{order:1}
+.band-text .hand{font-size:1.5rem;color:var(--coral-deep)}
+.band-text h2{margin:6px 0 14px}
+.band-text p{color:var(--ink-soft);margin-bottom:14px}
+.band-visual{
+  border-radius:26px;min-height:320px;box-shadow:var(--shadow);
+  display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;
+}
+.band-visual svg{width:44%;height:auto;filter:drop-shadow(0 14px 18px rgba(0,0,0,.2))}
+.band-visual .tag{
+  position:absolute;bottom:16px;left:16px;background:rgba(255,255,255,.9);
+  font-size:.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  padding:6px 14px;border-radius:999px;color:var(--ink);
+}
+.check-list{list-style:none;margin:18px 0;display:grid;gap:12px}
+.check-list li{display:flex;gap:12px;align-items:flex-start;font-weight:500}
+.check-list svg{flex:none;width:24px;height:24px;margin-top:2px}
+
+/* rating strip */
+.rating-strip{background:var(--ink);color:var(--cream);border-radius:26px;padding:44px 40px;display:flex;flex-wrap:wrap;gap:28px;align-items:center;justify-content:space-between;box-shadow:var(--shadow);margin:10px 0 0}
+.rating-strip .big{font-family:"Fraunces",serif;font-weight:900;font-size:3.2rem;line-height:1;color:var(--gold-soft)}
+.rating-strip .stars{color:var(--gold);font-size:1.4rem;letter-spacing:4px}
+.rating-strip p{color:#B9CFCB;max-width:30rem;margin:6px 0 0}
+
+/* ---------- services tabs ---------- */
+.tabs{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:34px}
+.tab-btn{
+  border:2px solid rgba(15,46,43,.2);background:var(--paper);color:var(--ink);
+  font-weight:700;font-size:.95rem;padding:12px 24px;border-radius:999px;cursor:pointer;
+  transition:all .2s;font-family:"Public Sans",sans-serif;
+}
+.tab-btn:hover{border-color:var(--coral);color:var(--coral-deep)}
+.tab-btn.active{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+.tab-panel{display:none}
+.tab-panel.active{display:block;animation:fadeIn .3s ease}
+.tab-list{display:grid;grid-template-columns:1fr 1fr;gap:8px 44px;background:var(--paper);border-radius:26px;padding:40px;box-shadow:var(--shadow-sm);border:1px solid rgba(232,106,74,.14)}
+.mi{padding:14px 4px;border-bottom:1px dashed rgba(15,46,43,.18)}
+.mi-top{display:flex;align-items:baseline;gap:10px}
+.mi-top strong{font-size:1.05rem}
+.mi-top .dots{flex:1;border-bottom:2px dotted rgba(232,106,74,.45);transform:translateY(-4px)}
+.mi-top .price{font-family:"Fraunces",serif;font-weight:700;color:var(--coral-deep);white-space:nowrap}
+.mi small{color:var(--ink-soft)}
+.mi .flag{display:inline-block;background:var(--gold-soft);color:#7A5A12;font-size:.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 10px;border-radius:999px;margin-left:8px;vertical-align:2px}
+.price-note{background:var(--coral-soft);border:2px dashed rgba(194,78,48,.45);border-radius:var(--radius);padding:18px 24px;margin-top:26px;font-size:.95rem;color:#7A3A26}
+.price-note strong{color:var(--coral-deep)}
+.brands{margin-top:34px;text-align:center}
+.brands small{display:block;font-size:.75rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--ink-soft);margin-bottom:14px}
+.brand-chips{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.brand-chips span{background:var(--paper);border:1px solid rgba(15,46,43,.16);padding:8px 20px;border-radius:999px;font-weight:700;font-size:.9rem;box-shadow:var(--shadow-sm)}
+
+/* ---------- masonry gallery ---------- */
+.masonry{columns:3;column-gap:20px}
+.mtile{break-inside:avoid;margin-bottom:20px;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);background:var(--paper);position:relative;transition:transform .2s}
+.mtile:hover{transform:translateY(-5px)}
+.mtile .art{display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.mtile .art svg{width:40%;height:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.18))}
+.mtile .cap{padding:16px 20px}
+.mtile .cap strong{font-family:"Fraunces",serif;font-size:1.05rem;display:block}
+.mtile .cap small{color:var(--ink-soft)}
+.mtile .soon{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.88);font-size:.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 12px;border-radius:999px;color:var(--ink-soft)}
+
+/* ---------- reviews ---------- */
+.rev-list{display:grid;gap:20px;max-width:46rem;margin:0 auto}
+.rev{background:var(--paper);border-radius:var(--radius);padding:30px 34px;box-shadow:var(--shadow-sm);border-left:6px solid var(--coral);position:relative}
+.rev:nth-child(2){border-left-color:var(--gold)}
+.rev:nth-child(3){border-left-color:var(--aqua-deep)}
+.rev .stars{color:var(--gold);font-size:1.15rem;letter-spacing:3px;margin-bottom:10px}
+.rev p{font-size:1.04rem;margin-bottom:12px}
+.rev cite{font-style:normal;font-weight:700;font-size:.85rem;color:var(--coral-deep);letter-spacing:.5px}
+.rs-strip{margin:30px auto 0;max-width:660px;background:var(--paper);border:1px solid var(--gold-soft);border-radius:16px;padding:20px 24px;text-align:center;box-shadow:var(--shadow-sm)}
+.rs-note{margin:0 0 14px;font-size:.95rem;color:var(--ink-soft);line-height:1.55}
+.rs-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rs-btn{display:inline-block;background:var(--coral);color:#fff;padding:11px 26px;border-radius:999px;font-weight:700;text-decoration:none;font-size:.95rem}
+.rs-btn:hover{background:var(--coral-deep)}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-bottom:26px}
+.info-card{background:var(--paper);border-radius:var(--radius);padding:34px;box-shadow:var(--shadow-sm);border:1px solid rgba(232,106,74,.14)}
+.info-card h3{font-family:"Fraunces",serif;font-size:1.4rem;margin-bottom:14px}
+.info-card p{color:var(--ink-soft);margin-bottom:8px}
+.info-card a.big{font-family:"Fraunces",serif;font-size:1.5rem;font-weight:700;color:var(--coral-deep);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.hours-table{width:100%;border-collapse:collapse;font-size:.98rem}
+.hours-table td{padding:10px 6px;border-bottom:1px dashed rgba(15,46,43,.18)}
+.hours-table tr.today td{font-weight:800;color:var(--coral-deep)}
+.hours-table tr.today td:first-child::after{content:" · today";font-family:"Caveat",cursive;font-size:1.1rem;color:var(--coral);margin-left:6px}
+.hours-table td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.map-card{
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:340px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 46px, rgba(62,122,114,.16) 46px 48px),
+    repeating-linear-gradient(90deg, transparent 0 46px, rgba(62,122,114,.16) 46px 48px),
+    linear-gradient(140deg,#F4EAD3,#EADFC2);
+  display:flex;align-items:center;justify-content:center;
+}
+.map-pin{text-align:center;background:var(--paper);padding:26px 34px;border-radius:20px;box-shadow:var(--shadow);max-width:78%;position:relative}
+.map-pin::after{content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);border:14px solid transparent;border-top-color:var(--paper);border-bottom:0}
+.map-pin svg{width:44px;height:44px;margin-bottom:8px}
+.map-pin strong{font-family:"Fraunces",serif;font-size:1.15rem;display:block}
+.map-pin small{color:var(--ink-soft)}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- page strips ---------- */
+.strip{border-radius:26px;padding:54px 48px;color:#fff;position:relative;overflow:hidden;margin-bottom:44px;box-shadow:var(--shadow)}
+.strip::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(255,255,255,.22), transparent 50%)}
+.strip h2{color:#fff;font-size:clamp(2rem,4vw,3rem);position:relative;margin:4px 0 10px}
+.strip p{color:rgba(255,255,255,.9);max-width:36rem;position:relative}
+.strip .hand{font-size:1.6rem;position:relative}
+.strip.s-services{background:linear-gradient(120deg,#C24E30,#7E2F1B)}
+.strip.s-about{background:linear-gradient(120deg,#1C4A44,#0F2E2B)}
+.strip.s-gal{background:linear-gradient(120deg,#C99B3F,#7A5A12)}
+.strip.s-rev{background:linear-gradient(120deg,#3E7A72,#234A45)}
+.strip.s-visit{background:linear-gradient(120deg,#46635F,#243B38)}
+
+/* ---------- multi-column footer ---------- */
+footer{background:var(--ink);color:#DCEBE8;margin-top:20px}
+.foot-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:36px;padding:56px 0 32px}
+.foot-grid h4{font-family:"Fraunces",serif;color:#fff;font-size:1.1rem;margin-bottom:14px}
+.foot-grid p,.foot-grid a{color:#A9C4C0;font-size:.94rem}
+.foot-grid a{text-decoration:none;display:block;margin-bottom:8px}
+.foot-grid a:hover{color:var(--gold-soft)}
+.foot-brand{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.foot-brand svg{width:44px;height:44px}
+.foot-brand span{font-family:"Fraunces",serif;font-weight:900;color:#fff;font-size:1.2rem;line-height:1.1}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.12);padding:20px 0 26px;display:flex;justify-content:center;flex-wrap:wrap;gap:10px;font-size:.85rem;color:#8AA5A1}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:940px){
+  .band-row{grid-template-columns:1fr;gap:28px}
+  .band-row.flip>.band-text{order:1}
+  .band-row.flip>.band-visual{order:2}
+  .tab-list{grid-template-columns:1fr;padding:28px}
+  .masonry{columns:2}
+  .visit-grid{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr 1fr}
+  .hero-art{display:none}
+  .bar-right .call-btn{display:none}
+  .strip{padding:40px 28px}
+  .rating-strip{padding:34px 28px}
+}
+@media(max-width:600px){
+  .masonry{columns:1}
+  .foot-grid{grid-template-columns:1fr}
+  .hero-full{min-height:auto}
+  .hero-full .wrap{padding:56px 24px 70px}
+  .hero-scroll{display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap bar">
+    <a class="brand" href="#home" data-page="home" aria-label="NU Nails and Spa Dewiit, home">
+      <svg viewBox="0 0 64 64" role="img" aria-label="Hand with polished nails logo"><path d="M20 58 V34 q0 -8 8 -8 h4 v-6 a4 4 0 018 0 v6 h4 v-8 a4 4 0 018 0 v10 q6 2 6 10 v20 q0 8 -8 8 H28 q-8 0 -8 -8z" fill="#E86A4A"/><rect x="30" y="12" width="8" height="10" rx="4" fill="#C99B3F"/><rect x="40" y="10" width="8" height="10" rx="4" fill="#9AD1C8"/><path d="M20 40 h34" stroke="#C24E30" stroke-width="3" opacity=".5"/></svg>
+      <span class="brand-name">NU Nails &amp; Spa<small>Dewiit · Syracuse, NY</small></span>
+    </a>
+    <div class="bar-right">
+      <a class="call-btn" href="tel:+13154491641">Call (315) 449-1641</a>
+      <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<nav class="main" id="mainNav" aria-label="Main navigation">
+  <button class="drawer-close" id="drawerClose" aria-label="Close menu">×</button>
+  <a href="#home" data-page="home" class="active" aria-current="page">Home</a>
+  <a href="#services" data-page="services">Services</a>
+  <a href="#about" data-page="about">About</a>
+  <a href="#gallery" data-page="gallery">Gallery</a>
+  <a href="#reviews" data-page="reviews">Reviews</a>
+  <a href="#visit" data-page="visit">Visit Us</a>
+  <div class="drawer-foot">
+    <p>Walk-ins welcome</p>
+    <a href="tel:+13154491641">(315) 449-1641</a>
+    <p style="margin-top:6px">3216 Erie Blvd E, Syracuse, NY</p>
+  </div>
+</nav>
+<section class="page active" id="page-home">
+  <div class="hero-full">
+    <svg class="hero-art" viewBox="0 0 400 500" aria-hidden="true">
+      <g opacity=".95">
+        <ellipse cx="200" cy="250" rx="62" ry="120" fill="#FFFDF7"/>
+        <ellipse cx="200" cy="180" rx="62" ry="52" fill="#E86A4A"/>
+        <ellipse cx="200" cy="150" rx="46" ry="30" fill="#C24E30" opacity=".55"/>
+        <ellipse cx="120" cy="300" rx="34" ry="70" fill="#FFFDF7"/>
+        <ellipse cx="120" cy="252" rx="34" ry="30" fill="#C99B3F"/>
+        <ellipse cx="280" cy="300" rx="34" ry="70" fill="#FFFDF7"/>
+        <ellipse cx="280" cy="252" rx="34" ry="30" fill="#9AD1C8"/>
+        <ellipse cx="200" cy="330" rx="30" ry="18" fill="#FADFD4" opacity=".8"/>
+        <ellipse cx="200" cy="250" rx="62" ry="120" fill="none" stroke="#C24E30" stroke-width="4" opacity=".4"/>
+      </g>
+    </svg>
+    <div class="wrap">
+      <span class="hero-kicker">Locally owned · Erie Blvd E</span>
+      <h1>Your me-time,<br><span class="it">nailed.</span></h1>
+      <p class="lede">NU Nails &amp; Spa Dewiit is DeWitt's go-to nail and spa haven: manicures, gel pedicures, custom acrylic sets, waxing and lash extensions, in a relaxed, walk-in-friendly salon.</p>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="#services" data-page="services">Explore Services</a>
+        <a class="btn btn-ghost" href="tel:+13154491641">Call (315) 449-1641</a>
+      </div>
+      <span class="hours-pill" id="hoursPill"><span class="dot"></span><span id="hoursText">Checking today's hours…</span></span>
+    </div>
+    <div class="hero-scroll">Scroll</div>
+  </div>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="band-row">
+        <div class="band-text reveal">
+          <span class="hand">the salon</span>
+          <h2>Relaxed, welcoming,<br>unrushed</h2>
+          <p>Guests describe the room as clean, calm and beautifully set up for comfort. Technicians take their time, with thoughtful touches like a hot towel and a real massage built into the visit.</p>
+          <p>Walk-ins are welcome, parking is ample, and the vibe suits a quick touch-up or a long, restorative afternoon equally well.</p>
+          <a class="btn btn-ghost" style="color:var(--ink);border-color:rgba(15,46,43,.3)" href="#about" data-page="about">More about us</a>
+        </div>
+        <div class="band-visual reveal" style="background:linear-gradient(140deg,#FADFD4,#F2B79F)">
+          <svg viewBox="0 0 100 100"><ellipse cx="50" cy="55" rx="14" ry="26" fill="#FFFDF7"/><ellipse cx="50" cy="38" rx="14" ry="12" fill="#E86A4A"/><path d="M42 58 q8 8 16 0" stroke="#C24E30" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+          <span class="tag">Salon preview · photo soon</span>
+        </div>
+      </div>
+
+      <div class="band-row flip">
+        <div class="band-text reveal">
+          <span class="hand">the craft</span>
+          <h2>Detail people,<br>through and through</h2>
+          <p>From intricate nail art to a perfect pink-and-white set, the team is known for attention to detail and finishes that hold up. One guest called hers the best nails she had had in eight years.</p>
+          <ul class="check-list">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#3E7A72" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Acrylics, gel, dip and nail art</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#3E7A72" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Spa and deluxe pedicures</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#3E7A72" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Waxing and lash extensions</li>
+          </ul>
+          <a class="btn btn-solid" href="#services" data-page="services">See the service list</a>
+        </div>
+        <div class="band-visual reveal" style="background:linear-gradient(140deg,#1C4A44,#0F2E2B)">
+          <svg viewBox="0 0 100 100"><ellipse cx="50" cy="55" rx="14" ry="26" fill="#F2FAFA"/><ellipse cx="50" cy="38" rx="14" ry="12" fill="#9AD1C8"/><circle cx="50" cy="54" r="5" fill="#C99B3F"/></svg>
+          <span class="tag">Nail art preview · photo soon</span>
+        </div>
+      </div>
+
+      <div class="rating-strip reveal">
+        <div>
+          <div class="big">4.2 ★</div>
+          <div class="stars">★★★★</div>
+        </div>
+        <p>Based on 213 public reviews aggregated on Birdeye. Guests praise the friendly staff, the pampering pedicures and nails that stay flawless.</p>
+        <a class="btn btn-solid" href="#reviews" data-page="reviews">Read reviews</a>
+      </div>
+      <div style="height:56px"></div>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-services">
+      <span class="hand">services &amp; pricing</span>
+      <h2>Head-to-toe services</h2>
+      <p>Manicures, pedicures, acrylics, waxing and lashes, all under one roof. Tap a category to browse. Prices are samples, call for today's pricing.</p>
+    </div>
+
+    <div class="tabs reveal" role="tablist" aria-label="Service categories">
+      <button class="tab-btn active" data-tab="manicures" role="tab" aria-selected="true">Manicures</button>
+      <button class="tab-btn" data-tab="pedicures" role="tab" aria-selected="false">Pedicures</button>
+      <button class="tab-btn" data-tab="enhancements" role="tab" aria-selected="false">Acrylics &amp; Enhancements</button>
+      <button class="tab-btn" data-tab="waxing" role="tab" aria-selected="false">Waxing</button>
+      <button class="tab-btn" data-tab="lashes" role="tab" aria-selected="false">Lashes &amp; Art</button>
+    </div>
+
+    <div class="tab-panel active reveal" id="tab-manicures" role="tabpanel">
+      <div class="tab-list">
+        <div class="mi"><div class="mi-top"><strong>Gel Manicure <span class="flag">Popular</span></strong><span class="dots"></span><span class="price">from $40</span></div><small>Long-wear gel color with a glossy finish.</small></div>
+        <div class="mi"><div class="mi-top"><strong>Regular Manicure</strong><span class="dots"></span><span class="price">from $25</span></div><small>Shape, cuticle care and classic polish.</small></div>
+        <div class="mi"><div class="mi-top"><strong>Men's Manicure</strong><span class="dots"></span><span class="price">from $22</span></div><small>Clean, natural, low maintenance.</small></div>
+        <div class="mi"><div class="mi-top"><strong>Polish Change, Nails</strong><span class="dots"></span><span class="price">from $12</span></div><small>Fresh color in minutes.</small></div>
+        <div class="mi"><div class="mi-top"><strong>Polish Change, Toes</strong><span class="dots"></span><span class="price">from $15</span></div><small>Quick toe refresh.</small></div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-pedicures" role="tabpanel">
+      <div class="tab-list">
+        <div class="mi"><div class="mi-top"><strong>Spa Pedicure <span class="flag">Favorite</span></strong><span class="dots"></span><span class="price">from $45</span></div><small>Soak, exfoliation, massage and polish.</small></div>
+        <div class="mi"><div class="mi-top"><strong>Deluxe Pedicure</strong><span class="dots"></span><span class="price">from $65</span></div><small>The full pampering treatment, extended massage.</small></div>
+        <div class="mi"><div class="mi-top"><strong>Gel Pedicure</strong><span class="dots"></span><span class="price">from $55</span></div><small>Gel color that outlasts your sandals season.</small></div>
+        <div class="mi"><div class="mi-top"><strong>Men's Pedicure</strong><span class="dots"></span><span class="price">from $32</span></div><small>Comfortable and tidy.</small></div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-enhancements" role="tabpanel">
+      <div class="tab-list">
+        <div class="mi"><div class="mi-top"><strong>Acrylic Full Set <span class="flag">Popular</span></strong><span class="dots"></span><span class="price">from $55</span></div><small>Custom length and shape.</small></div>
+        <div class="mi"><div class="mi-top"><strong>Acrylic Fill</strong><span class="dots"></span><span class="price">from $35</span></div><small>Keep your set looking new.</small></div>
+        <div class="mi"><div class="mi-top"><strong>Pink &amp; White</strong><span class="dots"></span><span class="price">from $60</span></div><small>The timeless French acrylic look.</small></div>
+        <div class="mi"><div class="mi-top"><strong>Gel Set</strong><span class="dots"></span><span class="price">from $60</span></div><small>Lightweight gel extensions.</small></div>
+        <div class="mi"><div class="mi-top"><strong>Dip Powder</strong><span class="dots"></span><span class="price">from $45</span></div><small>Strong, even color, no UV lamp.</small></div>
+        <div class="mi"><div class="mi-top"><strong>Silk Wrap / Solar Set</strong><span class="dots"></span><span class="price">ask us</span></div><small>Specialty overlays, ask our techs.</small></div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-waxing" role="tabpanel">
+      <div class="tab-list">
+        <div class="mi"><div class="mi-top"><strong>Eyebrow Wax</strong><span class="dots"></span><span class="price">from $12</span></div><small>Shape and define.</small></div>
+        <div class="mi"><div class="mi-top"><strong>Lip / Chin Wax</strong><span class="dots"></span><span class="price">from $10</span></div><small>Quick and smooth.</small></div>
+        <div class="mi"><div class="mi-top"><strong>Under Arms</strong><span class="dots"></span><span class="price">from $20</span></div><small> </small></div>
+        <div class="mi"><div class="mi-top"><strong>Leg Wax</strong><span class="dots"></span><span class="price">from $45</span></div><small>Half or full leg, ask when booking.</small></div>
+        <div class="mi"><div class="mi-top"><strong>Bikini Wax</strong><span class="dots"></span><span class="price">from $35</span></div><small> </small></div>
+        <div class="mi"><div class="mi-top"><strong>Back / Chest / Toes</strong><span class="dots"></span><span class="price">ask us</span></div><small>Priced by area, call for details.</small></div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-lashes" role="tabpanel">
+      <div class="tab-list">
+        <div class="mi"><div class="mi-top"><strong>Eyelash Extensions <span class="flag">By appointment</span></strong><span class="dots"></span><span class="price">ask us</span></div><small>Please book ahead for lash services.</small></div>
+        <div class="mi"><div class="mi-top"><strong>Nail Designs</strong><span class="dots"></span><span class="price">from $5</span></div><small>Hand-painted art, French, ombre and more.</small></div>
+        <div class="mi"><div class="mi-top"><strong>Full Nail Art Set</strong><span class="dots"></span><span class="price">from $15</span></div><small>Bring a photo, we love a challenge.</small></div>
+      </div>
+    </div>
+
+    <div class="price-note reveal">
+      <strong>Sample pricing:</strong> prices above are samples to give you an idea and may change. Call <a href="tel:+13154491641">(315) 449-1641</a> for current prices. Walk-ins welcome, appointments recommended for lashes and groups.
+    </div>
+
+    <div class="brands reveal">
+      <small>Professional products we use</small>
+      <div class="brand-chips"><span>OPI</span><span>Gelish</span><span>CND</span><span>Essie</span><span>China Glaze</span><span>SNS</span></div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-about">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-about">
+      <span class="hand">about us</span>
+      <h2>DeWitt's neighborhood<br>nail haven</h2>
+      <p>Locally owned and run, with a simple priority: your satisfaction comes first. Come in and rejuvenate yourself.</p>
+    </div>
+
+    <div class="band-row">
+      <div class="band-text reveal">
+        <span class="hand">our promise</span>
+        <h2>Customers first,<br>always</h2>
+        <p>NU Nails &amp; Spa Dewiit is a locally owned salon where the staff believes customer satisfaction is the number one priority. The team is well trained and friendly, and they mean it: guests keep coming back for the care, not just the color.</p>
+        <p>Both men and women are welcome, the salon is wheelchair accessible, and free Wi-Fi keeps you connected while you unwind.</p>
+      </div>
+      <div class="band-visual reveal" style="background:linear-gradient(140deg,#9AD1C8,#3E7A72)">
+        <svg viewBox="0 0 100 100"><g><circle cx="50" cy="50" r="34" fill="#FFFDF7"/><path d="M32 50 q18 -14 36 0 q-18 14 -36 0" fill="#E86A4A"/><circle cx="50" cy="50" r="6" fill="#C99B3F"/></g></svg>
+        <span class="tag">Salon preview · photo soon</span>
+      </div>
+    </div>
+
+    <div class="band-row flip">
+      <div class="band-text reveal">
+        <span class="hand">the details</span>
+        <h2>Modern products,<br>honest value</h2>
+        <p>The salon uses the newest products and techniques in the nail industry, from OPI and CND to Gelish and SNS, at moderate prices that keep regular visits easy.</p>
+        <ul class="check-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#3E7A72" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Walk-ins welcome, appointments by phone</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#3E7A72" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Credit cards accepted, free Wi-Fi</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#3E7A72" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Wheelchair accessible, ample parking</li>
+        </ul>
+      </div>
+      <div class="band-visual reveal" style="background:linear-gradient(140deg,#C99B3F,#7A5A12)">
+        <svg viewBox="0 0 100 100"><rect x="30" y="14" width="40" height="72" rx="20" fill="#FFFDF7"/><rect x="36" y="20" width="28" height="60" rx="14" fill="#E86A4A"/><rect x="36" y="20" width="28" height="22" rx="11" fill="#C24E30" opacity=".5"/></svg>
+        <span class="tag">Product preview · photo soon</span>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-gal">
+      <span class="hand">gallery</span>
+      <h2>Fresh from our chairs</h2>
+      <p>Artistic previews of the sets and finishes we create daily. Real salon photos are on the way.</p>
+    </div>
+
+    <div class="masonry">
+      <div class="mtile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#FADFD4,#F2B79F);aspect-ratio:4/5">
+          <svg viewBox="0 0 100 100"><ellipse cx="50" cy="55" rx="14" ry="26" fill="#FFFDF7"/><ellipse cx="50" cy="38" rx="14" ry="12" fill="#E86A4A"/></svg>
+        </div>
+        <div class="cap"><strong>Coral Gel Set</strong><small>Bright, glossy, long wear</small></div>
+      </div>
+      <div class="mtile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#1C4A44,#0F2E2B);aspect-ratio:1/1">
+          <svg viewBox="0 0 100 100"><ellipse cx="50" cy="55" rx="14" ry="26" fill="#F2FAFA"/><ellipse cx="50" cy="38" rx="14" ry="12" fill="#9AD1C8"/><path d="M44 52 l4 4 l8 -9" stroke="#0F2E2B" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="cap"><strong>Aqua Accent Nails</strong><small>Cool tones, crisp lines</small></div>
+      </div>
+      <div class="mtile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#F7EACB,#E8C877);aspect-ratio:4/3">
+          <svg viewBox="0 0 100 100"><ellipse cx="50" cy="55" rx="14" ry="26" fill="#FFFDF7"/><ellipse cx="50" cy="38" rx="14" ry="12" fill="#C99B3F"/><circle cx="50" cy="56" r="4" fill="#FFFDF7"/></svg>
+        </div>
+        <div class="cap"><strong>Golden French</strong><small>Pink and white, elevated</small></div>
+      </div>
+      <div class="mtile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#EAD9C2,#C99B3F);aspect-ratio:1/1">
+          <svg viewBox="0 0 100 100"><ellipse cx="50" cy="55" rx="14" ry="26" fill="#FFF9F0"/><ellipse cx="50" cy="38" rx="14" ry="12" fill="#C24E30"/><path d="M40 50 q10 -8 20 0" stroke="#F7EACB" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>Deluxe Pedicure Finish</strong><small>Pampered toes</small></div>
+      </div>
+      <div class="mtile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#DCEBE8,#9AD1C8);aspect-ratio:4/5">
+          <svg viewBox="0 0 100 100"><ellipse cx="50" cy="55" rx="14" ry="26" fill="#FFFDF7"/><ellipse cx="50" cy="38" rx="14" ry="12" fill="#3E7A72"/><circle cx="46" cy="52" r="2.5" fill="#C99B3F"/><circle cx="55" cy="60" r="2.5" fill="#C99B3F"/></svg>
+        </div>
+        <div class="cap"><strong>Hand-Painted Detail</strong><small>Nail art, made to order</small></div>
+      </div>
+      <div class="mtile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#F2B79F,#E86A4A);aspect-ratio:4/3">
+          <svg viewBox="0 0 100 100"><ellipse cx="50" cy="55" rx="14" ry="26" fill="#FFF4EE"/><ellipse cx="50" cy="38" rx="14" ry="12" fill="#E86A4A"/><ellipse cx="50" cy="60" rx="8" ry="12" fill="#FADFD4" opacity=".7"/></svg>
+        </div>
+        <div class="cap"><strong>Dip Powder Ombré</strong><small>Seamless fade</small></div>
+      </div>
+    </div>
+
+    <div class="price-note reveal" style="margin-top:10px;margin-bottom:56px">
+      <strong>Coming soon:</strong> real photos from our salon. The illustrations above are artistic previews of the work we do every day.
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-rev">
+      <span class="hand">reviews</span>
+      <h2>4.2 stars,<br>213 reviews</h2>
+      <p>Aggregated rating from Birdeye. Quotes below are from public Google reviews, lightly trimmed for length.</p>
+    </div>
+
+    <div class="rs-strip">
+      <p class="rs-note">Review themes on this page are paraphrased from public feedback. Open the source to read current reviews and live ratings.</p>
+      <div class="rs-links">
+        <a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJwWWCBdiM2YkRMgplspdXuFQ" target="_blank" rel="noopener">See reviews on Google</a>
+        <a class="rs-btn" href="https://reviews.birdeye.com/nu-nails-spa-dewiit-170024754782065" target="_blank" rel="noopener">See reviews on Birdeye</a>
+      </div>
+    </div>
+
+    <div class="rev-list">
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>"Sara did my nails and they are flawless. She has excellent attention to detail and makes sure to get it exactly right. Everyone in the salon was lovely."</p>
+        <cite>via Google reviews</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>"This salon was very efficient and gets an A+ for pampering! I had a full set and pedicure done. Highly recommend this place!"</p>
+        <cite>via Google reviews</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>"Loved this place. Amy is amazing and I look forward to coming back."</p>
+        <cite>via Google reviews</cite>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-visit">
+      <span class="hand">visit us</span>
+      <h2>Come on in</h2>
+      <p>On Erie Blvd East in DeWitt, with ample parking. Walk-ins welcome, or call to reserve your spot.</p>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3>Find us</h3>
+        <p><strong>NU Nails &amp; Spa Dewiit</strong><br>3216 Erie Blvd E<br>Syracuse, NY 13214</p>
+        <p>Easy to reach from Erie Blvd East, with ample parking right outside. Wheelchair accessible.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3>Call to book</h3>
+        <p>Appointments, questions and group visits:</p>
+        <a class="big" href="tel:+13154491641">(315) 449-1641</a>
+        <p style="margin-top:10px">Walk-ins are welcome. Please book ahead for eyelash extensions.</p>
+      </div>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3>Hours</h3>
+        <table class="hours-table" id="hoursTable">
+          <tr><td>Monday</td><td>9:30 AM - 7:30 PM</td></tr>
+          <tr><td>Tuesday</td><td>9:30 AM - 7:30 PM</td></tr>
+          <tr><td>Wednesday</td><td>9:30 AM - 7:30 PM</td></tr>
+          <tr><td>Thursday</td><td>9:30 AM - 7:30 PM</td></tr>
+          <tr><td>Friday</td><td>9:30 AM - 7:30 PM</td></tr>
+          <tr><td>Saturday</td><td>9:30 AM - 7:00 PM</td></tr>
+          <tr><td>Sunday</td><td>10:00 AM - 6:30 PM</td></tr>
+        </table>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <svg viewBox="0 0 24 24" fill="#E86A4A"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#FBF6EC"/></svg>
+          <strong>3216 Erie Blvd E</strong>
+          <small>Syracuse, NY 13214</small><br>
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJwWWCBdiM2YkRMgplspdXuFQ" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand">
+          <svg viewBox="0 0 64 64" role="img" aria-label="Hand with polished nails logo"><path d="M20 58 V34 q0 -8 8 -8 h4 v-6 a4 4 0 018 0 v6 h4 v-8 a4 4 0 018 0 v10 q6 2 6 10 v20 q0 8 -8 8 H28 q-8 0 -8 -8z" fill="#E86A4A"/><rect x="30" y="12" width="8" height="10" rx="4" fill="#C99B3F"/><rect x="40" y="10" width="8" height="10" rx="4" fill="#9AD1C8"/></svg>
+          <span>NU Nails &amp; Spa<br>Dewiit</span>
+        </div>
+        <p>DeWitt's go-to nail and spa haven. Manicures, pedicures, acrylics, waxing and lashes.</p>
+        <p style="margin-top:12px"><a href="tel:+13154491641" style="color:#fff;font-weight:700">(315) 449-1641</a></p>
+      </div>
+      <div>
+        <h4>Visit</h4>
+        <p>3216 Erie Blvd E<br>Syracuse, NY 13214</p>
+        <p style="margin-top:10px">Walk-ins welcome<br>Ample parking</p>
+      </div>
+      <div>
+        <h4>Hours</h4>
+        <p>Mon - Fri · 9:30 AM - 7:30 PM<br>Sat · 9:30 AM - 7:00 PM<br>Sun · 10:00 AM - 6:30 PM</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <a href="#services" data-page="services">Services</a>
+        <a href="#gallery" data-page="gallery">Gallery</a>
+        <a href="#reviews" data-page="reviews">Reviews</a>
+        <a href="#visit" data-page="visit">Visit Us</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© NU Nails &amp; Spa Dewiit</span>
+    </div>
+  </div>
+</footer>
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+
+  /* ---------- drawer close button ---------- */
+  var drawerClose = document.getElementById("drawerClose");
+  if(drawerClose){
+    drawerClose.addEventListener("click", function(){
+      closeMenu();
+    });
+  }
+
+  /* ---------- service tabs ---------- */
+  var tabBtns = document.querySelectorAll(".tab-btn");
+  var tabPanels = document.querySelectorAll(".tab-panel");
+  for(var t = 0; t < tabBtns.length; t++){
+    tabBtns[t].addEventListener("click", function(){
+      var name = this.getAttribute("data-tab");
+      for(var a = 0; a < tabBtns.length; a++){
+        var on = tabBtns[a].getAttribute("data-tab") === name;
+        tabBtns[a].classList.toggle("active", on);
+        tabBtns[a].setAttribute("aria-selected", on ? "true" : "false");
+      }
+      for(var b = 0; b < tabPanels.length; b++){
+        tabPanels[b].classList.toggle("active", tabPanels[b].id === "tab-" + name);
+      }
+    });
+  }
+
+  /* ---------- live hours (America/New_York) ---------- */
+  var HOURS = {0:[10,18.5],1:[9.5,19.5],2:[9.5,19.5],3:[9.5,19.5],4:[9.5,19.5],5:[9.5,19.5],6:[9.5,19]};
+  var DOW = {"Sun":0,"Mon":1,"Tue":2,"Wed":3,"Thu":4,"Fri":5,"Sat":6};
+  function fmt(h){
+    var ap = h < 12 ? "AM" : "PM";
+    var hh = Math.floor(h % 12);
+    if(hh === 0){ hh = 12; }
+    var mm = (h % 1 !== 0) ? ":30" : ":00";
+    return hh + mm + " " + ap;
+  }
+  try{
+    var parts = new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",weekday:"short",hour:"numeric",hour12:false}).formatToParts(new Date());
+    var wd = "Mon", hr = 12;
+    parts.forEach(function(p){
+      if(p.type === "weekday"){ wd = p.value; }
+      if(p.type === "hour"){ hr = parseInt(p.value, 10) % 24; }
+    });
+    var day = DOW[wd] !== undefined ? DOW[wd] : 1;
+    var openH = HOURS[day][0], closeH = HOURS[day][1];
+    var pill = document.getElementById("hoursPill");
+    var txt = document.getElementById("hoursText");
+    if(pill && txt){
+      if(hr >= openH && hr < closeH){
+        txt.textContent = "Open now · until " + fmt(closeH) + " today";
+      } else if(hr < openH){
+        pill.classList.add("closed");
+        txt.textContent = "Opens today at " + fmt(openH);
+      } else {
+        pill.classList.add("closed");
+        var nd = (day + 1) % 7;
+        var dayName = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][nd];
+        txt.textContent = "Opens " + (nd === day + 1 && nd !== 0 ? "tomorrow" : dayName) + " at " + fmt(HOURS[nd][0]);
+      }
+    }
+    var rows = document.querySelectorAll("#hoursTable tr");
+    var idx = (day + 6) % 7; /* rows run Mon..Sun */
+    if(rows[idx]){ rows[idx].classList.add("today"); }
+  }catch(e){ /* leave default pill text */ }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
