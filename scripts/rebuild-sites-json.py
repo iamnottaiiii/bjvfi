@@ -20,6 +20,7 @@ IGNORE = {
     "css",
     "js",
     "scripts",
+    "sitedesk",
     "node_modules",
 }
 
