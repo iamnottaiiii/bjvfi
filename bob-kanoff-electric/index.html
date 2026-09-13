@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bob Kanoff Electric | Electrician in Harrisburg, PA</title>
+<meta name="description" content="Bob Kanoff Electric provides electrical service and repairs in Harrisburg, PA. Free estimates. Call (717) 716-9407.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14161a; --paper:#f7f4ec; --band:#e9e2d2; --accent:#e8a013;
+    --accent-dark:#b57a06; --line:#14161a; --muted:#5d5a50;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Inter",system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.6}
+  h1,h2,h3,.display{font-family:"Archivo",sans-serif;line-height:1.05;letter-spacing:-.01em}
+  a{color:inherit}
+  .page{display:none}
+  .page.active{display:block;animation:fadeIn .35s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+  .kicker{font-size:12px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--accent-dark)}
+  .btn{display:inline-block;background:var(--ink);color:var(--paper);padding:14px 28px;font-weight:700;
+    text-decoration:none;border:2px solid var(--ink);border-radius:999px;font-size:15px;cursor:pointer}
+  .btn:hover{background:var(--accent);border-color:var(--accent);color:var(--ink)}
+  .btn.ghost{background:transparent;color:var(--ink)}
+  .btn.ghost:hover{background:var(--ink);color:var(--paper)}
+
+  /* ---------- side drawer nav ---------- */
+  .topbar{position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:14px;
+    padding:14px 20px;background:var(--ink);color:var(--paper)}
+  #burger{background:none;border:0;cursor:pointer;padding:8px;display:flex;flex-direction:column;gap:5px}
+  #burger span{display:block;width:26px;height:3px;background:var(--accent);border-radius:2px;transition:.25s}
+  .brand{font-family:"Archivo",sans-serif;font-weight:900;font-size:18px;letter-spacing:.02em;text-decoration:none}
+  .brand small{display:block;font-family:"Inter",sans-serif;font-weight:500;font-size:11px;letter-spacing:.18em;color:var(--accent)}
+  .topbar .call{margin-left:auto;color:var(--paper);text-decoration:none;font-weight:700;font-size:14px;
+    border:1px solid var(--accent);border-radius:999px;padding:8px 16px}
+  nav.drawer{position:fixed;top:0;left:0;bottom:0;width:min(340px,84vw);background:var(--ink);color:var(--paper);
+    z-index:80;transform:translateX(-105%);transition:transform .3s ease;display:flex;flex-direction:column;padding:26px}
+  nav.drawer.open{transform:none}
+  nav.drawer .close{align-self:flex-end;background:none;border:1px solid #444;color:var(--paper);
+    width:40px;height:40px;border-radius:50%;font-size:18px;cursor:pointer;margin-bottom:18px}
+  nav.drawer a.item{color:var(--paper);text-decoration:none;font-family:"Archivo",sans-serif;font-weight:800;
+    font-size:30px;padding:12px 0;border-bottom:1px solid #2c2e33}
+  nav.drawer a.item:hover,nav.drawer a.item.active{color:var(--accent)}
+  nav.drawer .foot{margin-top:auto;color:#9a958a;font-size:13px;line-height:1.7}
+  nav.drawer .foot a{color:var(--accent)}
+  .scrim{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:70;display:none}
+  .scrim.show{display:block}
+
+  /* ---------- split hero ---------- */
+  .hero{display:grid;grid-template-columns:1.05fr .95fr;min-height:78vh}
+  .hero .copy{padding:70px 40px 60px 8.5vw;display:flex;flex-direction:column;justify-content:center}
+  .hero .copy h1{font-size:clamp(42px,6vw,84px);font-weight:900}
+  .hero .copy h1 .bolt{color:var(--accent-dark)}
+  .hero .copy p{margin:20px 0 28px;font-size:18px;max-width:44ch;color:#33322d}
+  .hero .meta{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px}
+  .chip{background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:8px 16px;font-size:13px;font-weight:600}
+  .hero .cta{display:flex;gap:14px;flex-wrap:wrap}
+  .hero .art{background:var(--ink);display:flex;align-items:center;justify-content:center;padding:40px;position:relative;overflow:hidden}
+  .hero .art svg{width:min(420px,90%);height:auto}
+  .badge-note{position:absolute;bottom:14px;right:16px;color:#8f8a7d;font-size:11px;letter-spacing:.1em}
+
+  /* ---------- alternating bands ---------- */
+  .band{padding:74px 0}
+  .band.alt{background:var(--band)}
+  .band.dark{background:var(--ink);color:var(--paper)}
+  .band.dark .kicker{color:var(--accent)}
+  .band.dark p{color:#cfc9ba}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center}
+  .split h2{font-size:clamp(30px,3.6vw,46px);font-weight:900;margin:12px 0 16px}
+  .list{list-style:none;margin-top:18px}
+  .list li{padding:12px 0 12px 34px;position:relative;border-bottom:1px solid rgba(0,0,0,.12);font-weight:500}
+  .band.dark .list li{border-color:#2c2e33}
+  .list li::before{content:"";position:absolute;left:2px;top:16px;width:14px;height:14px;border-radius:50%;
+    background:var(--accent);border:2px solid var(--ink)}
+  .card{background:#fff;border:2px solid var(--line);border-radius:18px;padding:30px;box-shadow:6px 6px 0 var(--ink)}
+  .card h3{font-size:22px;font-weight:800;margin-bottom:8px}
+  .card .big{font-size:44px;font-weight:900;color:var(--accent-dark);margin:6px 0}
+  .card p{color:var(--muted);font-size:15px}
+  .card .btn{margin-top:16px}
+
+  /* ---------- leaders (services) ---------- */
+  .leader{display:flex;align-items:baseline;gap:12px;padding:20px 0;border-bottom:2px solid var(--line)}
+  .leader .name{font-family:"Archivo",sans-serif;font-weight:800;font-size:20px;white-space:nowrap}
+  .leader .dots{flex:1;border-bottom:3px dotted #b8b0a0;transform:translateY(-5px);min-width:30px}
+  .leader .val{font-weight:700;color:var(--accent-dark);white-space:nowrap;font-size:15px}
+  .svc-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:34px}
+  .svc{background:#fff;border:2px solid var(--line);border-radius:14px;padding:26px}
+  .svc h3{font-size:19px;font-weight:800;margin:10px 0 8px}
+  .svc p{font-size:14.5px;color:var(--muted)}
+  .svc .icon{width:44px;height:44px;border-radius:12px;background:var(--ink);display:flex;align-items:center;justify-content:center}
+  .flag{display:inline-block;background:#fff3d6;border:1px dashed var(--accent-dark);color:#7a5204;
+    font-size:12px;font-weight:600;border-radius:8px;padding:6px 12px;margin-top:18px}
+
+  /* ---------- horizontal gallery strip ---------- */
+  .strip{display:flex;gap:18px;overflow-x:auto;padding:10px 4px 22px;scroll-snap-type:x mandatory}
+  .tile{flex:0 0 300px;scroll-snap-align:start;border:2px solid var(--line);border-radius:16px;overflow:hidden;background:#fff}
+  .tile .art{height:210px;display:flex;align-items:center;justify-content:center}
+  .tile .art svg{width:120px;height:120px}
+  .tile .cap{padding:14px 16px;font-size:14px;font-weight:600;border-top:2px solid var(--line)}
+  .tile .cap small{display:block;font-weight:500;color:var(--muted);font-size:12px}
+
+  /* ---------- reviews ---------- */
+  .stars{color:var(--accent-dark);font-size:22px;letter-spacing:2px}
+  .quote{background:#fff;border:2px solid var(--line);border-radius:16px;padding:28px;margin-top:18px;box-shadow:6px 6px 0 var(--ink)}
+  .quote p{font-size:17px}
+  .quote .src{margin-top:12px;font-size:13px;color:var(--muted)}
+  .src-links{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+  .src-links a{display:inline-block;border:2px solid var(--line);border-radius:999px;padding:10px 20px;
+    font-weight:700;text-decoration:none;background:#fff;font-size:14px}
+  .src-links a:hover{background:var(--ink);color:var(--paper)}
+
+  /* ---------- contact ---------- */
+  .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:30px}
+  .cbox{background:#fff;border:2px solid var(--line);border-radius:16px;padding:28px}
+  .cbox h3{font-size:18px;font-weight:800;margin-bottom:10px}
+  .cbox a.big{font-family:"Archivo",sans-serif;font-size:26px;font-weight:900;text-decoration:none;color:var(--accent-dark)}
+  .cbox p{color:var(--muted);font-size:15px;margin-top:8px}
+  .maplink{display:inline-block;margin-top:14px;font-weight:700;color:var(--accent-dark)}
+
+  footer{background:var(--ink);color:#9a958a;padding:34px 0 26px;font-size:14px}
+  footer .row{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+  footer a{color:var(--accent);text-decoration:none}
+  footer .copyline{color:#cfc9ba}
+
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .5s ease,transform .5s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  @media(max-width:860px){
+    .hero{grid-template-columns:1fr}
+    .hero .copy{padding:54px 22px}
+    .hero .art{min-height:300px}
+    .split,.svc-grid,.contact-grid{grid-template-columns:1fr}
+    nav.drawer a.item{font-size:26px}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <button id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <a class="brand" href="#home" data-page="home">Bob Kanoff Electric<small>HARRISBURG, PA</small></a>
+  <a class="call" href="tel:+17177169407">(717) 716-9407</a>
+</div>
+
+<nav class="drawer main" id="drawer" aria-label="Main navigation">
+  <button class="close" id="drawerClose" aria-label="Close menu">&times;</button>
+  <a class="item" href="#home" data-page="home">Home</a>
+  <a class="item" href="#services" data-page="services">Services</a>
+  <a class="item" href="#about" data-page="about">About</a>
+  <a class="item" href="#gallery" data-page="gallery">Gallery</a>
+  <a class="item" href="#reviews" data-page="reviews">Reviews</a>
+  <a class="item" href="#contact" data-page="contact">Contact</a>
+  <div class="foot">1720 Paxton Church Rd<br>Harrisburg, PA 17110<br><a href="tel:+17177169407">(717) 716-9407</a></div>
+</nav>
+<div class="scrim" id="scrim"></div>
+
+<section class="page" id="page-home">
+  <div class="hero">
+    <div class="copy">
+      <span class="kicker">Licensed trade know-how, Harrisburg</span>
+      <h1>Straight answers.<br><span class="bolt">Safe power.</span></h1>
+      <p>Bob Kanoff Electric serves homes and small businesses around Harrisburg, PA with practical electrical repairs, troubleshooting, and honest advice. No runaround, no upsell.</p>
+      <div class="meta">
+        <span class="chip">5.0 star Google rating</span>
+        <span class="chip">Free estimates</span>
+        <span class="chip">Emergency service</span>
+      </div>
+      <div class="cta">
+        <a class="btn" href="tel:+17177169407">Call (717) 716-9407</a>
+        <a class="btn ghost" href="#services" data-page="services">See services</a>
+      </div>
+    </div>
+    <div class="art" aria-hidden="true">
+      <svg viewBox="0 0 200 200" role="img" aria-label="Decorative lightning bolt">
+        <circle cx="100" cy="100" r="92" fill="none" stroke="#e8a013" stroke-width="4"/>
+        <circle cx="100" cy="100" r="70" fill="none" stroke="#3a3d44" stroke-width="2" stroke-dasharray="8 8"/>
+        <polygon points="112,34 62,112 94,112 84,168 138,88 104,88" fill="#e8a013" stroke="#f7f4ec" stroke-width="5" stroke-linejoin="round"/>
+      </svg>
+      <span class="badge-note">ILLUSTRATION</span>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap split reveal">
+      <div>
+        <span class="kicker">Why neighbors call</span>
+        <h2>A local electrician who picks up the phone</h2>
+        <p>Directory records show Bob Kanoff Electric has served the Harrisburg area for decades from Paxton Church Road. Customers say the hallmark is straightforward help: quick callbacks and plain-spoken diagnosis, even over the phone.</p>
+        <ul class="list">
+          <li>Fast response and clear communication</li>
+          <li>Repairs and troubleshooting for homes</li>
+          <li>Free estimates before any work starts</li>
+          <li>Emergency electrical service available</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>What customers say</h3>
+        <div class="stars" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p class="big">5.0</p>
+        <p>Based on 4 Google reviews. Reviewers mention honest advice, fast callbacks, and problems diagnosed in minutes instead of inflated projects.</p>
+        <a class="btn" href="#reviews" data-page="reviews">Read reviews</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="band alt">
+    <div class="wrap">
+      <span class="kicker">Popular calls</span>
+      <h2 style="font-size:clamp(30px,3.6vw,46px);font-weight:900;margin:12px 0 8px">Common electrical work</h2>
+      <div class="leader"><span class="name">Troubleshooting and repairs</span><span class="dots"></span><span class="val">Free estimate</span></div>
+      <div class="leader"><span class="name">Wiring and circuit fixes</span><span class="dots"></span><span class="val">Free estimate</span></div>
+      <div class="leader"><span class="name">Lighting and fixture work</span><span class="dots"></span><span class="val">Free estimate</span></div>
+      <div class="leader"><span class="name">Panel and safety checks</span><span class="dots"></span><span class="val">Free estimate</span></div>
+      <div class="leader"><span class="name">Emergency electrical service</span><span class="dots"></span><span class="val">Call anytime</span></div>
+      <span class="flag">Service list is typical of the trade. Exact scope confirmed on your call.</span>
+    </div>
+  </div>
+
+  <div class="band dark">
+    <div class="wrap split reveal">
+      <div>
+        <span class="kicker">Get started</span>
+        <h2>Describe the problem. Get a straight answer.</h2>
+        <p>Call during business hours or leave a message any time. Estimates are free, and you will know the plan before any work begins.</p>
+        <p style="margin-top:14px"><a class="btn" style="background:var(--accent);border-color:var(--accent);color:var(--ink)" href="tel:+17177169407">Call (717) 716-9407</a></p>
+      </div>
+      <div class="card" style="color:var(--ink)">
+        <h3>Visit or call</h3>
+        <p>1720 Paxton Church Rd<br>Harrisburg, PA 17110</p>
+        <p style="margin-top:10px">Hours: call for hours</p>
+        <a class="maplink" href="https://www.google.com/maps/place/?q=place_id:ChIJGSjVAyLHyIkRjF6-7fObsmU" target="_blank" rel="noopener">Get directions on Google Maps</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="band">
+    <div class="wrap">
+      <span class="kicker">Services</span>
+      <h1 style="font-size:clamp(38px,5vw,64px);font-weight:900;margin:12px 0 14px">Electrical work, done right</h1>
+      <p style="max-width:60ch;font-size:17px">From a dead outlet to a full troubleshooting visit, Bob Kanoff Electric handles everyday electrical needs for Harrisburg-area homes. Estimates are free and there is no pressure to buy.</p>
+      <div class="svc-grid">
+        <div class="svc reveal">
+          <div class="icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><polygon points="13,2 5,14 11,14 9,22 19,9 13,9" fill="#e8a013"/></svg></div>
+          <h3>Troubleshooting and repairs</h3>
+          <p>Dead outlets, flickering lights, breakers that keep tripping. The problem gets diagnosed first, then fixed, with the cost explained up front.</p>
+        </div>
+        <div class="svc reveal">
+          <div class="icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e8a013" stroke-width="2"><path d="M9 3v6M15 3v6M7 9h10v3a5 5 0 0 1-10 0V9zM12 17v4"/></svg></div>
+          <h3>Wiring and circuit fixes</h3>
+          <p>Aging or damaged wiring and overloaded circuits are repaired to keep the home safe and up to practical working order.</p>
+        </div>
+        <div class="svc reveal">
+          <div class="icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e8a013" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg></div>
+          <h3>Lighting and fixtures</h3>
+          <p>Ceiling fans, fixtures, switches, and general lighting work installed or repaired cleanly.</p>
+        </div>
+        <div class="svc reveal">
+          <div class="icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e8a013" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h2M8 11h2M8 15h2M14 7h2M14 11h2M14 15h2"/></svg></div>
+          <h3>Panels and safety checks</h3>
+          <p>Panel evaluations and general safety checks that flag what actually needs attention and what can wait.</p>
+        </div>
+      </div>
+      <div class="leader" style="margin-top:34px"><span class="name">Emergency electrical service</span><span class="dots"></span><span class="val">Available, call first</span></div>
+      <div class="leader"><span class="name">Free estimates</span><span class="dots"></span><span class="val">No charge</span></div>
+      <span class="flag">Service descriptions are typical of the trade. Confirm scope and pricing on your call.</span>
+      <p style="margin-top:26px"><a class="btn" href="tel:+17177169407">Call (717) 716-9407</a></p>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-about">
+  <div class="band alt">
+    <div class="wrap split reveal">
+      <div>
+        <span class="kicker">About</span>
+        <h2>A Harrisburg name in electrical work</h2>
+        <p>Bob Kanoff Electric is an electrical contractor based on Paxton Church Road in Harrisburg, Pennsylvania. Directory records show the business has served the area for decades, building its reputation the old way: one neighbor, one job, one callback at a time.</p>
+        <p style="margin-top:14px">Customers describe an electrician who answers, listens, and gives practical guidance, including free phone diagnosis when the fix turns out to be simple.</p>
+        <ul class="list">
+          <li>Based in Harrisburg, PA 17110</li>
+          <li>Serving surrounding Central PA communities</li>
+          <li>Known for honest, no-upsell advice</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>At a glance</h3>
+        <p><strong>Business:</strong> Bob Kanoff Electric</p>
+        <p><strong>Trade:</strong> Electrician / electrical contractor</p>
+        <p><strong>Address:</strong> 1720 Paxton Church Rd, Harrisburg, PA 17110</p>
+        <p><strong>Phone:</strong> <a href="tel:+17177169407" style="color:var(--accent-dark);font-weight:700">(717) 716-9407</a></p>
+        <p><strong>Rating:</strong> 5.0 stars, 4 Google reviews</p>
+        <p style="margin-top:12px"><a class="btn" href="#contact" data-page="contact">Contact us</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="band">
+    <div class="wrap">
+      <span class="kicker">Gallery</span>
+      <h1 style="font-size:clamp(38px,5vw,64px);font-weight:900;margin:12px 0 10px">Work in progress, pictured</h1>
+      <p style="max-width:60ch;font-size:17px;margin-bottom:26px">Sample illustrations of typical electrical work. Real project photos will be added here.</p>
+      <div class="strip">
+        <div class="tile"><div class="art" style="background:#14161a"><svg viewBox="0 0 100 100"><polygon points="56,8 28,58 46,58 40,92 74,42 54,42" fill="#e8a013"/></svg></div><div class="cap">Troubleshooting<small>Sample illustration</small></div></div>
+        <div class="tile"><div class="art" style="background:#e9e2d2"><svg viewBox="0 0 100 100" fill="none" stroke="#14161a" stroke-width="5"><rect x="25" y="12" width="50" height="76" rx="8"/><path d="M40 30h6M40 44h6M40 58h6M60 30h6M60 44h6M60 58h6"/></svg></div><div class="cap">Panel checks<small>Sample illustration</small></div></div>
+        <div class="tile"><div class="art" style="background:#e8a013"><svg viewBox="0 0 100 100" fill="none" stroke="#14161a" stroke-width="5"><circle cx="50" cy="50" r="14"/><path d="M50 10v10M50 80v10M10 50h10M80 50h10M22 22l7 7M71 71l7 7M78 22l-7 7M29 71l-7 7"/></svg></div><div class="cap">Lighting and fixtures<small>Sample illustration</small></div></div>
+        <div class="tile"><div class="art" style="background:#14161a"><svg viewBox="0 0 100 100" fill="none" stroke="#e8a013" stroke-width="5"><path d="M20 70c15-30 45-30 60 0"/><path d="M50 70V30M50 30l-12 12M50 30l12 12"/></svg></div><div class="cap">Wiring runs<small>Sample illustration</small></div></div>
+        <div class="tile"><div class="art" style="background:#e9e2d2"><svg viewBox="0 0 100 100" fill="none" stroke="#14161a" stroke-width="5"><path d="M30 20h40l-8 25h-24z"/><path d="M42 45v20a8 8 0 0 0 16 0V45"/></svg></div><div class="cap">Ceiling fans<small>Sample illustration</small></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="band alt">
+    <div class="wrap">
+      <span class="kicker">Reviews</span>
+      <h1 style="font-size:clamp(38px,5vw,64px);font-weight:900;margin:12px 0 10px">Neighbors vouch for Bob</h1>
+      <p style="max-width:64ch;font-size:17px">Bob Kanoff Electric holds a <strong>5.0 star rating based on 4 Google reviews</strong>. Here is what reviewers have said, in their own words as listed on public review sites.</p>
+      <div class="quote reveal">
+        <div class="stars" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p>"Bob Kanoff fixed my electrical issue in 3 minutes over the phone. I was anticipating a large project and he diagnosed and directed a quick solution in minutes. I would not hesitate to use his services in the future as he displayed proven knowledge and experience without taking advantage of a home owner."</p>
+        <div class="src">Public Google review, shown via Birdeye</div>
+      </div>
+      <div class="quote reveal">
+        <div class="stars" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p>"He called me back in minutes and helped me through my problems at 8pm."</p>
+        <div class="src">Public Google review, shown via Birdeye</div>
+      </div>
+      <div class="src-links">
+        <a href="https://www.google.com/maps/place/?q=place_id:ChIJGSjVAyLHyIkRjF6-7fObsmU" target="_blank" rel="noopener">See reviews on Google</a>
+        <a href="https://reviews.birdeye.com/bob-kanoff-electric-166927811059211" target="_blank" rel="noopener">See reviews on Birdeye</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-contact">
+  <div class="band">
+    <div class="wrap">
+      <span class="kicker">Contact</span>
+      <h1 style="font-size:clamp(38px,5vw,64px);font-weight:900;margin:12px 0 10px">Get in touch</h1>
+      <p style="max-width:60ch;font-size:17px">Call for a free estimate or to talk through an electrical problem. Hours: call for hours.</p>
+      <div class="contact-grid">
+        <div class="cbox reveal">
+          <h3>Call</h3>
+          <a class="big" href="tel:+17177169407">(717) 716-9407</a>
+          <p>Estimates are free. Emergency service available.</p>
+        </div>
+        <div class="cbox reveal">
+          <h3>Find us</h3>
+          <p>1720 Paxton Church Rd<br>Harrisburg, PA 17110</p>
+          <a class="maplink" href="https://www.google.com/maps/place/?q=place_id:ChIJGSjVAyLHyIkRjF6-7fObsmU" target="_blank" rel="noopener">Get directions on Google Maps</a>
+        </div>
+      </div>
+      <p style="margin-top:26px"><a class="btn" href="#home" data-page="home">Back to home</a></p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="row">
+      <span><strong style="color:var(--paper)">Bob Kanoff Electric</strong> &middot; 1720 Paxton Church Rd, Harrisburg, PA 17110</span>
+      <span><a href="tel:+17177169407">(717) 716-9407</a></span>
+    </div>
+    <div class="copyline">© Bob Kanoff Electric</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var PAGES = ["home","services","about","gallery","reviews","contact"];
+  var nav = document.getElementById("drawer");
+  var burger = document.getElementById("burger");
+  var scrim = document.getElementById("scrim");
+  var drawerClose = document.getElementById("drawerClose");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+    if(scrim){ scrim.classList.remove("show"); }
+  }
+
+  function openMenu(){
+    if(nav){ nav.classList.add("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "true"); }
+    if(scrim){ scrim.classList.add("show"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger){ burger.addEventListener("click", function(e){ e.stopPropagation(); openMenu(); }); }
+  if(drawerClose){ drawerClose.addEventListener("click", function(){ closeMenu(); }); }
+  if(scrim){ scrim.addEventListener("click", function(){ closeMenu(); }); }
+
+  var observer = null;
+  function observeReveals(){
+    var items = document.querySelectorAll(".page.active .reveal:not(.in)");
+    if(!("IntersectionObserver" in window)){
+      for(var i = 0; i < items.length; i++){ items[i].classList.add("in"); }
+      return;
+    }
+    if(observer){ observer.disconnect(); }
+    observer = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); observer.unobserve(en.target); }
+      });
+    }, {threshold: 0.12});
+    for(var k = 0; k < items.length; k++){ observer.observe(items[k]); }
+  }
+
+  navigateTo(cleanHash() || "home");
+})();
+</script>
+</body>
+</html>

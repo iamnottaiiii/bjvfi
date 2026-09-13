@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bougie's Salon · Beauty Salon, Howard Beach, NY</title>
+<meta name="description" content="Bougie's Salon, a beauty salon at 164-32 Cross Bay Blvd, Howard Beach, NY. Facials and skincare, hair removal, makeup, threading and dermaplaning. Call (718) 835-1969.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --plum:#33222E; --plum-deep:#241822;
+  --rose:#C4637A; --rose-deep:#9E4460; --rose-soft:#F9E3E8;
+  --blush:#FBF1F0; --cream:#FFFDFB;
+  --gold:#D9A441; --gold-soft:#F8EAD0;
+  --ink-soft:#7A5F6B;
+  --radius:20px;
+  --shadow:0 20px 46px -20px rgba(51,34,46,.35);
+  --shadow-sm:0 10px 26px -12px rgba(51,34,46,.28);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Jost",system-ui,sans-serif;
+  background:var(--blush);color:var(--plum);line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--rose-deep)}
+::selection{background:var(--gold);color:var(--plum-deep)}
+.serif{font-family:"Cormorant Garamond",serif}
+
+/* ---------- rail (fixed left sidebar) ---------- */
+.rail{
+  position:fixed;inset:0 auto 0 0;width:300px;z-index:60;
+  background:linear-gradient(175deg,var(--plum) 0%,var(--plum-deep) 100%);
+  color:#F3E4E4;display:flex;flex-direction:column;
+  padding:34px 30px 26px;overflow-y:auto;
+}
+.rail::after{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background:radial-gradient(circle at 50% 0%, rgba(196,99,122,.35), transparent 55%);
+}
+.brand{display:flex;align-items:center;gap:14px;text-decoration:none;color:#FFF7F5;position:relative;z-index:1}
+.brand svg{width:52px;height:52px;flex:none}
+.brand-name{font-family:"Cormorant Garamond",serif;font-weight:700;font-size:1.5rem;line-height:1.05}
+.brand-name small{display:block;font-family:"Jost",sans-serif;font-weight:600;font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-top:4px}
+nav.main{display:flex;flex-direction:column;gap:4px;margin:38px 0 30px;position:relative;z-index:1}
+nav.main a{
+  text-decoration:none;color:#EAD4DA;font-weight:500;font-size:1.02rem;
+  padding:11px 16px;border-radius:14px;transition:background .2s,color .2s,transform .2s;
+}
+nav.main a:hover{background:rgba(255,255,255,.08);color:#fff}
+nav.main a.active{background:var(--rose);color:#fff;box-shadow:var(--shadow-sm)}
+nav.main a.brand.active{background:none;box-shadow:none}
+.call-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  background:var(--gold);color:var(--plum-deep)!important;text-decoration:none;font-weight:700;
+  padding:14px 20px;border-radius:999px;margin-top:14px;box-shadow:var(--shadow-sm);
+  transition:transform .18s,filter .18s;
+}
+.call-btn:hover{transform:translateY(-2px);filter:brightness(1.06)}
+.rail-foot{margin-top:auto;position:relative;z-index:1;font-size:.85rem;color:#C9A9B2;line-height:1.7}
+.rail-foot strong{color:#FFF7F5}
+.rail-foot a{color:var(--gold)}
+.burger{
+  display:none;position:fixed;top:16px;right:16px;z-index:80;
+  background:var(--plum);border:0;cursor:pointer;padding:12px;border-radius:14px;
+  box-shadow:var(--shadow-sm);
+}
+.burger span{display:block;width:24px;height:3px;border-radius:3px;background:#FFF7F5;margin:5px 0;transition:.25s}
+
+/* ---------- stage ---------- */
+.stage{margin-left:300px;min-height:100vh}
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- full-bleed hero ---------- */
+.hero-full{
+  min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;
+  background:
+    radial-gradient(900px 520px at 88% 12%, rgba(217,164,65,.28), transparent 60%),
+    radial-gradient(760px 620px at 8% 88%, rgba(158,68,96,.5), transparent 62%),
+    linear-gradient(160deg,#3A2534 0%,#2A1A26 60%,#1F131C 100%);
+  color:#FFF7F5;padding:80px 7vw;
+}
+.hero-full::before{
+  content:"";position:absolute;inset:0;opacity:.16;
+  background-image:radial-gradient(rgba(255,255,255,.7) 1.1px, transparent 1.2px);
+  background-size:30px 30px;
+}
+.hero-inner{position:relative;z-index:1;max-width:640px}
+.kicker{
+  display:inline-block;font-size:.78rem;font-weight:700;letter-spacing:4px;text-transform:uppercase;
+  color:var(--gold);border:1px solid rgba(217,164,65,.55);padding:8px 20px;border-radius:999px;margin-bottom:26px;
+}
+.hero-full h1{
+  font-family:"Cormorant Garamond",serif;font-weight:600;
+  font-size:clamp(3rem,7vw,5.6rem);line-height:1.02;letter-spacing:-.5px;margin-bottom:22px;
+}
+.hero-full h1 em{color:var(--gold);font-style:italic}
+.lede{font-size:1.15rem;color:#EAD4DA;max-width:32rem;margin-bottom:32px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;
+  padding:15px 30px;border-radius:999px;font-size:1rem;transition:transform .18s,box-shadow .18s,background .18s,filter .18s;
+}
+.btn-solid{background:var(--rose);color:#fff;box-shadow:var(--shadow-sm)}
+.btn-solid:hover{background:var(--rose-deep);transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:#FFF7F5;border:2px solid rgba(255,255,255,.4)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-2px)}
+.hero-motif{position:absolute;right:-40px;bottom:-30px;width:min(46vw,560px);opacity:.9;z-index:0;pointer-events:none}
+.scroll-hint{position:absolute;bottom:26px;left:7vw;z-index:1;color:#C9A9B2;font-size:.8rem;letter-spacing:3px;text-transform:uppercase}
+
+/* ---------- magazine panels ---------- */
+.mag{padding:96px 7vw;max-width:1280px;margin:0 auto}
+.sec-label{font-size:.78rem;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--rose-deep);margin-bottom:14px}
+.mag h2{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:clamp(2.2rem,4.4vw,3.4rem);line-height:1.08;margin-bottom:16px}
+.mag-sub{color:var(--ink-soft);max-width:36rem;margin-bottom:48px;font-size:1.08rem}
+.mag-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:26px;align-items:start}
+.panel{
+  background:var(--cream);border-radius:var(--radius);padding:38px 34px;box-shadow:var(--shadow-sm);
+  position:relative;overflow:hidden;
+}
+.panel::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 18% 8%, rgba(217,164,65,.14), transparent 55%);pointer-events:none}
+.panel.a{grid-column:1/8;transform:rotate(-.6deg)}
+.panel.b{grid-column:8/13;margin-top:64px;background:var(--plum);color:#F3E4E4;transform:rotate(.7deg)}
+.panel.c{grid-column:2/7;margin-top:-10px}
+.panel.d{grid-column:7/12;margin-top:44px;background:var(--rose-soft)}
+.panel .num{font-family:"Cormorant Garamond",serif;font-size:3.4rem;font-weight:700;color:var(--gold);line-height:1;margin-bottom:12px}
+.panel.b .num{color:var(--rose)}
+.panel h3{font-family:"Cormorant Garamond",serif;font-size:1.7rem;font-weight:700;margin-bottom:10px}
+.panel p{color:var(--ink-soft);font-size:1rem;position:relative}
+.panel.b p{color:#D9BFC7}
+.panel .art{margin:18px 0 6px}
+.panel .art svg{width:64px;height:64px}
+.pull{grid-column:1/13;margin:40px 0 0;text-align:center}
+.pull p{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:clamp(1.6rem,3.2vw,2.4rem);color:var(--rose-deep);max-width:44rem;margin:0 auto}
+.pull cite{display:block;margin-top:12px;font-style:normal;font-size:.85rem;letter-spacing:2px;text-transform:uppercase;color:var(--ink-soft)}
+
+/* ---------- services cards ---------- */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.card{
+  background:var(--cream);border-radius:var(--radius);padding:34px 30px;box-shadow:var(--shadow-sm);
+  border:1px solid rgba(158,68,96,.12);transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden;
+}
+.card:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+.card .icon{width:60px;height:60px;border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;background:var(--rose-soft)}
+.card .icon svg{width:32px;height:32px}
+.card h3{font-family:"Cormorant Garamond",serif;font-size:1.55rem;font-weight:700;margin-bottom:8px}
+.card p{color:var(--ink-soft);font-size:.98rem;margin-bottom:14px}
+.card .sample{display:inline-block;background:var(--gold-soft);color:#7A5A1E;font-size:.78rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:6px 14px;border-radius:999px}
+.price-note{background:var(--cream);border:2px dashed rgba(158,68,96,.4);border-radius:var(--radius);padding:20px 26px;margin-top:28px;font-size:.95rem;color:var(--ink-soft)}
+.price-note strong{color:var(--rose-deep)}
+
+/* ---------- scroll strip gallery ---------- */
+.strip-scroll{
+  display:flex;gap:22px;overflow-x:auto;padding:10px 4px 26px;
+  scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
+}
+.stile{
+  flex:0 0 300px;scroll-snap-align:start;border-radius:var(--radius);overflow:hidden;
+  background:var(--cream);box-shadow:var(--shadow-sm);position:relative;transition:transform .2s;
+}
+.stile:hover{transform:translateY(-5px)}
+.stile .art{height:250px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.stile .art svg{width:38%;height:auto;filter:drop-shadow(0 12px 14px rgba(0,0,0,.2))}
+.stile .soon{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.88);font-size:.68rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 13px;border-radius:999px;color:var(--ink-soft)}
+.stile .cap{padding:16px 20px 20px}
+.stile .cap strong{font-family:"Cormorant Garamond",serif;font-size:1.2rem;display:block}
+.stile .cap small{color:var(--ink-soft)}
+
+/* ---------- reviews ---------- */
+.rev-list{display:grid;gap:20px;max-width:760px}
+.rev{background:var(--cream);border-radius:var(--radius);padding:30px 32px;box-shadow:var(--shadow-sm);border-left:6px solid var(--rose)}
+.rev .stars{color:var(--gold);font-size:1.2rem;letter-spacing:4px;margin-bottom:10px}
+.rev p{font-size:1.05rem;margin-bottom:10px}
+.rev cite{font-style:normal;font-weight:600;font-size:.82rem;letter-spacing:1px;text-transform:uppercase;color:var(--rose-deep)}
+.rs-strip{max-width:640px;background:var(--cream);border:1px solid var(--gold-soft);border-radius:16px;padding:22px 26px;text-align:center;margin-bottom:34px}
+.rs-note{margin:0 0 14px;font-size:.95rem;color:var(--ink-soft);line-height:1.6}
+.rs-btn{display:inline-block;background:var(--rose-deep);color:#fff;padding:12px 30px;border-radius:999px;font-weight:700;text-decoration:none;font-size:.95rem}
+.rs-btn:hover{filter:brightness(1.1)}
+
+/* ---------- visit ---------- */
+.visit-cards{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
+.info-card{background:var(--cream);border-radius:var(--radius);padding:34px;box-shadow:var(--shadow-sm)}
+.info-card h3{font-family:"Cormorant Garamond",serif;font-size:1.5rem;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.info-card h3 svg{width:28px;height:28px}
+.info-card p{color:var(--ink-soft);margin-bottom:8px}
+.info-card a.big{font-family:"Cormorant Garamond",serif;font-size:1.6rem;font-weight:700;color:var(--rose-deep);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.hours-table{width:100%;border-collapse:collapse;font-size:.98rem}
+.hours-table td{padding:10px 6px;border-bottom:1px dashed rgba(51,34,46,.18)}
+.hours-table td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.map-card{
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:360px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 46px, rgba(158,68,96,.14) 46px 48px),
+    repeating-linear-gradient(90deg, transparent 0 46px, rgba(158,68,96,.14) 46px 48px),
+    linear-gradient(140deg,#F7E6EA,#EFD3DA);
+  display:flex;align-items:center;justify-content:center;margin-bottom:24px;
+}
+.map-pin{text-align:center;background:var(--cream);padding:28px 36px;border-radius:20px;box-shadow:var(--shadow);max-width:80%}
+.map-pin svg{width:44px;height:44px;margin-bottom:8px}
+.map-pin strong{font-family:"Cormorant Garamond",serif;font-size:1.2rem;display:block}
+.map-pin small{color:var(--ink-soft)}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- big-type footer ---------- */
+footer{background:var(--plum-deep);color:#EAD4DA;margin-top:40px;overflow:hidden}
+.foot-giant{
+  font-family:"Cormorant Garamond",serif;font-weight:700;text-align:center;white-space:nowrap;
+  font-size:clamp(3.4rem,12.5vw,11rem);line-height:1;color:rgba(255,247,245,.07);
+  padding:56px 0 10px;letter-spacing:2px;user-select:none;
+}
+.foot-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px;padding:30px 7vw 40px;max-width:1280px;margin:0 auto}
+.foot-grid h4{font-family:"Cormorant Garamond",serif;color:#fff;font-size:1.2rem;margin-bottom:12px}
+.foot-grid p,.foot-grid a{color:#C9A9B2;font-size:.94rem}
+.foot-grid a{text-decoration:none}.foot-grid a:hover{color:var(--gold)}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.1);padding:20px 0 26px;text-align:center;font-size:.88rem;color:#A98A94}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+.strip-head{border-radius:26px;padding:56px 48px;color:#fff;position:relative;overflow:hidden;margin-bottom:44px;box-shadow:var(--shadow)}
+.strip-head::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(255,255,255,.2), transparent 50%)}
+.strip-head h2{font-family:"Cormorant Garamond",serif;font-size:clamp(2.1rem,4.4vw,3.2rem);font-weight:600;position:relative;margin:4px 0 10px;line-height:1.05}
+.strip-head p{color:rgba(255,255,255,.88);max-width:36rem;position:relative}
+.strip-head .kick{font-size:.78rem;font-weight:700;letter-spacing:4px;text-transform:uppercase;position:relative;color:var(--gold-soft)}
+.strip-head.s-services{background:linear-gradient(120deg,#9E4460,#5E2A40)}
+.strip-head.s-story{background:linear-gradient(120deg,#3A2534,#1F131C)}
+.strip-head.s-gal{background:linear-gradient(120deg,#B98A2E,#7A5A1E)}
+.strip-head.s-rev{background:linear-gradient(120deg,#7A2E47,#4A1A2C)}
+.strip-head.s-visit{background:linear-gradient(120deg,#4E3345,#2A1A26)}
+
+@media(max-width:1100px){
+  .panel.a{grid-column:1/13}
+  .panel.b{grid-column:1/13;margin-top:0}
+  .panel.c{grid-column:1/7;margin-top:0}
+  .panel.d{grid-column:7/13;margin-top:0}
+}
+@media(max-width:940px){
+  .rail{width:auto;padding:0;background:none;position:static;overflow:visible;display:block}
+  .rail::after{display:none}
+  .rail > .brand,.rail-foot{display:none}
+  .stage{margin-left:0}
+  .burger{display:block}
+  nav.main{
+    position:fixed;top:0;left:0;bottom:0;width:min(320px,84vw);z-index:70;
+    background:linear-gradient(175deg,var(--plum),var(--plum-deep));
+    flex-direction:column;justify-content:center;padding:40px 30px;margin:0;gap:6px;
+    transform:translateX(-105%);transition:transform .3s ease;box-shadow:var(--shadow);
+  }
+  nav.main.open{transform:none}
+  nav.main a{font-size:1.15rem}
+  .cards{grid-template-columns:1fr 1fr}
+  .visit-cards{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+  .cards{grid-template-columns:1fr}
+  .panel.c{grid-column:1/13}
+  .panel.d{grid-column:1/13}
+  .strip-head{padding:40px 28px}
+  .hero-full{padding:70px 24px 90px}
+}
+</style>
+</head>
+<body>
+
+<button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+
+<aside class="rail">
+  <a class="brand" href="#home" data-page="home" aria-label="Bougie's Salon, home">
+    <svg viewBox="0 0 64 64" role="img" aria-label="Lipstick logo"><rect x="26" y="6" width="12" height="18" rx="5" fill="#C4637A"/><rect x="24" y="22" width="16" height="6" fill="#D9A441"/><rect x="22" y="28" width="20" height="26" rx="4" fill="#F3E4E4"/><rect x="22" y="28" width="20" height="8" rx="4" fill="#9E4460"/><circle cx="32" cy="44" r="3" fill="#9E4460" opacity=".35"/></svg>
+    <span class="brand-name">Bougie's Salon<small>Beauty · Howard Beach</small></span>
+  </a>
+  <nav class="main" id="mainNav" aria-label="Main navigation">
+    <a href="#home" data-page="home" class="active" aria-current="page">Home</a>
+    <a href="#services" data-page="services">Services</a>
+    <a href="#story" data-page="story">Our Story</a>
+    <a href="#gallery" data-page="gallery">Gallery</a>
+    <a href="#reviews" data-page="reviews">Reviews</a>
+    <a href="#visit" data-page="visit">Visit Us</a>
+    <a class="call-btn" href="tel:+17188351969">Call (718) 835-1969</a>
+  </nav>
+  <div class="rail-foot">
+    <strong>164-32 Cross Bay Blvd</strong><br>
+    Howard Beach, NY 11414<br>
+    <a href="https://www.google.com/maps/place/?q=place_id:ChIJV635yIZnwokR3FXcemC6kjs" target="_blank" rel="noopener">Get directions</a>
+  </div>
+</aside>
+
+<main class="stage">
+
+<section class="page active" id="page-home">
+  <div class="hero-full">
+    <svg class="hero-motif" viewBox="0 0 400 400" aria-hidden="true">
+      <circle cx="200" cy="190" r="150" fill="none" stroke="#D9A441" stroke-width="2" opacity=".5"/>
+      <circle cx="200" cy="190" r="118" fill="none" stroke="#C4637A" stroke-width="2" opacity=".6"/>
+      <g fill="none" stroke="#F3E4E4" stroke-width="5" stroke-linecap="round" opacity=".85">
+        <path d="M150 150 q50 -60 100 0"/>
+        <path d="M138 195 q62 -46 124 0"/>
+        <path d="M132 240 q68 -40 136 0"/>
+      </g>
+      <circle cx="120" cy="90" r="6" fill="#D9A441" opacity=".8"/>
+      <circle cx="292" cy="120" r="4" fill="#C4637A" opacity=".8"/>
+      <circle cx="310" cy="280" r="6" fill="#D9A441" opacity=".6"/>
+      <circle cx="95" cy="300" r="4" fill="#F3E4E4" opacity=".6"/>
+    </svg>
+    <div class="hero-inner">
+      <span class="kicker">Beauty Salon · Howard Beach, Queens</span>
+      <h1>Where Howard Beach<br>comes to <em>glow</em>.</h1>
+      <p class="lede">Bougie's Salon is a beauty salon on Cross Bay Blvd offering facials and skincare, hair removal, makeup services, threading and dermaplaning. Walk in, sit back, and leave feeling brand new.</p>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="#services" data-page="services">Explore services</a>
+        <a class="btn btn-ghost" href="tel:+17188351969">Call (718) 835-1969</a>
+      </div>
+    </div>
+    <span class="scroll-hint">Scroll</span>
+  </div>
+
+  <div class="mag">
+    <p class="sec-label">Why Bougie's</p>
+    <h2>Small salon,<br>big attention to detail</h2>
+    <p class="mag-sub">Everything here is personal. Appointments are one on one, the menu is built around what the neighborhood actually asks for, and nobody is ever rushed out of the chair.</p>
+    <div class="mag-grid">
+      <div class="panel a reveal">
+        <div class="num">01</div>
+        <h3>Skin first, always</h3>
+        <div class="art"><svg viewBox="0 0 64 64" fill="none" stroke="#9E4460" stroke-width="3" stroke-linecap="round"><path d="M32 8c-8 10-16 14-16 26a16 16 0 0032 0c0-12-8-16-16-26z"/><path d="M24 38a8 8 0 008 8" stroke-width="2.5"/></svg></div>
+        <p>Facials and skincare lead the menu, with dermaplaning for that smooth, lit-from-within finish. Treatments are tailored to your skin, not pulled from a script.</p>
+      </div>
+      <div class="panel b reveal">
+        <div class="num">02</div>
+        <h3>Brows that frame you</h3>
+        <p>Threading and precise brow shaping are a house specialty. Clean lines, natural arches, and a finish that photographs beautifully.</p>
+      </div>
+      <div class="panel c reveal">
+        <div class="num">03</div>
+        <h3>Makeup for the moment</h3>
+        <div class="art"><svg viewBox="0 0 64 64"><rect x="26" y="6" width="12" height="18" rx="5" fill="#C4637A"/><rect x="24" y="22" width="16" height="6" fill="#D9A441"/><rect x="22" y="28" width="20" height="26" rx="4" fill="#9E4460" opacity=".85"/></svg></div>
+        <p>Occasion makeup for nights out, photos, and celebrations. Soft glam or full drama, your call.</p>
+      </div>
+      <div class="panel d reveal">
+        <div class="num">04</div>
+        <h3>Smooth, simple waxing</h3>
+        <p>Quick, careful hair removal with an emphasis on comfort. In and out, feeling fresh.</p>
+      </div>
+      <div class="pull reveal">
+        <p>Call ahead for weekend appointments, the chairs fill up fast.</p>
+        <cite>Good to know</cite>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="mag">
+    <div class="strip-head s-services">
+      <span class="kick">What we do</span>
+      <h2>Services built around<br>real life</h2>
+      <p>From everyday upkeep to special occasions, the service list at Bougie's Salon reflects what public listings show clients actually book: skin, brows, makeup and smooth finishes.</p>
+    </div>
+    <div class="cards">
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#9E4460" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-3.5 4.5-7 6.5-7 11a7 7 0 0014 0c0-4.5-3.5-6.5-7-11z"/><path d="M9.5 14.5a3.5 3.5 0 003.5 3.5"/></svg></div>
+        <h3>Facials and Skincare</h3>
+        <p>Customized facials for hydration, glow and clarity, matched to your skin type and concerns.</p>
+        <span class="sample">Sample from $65</span>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#9E4460" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg></div>
+        <h3>Dermaplaning</h3>
+        <p>A gentle exfoliating treatment that removes peach fuzz and dull buildup for a smooth canvas.</p>
+        <span class="sample">Sample from $55</span>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#9E4460" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20c2-6 6-9 10-10l-2-2 4-1 1 4-2-2c-5 2-8 6-11 11z"/><circle cx="17" cy="7" r="1.6" fill="#9E4460"/></svg></div>
+        <h3>Eyebrow Threading</h3>
+        <p>Precise, gentle threading for brows with clean lines and a natural arch.</p>
+        <span class="sample">Sample from $12</span>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#9E4460" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-5-1.5-8-5-8-9 3 0 5 1 6 2.5C11 13 13 12 16 12c0 4-1.5 7.5-4 9z"/><path d="M12 21v-9"/></svg></div>
+        <h3>Hair Removal</h3>
+        <p>Careful waxing services with an emphasis on comfort and clean results.</p>
+        <span class="sample">Sample from $15</span>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#9E4460" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v5H9zM10 8h4v3h-4zM8 11h8l-1 9H9z"/></svg></div>
+        <h3>Makeup Services</h3>
+        <p>Occasion makeup for celebrations, photos and nights out, from soft glam to full drama.</p>
+        <span class="sample">Sample from $60</span>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#9E4460" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0116 0"/><path d="M12 4v4M8.5 5.5l1.5 2M15.5 5.5l-1.5 2"/></svg></div>
+        <h3>Haircuts and Styling</h3>
+        <p>Directory listings describe professional cuts, color and styling alongside the beauty menu.</p>
+        <span class="sample">Call for pricing</span>
+      </div>
+    </div>
+    <div class="price-note reveal">
+      <strong>About these prices:</strong> the figures above are samples for planning only, not the salon's price list. Final pricing is set in the salon. Please call <a href="tel:+17188351969">(718) 835-1969</a> for an exact quote.
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-story">
+  <div class="mag">
+    <div class="strip-head s-story">
+      <span class="kick">Our story</span>
+      <h2>A neighborhood salon<br>with a personal touch</h2>
+      <p>Bougie's Salon sits on Cross Bay Blvd in Howard Beach, the kind of small, appointment-driven beauty salon where the stylist knows your name and your usual.</p>
+    </div>
+    <div class="mag-grid">
+      <div class="panel a reveal">
+        <div class="num">01</div>
+        <h3>Listed as Lulu Bougie's Salon</h3>
+        <p>Public directories also list the salon as Lulu Bougie's Salon and Bougies Salon, all at the same Cross Bay Blvd address in Howard Beach, Queens. One salon, one team, one chair at a time.</p>
+      </div>
+      <div class="panel b reveal">
+        <div class="num">02</div>
+        <h3>Beauty, not an assembly line</h3>
+        <p>Facials, threading, makeup and waxing are booked as focused one-on-one appointments. The pace is deliberate: consultation first, treatment second, no rushing.</p>
+      </div>
+      <div class="panel c reveal">
+        <div class="num">03</div>
+        <h3>Howard Beach roots</h3>
+        <div class="art"><svg viewBox="0 0 64 64" fill="none" stroke="#9E4460" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M32 56V20M32 20c-8 0-14-5-14-12 8 0 14 5 14 12zM32 30c8 0 14-5 14-12-8 0-14 5-14 12z"/><path d="M20 56h24" stroke-width="2.5"/></svg></div>
+        <p>A Cross Bay Blvd address puts the salon in the middle of Howard Beach's main shopping strip, easy to reach and easy to make part of your routine.</p>
+      </div>
+      <div class="panel d reveal">
+        <div class="num">04</div>
+        <h3>Book the way you like</h3>
+        <p>Call the salon directly at (718) 835-1969 to book, or find Bougie's Salon on Fresha to see availability online.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="mag">
+    <div class="strip-head s-gal">
+      <span class="kick">The work</span>
+      <h2>A glimpse of<br>what we do</h2>
+      <p>Artistic previews of the salon's services. The owner can swap these tiles for real photos of actual work at any time.</p>
+    </div>
+    <div class="strip-scroll">
+      <div class="stile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#F3B8C6,#C4637A)">
+          <svg viewBox="0 0 100 100"><path d="M50 18c-14 18-28 26-28 44a28 28 0 0056 0c0-18-14-26-28-44z" fill="#FFF7F5" opacity=".92"/><path d="M38 66a12 12 0 0012 12" fill="none" stroke="#9E4460" stroke-width="4" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>Signature Facial</strong><small>Hydration and glow</small></div>
+      </div>
+      <div class="stile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#3A2534,#241822)">
+          <svg viewBox="0 0 100 100"><path d="M20 55 q30 -22 60 0" fill="none" stroke="#D9A441" stroke-width="6" stroke-linecap="round"/><path d="M28 68 q22 -14 44 0" fill="none" stroke="#F3E4E4" stroke-width="4" stroke-linecap="round" opacity=".7"/><circle cx="50" cy="40" r="5" fill="#C4637A"/></svg>
+        </div>
+        <div class="cap"><strong>Brow Threading</strong><small>Clean lines, natural arch</small></div>
+      </div>
+      <div class="stile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#D9A441,#9E6B1E)">
+          <svg viewBox="0 0 100 100"><rect x="40" y="14" width="20" height="30" rx="9" fill="#9E4460"/><rect x="36" y="42" width="28" height="10" fill="#FFF7F5"/><rect x="32" y="52" width="36" height="36" rx="7" fill="#33222E"/></svg>
+        </div>
+        <div class="cap"><strong>Occasion Makeup</strong><small>Soft glam to full drama</small></div>
+      </div>
+      <div class="stile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#9E4460,#5E2A40)">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="30" fill="none" stroke="#FFF7F5" stroke-width="5" opacity=".9"/><path d="M50 20v60M20 50h60" stroke="#D9A441" stroke-width="4" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>Dermaplaning</strong><small>Smooth, lit-from-within skin</small></div>
+      </div>
+      <div class="stile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#F8EAD0,#E8C88A)">
+          <svg viewBox="0 0 100 100"><path d="M30 70 q-4 -30 20 -34 q24 -4 20 34 q-20 8 -40 0z" fill="#FFFDFB" opacity=".95"/><path d="M40 52 q10 -6 20 0" fill="none" stroke="#9E4460" stroke-width="4" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>Waxing</strong><small>Quick, careful, comfortable</small></div>
+      </div>
+      <div class="stile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#5E2A40,#33222E)">
+          <svg viewBox="0 0 100 100"><path d="M25 75 L50 25 L75 75 Z" fill="none" stroke="#D9A441" stroke-width="5" stroke-linejoin="round"/><circle cx="50" cy="58" r="8" fill="#C4637A"/></svg>
+        </div>
+        <div class="cap"><strong>Bridal Party Prep</strong><small>Group appointments welcome</small></div>
+      </div>
+    </div>
+    <div class="price-note reveal">
+      <strong>Coming soon:</strong> real photos of actual salon work. The tiles above are artistic previews, clearly marked so visitors know what is a placeholder and what is real.
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="mag">
+    <div class="strip-head s-rev">
+      <span class="kick">Word of mouth</span>
+      <h2>What clients<br>are saying</h2>
+      <p>Bougie's Salon is listed on Google Maps and booking directories. Read current reviews and ratings at the source, straight from the people who have sat in the chair.</p>
+    </div>
+    <div class="rs-strip">
+      <p class="rs-note">Review themes on this page are paraphrased from public feedback. Open the source to read current reviews and ratings.</p>
+      <div class="rs-links"><a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJV635yIZnwokR3FXcemC6kjs" target="_blank" rel="noopener">See reviews on Google</a></div>
+    </div>
+    <div class="rev-list">
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>There is no published star rating we could verify in our research, so we will not invent one. The honest move: read what real clients say on the salon's Google listing before you book.</p>
+        <cite>Our research note</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>Had a great experience at Bougie's Salon? Your review on Google helps a small Howard Beach business more than you know.</p>
+        <cite>Leave yours</cite>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="mag">
+    <div class="strip-head s-visit">
+      <span class="kick">Find us</span>
+      <h2>Come say hello</h2>
+      <p>On Cross Bay Blvd in Howard Beach, right in the middle of the neighborhood's main strip. Call ahead to book your chair.</p>
+    </div>
+    <div class="visit-cards">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#9E4460" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Find us</h3>
+        <p><strong>Bougie's Salon</strong><br>164-32 Cross Bay Blvd<br>Howard Beach, NY 11414</p>
+        <p>Also listed as Lulu Bougie's Salon.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#9E4460" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg> Call us</h3>
+        <p>Questions or bookings:</p>
+        <a class="big" href="tel:+17188351969">(718) 835-1969</a>
+        <p style="margin-top:10px">Prefer to book online? <a href="https://www.fresha.com/lvp/bougies-salon-cross-bay-boulevard-eXXqeK" target="_blank" rel="noopener">Find Bougie's Salon on Fresha</a>.</p>
+      </div>
+    </div>
+    <div class="visit-cards">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#9E4460" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Hours</h3>
+        <table class="hours-table">
+          <tr><td>Monday</td><td>Closed</td></tr>
+          <tr><td>Tuesday</td><td>10:00 AM - 5:00 PM</td></tr>
+          <tr><td>Wednesday</td><td>10:00 AM - 5:00 PM</td></tr>
+          <tr><td>Thursday</td><td>10:00 AM - 6:00 PM</td></tr>
+          <tr><td>Friday</td><td>10:00 AM - 7:00 PM</td></tr>
+          <tr><td>Saturday</td><td>9:00 AM - 5:00 PM</td></tr>
+          <tr><td>Sunday</td><td>9:00 AM - 3:00 PM</td></tr>
+        </table>
+        <p style="margin-top:12px;font-size:.9rem">Hours reported by public directory listings. Please call to confirm before visiting.</p>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <svg viewBox="0 0 24 24" fill="#9E4460"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#FFFDFB"/></svg>
+          <strong>164-32 Cross Bay Blvd</strong>
+          <small>Howard Beach, NY 11414</small><br>
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJV635yIZnwokR3FXcemC6kjs" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-giant" aria-hidden="true">BOUGIE'S</div>
+  <div class="foot-grid">
+    <div>
+      <h4>Bougie's Salon</h4>
+      <p>A beauty salon on Cross Bay Blvd in Howard Beach, Queens. Facials, threading, makeup, waxing and dermaplaning.</p>
+    </div>
+    <div>
+      <h4>Visit</h4>
+      <p>164-32 Cross Bay Blvd<br>Howard Beach, NY 11414<br><a href="tel:+17188351969">(718) 835-1969</a></p>
+    </div>
+    <div>
+      <h4>Explore</h4>
+      <p><a href="#services" data-page="services">Services</a> · <a href="#gallery" data-page="gallery">Gallery</a> · <a href="#reviews" data-page="reviews">Reviews</a><br><a href="https://www.google.com/maps/place/?q=place_id:ChIJV635yIZnwokR3FXcemC6kjs" target="_blank" rel="noopener">See reviews on Google</a></p>
+    </div>
+  </div>
+  <div class="foot-bottom">© Bougie's Salon</div>
+</footer>
+
+</main>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "story", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

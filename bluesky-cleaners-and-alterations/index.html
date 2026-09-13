@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bluesky cleaners and Alterations · Dry Cleaning & Tailoring, New Haven, CT</title>
+<meta name="description" content="Bluesky cleaners and Alterations at 1321 Whalley Ave, New Haven, CT. Chemical-free wetcleaning, dry cleaning, alterations and tailoring. Mon-Fri 8 AM to 5:30 PM, Sat 8:30 AM to 4 PM. Call (203) 389-6628.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5FAFE; --paper:#FFFFFF;
+  --ink:#0C2B45; --ink-soft:#4A6B87;
+  --blue:#1479C9; --blue-deep:#0D5C9C; --blue-soft:#DDEFFD;
+  --teal:#12A594; --teal-soft:#D6F3EE;
+  --sun:#FFC53D; --sun-soft:#FFF3D6;
+  --line:rgba(12,43,69,.12);
+  --radius:16px;
+  --shadow:0 16px 36px -16px rgba(12,43,69,.22);
+  --shadow-sm:0 8px 20px -10px rgba(12,43,69,.18);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Inter",system-ui,sans-serif;
+  background:var(--bg);color:var(--ink);line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%}
+a{color:var(--blue)}
+::selection{background:var(--sun);color:var(--ink)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+
+/* ---------- header + side drawer ---------- */
+header.site{
+  position:sticky;top:0;z-index:60;
+  background:rgba(245,250,254,.94);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
+.brand svg{width:44px;height:44px;flex:none}
+.brand-name{font-family:"Sora",sans-serif;font-weight:800;font-size:1.18rem;line-height:1.1;letter-spacing:.2px}
+.brand-name small{display:block;font-weight:600;font-size:.64rem;letter-spacing:2.6px;text-transform:uppercase;color:var(--blue)}
+.bar-actions{display:flex;align-items:center;gap:10px}
+.call-btn{
+  display:inline-flex;align-items:center;gap:8px;background:var(--blue);color:#fff;
+  text-decoration:none;font-weight:700;padding:11px 20px;border-radius:999px;
+  box-shadow:var(--shadow-sm);transition:background .18s,transform .18s;white-space:nowrap;
+}
+.call-btn:hover{background:var(--blue-deep);transform:translateY(-2px)}
+.burger{
+  display:inline-flex;flex-direction:column;justify-content:center;align-items:center;gap:6px;
+  background:var(--ink);border:0;cursor:pointer;border-radius:12px;width:48px;height:48px;
+}
+.burger span{display:block;width:22px;height:3px;border-radius:3px;background:#fff;transition:.25s}
+.burger small{color:#fff;font-size:.58rem;font-weight:700;letter-spacing:1.6px;text-transform:uppercase}
+.scrim{
+  position:fixed;inset:0;background:rgba(12,43,69,.45);z-index:70;
+  opacity:0;pointer-events:none;transition:opacity .28s;
+}
+.scrim.show{opacity:1;pointer-events:auto}
+nav.main{
+  position:fixed;top:0;left:0;bottom:0;width:min(340px,86vw);z-index:80;
+  background:var(--paper);box-shadow:24px 0 60px -20px rgba(12,43,69,.35);
+  transform:translateX(-105%);transition:transform .32s cubic-bezier(.2,.8,.25,1);
+  display:flex;flex-direction:column;padding:26px 26px 34px;
+}
+nav.main.open{transform:translateX(0)}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.drawer-head strong{font-family:"Sora",sans-serif;font-size:1.05rem}
+.drawer-close{background:var(--blue-soft);border:0;width:40px;height:40px;border-radius:12px;cursor:pointer;font-size:1.2rem;color:var(--blue-deep)}
+nav.main a.navlink{
+  display:flex;align-items:center;justify-content:space-between;
+  text-decoration:none;color:var(--ink);font-weight:600;font-size:1.06rem;
+  padding:14px 16px;border-radius:12px;transition:background .18s;
+}
+nav.main a.navlink:hover{background:var(--blue-soft)}
+nav.main a.navlink.active{background:var(--ink);color:#fff}
+nav.main a.navlink .arr{color:var(--blue)}
+nav.main a.navlink.active .arr{color:var(--sun)}
+.drawer-call{margin-top:auto;padding-top:20px;border-top:1px solid var(--line)}
+.drawer-call p{font-size:.86rem;color:var(--ink-soft);margin-bottom:10px}
+.drawer-call .call-btn{width:100%;justify-content:center}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- hero (split) ---------- */
+.hero{padding:64px 0 56px;position:relative;overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center}
+.kicker{
+  display:inline-flex;align-items:center;gap:9px;background:var(--paper);
+  border:1px solid var(--line);border-radius:999px;padding:7px 18px;
+  font-size:.82rem;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--blue-deep);
+  margin-bottom:20px;box-shadow:var(--shadow-sm);
+}
+.kicker .dot{width:9px;height:9px;border-radius:50%;background:var(--teal)}
+h1{font-family:"Sora",sans-serif;font-weight:800;font-size:clamp(2.4rem,5vw,3.9rem);line-height:1.05;letter-spacing:-.6px;margin-bottom:18px}
+h1 .hl{color:var(--blue);position:relative;white-space:nowrap}
+h1 .hl svg{position:absolute;left:0;bottom:-8px;width:100%;height:10px}
+.lede{font-size:1.1rem;color:var(--ink-soft);max-width:32rem;margin-bottom:26px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:24px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;
+  padding:14px 26px;border-radius:999px;font-size:1rem;transition:transform .18s,box-shadow .18s,background .18s;
+}
+.btn-solid{background:var(--blue);color:#fff;box-shadow:var(--shadow-sm)}
+.btn-solid:hover{background:var(--blue-deep);transform:translateY(-2px)}
+.btn-ghost{background:var(--paper);color:var(--ink);border:2px solid var(--line)}
+.btn-ghost:hover{border-color:var(--blue);color:var(--blue-deep);transform:translateY(-2px)}
+.hours-pill{
+  display:inline-flex;align-items:center;gap:10px;background:var(--ink);color:#fff;
+  padding:10px 20px;border-radius:999px;font-weight:600;font-size:.94rem;box-shadow:var(--shadow-sm);
+}
+.hours-pill .dot{width:10px;height:10px;border-radius:50%;background:#4ADE80;box-shadow:0 0 0 4px rgba(74,222,128,.22);animation:pulse 2s infinite}
+.hours-pill.closed .dot{background:#F87171;box-shadow:0 0 0 4px rgba(248,113,113,.22)}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+.hero-art{position:relative}
+.garment-stage{
+  background:linear-gradient(150deg,#FFFFFF,#E3F2FD);border-radius:28px;padding:44px;
+  box-shadow:var(--shadow);border:1px solid var(--line);position:relative;overflow:hidden;
+}
+.garment-stage::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 80% 12%, rgba(20,121,201,.18), transparent 46%)}
+.garment-stage svg{width:100%;height:auto;display:block;position:relative}
+.float-tag{
+  position:absolute;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow-sm);
+  border-radius:14px;padding:10px 16px;font-weight:700;font-size:.86rem;z-index:2;
+  display:flex;align-items:center;gap:8px;
+}
+.float-tag.t1{top:22px;left:-14px;transform:rotate(-4deg)}
+.float-tag.t2{bottom:26px;right:-8px;transform:rotate(3deg)}
+
+/* ---------- marquee ---------- */
+.marquee{background:var(--blue);color:#fff;overflow:hidden;padding:14px 0;margin:8px 0 0}
+.marquee-track{display:flex;width:max-content;animation:scroll 26s linear infinite}
+.marquee-track span{font-family:"Sora",sans-serif;font-weight:600;font-size:1rem;padding:0 24px;white-space:nowrap}
+.marquee-track span i{font-style:normal;color:var(--sun);padding-right:24px}
+@keyframes scroll{to{transform:translateX(-50%)}}
+
+/* ---------- sections ---------- */
+section.block{padding:60px 0}
+.sec-head{max-width:46rem;margin:0 auto 40px;text-align:center}
+.sec-head .eyebrow{font-size:.78rem;font-weight:700;letter-spacing:2.4px;text-transform:uppercase;color:var(--teal);display:block;margin-bottom:10px}
+h2{font-family:"Sora",sans-serif;font-weight:800;font-size:clamp(1.85rem,3.6vw,2.6rem);line-height:1.12;letter-spacing:-.4px;margin-bottom:12px}
+.sec-head p{color:var(--ink-soft)}
+
+/* card wall */
+.wall{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.wcard{
+  background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+  padding:26px 24px;box-shadow:var(--shadow-sm);transition:transform .2s,box-shadow .2s;
+  display:flex;flex-direction:column;gap:10px;
+}
+.wcard:hover{transform:translateY(-5px);box-shadow:var(--shadow)}
+.wcard .ic{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:var(--blue-soft)}
+.wcard:nth-child(3n+2) .ic{background:var(--teal-soft)}
+.wcard:nth-child(3n) .ic{background:var(--sun-soft)}
+.wcard .ic svg{width:26px;height:26px}
+.wcard h3{font-family:"Sora",sans-serif;font-size:1.08rem}
+.wcard p{color:var(--ink-soft);font-size:.95rem}
+.wcard .mini{font-size:.78rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--teal)}
+
+/* split teaser */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center}
+.split p{color:var(--ink-soft);margin-bottom:14px}
+.check-list{list-style:none;margin:20px 0;display:grid;gap:12px}
+.check-list li{display:flex;gap:12px;align-items:flex-start;font-weight:500}
+.check-list svg{flex:none;width:24px;height:24px;margin-top:2px}
+.stat-band{background:var(--ink);color:#fff;border-radius:24px;padding:40px;display:grid;grid-template-columns:repeat(3,1fr);gap:24px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.stat-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 88% 8%, rgba(20,121,201,.5), transparent 52%)}
+.stat{position:relative;text-align:center}
+.stat strong{font-family:"Sora",sans-serif;font-size:2.1rem;display:block;color:var(--sun)}
+.stat span{font-size:.9rem;color:#BFD7EA}
+
+/* ---------- tabs (services page) ---------- */
+.tabs{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:32px}
+.tab-btn{
+  font-family:"Sora",sans-serif;font-weight:700;font-size:.98rem;cursor:pointer;
+  border:2px solid var(--line);background:var(--paper);color:var(--ink);
+  padding:13px 26px;border-radius:999px;transition:.2s;
+}
+.tab-btn:hover{border-color:var(--blue)}
+.tab-btn.active{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:var(--shadow-sm)}
+.tab-panel{display:none}
+.tab-panel.active{display:block;animation:fadeIn .3s ease}
+.svc-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.svc{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow-sm)}
+.svc h3{font-family:"Sora",sans-serif;font-size:1.2rem;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.svc h3 .tag{font-family:"Inter",sans-serif;font-size:.68rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;background:var(--teal-soft);color:#0B6E62;padding:4px 12px;border-radius:999px}
+.svc p{color:var(--ink-soft);font-size:.96rem}
+.svc ul{list-style:none;margin-top:12px;display:grid;gap:8px;color:var(--ink-soft);font-size:.94rem}
+.svc ul li::before{content:"✓ ";color:var(--teal);font-weight:700}
+.note{
+  background:var(--sun-soft);border:1px dashed rgba(12,43,69,.3);border-radius:var(--radius);
+  padding:18px 24px;margin-top:26px;font-size:.94rem;color:#6B4E1F;
+}
+.note strong{color:var(--ink)}
+
+/* ---------- masonry gallery ---------- */
+.masonry{columns:3;column-gap:18px}
+.tile{
+  break-inside:avoid;margin-bottom:18px;border-radius:var(--radius);overflow:hidden;
+  background:var(--paper);border:1px solid var(--line);box-shadow:var(--shadow-sm);
+  transition:transform .2s;position:relative;
+}
+.tile:hover{transform:translateY(-4px)}
+.tile .art{display:flex;align-items:center;justify-content:center;position:relative}
+.tile .art svg{width:46%;height:auto;padding:26px 0;filter:drop-shadow(0 10px 12px rgba(12,43,69,.16))}
+.tile .cap{padding:14px 20px 18px}
+.tile .cap strong{font-family:"Sora",sans-serif;font-size:1.02rem;display:block}
+.tile .cap small{color:var(--ink-soft)}
+.tile .soon{
+  position:absolute;top:12px;right:12px;background:rgba(255,255,255,.9);font-size:.68rem;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;padding:4px 12px;border-radius:999px;color:var(--ink-soft);z-index:2;
+}
+
+/* ---------- reviews ---------- */
+.rev-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.rev{
+  background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+  padding:30px;box-shadow:var(--shadow-sm);position:relative;
+}
+.rev .stars{color:#F59E0B;font-size:1.15rem;letter-spacing:3px;margin-bottom:12px}
+.rev p{font-size:1rem;margin-bottom:14px}
+.rev cite{font-style:normal;font-weight:700;font-size:.84rem;color:var(--blue-deep);letter-spacing:.4px}
+.rev .sample{
+  position:absolute;top:16px;right:16px;font-size:.66rem;font-weight:700;letter-spacing:1.2px;
+  text-transform:uppercase;background:var(--blue-soft);color:var(--blue-deep);padding:4px 12px;border-radius:999px;
+}
+.rev.featured{background:var(--ink);color:#fff;border-color:var(--ink)}
+.rev.featured .sample{background:rgba(255,255,255,.16);color:var(--sun)}
+.rev.featured cite{color:var(--sun)}
+.rs-strip{margin:0 auto 34px;max-width:660px;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:20px 26px;text-align:center;box-shadow:var(--shadow-sm)}
+.rs-note{margin:0 0 14px;font-size:.95rem;color:var(--ink-soft)}
+.rs-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rs-btn{display:inline-block;background:var(--blue);color:#fff;padding:11px 26px;border-radius:999px;font-weight:700;text-decoration:none}
+.rs-btn:hover{background:var(--blue-deep)}
+.cta-band{background:linear-gradient(120deg,var(--blue),var(--blue-deep));border-radius:26px;color:#fff;padding:52px 40px;text-align:center;margin-top:44px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.cta-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 82% 18%, rgba(255,197,61,.4), transparent 50%)}
+.cta-band h2{color:#fff;position:relative}
+.cta-band p{color:#D6E9FA;position:relative;max-width:36rem;margin:0 auto 26px}
+.cta-band .btn-solid{background:#fff;color:var(--blue-deep);position:relative}
+.cta-band .btn-solid:hover{background:var(--sun-soft)}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:22px}
+.info-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm)}
+.info-card h3{font-family:"Sora",sans-serif;font-size:1.35rem;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.info-card h3 svg{width:28px;height:28px}
+.info-card p{color:var(--ink-soft);margin-bottom:8px}
+.info-card a.big{font-family:"Sora",sans-serif;font-size:1.45rem;font-weight:700;color:var(--blue-deep);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.hours-table{width:100%;border-collapse:collapse;font-size:.97rem}
+.hours-table td{padding:10px 6px;border-bottom:1px dashed var(--line)}
+.hours-table tr.today td{font-weight:800;color:var(--blue-deep)}
+.hours-table tr.today td:first-child::after{content:"· today";font-weight:700;color:var(--teal);margin-left:6px;font-size:.85rem}
+.hours-table td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.map-card{
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:340px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 44px, rgba(20,121,201,.16) 44px 46px),
+    repeating-linear-gradient(90deg, transparent 0 44px, rgba(20,121,201,.16) 44px 46px),
+    linear-gradient(140deg,#EAF5FD,#D6EAFB);
+  display:flex;align-items:center;justify-content:center;
+}
+.map-pin{
+  text-align:center;background:var(--paper);padding:26px 34px;border-radius:20px;box-shadow:var(--shadow);
+  max-width:80%;position:relative;
+}
+.map-pin::after{content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);border:14px solid transparent;border-top-color:#fff;border-bottom:0}
+.map-pin svg{width:44px;height:44px;margin-bottom:8px}
+.map-pin strong{font-family:"Sora",sans-serif;font-size:1.12rem;display:block}
+.map-pin small{color:var(--ink-soft)}
+.map-pin .btn{margin-top:14px}
+
+/* page hero strips */
+.strip{border-radius:26px;padding:52px 46px;color:#fff;position:relative;overflow:hidden;margin-bottom:40px;box-shadow:var(--shadow)}
+.strip::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(255,255,255,.2), transparent 52%)}
+.strip h2{color:#fff;font-size:clamp(1.9rem,3.8vw,2.8rem);position:relative;margin:6px 0 10px}
+.strip p{color:rgba(255,255,255,.88);max-width:36rem;position:relative}
+.strip .eyebrow{font-size:.78rem;font-weight:700;letter-spacing:2.4px;text-transform:uppercase;color:var(--sun);position:relative;display:block}
+.strip.s-services{background:linear-gradient(120deg,#1479C9,#0B4E80)}
+.strip.s-story{background:linear-gradient(120deg,#12A594,#0A6B5F)}
+.strip.s-gal{background:linear-gradient(120deg,#3B82C4,#1D3E66)}
+.strip.s-rev{background:linear-gradient(120deg,#0C2B45,#071A2C)}
+.strip.s-visit{background:linear-gradient(120deg,#0D5C9C,#083A66)}
+
+/* ---------- footer (minimal) ---------- */
+footer{background:var(--ink);color:#BFD7EA;margin-top:20px}
+.foot-min{max-width:640px;margin:0 auto;text-align:center;padding:52px 24px 26px}
+.foot-brand{display:inline-flex;align-items:center;gap:10px;margin-bottom:14px}
+.foot-brand svg{width:38px;height:38px}
+.foot-brand span{font-family:"Sora",sans-serif;font-weight:800;color:#fff;font-size:1.15rem}
+.foot-min p{font-size:.94rem;margin-bottom:8px}
+.foot-min a{color:var(--sun);text-decoration:none}
+.foot-min a:hover{text-decoration:underline}
+.foot-links{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin:18px 0}
+.foot-links a{color:#BFD7EA;font-weight:600;font-size:.92rem;text-decoration:none}
+.foot-links a:hover{color:#fff}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.12);padding:18px 24px 24px;text-align:center;font-size:.85rem;color:#8FA9C2}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:940px){
+  .hero-grid,.split,.visit-grid{grid-template-columns:1fr}
+  .wall{grid-template-columns:1fr 1fr}
+  .masonry{columns:2}
+  .rev-grid{grid-template-columns:1fr}
+  .stat-band{grid-template-columns:1fr}
+  .svc-grid{grid-template-columns:1fr}
+  .strip{padding:40px 28px}
+  .float-tag.t1{left:6px}
+}
+@media(max-width:600px){
+  .wall{grid-template-columns:1fr}
+  .masonry{columns:1}
+  .hero{padding:44px 0 40px}
+  .bar .call-btn{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="scrim" id="scrim"></div>
+
+<header class="site">
+  <div class="wrap bar">
+    <button class="burger" id="burger" aria-label="Open navigation menu" aria-expanded="false"><span></span><span></span><span></span><small>Menu</small></button>
+    <a class="brand" href="#home" data-page="home" aria-label="Bluesky cleaners and Alterations, home">
+      <svg viewBox="0 0 64 64" role="img" aria-label="Shirt logo"><circle cx="32" cy="32" r="29" fill="#1479C9"/><circle cx="32" cy="32" r="29" fill="none" stroke="#0C2B45" stroke-width="2"/><path d="M32 14 v4 M28 18 h8" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="M28 18 L16 26 L21 34 L26 30 V50 H38 V30 L43 34 L48 26 L36 18" fill="none" stroke="#fff" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M26 46 h12" stroke="#FFC53D" stroke-width="3" stroke-linecap="round"/></svg>
+      <span class="brand-name">Bluesky cleaners<small>and Alterations · New Haven</small></span>
+    </a>
+    <div class="bar-actions">
+      <a class="call-btn" href="tel:+12033896628">☎ (203) 389-6628</a>
+    </div>
+  </div>
+</header>
+
+<nav class="main" id="mainNav" aria-label="Main navigation">
+  <div class="drawer-head">
+    <strong>Explore</strong>
+    <button class="drawer-close" id="drawerClose" aria-label="Close navigation menu">✕</button>
+  </div>
+  <a class="navlink active" href="#home" data-page="home" aria-current="page">Home <span class="arr">→</span></a>
+  <a class="navlink" href="#services" data-page="services">Services <span class="arr">→</span></a>
+  <a class="navlink" href="#story" data-page="story">Our Story <span class="arr">→</span></a>
+  <a class="navlink" href="#gallery" data-page="gallery">Gallery <span class="arr">→</span></a>
+  <a class="navlink" href="#reviews" data-page="reviews">Reviews <span class="arr">→</span></a>
+  <a class="navlink" href="#visit" data-page="visit">Visit Us <span class="arr">→</span></a>
+  <div class="drawer-call">
+    <p>Questions about a garment or a fitting? Call the shop.</p>
+    <a class="call-btn" href="tel:+12033896628">☎ (203) 389-6628</a>
+  </div>
+</nav>
+
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="kicker"><span class="dot"></span>Chemical-free wetcleaning</span>
+        <h1>Crisp clothes.<br><span class="hl">Zero fuss.<svg viewBox="0 0 200 12" preserveAspectRatio="none" aria-hidden="true"><path d="M2 9 Q 50 2 100 7 T 198 5" fill="none" stroke="#12A594" stroke-width="5" stroke-linecap="round"/></svg></span></h1>
+        <p class="lede">Bluesky cleaners and Alterations is Whalley Ave's neighborhood spot for dry cleaning, careful alterations and honest tailoring. Fast when you need it, precise when it counts.</p>
+        <div class="cta-row">
+          <a class="btn btn-solid" href="#services" data-page="services">See Services →</a>
+          <a class="btn btn-ghost" href="https://www.google.com/maps/place/?q=place_id:ChIJlfG5ya7Z54kRpxnNrGsQVYY" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+        <span class="hours-pill" id="hoursPill"><span class="dot"></span><span id="hoursText">Checking today's hours…</span></span>
+      </div>
+      <div class="hero-art">
+        <div class="garment-stage">
+          <svg viewBox="0 0 320 300" role="img" aria-label="Illustration of a freshly pressed shirt on a hanger">
+            <ellipse cx="160" cy="272" rx="110" ry="14" fill="#0C2B45" opacity=".1"/>
+            <circle cx="160" cy="60" r="9" fill="none" stroke="#0C2B45" stroke-width="6"/>
+            <path d="M160 69 v18 M132 92 L160 78 L188 92" fill="none" stroke="#0C2B45" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M132 92 L96 118 L108 132 L126 120 V246 a8 8 0 008 8 h44 a8 8 0 008-8 V120 L212 132 L224 118 L188 92" fill="#FFFFFF" stroke="#0D5C9C" stroke-width="5" stroke-linejoin="round"/>
+            <path d="M132 92 L160 130 L188 92" fill="none" stroke="#0D5C9C" stroke-width="4"/>
+            <path d="M160 130 V254 M160 130 L146 150 M160 130 L174 150" stroke="#DDEFFD" stroke-width="4" fill="none" stroke-linecap="round"/>
+            <circle cx="160" cy="160" r="4" fill="#1479C9"/><circle cx="160" cy="188" r="4" fill="#1479C9"/><circle cx="160" cy="216" r="4" fill="#1479C9"/>
+            <path d="M70 60 q10 -14 24 -8 M250 210 q12 10 6 26" stroke="#12A594" stroke-width="5" fill="none" stroke-linecap="round" opacity=".7"/>
+            <circle cx="252" cy="66" r="18" fill="#FFC53D" opacity=".9"/>
+            <path d="M246 66 a6 6 0 006 6 M258 66 a6 6 0 00-6 6" stroke="#0C2B45" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".55"/>
+          </svg>
+        </div>
+        <div class="float-tag t1">✦ 4.5 stars on Google</div>
+        <div class="float-tag t2">✂ Alterations done right</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track" id="marqueeTrack">
+      <span><i>✦</i>Dry Cleaning</span><span><i>✦</i>Wetcleaning</span><span><i>✦</i>Alterations</span><span><i>✦</i>Tailoring</span><span><i>✦</i>Hems &amp; Repairs</span><span><i>✦</i>Suit Fittings</span><span><i>✦</i>Last-Minute Help</span>
+    </div>
+  </div>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow">Why Bluesky</span>
+        <h2>The cleaners your neighbors<br>actually recommend</h2>
+        <p>Based on 26 Google reviews: quick turnarounds, careful fittings and owners who treat your clothes like their own.</p>
+      </div>
+      <div class="wall">
+        <div class="wcard reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#0D5C9C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3.5 4.5 6 8 6 11.5a6 6 0 01-12 0C6 11 8.5 7.5 12 3z"/></svg></div>
+          <span class="mini">Chemical-free</span>
+          <h3>Gentle wetcleaning</h3>
+          <p>Garments cleaned with a chemical-free method that is kinder to fabrics, skin and the air in the shop.</p>
+        </div>
+        <div class="wcard reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#0B6E62" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.6"/><circle cx="6" cy="18" r="2.6"/><path d="M8.2 7.6L20 19M8.2 16.4L20 5"/></svg></div>
+          <span class="mini">Alterations</span>
+          <h3>Fitted like it was made for you</h3>
+          <p>Suit alterations taken to exact measurements. One reviewer finished a dress alteration in under 6 hours.</p>
+        </div>
+        <div class="wcard reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z"/></svg></div>
+          <span class="mini">When it is urgent</span>
+          <h3>Last-minute rescue</h3>
+          <p>Wedding this weekend? Interview tomorrow? This is the shop people call when the clock is ticking.</p>
+        </div>
+        <div class="wcard reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#0D5C9C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg></div>
+          <span class="mini">They call you</span>
+          <h3>Owners who pay attention</h3>
+          <p>If they spot an issue with your garment, they call you first. Service like that is why people switch to Bluesky.</p>
+        </div>
+        <div class="wcard reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#0B6E62" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 6.5c0-2-2.2-3-5-3s-5 1-5 3 2 2.6 5 3.2 5 1.3 5 3.3-2.2 3-5 3-5-1-5-3"/></svg></div>
+          <span class="mini">Fair prices</span>
+          <h3>Reasonable, every time</h3>
+          <p>Reviewers keep saying the same thing: quality work at prices that make sense. No surprises at pickup.</p>
+        </div>
+        <div class="wcard reveal">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-8 9 8M5 10v10h5v-6h4v6h5V10"/></svg></div>
+          <span class="mini">Local</span>
+          <h3>Right on Whalley Ave</h3>
+          <p>Easy drop-off on your way through Westville. Park, drop, done, and back to your day in minutes.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" style="padding-top:0">
+    <div class="wrap split">
+      <div class="reveal">
+        <span class="eyebrow">Cleaner in every sense</span>
+        <h2>Chemical-free cleaning<br>you can feel good about</h2>
+        <p>Bluesky cleans garments with a chemical-free wetcleaning method instead of harsh traditional solvents. That means softer fabrics, no chemical smell, and a gentler choice for sensitive skin.</p>
+        <ul class="check-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#12A594" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>No harsh dry cleaning chemicals on your clothes</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#12A594" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Gentler on delicates, silks and fine wool</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#12A594" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Fresh results without the chemical odor</li>
+        </ul>
+        <a class="btn btn-ghost" href="#story" data-page="story">Our story →</a>
+      </div>
+      <div class="stat-band reveal">
+        <div class="stat"><strong>4.5★</strong><span>Google rating</span></div>
+        <div class="stat"><strong>26</strong><span>Google reviews</span></div>
+        <div class="stat"><strong>6 hrs</strong><span>fastest recorded alteration</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="cta-band reveal">
+      <h2>Drop it off. Pick it up perfect.</h2>
+      <p>1321 Whalley Ave, New Haven, CT 06515. Open Monday to Friday 8 AM to 5:30 PM, Saturday 8:30 AM to 4 PM.</p>
+      <a class="btn btn-solid" href="tel:+12033896628">☎ Call (203) 389-6628</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-services">
+      <span class="eyebrow">What we do</span>
+      <h2>Cleaning, fitting<br>and everything between</h2>
+      <p>Pick a lane below. Every garment gets inspected by hand before it goes out the door.</p>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Service categories">
+      <button class="tab-btn active" data-tab="dry" role="tab" aria-selected="true">Dry Cleaning</button>
+      <button class="tab-btn" data-tab="alter" role="tab" aria-selected="false">Alterations &amp; Tailoring</button>
+      <button class="tab-btn" data-tab="extra" role="tab" aria-selected="false">Fittings &amp; Repairs</button>
+    </div>
+
+    <div class="tab-panel active" id="tab-dry" role="tabpanel">
+      <div class="svc-grid">
+        <div class="svc reveal">
+          <h3>Chemical-free wetcleaning <span class="tag">Signature</span></h3>
+          <p>Our signature method. Garments are cleaned without harsh dry cleaning chemicals, so fabrics stay soft and colors stay true.</p>
+          <ul><li>Everyday shirts, blouses and slacks</li><li>Delicates, silk and fine wool</li><li>No chemical odor when you pick up</li></ul>
+        </div>
+        <div class="svc reveal">
+          <h3>Dry cleaning</h3>
+          <p>Classic dry cleaning for suits, dresses, coats and anything the label says to treat with care.</p>
+          <ul><li>Suits and blazers</li><li>Dresses and formal wear</li><li>Coats and outerwear</li></ul>
+        </div>
+        <div class="svc reveal">
+          <h3>Press and finish</h3>
+          <p>Crisp lines, sharp collars. Bring in the shirt you already washed and we will make it look brand new.</p>
+          <ul><li>Shirt pressing</li><li>Pleats and creases set right</li><li>Ready to wear off the hanger</li></ul>
+        </div>
+        <div class="svc reveal">
+          <h3>Stain attention</h3>
+          <p>Spills happen. We look at every stain individually and treat it before the garment goes through.</p>
+          <ul><li>Spot treatment on arrival</li><li>Honest word if a stain may not lift</li></ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-alter" role="tabpanel">
+      <div class="svc-grid">
+        <div class="svc reveal">
+          <h3>Suit alterations <span class="tag">Most loved</span></h3>
+          <p>Measured to the millimeter, finished exactly the way you asked. Reviewers say their suits came back fitting like custom work.</p>
+          <ul><li>Jacket sides, sleeves and shoulders</li><li>Trouser hems, waist and taper</li><li>Precise measurements, pinned with you</li></ul>
+        </div>
+        <div class="svc reveal">
+          <h3>Dress alterations</h3>
+          <p>From a simple hem to a full reshape before the big day. One customer had a dress finished in under 6 hours.</p>
+          <ul><li>Hems, straps and necklines</li><li>Taking in or letting out</li><li>Rush service when time is short</li></ul>
+        </div>
+        <div class="svc reveal">
+          <h3>Tailoring</h3>
+          <p>Off the rack rarely fits perfectly. A tailor makes it yours, adjusting the garment to your frame.</p>
+          <ul><li>Waist, seat and rise adjustments</li><li>Lining and seam work</li></ul>
+        </div>
+        <div class="svc reveal">
+          <h3>Wedding and event prep</h3>
+          <p>Bring the outfit, tell us the date, and we will work backward from it so everything is ready in time.</p>
+          <ul><li>Bridal party and formal wear</li><li>Final fitting check before pickup</li></ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-extra" role="tabpanel">
+      <div class="svc-grid">
+        <div class="svc reveal">
+          <h3>Hems</h3>
+          <p>Jeans, trousers, skirts, curtains of fabric: a clean hem changes how the whole garment hangs.</p>
+          <ul><li>Original-look jean hems</li><li>Blind hems for dress pants</li></ul>
+        </div>
+        <div class="svc reveal">
+          <h3>Repairs</h3>
+          <p>Rips, loose buttons, busted zippers and tired seams get a second life instead of a trash bag.</p>
+          <ul><li>Zipper replacement</li><li>Button and seam repair</li><li>Patching and reinforcement</li></ul>
+        </div>
+        <div class="svc reveal">
+          <h3>Personal fittings</h3>
+          <p>Walk in, get pinned, get measured. The owners take the measurements themselves and check every detail.</p>
+          <ul><li>Measured with you in the shop</li><li>Clear pickup date before you leave</li></ul>
+        </div>
+        <div class="svc reveal">
+          <h3>Not sure? Just ask</h3>
+          <p>Bring the garment in and we will tell you straight what can be done, what it costs, and how long it takes.</p>
+          <ul><li>Free honest advice at the counter</li><li>Call ahead: (203) 389-6628</li></ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="note reveal">
+      <strong>Good to know:</strong> turnaround depends on the garment and the season. Simple jobs are often back in a day or two, and rush service is available when the calendar is tight. Prices are quoted at drop-off, always before work begins.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-story">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-story">
+      <span class="eyebrow">Our story</span>
+      <h2>A small shop with<br>a careful hand</h2>
+      <p>Bluesky cleaners and Alterations is a locally run shop on Whalley Ave where the owners still do the measuring, the pinning and the inspecting themselves.</p>
+    </div>
+
+    <div class="split" style="margin-bottom:52px">
+      <div class="reveal">
+        <span class="eyebrow">How we work</span>
+        <h2>Measured twice,<br>cleaned once</h2>
+        <p>Every garment that comes over the counter gets looked at by a person, not just a tag gun. Stains get spotted before cleaning. Alterations get pinned while you are standing there. If something looks off, the owners call you before they do anything.</p>
+        <p>That is the whole philosophy: pay attention at the start so there are no surprises at pickup. It is why reviewers talk about switching from other cleaners and never looking back.</p>
+        <p>And it is why the shop chose a chemical-free wetcleaning method: cleaner for your clothes, cleaner for the people handling them all day.</p>
+      </div>
+      <div class="stat-band reveal">
+        <div class="stat"><strong>100%</strong><span>garments hand inspected</span></div>
+        <div class="stat"><strong>0</strong><span>harsh chemicals in our wetclean</span></div>
+        <div class="stat"><strong>1</strong><span>call before any surprise</span></div>
+      </div>
+    </div>
+
+    <div class="wall" style="margin-bottom:52px">
+      <div class="wcard reveal">
+        <span class="mini">Reviewers say</span>
+        <h3>"Finished my dress in less than 6 hours"</h3>
+        <p>A last-minute alteration, done fast and affordable. That is the Bluesky reputation in one sentence.</p>
+      </div>
+      <div class="wcard reveal">
+        <span class="mini">Reviewers say</span>
+        <h3>"Done exactly what I was looking for"</h3>
+        <p>A suit alteration measured and finished to the customer's exact ask. Precision is the product.</p>
+      </div>
+      <div class="wcard reveal">
+        <span class="mini">Reviewers say</span>
+        <h3>"They will call you if they find an issue"</h3>
+        <p>Owners who flag a problem before it becomes your problem. That is how trust gets built.</p>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <div class="cta-band reveal">
+        <h2>Come see the difference.</h2>
+        <p>1321 Whalley Ave, New Haven. Bring the garment, we will take it from there.</p>
+        <a class="btn btn-solid" href="#visit" data-page="visit">Plan your visit →</a>
+      </div>
+      <div style="height:56px"></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-gal">
+      <span class="eyebrow">Gallery</span>
+      <h2>Fresh from the press</h2>
+      <p>Artistic previews of the craft. Real photos of our work are on the way.</p>
+    </div>
+
+    <div class="masonry">
+      <div class="tile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#DDEFFD,#BFE0F8)">
+          <svg viewBox="0 0 100 100"><path d="M50 12 v6 M42 20 h16" stroke="#0C2B45" stroke-width="3.4" stroke-linecap="round"/><path d="M42 20 L28 30 L34 38 L40 33 V80 H60 V33 L66 38 L72 30 L58 20" fill="#fff" stroke="#0D5C9C" stroke-width="3.4" stroke-linejoin="round"/><path d="M42 20 L50 34 L58 20" fill="none" stroke="#0D5C9C" stroke-width="2.4"/></svg>
+        </div>
+        <div class="cap"><strong>Pressed shirts</strong><small>Crisp collars, sharp lines</small></div>
+      </div>
+      <div class="tile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#D6F3EE,#B5E7DD)">
+          <svg viewBox="0 0 100 100"><circle cx="30" cy="30" r="13" fill="none" stroke="#0B6E62" stroke-width="3.4"/><circle cx="30" cy="70" r="13" fill="none" stroke="#0B6E62" stroke-width="3.4"/><path d="M40 36 L74 68 M40 64 L74 32" stroke="#1479C9" stroke-width="4" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>Alterations bench</strong><small>Measured, pinned, perfected</small></div>
+      </div>
+      <div class="tile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#FFF3D6,#FFE4A6)">
+          <svg viewBox="0 0 100 100"><path d="M30 78 L50 22 L70 78 Z" fill="#fff" stroke="#B45309" stroke-width="3.4" stroke-linejoin="round"/><path d="M38 62 h24 M42 50 h16" stroke="#1479C9" stroke-width="3" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>Dress care</strong><small>Formal wear, handled gently</small></div>
+      </div>
+      <div class="tile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#E4EAF2,#CBD8E6)">
+          <svg viewBox="0 0 100 100"><path d="M34 20 h32 l-4 60 a8 8 0 01-8 8 h-8 a8 8 0 01-8-8 Z" fill="#fff" stroke="#0C2B45" stroke-width="3.4"/><path d="M40 34 q10 8 20 0 M40 48 q10 8 20 0 M40 62 q10 8 20 0" stroke="#12A594" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>Wetcleaning</strong><small>Chemical-free, fabric first</small></div>
+      </div>
+      <div class="tile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#DDEFFD,#C4E2F8)">
+          <svg viewBox="0 0 100 100"><rect x="24" y="30" width="52" height="44" rx="8" fill="#fff" stroke="#0D5C9C" stroke-width="3.4"/><path d="M32 30 v-8 a6 6 0 016-6 h24 a6 6 0 016 6 v8" fill="none" stroke="#0D5C9C" stroke-width="3.4"/><circle cx="50" cy="52" r="7" fill="none" stroke="#12A594" stroke-width="3"/></svg>
+        </div>
+        <div class="cap"><strong>Ready for pickup</strong><small>Bagged, tagged, pressed</small></div>
+      </div>
+      <div class="tile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#D6F3EE,#AEE3D8)">
+          <svg viewBox="0 0 100 100"><path d="M20 70 L50 30 L80 70" fill="none" stroke="#0B6E62" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M32 70 v-14 M50 70 v-24 M68 70 v-14" stroke="#1479C9" stroke-width="3" stroke-linecap="round"/><circle cx="50" cy="22" r="5" fill="#FFC53D"/></svg>
+        </div>
+        <div class="cap"><strong>Suit fittings</strong><small>Shoulders, sleeves, waist</small></div>
+      </div>
+      <div class="tile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#FFF3D6,#FFDFA0)">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="30" fill="#fff" stroke="#B45309" stroke-width="3.4"/><path d="M50 30 v20 l14 10" fill="none" stroke="#1479C9" stroke-width="3.4" stroke-linecap="round"/><circle cx="50" cy="50" r="4" fill="#0C2B45"/></svg>
+        </div>
+        <div class="cap"><strong>Rush service</strong><small>When the clock is ticking</small></div>
+      </div>
+      <div class="tile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#E4EAF2,#D3DDE9)">
+          <svg viewBox="0 0 100 100"><path d="M28 62 q22 -34 44 0 q-22 10 -44 0Z" fill="#fff" stroke="#0C2B45" stroke-width="3.4"/><path d="M38 56 l8 8 14 -16" stroke="#12A594" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="cap"><strong>Hand inspected</strong><small>Checked before it leaves</small></div>
+      </div>
+    </div>
+
+    <div class="note reveal" style="margin-top:10px">
+      <strong>Coming soon:</strong> real photos from the shop and the pressing table. The illustrations above are artistic previews.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-rev">
+      <span class="eyebrow">Reviews</span>
+      <h2>Neighbors keep<br>the secret badly</h2>
+      <p>Rated around 4.5 stars. Here is what people keep saying about this little shop.</p>
+    </div>
+
+    <div class="rs-strip reveal">
+      <p class="rs-note">Review themes on this page are paraphrased from public feedback. Open the source to read current reviews and ratings.</p>
+      <div class="rs-links"><a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJlfG5ya7Z54kRpxnNrGsQVYY" target="_blank" rel="noopener">See reviews on Google</a></div>
+    </div>
+
+    <div class="rev-grid">
+      <div class="rev featured reveal">
+        <span class="sample">Sample review</span>
+        <div class="stars">★★★★★</div>
+        <p>Based on 26 Google reviews: service is fast, reliable and excellent quality. The owners are super nice and will call you if they find an issue with your garments. Switched from another cleaner and never looked back.</p>
+        <cite>Paraphrased from Google reviews</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="sample">Sample review</span>
+        <div class="stars">★★★★★</div>
+        <p>Based on 26 Google reviews: went in for a last-minute alteration and they finished a dress in less than 6 hours, very affordable. The best when time is short.</p>
+        <cite>Paraphrased from Google reviews</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="sample">Sample review</span>
+        <div class="stars">★★★★★</div>
+        <p>Based on 26 Google reviews: brought in a suit for alteration, they took the measurements and finished it exactly as asked. Precise work that stands out from other cleaners.</p>
+        <cite>Paraphrased from Google reviews</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="sample">Sample review</span>
+        <div class="stars">★★★★★</div>
+        <p>Based on 26 Google reviews: reasonable prices and real satisfaction with the results, for dry cleaning and alterations alike. A strong reputation for saving the day.</p>
+        <cite>Paraphrased from Google reviews</cite>
+      </div>
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Had a great pickup? Tell the neighborhood.</h2>
+      <p>Your review helps a small local shop keep thriving. It takes a minute and it means a lot.</p>
+      <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJlfG5ya7Z54kRpxnNrGsQVYY" target="_blank" rel="noopener">★ Leave us a Google review</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-visit">
+      <span class="eyebrow">Visit us</span>
+      <h2>Drop it off on<br>Whalley Ave</h2>
+      <p>Easy to reach in the Westville area of New Haven, with parking nearby. Bring the garment, we will take it from there.</p>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#0D5C9C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Find us</h3>
+        <p><strong>Bluesky cleaners and Alterations</strong><br>1321 Whalley Ave<br>New Haven, CT 06515</p>
+        <p>Look for us on Whalley Ave in Westville.<br>Street parking nearby.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#0D5C9C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg> Call us</h3>
+        <p>Questions about a garment, a fitting or a rush job:</p>
+        <a class="big" href="tel:+12033896628">(203) 389-6628</a>
+        <p style="margin-top:10px">Calling ahead about rush alterations<br>saves you a trip.</p>
+      </div>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#0D5C9C" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Hours</h3>
+        <table class="hours-table" id="hoursTable">
+          <tr><td>Monday</td><td>8:00 AM to 5:30 PM</td></tr>
+          <tr><td>Tuesday</td><td>8:00 AM to 5:30 PM</td></tr>
+          <tr><td>Wednesday</td><td>8:00 AM to 5:30 PM</td></tr>
+          <tr><td>Thursday</td><td>8:00 AM to 5:30 PM</td></tr>
+          <tr><td>Friday</td><td>8:00 AM to 5:30 PM</td></tr>
+          <tr><td>Saturday</td><td>8:30 AM to 4:00 PM</td></tr>
+          <tr><td>Sunday</td><td>Closed</td></tr>
+        </table>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <svg viewBox="0 0 24 24" fill="#0D5C9C"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#fff"/></svg>
+          <strong>1321 Whalley Ave</strong>
+          <small>New Haven, CT 06515</small><br>
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJlfG5ya7Z54kRpxnNrGsQVYY" target="_blank" rel="noopener">Get Directions →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="note reveal" style="margin-bottom:56px">
+      <strong>First visit?</strong> Bring the garment as is. We will look it over with you at the counter, quote the price and the pickup date before anything begins.
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-min">
+    <div class="foot-brand">
+      <svg viewBox="0 0 64 64" role="img" aria-label="Shirt logo"><circle cx="32" cy="32" r="29" fill="#1479C9"/><path d="M32 14 v4 M28 18 h8" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="M28 18 L16 26 L21 34 L26 30 V50 H38 V30 L43 34 L48 26 L36 18" fill="none" stroke="#fff" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"/></svg>
+      <span>Bluesky cleaners and Alterations</span>
+    </div>
+    <p>1321 Whalley Ave, New Haven, CT 06515<br><a href="tel:+12033896628">(203) 389-6628</a></p>
+    <div class="foot-links">
+      <a href="#services" data-page="services">Services</a>
+      <a href="#gallery" data-page="gallery">Gallery</a>
+      <a href="#reviews" data-page="reviews">Reviews</a>
+      <a href="#visit" data-page="visit">Visit Us</a>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <span>© Bluesky cleaners and Alterations</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "story", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+    var scrim = document.getElementById("scrim");
+    if(scrim){ scrim.classList.remove("show"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+      var scrim = document.getElementById("scrim");
+      if(scrim){ scrim.classList.toggle("show", open); }
+    });
+  }
+  var drawerClose = document.getElementById("drawerClose");
+  if(drawerClose){ drawerClose.addEventListener("click", closeMenu); }
+  var scrimEl = document.getElementById("scrim");
+  if(scrimEl){ scrimEl.addEventListener("click", closeMenu); }
+
+  /* ---------- marquee: duplicate for seamless loop ---------- */
+  var track = document.getElementById("marqueeTrack");
+  if(track){ track.innerHTML += track.innerHTML; }
+
+  /* ---------- service tabs ---------- */
+  var tabBtns = document.querySelectorAll(".tab-btn");
+  for(var t = 0; t < tabBtns.length; t++){
+    tabBtns[t].addEventListener("click", function(){
+      var key = this.getAttribute("data-tab");
+      for(var a = 0; a < tabBtns.length; a++){
+        tabBtns[a].classList.toggle("active", tabBtns[a] === this);
+        tabBtns[a].setAttribute("aria-selected", tabBtns[a] === this ? "true" : "false");
+      }
+      var panels = document.querySelectorAll(".tab-panel");
+      for(var b = 0; b < panels.length; b++){
+        panels[b].classList.toggle("active", panels[b].id === "tab-" + key);
+      }
+      observeReveals();
+    });
+  }
+
+  /* ---------- live hours (America/New_York) ---------- */
+  var HOURS = {0:null,1:[8,17.5],2:[8,17.5],3:[8,17.5],4:[8,17.5],5:[8,17.5],6:[8.5,16]};
+  var DOW = {"Sun":0,"Mon":1,"Tue":2,"Wed":3,"Thu":4,"Fri":5,"Sat":6};
+  var DAYNAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  function fmt(h){
+    var ap = h < 12 ? "AM" : "PM";
+    var hh = Math.floor(h) % 12;
+    if(hh === 0){ hh = 12; }
+    var mm = (h % 1 === 0.5) ? ":30" : ":00";
+    return hh + mm + " " + ap;
+  }
+  try{
+    var parts = new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",weekday:"short",hour:"numeric",hour12:false,minute:"numeric"}).formatToParts(new Date());
+    var wd = "Mon", hr = 12, mn = 0;
+    parts.forEach(function(p){
+      if(p.type === "weekday"){ wd = p.value; }
+      if(p.type === "hour"){ hr = parseInt(p.value, 10) % 24; }
+      if(p.type === "minute"){ mn = parseInt(p.value, 10); }
+    });
+    var day = DOW[wd] !== undefined ? DOW[wd] : 1;
+    var nowH = hr + mn / 60;
+    var pill = document.getElementById("hoursPill");
+    var txt = document.getElementById("hoursText");
+    var todayH = HOURS[day];
+    if(pill && txt){
+      if(todayH && nowH >= todayH[0] && nowH < todayH[1]){
+        txt.textContent = "Open now · until " + fmt(todayH[1]) + " today";
+      } else {
+        pill.classList.add("closed");
+        if(todayH && nowH < todayH[0]){
+          txt.textContent = "Opens today at " + fmt(todayH[0]);
+        } else {
+          var nd = (day + 1) % 7;
+          while(!HOURS[nd]){ nd = (nd + 1) % 7; }
+          var label = ((day + 1) % 7 === nd) ? "tomorrow" : DAYNAMES[nd];
+          txt.textContent = "Opens " + label + " at " + fmt(HOURS[nd][0]);
+        }
+      }
+    }
+    var rows = document.querySelectorAll("#hoursTable tr");
+    var idx = (day + 6) % 7; /* rows run Mon..Sun */
+    if(rows[idx]){ rows[idx].classList.add("today"); }
+  }catch(e){ /* leave default pill text */ }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
