@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Merv's Auto Repair · Auto Repair Shop, Lorton, VA</title>
+<meta name="description" content="Merv's Auto Repair at 6829 Hill Park Dr, Lorton, VA. Servicing Northern Virginia since 1987: brakes, diagnostics, engine and transmission work on all makes and models. Call (703) 644-1900.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pit:#16181b; --pit-2:#1f2226; --steel:#2a2e34; --steel-2:#343a41;
+  --cream:#f5f3ec; --cream-2:#ebe7da;
+  --red:#e02b2b; --red-deep:#b31212;
+  --amber:#f5a623; --amber-soft:rgba(245,166,35,.14);
+  --ink:#191b1e; --muted:#5c626a;
+  --line:#d8d3c4;
+  --radius:14px;
+  --shadow:0 20px 44px -18px rgba(22,24,27,.45);
+  --shadow-sm:0 10px 24px -12px rgba(22,24,27,.3);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Archivo",system-ui,sans-serif;
+  background:var(--cream);
+  background-image:repeating-linear-gradient(45deg, rgba(22,24,27,.028) 0 2px, transparent 2px 26px);
+  color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased;
+}
+img{max-width:100%}
+a{color:var(--red-deep)}
+::selection{background:var(--amber);color:var(--ink)}
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+h1,h2,h3,.condensed{font-family:"Barlow Condensed",sans-serif}
+
+/* ---------- top bar (minimal; nav lives in the drawer) ---------- */
+.topbar{
+  position:sticky;top:0;z-index:60;
+  background:var(--pit);color:var(--cream);
+  border-bottom:3px solid var(--red);
+}
+.topbar .bar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--cream)}
+.brand svg{width:44px;height:44px;flex:none}
+.brand-name{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:1.35rem;line-height:1;letter-spacing:.5px}
+.brand-name small{display:block;font-family:"Archivo",sans-serif;font-weight:600;font-size:.6rem;letter-spacing:3.5px;text-transform:uppercase;color:var(--amber)}
+.top-cta{display:flex;align-items:center;gap:10px}
+.call-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--red);color:#fff;text-decoration:none;font-weight:700;font-size:.95rem;
+  padding:10px 18px;border-radius:8px;transition:background .18s,transform .18s;white-space:nowrap;
+}
+.call-btn:hover{background:var(--red-deep);transform:translateY(-1px)}
+.burger{
+  display:inline-flex;align-items:center;gap:10px;background:none;border:2px solid var(--steel-2);
+  color:var(--cream);cursor:pointer;padding:9px 16px;border-radius:8px;font-weight:600;font-size:.95rem;
+}
+.burger:hover{border-color:var(--amber)}
+.burger .lines{display:inline-block}
+.burger .lines span{display:block;width:24px;height:3px;border-radius:2px;background:var(--amber);margin:4px 0;transition:.25s}
+.burger[aria-expanded="true"] .lines span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.burger[aria-expanded="true"] .lines span:nth-child(2){opacity:0}
+.burger[aria-expanded="true"] .lines span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+/* ---------- side drawer ---------- */
+.drawer-veil{
+  position:fixed;inset:0;background:rgba(22,24,27,.6);z-index:70;opacity:0;pointer-events:none;transition:opacity .25s;
+}
+.drawer-veil.open{opacity:1;pointer-events:auto}
+.drawer{
+  position:fixed;top:0;left:0;bottom:0;width:min(360px,88vw);z-index:71;
+  background:var(--pit-2);color:var(--cream);
+  transform:translateX(-105%);transition:transform .32s cubic-bezier(.22,.8,.3,1);
+  display:flex;flex-direction:column;border-right:3px solid var(--red);
+}
+.drawer.open{transform:translateX(0)}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:22px 26px;border-bottom:1px solid var(--steel)}
+.drawer-head .brand-name{font-size:1.2rem}
+.drawer-close{background:none;border:0;color:var(--cream);font-size:1.6rem;cursor:pointer;line-height:1;padding:6px}
+.drawer-close:hover{color:var(--amber)}
+.drawer nav{padding:18px 14px;display:flex;flex-direction:column;gap:4px;overflow:auto;flex:1}
+.drawer nav a{
+  display:flex;align-items:center;gap:14px;text-decoration:none;color:var(--cream);
+  padding:13px 14px;border-radius:10px;font-family:"Barlow Condensed",sans-serif;font-weight:700;
+  font-size:1.35rem;letter-spacing:.8px;text-transform:uppercase;
+}
+.drawer nav a .num{
+  font-size:.8rem;color:var(--amber);font-family:"Archivo",sans-serif;font-weight:700;min-width:26px;
+  border:1px solid var(--steel-2);border-radius:6px;text-align:center;padding:2px 0;
+}
+.drawer nav a:hover{background:var(--steel)}
+.drawer nav a.active{background:var(--red);color:#fff}
+.drawer nav a.active .num{color:#fff;border-color:rgba(255,255,255,.5)}
+.drawer-foot{padding:22px 26px;border-top:1px solid var(--steel);font-size:.9rem;color:#a9adb4}
+.drawer-foot a{color:var(--amber);text-decoration:none;font-weight:700}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- split hero ---------- */
+.hero{background:var(--pit);color:var(--cream);position:relative;overflow:hidden}
+.hero::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    repeating-linear-gradient(-45deg, transparent 0 26px, rgba(245,166,35,.07) 26px 52px),
+    radial-gradient(circle at 88% 12%, rgba(224,43,43,.28), transparent 46%);
+}
+.hero-grid{position:relative;display:grid;grid-template-columns:1.05fr .95fr;gap:52px;align-items:center;padding:74px 0 70px}
+.kicker{
+  display:inline-flex;align-items:center;gap:10px;background:var(--amber-soft);
+  border:1px solid rgba(245,166,35,.5);color:var(--amber);
+  font-weight:700;font-size:.78rem;letter-spacing:2.5px;text-transform:uppercase;
+  padding:8px 18px;border-radius:999px;margin-bottom:20px;
+}
+.kicker .flag{display:inline-block;width:16px;height:10px;background:repeating-linear-gradient(90deg,var(--amber) 0 8px,var(--pit-2) 8px 16px);border:1px solid var(--amber)}
+h1{font-weight:800;font-size:clamp(2.9rem,6.4vw,5rem);line-height:.98;letter-spacing:.5px;text-transform:uppercase;margin-bottom:18px}
+h1 .red{color:var(--red)}
+h1 .amber{color:var(--amber)}
+.lede{font-size:1.1rem;color:#c9cdd3;max-width:32rem;margin-bottom:26px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:26px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;
+  padding:14px 26px;border-radius:8px;font-size:1rem;transition:transform .18s,background .18s,border-color .18s;
+}
+.btn-solid{background:var(--red);color:#fff;box-shadow:var(--shadow-sm)}
+.btn-solid:hover{background:var(--red-deep);transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:var(--cream);border:2px solid var(--steel-2)}
+.btn-ghost:hover{border-color:var(--amber);color:var(--amber);transform:translateY(-2px)}
+.hours-pill{
+  display:inline-flex;align-items:center;gap:10px;background:var(--steel);color:var(--cream);
+  padding:10px 20px;border-radius:999px;font-weight:600;font-size:.95rem;
+}
+.hours-pill .dot{width:10px;height:10px;border-radius:50%;background:#7bc47f;box-shadow:0 0 0 4px rgba(123,196,127,.25);animation:pulse 2s infinite}
+.hours-pill.closed .dot{background:#e02b2b;box-shadow:0 0 0 4px rgba(224,43,43,.25)}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+.hero-art{position:relative}
+.garage-card{
+  position:relative;background:linear-gradient(150deg,var(--steel-2),var(--steel));
+  border-radius:22px;padding:36px;box-shadow:var(--shadow);border:1px solid rgba(255,255,255,.08);overflow:hidden;
+}
+.garage-card::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(-45deg, transparent 0 30px, rgba(245,166,35,.09) 30px 60px);
+}
+.garage-card svg{width:100%;height:auto;display:block;position:relative;z-index:1;animation:floaty 6s ease-in-out infinite}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.stamp{
+  position:absolute;bottom:-16px;right:20px;background:var(--amber);color:var(--ink);
+  font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:1rem;letter-spacing:1px;text-transform:uppercase;
+  padding:10px 20px;border-radius:8px;transform:rotate(3deg);box-shadow:var(--shadow-sm);z-index:2;
+}
+
+/* ---------- sections ---------- */
+section.block{padding:60px 0}
+.sec-head{max-width:46rem;margin:0 auto 42px;text-align:center}
+.sec-tag{font-weight:700;font-size:.78rem;letter-spacing:3px;text-transform:uppercase;color:var(--red-deep)}
+h2{font-weight:800;font-size:clamp(2rem,4.4vw,3rem);line-height:1.02;letter-spacing:.4px;text-transform:uppercase;margin:10px 0 12px}
+.sec-head p{color:var(--muted)}
+.dark-band{background:var(--pit);color:var(--cream)}
+.dark-band .sec-head p{color:#c9cdd3}
+.dark-band h2{color:#fff}
+
+/* cards */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.card{
+  background:#fff;border-radius:var(--radius);padding:30px 26px;box-shadow:var(--shadow-sm);
+  border-left:8px solid var(--red);transition:transform .2s,box-shadow .2s;position:relative;
+}
+.card:nth-child(2){border-left-color:var(--amber)}
+.card:nth-child(3){border-left-color:var(--steel-2)}
+.card:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+.card .icon{width:54px;height:54px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;background:rgba(224,43,43,.1)}
+.card:nth-child(2) .icon{background:var(--amber-soft)}
+.card:nth-child(3) .icon{background:rgba(22,24,27,.07)}
+.card .icon svg{width:30px;height:30px}
+.card h3{font-size:1.45rem;font-weight:800;letter-spacing:.4px;text-transform:uppercase;margin-bottom:8px}
+.card p{color:var(--muted);font-size:.97rem}
+.dark-band .card{background:var(--pit-2);border:1px solid var(--steel);border-left:8px solid var(--red);color:var(--cream)}
+.dark-band .card:nth-child(2){border-left-color:var(--amber)}
+.dark-band .card:nth-child(3){border-left-color:#5c626a}
+.dark-band .card p{color:#a9adb4}
+
+/* marquee */
+.marquee{background:var(--red);color:#fff;overflow:hidden;padding:14px 0;transform:rotate(-.8deg) scale(1.02);margin:26px 0}
+.marquee-track{display:flex;width:max-content;animation:scroll 26s linear infinite}
+.marquee-track span{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:1.2rem;letter-spacing:1.5px;text-transform:uppercase;padding:0 26px;white-space:nowrap}
+.marquee-track span i{font-style:normal;color:var(--amber);padding-right:26px}
+@keyframes scroll{to{transform:translateX(-50%)}}
+
+/* split */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center}
+.split h2{margin-top:8px}
+.split p{color:var(--muted);margin-bottom:14px}
+.check-list{list-style:none;margin:20px 0;display:grid;gap:12px}
+.check-list li{display:flex;gap:12px;align-items:flex-start;font-weight:500}
+.check-list svg{flex:none;width:24px;height:24px;margin-top:2px}
+.quote-card{background:var(--pit);color:var(--cream);border-radius:20px;padding:40px 36px;position:relative;box-shadow:var(--shadow);border-top:6px solid var(--amber)}
+.quote-card::before{content:"\201C";position:absolute;top:2px;left:26px;font-family:"Barlow Condensed",sans-serif;font-size:5rem;color:var(--amber);opacity:.6}
+.quote-card p{font-size:1.3rem;line-height:1.5;margin-bottom:14px;position:relative;font-weight:500}
+.quote-card cite{font-style:normal;font-weight:700;color:var(--amber);font-size:.85rem;letter-spacing:2px;text-transform:uppercase}
+
+/* ---------- services: leaders board ---------- */
+.leaders{display:grid;gap:14px;max-width:900px;margin:0 auto}
+.leader{
+  display:grid;grid-template-columns:76px 1fr auto;gap:22px;align-items:center;
+  background:#fff;border-radius:var(--radius);padding:20px 26px;box-shadow:var(--shadow-sm);
+  border:1px solid var(--line);transition:transform .18s,box-shadow .18s;position:relative;overflow:hidden;
+}
+.leader:hover{transform:translateX(6px);box-shadow:var(--shadow)}
+.leader .rank{
+  font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:2.6rem;color:var(--cream);
+  -webkit-text-stroke:1.6px var(--red-deep);line-height:1;text-align:center;
+}
+.leader h3{font-size:1.5rem;font-weight:800;letter-spacing:.4px;text-transform:uppercase;margin-bottom:4px}
+.leader p{color:var(--muted);font-size:.95rem}
+.leader .badge{
+  font-size:.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  background:var(--amber-soft);color:#8a5a12;border:1px solid rgba(245,166,35,.6);
+  padding:6px 14px;border-radius:999px;white-space:nowrap;
+}
+.leader.leader-dark{background:var(--pit-2);color:var(--cream);border-color:var(--steel)}
+.leader.leader-dark p{color:#a9adb4}
+.leader.leader-dark .rank{-webkit-text-stroke:1.6px var(--amber);color:var(--pit-2)}
+.price-note{background:var(--amber-soft);border:2px dashed rgba(245,166,35,.6);border-radius:var(--radius);padding:18px 24px;margin-top:26px;font-size:.95rem;color:#6b4a12}
+.price-note strong{color:var(--red-deep)}
+
+/* ---------- gallery: carousel ---------- */
+.carousel-wrap{position:relative}
+.carousel{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;padding:8px 4px 24px;scrollbar-width:thin}
+.carousel::-webkit-scrollbar{height:10px}
+.carousel::-webkit-scrollbar-thumb{background:var(--red);border-radius:99px}
+.carousel::-webkit-scrollbar-track{background:var(--line);border-radius:99px}
+.slide{
+  flex:0 0 min(340px,82vw);scroll-snap-align:start;border-radius:var(--radius);overflow:hidden;
+  background:#fff;box-shadow:var(--shadow-sm);border:1px solid var(--line);position:relative;
+}
+.slide .art{aspect-ratio:4/3.2;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.slide .art svg{width:46%;height:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.2))}
+.slide .cap{padding:16px 20px 20px}
+.slide .cap strong{font-family:"Barlow Condensed",sans-serif;font-size:1.35rem;font-weight:800;letter-spacing:.4px;text-transform:uppercase;display:block}
+.slide .cap small{color:var(--muted)}
+.slide .soon{
+  position:absolute;top:12px;right:12px;background:rgba(22,24,27,.85);color:#fff;font-size:.68rem;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;padding:5px 13px;border-radius:999px;
+}
+.car-btns{display:flex;gap:12px;justify-content:center;margin-top:6px}
+.car-btn{
+  background:var(--pit);color:#fff;border:0;cursor:pointer;width:52px;height:52px;border-radius:50%;
+  font-size:1.3rem;line-height:1;transition:background .18s,transform .18s;
+}
+.car-btn:hover{background:var(--red);transform:scale(1.06)}
+
+/* ---------- reviews ---------- */
+.rev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.rev{background:#fff;border-radius:var(--radius);padding:30px;box-shadow:var(--shadow-sm);position:relative;border-top:6px solid var(--steel-2)}
+.rev .stars{color:var(--amber);font-size:1.15rem;letter-spacing:3px;margin-bottom:12px}
+.rev p{font-size:1.02rem;margin-bottom:14px}
+.rev cite{font-style:normal;font-weight:700;font-size:.85rem;color:var(--red-deep);letter-spacing:.5px}
+.rev.featured{background:var(--pit);color:var(--cream);border-top-color:var(--red)}
+.rev.featured cite{color:var(--amber)}
+.rev.featured p{color:#efe9db}
+.rev .sample-badge{
+  display:inline-block;background:var(--amber-soft);color:#8a5a12;font-size:.7rem;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;padding:4px 12px;border-radius:999px;margin-bottom:10px;
+}
+.cta-band{background:linear-gradient(120deg,var(--red),var(--red-deep));border-radius:22px;color:#fff;padding:48px;text-align:center;margin-top:44px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.cta-band::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(-45deg, transparent 0 30px, rgba(255,255,255,.06) 30px 60px)}
+.cta-band h2{color:#fff;position:relative}
+.cta-band p{color:#ffd9d4;position:relative;max-width:36rem;margin:0 auto 24px}
+.cta-band .btn-solid{background:#fff;color:var(--red-deep);position:relative}
+.cta-band .btn-solid:hover{background:var(--amber);color:var(--ink)}
+.rs-strip{margin:26px auto 34px;max-width:660px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 24px;text-align:center;box-shadow:var(--shadow-sm)}
+.rs-note{margin:0 0 12px;font-size:.95rem;color:var(--muted);line-height:1.55}
+.rs-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rs-btn{display:inline-block;background:var(--red);color:#fff;padding:11px 26px;border-radius:8px;font-weight:700;text-decoration:none;font-size:.95rem;line-height:1.2}
+.rs-btn:hover{background:var(--red-deep)}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-bottom:26px}
+.info-card{background:#fff;border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm);border:1px solid var(--line)}
+.info-card h3{font-size:1.6rem;font-weight:800;letter-spacing:.4px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.info-card h3 svg{width:28px;height:28px}
+.info-card p{color:var(--muted);margin-bottom:8px}
+.info-card a.big{font-family:"Barlow Condensed",sans-serif;font-size:1.7rem;font-weight:800;letter-spacing:.5px;color:var(--red-deep);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.hours-table{width:100%;border-collapse:collapse;font-size:.98rem}
+.hours-table td{padding:10px 6px;border-bottom:1px dashed var(--line)}
+.hours-table tr.today td{font-weight:800;color:var(--red-deep)}
+.hours-table tr.today td:first-child::after{content:"\00B7 today";font-family:"Barlow Condensed",sans-serif;font-size:1.1rem;color:var(--red);margin-left:6px}
+.hours-table td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.map-card{
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:340px;
+  background:
+    linear-gradient(rgba(224,43,43,.06), rgba(224,43,43,.06)),
+    repeating-linear-gradient(0deg, transparent 0 46px, rgba(22,24,27,.12) 46px 48px),
+    repeating-linear-gradient(90deg, transparent 0 46px, rgba(22,24,27,.12) 46px 48px),
+    linear-gradient(140deg,#e9e4d4,#dcd5bd);
+  display:flex;align-items:center;justify-content:center;
+}
+.map-pin{text-align:center;background:#fff;padding:26px 34px;border-radius:16px;box-shadow:var(--shadow);max-width:78%;position:relative;border-top:6px solid var(--red)}
+.map-pin svg{width:44px;height:44px;margin-bottom:8px}
+.map-pin strong{font-family:"Barlow Condensed",sans-serif;font-size:1.4rem;font-weight:800;letter-spacing:.4px;text-transform:uppercase;display:block}
+.map-pin small{color:var(--muted)}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- strip hero (inner pages) ---------- */
+.strip{border-radius:20px;padding:52px 44px;color:#fff;position:relative;overflow:hidden;margin-bottom:42px;box-shadow:var(--shadow)}
+.strip::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(-45deg, transparent 0 30px, rgba(255,255,255,.07) 30px 60px)}
+.strip h2{color:#fff;font-size:clamp(2.1rem,4.4vw,3.1rem);position:relative;margin:6px 0 10px}
+.strip p{color:rgba(255,255,255,.88);max-width:36rem;position:relative}
+.strip .sec-tag{color:var(--amber);position:relative}
+.strip.s-services{background:linear-gradient(120deg,#16181b,#2a2e34)}
+.strip.s-story{background:linear-gradient(120deg,#8f1d1d,#e02b2b)}
+.strip.s-gal{background:linear-gradient(120deg,#1f2226,#3a4048)}
+.strip.s-rev{background:linear-gradient(120deg,#b31212,#e02b2b)}
+.strip.s-visit{background:linear-gradient(120deg,#2a2e34,#16181b)}
+
+/* ---------- footer: big type ---------- */
+footer{background:var(--pit);color:#c9cdd3;margin-top:20px;border-top:6px solid var(--red)}
+.foot-big{padding:64px 0 8px;text-align:center}
+.foot-big .big-name{
+  font-family:"Barlow Condensed",sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:2px;
+  font-size:clamp(3rem,10vw,7.5rem);line-height:.95;color:#fff;margin-bottom:10px;
+}
+.foot-big .big-name .alt{color:var(--red)}
+.foot-tag{color:var(--amber);font-weight:700;letter-spacing:3px;text-transform:uppercase;font-size:.85rem;margin-bottom:30px}
+.foot-links{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:10px}
+.foot-links a{color:#a9adb4;text-decoration:none;font-weight:600;font-size:.95rem;padding:8px 14px;border-radius:8px}
+.foot-links a:hover{background:var(--steel);color:#fff}
+.foot-contact{padding:26px 0 8px;text-align:center;font-size:.98rem}
+.foot-contact a{color:var(--amber);text-decoration:none;font-weight:700}
+.foot-contact a:hover{text-decoration:underline}
+.foot-bottom{border-top:1px solid var(--steel);padding:22px 0 28px;display:flex;justify-content:center;font-size:.85rem;color:#8b9098}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:940px){
+  .hero-grid,.split,.visit-grid{grid-template-columns:1fr}
+  .cards{grid-template-columns:1fr 1fr}
+  .rev-grid{grid-template-columns:1fr}
+  .strip{padding:40px 28px}
+  .leader{grid-template-columns:56px 1fr;gap:16px}
+  .leader .badge{grid-column:2}
+}
+@media(max-width:600px){
+  .cards{grid-template-columns:1fr}
+  .hero-grid{padding:52px 0 60px}
+  .cta-band{padding:36px 24px}
+  .top-cta .call-btn span.num{display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap bar">
+    <a class="brand" href="#home" data-page="home" aria-label="Merv's Auto Repair, home">
+      <svg viewBox="0 0 64 64" role="img" aria-label="Wrench logo"><rect x="6" y="6" width="52" height="52" rx="10" fill="#e02b2b"/><path d="M41.5 17.5a9.5 9.5 0 00-12.9 11.6L17 40.7a5.6 5.6 0 107.9 7.9l11.6-11.6a9.5 9.5 0 0011.6-12.9l-6.1 6.1-4.6-4.6 4.1-4.1z" fill="#fff"/><path d="M12 52h40" stroke="#f5a623" stroke-width="3.4" stroke-linecap="round"/></svg>
+      <span class="brand-name">Merv's<small>Auto Repair · Lorton</small></span>
+    </a>
+    <div class="top-cta">
+      <a class="call-btn" href="tel:+17036441900" aria-label="Call Merv's Auto Repair">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg>
+        <span class="num">(703) 644-1900</span>
+      </a>
+      <button class="burger" id="drawerToggle" aria-label="Open navigation menu" aria-expanded="false">
+        <span class="lines"><span></span><span></span><span></span></span> Menu
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="drawer-veil" id="drawerVeil"></div>
+<aside class="drawer" id="drawer" aria-label="Site navigation">
+  <div class="drawer-head">
+    <span class="brand-name">Merv's <small style="display:block;font-family:Archivo,sans-serif;font-weight:600;font-size:.6rem;letter-spacing:3.5px;color:#f5a623">PIT CREW MENU</small></span>
+    <button class="drawer-close" id="drawerClose" aria-label="Close navigation menu">&times;</button>
+  </div>
+  <nav aria-label="Main navigation">
+    <a href="#home" data-page="home" class="active" aria-current="page"><span class="num">01</span>Home</a>
+    <a href="#services" data-page="services"><span class="num">02</span>Services</a>
+    <a href="#story" data-page="story"><span class="num">03</span>Our Story</a>
+    <a href="#gallery" data-page="gallery"><span class="num">04</span>Garage</a>
+    <a href="#reviews" data-page="reviews"><span class="num">05</span>Reviews</a>
+    <a href="#visit" data-page="visit"><span class="num">06</span>Visit Us</a>
+  </nav>
+  <div class="drawer-foot">
+    6829 Hill Park Dr, Lorton, VA 22079<br>
+    <a href="tel:+17036441900">(703) 644-1900</a><br>
+    Mon - Fri · 8 AM - 8 PM
+  </div>
+</aside>
+
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="kicker"><span class="flag"></span> Northern Virginia · Since 1987</span>
+        <h1>Pull in.<br><span class="red">We</span> fix it<br><span class="amber">right.</span></h1>
+        <p class="lede">Merv's Auto Repair has kept Northern Virginia moving since 1987. All makes and models, honest diagnostics, and a crew that treats your car like their own.</p>
+        <div class="cta-row">
+          <a class="btn btn-solid" href="#services" data-page="services">See Services</a>
+          <a class="btn btn-ghost" href="#visit" data-page="visit">Get Directions</a>
+        </div>
+        <span class="hours-pill" id="hoursPill"><span class="dot"></span><span id="hoursText">Checking today's hours…</span></span>
+      </div>
+      <div class="hero-art">
+        <div class="garage-card">
+          <svg viewBox="0 0 320 260" role="img" aria-label="Illustration of a car on a lift in a garage">
+            <rect x="10" y="20" width="300" height="220" rx="14" fill="#343a41"/>
+            <rect x="10" y="20" width="300" height="220" rx="14" fill="none" stroke="#f5a623" stroke-width="2" stroke-dasharray="10 8" opacity=".6"/>
+            <rect x="140" y="150" width="40" height="70" fill="#e02b2b"/>
+            <rect x="126" y="140" width="68" height="12" rx="4" fill="#f5a623"/>
+            <path d="M70 168 q50 -44 100 0 q50 44 100 0" fill="none" stroke="#5c626a" stroke-width="8" stroke-linecap="round"/>
+            <g>
+              <rect x="88" y="96" width="144" height="44" rx="12" fill="#e02b2b"/>
+              <path d="M100 96 l16 -22 h88 l16 22 z" fill="#e02b2b"/>
+              <rect x="112" y="80" width="30" height="14" rx="4" fill="#f5f3ec"/>
+              <rect x="148" y="80" width="60" height="14" rx="4" fill="#f5f3ec"/>
+              <rect x="96" y="104" width="128" height="8" rx="4" fill="#fff" opacity=".25"/>
+              <circle cx="120" cy="148" r="16" fill="#16181b"/><circle cx="120" cy="148" r="8" fill="#5c626a"/>
+              <circle cx="200" cy="148" r="16" fill="#16181b"/><circle cx="200" cy="148" r="8" fill="#5c626a"/>
+            </g>
+            <rect x="40" y="220" width="240" height="8" rx="4" fill="#16181b"/>
+            <circle cx="60" cy="52" r="5" fill="#f5a623"/><circle cx="260" cy="52" r="5" fill="#f5a623"/>
+          </svg>
+        </div>
+        <div class="stamp">4.9 stars · 230+ Google reviews</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track" id="marqueeTrack">
+      <span><i>///</i>Diagnostics</span><span><i>///</i>Brakes</span><span><i>///</i>Oil Change</span><span><i>///</i>Engine Repair</span><span><i>///</i>Transmission</span><span><i>///</i>Diesel Trucks</span><span><i>///</i>All Makes &amp; Models</span>
+    </div>
+  </div>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-tag">Why drivers pick Merv's</span>
+        <h2>No games. Just good wrench work.</h2>
+        <p>Reviews keep coming back to the same words: honest, thorough, and fair. The kind of shop that explains the problem before reaching for your wallet.</p>
+      </div>
+      <div class="cards">
+        <div class="card reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#e02b2b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg></div>
+          <h3>Since 1987</h3>
+          <p>Nearly four decades keeping Northern Virginia on the road. That is not luck, it is reputation earned one repair at a time.</p>
+        </div>
+        <div class="card reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#8a5a12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
+          <h3>Diagnostics done right</h3>
+          <p>They look at the whole picture, not just the symptom. Drivers say the team finds the real cause where other shops guess.</p>
+        </div>
+        <div class="card reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#5c626a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <h3>All makes, all models</h3>
+          <p>Commuter cars, family SUVs, diesel trucks. If it rolls into the bay, this crew has likely fixed its twin before.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="dark-band">
+    <section class="block">
+      <div class="wrap split">
+        <div class="reveal">
+          <span class="sec-tag" style="color:#f5a623">The Merv's way</span>
+          <h2 style="color:#fff">Your car, fixed<br>without the runaround</h2>
+          <p style="color:#c9cdd3">Customers describe a shop that stays late to help with urgent issues, skips the upsell, and charges fairly compared to the dealer. It gets busy, which is why regulars recommend making an appointment.</p>
+          <ul class="check-list">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#f5a623" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span style="color:#efe9db">Honest quotes before any work begins</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#f5a623" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span style="color:#efe9db">Full-view diagnostics, not tunnel vision</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#f5a623" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span style="color:#efe9db">Visa, Mastercard, Discover, cash and check welcome</span></li>
+          </ul>
+          <a class="btn btn-solid" href="#story" data-page="story" style="margin-top:10px">Our Story</a>
+        </div>
+        <div class="quote-card reveal">
+          <p>No frills. All competence and no games. I don't take my car or truck anywhere else.</p>
+          <cite>Paraphrased from a Google review</cite>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section class="block" style="padding-top:0">
+    <div class="wrap">
+      <div class="cta-band reveal">
+        <h2>Hear something funny under the hood?</h2>
+        <p>6829 Hill Park Dr, Lorton, VA 22079. Open Mon - Fri, 8 AM - 8 PM. Call ahead and the bay is yours.</p>
+        <a class="btn btn-solid" href="tel:+17036441900">Call (703) 644-1900</a>
+      </div>
+      <div style="height:56px"></div>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-services">
+      <span class="sec-tag">The service board</span>
+      <h2>What we fix,<br>ranked by demand</h2>
+      <p>From check-engine lights to full engine rebuilds. These are the jobs that keep the bays humming.</p>
+    </div>
+
+    <div class="leaders">
+      <div class="leader reveal">
+        <div class="rank">01</div>
+        <div><h3>Diagnostics</h3><p>Check-engine lights, mystery noises, warning lamps. Full-view troubleshooting that finds the real cause, not just the symptom.</p></div>
+        <span class="badge">Most booked</span>
+      </div>
+      <div class="leader leader-dark reveal">
+        <div class="rank">02</div>
+        <div><h3>Brake Service</h3><p>Pads, rotors, calipers and fluid. Stopping power you can trust on I-95, rain or shine.</p></div>
+        <span class="badge">Safety first</span>
+      </div>
+      <div class="leader reveal">
+        <div class="rank">03</div>
+        <div><h3>Oil Change &amp; Maintenance</h3><p>Routine service, filters, fluids and tire rotations that keep your cost of ownership low.</p></div>
+        <span class="badge">Keep it running</span>
+      </div>
+      <div class="leader leader-dark reveal">
+        <div class="rank">04</div>
+        <div><h3>Engine Repair &amp; Rebuilding</h3><p>From head gaskets to full rebuilds. Major mechanical work with a major-mechanics track record.</p></div>
+        <span class="badge">Heavy duty</span>
+      </div>
+      <div class="leader reveal">
+        <div class="rank">05</div>
+        <div><h3>Transmission Service</h3><p>Automatic transmission diagnosis, service and repair, done with care instead of guesswork.</p></div>
+        <span class="badge">Specialty</span>
+      </div>
+      <div class="leader leader-dark reveal">
+        <div class="rank">06</div>
+        <div><h3>Diesel Truck Service</h3><p>Truck owners call this shop out by name: diesel pickups diagnosed and fixed correctly the first time.</p></div>
+        <span class="badge">Truck approved</span>
+      </div>
+      <div class="leader reveal">
+        <div class="rank">07</div>
+        <div><h3>Electrical &amp; Battery</h3><p>Starting and charging systems, wiring gremlins, batteries and alternators sorted fast.</p></div>
+        <span class="badge">No surprises</span>
+      </div>
+      <div class="leader leader-dark reveal">
+        <div class="rank">08</div>
+        <div><h3>Tires &amp; Alignment</h3><p>Tires, rotations, balancing and alignments that keep wear even and steering straight.</p></div>
+        <span class="badge">Smooth ride</span>
+      </div>
+      <div class="leader reveal">
+        <div class="rank">09</div>
+        <div><h3>Heating &amp; Cooling</h3><p>AC recharge and repair, plus radiators and cooling systems for Virginia summers.</p></div>
+        <span class="badge">Stay cool</span>
+      </div>
+    </div>
+
+    <div class="price-note reveal">
+      <strong>Straight talk on pricing:</strong> every job is quoted before work begins, and customers consistently say the final bill beats the dealer. Call <a href="tel:+17036441900" style="color:#b31212;font-weight:700">(703) 644-1900</a> for an estimate on your repair.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-story">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-story">
+      <span class="sec-tag">Our story</span>
+      <h2>Turning wrenches<br>in Lorton since 1987</h2>
+      <p>One shop, one promise: keep your investment running well while keeping your cost of ownership low.</p>
+    </div>
+
+    <div class="split" style="margin-bottom:56px">
+      <div class="reveal">
+        <span class="sec-tag">The shop</span>
+        <h2>Nearly four decades,<br>same honest garage</h2>
+        <p>Merv's Auto Repair has been servicing Northern Virginia since 1987, and it shows in everything from the spotless bays to the way the team talks to customers: straight, respectful, and without talking down to anyone.</p>
+        <p>They handle all makes and models of automobiles, from daily commuters to hard-working diesel trucks, and the mission has never changed. Help you keep your investment running well while keeping your cost of ownership low.</p>
+        <p>Regulars say it best: efficient, honest, and kind. The kind of shop you recommend to your neighbor without thinking twice.</p>
+      </div>
+      <div class="quote-card reveal">
+        <p>Professional. Trustworthy. The team has all been great to work with.</p>
+        <cite>Paraphrased from a Google review</cite>
+      </div>
+    </div>
+
+    <div class="cards" style="margin-bottom:56px">
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#e02b2b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg></div>
+        <h3>Reputation first</h3>
+        <p>A 4.9-star average across 230+ Google reviews, built over decades, not bought overnight.</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#8a5a12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div>
+        <h3>A crew, not a counter</h3>
+        <p>Drivers remember the team by name and say they go above and beyond, even helping with urgent issues near closing time.</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#5c626a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l2.5 2.5"/><circle cx="12" cy="12" r="9"/></svg></div>
+        <h3>Busy for a reason</h3>
+        <p>The shop stays full, so book ahead. That kind of demand only comes from years of getting it right.</p>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <div class="cta-band reveal">
+        <h2>Join the regulars.</h2>
+        <p>6829 Hill Park Dr, Lorton, VA 22079. Open Mon - Fri, 8 AM - 8 PM. Call ahead for an appointment.</p>
+        <a class="btn btn-solid" href="#visit" data-page="visit">Plan your visit</a>
+      </div>
+      <div style="height:56px"></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-gal">
+      <span class="sec-tag">The garage</span>
+      <h2>Inside the shop</h2>
+      <p>Swipe through the bays. Illustrations below are previews; real shop photos are on the way.</p>
+    </div>
+
+    <div class="carousel-wrap">
+      <div class="carousel" id="garageCarousel">
+        <div class="slide reveal">
+          <span class="soon">Photo soon</span>
+          <div class="art" style="background:linear-gradient(140deg,#343a41,#16181b)">
+            <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="32" fill="none" stroke="#f5a623" stroke-width="8"/><circle cx="50" cy="50" r="14" fill="#e02b2b"/><circle cx="50" cy="50" r="5" fill="#f5f3ec"/><path d="M50 18 v10 M50 72 v10 M18 50 h10 M72 50 h10" stroke="#f5f3ec" stroke-width="5" stroke-linecap="round"/></svg>
+          </div>
+          <div class="cap"><strong>Brake Service</strong><small>Pads, rotors and stopping power</small></div>
+        </div>
+        <div class="slide reveal">
+          <span class="soon">Photo soon</span>
+          <div class="art" style="background:linear-gradient(140deg,#e02b2b,#b31212)">
+            <svg viewBox="0 0 100 100"><path d="M30 42 h40 l-6 34 a8 8 0 01-8 7 h-12 a8 8 0 01-8 -7 Z" fill="#f5f3ec"/><path d="M30 42 h40" stroke="#f5a623" stroke-width="5" stroke-linecap="round"/><path d="M40 32 q4 -8 0 -14 M52 32 q4 -8 0 -14 M64 32 q4 -8 0 -14" stroke="#f5f3ec" stroke-width="4" fill="none" stroke-linecap="round" opacity=".8"/><rect x="42" y="56" width="16" height="14" rx="2" fill="#e02b2b"/></svg>
+          </div>
+          <div class="cap"><strong>Oil Changes</strong><small>Quick, clean, on the record</small></div>
+        </div>
+        <div class="slide reveal">
+          <span class="soon">Photo soon</span>
+          <div class="art" style="background:linear-gradient(140deg,#4a5158,#2a2e34)">
+            <svg viewBox="0 0 100 100"><rect x="18" y="30" width="64" height="44" rx="8" fill="#f5f3ec"/><path d="M28 44 l10 -10 8 8 12 -12 8 8 8 -8" stroke="#e02b2b" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="18" y="62" width="64" height="12" rx="6" fill="#f5a623"/><path d="M30 68 h40" stroke="#16181b" stroke-width="3" stroke-linecap="round" opacity=".5"/></svg>
+          </div>
+          <div class="cap"><strong>Diagnostics</strong><small>Full-view troubleshooting</small></div>
+        </div>
+        <div class="slide reveal">
+          <span class="soon">Photo soon</span>
+          <div class="art" style="background:linear-gradient(140deg,#f5a623,#c47f12)">
+            <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="30" fill="#16181b"/><circle cx="50" cy="50" r="30" fill="none" stroke="#f5f3ec" stroke-width="4"/><path d="M50 26 a24 24 0 015 47" fill="none" stroke="#e02b2b" stroke-width="6" stroke-linecap="round"/><circle cx="50" cy="50" r="9" fill="#f5f3ec"/><circle cx="50" cy="50" r="3.5" fill="#16181b"/></svg>
+          </div>
+          <div class="cap"><strong>Transmissions</strong><small>Automatic service and repair</small></div>
+        </div>
+        <div class="slide reveal">
+          <span class="soon">Photo soon</span>
+          <div class="art" style="background:linear-gradient(140deg,#5c626a,#343a41)">
+            <svg viewBox="0 0 100 100"><rect x="22" y="34" width="56" height="32" rx="8" fill="#e02b2b"/><rect x="28" y="40" width="44" height="8" rx="4" fill="#f5f3ec" opacity=".85"/><circle cx="36" cy="72" r="9" fill="#16181b"/><circle cx="64" cy="72" r="9" fill="#16181b"/><path d="M22 50 h-8 v-6 M78 50 h8 v-6" stroke="#f5a623" stroke-width="4" stroke-linecap="round"/></svg>
+          </div>
+          <div class="cap"><strong>Diesel Trucks</strong><small>A specialty drivers name by name</small></div>
+        </div>
+        <div class="slide reveal">
+          <span class="soon">Photo soon</span>
+          <div class="art" style="background:linear-gradient(140deg,#16181b,#343a41)">
+            <svg viewBox="0 0 100 100"><rect x="30" y="24" width="40" height="52" rx="8" fill="#e02b2b"/><path d="M38 34 h24 M38 44 h24 M38 54 h16" stroke="#f5f3ec" stroke-width="4" stroke-linecap="round"/><circle cx="50" cy="66" r="5" fill="#f5a623"/><rect x="42" y="76" width="16" height="8" rx="4" fill="#5c626a"/></svg>
+          </div>
+          <div class="cap"><strong>Electrical &amp; Battery</strong><small>Starting, charging, wiring</small></div>
+        </div>
+      </div>
+      <div class="car-btns">
+        <button class="car-btn" id="carPrev" aria-label="Previous garage photos">&#8592;</button>
+        <button class="car-btn" id="carNext" aria-label="Next garage photos">&#8594;</button>
+      </div>
+    </div>
+
+    <div class="price-note reveal" style="margin-top:26px">
+      <strong>Coming soon:</strong> real photos from the bays at 6829 Hill Park Dr. The illustrations above are previews. The real thing smells like a proper garage.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-rev">
+      <span class="sec-tag">Reviews</span>
+      <h2>Drivers keep<br>the score</h2>
+      <p>A 4.9-star average across 230+ Google reviews. Here is what people keep saying.</p>
+    </div>
+    <div class="rs-strip">
+      <p class="rs-note">Review themes on this page are paraphrased from public feedback. Open the source to read current reviews and ratings.</p>
+      <div class="rs-links"><a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJT6V_8Fett4kRhAu6_bS_slE" target="_blank" rel="noopener">See reviews on Google</a></div>
+    </div>
+
+    <div class="rev-grid">
+      <div class="rev featured reveal">
+        <div class="stars">★★★★★</div>
+        <p>No frills. All competence and no games. I don't take my car or truck anywhere else.</p>
+        <cite>via Google</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>Excellent service and diagnostics. They looked over my new used car thoroughly, and I recommend making an appointment since they stay busy.</p>
+        <cite>via Google</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>Absolutely the best auto mechanic ever. Honest and the most reliable shop I have seen in years.</p>
+        <cite>via Google</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>Excellent service and repair. They see the overall problem, not just one part, and then they fix it right.</p>
+        <cite>via Google</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="sample-badge">Sample</span>
+        <div class="stars">★★★★★</div>
+        <p>Quoted me fairly, called before doing anything extra, and the car has run perfectly since. This is my shop now.</p>
+        <cite>Sample review</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="sample-badge">Sample</span>
+        <div class="stars">★★★★★</div>
+        <p>They stayed late to get me back on the road and would not charge me for the extra look. You do not forget that.</p>
+        <cite>Sample review</cite>
+      </div>
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Fixed up right? Say so.</h2>
+      <p>Your review keeps an honest local shop busy. It takes a minute, and it means the world to the crew.</p>
+      <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJT6V_8Fett4kRhAu6_bS_slE" target="_blank" rel="noopener">Leave a Google review</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-visit">
+      <span class="sec-tag">Visit us</span>
+      <h2>Pull into the bay</h2>
+      <p>On Hill Park Dr in Lorton, just off the Fairfax County Parkway corridor. Customer parking on site.</p>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#e02b2b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Find us</h3>
+        <p><strong>Merv's Auto Repair</strong><br>6829 Hill Park Dr<br>Lorton, VA 22079</p>
+        <p>Customer parking on site.<br>Appointments recommended, the shop stays busy.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#e02b2b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg> Call us</h3>
+        <p>Estimates, appointments, and questions:</p>
+        <a class="big" href="tel:+17036441900">(703) 644-1900</a>
+        <p style="margin-top:10px">Call ahead and the bay is yours.</p>
+      </div>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#e02b2b" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Hours</h3>
+        <table class="hours-table" id="hoursTable">
+          <tr><td>Monday</td><td>8:00 AM - 8:00 PM</td></tr>
+          <tr><td>Tuesday</td><td>8:00 AM - 8:00 PM</td></tr>
+          <tr><td>Wednesday</td><td>8:00 AM - 8:00 PM</td></tr>
+          <tr><td>Thursday</td><td>8:00 AM - 8:00 PM</td></tr>
+          <tr><td>Friday</td><td>8:00 AM - 8:00 PM</td></tr>
+          <tr><td>Saturday</td><td>Call for hours</td></tr>
+          <tr><td>Sunday</td><td>Call for hours</td></tr>
+        </table>
+        <p style="margin-top:10px;font-size:.88rem">Weekday hours are widely listed; call to confirm weekend hours.</p>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <svg viewBox="0 0 24 24" fill="#e02b2b"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#f5f3ec"/></svg>
+          <strong>6829 Hill Park Dr</strong>
+          <small>Lorton, VA 22079</small><br>
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJT6V_8Fett4kRhAu6_bS_slE" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-big">
+      <div class="big-name">Merv's <span class="alt">Auto Repair</span></div>
+      <div class="foot-tag">Servicing Northern Virginia since 1987</div>
+      <div class="foot-links">
+        <a href="#home" data-page="home">Home</a>
+        <a href="#services" data-page="services">Services</a>
+        <a href="#story" data-page="story">Our Story</a>
+        <a href="#gallery" data-page="gallery">Garage</a>
+        <a href="#reviews" data-page="reviews">Reviews</a>
+        <a href="#visit" data-page="visit">Visit Us</a>
+      </div>
+    </div>
+    <div class="foot-contact">
+      6829 Hill Park Dr, Lorton, VA 22079 · <a href="tel:+17036441900">(703) 644-1900</a><br>
+      Mon - Fri · 8:00 AM - 8:00 PM
+    </div>
+    <div class="foot-bottom">
+      <span>© Merv's Auto Repair</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "story", "gallery", "reviews", "visit"];
+  var drawer = document.getElementById("drawer");
+  var veil = document.getElementById("drawerVeil");
+  var toggle = document.getElementById("drawerToggle");
+  var closeBtn = document.getElementById("drawerClose");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function openDrawer(){
+    if(drawer){ drawer.classList.add("open"); }
+    if(veil){ veil.classList.add("open"); }
+    if(toggle){ toggle.setAttribute("aria-expanded", "true"); }
+  }
+
+  function closeMenu(){
+    if(drawer){ drawer.classList.remove("open"); }
+    if(veil){ veil.classList.remove("open"); }
+    if(toggle){ toggle.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll(".drawer nav a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(toggle){ toggle.addEventListener("click", function(){ drawer.classList.contains("open") ? closeMenu() : openDrawer(); }); }
+  if(closeBtn){ closeBtn.addEventListener("click", function(){ closeMenu(); }); }
+  if(veil){ veil.addEventListener("click", function(){ closeMenu(); }); }
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape"){ closeMenu(); }
+  });
+
+  /* ---------- marquee: duplicate for seamless loop ---------- */
+  var track = document.getElementById("marqueeTrack");
+  if(track){ track.innerHTML += track.innerHTML; }
+
+  /* ---------- carousel ---------- */
+  var car = document.getElementById("garageCarousel");
+  var prev = document.getElementById("carPrev");
+  var next = document.getElementById("carNext");
+  function slideBy(dir){
+    if(!car){ return; }
+    var card = car.querySelector(".slide");
+    var w = card ? card.offsetWidth + 20 : 360;
+    car.scrollBy({left: dir * w, behavior: "smooth"});
+  }
+  if(prev){ prev.addEventListener("click", function(){ slideBy(-1); }); }
+  if(next){ next.addEventListener("click", function(){ slideBy(1); }); }
+
+  /* ---------- live hours (America/New_York) ---------- */
+  var HOURS = {0:null,1:[8,20],2:[8,20],3:[8,20],4:[8,20],5:[8,20],6:null};
+  var DOW = {"Sun":0,"Mon":1,"Tue":2,"Wed":3,"Thu":4,"Fri":5,"Sat":6};
+  function fmt(h){
+    var ap = h < 12 ? "AM" : "PM";
+    var hh = h % 12;
+    if(hh === 0){ hh = 12; }
+    return hh + ":00 " + ap;
+  }
+  try{
+    var parts = new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",weekday:"short",hour:"numeric",hour12:false}).formatToParts(new Date());
+    var wd = "Sun", hr = 12;
+    parts.forEach(function(p){
+      if(p.type === "weekday"){ wd = p.value; }
+      if(p.type === "hour"){ hr = parseInt(p.value, 10) % 24; }
+    });
+    var day = DOW[wd] !== undefined ? DOW[wd] : 0;
+    var today = HOURS[day];
+    var pill = document.getElementById("hoursPill");
+    var txt = document.getElementById("hoursText");
+    if(pill && txt){
+      if(today && hr >= today[0] && hr < today[1]){
+        txt.textContent = "Open now · until " + fmt(today[1]) + " today";
+      } else {
+        pill.classList.add("closed");
+        if(day >= 1 && day <= 4){
+          txt.textContent = "Opens tomorrow at " + fmt(HOURS[day + 1][0]);
+        } else if(day === 5){
+          txt.textContent = "Open Mon - Fri · call for weekend hours";
+        } else if(day === 0){
+          txt.textContent = "Opens tomorrow at " + fmt(HOURS[1][0]);
+        } else {
+          txt.textContent = "Opens Monday at " + fmt(HOURS[1][0]);
+        }
+      }
+    }
+    var rows = document.querySelectorAll("#hoursTable tr");
+    var idx = (day + 6) % 7;
+    if(rows[idx]){ rows[idx].classList.add("today"); }
+  }catch(e){ /* leave default pill text */ }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

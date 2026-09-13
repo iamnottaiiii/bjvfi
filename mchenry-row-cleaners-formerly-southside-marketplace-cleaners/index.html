@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>McHenry Row Cleaners · Dry Cleaning in Locust Point, Baltimore, MD</title>
+<meta name="description" content="McHenry Row Cleaners Formerly Southside Marketplace Cleaners is a 4.5 star dry cleaner at 1614 Whetstone Way, Baltimore, MD 21230. Dry cleaning, laundry, alterations and pick-up and delivery. Call (410) 332-0000.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700;8..60,900&family=Libre+Franklin:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sand:#F4EDDC; --sand-2:#EDE2C9; --paper:#FFFDF6;
+  --indigo:#2E3A67; --indigo-deep:#1E2545; --indigo-soft:#E4E8F5;
+  --ink:#242A3F; --ink-soft:#5B6178;
+  --gold:#C19A2E; --gold-soft:#F6ECD2;
+  --radius:14px;
+  --shadow:0 16px 36px -18px rgba(30,37,69,.28);
+  --shadow-sm:0 8px 20px -10px rgba(30,37,69,.22);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Libre Franklin",system-ui,sans-serif;
+  background:var(--sand);
+  background-image:linear-gradient(rgba(46,58,103,.05) 1px, transparent 1px),linear-gradient(90deg, rgba(46,58,103,.05) 1px, transparent 1px);
+  background-size:34px 34px;
+  color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased;
+}
+img{max-width:100%}
+a{color:var(--indigo)}
+::selection{background:var(--gold-soft);color:var(--indigo-deep)}
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+.serif{font-family:"Source Serif 4",Georgia,serif}
+
+/* ---------- top bar ---------- */
+header.site{
+  position:sticky;top:0;z-index:60;
+  background:rgba(30,37,69,.97);color:#F4EDDC;
+  border-bottom:3px solid var(--gold);
+}
+.bar{display:flex;align-items:center;gap:14px;padding:10px 0}
+.drawer-btn{
+  background:none;border:2px solid rgba(244,237,220,.4);border-radius:10px;cursor:pointer;
+  padding:9px 11px;display:flex;flex-direction:column;gap:5px;
+}
+.drawer-btn span{display:block;width:22px;height:2.5px;border-radius:3px;background:#F4EDDC}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:#F4EDDC;margin-right:auto}
+.brand svg{width:42px;height:42px;flex:none}
+.brand-name{font-family:"Source Serif 4",serif;font-weight:900;font-size:1.18rem;line-height:1.05}
+.brand-name small{display:block;font-family:"Libre Franklin",sans-serif;font-weight:600;font-size:.6rem;letter-spacing:2.6px;text-transform:uppercase;color:var(--gold)}
+.hours-mini{
+  display:inline-flex;align-items:center;gap:8px;font-size:.8rem;font-weight:600;
+  background:rgba(244,237,220,.1);border:1px solid rgba(244,237,220,.25);
+  padding:8px 16px;border-radius:999px;white-space:nowrap;color:#F4EDDC;
+}
+.hours-mini .dot{width:8px;height:8px;border-radius:50%;background:#8FD694}
+.call-btn{
+  display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:var(--indigo-deep);
+  text-decoration:none;font-weight:800;padding:10px 20px;border-radius:999px;font-size:.92rem;
+  transition:transform .18s,filter .18s;white-space:nowrap;
+}
+.call-btn:hover{transform:translateY(-2px);filter:brightness(1.07)}
+
+/* ---------- side drawer ---------- */
+.scrim{position:fixed;inset:0;background:rgba(30,37,69,.55);opacity:0;pointer-events:none;transition:opacity .3s;z-index:70}
+.scrim.show{opacity:1;pointer-events:auto}
+nav.drawer{
+  position:fixed;top:0;left:0;bottom:0;width:330px;max-width:88vw;z-index:80;
+  background:var(--paper);transform:translateX(-105%);transition:transform .32s cubic-bezier(.22,.8,.3,1);
+  display:flex;flex-direction:column;box-shadow:var(--shadow);
+}
+nav.drawer.open{transform:translateX(0)}
+.drawer-head{background:var(--indigo-deep);color:#F4EDDC;padding:26px 26px 22px}
+.drawer-head .brand-name{color:#F4EDDC}
+.drawer-head p{font-size:.85rem;color:#B9C0D8;margin-top:6px}
+.drawer-links{padding:18px;display:grid;gap:4px;flex:1;overflow:auto}
+.drawer-links a{
+  display:flex;align-items:center;gap:14px;text-decoration:none;color:var(--ink);
+  font-weight:700;font-size:1.05rem;padding:13px 16px;border-radius:12px;transition:background .18s;
+}
+.drawer-links a .num{font-family:"Source Serif 4",serif;color:var(--gold);font-size:.85rem;font-weight:700;min-width:26px}
+.drawer-links a:hover{background:var(--indigo-soft)}
+.drawer-links a.active{background:var(--indigo);color:#fff}
+.drawer-links a.active .num{color:var(--gold-soft)}
+.drawer-foot{padding:20px 26px;border-top:1px solid var(--sand-2);font-size:.85rem;color:var(--ink-soft)}
+.drawer-foot a{color:var(--indigo);font-weight:700;text-decoration:none}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- compact masthead (no big hero) ---------- */
+.mast{background:var(--indigo-deep);color:#F4EDDC;position:relative;overflow:hidden}
+.mast::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 88% 12%, rgba(193,154,46,.28), transparent 46%)}
+.mast-inner{position:relative;padding:40px 0 36px;max-width:1140px;margin:0 auto;padding-left:24px;padding-right:24px}
+.kicker{
+  display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:3px;text-transform:uppercase;
+  color:var(--gold);border:1px solid rgba(193,154,46,.55);padding:7px 16px;border-radius:999px;margin-bottom:14px;
+}
+.mast h1{font-family:"Source Serif 4",serif;font-weight:900;font-size:clamp(1.9rem,3.6vw,2.8rem);line-height:1.08;letter-spacing:-.3px;max-width:40rem}
+.mast p.lede{color:#C9CFE4;max-width:36rem;margin:12px 0 20px;font-size:1.02rem}
+.cta-row{display:flex;flex-wrap:wrap;gap:12px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;
+  padding:13px 26px;border-radius:999px;font-size:.98rem;transition:transform .18s,background .18s;
+}
+.btn-solid{background:var(--gold);color:var(--indigo-deep)}
+.btn-solid:hover{transform:translateY(-2px);filter:brightness(1.07)}
+.btn-ghost{background:transparent;color:#F4EDDC;border:2px solid rgba(244,237,220,.45)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+.rating-line{margin-top:18px;font-size:.9rem;color:#C9CFE4}
+.rating-line .stars{color:var(--gold);letter-spacing:2px}
+
+/* ---------- magazine rhythm ---------- */
+.mag{display:grid;grid-template-columns:1.6fr 1fr;gap:30px;padding:44px 0 8px}
+.lead-story{background:var(--paper);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden}
+.lead-art{height:230px;background:linear-gradient(130deg,#3A4670,#1E2545);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.lead-art::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 20% 80%, rgba(193,154,46,.3), transparent 55%)}
+.lead-art svg{width:120px;height:120px;position:relative;z-index:1}
+.lead-body{padding:30px 32px}
+.lead-body .tag{display:inline-block;background:var(--gold-soft);color:#8A6A17;font-size:.7rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;padding:5px 14px;border-radius:999px;margin-bottom:12px}
+.lead-body h2{font-family:"Source Serif 4",serif;font-weight:900;font-size:1.75rem;line-height:1.15;margin-bottom:10px}
+.lead-body p{color:var(--ink-soft)}
+.rail{display:grid;gap:18px;align-content:start}
+.fact{background:var(--paper);border-radius:var(--radius);padding:22px 24px;box-shadow:var(--shadow-sm);border-left:5px solid var(--gold)}
+.fact strong{font-family:"Source Serif 4",serif;font-size:1.15rem;display:block;margin-bottom:4px}
+.fact p{color:var(--ink-soft);font-size:.92rem}
+.fact a{color:var(--indigo);font-weight:700}
+
+.sec-head{max-width:46rem;margin:0 0 28px}
+.sec-head .hand{font-size:1.5rem;color:#8A6A17}
+h2{font-family:"Source Serif 4",serif;font-weight:900;font-size:clamp(1.7rem,3vw,2.4rem);line-height:1.12;margin:6px 0 10px;letter-spacing:-.3px}
+.sec-head p{color:var(--ink-soft)}
+
+.num-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.num-card{background:var(--paper);border-radius:var(--radius);padding:28px 26px;box-shadow:var(--shadow-sm);position:relative}
+.num-card .big{font-family:"Source Serif 4",serif;font-weight:900;font-size:2.6rem;color:var(--indigo-soft);-webkit-text-stroke:1.5px var(--indigo);line-height:1}
+.num-card h3{font-family:"Source Serif 4",serif;font-size:1.2rem;margin:10px 0 6px}
+.num-card p{color:var(--ink-soft);font-size:.93rem}
+
+.quote-band{background:var(--indigo);color:#F4EDDC;border-radius:20px;padding:44px 48px;margin:40px 0;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.quote-band::before{content:"\201C";position:absolute;top:-6px;left:30px;font-family:"Source Serif 4",serif;font-size:7rem;color:var(--gold);opacity:.4}
+.quote-band p{font-family:"Source Serif 4",serif;font-size:1.4rem;line-height:1.5;position:relative;max-width:44rem}
+.quote-band cite{display:block;margin-top:14px;font-style:normal;font-weight:700;color:var(--gold);font-size:.85rem;letter-spacing:1.5px;text-transform:uppercase;position:relative}
+
+.tips{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.tip{background:var(--paper);border:1px solid var(--sand-2);border-radius:var(--radius);padding:20px 24px;display:flex;gap:14px;align-items:flex-start}
+.tip svg{flex:none;width:26px;height:26px;margin-top:2px}
+.tip strong{display:block;font-size:1rem}
+.tip p{color:var(--ink-soft);font-size:.9rem}
+
+section.block{padding:40px 0}
+
+/* ---------- services dotted leaders ---------- */
+.svc-cat{margin-bottom:38px}
+.svc-cat h3{font-family:"Source Serif 4",serif;font-size:1.5rem;font-weight:900;margin-bottom:4px;display:flex;align-items:center;gap:12px}
+.svc-cat h3 svg{width:30px;height:30px}
+.svc-cat>p{color:var(--ink-soft);font-size:.95rem;margin-bottom:14px}
+.svc-list{background:var(--paper);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:8px 28px;list-style:none}
+.svc-list li{padding:15px 0;border-bottom:1px dashed rgba(36,42,63,.2)}
+.svc-list li:last-child{border-bottom:0}
+.svc-top{display:flex;align-items:baseline;gap:10px}
+.svc-top strong{font-size:1.02rem}
+.svc-top .dots{flex:1;border-bottom:3px dotted rgba(46,58,103,.4);transform:translateY(-4px)}
+.svc-top .price{font-family:"Source Serif 4",serif;font-weight:700;color:var(--indigo);white-space:nowrap}
+.svc-list small{color:var(--ink-soft)}
+.svc-list .flag{display:inline-block;background:var(--gold-soft);color:#8A6A17;font-size:.66rem;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;padding:2px 10px;border-radius:999px;margin-left:8px;vertical-align:2px}
+.price-note{background:var(--gold-soft);border:2px dashed rgba(193,154,46,.55);border-radius:var(--radius);padding:18px 24px;font-size:.94rem;color:#6B5518}
+.price-note strong{color:var(--indigo-deep)}
+
+/* ---------- gallery square grid ---------- */
+.gal-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.tile{background:var(--paper);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);transition:transform .2s;position:relative}
+.tile:hover{transform:translateY(-4px)}
+.tile .art{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.tile .art svg{width:46%;height:auto;filter:drop-shadow(0 10px 12px rgba(0,0,0,.18));transition:transform .3s}
+.tile:hover .art svg{transform:scale(1.08)}
+.tile .cap{padding:12px 16px;border-top:1px solid var(--sand-2)}
+.tile .cap strong{font-family:"Source Serif 4",serif;font-size:1rem;display:block}
+.tile .cap small{color:var(--ink-soft);font-size:.82rem}
+.tile .soon{position:absolute;top:10px;right:10px;background:rgba(255,253,246,.9);font-size:.64rem;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;padding:4px 11px;border-radius:999px;color:var(--ink-soft)}
+
+/* ---------- reviews ---------- */
+.rs-strip{margin:6px auto 30px;max-width:660px;background:var(--paper);border:1px solid var(--sand-2);border-radius:14px;padding:20px 24px;text-align:center;box-shadow:var(--shadow-sm)}
+.rs-note{margin:0 0 14px;font-size:.93rem;color:var(--ink-soft);line-height:1.55}
+.rs-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rs-btn{display:inline-block;background:var(--indigo);color:#F4EDDC;padding:11px 26px;border-radius:999px;font-weight:700;text-decoration:none;font-size:.95rem}
+.rs-btn:hover{background:var(--indigo-deep)}
+.rev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.rev{background:var(--paper);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow-sm);position:relative;border-top:5px solid var(--gold)}
+.rev .stars{color:var(--gold);font-size:1.1rem;letter-spacing:3px;margin-bottom:10px}
+.rev p{font-size:1rem;margin-bottom:12px}
+.rev cite{font-style:normal;font-weight:700;font-size:.82rem;color:var(--indigo);letter-spacing:.5px}
+.rev .badge{display:inline-block;background:var(--indigo-soft);color:var(--indigo);font-size:.64rem;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;padding:3px 12px;border-radius:999px;margin-top:8px}
+.cta-band{background:linear-gradient(120deg,var(--indigo),var(--indigo-deep));border-radius:20px;color:#F4EDDC;padding:46px;text-align:center;margin-top:40px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.cta-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 82% 18%, rgba(193,154,46,.35), transparent 50%)}
+.cta-band h2{color:#fff;position:relative}
+.cta-band p{color:#C9CFE4;position:relative;max-width:36rem;margin:0 auto 24px}
+.cta-band .btn-solid{position:relative}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
+.info-card{background:var(--paper);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow-sm)}
+.info-card h3{font-family:"Source Serif 4",serif;font-size:1.35rem;margin-bottom:12px;display:flex;align-items:center;gap:12px}
+.info-card h3 svg{width:28px;height:28px}
+.info-card p{color:var(--ink-soft);margin-bottom:8px}
+.info-card a.big{font-family:"Source Serif 4",serif;font-size:1.45rem;font-weight:700;color:var(--indigo);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.hours-table{width:100%;border-collapse:collapse;font-size:.96rem}
+.hours-table td{padding:10px 4px;border-bottom:1px dashed rgba(36,42,63,.2)}
+.hours-table tr.today td{font-weight:800;color:var(--indigo)}
+.hours-table td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.map-card{
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:340px;
+  background:
+    linear-gradient(rgba(46,58,103,.07), rgba(46,58,103,.07)),
+    repeating-linear-gradient(0deg, transparent 0 44px, rgba(46,58,103,.16) 44px 46px),
+    repeating-linear-gradient(90deg, transparent 0 44px, rgba(46,58,103,.16) 44px 46px),
+    linear-gradient(140deg,#EFE4CC,#E2D3B0);
+  display:flex;align-items:center;justify-content:center;
+}
+.map-pin{text-align:center;background:var(--paper);padding:26px 34px;border-radius:18px;box-shadow:var(--shadow);max-width:78%;position:relative}
+.map-pin::after{content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);border:14px solid transparent;border-top-color:var(--paper);border-bottom:0}
+.map-pin svg{width:42px;height:42px;margin-bottom:8px}
+.map-pin strong{font-family:"Source Serif 4",serif;font-size:1.12rem;display:block}
+.map-pin small{color:var(--ink-soft)}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- page strips ---------- */
+.strip{background:var(--indigo-deep);color:#F4EDDC;border-radius:20px;padding:44px 42px;position:relative;overflow:hidden;margin:34px 0 36px;box-shadow:var(--shadow)}
+.strip::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 86% 14%, rgba(193,154,46,.3), transparent 50%)}
+.strip .kicker{position:relative}
+.strip h2{color:#fff;position:relative;font-size:clamp(1.8rem,3.6vw,2.6rem)}
+.strip p{color:#C9CFE4;max-width:36rem;position:relative}
+
+/* ---------- footer multi column ---------- */
+footer{background:var(--indigo-deep);color:#C9CFE4;margin-top:36px;border-top:3px solid var(--gold)}
+.foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:34px;padding:52px 0 30px}
+.foot-grid h4{font-family:"Source Serif 4",serif;color:#fff;font-size:1.1rem;margin-bottom:12px}
+.foot-grid p,.foot-grid a{color:#A9B0CC;font-size:.92rem}
+.foot-grid a{text-decoration:none}
+.foot-grid a:hover{color:var(--gold)}
+.foot-brand{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.foot-brand svg{width:42px;height:42px}
+.foot-brand span{font-family:"Source Serif 4",serif;font-weight:900;color:#fff;font-size:1.2rem;line-height:1.1}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.12);padding:18px 0 24px;display:flex;justify-content:center;font-size:.85rem;color:#8E96B5}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:980px){
+  .mag{grid-template-columns:1fr}
+  .num-grid{grid-template-columns:1fr}
+  .tips{grid-template-columns:1fr}
+  .gal-grid{grid-template-columns:1fr 1fr}
+  .rev-grid{grid-template-columns:1fr}
+  .visit-grid{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr 1fr}
+  .hours-mini{display:none}
+  .bar .call-btn{display:none}
+}
+@media(max-width:600px){
+  .gal-grid{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr}
+  .quote-band{padding:32px 26px}
+  .strip{padding:34px 26px}
+}
+</style>
+</head>
+<body>
+
+<div class="scrim" id="scrim"></div>
+
+<header class="site">
+  <div class="wrap bar">
+    <button class="drawer-btn" id="burger" aria-label="Open site menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    <a class="brand" href="#home" data-page="home" aria-label="McHenry Row Cleaners, home">
+      <svg viewBox="0 0 64 64" role="img" aria-label="Hanger logo"><rect x="6" y="10" width="52" height="44" rx="8" fill="none" stroke="#C19A2E" stroke-width="3.5"/><circle cx="32" cy="20" r="6" fill="none" stroke="#C19A2E" stroke-width="3.5"/><path d="M32 26 L32 34 M32 34 L16 46 M32 34 L48 46" stroke="#C19A2E" stroke-width="3.5" stroke-linecap="round"/></svg>
+      <span class="brand-name">McHenry Row Cleaners<small>Formerly Southside Marketplace</small></span>
+    </a>
+    <span class="hours-mini" id="hoursMini"><span class="dot"></span><span id="hoursMiniText">Check hours</span></span>
+    <a class="call-btn" href="tel:+14103320000">Call (410) 332-0000</a>
+  </div>
+</header>
+
+<nav class="drawer" id="mainNav" aria-label="Main navigation">
+  <div class="drawer-head">
+    <span class="brand-name">McHenry Row Cleaners<small style="color:#C19A2E">Formerly Southside Marketplace</small></span>
+    <p>Dry cleaning and laundry in Locust Point, Baltimore</p>
+  </div>
+  <div class="drawer-links">
+    <a href="#home" data-page="home" class="active" aria-current="page"><span class="num">01</span>Home</a>
+    <a href="#services" data-page="services"><span class="num">02</span>Services and Prices</a>
+    <a href="#story" data-page="story"><span class="num">03</span>Our Story</a>
+    <a href="#gallery" data-page="gallery"><span class="num">04</span>Gallery</a>
+    <a href="#reviews" data-page="reviews"><span class="num">05</span>Reviews</a>
+    <a href="#visit" data-page="visit"><span class="num">06</span>Visit Us</a>
+  </div>
+  <div class="drawer-foot">
+    <a href="tel:+14103320000">(410) 332-0000</a><br>
+    1614 Whetstone Way, Baltimore, MD 21230
+  </div>
+</nav>
+
+<section class="page active" id="page-home">
+  <div class="mast">
+    <div class="mast-inner">
+      <span class="kicker">Locust Point · Baltimore, MD</span>
+      <h1>Your neighborhood dry cleaner, done right the first time.</h1>
+      <p class="lede">McHenry Row Cleaners, formerly Southside Marketplace Cleaners, at 1614 Whetstone Way. Dry cleaning, laundry, alterations and pick-up and delivery, with a 4.5 star rating from Baltimore neighbors.</p>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="#services" data-page="services">See Services and Prices</a>
+        <a class="btn btn-ghost" href="https://www.google.com/maps/place/?q=place_id:ChIJn31p3HMDyIkRQQigjZQsylE" target="_blank" rel="noopener">Get Directions</a>
+      </div>
+      <p class="rating-line"><span class="stars">★★★★★</span> 4.5 out of 5, based on 53 Google reviews</p>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="mag">
+      <article class="lead-story reveal">
+        <div class="lead-art">
+          <svg viewBox="0 0 120 120" role="img" aria-label="Illustration of clothes on a rack">
+            <line x1="14" y1="22" x2="106" y2="22" stroke="#F4EDDC" stroke-width="5" stroke-linecap="round"/>
+            <circle cx="14" cy="18" r="4" fill="#C19A2E"/><circle cx="106" cy="18" r="4" fill="#C19A2E"/>
+            <g stroke="#F4EDDC" stroke-width="4" stroke-linecap="round">
+              <path d="M38 22 v8 M38 30 L28 44 L32 92 M38 30 L48 44 L44 92"/>
+              <path d="M64 22 v8 M64 30 L54 44 L58 92 M64 30 L74 44 L70 92"/>
+              <path d="M90 22 v8 M90 30 L80 46 L84 92 M90 30 L100 46 L96 92"/>
+            </g>
+            <rect x="26" y="86" width="70" height="6" rx="3" fill="#C19A2E" opacity=".7"/>
+          </svg>
+        </div>
+        <div class="lead-body">
+          <span class="tag">The neighborhood gem</span>
+          <h2>A dry cleaner Locust Point actually recommends</h2>
+          <p>Review after review says the same thing: friendly staff, quality cleaning, and a team that comes through when you are in a pinch. Customers praise the prompt pick-up and delivery, careful alterations, and fair, reasonable prices. If you need a stain out before Friday or a zipper fixed before the weekend, this is the counter to visit.</p>
+          <p style="margin-top:12px"><a href="#reviews" data-page="reviews" style="font-weight:700">Read what neighbors are saying →</a></p>
+        </div>
+      </article>
+      <aside class="rail">
+        <div class="fact reveal">
+          <strong>Pick-up and delivery</strong>
+          <p>Too busy to swing by? Ask about prompt pick-up and delivery service for your dry cleaning and laundry.</p>
+        </div>
+        <div class="fact reveal">
+          <strong>Urgent requests welcome</strong>
+          <p>Reviewers say the team is known for accommodating last minute and urgent requests. Just ask.</p>
+        </div>
+        <div class="fact reveal">
+          <strong>Alterations in house</strong>
+          <p>Hems, zipper repairs, tailoring and fixes, handled with care by people who know garments.</p>
+        </div>
+        <div class="fact reveal">
+          <strong>Call us</strong>
+          <p><a href="tel:+14103320000">(410) 332-0000</a><br>1614 Whetstone Way, Baltimore, MD 21230</p>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="hand serif">Why neighbors choose us</span>
+        <h2>Consistent, careful, and close by</h2>
+        <p>Three reasons McHenry Row Cleaners keeps earning repeat customers in Locust Point.</p>
+      </div>
+      <div class="num-grid">
+        <div class="num-card reveal">
+          <div class="big">01</div>
+          <h3>Quality you can wear</h3>
+          <p>Garments come back clean, pressed and finished. No shortcuts, no surprises, just clothing that looks its best.</p>
+        </div>
+        <div class="num-card reveal">
+          <div class="big">02</div>
+          <h3>Friendly, personal service</h3>
+          <p>A staff that knows the neighborhood and treats every order like it matters. Many reviewers call it out by name.</p>
+        </div>
+        <div class="num-card reveal">
+          <div class="big">03</div>
+          <h3>Reasonable prices</h3>
+          <p>Fair pricing on dry cleaning, laundry and alterations. Sample prices are listed on our services page.</p>
+        </div>
+      </div>
+
+      <div class="quote-band reveal">
+        <p>A neighborhood gem. You have got to love a business that is consistent and nails it. I know it is a dry cleaner, but it is a necessary service, so having a great one nearby is a huge help.</p>
+        <cite>Review theme, based on Google reviews</cite>
+      </div>
+
+      <div class="sec-head reveal">
+        <span class="hand serif">Good to know</span>
+        <h2>Before you drop off</h2>
+      </div>
+      <div class="tips">
+        <div class="tip reveal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#2E3A67" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+          <div><strong>Check the pockets</strong><p>Empty pockets and unbutton loose buttons before drop off. It protects your garments and speeds up intake.</p></div>
+        </div>
+        <div class="tip reveal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#2E3A67" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.5-4.8 2.5.9-5.4L4.2 8.7l5.4-.8z"/></svg>
+          <div><strong>Point out stains</strong><p>Tell us what the stain is and how fresh it is. The more we know, the better the treatment we can choose.</p></div>
+        </div>
+        <div class="tip reveal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#2E3A67" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+          <div><strong>Ask about urgent service</strong><p>On a deadline? The team is known for accommodating urgent requests. Ask at the counter.</p></div>
+        </div>
+        <div class="tip reveal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#2E3A67" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+          <div><strong>Alterations while you wait? Ask.</strong><p>Simple hems and zipper repairs are done in house. Bring the shoes you will wear for the best fit.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="cta-band reveal">
+      <h2>Fresh, pressed, and ready.</h2>
+      <p>1614 Whetstone Way, Baltimore, MD 21230. Open Mon to Fri 8 AM to 6 PM, Sat 8 AM to 4 PM. Closed Sundays.</p>
+      <a class="btn btn-solid" href="tel:+14103320000">Call (410) 332-0000</a>
+    </div>
+    <div style="height:48px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div class="strip">
+      <span class="kicker">Services and prices</span>
+      <h2>Dry cleaning, laundry and alterations</h2>
+      <p>Everything a garment needs, under one roof in Locust Point. Prices below are samples. Final pricing is confirmed at drop off.</p>
+    </div>
+
+    <div class="svc-cat reveal">
+      <h3><svg viewBox="0 0 120 120" aria-hidden="true"><line x1="24" y1="20" x2="96" y2="20" stroke="#2E3A67" stroke-width="5" stroke-linecap="round"/><path d="M48 20 v8 M48 28 L38 44 L42 92 M48 28 L58 44 L54 92" stroke="#2E3A67" stroke-width="4" stroke-linecap="round" fill="none"/></svg> Dry Cleaning</h3>
+      <p>Suits, dresses, coats and everyday pieces, cleaned and pressed to a crisp finish.</p>
+      <ul class="svc-list">
+        <li><div class="svc-top"><strong>Shirt, laundered and pressed</strong><span class="dots"></span><span class="price">from $3.25</span></div><small>Crisp collars, creased sleeves, on a hanger or boxed.</small></li>
+        <li><div class="svc-top"><strong>Pants or skirt</strong><span class="dots"></span><span class="price">from $7.50</span></div><small>Pressed with a sharp crease.</small></li>
+        <li><div class="svc-top"><strong>Blazer or sport coat</strong><span class="dots"></span><span class="price">from $8.50</span></div><small>Shaped and finished, lapels pressed flat.</small></li>
+        <li><div class="svc-top"><strong>Two piece suit</strong><span class="dots"></span><span class="price">from $14.50</span></div><small>Jacket and trousers cleaned as a set.</small></li>
+        <li><div class="svc-top"><strong>Dress</strong><span class="dots"></span><span class="price">from $12.95</span></div><small>Delicate fabrics handled with extra care.</small></li>
+        <li><div class="svc-top"><strong>Winter coat</strong><span class="dots"></span><span class="price">from $16.50</span></div><small>Wool, down and lined coats welcome.</small></li>
+        <li><div class="svc-top"><strong>Tie or scarf</strong><span class="dots"></span><span class="price">from $5.25</span></div><small>Hand finished.</small></li>
+      </ul>
+    </div>
+
+    <div class="svc-cat reveal">
+      <h3><svg viewBox="0 0 120 120" aria-hidden="true"><rect x="28" y="34" width="64" height="54" rx="8" fill="none" stroke="#2E3A67" stroke-width="5"/><circle cx="60" cy="61" r="16" fill="none" stroke="#2E3A67" stroke-width="5"/><path d="M52 61 q8 -10 16 0 q-8 10 -16 0" fill="#C19A2E" opacity=".7"/></svg> Laundry and Household</h3>
+      <p>Wash and fold for busy weeks, plus the big items your home washer cannot handle.</p>
+      <ul class="svc-list">
+        <li><div class="svc-top"><strong>Wash and fold <span class="flag">Popular</span></strong><span class="dots"></span><span class="price">from $1.75 per lb</span></div><small>Everyday laundry, washed, dried and neatly folded.</small></li>
+        <li><div class="svc-top"><strong>Comforter or duvet</strong><span class="dots"></span><span class="price">from $24</span></div><small>King, queen and twin sizes.</small></li>
+        <li><div class="svc-top"><strong>Blanket or throw</strong><span class="dots"></span><span class="price">from $14</span></div><small>Wool, fleece and cotton.</small></li>
+        <li><div class="svc-top"><strong>Tablecloth</strong><span class="dots"></span><span class="price">from $12</span></div><small>Pressed and ready for the next gathering.</small></li>
+      </ul>
+    </div>
+
+    <div class="svc-cat reveal">
+      <h3><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="44" cy="44" r="18" fill="none" stroke="#2E3A67" stroke-width="5"/><circle cx="76" cy="76" r="18" fill="none" stroke="#2E3A67" stroke-width="5"/><path d="M56 56 L64 64" stroke="#2E3A67" stroke-width="5" stroke-linecap="round"/></svg> Alterations and Tailoring</h3>
+      <p>The service reviewers rave about. Hems, repairs and fit adjustments done in house.</p>
+      <ul class="svc-list">
+        <li><div class="svc-top"><strong>Hem pants or skirt <span class="flag">In house</span></strong><span class="dots"></span><span class="price">from $12</span></div><small>Plain, cuffed and blind hems.</small></li>
+        <li><div class="svc-top"><strong>Replace a zipper</strong><span class="dots"></span><span class="price">from $18</span></div><small>Jackets, pants and dresses. Reviewers praise the zipper work.</small></li>
+        <li><div class="svc-top"><strong>Take in or let out waist</strong><span class="dots"></span><span class="price">from $16</span></div><small>Pants and skirts tailored to fit.</small></li>
+        <li><div class="svc-top"><strong>Repair tears and seams</strong><span class="dots"></span><span class="price">from $8</span></div><small>Small fixes that extend the life of a garment.</small></li>
+      </ul>
+    </div>
+
+    <div class="svc-cat reveal">
+      <h3><svg viewBox="0 0 120 120" aria-hidden="true"><rect x="20" y="44" width="56" height="36" rx="6" fill="none" stroke="#2E3A67" stroke-width="5"/><path d="M76 56 h12 a6 6 0 016 6 v12 h-18" fill="none" stroke="#2E3A67" stroke-width="5"/><circle cx="36" cy="86" r="8" fill="#2E3A67"/><circle cx="88" cy="86" r="8" fill="#2E3A67"/></svg> Pick-up and Delivery</h3>
+      <p>Reviewers call out the prompt pick-up and delivery. Ask at the counter or by phone about scheduling.</p>
+      <ul class="svc-list">
+        <li><div class="svc-top"><strong>Scheduled pick-up</strong><span class="dots"></span><span class="price">ask us</span></div><small>We collect your garments at your door.</small></li>
+        <li><div class="svc-top"><strong>Delivery on return</strong><span class="dots"></span><span class="price">ask us</span></div><small>Finished orders brought back to you, pressed and bagged.</small></li>
+        <li><div class="svc-top"><strong>Urgent requests <span class="flag">Ask us</span></strong><span class="dots"></span><span class="price">ask us</span></div><small>The team is known for accommodating last minute needs.</small></li>
+      </ul>
+    </div>
+
+    <div class="price-note reveal">
+      <strong>Please note:</strong> all prices on this page are samples to give you an idea of typical costs. Final prices depend on the garment, fabric and work needed, and are confirmed at drop off. Call <strong>(410) 332-0000</strong> for a quote.
+    </div>
+    <div style="height:48px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-story">
+  <div class="wrap">
+    <div class="strip">
+      <span class="kicker">Our story</span>
+      <h2>From Southside Marketplace to McHenry Row</h2>
+      <p>The name on the door changed. The promise behind the counter did not.</p>
+    </div>
+
+    <div class="mag" style="padding-top:8px">
+      <article class="lead-story reveal">
+        <div class="lead-body">
+          <span class="tag">Same team, new home</span>
+          <h2>A familiar cleaner in a new location</h2>
+          <p>McHenry Row Cleaners began as Southside Marketplace Cleaners, serving Baltimore with dry cleaning, laundry and alterations. When the shop moved to its new home at 1614 Whetstone Way in the McHenry Row shopping center, the name changed, but the team, the craft and the neighborhood-first attitude came along for the ride.</p>
+          <p style="margin-top:12px">Today the shop sits in the heart of Locust Point, an easy stop on the way to or from the Fort McHenry area. Regulars followed the move, and new customers keep finding their way in, drawn by word of mouth and a 4.5 star rating built one pressed shirt at a time.</p>
+          <p style="margin-top:12px">What has not changed: a friendly staff, careful work, fair prices, and a willingness to help when you need it fast. That is the whole story, and it is a good one.</p>
+        </div>
+      </article>
+      <aside class="rail">
+        <div class="fact reveal">
+          <strong>Formerly Southside Marketplace Cleaners</strong>
+          <p>The same trusted team, now at McHenry Row in Locust Point.</p>
+        </div>
+        <div class="fact reveal">
+          <strong>Locust Point, Baltimore</strong>
+          <p>1614 Whetstone Way, in the McHenry Row shopping center, near Fort McHenry.</p>
+        </div>
+        <div class="fact reveal">
+          <strong>4.5 stars, 53 Google reviews</strong>
+          <p>Built on friendly service, quality cleaning and reasonable prices.</p>
+        </div>
+      </aside>
+    </div>
+
+    <div class="quote-band reveal">
+      <p>Excellent work, great service. Never had a bad experience.</p>
+      <cite>Review theme, based on Google reviews</cite>
+    </div>
+    <div style="height:24px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div class="strip">
+      <span class="kicker">Gallery</span>
+      <h2>A look inside the shop</h2>
+      <p>Artistic previews of the craft. Real photos of our work are on the way.</p>
+    </div>
+
+    <div class="gal-grid">
+      <div class="tile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#3A4670,#1E2545)">
+          <svg viewBox="0 0 100 100"><path d="M50 14 a8 8 0 018 8 M50 22 v8 M50 30 L32 44 L36 88 M50 30 L68 44 L64 88" stroke="#F4EDDC" stroke-width="4" fill="none" stroke-linecap="round"/><rect x="28" y="82" width="44" height="5" rx="2.5" fill="#C19A2E" opacity=".8"/></svg>
+        </div>
+        <div class="cap"><strong>Pressed shirts</strong><small>Crisp collars, sharp creases</small></div>
+      </div>
+      <div class="tile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#8A6A17,#C19A2E)">
+          <svg viewBox="0 0 100 100"><path d="M30 30 L50 22 L70 30 L66 78 L34 78 Z" fill="#FFFDF6"/><path d="M46 26 L50 40 L54 26" fill="none" stroke="#2E3A67" stroke-width="3"/><line x1="34" y1="78" x2="66" y2="78" stroke="#2E3A67" stroke-width="3"/></svg>
+        </div>
+        <div class="cap"><strong>Suits and blazers</strong><small>Shaped and finished</small></div>
+      </div>
+      <div class="tile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#4A5878,#2E3A67)">
+          <svg viewBox="0 0 100 100"><path d="M35 28 q15 -8 30 0 l4 50 q-19 8 -38 0 Z" fill="#FFFDF6"/><path d="M50 22 q4 -6 10 -6" stroke="#C19A2E" stroke-width="4" fill="none" stroke-linecap="round"/><line x1="38" y1="60" x2="62" y2="60" stroke="#C19A2E" stroke-width="3"/></svg>
+        </div>
+        <div class="cap"><strong>Dresses</strong><small>Delicate fabrics, gentle care</small></div>
+      </div>
+      <div class="tile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#C9CFE4,#8E96B5)">
+          <svg viewBox="0 0 100 100"><rect x="26" y="38" width="48" height="34" rx="10" fill="#FFFDF6"/><path d="M30 38 a20 14 0 0140 0" fill="none" stroke="#2E3A67" stroke-width="4"/><circle cx="50" cy="55" r="7" fill="none" stroke="#2E3A67" stroke-width="4"/></svg>
+        </div>
+        <div class="cap"><strong>Wash and fold</strong><small>Neatly folded, ready to shelve</small></div>
+      </div>
+      <div class="tile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#6B5518,#8A6A17)">
+          <svg viewBox="0 0 100 100"><path d="M30 30 h40 v44 a10 10 0 01-10 10 h-20 a10 10 0 01-10 -10 Z" fill="#FFFDF6"/><path d="M40 30 v54 M60 30 v54 M30 52 h40" stroke="#2E3A67" stroke-width="3" fill="none"/><path d="M50 74 l-4 -4 M50 74 l4 -4" stroke="#C19A2E" stroke-width="3" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>Alterations</strong><small>Hems, zippers and repairs</small></div>
+      </div>
+      <div class="tile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#3A4670,#8A6A17)">
+          <svg viewBox="0 0 100 100"><rect x="22" y="40" width="40" height="26" rx="5" fill="#FFFDF6"/><path d="M62 48 h10 a5 5 0 015 5 v8 h-15" fill="none" stroke="#FFFDF6" stroke-width="4"/><circle cx="32" cy="72" r="6" fill="#1E2545"/><circle cx="70" cy="72" r="6" fill="#1E2545"/><rect x="28" y="46" width="28" height="8" rx="4" fill="#C19A2E"/></svg>
+        </div>
+        <div class="cap"><strong>Pick-up and delivery</strong><small>Door to door convenience</small></div>
+      </div>
+      <div class="tile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#EDE2C9,#C9B98F)">
+          <svg viewBox="0 0 100 100"><rect x="30" y="26" width="40" height="48" rx="6" fill="#FFFDF6"/><path d="M38 34 h24 M38 42 h24 M38 50 h16" stroke="#2E3A67" stroke-width="3" stroke-linecap="round"/><rect x="36" y="60" width="28" height="8" rx="4" fill="#C19A2E"/></svg>
+        </div>
+        <div class="cap"><strong>Comforters</strong><small>Big items, fresh and fluffy</small></div>
+      </div>
+      <div class="tile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#2E3A67,#1E2545)">
+          <svg viewBox="0 0 100 100"><path d="M20 30 h60 v14 h-60 Z" fill="#C19A2E"/><path d="M26 44 v28 a6 6 0 006 6 h36 a6 6 0 006 -6 v-28" fill="none" stroke="#F4EDDC" stroke-width="4"/><circle cx="50" cy="60" r="8" fill="none" stroke="#F4EDDC" stroke-width="4"/></svg>
+        </div>
+        <div class="cap"><strong>The storefront</strong><small>1614 Whetstone Way</small></div>
+      </div>
+    </div>
+
+    <div class="price-note reveal" style="margin-top:28px">
+      <strong>Coming soon:</strong> real photos of our shop and finished garments. The illustrations above are artistic previews.
+    </div>
+    <div style="height:48px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div class="strip">
+      <span class="kicker">Reviews</span>
+      <h2>What Baltimore is saying</h2>
+      <p>4.5 out of 5 stars, based on 53 Google reviews. Review themes below are paraphrased from public feedback.</p>
+    </div>
+    <div class="rs-strip">
+      <p class="rs-note">Review themes on this page are paraphrased from public feedback. Open the source to read current reviews and ratings.</p>
+      <div class="rs-links"><a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJn31p3HMDyIkRQQigjZQsylE" target="_blank" rel="noopener">See reviews on Google</a></div>
+    </div>
+
+    <div class="rev-grid">
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>A neighborhood gem. You have got to love a business that is consistent and nails it. For a necessary service like dry cleaning, having a great one nearby is a huge help.</p>
+        <cite>Review theme, April 2025</cite><br><span class="badge">Sample</span>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>Excellent work, great service. Never had a bad experience here, everything comes back done right.</p>
+        <cite>Review theme, June 2025</cite><br><span class="badge">Sample</span>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>They fixed a jacket zipper wonderfully, and the regular dry cleaning is always excellent. Highly recommended.</p>
+        <cite>Review theme, October 2024</cite><br><span class="badge">Sample</span>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>Friendly staff, prompt pick-up and delivery, and fair prices. Repeat customers say the new McHenry Row location is great.</p>
+        <cite>Review theme, based on Google reviews</cite><br><span class="badge">Sample</span>
+      </div>
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Had a great visit? Tell the neighborhood.</h2>
+      <p>Your review helps a local Locust Point business keep growing. It takes a minute, and it means a lot.</p>
+      <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJn31p3HMDyIkRQQigjZQsylE" target="_blank" rel="noopener">Leave us a Google review</a>
+    </div>
+    <div style="height:48px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="wrap">
+    <div class="strip">
+      <span class="kicker">Visit us</span>
+      <h2>Drop off in Locust Point</h2>
+      <p>Find us in the McHenry Row shopping center at 1614 Whetstone Way, Baltimore, MD 21230.</p>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#2E3A67" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Find us</h3>
+        <p><strong>McHenry Row Cleaners</strong><br>1614 Whetstone Way<br>Baltimore, MD 21230</p>
+        <p>In the McHenry Row shopping center, Locust Point, near Fort McHenry. Shopping center parking available.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#2E3A67" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg> Call us</h3>
+        <p>Questions, quotes, pick-up scheduling:</p>
+        <a class="big" href="tel:+14103320000">(410) 332-0000</a>
+        <p style="margin-top:10px">Ask about urgent requests and pick-up and delivery when you call.</p>
+      </div>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#2E3A67" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Hours</h3>
+        <table class="hours-table" id="hoursTable">
+          <tr><td>Monday</td><td>8:00 AM - 6:00 PM</td></tr>
+          <tr><td>Tuesday</td><td>8:00 AM - 6:00 PM</td></tr>
+          <tr><td>Wednesday</td><td>8:00 AM - 6:00 PM</td></tr>
+          <tr><td>Thursday</td><td>8:00 AM - 6:00 PM</td></tr>
+          <tr><td>Friday</td><td>8:00 AM - 6:00 PM</td></tr>
+          <tr><td>Saturday</td><td>8:00 AM - 4:00 PM</td></tr>
+          <tr><td>Sunday</td><td>Closed</td></tr>
+        </table>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <svg viewBox="0 0 24 24" fill="#2E3A67"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#FFFDF6"/></svg>
+          <strong>1614 Whetstone Way</strong>
+          <small>Baltimore, MD 21230</small><br>
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJn31p3HMDyIkRQQigjZQsylE" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+      </div>
+    </div>
+    <div style="height:48px"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand">
+          <svg viewBox="0 0 64 64" role="img" aria-label="Hanger logo"><rect x="6" y="10" width="52" height="44" rx="8" fill="none" stroke="#C19A2E" stroke-width="3.5"/><circle cx="32" cy="20" r="6" fill="none" stroke="#C19A2E" stroke-width="3.5"/><path d="M32 26 L32 34 M32 34 L16 46 M32 34 L48 46" stroke="#C19A2E" stroke-width="3.5" stroke-linecap="round"/></svg>
+          <span>McHenry Row<br>Cleaners</span>
+        </div>
+        <p>Formerly Southside Marketplace Cleaners. Dry cleaning, laundry and alterations in Locust Point, Baltimore, MD. Friendly staff, quality work, reasonable prices.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <p><a href="#home" data-page="home">Home</a><br><a href="#services" data-page="services">Services and Prices</a><br><a href="#story" data-page="story">Our Story</a><br><a href="#gallery" data-page="gallery">Gallery</a><br><a href="#reviews" data-page="reviews">Reviews</a></p>
+      </div>
+      <div>
+        <h4>Visit</h4>
+        <p>1614 Whetstone Way<br>Baltimore, MD 21230<br><a href="tel:+14103320000">(410) 332-0000</a><br><a href="https://www.google.com/maps/place/?q=place_id:ChIJn31p3HMDyIkRQQigjZQsylE" target="_blank" rel="noopener">Get Directions</a></p>
+      </div>
+      <div>
+        <h4>Hours</h4>
+        <p>Mon - Fri · 8:00 AM - 6:00 PM<br>Saturday · 8:00 AM - 4:00 PM<br>Sunday · Closed</p>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© McHenry Row Cleaners Formerly Southside Marketplace Cleaners</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "story", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+    var scrim = document.getElementById("scrim");
+    if(scrim){ scrim.classList.remove("show"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.drawer a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+      var scrim = document.getElementById("scrim");
+      if(scrim){ scrim.classList.toggle("show", open); }
+    });
+  }
+  var scrimEl = document.getElementById("scrim");
+  if(scrimEl){ scrimEl.addEventListener("click", closeMenu); }
+
+  /* ---------- live hours (America/New_York) ---------- */
+  var HOURS = {0:null,1:[8,18],2:[8,18],3:[8,18],4:[8,18],5:[8,18],6:[8,16]};
+  var DOW = {"Sun":0,"Mon":1,"Tue":2,"Wed":3,"Thu":4,"Fri":5,"Sat":6};
+  function fmt(h){
+    var ap = h < 12 ? "AM" : "PM";
+    var hh = h % 12;
+    if(hh === 0){ hh = 12; }
+    return hh + ":00 " + ap;
+  }
+  try{
+    var parts = new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",weekday:"short",hour:"numeric",hour12:false}).formatToParts(new Date());
+    var wd = "Mon", hr = 12;
+    parts.forEach(function(p){
+      if(p.type === "weekday"){ wd = p.value; }
+      if(p.type === "hour"){ hr = parseInt(p.value, 10) % 24; }
+    });
+    var day = DOW[wd] !== undefined ? DOW[wd] : 1;
+    var mini = document.getElementById("hoursMini");
+    var txt = document.getElementById("hoursMiniText");
+    var today = HOURS[day];
+    function nextOpen(d){
+      for(var k = 1; k <= 7; k++){
+        var nd = (d + k) % 7;
+        if(HOURS[nd]){ return {day: nd, open: HOURS[nd][0]}; }
+      }
+      return null;
+    }
+    if(mini && txt){
+      if(today && hr >= today[0] && hr < today[1]){
+        txt.textContent = "Open now, until " + fmt(today[1]);
+      } else {
+        var dot = mini.querySelector(".dot");
+        if(dot){ dot.style.background = "#E4658F"; }
+        if(today && hr < today[0]){
+          txt.textContent = "Opens today at " + fmt(today[0]);
+        } else {
+          var nx = nextOpen(day);
+          var dayName = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][nx.day];
+          txt.textContent = "Opens " + dayName + " at " + fmt(nx.open);
+        }
+      }
+    }
+    var rows = document.querySelectorAll("#hoursTable tr");
+    var idx = (day + 6) % 7; /* rows run Mon..Sun */
+    if(rows[idx]){ rows[idx].classList.add("today"); }
+  }catch(e){ /* leave default text */ }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

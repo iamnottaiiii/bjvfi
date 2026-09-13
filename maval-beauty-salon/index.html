@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maval Beauty Salon · Beauty Salon on Avenue X, Brooklyn NY</title>
+<meta name="description" content="Maval Beauty Salon is a full-service beauty salon at 624 Avenue X, Brooklyn, NY 11235. Haircuts, color, styling and nail care. Call (718) 676-5655.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FFF8F4; --paper:#FFFDFB; --blush:#F9E7EA;
+  --ink:#2E2129; --ink-soft:#6E5A63;
+  --rose:#C2485F; --rose-deep:#932F45; --rose-soft:#F7D9E0;
+  --gold:#C9932E; --gold-soft:#F8EACB;
+  --radius:20px;
+  --shadow:0 20px 44px -20px rgba(147,47,69,.28);
+  --shadow-sm:0 10px 26px -12px rgba(46,33,41,.22);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Jost",system-ui,sans-serif;background:var(--cream);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased}
+.serif{font-family:"Cormorant Garamond",serif}
+img{max-width:100%}
+a{color:var(--rose)}
+::selection{background:var(--rose-soft);color:var(--rose-deep)}
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+
+/* ---------- header + side drawer ---------- */
+header.site{position:sticky;top:0;z-index:80;background:rgba(255,248,244,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid rgba(194,72,95,.18)}
+.bar{display:flex;align-items:center;gap:16px;padding:14px 0}
+.drawer-btn{background:var(--ink);border:0;cursor:pointer;width:46px;height:46px;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;transition:background .2s}
+.drawer-btn:hover{background:var(--rose-deep)}
+.drawer-btn span{display:block;width:22px;height:2.5px;border-radius:2px;background:#fff}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
+.brand-mark{width:46px;height:46px;border-radius:50%;background:linear-gradient(140deg,var(--rose),var(--rose-deep));display:flex;align-items:center;justify-content:center;color:#fff;font-family:"Cormorant Garamond",serif;font-weight:700;font-size:1.7rem;box-shadow:var(--shadow-sm)}
+.brand-name{font-family:"Cormorant Garamond",serif;font-weight:700;font-size:1.5rem;line-height:1.05;letter-spacing:.3px}
+.brand-name small{display:block;font-family:"Jost",sans-serif;font-weight:600;font-size:.62rem;letter-spacing:3px;text-transform:uppercase;color:var(--rose)}
+.bar .call{margin-left:auto;display:inline-flex;align-items:center;gap:8px;background:var(--rose);color:#fff;text-decoration:none;font-weight:600;padding:11px 22px;border-radius:999px;box-shadow:var(--shadow-sm);transition:background .2s,transform .18s;white-space:nowrap}
+.bar .call:hover{background:var(--rose-deep);transform:translateY(-2px)}
+
+.scrim{position:fixed;inset:0;background:rgba(46,33,41,.45);opacity:0;pointer-events:none;transition:opacity .3s;z-index:90}
+.scrim.show{opacity:1;pointer-events:auto}
+nav.drawer{position:fixed;top:0;left:0;bottom:0;width:320px;max-width:86vw;background:var(--paper);z-index:100;transform:translateX(-105%);transition:transform .34s cubic-bezier(.22,.8,.3,1);display:flex;flex-direction:column;box-shadow:var(--shadow)}
+nav.drawer.open{transform:translateX(0)}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:22px 24px;border-bottom:1px solid rgba(194,72,95,.15)}
+.drawer-head .brand-name{font-size:1.3rem}
+.drawer-close{background:none;border:0;cursor:pointer;font-size:1.6rem;color:var(--ink-soft);line-height:1;padding:6px}
+nav.drawer a.dlink{display:flex;align-items:center;gap:14px;text-decoration:none;color:var(--ink);font-weight:500;font-size:1.08rem;padding:15px 24px;border-bottom:1px solid rgba(194,72,95,.08);transition:background .2s,color .2s}
+nav.drawer a.dlink:hover{background:var(--rose-soft)}
+nav.drawer a.dlink.active{background:var(--rose);color:#fff;font-weight:600}
+nav.drawer a.dlink .n{font-family:"Cormorant Garamond",serif;font-size:1.25rem;color:var(--gold);width:34px;flex:none}
+nav.drawer a.dlink.active .n{color:#fff}
+.drawer-foot{margin-top:auto;padding:22px 24px;background:var(--blush)}
+.drawer-foot p{font-size:.92rem;color:var(--ink-soft);margin-bottom:8px}
+.drawer-foot a.tel{font-family:"Cormorant Garamond",serif;font-size:1.45rem;font-weight:700;color:var(--rose-deep);text-decoration:none}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .32s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- card hero ---------- */
+.hero{padding:56px 0 48px}
+.hero-card{background:var(--paper);border-radius:32px;box-shadow:var(--shadow);overflow:hidden;display:grid;grid-template-columns:1.05fr .95fr;position:relative}
+.hero-copy{padding:58px 52px}
+.kicker{display:inline-block;background:var(--rose-soft);color:var(--rose-deep);font-weight:600;font-size:.78rem;letter-spacing:2.5px;text-transform:uppercase;padding:8px 18px;border-radius:999px;margin-bottom:20px}
+h1{font-family:"Cormorant Garamond",serif;font-weight:700;font-size:clamp(2.7rem,5.2vw,4.2rem);line-height:1.04;letter-spacing:-.3px;margin-bottom:18px}
+h1 em{font-style:italic;color:var(--rose-deep)}
+.lede{font-size:1.1rem;color:var(--ink-soft);max-width:32rem;margin-bottom:28px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:26px}
+.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:600;padding:14px 28px;border-radius:999px;font-size:1rem;transition:transform .18s,background .18s,border-color .18s}
+.btn-solid{background:var(--rose);color:#fff;box-shadow:var(--shadow-sm)}
+.btn-solid:hover{background:var(--rose-deep);transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:var(--ink);border:2px solid rgba(46,33,41,.22)}
+.btn-ghost:hover{border-color:var(--rose);color:var(--rose-deep);transform:translateY(-2px)}
+.hours-line{display:flex;align-items:center;gap:10px;font-weight:500;font-size:.96rem;color:var(--ink-soft)}
+.hours-line .dot{width:10px;height:10px;border-radius:50%;background:#6FBF73;box-shadow:0 0 0 4px rgba(111,191,115,.25);animation:pulse 2s infinite}
+.hours-line.closed .dot{background:var(--rose);box-shadow:0 0 0 4px rgba(194,72,95,.25)}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+.hero-art{position:relative;background:linear-gradient(150deg,var(--rose-deep),#5F1E2E);display:flex;align-items:center;justify-content:center;padding:44px;overflow:hidden}
+.hero-art::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 70% 20%,rgba(217,164,65,.4),transparent 55%)}
+.hero-art svg{width:78%;max-width:340px;height:auto;position:relative;filter:drop-shadow(0 18px 26px rgba(0,0,0,.3));animation:floaty 7s ease-in-out infinite}
+@keyframes floaty{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-12px) rotate(2deg)}}
+.hero-badge{position:absolute;bottom:26px;left:50%;transform:translateX(-50%) rotate(-3deg);background:var(--gold);color:#3A2B08;font-weight:700;font-size:.85rem;letter-spacing:1px;padding:10px 24px;border-radius:999px;box-shadow:var(--shadow-sm);white-space:nowrap}
+
+/* ---------- card wall ---------- */
+section.block{padding:54px 0}
+.sec-head{max-width:46rem;margin:0 auto 38px;text-align:center}
+.sec-head .hand{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:1.5rem;color:var(--rose-deep)}
+h2{font-family:"Cormorant Garamond",serif;font-weight:700;font-size:clamp(2rem,3.8vw,2.9rem);line-height:1.1;margin:6px 0 12px;letter-spacing:-.3px}
+.sec-head p{color:var(--ink-soft)}
+.wall{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.wcard{background:var(--paper);border-radius:var(--radius);padding:32px 28px;box-shadow:var(--shadow-sm);transition:transform .2s,box-shadow .2s;border:1px solid rgba(194,72,95,.1);display:flex;flex-direction:column}
+.wcard:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+.wcard .glyph{width:58px;height:58px;border-radius:18px;background:var(--rose-soft);display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+.wcard .glyph svg{width:30px;height:30px}
+.wcard h3{font-family:"Cormorant Garamond",serif;font-size:1.45rem;margin-bottom:8px}
+.wcard p{color:var(--ink-soft);font-size:.97rem;flex:1}
+.wcard a.more{margin-top:16px;font-weight:600;text-decoration:none;font-size:.95rem}
+.wcard a.more:hover{text-decoration:underline}
+.wcard.alt{background:linear-gradient(150deg,var(--ink),#453038);color:#F3E4DA}
+.wcard.alt h3{color:#fff}
+.wcard.alt p{color:#D8BFAE}
+.wcard.alt .glyph{background:rgba(255,255,255,.12)}
+.wcard.alt a.more{color:var(--gold)}
+
+/* ---------- editorial offerings (services page) ---------- */
+.strip{border-radius:28px;padding:56px 50px;color:#fff;position:relative;overflow:hidden;margin-bottom:46px;box-shadow:var(--shadow);background:linear-gradient(120deg,var(--rose-deep),#5F1E2E)}
+.strip::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%,rgba(255,255,255,.2),transparent 50%)}
+.strip h2{color:#fff;font-size:clamp(2.1rem,4vw,3.1rem);position:relative;margin:6px 0 10px}
+.strip p{color:rgba(255,255,255,.88);max-width:38rem;position:relative}
+.strip .eyebrow{font-size:.8rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold-soft);position:relative;font-weight:600}
+.ed-row{display:grid;grid-template-columns:120px 1fr 1fr;gap:36px;align-items:start;padding:38px 0;border-bottom:1px solid rgba(194,72,95,.18)}
+.ed-num{font-family:"Cormorant Garamond",serif;font-size:3.4rem;font-weight:700;color:var(--rose);line-height:1;opacity:.85}
+.ed-row h3{font-family:"Cormorant Garamond",serif;font-size:1.8rem;margin-bottom:10px}
+.ed-row p{color:var(--ink-soft);margin-bottom:10px}
+.ed-list{list-style:none;display:grid;gap:9px}
+.ed-list li{display:flex;gap:10px;align-items:flex-start;font-size:.97rem}
+.ed-list li::before{content:"";flex:none;width:9px;height:9px;border-radius:50%;background:var(--gold);margin-top:8px}
+.ed-note{background:var(--gold-soft);border:2px dashed rgba(201,147,46,.55);border-radius:var(--radius);padding:20px 26px;margin:34px 0 10px;font-size:.96rem;color:#6B4d12}
+.ed-note strong{color:var(--rose-deep)}
+.cta-band{background:linear-gradient(120deg,var(--rose),var(--rose-deep));border-radius:28px;color:#fff;padding:52px;text-align:center;margin-top:48px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.cta-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 20%,rgba(217,164,65,.35),transparent 50%)}
+.cta-band h2{color:#fff;position:relative}
+.cta-band p{color:#F7D9E0;position:relative;max-width:36rem;margin:0 auto 26px}
+.cta-band .btn-solid{background:#fff;color:var(--rose-deep);position:relative}
+.cta-band .btn-solid:hover{background:var(--gold-soft)}
+
+/* ---------- horizontal strip gallery ---------- */
+.hstrip{display:flex;gap:20px;overflow-x:auto;padding:10px 4px 26px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+.hstrip::-webkit-scrollbar{height:10px}
+.hstrip::-webkit-scrollbar-track{background:var(--rose-soft);border-radius:999px}
+.hstrip::-webkit-scrollbar-thumb{background:var(--rose);border-radius:999px}
+.htile{flex:0 0 300px;scroll-snap-align:start;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);background:var(--paper);position:relative}
+.htile .art{aspect-ratio:4/3.2;display:flex;align-items:center;justify-content:center}
+.htile .art svg{width:42%;height:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.16))}
+.htile .cap{padding:16px 20px}
+.htile .cap strong{font-family:"Cormorant Garamond",serif;font-size:1.2rem;display:block}
+.htile .cap small{color:var(--ink-soft)}
+.htile .soon{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.88);font-size:.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 12px;border-radius:999px;color:var(--ink-soft)}
+
+/* ---------- reviews ---------- */
+.rs-strip{margin:0 auto 30px;max-width:660px;background:var(--paper);border:1px solid rgba(194,72,95,.18);border-radius:var(--radius);padding:22px 26px;text-align:center;box-shadow:var(--shadow-sm)}
+.rs-note{margin:0 0 14px;font-size:.95rem;color:var(--ink-soft);line-height:1.55}
+.rs-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rs-btn{display:inline-block;background:var(--rose);color:#fff;padding:12px 28px;border-radius:999px;font-weight:600;text-decoration:none;font-size:.97rem}
+.rs-btn:hover{background:var(--rose-deep)}
+.rev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.rev{background:var(--paper);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow-sm);position:relative;border:1px solid rgba(194,72,95,.1)}
+.rev .stars{color:var(--gold);font-size:1.2rem;letter-spacing:3px;margin-bottom:12px}
+.rev p{font-size:1.02rem;margin-bottom:14px}
+.rev cite{font-style:normal;font-weight:600;font-size:.86rem;color:var(--rose-deep);letter-spacing:.5px}
+.rev .badge{display:inline-block;background:var(--gold-soft);color:#6B4d12;font-size:.68rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 12px;border-radius:999px;margin-bottom:10px}
+.rev.low{border-left:6px solid var(--rose)}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:24px}
+.info-card{background:var(--paper);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm);border:1px solid rgba(194,72,95,.1)}
+.info-card h3{font-family:"Cormorant Garamond",serif;font-size:1.55rem;margin-bottom:12px}
+.info-card p{color:var(--ink-soft);margin-bottom:8px}
+.info-card a.big{font-family:"Cormorant Garamond",serif;font-size:1.6rem;font-weight:700;color:var(--rose-deep);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.hours-table{width:100%;border-collapse:collapse;font-size:.98rem}
+.hours-table td{padding:10px 6px;border-bottom:1px dashed rgba(46,33,41,.18)}
+.hours-table tr.today td{font-weight:700;color:var(--rose-deep)}
+.hours-table tr.today td:first-child::after{content:" · today";font-family:"Cormorant Garamond",serif;font-style:italic;font-size:1.15rem;color:var(--rose);margin-left:6px}
+.hours-table td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.map-card{border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);min-height:340px;background:linear-gradient(rgba(194,72,95,.07),rgba(194,72,95,.07)),repeating-linear-gradient(0deg,transparent 0 46px,rgba(194,72,95,.16) 46px 48px),repeating-linear-gradient(90deg,transparent 0 46px,rgba(194,72,95,.16) 46px 48px),linear-gradient(140deg,#F7E7DA,#EFd3C0);display:flex;align-items:center;justify-content:center}
+.map-pin{text-align:center;background:var(--paper);padding:28px 36px;border-radius:20px;box-shadow:var(--shadow);max-width:80%;position:relative}
+.map-pin::after{content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);border:14px solid transparent;border-top-color:var(--paper);border-bottom:0}
+.map-pin strong{font-family:"Cormorant Garamond",serif;font-size:1.25rem;display:block}
+.map-pin small{color:var(--ink-soft)}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- minimal footer ---------- */
+footer{background:var(--ink);color:#E6D2D8;margin-top:24px}
+.foot-simple{padding:52px 0 30px;text-align:center}
+.foot-simple .fmark{width:52px;height:52px;border-radius:50%;background:linear-gradient(140deg,var(--rose),var(--rose-deep));display:inline-flex;align-items:center;justify-content:center;color:#fff;font-family:"Cormorant Garamond",serif;font-weight:700;font-size:1.9rem;margin-bottom:14px}
+.foot-simple nav{display:flex;justify-content:center;flex-wrap:wrap;gap:6px;margin:16px 0}
+.foot-simple nav a{color:#D8BFAE;text-decoration:none;font-weight:500;font-size:.95rem;padding:8px 14px;border-radius:999px}
+.foot-simple nav a:hover{background:rgba(255,255,255,.1);color:#fff}
+.foot-simple p{font-size:.93rem;color:#B79AA3;max-width:34rem;margin:0 auto}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.12);padding:20px 0 26px;text-align:center;font-size:.88rem;color:#A98F98}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:940px){
+  .hero-card{grid-template-columns:1fr}
+  .hero-copy{padding:42px 32px}
+  .hero-art{padding:40px 24px 80px}
+  .wall{grid-template-columns:1fr 1fr}
+  .rev-grid{grid-template-columns:1fr}
+  .visit-grid{grid-template-columns:1fr}
+  .ed-row{grid-template-columns:64px 1fr;gap:20px}
+  .ed-row .ed-list{grid-column:2}
+  .strip{padding:44px 30px}
+  .bar .call{display:none}
+}
+@media(max-width:600px){
+  .wall{grid-template-columns:1fr}
+  .hero-copy{padding:34px 24px}
+  .ed-row{grid-template-columns:1fr}
+  .ed-num{font-size:2.6rem}
+  .ed-row .ed-list{grid-column:1}
+  .cta-band{padding:38px 24px}
+}
+</style>
+</head>
+<body>
+
+<div class="scrim" id="scrim"></div>
+<nav class="drawer" id="mainNav" aria-label="Main navigation">
+  <div class="drawer-head">
+    <span class="brand-name serif">Maval<small>Beauty Salon</small></span>
+    <button class="drawer-close" id="drawerClose" aria-label="Close menu">✕</button>
+  </div>
+  <a class="dlink active" href="#home" data-page="home" aria-current="page"><span class="n serif">01</span>Home</a>
+  <a class="dlink" href="#services" data-page="services"><span class="n serif">02</span>Services</a>
+  <a class="dlink" href="#story" data-page="story"><span class="n serif">03</span>Our Story</a>
+  <a class="dlink" href="#gallery" data-page="gallery"><span class="n serif">04</span>Gallery</a>
+  <a class="dlink" href="#reviews" data-page="reviews"><span class="n serif">05</span>Reviews</a>
+  <a class="dlink" href="#visit" data-page="visit"><span class="n serif">06</span>Visit Us</a>
+  <div class="drawer-foot">
+    <p>Book your chair today</p>
+    <a class="tel" href="tel:+17186765655">(718) 676-5655</a>
+  </div>
+</nav>
+
+<header class="site">
+  <div class="wrap bar">
+    <button class="drawer-btn" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    <a class="brand" href="#home" data-page="home" aria-label="Maval Beauty Salon, home">
+      <span class="brand-mark serif">M</span>
+      <span class="brand-name">Maval<small>Beauty Salon · Brooklyn</small></span>
+    </a>
+    <a class="call" href="tel:+17186765655">✆ (718) 676-5655</a>
+  </div>
+</header>
+
+<section class="page active" id="page-home">
+  <div class="wrap">
+    <div class="hero">
+      <div class="hero-card">
+        <div class="hero-copy">
+          <span class="kicker">Sheepshead Bay · Brooklyn</span>
+          <h1>Your chair is waiting, <em>your glow is next.</em></h1>
+          <p class="lede">Maval Beauty Salon is a full-service beauty salon on Avenue X. Haircuts, color, styling and nail care, all in one chair, all in one visit. Call to book and leave feeling like yourself, only better.</p>
+          <div class="cta-row">
+            <a class="btn btn-solid" href="tel:+17186765655">✆ Call to Book</a>
+            <a class="btn btn-ghost" href="#services" data-page="services">Explore Services →</a>
+          </div>
+          <p class="hours-line" id="hoursPill"><span class="dot"></span><span id="hoursText">Checking today's hours…</span></p>
+        </div>
+        <div class="hero-art">
+          <svg viewBox="0 0 200 200" role="img" aria-label="Illustration of salon styling tools">
+            <circle cx="100" cy="100" r="88" fill="#FFF8F4" opacity=".14"/>
+            <rect x="86" y="30" width="10" height="110" rx="5" fill="#F8EACB" transform="rotate(24 91 95)"/>
+            <rect x="86" y="30" width="10" height="110" rx="5" fill="none" stroke="#C9932E" stroke-width="3" transform="rotate(24 91 95)"/>
+            <g transform="rotate(-18 130 120)">
+              <rect x="120" y="60" width="20" height="90" rx="10" fill="#C2485F"/>
+              <rect x="120" y="44" width="20" height="26" rx="8" fill="#F8EACB"/>
+              <path d="M124 96 l12 -14 M124 116 l12 -14 M124 136 l12 -14" stroke="#FFF8F4" stroke-width="4" stroke-linecap="round"/>
+            </g>
+            <circle cx="62" cy="150" r="22" fill="none" stroke="#F8EACB" stroke-width="8"/>
+            <circle cx="62" cy="150" r="22" fill="none" stroke="#C9932E" stroke-width="8" stroke-dasharray="40 100" stroke-linecap="round"/>
+            <circle cx="150" cy="150" r="6" fill="#F8EACB" opacity=".9"/>
+            <circle cx="44" cy="60" r="4" fill="#F8EACB" opacity=".8"/>
+            <circle cx="168" cy="60" r="5" fill="#C9932E" opacity=".8"/>
+          </svg>
+          <span class="hero-badge">Full-service salon · one visit, all done</span>
+        </div>
+      </div>
+    </div>
+
+    <section class="block" style="padding-top:10px">
+      <div class="sec-head reveal">
+        <span class="hand">Why Maval</span>
+        <h2>A neighborhood salon that treats you like a regular</h2>
+        <p>One chair for hair, color and nails, so a full refresh takes one trip, not three.</p>
+      </div>
+      <div class="wall">
+        <div class="wcard reveal">
+          <div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="#C2485F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6.5 8-6.5s8 2.5 8 6.5"/></svg></div>
+          <h3>Hair, start to finish</h3>
+          <p>Precision cuts, rich color and smooth styling. Bring a photo or an idea, your stylist shapes it to you.</p>
+          <a class="more" href="#services" data-page="services">See hair services →</a>
+        </div>
+        <div class="wcard reveal">
+          <div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="#C2485F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21C7 17 3 13.5 3 9.5 3 7 5 5 7.5 5c1.7 0 3.3.9 4.5 2.6C13.2 5.9 14.8 5 16.5 5 19 5 21 7 21 9.5c0 4-4 7.5-9 11.5z"/></svg></div>
+          <h3>Nails, hands and feet</h3>
+          <p>Manicures and pedicures to finish the look. Sit back, soak, and let the day melt off.</p>
+          <a class="more" href="#services" data-page="services">See nail services →</a>
+        </div>
+        <div class="wcard alt reveal">
+          <div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="#C9932E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg></div>
+          <h3>Known for detail</h3>
+          <p>Reviewers call out neat, careful work and a comfortable, unhurried chair. Read what neighbors say.</p>
+          <a class="more" href="#reviews" data-page="reviews">Read reviews →</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="block" style="padding-top:0">
+      <div class="sec-head reveal">
+        <span class="hand">The Maval way</span>
+        <h2>Walk in with a plan, walk out glowing</h2>
+      </div>
+      <div class="wall">
+        <div class="wcard reveal">
+          <div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="#C2485F" stroke-width="2" stroke-linecap="round"><path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h5"/></svg></div>
+          <h3>1. Call ahead</h3>
+          <p>One quick call to (718) 676-5655 and your chair is reserved. Walk-ins are welcome when the schedule allows.</p>
+        </div>
+        <div class="wcard reveal">
+          <div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="#C2485F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 01-8.5 8.5c-1.5 0-3-.4-4.2-1L3 20l1-5.2A8.5 8.5 0 1121 11.5z"/></svg></div>
+          <h3>2. Talk it through</h3>
+          <p>Your stylist listens first: what you want, what your hair does, what fits your life. No guesswork.</p>
+        </div>
+        <div class="wcard reveal">
+          <div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="#C2485F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <h3>3. Leave refreshed</h3>
+          <p>Cut, color, style or nails, done with care. You leave with the look and the know-how to keep it.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="cta-band reveal">
+      <h2>Ready for your refresh?</h2>
+      <p>624 Avenue X, Brooklyn. One call books hair, color and nails, all in a single visit.</p>
+      <a class="btn btn-solid" href="tel:+17186765655">✆ (718) 676-5655</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip">
+      <span class="eyebrow">Services</span>
+      <h2 class="serif">Everything you need, in one chair</h2>
+      <p>Maval is a full-service beauty salon: hair, color, styling and nail care under one roof on Avenue X. Exact pricing is confirmed at booking, since it depends on hair length, thickness and the look you want.</p>
+    </div>
+
+    <div class="ed-row reveal">
+      <div class="ed-num serif">01</div>
+      <div>
+        <h3 class="serif">Haircuts and styling</h3>
+        <p>Precision cuts shaped to your face and your routine, finished with a smooth, polished style. Come for a trim or a full transformation.</p>
+      </div>
+      <ul class="ed-list">
+        <li>Women's and men's cuts</li>
+        <li>Blowouts and occasion styling</li>
+        <li>Consultation before every service</li>
+      </ul>
+    </div>
+
+    <div class="ed-row reveal">
+      <div class="ed-num serif">02</div>
+      <div>
+        <h3 class="serif">Hair color</h3>
+        <p>Rich, even color and dimensional looks. Tell your stylist what you are dreaming of, and get an honest read on what will work with your hair.</p>
+      </div>
+      <ul class="ed-list">
+        <li>Single-process color and root touch-ups</li>
+        <li>Highlights and dimensional color</li>
+        <li>Color correction guidance</li>
+      </ul>
+    </div>
+
+    <div class="ed-row reveal">
+      <div class="ed-num serif">03</div>
+      <div>
+        <h3 class="serif">Nails, manicures and pedicures</h3>
+        <p>Neat, careful nail care to finish your visit. Reviewers single out pedicures here, so book the full set and leave polished head to toe.</p>
+      </div>
+      <ul class="ed-list">
+        <li>Manicures</li>
+        <li>Pedicures</li>
+        <li>Nail shaping and polish</li>
+      </ul>
+    </div>
+
+    <div class="ed-note reveal">
+      <strong>Pricing:</strong> prices are samples to give you a general idea and vary by service, hair length and products used. Final pricing is always confirmed with your stylist before work begins. <strong>Call (718) 676-5655</strong> for a quote on your specific service.
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Book your chair</h2>
+      <p>Call ahead so your visit is relaxed and unhurried. Walk-ins are welcome when the schedule allows.</p>
+      <a class="btn btn-solid" href="tel:+17186765655">✆ (718) 676-5655</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-story">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip" style="background:linear-gradient(120deg,#2E2129,#453038)">
+      <span class="eyebrow" style="color:var(--gold-soft)">Our story</span>
+      <h2 class="serif">A neighborhood chair on Avenue X</h2>
+      <p>Maval Beauty Salon is a full-service beauty salon in Sheepshead Bay, Brooklyn, where hair, color and nail care happen in one relaxed visit.</p>
+    </div>
+
+    <div class="ed-row reveal">
+      <div class="ed-num serif">A</div>
+      <div>
+        <h3 class="serif">One salon, every treatment</h3>
+        <p>The idea behind Maval is simple: knock out all of your beauty treatments in one location. Instead of running across the neighborhood for a cut, color and pedicure, you settle into one chair and the team takes care of it all.</p>
+        <p>It is the kind of practical luxury busy neighbors appreciate: one booking, one visit, one very good hair day.</p>
+      </div>
+      <ul class="ed-list">
+        <li>Hair, color and styling</li>
+        <li>Manicures and pedicures</li>
+        <li>A calm, comfortable chair</li>
+      </ul>
+    </div>
+
+    <div class="ed-row reveal">
+      <div class="ed-num serif">B</div>
+      <div>
+        <h3 class="serif">Detail you can see</h3>
+        <p>Public reviews keep coming back to the same words: neat, careful, professional, kind. Guests praise the attention to detail, from the first consultation to the final mirror check, and say the atmosphere makes the time fly.</p>
+        <p>That is the standard every appointment is held to, whether it is a quick trim or a full color transformation.</p>
+      </div>
+      <ul class="ed-list">
+        <li>Careful, detail-first work</li>
+        <li>An unhurried, comfortable visit</li>
+        <li>Stylists who listen before they cut</li>
+      </ul>
+    </div>
+
+    <div class="ed-row reveal">
+      <div class="ed-num serif">C</div>
+      <div>
+        <h3 class="serif">Part of Sheepshead Bay</h3>
+        <p>Maval sits on Avenue X in the heart of Sheepshead Bay, serving a wonderfully diverse neighborhood. Reviews arrive in more than one language, and the salon's door is open to everyone.</p>
+        <p>New to the area? Introduce yourself at your first visit. Regulars will tell you this is the kind of place that remembers you.</p>
+      </div>
+      <ul class="ed-list">
+        <li>624 Avenue X, easy to reach</li>
+        <li>A multilingual, welcoming team</li>
+        <li>Weekday hours that fit a workday</li>
+      </ul>
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Come meet your stylist</h2>
+      <p>The best way to know a salon is to sit in the chair. Call and book your first visit.</p>
+      <a class="btn btn-solid" href="#visit" data-page="visit">Plan your visit →</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip" style="background:linear-gradient(120deg,#C9932E,#8A6417)">
+      <span class="eyebrow" style="color:#fff">Gallery</span>
+      <h2 class="serif">A peek at the chair</h2>
+      <p>Artistic previews of salon life at Maval. Real photos of our work are on the way, scroll to browse.</p>
+    </div>
+
+    <div class="hstrip">
+      <div class="htile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#F7D9E0,#E9AEBD)">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="38" r="16" fill="#FFFDFB"/><path d="M50 22 q-14 2 -12 18 q1 10 12 10 q11 0 12 -10 q2 -16 -12 -18z" fill="#2E2129" opacity=".85"/><path d="M34 54 q16 -10 32 0 l6 34 q-22 8 -44 0 z" fill="#C2485F"/></svg>
+        </div>
+        <div class="cap"><strong>The signature cut</strong><small>Shaped to you, finished smooth</small></div>
+      </div>
+      <div class="htile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#F8EACB,#E5C878)">
+          <svg viewBox="0 0 100 100"><path d="M30 20 q-6 30 4 60 q3 8 10 2 q-6 -30 -4 -58 q-6 -8 -10 -4z" fill="#C2485F"/><path d="M70 20 q6 30 -4 60 q-3 8 -10 2 q6 -30 4 -58 q6 -8 10 -4z" fill="#C2485F"/><circle cx="50" cy="55" r="8" fill="#932F45"/></svg>
+        </div>
+        <div class="cap"><strong>Rich, even color</strong><small>From touch-ups to transformations</small></div>
+      </div>
+      <div class="htile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#E7F3E7,#B9DAB9)">
+          <svg viewBox="0 0 100 100"><ellipse cx="50" cy="66" rx="30" ry="12" fill="#7FB3D9"/><ellipse cx="50" cy="62" rx="26" ry="9" fill="#DCEEF7"/><rect x="42" y="30" width="16" height="24" rx="7" fill="#C9932E"/><circle cx="50" cy="26" r="5" fill="#932F45"/></svg>
+        </div>
+        <div class="cap"><strong>Pedicure hour</strong><small>Soak, shape, polish, relax</small></div>
+      </div>
+      <div class="htile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#E8D9F2,#C2A3DC)">
+          <svg viewBox="0 0 100 100"><rect x="40" y="18" width="20" height="52" rx="10" fill="#2E2129"/><rect x="40" y="18" width="20" height="14" rx="7" fill="#C2485F"/><path d="M50 70 v20 M50 80 l-8 8 M50 80 l8 8" stroke="#C2485F" stroke-width="4" stroke-linecap="round"/><circle cx="72" cy="36" r="4" fill="#C9932E"/><circle cx="28" cy="50" r="3" fill="#C9932E"/></svg>
+        </div>
+        <div class="cap"><strong>Blowout finish</strong><small>Sleek, bouncy, ready to go</small></div>
+      </div>
+      <div class="htile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#F9D9C8,#EFAE85)">
+          <svg viewBox="0 0 100 100"><rect x="26" y="58" width="48" height="16" rx="8" fill="#FFFDFB" stroke="#C2485F" stroke-width="3"/><path d="M34 58 q4 -14 12 -16 M46 58 q4 -14 12 -16 M58 58 q4 -14 12 -16" stroke="#C2485F" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="50" cy="34" r="6" fill="#C9932E" opacity=".9"/></svg>
+        </div>
+        <div class="cap"><strong>Manicure detail</strong><small>Neat, careful, polished</small></div>
+      </div>
+      <div class="htile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#DCEEF7,#9CC4E2)">
+          <svg viewBox="0 0 100 100"><rect x="30" y="34" width="40" height="46" rx="10" fill="#FFFDFB" stroke="#932F45" stroke-width="3"/><path d="M38 48 h24 M38 58 h24 M38 68 h14" stroke="#C2485F" stroke-width="4" stroke-linecap="round"/><circle cx="70" cy="30" r="6" fill="#C9932E"/></svg>
+        </div>
+        <div class="cap"><strong>The salon shelf</strong><small>Pro products, honest advice</small></div>
+      </div>
+    </div>
+
+    <div class="ed-note reveal">
+      <strong>Coming soon:</strong> real photos of our stylists' work. The illustrations above are artistic previews. The real thing is in the chair, call to see it in person.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip" style="background:linear-gradient(120deg,#932F45,#5F1E2E)">
+      <span class="eyebrow" style="color:var(--gold-soft)">Reviews</span>
+      <h2 class="serif">What neighbors say</h2>
+      <p>Based on 9 Google reviews, rated 4.1 out of 5. Here are the themes guests keep mentioning.</p>
+    </div>
+    <div class="rs-strip">
+      <p class="rs-note">Review themes on this page are paraphrased from public feedback. Open the source to read current reviews and ratings.</p>
+      <div class="rs-links"><a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJ72fk_F5EwokRNBTjTxGCwlE" target="_blank" rel="noopener">See reviews on Google</a></div>
+    </div>
+
+    <div class="rev-grid">
+      <div class="rev reveal">
+        <span class="badge">Sample</span>
+        <div class="stars">★★★★★</div>
+        <p>Neat, detailed work with real attention to the small things. The visit felt comfortable and the time flew by.</p>
+        <cite>Paraphrased from a public review</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="badge">Sample</span>
+        <div class="stars">★★★★★</div>
+        <p>Super professional, kind and loving. Loved this place so much, I will be back and I am telling my friends.</p>
+        <cite>Paraphrased from a public review</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="badge">Sample</span>
+        <div class="stars">★★★★★</div>
+        <p>My stylist listened to exactly what I wanted and the result was better than I expected. Booking again.</p>
+        <cite>Paraphrased from a public review</cite>
+      </div>
+      <div class="rev low reveal">
+        <span class="badge">Sample</span>
+        <div class="stars">★★☆☆☆</div>
+        <p>A guest reported being unhappy with how a pedicure held up two days later. We take this feedback seriously, please tell us right away if anything is not perfect.</p>
+        <cite>Paraphrased from public reviews</cite>
+      </div>
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Visited us? Tell the neighborhood.</h2>
+      <p>Your review helps a local salon keep growing. It takes a minute and it means the world to us.</p>
+      <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJ72fk_F5EwokRNBTjTxGCwlE" target="_blank" rel="noopener">★ Leave us a Google review</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip" style="background:linear-gradient(120deg,#3E5A2B,#243318)">
+      <span class="eyebrow" style="color:#fff">Visit us</span>
+      <h2 class="serif">Find us on Avenue X</h2>
+      <p>Maval Beauty Salon sits in Sheepshead Bay, Brooklyn. Call ahead to book, walk-ins are welcome when the schedule allows.</p>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3 class="serif">Find us</h3>
+        <p><strong>Maval Beauty Salon</strong><br>624 Avenue X<br>Brooklyn, NY 11235</p>
+        <p>In the heart of Sheepshead Bay, easy to reach by car or subway.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3 class="serif">Call us</h3>
+        <p>Book hair, color and nails in one visit:</p>
+        <a class="big" href="tel:+17186765655">(718) 676-5655</a>
+        <p style="margin-top:10px">Weekday hours fit a workday, mornings through early evening.</p>
+      </div>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3 class="serif">Hours</h3>
+        <table class="hours-table" id="hoursTable">
+          <tr><td>Monday</td><td>9:00 AM - 6:00 PM</td></tr>
+          <tr><td>Tuesday</td><td>9:00 AM - 6:00 PM</td></tr>
+          <tr><td>Wednesday</td><td>9:00 AM - 6:00 PM</td></tr>
+          <tr><td>Thursday</td><td>9:00 AM - 6:00 PM</td></tr>
+          <tr><td>Friday</td><td>9:00 AM - 6:00 PM</td></tr>
+          <tr><td>Saturday</td><td>Closed</td></tr>
+          <tr><td>Sunday</td><td>Closed</td></tr>
+        </table>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <strong class="serif">624 Avenue X</strong>
+          <small>Brooklyn, NY 11235</small><br>
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJ72fk_F5EwokRNBTjTxGCwlE" target="_blank" rel="noopener">Get Directions →</a>
+        </div>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-simple">
+      <span class="fmark serif">M</span>
+      <nav>
+        <a href="#home" data-page="home">Home</a>
+        <a href="#services" data-page="services">Services</a>
+        <a href="#story" data-page="story">Our Story</a>
+        <a href="#gallery" data-page="gallery">Gallery</a>
+        <a href="#reviews" data-page="reviews">Reviews</a>
+        <a href="#visit" data-page="visit">Visit Us</a>
+      </nav>
+      <p>Maval Beauty Salon, 624 Avenue X, Brooklyn, NY 11235 · <a href="tel:+17186765655" style="color:#D8BFAE">(718) 676-5655</a></p>
+    </div>
+    <div class="foot-bottom">
+      <span>© Maval Beauty Salon</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "story", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+  var scrim = document.getElementById("scrim");
+  var drawerClose = document.getElementById("drawerClose");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(scrim){ scrim.classList.remove("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function openMenu(){
+    if(nav){ nav.classList.add("open"); }
+    if(scrim){ scrim.classList.add("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "true"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.drawer a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      if(nav.classList.contains("open")){ closeMenu(); } else { openMenu(); }
+    });
+  }
+  if(drawerClose){ drawerClose.addEventListener("click", closeMenu); }
+  if(scrim){ scrim.addEventListener("click", closeMenu); }
+
+  /* ---------- live hours (America/New_York) ---------- */
+  var HOURS = {0:null,1:[9,18],2:[9,18],3:[9,18],4:[9,18],5:[9,18],6:null};
+  var DOW = {"Sun":0,"Mon":1,"Tue":2,"Wed":3,"Thu":4,"Fri":5,"Sat":6};
+  function fmt(h){
+    var ap = h < 12 ? "AM" : "PM";
+    var hh = h % 12;
+    if(hh === 0){ hh = 12; }
+    return hh + ":00 " + ap;
+  }
+  try{
+    var parts = new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",weekday:"short",hour:"numeric",hour12:false}).formatToParts(new Date());
+    var wd = "Mon", hr = 12;
+    parts.forEach(function(p){
+      if(p.type === "weekday"){ wd = p.value; }
+      if(p.type === "hour"){ hr = parseInt(p.value, 10) % 24; }
+    });
+    var day = DOW[wd] !== undefined ? DOW[wd] : 1;
+    var today = HOURS[day];
+    var pill = document.getElementById("hoursPill");
+    var txt = document.getElementById("hoursText");
+    if(pill && txt){
+      if(today && hr >= today[0] && hr < today[1]){
+        txt.textContent = "Open now · until " + fmt(today[1]) + " today";
+      } else {
+        pill.classList.add("closed");
+        var found = false;
+        for(var k = 1; k <= 7; k++){
+          var nd = (day + k) % 7;
+          if(HOURS[nd]){
+            var dayName = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][nd];
+            txt.textContent = "Opens " + (k === 1 ? "tomorrow" : dayName) + " at " + fmt(HOURS[nd][0]);
+            found = true;
+            break;
+          }
+        }
+        if(!found){ txt.textContent = "Call for hours: (718) 676-5655"; }
+      }
+    }
+    var rows = document.querySelectorAll("#hoursTable tr");
+    var idx = (day + 6) % 7;
+    if(rows[idx]){ rows[idx].classList.add("today"); }
+  }catch(e){ /* leave default pill text */ }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

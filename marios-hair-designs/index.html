@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mario's Hair Designs | Family Salon in Manlius, NY</title>
+<meta name="description" content="Mario's Hair Designs is a family-owned and operated hair salon at 131 W Seneca St, Manlius, NY 13104. Cuts, color and styling for men, women and children. Call (315) 682-6423.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#faf6ef; --cream2:#f3ecdf; --ink:#2c2420; --muted:#6f625a;
+    --plum:#6d2e46; --plum-d:#532238; --gold:#c9a227; --gold-soft:#e8d9a8;
+    --card:#ffffff; --line:#e6dccb; --radius:14px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--cream);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased}
+  h1,h2,h3,.serif{font-family:'Playfair Display',Georgia,serif;font-weight:700;line-height:1.18;color:var(--ink)}
+  a{color:var(--plum)}
+  img,svg{display:block;max-width:100%}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+  .eyebrow{display:inline-block;font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--plum);font-weight:700;margin-bottom:14px}
+  .page{display:none}
+  .page.active{display:block;animation:fadeIn .45s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+  .burger{position:fixed;top:18px;left:18px;z-index:60;width:48px;height:48px;border:1px solid var(--line);border-radius:12px;background:var(--card);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;box-shadow:0 6px 18px rgba(44,36,32,.10)}
+  .burger span{display:block;width:22px;height:2px;background:var(--ink);border-radius:2px;transition:transform .25s,opacity .25s}
+  .burger[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+  .burger[aria-expanded="true"] span:nth-child(2){opacity:0}
+  .burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+  .scrim{position:fixed;inset:0;background:rgba(44,36,32,.45);opacity:0;pointer-events:none;transition:opacity .3s;z-index:48}
+  .scrim.show{opacity:1;pointer-events:auto}
+
+  .drawer{position:fixed;top:0;left:0;bottom:0;width:288px;background:var(--plum-d);color:#f5ecdd;z-index:55;transform:translateX(-105%);transition:transform .32s ease;padding:84px 28px 28px;display:flex;flex-direction:column;gap:6px}
+  .drawer.open{transform:none}
+  .drawer .brand{font-family:'Playfair Display',serif;font-size:24px;color:#fff;margin-bottom:6px}
+  .drawer .brand small{display:block;font-family:'Inter',sans-serif;font-size:12px;letter-spacing:2px;color:var(--gold-soft);margin-top:4px}
+  .drawer nav.main{display:flex;flex-direction:column;margin-top:26px}
+  .drawer nav.main a{color:#f0e4cf;text-decoration:none;padding:12px 14px;border-radius:10px;font-weight:600;letter-spacing:.4px}
+  .drawer nav.main a:hover{background:rgba(255,255,255,.08)}
+  .drawer nav.main a.active{background:var(--gold);color:var(--plum-d)}
+  .drawer .d-foot{margin-top:auto;font-size:13px;color:#d8c9ae;line-height:1.7}
+  .drawer .d-foot a{color:#fff}
+
+  .hero-split{display:grid;grid-template-columns:1.05fr .95fr;gap:0;min-height:92vh;align-items:stretch}
+  .hero-copy{padding:120px 48px 72px 96px;display:flex;flex-direction:column;justify-content:center}
+  .hero-copy h1{font-size:clamp(40px,5vw,64px);margin-bottom:18px}
+  .hero-copy h1 em{font-style:italic;color:var(--plum)}
+  .hero-copy p.lead{font-size:18px;color:var(--muted);max-width:44ch;margin-bottom:30px}
+  .hero-art{background:linear-gradient(135deg,var(--plum) 0%,var(--plum-d) 60%,#3c1626 100%);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:60px}
+  .hero-art .ring{width:min(340px,70%);aspect-ratio:1;border:2px solid var(--gold-soft);border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative}
+  .hero-art .ring svg{width:56%}
+  .hero-art .dots{position:absolute;inset:0;opacity:.16;background-image:radial-gradient(#e8d9a8 1.5px,transparent 1.5px);background-size:26px 26px}
+  .btn{display:inline-block;padding:14px 28px;border-radius:999px;font-weight:700;text-decoration:none;font-size:15px;transition:transform .15s,box-shadow .15s;cursor:pointer;border:2px solid var(--plum)}
+  .btn:hover{transform:translateY(-2px)}
+  .btn-solid{background:var(--plum);color:#fff;box-shadow:0 10px 24px rgba(109,46,70,.28)}
+  .btn-ghost{background:transparent;color:var(--plum)}
+  .btn-row{display:flex;gap:14px;flex-wrap:wrap}
+
+  .band{padding:84px 0}
+  .band.alt{background:var(--cream2)}
+  .asym-a{display:grid;grid-template-columns:1.35fr .65fr;gap:56px;align-items:center}
+  .asym-b{display:grid;grid-template-columns:.6fr 1.4fr;gap:56px;align-items:center}
+  .asym-a h2,.asym-b h2{font-size:clamp(28px,3.4vw,42px);margin-bottom:16px}
+  .asym-a p,.asym-b p{color:var(--muted);margin-bottom:14px}
+  .info-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:28px;box-shadow:0 12px 30px rgba(44,36,32,.07)}
+  .info-card h3{font-size:20px;margin-bottom:10px}
+  .info-card p{font-size:15px;color:var(--muted);margin-bottom:8px}
+  .info-card .big{font-size:22px;font-weight:700;color:var(--plum)}
+  .quote-card{background:var(--plum);color:#f7efe0;border-radius:var(--radius);padding:30px;position:relative}
+  .quote-card::before{content:"\201C";font-family:Georgia,serif;font-size:64px;color:var(--gold);position:absolute;top:8px;left:20px;opacity:.7}
+  .quote-card p{font-style:italic;font-size:17px;margin:22px 0 10px}
+  .quote-card cite{font-style:normal;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--gold-soft)}
+
+  .tabs{display:flex;gap:10px;flex-wrap:wrap;margin:26px 0 8px}
+  .tab-btn{border:2px solid var(--line);background:var(--card);color:var(--ink);padding:12px 24px;border-radius:999px;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s}
+  .tab-btn.active{background:var(--plum);border-color:var(--plum);color:#fff}
+  .tab-panel{display:none;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:12px 8px;margin-top:14px}
+  .tab-panel.active{display:block;animation:fadeIn .35s ease}
+  .svc{display:flex;justify-content:space-between;gap:18px;padding:18px 20px;border-bottom:1px dashed var(--line);align-items:baseline}
+  .svc:last-child{border-bottom:none}
+  .svc .n{font-weight:700;font-size:16px}
+  .svc .d{font-size:14px;color:var(--muted);margin-top:4px}
+  .svc .p{font-family:'Playfair Display',serif;font-size:18px;color:var(--plum);white-space:nowrap}
+  .sample-note{display:inline-block;background:var(--gold-soft);color:#5d4a12;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:6px 12px;border-radius:999px;margin-top:14px}
+
+  .masonry{columns:3 240px;column-gap:18px;margin-top:30px}
+  .tile{break-inside:avoid;margin-bottom:18px;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line);background:var(--card);position:relative}
+  .tile .ph{aspect-ratio:4/5;display:flex;align-items:center;justify-content:center}
+  .tile.wide .ph{aspect-ratio:16/10}
+  .tile.tall .ph{aspect-ratio:3/4}
+  .tile .badge{position:absolute;top:12px;left:12px;background:rgba(44,36,32,.78);color:#fff;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 11px;border-radius:999px}
+  .tile .cap{padding:12px 16px;font-size:14px;color:var(--muted)}
+
+  .chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+  .chip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 18px;font-size:14px;font-weight:600}
+
+  .rev-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-top:30px}
+  .rev-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:26px}
+  .rev-card .stars{color:var(--gold);letter-spacing:3px;font-size:16px;margin-bottom:12px}
+  .rev-card p{font-size:15px;margin-bottom:12px}
+  .rev-card cite{font-style:normal;font-size:13px;color:var(--muted);font-weight:600}
+  .score-band{display:grid;grid-template-columns:.5fr 1.5fr;gap:40px;align-items:center;background:var(--plum);color:#f7efe0;border-radius:20px;padding:44px;margin-bottom:10px}
+  .score-num{font-family:'Playfair Display',serif;font-size:84px;color:var(--gold);line-height:1}
+  .score-band p{color:#e9dcc4}
+  .src-links{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+  .src-links a{color:var(--gold-soft);font-weight:700;text-decoration:underline;text-underline-offset:4px}
+
+  .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:30px}
+  .map-ph{border-radius:var(--radius);border:1px solid var(--line);background:linear-gradient(135deg,#efe6d3,#e2d3b8);min-height:320px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:30px;text-align:center}
+  .map-ph svg{width:64px;opacity:.55}
+
+  footer{border-top:1px solid var(--line);padding:34px 0 26px;margin-top:40px;background:#f7f1e6}
+  footer .f-row{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:18px;font-size:14px;color:var(--muted)}
+  footer .f-row a{color:var(--plum);text-decoration:none;font-weight:600;margin-right:16px}
+  footer .f-copy{font-size:13px;color:var(--muted)}
+
+  .reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  @media (max-width:900px){
+    .hero-split{grid-template-columns:1fr;min-height:0}
+    .hero-copy{padding:110px 24px 48px}
+    .hero-art{min-height:320px;padding:40px}
+    .asym-a,.asym-b{grid-template-columns:1fr;gap:30px}
+    .score-band{grid-template-columns:1fr;gap:18px;padding:32px}
+    .contact-grid{grid-template-columns:1fr}
+    .drawer{width:min(288px,84vw)}
+  }
+</style>
+</head>
+<body>
+
+<button class="burger" id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="mainNav">
+  <span></span><span></span><span></span>
+</button>
+<div class="scrim" id="scrim"></div>
+
+<aside class="drawer" id="drawer">
+  <div class="brand">Mario's Hair Designs<small>MANLIUS, NEW YORK</small></div>
+  <nav class="main" id="mainNav" aria-label="Primary">
+    <a href="#home" data-page="home" class="active" aria-current="page">Home</a>
+    <a href="#services" data-page="services">Services</a>
+    <a href="#about" data-page="about">Our Story</a>
+    <a href="#gallery" data-page="gallery">Gallery</a>
+    <a href="#reviews" data-page="reviews">Reviews</a>
+    <a href="#visit" data-page="visit">Visit Us</a>
+  </nav>
+  <div class="d-foot">
+    131 W Seneca St<br>Manlius, NY 13104<br>
+    <a href="tel:+13156826423">(315) 682-6423</a>
+  </div>
+</aside>
+
+<main>
+
+<section class="page" id="page-home">
+  <div class="hero-split">
+    <div class="hero-copy">
+      <span class="eyebrow">Family-owned salon, Manlius NY</span>
+      <h1>Great hair, <em>honest prices,</em> people who know your name.</h1>
+      <p class="lead">Mario's Hair Designs is a family-owned and operated hair salon on W Seneca St offering the latest styles and services for men, women and children. Clients have trusted us with their hair for decades.</p>
+      <div class="btn-row">
+        <a class="btn btn-solid" href="tel:+13156826423">Call (315) 682-6423</a>
+        <a class="btn btn-ghost" href="#services" data-page="services">See Services</a>
+      </div>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <div class="dots"></div>
+      <div class="ring">
+        <svg viewBox="0 0 120 120" fill="none" stroke="#e8d9a8" stroke-width="3" stroke-linecap="round">
+          <circle cx="34" cy="34" r="12"/><circle cx="34" cy="86" r="12"/>
+          <path d="M44 44 L100 96 M44 76 L100 24"/>
+          <path d="M96 24 l10 0 M100 20 l0 10" stroke-width="2"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="band alt">
+    <div class="wrap asym-a">
+      <div class="reveal">
+        <span class="eyebrow">Welcome in</span>
+        <h2>A neighborhood salon that treats you like family.</h2>
+        <p>Walk through our door on W Seneca St and you will find a relaxed, friendly shop where the stylists take time to listen. From precision cuts to dimensional color, every service is done with care and a fair price.</p>
+        <p>Regulars mention stylists by name and keep coming back year after year. Many clients have been with us for decades, and new guests are always welcome.</p>
+        <div class="btn-row" style="margin-top:22px">
+          <a class="btn btn-solid" href="#about" data-page="about">Our Story</a>
+          <a class="btn btn-ghost" href="#reviews" data-page="reviews">Read Reviews</a>
+        </div>
+      </div>
+      <div class="info-card reveal">
+        <h3>Book your chair</h3>
+        <p>Call ahead or just walk in.</p>
+        <p class="big"><a href="tel:+13156826423" style="text-decoration:none;color:inherit">(315) 682-6423</a></p>
+        <p>131 W Seneca St<br>Manlius, NY 13104</p>
+        <p style="margin-top:10px"><a href="https://www.google.com/maps/place/?q=place_id:ChIJq7-Bb1KJ2YkRAq9vBOi6Z_Y" target="_blank" rel="noopener">Get directions</a></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap asym-b">
+      <div class="quote-card reveal">
+        <p>If you want a good hair cut and good price, this is the place to go. I have been going here for 30 years and will not go anywhere else.</p>
+        <cite>Client review, via Birdeye</cite>
+      </div>
+      <div class="reveal">
+        <span class="eyebrow">What clients say</span>
+        <h2>Loyal clients, honest reviews.</h2>
+        <p>Our reviews on Birdeye and Google speak to the same things: reasonable prices, skilled stylists, and a team that knows what they are doing. Ask for Claudia, Sunny, Alida or Charlene by name.</p>
+        <div class="btn-row" style="margin-top:22px">
+          <a class="btn btn-solid" href="#reviews" data-page="reviews">All Reviews</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-services">
+  <div class="band">
+    <div class="wrap">
+      <span class="eyebrow">Services</span>
+      <h2 style="font-size:clamp(30px,4vw,48px);margin-bottom:10px">Cuts, color and styling for the whole family.</h2>
+      <p style="color:var(--muted);max-width:60ch">Choose a category below. Every service starts with a consultation so your stylist understands exactly what you want.</p>
+
+      <div class="tabs" role="tablist" aria-label="Service categories">
+        <button class="tab-btn active" data-tab="cuts" role="tab" aria-selected="true">Cuts</button>
+        <button class="tab-btn" data-tab="color" role="tab" aria-selected="false">Color</button>
+        <button class="tab-btn" data-tab="finish" role="tab" aria-selected="false">Styling</button>
+      </div>
+
+      <div class="tab-panel active" id="tab-cuts" role="tabpanel">
+        <div class="svc"><div><div class="n">Women's Cut and Style</div><div class="d">Consultation, precision cut, shampoo, blow dry and finish.</div></div><div class="p">from $35</div></div>
+        <div class="svc"><div><div class="n">Men's Cut</div><div class="d">Classic and modern cuts, cleaned up neckline, styled to finish.</div></div><div class="p">from $20</div></div>
+        <div class="svc"><div><div class="n">Children's Cut</div><div class="d">Patient, friendly cuts for kids in a relaxed family shop.</div></div><div class="p">from $15</div></div>
+        <div class="svc"><div><div class="n">Bang Trim</div><div class="d">Quick tidy-up between full appointments.</div></div><div class="p">from $8</div></div>
+      </div>
+
+      <div class="tab-panel" id="tab-color" role="tabpanel">
+        <div class="svc"><div><div class="n">Single Process Color</div><div class="d">Root touch-up or all-over color for rich, even coverage.</div></div><div class="p">from $45</div></div>
+        <div class="svc"><div><div class="n">Partial Highlights</div><div class="d">Face-framing brightness and dimension where it counts.</div></div><div class="p">from $60</div></div>
+        <div class="svc"><div><div class="n">Full Highlights</div><div class="d">Multi-dimensional color, including three-color highlight work.</div></div><div class="p">from $85</div></div>
+        <div class="svc"><div><div class="n">Color and Cut</div><div class="d">Complete refresh: color service plus precision cut and style.</div></div><div class="p">from $75</div></div>
+      </div>
+
+      <div class="tab-panel" id="tab-finish" role="tabpanel">
+        <div class="svc"><div><div class="n">Shampoo and Style</div><div class="d">Shampoo, blow dry and iron finish for a polished look.</div></div><div class="p">from $25</div></div>
+        <div class="svc"><div><div class="n">Updo and Special Occasion</div><div class="d">Elegant styling for weddings, proms and events.</div></div><div class="p">from $50</div></div>
+        <div class="svc"><div><div class="n">Perm and Body Wave</div><div class="d">Lasting texture and volume, customized to your hair.</div></div><div class="p">from $65</div></div>
+        <div class="svc"><div><div class="n">Deep Conditioning Treatment</div><div class="d">Restorative treatment for soft, healthy hair.</div></div><div class="p">from $20</div></div>
+      </div>
+
+      <span class="sample-note">Sample pricing, call to confirm</span>
+      <div class="btn-row" style="margin-top:26px">
+        <a class="btn btn-solid" href="tel:+13156826423">Call (315) 682-6423</a>
+        <a class="btn btn-ghost" href="#visit" data-page="visit">Plan Your Visit</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-about">
+  <div class="band">
+    <div class="wrap asym-a">
+      <div class="reveal">
+        <span class="eyebrow">Our story</span>
+        <h2>A family shop with decades behind the chair.</h2>
+        <p>Mario's Hair Designs is a family-owned and operated hair salon in the heart of Manlius. We offer the latest styles and services for men, women and children, and we do it the old-fashioned way: by listening first and rushing nothing.</p>
+        <p>Our clients tell our story best. Many have been coming for 10, 20, even 30 years. They mention our stylists by name, bring their families, and send their friends. That kind of loyalty is earned one appointment at a time.</p>
+        <div class="chips">
+          <span class="chip">Family owned and operated</span>
+          <span class="chip">Men, women and children</span>
+          <span class="chip">Walk-ins welcome</span>
+          <span class="chip">Free lot parking</span>
+        </div>
+      </div>
+      <div class="quote-card reveal">
+        <p>Great place, great people. Sunny gave me a beautiful style and great conversation. My new hair care shop forever.</p>
+        <cite>Client review, via Google</cite>
+      </div>
+    </div>
+  </div>
+  <div class="band alt">
+    <div class="wrap asym-b">
+      <div class="info-card reveal">
+        <h3>Stylists clients ask for by name</h3>
+        <p>Recent client reviews name <strong>Mario</strong>, <strong>Claudia</strong>, <strong>Sunny</strong>, <strong>Alida</strong> and <strong>Charlene</strong> for standout cuts, color and styling. When you call, feel free to request your favorite.</p>
+      </div>
+      <div class="reveal">
+        <span class="eyebrow">The team</span>
+        <h2>Real people, real skill.</h2>
+        <p>We are a small team that takes pride in clean work, honest advice and fair prices. Whether it is your first visit or your three-hundredth, you get the same care.</p>
+        <div class="btn-row" style="margin-top:22px">
+          <a class="btn btn-solid" href="tel:+13156826423">Call (315) 682-6423</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-gallery">
+  <div class="band">
+    <div class="wrap">
+      <span class="eyebrow">Gallery</span>
+      <h2 style="font-size:clamp(30px,4vw,48px);margin-bottom:10px">Work we are proud of.</h2>
+      <p style="color:var(--muted);max-width:60ch">A look at the cuts, color and finishes coming out of our chairs. Photos shown are representative samples.</p>
+      <div class="masonry">
+        <div class="tile"><span class="badge">Sample photo</span><div class="ph" style="background:linear-gradient(135deg,#6d2e46,#a04a63)"><svg width="72" height="72" viewBox="0 0 72 72" fill="none" stroke="#f5ecdd" stroke-width="2.5"><circle cx="20" cy="20" r="7"/><circle cx="20" cy="52" r="7"/><path d="M26 26 L60 58 M26 46 L60 14"/></svg></div><div class="cap">Precision cut and finish</div></div>
+        <div class="tile wide"><span class="badge">Sample photo</span><div class="ph" style="background:linear-gradient(135deg,#c9a227,#e8d9a8)"><svg width="72" height="72" viewBox="0 0 72 72" fill="none" stroke="#5d4a12" stroke-width="2.5"><path d="M12 50 Q24 20 36 50 Q48 20 60 50" stroke-linecap="round"/></svg></div><div class="cap">Dimensional highlights</div></div>
+        <div class="tile tall"><span class="badge">Sample photo</span><div class="ph" style="background:linear-gradient(135deg,#3c1626,#6d2e46)"><svg width="72" height="72" viewBox="0 0 72 72" fill="none" stroke="#e8d9a8" stroke-width="2.5"><circle cx="36" cy="24" r="10"/><path d="M36 34 v22 M24 44 l24 0" stroke-linecap="round"/></svg></div><div class="cap">Classic men's cut</div></div>
+        <div class="tile"><span class="badge">Sample photo</span><div class="ph" style="background:linear-gradient(135deg,#e8d9a8,#faf6ef)"><svg width="72" height="72" viewBox="0 0 72 72" fill="none" stroke="#6d2e46" stroke-width="2.5"><path d="M20 58 Q28 30 36 58 Q44 30 52 58" stroke-linecap="round"/></svg></div><div class="cap">Blowout with movement</div></div>
+        <div class="tile tall"><span class="badge">Sample photo</span><div class="ph" style="background:linear-gradient(135deg,#a04a63,#e8d9a8)"><svg width="72" height="72" viewBox="0 0 72 72" fill="none" stroke="#3c1626" stroke-width="2.5"><path d="M18 54 C26 40 30 30 30 18 M42 54 C40 42 44 30 54 22" stroke-linecap="round"/><circle cx="30" cy="14" r="4"/><circle cx="56" cy="18" r="4"/></svg></div><div class="cap">Special occasion updo</div></div>
+        <div class="tile wide"><span class="badge">Sample photo</span><div class="ph" style="background:linear-gradient(135deg,#2c2420,#6f625a)"><svg width="72" height="72" viewBox="0 0 72 72" fill="none" stroke="#e8d9a8" stroke-width="2.5"><rect x="18" y="14" width="36" height="44" rx="8"/><path d="M18 26 h36 M30 14 v12 M42 14 v12" /></svg></div><div class="cap">Rich single-process color</div></div>
+        <div class="tile"><span class="badge">Sample photo</span><div class="ph" style="background:linear-gradient(135deg,#6d2e46,#3c1626)"><svg width="72" height="72" viewBox="0 0 72 72" fill="none" stroke="#e8d9a8" stroke-width="2.5"><path d="M14 52 Q36 8 58 52" stroke-linecap="round"/><path d="M24 52 Q36 24 48 52" stroke-linecap="round"/></svg></div><div class="cap">Soft layers</div></div>
+        <div class="tile"><span class="badge">Sample photo</span><div class="ph" style="background:linear-gradient(135deg,#e8d9a8,#c9a227)"><svg width="72" height="72" viewBox="0 0 72 72" fill="none" stroke="#5d4a12" stroke-width="2.5"><circle cx="36" cy="36" r="20"/><path d="M36 16 v-6 M36 62 v-6 M16 36 h-6 M62 36 h-6" stroke-linecap="round"/></svg></div><div class="cap">Healthy shine finish</div></div>
+      </div>
+      <div class="btn-row" style="margin-top:30px">
+        <a class="btn btn-solid" href="#visit" data-page="visit">Book Your Visit</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-reviews">
+  <div class="band">
+    <div class="wrap">
+      <span class="eyebrow">Reviews</span>
+      <h2 style="font-size:clamp(30px,4vw,48px);margin-bottom:24px">What Manlius says about us.</h2>
+      <div class="score-band reveal">
+        <div class="score-num">4.4</div>
+        <div>
+          <h3 style="color:#fff;margin-bottom:8px">Based on 21 reviews on Birdeye</h3>
+          <p>Clients praise our reasonable prices, skilled stylists and friendly, no-rush atmosphere. Review totals change as new reviews are posted.</p>
+          <div class="src-links">
+            <a href="https://www.google.com/maps/place/?q=place_id:ChIJq7-Bb1KJ2YkRAq9vBOi6Z_Y" target="_blank" rel="noopener">See reviews on Google</a>
+            <a href="https://reviews.birdeye.com/marios-hair-designs-170200781166316" target="_blank" rel="noopener">See reviews on Birdeye</a>
+          </div>
+        </div>
+      </div>
+      <div class="rev-grid">
+        <div class="rev-card reveal"><div class="stars">★★★★★</div><p>"I got a really nice haircut here. Ask for Claudia. Reasonable prices and they really know what they are doing."</p><cite>Birdeye review</cite></div>
+        <div class="rev-card reveal"><div class="stars">★★★★★</div><p>"If you want a good hair cut and good price, this is the place to go. I have been going here for 30 years and will not go anywhere else."</p><cite>Birdeye review</cite></div>
+        <div class="rev-card reveal"><div class="stars">★★★★★</div><p>"Sunny gave me a haircut. I have very thick, difficult to cut hair and she did an amazing job. I will be going back."</p><cite>Google review, via SalonDiscover</cite></div>
+        <div class="rev-card reveal"><div class="stars">★★★★★</div><p>"Great personnel at Mario's, just really nice people and you get a great professional haircut too. My three color highlight was an expert job by Alida."</p><cite>Google review, via SalonDiscover</cite></div>
+        <div class="rev-card reveal"><div class="stars">★★★★★</div><p>"Charlene is the BEST. All the other ladies are very sweet and always so complimentary."</p><cite>Google review, via SalonDiscover</cite></div>
+        <div class="rev-card reveal"><div class="stars">★★★★★</div><p>"Have been going to Mario for years. Nice place, good cuts, very clean."</p><cite>Google review, via SalonDiscover</cite></div>
+      </div>
+      <p style="margin-top:26px;color:var(--muted);font-size:14px">Have you visited us? <a href="https://www.google.com/maps/place/?q=place_id:ChIJq7-Bb1KJ2YkRAq9vBOi6Z_Y" target="_blank" rel="noopener">Leave us a review on Google</a>.</p>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-visit">
+  <div class="band">
+    <div class="wrap">
+      <span class="eyebrow">Visit us</span>
+      <h2 style="font-size:clamp(30px,4vw,48px);margin-bottom:24px">Come see us on W Seneca St.</h2>
+      <div class="contact-grid">
+        <div class="info-card reveal">
+          <h3>Mario's Hair Designs</h3>
+          <p>131 W Seneca St<br>Manlius, NY 13104</p>
+          <p class="big" style="margin-top:12px"><a href="tel:+13156826423" style="text-decoration:none;color:inherit">(315) 682-6423</a></p>
+          <p style="margin-top:12px"><strong>Hours:</strong> Call for hours</p>
+          <p><strong>Parking:</strong> Free lot parking available</p>
+          <div class="btn-row" style="margin-top:20px">
+            <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJq7-Bb1KJ2YkRAq9vBOi6Z_Y" target="_blank" rel="noopener" title="Mario's Hair Designs, 131 W Seneca St, Manlius, NY 13104">Get Directions</a>
+            <a class="btn btn-ghost" href="tel:+13156826423">Call Now</a>
+          </div>
+        </div>
+        <div class="map-ph reveal">
+          <svg viewBox="0 0 64 64" fill="none" stroke="#6d2e46" stroke-width="3"><path d="M32 56 C32 56 14 34 14 22 a18 18 0 1 1 36 0 C50 34 32 56 32 56 Z"/><circle cx="32" cy="22" r="6"/></svg>
+          <p style="color:var(--muted);max-width:32ch">Find us in Kinloch Commons on W Seneca St in Manlius. Tap Get Directions for turn by turn navigation.</p>
+          <a class="btn btn-ghost" href="https://www.google.com/maps/place/?q=place_id:ChIJq7-Bb1KJ2YkRAq9vBOi6Z_Y" target="_blank" rel="noopener">Open in Google Maps</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="f-row">
+      <div>
+        <a href="#home" data-page="home">Home</a>
+        <a href="#services" data-page="services">Services</a>
+        <a href="#gallery" data-page="gallery">Gallery</a>
+        <a href="#reviews" data-page="reviews">Reviews</a>
+        <a href="#visit" data-page="visit">Visit</a>
+      </div>
+      <div><a href="tel:+13156826423">(315) 682-6423</a></div>
+    </div>
+    <div class="f-copy">© Mario's Hair Designs</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    var drawer = document.getElementById("drawer");
+    var scrim = document.getElementById("scrim");
+    if(drawer){ drawer.classList.remove("open"); }
+    if(scrim){ scrim.classList.remove("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger){
+    burger.addEventListener("click", function(){
+      var drawer = document.getElementById("drawer");
+      var scrim = document.getElementById("scrim");
+      var open = drawer.classList.toggle("open");
+      scrim.classList.toggle("show", open);
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+  var scrim = document.getElementById("scrim");
+  if(scrim){ scrim.addEventListener("click", closeMenu); }
+
+  /* ---------- service tabs ---------- */
+  var tabBtns = document.querySelectorAll(".tab-btn");
+  for(var t = 0; t < tabBtns.length; t++){
+    tabBtns[t].addEventListener("click", function(){
+      for(var a = 0; a < tabBtns.length; a++){
+        tabBtns[a].classList.remove("active");
+        tabBtns[a].setAttribute("aria-selected", "false");
+      }
+      this.classList.add("active");
+      this.setAttribute("aria-selected", "true");
+      var panels = document.querySelectorAll(".tab-panel");
+      for(var p = 0; p < panels.length; p++){
+        panels[p].classList.toggle("active", panels[p].id === "tab-" + this.getAttribute("data-tab"));
+      }
+    });
+  }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
