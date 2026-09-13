@@ -318,10 +318,12 @@
       } catch {
         applyAccent("default");
       }
+      applyUitheme(storedUitheme(), storedUithemeCustom());
       applyAppBg(null);
       return;
     }
     applyAccent(user.theme_accent || "default");
+    applyUitheme(user.theme_preset || "", user.theme_custom || "");
     applyAppBg(user.theme_bg_url || null);
   }
 
@@ -335,6 +337,174 @@
       .join("");
   }
 
+  /* ---- whole-UI themes: presets + custom color ---- */
+  const UITHEMES = ["midnight", "paper", "ocean", "forest", "sunset", "mono", "sand", "custom"];
+  const UITHEME_KEY = "eez_uitheme";
+  const UITHEME_CUSTOM_KEY = "eez_uitheme_custom";
+  const CUSTOM_THEME_VARS = ["--bg", "--bg2", "--bg3", "--surface", "--ink", "--muted", "--muted2",
+    "--accent", "--accent-soft", "--accent-ink", "--btn-bg", "--btn-fg", "--toast-bg", "--toast-fg",
+    "--modal", "--unread", "--red", "--bubble-theirs"];
+
+  function storedUitheme() {
+    try {
+      const t = localStorage.getItem(UITHEME_KEY);
+      return UITHEMES.includes(t) ? t : "";
+    } catch {
+      return "";
+    }
+  }
+  function storedUithemeCustom() {
+    try {
+      const c = localStorage.getItem(UITHEME_CUSTOM_KEY);
+      return /^#[0-9a-fA-F]{6}$/.test(c || "") ? c : "#5b9cff";
+    } catch {
+      return "#5b9cff";
+    }
+  }
+  function hexToHsl(hex) {
+    const n = parseInt(hex.slice(1), 16);
+    const r = ((n >> 16) & 255) / 255, g = ((n >> 8) & 255) / 255, b = (n & 255) / 255;
+    const mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+    let h = 0, s = 0;
+    const l = (mx + mn) / 2;
+    if (mx !== mn) {
+      const d = mx - mn;
+      s = l > 0.5 ? d / (2 - mx - mn) : d / (mx + mn);
+      if (mx === r) h = (g - b) / d + (g < b ? 6 : 0);
+      else if (mx === g) h = (b - r) / d + 2;
+      else h = (r - g) / d + 4;
+      h *= 60;
+    }
+    return [Math.round(h), Math.round(s * 100), Math.round(l * 100)];
+  }
+  function applyCustomThemeVars(hex) {
+    const root = document.documentElement;
+    const [h, s0] = hexToHsl(hex);
+    const s = Math.max(s0, 30);
+    const bgS = Math.round(s * 0.45);
+    const vars = {
+      "--bg": `hsl(${h}, ${bgS}%, 6%)`,
+      "--bg2": `hsl(${h}, ${bgS}%, 9%)`,
+      "--bg3": `hsl(${h}, ${Math.round(s * 0.4)}%, 13%)`,
+      "--surface": `hsla(${h}, ${Math.round(s * 0.5)}%, 16%, 0.85)`,
+      "--ink": `hsl(${h}, 14%, 93%)`,
+      "--muted": `hsl(${h}, 16%, 64%)`,
+      "--muted2": `hsl(${h}, 14%, 46%)`,
+      "--accent": `hsl(${h}, ${s}%, 62%)`,
+      "--accent-soft": `hsl(${h}, ${s}%, 48%)`,
+      "--accent-ink": "#0b0e12",
+      "--btn-bg": `hsl(${h}, 14%, 93%)`,
+      "--btn-fg": `hsl(${h}, ${bgS}%, 9%)`,
+      "--toast-bg": `hsl(${h}, 14%, 93%)`,
+      "--toast-fg": `hsl(${h}, ${bgS}%, 9%)`,
+      "--modal": `hsla(${h}, ${bgS}%, 9%, 0.96)`,
+      "--unread": `hsl(${h}, ${s}%, 62%)`,
+      "--red": "#e08080",
+      "--bubble-theirs": `hsla(${h}, ${s}%, 62%, 0.08)`,
+    };
+    Object.keys(vars).forEach((k) => root.style.setProperty(k, vars[k]));
+    root.style.colorScheme = "dark";
+  }
+  function clearCustomThemeVars() {
+    const root = document.documentElement;
+    CUSTOM_THEME_VARS.forEach((v) => root.style.removeProperty(v));
+    root.style.colorScheme = "";
+  }
+  function currentUitheme() {
+    return document.documentElement.getAttribute("data-uitheme") || "";
+  }
+  function applyUitheme(name, customHex) {
+    const t = UITHEMES.includes(name) ? name : "";
+    const root = document.documentElement;
+    clearCustomThemeVars();
+    if (t === "custom") {
+      const hex = /^#[0-9a-fA-F]{6}$/.test(customHex || "") ? customHex : storedUithemeCustom();
+      applyCustomThemeVars(hex);
+    }
+    if (t) root.setAttribute("data-uitheme", t);
+    else root.removeAttribute("data-uitheme");
+    try {
+      if (t) localStorage.setItem(UITHEME_KEY, t);
+      else localStorage.removeItem(UITHEME_KEY);
+      if (/^#[0-9a-fA-F]{6}$/.test(customHex || "")) localStorage.setItem(UITHEME_CUSTOM_KEY, customHex);
+    } catch {
+      /* ignore */
+    }
+  }
+  async function saveUitheme(name, customHex) {
+    const t = UITHEMES.includes(name) ? name : "";
+    applyUitheme(t, customHex);
+    if (t) applyAccent("default");
+    if (!state.me) return;
+    try {
+      const patch = { theme_preset: t };
+      if (t) patch.theme_accent = "default";
+      if (/^#[0-9a-fA-F]{6}$/.test(customHex || "")) patch.theme_custom = customHex;
+      const data = await api("/api/me", { method: "PATCH", body: JSON.stringify(patch) });
+      state.me = data.user;
+    } catch {
+      /* keep the local choice */
+    }
+  }
+  function uithemePicksHtml(current) {
+    const cur = current || "";
+    return ["midnight", "paper", "ocean", "forest", "sunset", "mono", "sand"]
+      .map(
+        (n) =>
+          `<button type="button" class="theme-pick ${n === cur ? "on" : ""}" data-uitheme="${n}" title="${n}" aria-label="theme ${n}"></button>`,
+      )
+      .join("");
+  }
+  function markPicks(selector, activeEl) {
+    document.querySelectorAll(selector).forEach((b) => b.classList.toggle("on", b === activeEl));
+  }
+  function clearUitheme(persist) {
+    markPicks("#theme-picks .theme-pick", null);
+    const cust = document.getElementById("theme-custom-on");
+    if (cust) cust.hidden = true;
+    if (persist) return saveUitheme("");
+    applyUitheme("");
+    return Promise.resolve();
+  }
+  function bindUithemeControls(persist) {
+    document.querySelectorAll("#theme-picks .theme-pick").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const t = btn.getAttribute("data-uitheme");
+        applyAccent("default");
+        markPicks("#theme-picks .theme-pick", btn);
+        markPicks("#accent-picks .accent-pick", document.querySelector('#accent-picks [data-accent="default"]'));
+        if (persist) await saveUitheme(t);
+        else applyUitheme(t);
+        showToast("theme set");
+      });
+    });
+    const cc = document.getElementById("theme-custom-color");
+    if (cc) {
+      const applyCustom = () => {
+        applyAccent("default");
+        markPicks("#theme-picks .theme-pick", null);
+        markPicks("#accent-picks .accent-pick", document.querySelector('#accent-picks [data-accent="default"]'));
+        document.getElementById("theme-custom-on").hidden = false;
+        applyUitheme("custom", cc.value);
+      };
+      cc.addEventListener("input", applyCustom);
+      cc.addEventListener("change", async () => {
+        if (persist) await saveUitheme("custom", cc.value);
+      });
+    }
+    const td = document.getElementById("theme-default");
+    if (td) {
+      td.addEventListener("click", async () => {
+        markPicks("#theme-picks .theme-pick", null);
+        const cust = document.getElementById("theme-custom-on");
+        if (cust) cust.hidden = true;
+        if (persist) await saveUitheme("");
+        else applyUitheme("");
+        showToast("default look");
+      });
+    }
+  }
+
   function initTheme() {
     // Default dark / solid black; light remains available via settings.
     applyTheme(storedTheme() || "dark");
@@ -343,6 +513,7 @@
     } catch {
       applyAccent("default");
     }
+    applyUitheme(storedUitheme(), storedUithemeCustom());
   }
 
   function scrubLegacyTopChrome() {
@@ -367,10 +538,13 @@
     </label>`;
   }
 
-  function bindThemeToggle() {
+  function bindThemeToggle(onChange) {
     const el = document.getElementById("theme-toggle");
     if (!el) return;
-    el.addEventListener("change", () => setTheme(el.checked ? "dark" : "light"));
+    el.addEventListener("change", () => {
+      setTheme(el.checked ? "dark" : "light");
+      if (onChange) onChange();
+    });
   }
 
   function clip(s, n) {
@@ -767,6 +941,8 @@ async function publicUser(u){
     quiet_mode: !!u.quiet_mode,
     stack_sort: u.stack_sort || 'active',
     theme_accent: u.theme_accent || 'default',
+    theme_preset: u.theme_preset || '',
+    theme_custom: u.theme_custom || '',
     theme_bg_url: u.theme_bg_key ? await resolveImageUrl(u.theme_bg_key) : null,
     digest_opt_in: !!u.digest_opt_in,
     last_seen_at: s2ms(u.last_seen_at || u.created_at || 0),
@@ -952,6 +1128,8 @@ async function ghApi(path, opts){
       if(!t) throw bad('account gone', 404);
       if(patch.stack_sort && ['active','oldest','unseen'].indexOf(patch.stack_sort) >= 0) t.stack_sort = patch.stack_sort;
       if(typeof patch.theme_accent === 'string') t.theme_accent = patch.theme_accent.slice(0, 24);
+      if(typeof patch.theme_preset === 'string') t.theme_preset = patch.theme_preset.slice(0, 24);
+      if(typeof patch.theme_custom === 'string' && /^#[0-9a-fA-F]{6}$/.test(patch.theme_custom)) t.theme_custom = patch.theme_custom;
       if(typeof patch.theme_bg_key === 'string') t.theme_bg_key = patch.theme_bg_key.slice(0, 200);
       if(patch.clear_theme_bg) t.theme_bg_key = '';
       if(typeof patch.quiet_mode === 'boolean') t.quiet_mode = patch.quiet_mode ? 1 : 0;
@@ -1006,7 +1184,7 @@ async function ghApi(path, opts){
       created = {
         id: newId(), email: email, handle: makeHandle(email, us), pass: hash,
         why_here: whyH.slice(0,500), into_now: intoN.slice(0,500), ask_them: askT.slice(0,500),
-        quiet_mode: 0, stack_sort: 'active', theme_accent: 'default', theme_bg_key: '',
+        quiet_mode: 0, stack_sort: 'active', theme_accent: 'default', theme_preset: '', theme_custom: '', theme_bg_key: '',
         digest_opt_in: 0, last_seen_at: nowS(), created_at: nowS()
       };
       us.push(created);
@@ -2140,9 +2318,15 @@ var lastSendAt = 0;
       }
       askForm.addEventListener("submit", async (e) => {
         e.preventDefault();
+        const postBtn = askForm.querySelector('button[type="submit"]');
+        if (postBtn && postBtn.disabled) return;
         const fd = new FormData(askForm);
         const kind = String(fd.get("kind") || "text");
         const payload = { body: fd.get("body"), kind };
+        if (postBtn) {
+          postBtn.disabled = true;
+          postBtn.innerHTML = '<span class="btn-spinner"></span>posting';
+        }
         try {
           if (kind === "poll") {
             const options = fd.getAll("opt")
@@ -2164,6 +2348,10 @@ var lastSendAt = 0;
           renderQa();
         } catch (err) {
           alert(err.message);
+          if (postBtn) {
+            postBtn.disabled = false;
+            postBtn.textContent = "post";
+          }
         }
       });
     }
@@ -2172,6 +2360,7 @@ var lastSendAt = 0;
       pollEl.querySelectorAll(".poll-opt").forEach((btn) => {
         btn.addEventListener("click", async () => {
           if (btn.disabled) return;
+          pollEl.classList.add("posting-pending");
           try {
             await api(`/api/questions/${pollEl.getAttribute("data-qid")}/vote`, {
               method: "POST",
@@ -2180,6 +2369,7 @@ var lastSendAt = 0;
             showToast("saved");
             renderQa();
           } catch (err) {
+            pollEl.classList.remove("posting-pending");
             alert(err.message);
           }
         });
@@ -2647,7 +2837,14 @@ var lastSendAt = 0;
         <section class="settings-block">
           <h2>appearance</h2>
           <div class="settings-card">${themeToggleHtml()}</div>
-          <p class="settings-note">accent (this device until you log in)</p>
+          <p class="settings-note">theme — recolors the whole app (this device until you log in)</p>
+          <div class="theme-picks" id="theme-picks">${uithemePicksHtml(storedUitheme())}</div>
+          <div class="theme-custom-row">
+            <input type="color" id="theme-custom-color" value="${storedUithemeCustom()}" aria-label="custom theme color" />
+            <span class="settings-note" id="theme-custom-on"${storedUitheme() === "custom" ? "" : " hidden"}>custom on</span>
+            <button type="button" class="btn ghost sm" id="theme-default">default</button>
+          </div>
+          <p class="settings-note">accent (buttons + highlights)</p>
           <div class="accent-picks" id="accent-picks">${accentPicksHtml((() => { try { return localStorage.getItem("eez_accent") || "default"; } catch { return "default"; } })())}</div>
         </section>
         <section class="settings-block">
@@ -2663,10 +2860,12 @@ var lastSendAt = 0;
           <p class="fine"><a href="#/terms">terms</a> · <a href="#/privacy">privacy</a></p>
         </section>
       </div>`);
-      bindThemeToggle();
+      bindThemeToggle(() => clearUitheme(false));
+      bindUithemeControls(false);
       document.querySelectorAll("#accent-picks .accent-pick").forEach((btn) => {
         btn.addEventListener("click", () => {
           const accent = btn.getAttribute("data-accent");
+          if (accent !== "default") clearUitheme(false);
           applyAccent(accent);
           document.querySelectorAll("#accent-picks .accent-pick").forEach((b) => b.classList.toggle("on", b === btn));
           showToast("accent set");
@@ -2680,7 +2879,14 @@ var lastSendAt = 0;
       <section class="settings-block">
         <h2>appearance</h2>
         <div class="settings-card">${themeToggleHtml()}</div>
-        <p class="settings-note">accent color (app-wide)</p>
+        <p class="settings-note">theme — recolors the whole app</p>
+        <div class="theme-picks" id="theme-picks">${uithemePicksHtml(u.theme_preset || "")}</div>
+        <div class="theme-custom-row">
+          <input type="color" id="theme-custom-color" value="${/^#[0-9a-fA-F]{6}$/.test(u.theme_custom || "") ? u.theme_custom : "#5b9cff"}" aria-label="custom theme color" />
+          <span class="settings-note" id="theme-custom-on"${(u.theme_preset || "") === "custom" ? "" : " hidden"}>custom on</span>
+          <button type="button" class="btn ghost sm" id="theme-default">default</button>
+        </div>
+        <p class="settings-note">accent color (buttons + highlights)</p>
         <div class="accent-picks" id="accent-picks">${accentPicksHtml(u.theme_accent || "default")}</div>
         <div class="settings-card" style="margin-top:12px">
           <label>background image
@@ -2727,13 +2933,6 @@ var lastSendAt = 0;
         <p class="settings-note">Replies and answers show up on the bell at the top of the screen.</p>
       </section>
       <section class="settings-block">
-        <h2>your data</h2>
-        <div class="settings-card">
-          <button class="btn" type="button" id="export-data">export my data (JSON)</button>
-        </div>
-        <p class="settings-note">Downloads your profile, messages, and Q&amp;A.</p>
-      </section>
-      <section class="settings-block">
         <h2>account</h2>
         <p class="settings-email">${escapeHtml(u.email || "")}</p>
         <div class="row-btns">
@@ -2743,19 +2942,24 @@ var lastSendAt = 0;
         <p class="settings-note">Delete permanently wipes your profile, messages, Q&amp;A, and bookmarks.</p>
       </section>
       <section class="settings-block">
-        <h2>legal</h2>
+        <h2>more</h2>
+        <div class="settings-card">
+          <button class="btn" type="button" id="export-data">export my data (JSON)</button>
+        </div>
         <p class="fine"><a href="#/terms">terms</a> · <a href="#/privacy">privacy</a></p>
       </section>
     </div>`);
-    bindThemeToggle();
+    bindThemeToggle(() => clearUitheme(true));
+    bindUithemeControls(true);
     applyUserAppearance(u);
     document.querySelectorAll("#accent-picks .accent-pick").forEach((btn) => {
       btn.addEventListener("click", async () => {
         const accent = btn.getAttribute("data-accent");
+        if (accent !== "default") await clearUitheme(false);
         applyAccent(accent);
         document.querySelectorAll("#accent-picks .accent-pick").forEach((b) => b.classList.toggle("on", b === btn));
         try {
-          const data = await api("/api/me", { method: "PATCH", body: JSON.stringify({ theme_accent: accent }) });
+          const data = await api("/api/me", { method: "PATCH", body: JSON.stringify({ theme_accent: accent, theme_preset: accent === "default" ? currentUitheme() : "" }) });
           state.me = data.user;
           showToast("accent saved");
         } catch (err) {
