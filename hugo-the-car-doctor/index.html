@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HUGO THE CAR DOCTOR | South Orange, NJ</title>
+<meta name="description" content="The doctor is in for your car. 252 Irvington Ave, South Orange Village, NJ 07079, (973) 931-7967.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400;600;700&family=Nunito+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:'Nunito Sans',system-ui,sans-serif;background:#fdf7f4;color:#2b1d18;line-height:1.6}
+h1,h2,h3{font-family:'Bebas Neue',serif;line-height:1.15;margin:0 0 12px}
+a{color:#c0392b}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+.page{display:none}
+.page.active{display:block;animation:fadeIn .35s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.topbar{position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:14px;padding:12px 16px;background:#ffffff;border-bottom:1px solid #ecd9cf}
+.brand{font-family:'Bebas Neue';font-size:24px;font-weight:700;color:#2b1d18;text-decoration:none;margin-right:auto}
+.call{font-weight:700;color:#2b1d18;text-decoration:none;border:2px solid #c0392b;border-radius:999px;padding:8px 16px;white-space:nowrap}
+#burger{background:none;border:0;cursor:pointer;padding:8px;display:flex;flex-direction:column;gap:5px}
+#burger span{display:block;width:26px;height:3px;background:#2b1d18;border-radius:2px;transition:transform .25s,opacity .25s}
+.drawer{position:fixed;top:0;left:0;height:100%;width:300px;max-width:85vw;background:#f4d35e;color:#fff;transform:translateX(-105%);transition:transform .3s ease;z-index:70;display:flex;flex-direction:column;padding:26px 22px;box-shadow:8px 0 30px rgba(0,0,0,.25)}
+.drawer.open{transform:none}
+.drawer-head{font-family:'Bebas Neue';font-size:26px;font-weight:700;margin-bottom:6px}
+.drawer-sub{font-size:14px;opacity:.75;margin-bottom:22px}
+.drawer a.dlink{color:#fff;text-decoration:none;font-size:18px;padding:12px 10px;border-radius:10px;display:block}
+.drawer a.dlink:hover{background:rgba(255,255,255,.1)}
+.drawer a.dlink.active{background:#c0392b}
+.drawer-foot{margin-top:auto;font-size:14px;opacity:.85;line-height:1.8}
+.drawer-foot a{color:#fff}
+.pill{display:inline-flex;align-items:center;gap:8px;background:#ffffff;border:1px solid #ecd9cf;border-radius:999px;padding:8px 14px;font-size:14px;font-weight:600}
+.dot{width:9px;height:9px;border-radius:50%;background:#2ecc71;display:inline-block}
+.btn{display:inline-block;background:#c0392b;color:#fff;text-decoration:none;font-weight:700;padding:14px 26px;border-radius:12px;border:0;cursor:pointer;font-size:16px}
+.btn.ghost{background:transparent;color:#c0392b;border:2px solid #f4d35e}
+.sec{padding:56px 0}
+.sec h2{font-size:34px;margin-bottom:8px}
+.sec .lede{font-size:18px;opacity:.85;margin-bottom:28px;max-width:640px}
+.card{background:#2b1d18;border:1px solid #ecd9cf;border-radius:16px;padding:24px}
+.badge{display:inline-block;background:#2b1d18;color:#fff;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:999px;margin-bottom:10px}
+.ph{position:relative;border-radius:12px;min-height:150px;background:linear-gradient(135deg,#ecd9cf 0%,#ffffff 100%);display:flex;align-items:flex-end;overflow:hidden}
+.ph span.cap{position:relative;z-index:2;color:#fff;font-size:13px;font-weight:600;padding:10px 12px;background:rgba(0,0,0,.45);width:100%}
+.ph .badge{position:absolute;top:10px;left:10px;z-index:2}
+table.hours{width:100%;border-collapse:collapse}
+table.hours td{padding:10px 4px;border-bottom:1px solid #ecd9cf}
+table.hours tr.today td{font-weight:700;color:#ecd9cf}
+.rev{background:#c0392b;border:1px solid #f4d35e;border-radius:14px;padding:20px}
+.rev .stars{color:#e8a100;font-size:18px;letter-spacing:2px}
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .5s ease,transform .5s ease}
+.reveal.in{opacity:1;transform:none}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.tab-btn{background:#ecd9cf;border:1px solid #2b1d18;border-radius:999px;padding:10px 18px;cursor:pointer;font-weight:600;color:#c0392b}
+.tab-btn.on{background:#c0392b;color:#fff;border-color:#ecd9cf}
+.tab-panel{display:none}
+.tab-panel.on{display:block;animation:fadeIn .3s ease}
+.acc-item{border:1px solid #ffffff;border-radius:12px;margin-bottom:10px;background:#2b1d18;overflow:hidden}
+.acc-btn{width:100%;text-align:left;background:none;border:0;padding:16px 18px;font-size:17px;font-weight:700;cursor:pointer;color:Nunito Sans;font-family:'#ecd9cf',sans-serif}
+.acc-panel{display:none;padding:0 18px 18px}
+.acc-item.open .acc-panel{display:block}
+table.price{width:100%;border-collapse:collapse}
+table.price th,table.price td{text-align:left;padding:12px 8px;border-bottom:1px solid #ecd9cf}
+@media(max-width:700px){.sec{padding:40px 0}.sec h2{font-size:27px}}
+
+.hero-diag{position:relative;padding:78px 0 130px;background:linear-gradient(150deg,#f4d35e 0%,#c0392b 120%);color:#fff;clip-path:polygon(0 0,100% 0,100% 86%,0 100%)}
+.hero-diag h1{font-size:50px;max-width:700px}
+.hero-diag p.tag{font-size:21px;opacity:.92;max-width:600px}
+.hero-diag .cta-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
+.hero-diag .btn.ghost{color:#fff;border-color:rgba(255,255,255,.6)}
+.diag-band{background:#ffffff;color:#2b1d18;padding:26px 0;margin-top:-30px}
+@media(max-width:700px){.hero-diag h1{font-size:34px}}
+
+.cwall{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.cwall .card h3{margin:0 0 8px;font-size:20px}
+.cwall .card p{margin:0;font-size:15px;opacity:.85}
+@media(max-width:700px){.cwall{grid-template-columns:1fr}}
+
+.svc-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.svc-list li{background:#ffffff;border:1px solid #ecd9cf;border-radius:12px;padding:14px 16px;font-weight:600}
+.svc-list li span{display:block;font-weight:400;font-size:14px;opacity:.8;margin-top:4px}
+@media(max-width:700px){.svc-list{grid-template-columns:1fr}}
+
+.mas{columns:3;column-gap:14px}
+.mas .ph{break-inside:avoid;margin-bottom:14px;min-height:170px}
+.mas .ph.tall{min-height:250px}
+.mas .ph.short{min-height:120px}
+@media(max-width:700px){.mas{columns:2}}
+
+footer{margin-top:40px;background:#f4d35e;color:#ffffff}
+footer .copy{padding:18px 20px;text-align:center;font-size:14px;border-top:1px solid rgba(255,255,255,.2)}
+
+.f-split{display:grid;grid-template-columns:1fr 1fr;gap:26px;padding:56px 0 34px}
+.f-split h3{margin:0 0 10px;font-size:22px}
+.f-split p{margin:0 0 8px;opacity:.9}
+.f-split a{color:#fff}
+@media(max-width:700px){.f-split{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <button id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <a class="brand" data-page="home" href="#home">Hugo</a>
+  <a class="call" href="tel:+19739317967">(973) 931-7967</a>
+</header>
+<nav id="mainNav" class="drawer nd-links" aria-label="Site">
+  <div class="drawer-head">Hugo</div>
+  <div class="drawer-sub">South Orange, NJ</div>
+  <a class="dlink" data-page="home" href="#home">Home</a><a class="dlink" data-page="services" href="#services">Services</a><a class="dlink" data-page="story" href="#story">Our Story</a><a class="dlink" data-page="gallery" href="#gallery">Gallery</a><a class="dlink" data-page="reviews" href="#reviews">Reviews</a><a class="dlink" data-page="visit" href="#visit">Visit Us</a>
+  <div class="drawer-foot">252 Irvington Ave, South Orange Village, NJ 07079<br><a href="tel:+19739317967">(973) 931-7967</a></div>
+</nav>
+<main>
+
+<section class="page" id="page-home">
+
+<section class="hero-diag"><div class="wrap">
+  <h1>HUGO THE CAR DOCTOR</h1>
+  <p class="tag">The doctor is in for your car</p>
+  <div class="cta-row"><a class="btn" data-page="services" href="#services">See services</a><a class="btn ghost" data-page="visit" href="#visit">Get directions</a></div>
+</div></section>
+<div class="diag-band"><div class="wrap">
+  <span class="pill"><span class="dot"></span><span>Call for hours: (973) 931-7967</span></span>
+  <p style="margin:10px 0 0"><strong>252 Irvington Ave, South Orange Village, NJ 07079</strong> &nbsp;<a href="https://www.google.com/maps/place/?q=place_id:ChIJpb9Fptesw4kRCT4E6GSY3CA" target="_blank" rel="noopener">Get directions</a> &nbsp;|&nbsp; <a href="tel:+19739317967">(973) 931-7967</a></p>
+</div></div>
+
+<div class="sec"><div class="wrap">
+  <h2>What we do</h2>
+  <p class="lede">Everyday repairs and maintenance, handled by people who do this all day, every day.</p>
+  <div class="cwall"><div class="card reveal"><h3>Full vehicle checkups</h3><p>Done right with quality parts and a careful eye.</p></div><div class="card reveal"><h3>Engine diagnostics</h3><p>Priced fairly and explained before we start.</p></div><div class="card reveal"><h3>Brake service</h3><p>Most jobs finished the same day you arrive.</p></div><div class="card reveal"><h3>Oil changes</h3><p>Backed by mechanics drivers recommend to friends.</p></div><div class="card reveal"><h3>Suspension and steering</h3><p>Clear updates while the work is underway.</p></div><div class="card reveal"><h3>Electrical repair</h3><p>A clean, careful job you can feel on the road.</p></div></div>
+  <p style="margin-top:22px"><a class="btn" data-page="services" href="#services">All services</a></p>
+</div></div>
+<div class="sec" style="background:#f4d35e22"><div class="wrap">
+  <h2>How it works</h2>
+  <p class="lede">Simple from the first call to the final handshake.</p>
+  <div class="tabs"><button class="tab-btn on" data-tab="tab-0">Checkups</button><button class="tab-btn" data-tab="tab-1">Treatment</button><button class="tab-btn" data-tab="tab-2">Recovery</button></div><div class="tab-panel on" id="tab-0"><ul class="svc-list"><li><strong>Full vehicle checkup</strong><span>A head-to-toe look at your car with a plain-language report.</span></li><li><strong>Pre-purchase inspection</strong><span>Know what you are buying before you sign.</span></li><li><strong>Seasonal check</strong><span>Get ready for summer heat or winter cold.</span></li></ul></div><div class="tab-panel" id="tab-1"><ul class="svc-list"><li><strong>Engine diagnostics</strong><span>Find the cause, not just the symptom.</span></li><li><strong>Brake service</strong><span>Pads, rotors, and fluid for safe stops.</span></li><li><strong>Suspension and steering</strong><span>A smooth, steady ride.</span></li></ul></div><div class="tab-panel" id="tab-2"><ul class="svc-list"><li><strong>Electrical repair</strong><span>Battery, alternator, and wiring.</span></li><li><strong>Cooling system</strong><span>Keep the engine at a healthy temperature.</span></li><li><strong>Maintenance plans</strong><span>Stay ahead of breakdowns.</span></li></ul></div>
+</div></div>
+<div class="sec"><div class="wrap">
+  <h2>From the shop</h2>
+  <p class="lede">In the treatment bays. Photos are placeholders the owner can swap in one click.</p>
+  <div class="mas"><div class="ph  reveal"><span class="badge">Placeholder</span><span class="cap">In the treatment bays 1</span></div><div class="ph tall reveal"><span class="badge">Placeholder</span><span class="cap">In the treatment bays 2</span></div><div class="ph short reveal"><span class="badge">Placeholder</span><span class="cap">In the treatment bays 3</span></div></div>
+  <p style="margin-top:22px"><a class="btn ghost" data-page="gallery" href="#gallery">Open gallery</a></p>
+</div></div>
+</section>
+
+<section class="page" id="page-services">
+<div class="sec"><div class="wrap">
+  <h2>Services</h2>
+  <p class="lede">The full list of what Hugo does for drivers across South Orange, NJ.</p>
+  <div class="cwall"><div class="card reveal"><h3>Full vehicle checkups</h3><p>Done right with quality parts and a careful eye.</p></div><div class="card reveal"><h3>Engine diagnostics</h3><p>Priced fairly and explained before we start.</p></div><div class="card reveal"><h3>Brake service</h3><p>Most jobs finished the same day you arrive.</p></div><div class="card reveal"><h3>Oil changes</h3><p>Backed by mechanics drivers recommend to friends.</p></div><div class="card reveal"><h3>Suspension and steering</h3><p>Clear updates while the work is underway.</p></div><div class="card reveal"><h3>Electrical repair</h3><p>A clean, careful job you can feel on the road.</p></div><div class="card reveal"><h3>Cooling system</h3><p>Honest advice on what can wait and what cannot.</p></div><div class="card reveal"><h3>Pre-purchase inspections</h3><p>Finished to a standard we would put our name on.</p></div></div>
+</div></div>
+<div class="sec" style="background:#f4d35e22"><div class="wrap">
+  <h2>Service details</h2>
+  <p class="lede">Pick a category to see what each visit includes.</p>
+  <div class="tabs"><button class="tab-btn on" data-tab="tab-0">Checkups</button><button class="tab-btn" data-tab="tab-1">Treatment</button><button class="tab-btn" data-tab="tab-2">Recovery</button></div><div class="tab-panel on" id="tab-0"><ul class="svc-list"><li><strong>Full vehicle checkup</strong><span>A head-to-toe look at your car with a plain-language report.</span></li><li><strong>Pre-purchase inspection</strong><span>Know what you are buying before you sign.</span></li><li><strong>Seasonal check</strong><span>Get ready for summer heat or winter cold.</span></li></ul></div><div class="tab-panel" id="tab-1"><ul class="svc-list"><li><strong>Engine diagnostics</strong><span>Find the cause, not just the symptom.</span></li><li><strong>Brake service</strong><span>Pads, rotors, and fluid for safe stops.</span></li><li><strong>Suspension and steering</strong><span>A smooth, steady ride.</span></li></ul></div><div class="tab-panel" id="tab-2"><ul class="svc-list"><li><strong>Electrical repair</strong><span>Battery, alternator, and wiring.</span></li><li><strong>Cooling system</strong><span>Keep the engine at a healthy temperature.</span></li><li><strong>Maintenance plans</strong><span>Stay ahead of breakdowns.</span></li></ul></div>
+</div></div>
+</section>
+
+<section class="page" id="page-story">
+<div class="sec"><div class="wrap">
+  <span class="badge">Our story</span>
+  <h2>About Hugo</h2>
+  <div style="max-width:680px;font-size:18px"><p>HUGO THE CAR DOCTOR on Irvington Ave in South Orange Village diagnoses and treats what ails your car.</p><p>Like finding a good doctor, finding a good mechanic is worth keeping. Bring your car in for a checkup, an honest diagnosis, and repairs that stick.</p></div>
+  <div class="card" style="margin-top:26px;max-width:680px">
+    <p style="margin:0"><strong>Visit us:</strong> 252 Irvington Ave, South Orange Village, NJ 07079<br><strong>Call us:</strong> <a href="tel:+19739317967">(973) 931-7967</a></p>
+    <p style="margin:14px 0 0"><a class="btn" data-page="visit" href="#visit">Plan your visit</a></p>
+  </div>
+</div></div>
+</section>
+
+<section class="page" id="page-gallery">
+<div class="sec"><div class="wrap">
+  <h2>Gallery</h2>
+  <p class="lede">In the treatment bays. Photos are placeholders the owner can swap in one click.</p>
+  <div class="mas"><div class="ph  reveal"><span class="badge">Placeholder</span><span class="cap">In the treatment bays 1</span></div><div class="ph tall reveal"><span class="badge">Placeholder</span><span class="cap">In the treatment bays 2</span></div><div class="ph short reveal"><span class="badge">Placeholder</span><span class="cap">In the treatment bays 3</span></div><div class="ph tall reveal"><span class="badge">Placeholder</span><span class="cap">In the treatment bays 4</span></div><div class="ph  reveal"><span class="badge">Placeholder</span><span class="cap">In the treatment bays 5</span></div><div class="ph short reveal"><span class="badge">Placeholder</span><span class="cap">In the treatment bays 6</span></div></div>
+</div></div>
+</section>
+
+<section class="page" id="page-reviews">
+<div class="sec"><div class="wrap">
+  <h2>Reviews</h2>
+  <p class="lede">Fresh on the review sites. Read what drivers say on Google.</p>
+  <p><a class="btn" href="https://www.google.com/maps/place/?q=place_id:ChIJpb9Fptesw4kRCT4E6GSY3CA" target="_blank" rel="noopener">See reviews on Google</a></p>
+  
+  
+</div></div>
+</section>
+
+<section class="page" id="page-visit">
+<div class="sec"><div class="wrap">
+  <h2>Visit us</h2>
+  <p class="lede">Find us, call us, or just roll in.</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div class="card"><h3>Address</h3><p>252 Irvington Ave, South Orange Village, NJ 07079</p>
+      <p><a class="btn" href="https://www.google.com/maps/place/?q=place_id:ChIJpb9Fptesw4kRCT4E6GSY3CA" target="_blank" rel="noopener">Get directions</a></p></div>
+    <div class="card"><h3>Contact</h3><p><a href="tel:+19739317967">(973) 931-7967</a></p>
+      <p><span class="pill"><span class="dot"></span><span>Call for hours: (973) 931-7967</span></span></p></div>
+  </div>
+  <div class="card" style="margin-top:16px"><h3>Hours</h3><p>Hours vary by day. Call <a href="tel:+19739317967">(973) 931-7967</a> and we will fit you in.</p></div>
+</div></div>
+</section>
+</main>
+<footer><div class="f-split wrap"><div><h3>HUGO THE CAR DOCTOR</h3><p>The doctor is in for your car</p><p>252 Irvington Ave, South Orange Village, NJ 07079</p></div><div><h3>Reach us</h3><p><a href="tel:+19739317967">(973) 931-7967</a></p><p><a href="https://www.google.com/maps/place/?q=place_id:ChIJpb9Fptesw4kRCT4E6GSY3CA" target="_blank" rel="noopener">Get directions</a></p><p><a href="https://www.google.com/maps/place/?q=place_id:ChIJpb9Fptesw4kRCT4E6GSY3CA" target="_blank" rel="noopener">See reviews on Google</a></p></div></div>
+<p class="copy">© HUGO THE CAR DOCTOR</p>
+</footer>
+<script>
+(function(){
+"use strict";
+var PAGES=["home","services","story","gallery","reviews","visit"];
+var nav=document.getElementById("mainNav");
+var burger=document.getElementById("burger");
+function cleanHash(){return (location.hash||"").replace(/^#\/?/,"").split("?")[0];}
+function closeMenu(){if(nav){nav.classList.remove("open");}if(burger){burger.setAttribute("aria-expanded","false");}}
+function navigateTo(page,updateHash){
+if(PAGES.indexOf(page)===-1){page="home";}
+var sections=document.querySelectorAll(".page");
+for(var i=0;i<sections.length;i++){sections[i].classList.toggle("active",sections[i].id==="page-"+page);}
+var links=document.querySelectorAll(".nd-links a[data-page]");
+for(var j=0;j<links.length;j++){var on=links[j].getAttribute("data-page")===page;links[j].classList.toggle("active",on);if(on){links[j].setAttribute("aria-current","page");}else{links[j].removeAttribute("aria-current");}}
+if(updateHash!==false&&location.hash!=="#"+page){location.hash="#"+page;}
+closeMenu();window.scrollTo(0,0);observeReveals();}
+document.addEventListener("click",function(e){
+var el=e.target.closest('a[data-page], button[data-page]');
+if(!el)return;
+e.preventDefault();
+navigateTo(el.getAttribute("data-page"));});
+window.addEventListener("hashchange",function(){
+navigateTo(cleanHash()||"home");});
+if(burger&&nav){burger.addEventListener("click",function(){var open=nav.classList.toggle("open");burger.setAttribute("aria-expanded",open?"true":"false");});}
+
+function observeReveals(){
+var els=document.querySelectorAll(".reveal:not(.in)");
+for(var i=0;i<els.length;i++){els[i].classList.add("in");}}
+var tabBtns=document.querySelectorAll(".tab-btn");
+for(var t=0;t<tabBtns.length;t++){tabBtns[t].addEventListener("click",function(){
+var id=this.getAttribute("data-tab");
+var bs=document.querySelectorAll(".tab-btn");for(var k=0;k<bs.length;k++){bs[k].classList.remove("on");}
+var ps=document.querySelectorAll(".tab-panel");for(var m=0;m<ps.length;m++){ps[m].classList.remove("on");}
+this.classList.add("on");var p=document.getElementById(id);if(p){p.classList.add("on");}});}
+var accBtns=document.querySelectorAll(".acc-btn");
+for(var a=0;a<accBtns.length;a++){accBtns[a].addEventListener("click",function(){
+var item=this.parentNode;var was=item.classList.contains("open");
+var items=document.querySelectorAll(".acc-item");for(var k=0;k<items.length;k++){items[k].classList.remove("open");}
+if(!was){item.classList.add("open");}});}
+
+var lb=document.getElementById("lb");
+if(lb){var tiles=document.querySelectorAll(".gal .t");
+for(var g=0;g<tiles.length;g++){tiles[g].addEventListener("click",function(){
+var box=document.getElementById("lbBox");var cap=this.getAttribute("data-cap")||"";
+box.querySelector("span").textContent=cap;lb.classList.add("show");});}
+lb.addEventListener("click",function(){lb.classList.remove("show");});}
+navigateTo(cleanHash()||"home",false);
+})();
+</script>
+</body>
+</html>
