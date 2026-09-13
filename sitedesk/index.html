@@ -3,184 +3,24 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0b0d10">
+<meta name="theme-color" content="#000">
 <title>SiteDesk</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<header class="topbar">
-  <h1>SiteDesk</h1>
-  <div class="topright">
-    <div class="who" id="whoLine"></div>
-    <button class="bellbtn" id="bellBtn" style="display:none" aria-label="Notifications">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
-      <span class="bellbadge" id="bellBadge" style="display:none"></span>
-    </button>
-  </div>
-</header>
-
-<main id="app">
-
-  <section class="view" id="view-signin">
-    <div class="card">
-      <h2>Sign in</h2>
-      <p class="muted">Paste a fine-grained personal access token for this repo (Contents read and write). It stays in this browser only and is never shown again.</p>
-      <label for="pat">GitHub token</label>
-      <input id="pat" type="password" autocomplete="off" placeholder="ghp_...">
-      <button class="btn block" id="btnSignIn">Sign in</button>
-      <div class="muted" id="signinErr" style="margin-top:8px"></div>
-    </div>
-    <div class="card">
-      <h3>How access works</h3>
-      <p class="muted">Your token identifies your GitHub login. The app then checks the staff list in the repo to find your role. New accounts start as pending until the head or an admin approves them.</p>
-    </div>
-  </section>
-
-  <section class="view" id="view-queue">
-    <div class="card notifask" id="notifAsk" style="display:none">
-      <h3>Device popups</h3>
-      <p class="muted">Turn on notifications so you get a popup on this device when the admin approves you or a build status updates.</p>
-      <div class="row">
-        <button class="btn small" id="btnNotifEnable">Enable</button>
-        <button class="btn ghost small" id="btnNotifLater">Not now</button>
-      </div>
-    </div>
-    <div class="card">
-      <h2>Open queue</h2>
-      <p class="muted" id="queueMeta"></p>
-      <div class="filters">
-        <div class="full"><input id="fq" type="search" placeholder="Search name, phone, address"></div>
-        <div><select id="fcat"><option value="">All categories</option></select></div>
-        <div class="checkline"><input id="fphone" type="checkbox"><label for="fphone" style="text-transform:none;letter-spacing:0">Has phone</label></div>
-      </div>
-      <div class="row">
-        <button class="btn ghost small" id="btnApplyFilters">Apply</button>
-        <button class="btn ghost small" id="btnShuffle">Shuffle</button>
-      </div>
-    </div>
-    <div id="queueList"></div>
-    <button class="btn ghost block" id="btnMore" style="display:none">Show 10 more</button>
-  </section>
-
-  <section class="view" id="view-claims">
-    <div class="card">
-      <div class="row" style="justify-content:space-between">
-        <h2 style="margin:0">My claims</h2>
-        <button class="btn ghost small" id="btnRefreshClaims">Refresh</button>
-      </div>
-      <p class="muted" id="claimsMeta"></p>
-    </div>
-    <div id="claimsList"></div>
-  </section>
-
-  <section class="view" id="view-scripts">
-    <div class="card">
-      <h2>Call scripts</h2>
-      <p class="muted">The offer is simple. Building the website is free. Hosting and management is $27 per month.</p>
-    </div>
-    <div class="card">
-      <h3>Opener</h3>
-      <div class="scriptbox" id="script1">Hi, this is ___ from SiteDesk. We built a preview website for your business and it is ready to look at. Do you have two minutes?</div>
-      <button class="btn ghost small" data-copy="script1">Copy</button>
-    </div>
-    <div class="card">
-      <h3>The pitch</h3>
-      <div class="scriptbox" id="script2">Building the site is free, there is no charge for the build itself. If you want to keep it live, we host it and manage it for $27 per month. No contract, cancel anytime, and we handle updates for you.</div>
-      <button class="btn ghost small" data-copy="script2">Copy</button>
-    </div>
-    <div class="card">
-      <h3>Voicemail</h3>
-      <div class="scriptbox" id="script3">Hi, this is ___ from SiteDesk. We put together a free preview website for your business. I will text you the link so you can see it, and you can call me back if you like it. Thanks.</div>
-      <button class="btn ghost small" data-copy="script3">Copy</button>
-    </div>
-    <div class="card">
-      <h3>SMS drafts</h3>
-      <div class="scriptbox" id="sms1">Hi, this is ___ from SiteDesk. We built a free preview website for your business: LINK. Building it was free. Keeping it live with hosting and management is $27 per month. Want me to turn it on for you?</div>
-      <button class="btn ghost small" data-copy="sms1">Copy</button>
-      <div class="scriptbox" id="sms2">Quick follow up from SiteDesk. Your preview site is still ready here: LINK. Free to build, $27 per month only if you want it live and managed. Reply YES and I will switch it on.</div>
-      <button class="btn ghost small" data-copy="sms2">Copy</button>
-      <p class="muted">Replace LINK with the business preview link before sending.</p>
-    </div>
-  </section>
-
-  <section class="view" id="view-intake">
-    <div class="card">
-      <h2>New intake</h2>
-      <p class="muted" id="intakeFor"></p>
-      <label for="inBiz">Business name</label><input id="inBiz">
-      <label for="inContact">Contact name</label><input id="inContact">
-      <label for="inPhone">Phone</label><input id="inPhone" inputmode="tel">
-      <label for="inEmail">Email</label><input id="inEmail" inputmode="email">
-      <label for="inWants">What they want</label><textarea id="inWants"></textarea>
-      <label for="inNotes">Notes</label><textarea id="inNotes"></textarea>
-      <div class="row">
-        <button class="btn" id="btnSaveIntake">Save intake</button>
-        <button class="btn ghost" id="btnCancelIntake">Cancel</button>
-      </div>
-      <div class="muted" id="intakeErr" style="margin-top:8px"></div>
-    </div>
-  </section>
-
-  <section class="view" id="view-intakes">
-    <div class="card">
-      <div class="row" style="justify-content:space-between">
-        <h2 style="margin:0">Intakes</h2>
-        <button class="btn ghost small" id="btnRefreshIntakes">Refresh</button>
-      </div>
-      <p class="muted">Sold deals waiting on builds.</p>
-    </div>
-    <div id="intakesList"></div>
-  </section>
-
-  <section class="view" id="view-admin">
-    <div class="card">
-      <h2>Staff</h2>
-      <div id="usersList"></div>
-    </div>
-    <div class="card">
-      <h2>Claim lookup</h2>
-      <p class="muted">Enter a site slug to view or unlock its claim.</p>
-      <div class="row">
-        <input id="adminSlug" placeholder="business-slug" style="flex:1">
-        <button class="btn ghost small" id="btnLookupClaim">Look up</button>
-      </div>
-      <div id="adminClaim"></div>
-    </div>
-    <div class="card">
-      <h2>Announcement</h2>
-      <p class="muted">Sends a notification to every caller on their device.</p>
-      <label for="ancTitle">Title</label><input id="ancTitle" placeholder="e.g. New leads added">
-      <label for="ancBody">Message</label><textarea id="ancBody" rows="2"></textarea>
-      <button class="btn" id="btnAnnounce">Send to all callers</button>
-    </div>
-  </section>
-
-  <section class="view" id="view-notifs">
-    <div class="card">
-      <div class="row" style="justify-content:space-between">
-        <h2 style="margin:0">Notifications</h2>
-        <button class="btn ghost small" id="btnRefreshFeed">Refresh</button>
-      </div>
-      <p class="muted">Approvals, build updates, and announcements for you.</p>
-    </div>
-    <div id="notifList"></div>
-  </section>
-
-</main>
-
-<nav class="bottomnav" id="nav" style="display:none">
-  <button data-view="queue"><span class="dot">Q</span>Queue</button>
-  <button data-view="claims"><span class="dot">C</span>My Claims</button>
-  <button data-view="scripts"><span class="dot">S</span>Scripts</button>
-  <button data-view="intakes"><span class="dot">I</span>Intakes</button>
-  <button data-view="admin" id="navAdmin" style="display:none"><span class="dot">A</span>Admin</button>
-</nav>
-
-<div class="toast" id="toast"></div>
-
+<div class="void-shell">
+  <div class="app" id="app"></div>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<div id="modal-root"></div>
+<noscript><div class="card" style="margin:24px"><h2>SiteDesk</h2><p class="muted">This app needs JavaScript.</p></div></noscript>
+<script src="config.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

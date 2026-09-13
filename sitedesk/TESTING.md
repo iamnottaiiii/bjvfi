@@ -1,50 +1,26 @@
-# SiteDesk static PWA: what was verified
+# SiteDesk frontend rebuild: what was verified
 
-## Device notifications + bell (added 2026-09-13)
+Rebuilt 2026-09-13 in `~/workspace/sitedesk-pages/sitedesk/`. Static frontend, local files only, nothing pushed.
 
-- `node --check app.js`: clean after all changes.
-- 23 new unit tests (`/tmp/sd-pages-notif-test.js`, re-runnable), all passing:
-  - `feedItem`: id prefix `ev_`, ISO timestamp, audience/title/body/link fields, link defaults to null, ids unique
-  - `feedAppendCap`: prepends newest, does not mutate input, caps at 200, handles null feed
-  - `feedNewItems`: audience filter (all / me / other logins), skips seen ids, skips items without id, returns oldest-first for popup order
-  - `capSeenIds`: dedupes and caps the stored seen list at 500
-  - `timeAgo`: just now / min / hr / day buckets and date fallback, empty on invalid ts
-- All 25 pre-existing tests still pass (no regressions).
-- DOM id cross-check: `bellBtn`, `bellBadge`, `notifAsk`, `btnNotifEnable`, `btnNotifLater`, `view-notifs`, `btnRefreshFeed`, `notifList`, `ancTitle`, `ancBody`, `btnAnnounce` all present in index.html and wired in app.js.
-- Em/en dash scan over every shipped file (index.html, app.js, styles.css, manifest.webmanifest, icon.svg, data/users.json, TESTING.md): 0 violations.
-- Anti-spam rules in code: first feed fetch seeds last-seen silently (no popup storm); popups only for items newer than last-seen; max 5 popups per fetch; feed read on sign-in, bell-panel open, and manual refresh only, no polling loops; `new Notification` only fires when permission is granted.
+## Security warning: shared token scoping
 
-## Automated checks (all passing)
+`config.js` ships `SITEDESK_DATA_TOKEN` in the client, visible to anyone who inspects the app. Scope it to ONLY the `iamnottaiiii/sitedesk-data` repo with Contents read+write and NOTHING else. Caller access is still gated by PBKDF2 passwords in `users.json` verified client-side. The token, passwords, and hashes are never logged, never displayed, and never sent anywhere except `api.github.com`.
 
-- `node --check app.js`: clean, no syntax errors.
-- 25 unit tests against the real exported functions in app.js (`/tmp/sd-pages-test.js`, re-runnable):
-  - base64 UTF-8 encode/decode roundtrip, including non-Latin text (Arabic business name)
-  - `normLead`: full key set, alternate keys (`id`/`name`/`maps_url`), null input, missing name returns null
-  - `normSites`: `{sites: [...]}` wrapper handling, duplicate slug removal
-  - `isExpired`: future expiry false, past expiry true, missing expiry treated as expired
-  - `telHref`: 10-digit gets +1, 11-digit starting with 1 kept, empty returns empty
-  - `smsHref`: correct `sms:+1...?body=` encoding
-  - `directionsUrl`: exact Google Maps search URL with encoded address
-  - `newClaimDoc`: status claimed, claimed_by set, outcome null, expiry exactly 45 min after claimed_at
-  - `newIntakeDoc`: id prefix, status open, claim link, creator recorded
-  - `claimPath` / `intakePath` shapes
-  - `ghErrorMessage`: plain-English text for 401, 403, 404, 422, and fallback
-  - `shuffle` preserves all elements
-- Em/en dash scan over every shipped file: 0 violations (code and UI text).
-- JSON validity: `manifest.webmanifest` and `data/users.json` parse.
-- Cross-check: all 40 element ids referenced in app.js exist in index.html (one, `btnUnlock`, is injected dynamically by the claim lookup and wired immediately after, which is correct at runtime). All `data-copy` and nav targets resolve.
+## What was verified
 
-## What was NOT tested (needs a real browser + repo)
+- `node --check app.js` and `node --check config.js`: both pass.
+- Unit tests (`/tmp/sitedesk-tests.js`, 40 assertions, all pass):
+  - Lead normalizer uses SHORT keys as primary: realistic entry `{"s":"x-y","n":"X Y","c":"Plumber","p":"(555) 123-4567","a":"123 Main St"}` asserts slug `x-y`, name `X Y`, category `Plumber`, phone digits `5551234567`, address `123 Main St`. This was the critical queue bug: the old normalizer read long keys first, so every entry parsed to null and the queue showed zero leads.
+  - Long keys still work as fallbacks; short keys win when both are present; null/empty entries never produce null fields.
+  - `siteUrlFor` prefers an embedded url key, falls back to `https://bjvfi.com/<slug>/` (URL structure assumed, not confirmed against the live site).
+  - PBKDF2 roundtrip against the real format `pbkdf2$600000$<salt-b64>$<hash-b64>` (SHA-256, 256-bit, timing-safe compare): correct password verifies, wrong password / garbage format / tampered hash all reject.
+  - Feed cap at 200 keeps newest-first order; claim expiry math (45 min window); `tel:`/`sms:`/directions URL builders; shuffle preserves the set; `esc` escapes markup; plain-English GitHub error messages for 401/403/404/422; countdown formatting; generated passwords are 16 chars from the unambiguous alphabet (no 0/O/1/l).
+- DOM cross-check: every id referenced in `app.js` (51 refs) exists in `index.html` or is created dynamically by `app.js` render functions. Zero missing.
+- Dash scan: no em dashes or en dashes in any file (UI strings or comments). Separators use the middle dot.
+- `styles.css` is byte-identical to the original `<style>` block from `/tmp/orig-style.html` (diff clean). All original classes present: `:root` variables, `.void-shell` texture/vignette, `.top` header with fade mask, `.brand` + `.bell` with amber dot, `.card` with fade-edge/soft-bleed/radial mask, `.btn` variants (light, ghost, danger, call, sms), `.bottom-nav` 64px tab bar, `.toast` (light), `.lead-row`, `.statrow/.stat`, `.chiprow/.chip`, `.pick`, `.copybox`, `.phone-line`, `.timer`, `.timeline`, `.badge` variants, `.modal-back/.modal`, `.home-void/.home-mark`, `.install-gate/.notif-gate`, `.notif-banner`.
+- Network surface: only `https://api.github.com/repos/iamnottaiiii/sitedesk-data` (auth header `Bearer SITEDESK_DATA_TOKEN`), `https://bjvfi.com/sites.json` (no auth), plus the Google Fonts CDN from `index.html`. No polling loops; feed is fetched on login, on Alerts open, and via manual refresh.
 
-- Actual GitHub API calls (auth, claim race 422, PUT/DELETE with sha). The request shapes follow the Contents and Git Trees APIs exactly, but live behavior needs a token and a test repo.
-- PWA install flow and service worker (no service worker shipped on purpose, see below).
-- The `sites.json` fetch from `location.origin`, which assumes the app is served from the domain root (custom domain). On `*.github.io/bjvfi/sitedesk/` the catalog and preview links would need the `/bjvfi` base path.
+## Not verified live (needs a browser + real token)
 
-## Cut or stubbed, and why
-
-- No service worker: a worker that caches aggressively could serve stale claim state and cause double-claim confusion. The app works offline-ish by being dependency-free (no CDNs); live data always needs network anyway.
-- My-claims discovery scans the git tree then fetches each claim file. That is O(n) requests, fine for a small caller team; cached per session with a Refresh button. No polling anywhere.
-- Expired claims are treated as open client-side. Re-claiming an expired claim overwrites the file with a fresh 45-minute window.
-- Admin claim list is slug lookup plus unlock, not a full table, to keep request counts minimal.
-- Push notifications, email, and SMS sending are out of scope for a zero-backend build. What ships instead: an in-app notification center plus built-in browser popups (`new Notification`, no VAPID, no keys, no service worker, no third party). Events are stored in `sitedesk/data/feed.json` in the repo (newest first, capped at 200). SMS uses `sms:` links with prefilled drafts; scripts are copyable text.
-- The sign-in screen asks for a fine-grained PAT with Contents read/write on the repo. The token lives in localStorage only and is never displayed or logged.
+- Actual GitHub read/write roundtrips (claims, intakes, users.json, feed.json), 422 race on claim create, admin create-user flow, and the one-time notif-gate permission prompt. The data repo was not touched.
+- No service worker was added: aggressive caching could serve stale claim state and cause double-claim confusion.

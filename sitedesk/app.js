@@ -1,1245 +1,1564 @@
-/* SiteDesk static PWA. Zero backend. GitHub is the database via api.github.com.
-   The token is kept in localStorage and never logged or displayed. */
+'use strict';
+/* SiteDesk caller app. Static frontend, GitHub is the database.
+   Data repo: iamnottaiiii/sitedesk-data via api.github.com.
+   Lead catalog: https://bjvfi.com/sites.json (no auth).
+   Auth: shared data token (config.js) + per-user PBKDF2 passwords in users.json.
+   The token is never logged or displayed. Passwords and hashes are never logged. */
 
-var OWNER = 'iamnottaiiii';
-var REPO = 'bjvfi';
-var API = 'https://api.github.com';
-var LS_TOKEN = 'sitedesk_pat_v1';
-var LS_MYCLAIMS = 'sitedesk_myclaims_v1';
-var CLAIM_TTL_MIN = 45;
-var MAX_ACTIVE_CLAIMS = 5;
-var PAGE_SIZE = 10;
-var FEED_PATH = 'sitedesk/data/feed.json';
-var FEED_CAP = 200;
-var LS_FEED_SEEN = 'sitedesk_feed_seen_v1';
-var LS_NOTIF_ASKED = 'sitedesk_notif_asked_v1';
-var MAX_POPUPS = 5;
+/* ================= pure helpers (node-testable) ================= */
 
-var S = {
-  token: null,
-  me: null,            // {login, name, role, status}
-  users: null,
-  sites: null,
-  sitesBySlug: {},
-  claimCache: {},     // slug -> claim doc or null (null = known open)
-  queue: [],
-  shown: 0,
-  myClaims: [],
-  intakes: [],
-  intakeClaimSlug: null,
-  filters: { q: '', cat: '', phone: false }
-};
+function esc(s){
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
 
-/* ---------------- pure helpers (also exported for node tests) ---------------- */
+function digitsOnly(s){ return String(s||'').replace(/\D/g,''); }
+function hasPhone(p){ return digitsOnly(p).length >= 7; }
 
-function b64encodeUtf8(s) {
-  var bytes = new TextEncoder().encode(s);
-  var bin = '';
-  for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+function b64encode(bytes){
+  let bin='';
+  const b = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  for(let i=0;i<b.length;i++) bin += String.fromCharCode(b[i]);
   return btoa(bin);
 }
-
-function b64decodeUtf8(s) {
-  var bin = atob(String(s).replace(/\s+/g, ''));
-  var bytes = new Uint8Array(bin.length);
-  for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-  return new TextDecoder().decode(bytes);
-}
-
-function normLead(e) {
-  if (!e || typeof e !== 'object') return null;
-  var slug = e.slug || e.id || '';
-  var name = e.business_name || e.name || '';
-  if (!slug || !name) return null;
-  return {
-    slug: String(slug),
-    name: String(name),
-    phone: e.phone || '',
-    category: e.category || '',
-    address: e.address || '',
-    site: e.site_url || e.maps_url || ''
-  };
-}
-
-function normSites(data) {
-  var arr = Array.isArray(data) ? data : (data && Array.isArray(data.sites) ? data.sites : []);
-  var out = [], seen = {};
-  for (var i = 0; i < arr.length; i++) {
-    var l = normLead(arr[i]);
-    if (l && !seen[l.slug]) { seen[l.slug] = 1; out.push(l); }
-  }
+function b64decodeToBytes(b64){
+  const bin = atob(String(b64).replace(/\s/g,''));
+  const out = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) out[i] = bin.charCodeAt(i);
   return out;
 }
 
-function isExpired(claim, nowMs) {
-  if (!claim || !claim.claim_expires_at) return true;
-  var t = Date.parse(claim.claim_expires_at);
-  return !(t > nowMs);
-}
-
-function shuffle(a) {
-  var x = a.slice();
-  for (var i = x.length - 1; i > 0; i--) {
-    var j = Math.floor(Math.random() * (i + 1));
-    var t = x[i]; x[i] = x[j]; x[j] = t;
-  }
-  return x;
-}
-
-function phoneDigits(p) {
-  return String(p || '').replace(/\D/g, '');
-}
-
-function telHref(phone) {
-  var d = phoneDigits(phone);
-  if (d.length === 10) return 'tel:+1' + d;
-  if (d.length === 11 && d.charAt(0) === '1') return 'tel:+' + d;
-  return d ? 'tel:' + d : '';
-}
-
-function smsHref(phone, body) {
-  var d = phoneDigits(phone);
-  var base = d.length === 10 ? 'sms:+1' + d : (d ? 'sms:+' + d : 'sms:');
-  return base + '?body=' + encodeURIComponent(body || '');
-}
-
-function directionsUrl(address) {
-  return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(address || '');
-}
-
-function sitePreviewUrl(slug) {
-  var origin = (typeof location !== 'undefined' && location.origin) ? location.origin : '';
-  return origin + '/' + slug + '/';
-}
-
-function sitesCatalogUrl() {
-  var origin = (typeof location !== 'undefined' && location.origin) ? location.origin : '';
-  return origin + '/sites.json';
-}
-
-function newClaimDoc(lead, login, name) {
-  var now = new Date();
-  var exp = new Date(now.getTime() + CLAIM_TTL_MIN * 60 * 1000);
+/* Lead catalog entries from bjvfi.com/sites.json use SHORT keys as the primary
+   format: {"s": slug, "n": name, "c": category, "p": phone, "a": address}.
+   Long keys are kept only as fallbacks. */
+function normalizeLead(e){
+  e = e || {};
+  const slug = e.s || e.slug || e.id || '';
+  const name = e.n || e.name || e.business_name || '';
+  const phone = e.p || e.phone || '';
+  const category = e.c || e.category || '';
+  const address = e.a || e.address || '';
+  const url = e.url || e.site_url || e.u || '';
   return {
-    slug: lead.slug,
-    business_name: lead.name,
-    phone: lead.phone,
-    category: lead.category,
-    address: lead.address,
-    claimed_by: login,
-    claimed_by_name: name,
-    claimed_at: now.toISOString(),
-    claim_expires_at: exp.toISOString(),
-    status: 'claimed',
-    outcome: null,
-    note: null
+    slug: String(slug), name: String(name), phone: String(phone),
+    category: String(category), address: String(address), url: String(url),
   };
 }
 
-function newIntakeDoc(f, login, claimSlug) {
-  var id = 'in_' + Date.now().toString(36) + Math.floor(Math.random() * 1e6).toString(36);
+function siteUrlFor(lead){
+  if(lead.url) return lead.url;
+  return 'https://bjvfi.com/' + lead.slug + '/';
+}
+
+function telHref(phone){ return 'tel:+' + digitsOnly(phone); }
+
+function smsHref(phone, body){
+  return 'sms:+' + digitsOnly(phone) + '?body=' + encodeURIComponent(String(body||''));
+}
+
+function directionsHref(address){
+  return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(String(address||''));
+}
+
+var CLAIM_TTL_MS = 45 * 60 * 1000;
+function claimExpired(claim, nowMs){
+  if(!claim || !claim.claim_expires_at) return false;
+  return (nowMs == null ? Date.now() : nowMs) >= Number(claim.claim_expires_at);
+}
+
+function fmtCountdown(ms){
+  if(ms <= 0) return 'expired';
+  const m = Math.floor(ms/60000), s = Math.floor((ms%60000)/1000);
+  if(m >= 60) return Math.floor(m/60) + 'h ' + (m%60) + 'm left';
+  return m + 'm ' + (s < 10 ? '0' : '') + s + 's left';
+}
+
+function capFeed(items, max){
+  const arr = Array.isArray(items) ? items.slice() : [];
+  return arr.slice(0, max == null ? 200 : max);
+}
+
+function ghErrorMessage(status, action){
+  const a = action || 'request';
+  if(status === 401) return 'Token rejected (401). Check the shared token in config.js is valid and scoped to the data repo.';
+  if(status === 403) return 'Forbidden (403). The token may be rate limited or lack Contents write access on the data repo.';
+  if(status === 404) return 'Not found (404). ' + a + ' hit a missing file or repo.';
+  if(status === 422) return 'Already taken (422). Someone claimed this lead first.';
+  return 'GitHub error ' + status + ' during ' + a + '.';
+}
+
+function shuffle(arr, rand){
+  const a = arr.slice();
+  const r = rand || Math.random;
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(r()*(i+1));
+    const t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+var PW_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
+function genPassword(len){
+  len = len || 16;
+  const out = [];
+  const rnd = (typeof crypto !== 'undefined' && crypto.getRandomValues)
+    ? crypto.getRandomValues(new Uint8Array(len)) : null;
+  for(let i=0;i<len;i++){
+    const n = rnd ? rnd[i] : Math.floor(Math.random()*256);
+    out.push(PW_ALPHABET[n % PW_ALPHABET.length]);
+  }
+  return out.join('');
+}
+
+function getSubtle(){
+  if(typeof crypto !== 'undefined' && crypto.subtle) return crypto.subtle;
+  try{ return require('crypto').webcrypto.subtle; }catch(e){ return null; }
+}
+
+/* Format: pbkdf2$<iterations>$<salt-b64>$<hash-b64>, SHA-256, 256-bit key. */
+async function pbkdf2Hash(password, iterations){
+  const subtle = getSubtle();
+  const iters = iterations || 600000;
+  const salt = new Uint8Array(16);
+  if(typeof crypto !== 'undefined' && crypto.getRandomValues) crypto.getRandomValues(salt);
+  else require('crypto').randomFillSync(salt);
+  const key = await subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits']);
+  const bits = await subtle.deriveBits({name:'PBKDF2', salt: salt, iterations: iters, hash:'SHA-256'}, key, 256);
+  return 'pbkdf2$' + iters + '$' + b64encode(salt) + '$' + b64encode(new Uint8Array(bits));
+}
+
+async function pbkdf2Verify(password, stored){
+  const m = /^pbkdf2\$(\d+)\$([A-Za-z0-9+/=]+)\$([A-Za-z0-9+/=]+)$/.exec(String(stored||''));
+  if(!m) return false;
+  const subtle = getSubtle();
+  const iters = parseInt(m[1],10);
+  if(!(iters >= 1000 && iters <= 2000000)) return false;
+  const salt = b64decodeToBytes(m[2]);
+  const want = b64decodeToBytes(m[3]);
+  const key = await subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits']);
+  const bits = await subtle.deriveBits({name:'PBKDF2', salt: salt, iterations: iters, hash:'SHA-256'}, key, 256);
+  const got = new Uint8Array(bits);
+  if(got.length !== want.length) return false;
+  let diff = 0;
+  for(let i=0;i<got.length;i++) diff |= got[i] ^ want[i];
+  return diff === 0;
+}
+
+function nowISO(){ return new Date().toISOString(); }
+function uid(prefix){
+  const r = Math.random().toString(36).slice(2,8);
+  return (prefix||'id') + '_' + Date.now().toString(36) + r;
+}
+
+/* Sales copy. Static, guide only. */
+function salesLine(){
+  return 'Building the site is free. Hosting and management is $27/month.';
+}
+function smsDraft(businessName, callerName, siteUrl){
+  return 'Hi ' + businessName + ', this is ' + callerName +
+    ' with BJ VFI. We built you a free preview site: ' + siteUrl +
+    '. Worth a 2-min look?';
+}
+function callScriptText(businessName, callerName){
+  return [
+    'Opener: Hi, is this ' + businessName + '? I am ' + callerName + ' with BJ VFI.',
+    '',
+    'Hook: We built a free preview website for your business. No catch, it is already made.',
+    '',
+    'Value: ' + salesLine() + ' If you like it we can put your real info on it this week.',
+    '',
+    'Ask: Can I text you the link so you can see it? What is the best email to send it to?',
+    '',
+    'Close: Great, I will send it now. If you want changes, just reply and we handle it.'
+  ].join('\n');
+}
+
+if(typeof module !== 'undefined' && module.exports){
+  module.exports = { esc: esc, digitsOnly: digitsOnly, hasPhone: hasPhone,
+    normalizeLead: normalizeLead, siteUrlFor: siteUrlFor, telHref: telHref,
+    smsHref: smsHref, directionsHref: directionsHref, claimExpired: claimExpired,
+    fmtCountdown: fmtCountdown, capFeed: capFeed, ghErrorMessage: ghErrorMessage,
+    shuffle: shuffle, genPassword: genPassword, pbkdf2Hash: pbkdf2Hash,
+    pbkdf2Verify: pbkdf2Verify, uid: uid, salesLine: salesLine,
+    smsDraft: smsDraft, callScriptText: callScriptText };
+}
+
+/* ================= GitHub data layer (only network besides bjvfi.com) ================= */
+
+var GH_API = 'https://api.github.com/repos/iamnottaiiii/sitedesk-data';
+var CATALOG_URL = 'https://bjvfi.com/sites.json';
+var MAX_ACTIVE_CLAIMS = 5;
+var FEED_CAP = 200;
+
+function ghHeaders(){
   return {
-    id: id,
-    business_name: f.biz,
-    contact_name: f.contact,
-    phone: f.phone,
-    email: f.email,
-    wants: f.wants,
-    notes: f.notes,
-    status: 'open',
-    claim_slug: claimSlug || null,
-    created_by: login,
-    created_at: new Date().toISOString()
+    'Accept': 'application/vnd.github+json',
+    'Authorization': 'Bearer ' + SITEDESK_DATA_TOKEN,
+    'Content-Type': 'application/json'
   };
 }
 
-function claimPath(slug) { return 'sitedesk/data/claims/' + slug + '.json'; }
-function intakePath(id) { return 'sitedesk/data/intakes/' + id + '.json'; }
-
-function ghErrorMessage(status) {
-  if (status === 401) return 'Bad token. Check your token and try again.';
-  if (status === 403) return 'GitHub refused the request. The token may lack repo scope or hit a rate limit.';
-  if (status === 404) return 'Not found on GitHub.';
-  if (status === 422) return 'Someone else just claimed this lead.';
-  return 'GitHub request failed (status ' + status + ').';
-}
-
-function feedItem(audience, title, body, link) {
-  var now = new Date();
-  var id = 'ev_' + now.getTime().toString(36) + Math.floor(Math.random() * 1e6).toString(36);
-  return {
-    id: id,
-    ts: now.toISOString(),
-    audience: audience,
-    title: String(title || ''),
-    body: String(body || ''),
-    link: link || null
-  };
-}
-
-function feedAppendCap(feed, item, cap) {
-  var arr = Array.isArray(feed) ? feed.slice() : [];
-  arr.unshift(item);
-  return arr.slice(0, cap);
-}
-
-/* Newest items addressed to me or "all" that I have not seen yet,
-   returned oldest-first so popups fire in order. */
-function feedNewItems(feed, seenArr, login) {
-  var seen = seenArr || [];
-  var out = [];
-  for (var i = 0; i < feed.length; i++) {
-    var it = feed[i];
-    if (!it || !it.id) continue;
-    if (it.audience !== 'all' && it.audience !== login) continue;
-    if (seen.indexOf(it.id) !== -1) continue;
-    out.push(it);
+async function ghFetch(path, opts){
+  opts = opts || {};
+  const res = await fetch(GH_API + path, {
+    method: opts.method || 'GET',
+    headers: ghHeaders(),
+    body: opts.body ? JSON.stringify(opts.body) : undefined
+  });
+  const text = await res.text();
+  let json = null;
+  try{ json = text ? JSON.parse(text) : null; }catch(e){ json = null; }
+  if(!res.ok){
+    const err = new Error(ghErrorMessage(res.status, opts.action || ('GitHub ' + (opts.method||'GET') + ' ' + path)));
+    err.status = res.status;
+    throw err;
   }
-  out.reverse();
-  return out;
+  return json;
 }
 
-function capSeenIds(arr) {
-  var out = [], seen = {};
-  for (var i = 0; i < arr.length; i++) {
-    var id = arr[i];
-    if (id && !seen[id]) { seen[id] = 1; out.push(id); }
-    if (out.length >= 500) break;
+/* Read a JSON file from the repo. Returns {data, sha} or null when missing. */
+async function ghGetJson(path){
+  try{
+    const file = await ghFetch('/contents/' + path + '?ref=main', {action:'read ' + path});
+    const raw = b64decodeToBytes(file.content || '');
+    return { data: JSON.parse(new TextDecoder().decode(raw)), sha: file.sha };
+  }catch(e){
+    if(e.status === 404) return null;
+    throw e;
   }
-  return out;
 }
 
-function timeAgo(ts, nowMs) {
-  var t = Date.parse(ts);
-  if (isNaN(t)) return '';
-  var diff = Math.max(0, (nowMs || Date.now()) - t);
-  var m = Math.floor(diff / 60000);
-  if (m < 1) return 'just now';
-  if (m < 60) return m + ' min ago';
-  var h = Math.floor(m / 60);
-  if (h < 24) return h + ' hr ago';
-  var d = Math.floor(h / 24);
-  if (d < 7) return d + ' day' + (d === 1 ? '' : 's') + ' ago';
-  return new Date(t).toISOString().slice(0, 10);
+/* Write a JSON file. sha null = create-only (422 when taken). */
+async function ghPutJson(path, obj, sha, message){
+  const body = { message: message || ('sitedesk: update ' + path),
+    content: b64encode(new TextEncoder().encode(JSON.stringify(obj, null, 2))) };
+  if(sha) body.sha = sha;
+  return ghFetch('/contents/' + path, { method:'PUT', body: body, action:'save ' + path });
 }
 
-/* ---------------- GitHub API layer ---------------- */
-
-function gh(method, path, body) {
-  return fetch(API + path, {
-    method: method,
-    headers: {
-      'Accept': 'application/vnd.github+json',
-      'Authorization': 'Bearer ' + S.token,
-      'Content-Type': 'application/json'
-    },
-    body: body === undefined ? undefined : JSON.stringify(body)
+async function ghDeleteFile(path, sha){
+  return ghFetch('/contents/' + path, {
+    method:'DELETE',
+    body: { message: 'sitedesk: delete ' + path, sha: sha },
+    action:'delete ' + path
   });
 }
 
-function getFile(path) {
-  return gh('GET', '/repos/' + OWNER + '/' + REPO + '/contents/' + path + '?ref=main')
-    .then(function (res) {
-      if (res.status === 404) return { status: 404 };
-      if (!res.ok) throw Object.assign(new Error(ghErrorMessage(res.status)), { status: res.status });
-      return res.json().then(function (j) {
-        return { status: 200, sha: j.sha, data: JSON.parse(b64decodeUtf8(j.content)) };
-      });
-    });
+var treeCache = null;
+async function ghTree(){
+  if(treeCache) return treeCache;
+  const t = await ghFetch('/git/trees/main?recursive=1', {action:'list repo tree'});
+  treeCache = (t.tree || []).map(function(n){ return n.path; });
+  return treeCache;
 }
-
-function putFile(path, obj, sha, message) {
-  var body = { message: message, content: b64encodeUtf8(JSON.stringify(obj, null, 2)), branch: 'main' };
-  if (sha) body.sha = sha;
-  return gh('PUT', '/repos/' + OWNER + '/' + REPO + '/contents/' + path, body)
-    .then(function (res) {
-      if (!res.ok) throw Object.assign(new Error(ghErrorMessage(res.status)), { status: res.status });
-      return res.json();
-    });
+function treePaths(prefix){
+  if(!treeCache) return [];
+  return treeCache.filter(function(p){ return p.indexOf(prefix) === 0; });
 }
+function clearTreeCache(){ treeCache = null; }
 
-function deleteFile(path, sha, message) {
-  return gh('DELETE', '/repos/' + OWNER + '/' + REPO + '/contents/' + path,
-    { message: message, sha: sha, branch: 'main' })
-    .then(function (res) {
-      if (!res.ok) throw Object.assign(new Error(ghErrorMessage(res.status)), { status: res.status });
-      return res.json();
-    });
+/* ================= state ================= */
+
+var state = {
+  user: null,
+  tab: 'queue',
+  catalog: [],
+  catalogAt: 0,
+  claimsBySlug: {},
+  treeSlugs: null,
+  myClaims: [],
+  myIntakes: [],
+  feed: [],
+  feedMaxTs: 0,
+  unread: 0,
+  q: '', cat: '', hasPhoneOnly: false,
+  boardOrder: [],
+  boardShown: 60,
+  mineQ: '', mineStatus: 'all', meSlug: null,
+  userQ: '', userStatus: '',
+  adminSec: 'users',
+  intakeStatusFilter: 'all',
+  users: null, usersSha: null,
+  booted: false,
+};
+
+var LS_SESSION = 'sitedesk_session_v1';
+var LS_LASTREAD = 'sitedesk_lastread_v1';
+var LS_NOTIF_ASKED = 'sitedesk_notif_asked_v1';
+
+/* ================= session ================= */
+
+function loadSession(){
+  try{
+    const s = JSON.parse(localStorage.getItem(LS_SESSION) || 'null');
+    if(s && s.username && s.exp && s.exp > Date.now()) return s;
+  }catch(e){}
+  return null;
 }
-
-function listTree(prefix) {
-  return gh('GET', '/repos/' + OWNER + '/' + REPO + '/git/trees/main?recursive=1')
-    .then(function (res) {
-      if (!res.ok) throw Object.assign(new Error(ghErrorMessage(res.status)), { status: res.status });
-      return res.json();
-    })
-    .then(function (j) {
-      return (j.tree || [])
-        .filter(function (n) { return n.type === 'blob' && n.path.indexOf(prefix) === 0 && n.path.slice(-5) === '.json'; })
-        .map(function (n) { return n.path; });
-    });
+function saveSession(u){
+  localStorage.setItem(LS_SESSION, JSON.stringify({
+    username: u.username, role: u.role, name: u.name, exp: Date.now() + 7*24*3600*1000
+  }));
 }
+function clearSession(){ localStorage.removeItem(LS_SESSION); }
 
-/* ---------------- DOM helpers ---------------- */
-
-function el(id) { return document.getElementById(id); }
-
-function esc(s) {
-  return String(s == null ? '' : s)
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+function lastReadAt(){
+  try{ return Number(localStorage.getItem(LS_LASTREAD) || 0) || 0; }catch(e){ return 0; }
 }
+function setLastRead(ts){ try{ localStorage.setItem(LS_LASTREAD, String(ts)); }catch(e){} }
+
+/* ================= ui primitives ================= */
 
 var toastTimer = null;
-function toast(msg, isErr) {
-  var t = el('toast');
-  t.textContent = msg;
-  t.className = 'toast show' + (isErr ? ' err' : '');
-  if (toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(function () { t.className = 'toast'; }, 4200);
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = String(msg);
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ el.classList.remove('show'); }, 2600);
 }
 
-function showView(name) {
-  S.view = name;
-  var views = document.querySelectorAll('.view');
-  for (var i = 0; i < views.length; i++) views[i].classList.remove('on');
-  el('view-' + name).classList.add('on');
-  var btns = document.querySelectorAll('#nav button');
-  for (var k = 0; k < btns.length; k++) {
-    btns[k].classList.toggle('on', btns[k].getAttribute('data-view') === name);
+function openModal(html){
+  const root = document.getElementById('modal-root');
+  root.innerHTML = '<div class="modal-back" id="modal-back"><div class="modal" role="dialog" aria-modal="true">' +
+    html + '</div></div>';
+  document.getElementById('modal-back').addEventListener('click', function(e){
+    if(e.target.id === 'modal-back') closeModal();
+  });
+}
+function closeModal(){ document.getElementById('modal-root').innerHTML = ''; }
+
+async function copyText(text, label){
+  try{
+    await navigator.clipboard.writeText(String(text));
+    toast((label || 'Copied') + ' to clipboard');
+  }catch(e){
+    const ta = document.createElement('textarea');
+    ta.value = String(text);
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); toast((label || 'Copied') + ' to clipboard'); }
+    catch(e2){ toast('Copy failed, select manually'); }
+    document.body.removeChild(ta);
   }
-  window.scrollTo(0, 0);
 }
 
-function renderNav() {
-  el('nav').style.display = S.me ? 'flex' : 'none';
-  el('navAdmin').style.display = (S.me && (S.me.role === 'head' || S.me.role === 'admin')) ? 'flex' : 'none';
-  el('whoLine').textContent = S.me ? (S.me.name + ' (' + S.me.role + ')') : '';
-  updateBell([]);
+function badge(s){
+  return '<span class="badge ' + esc(s||'') + '">' + esc(s || 'none') + '</span>';
 }
 
-/* ---------------- auth ---------------- */
-
-function signOut() {
-  S.token = null; S.me = null; S.users = null;
-  S.sites = null; S.claimCache = {}; S.queue = []; S.myClaims = []; S.intakes = [];
-  try { localStorage.removeItem(LS_TOKEN); } catch (e) {}
-  var ask = el('notifAsk');
-  if (ask) ask.style.display = 'none';
-  renderNav();
-  showView('signin');
+function fmtTime(ts){
+  try{ return new Date(ts).toLocaleString(); }catch(e){ return ''; }
 }
 
-function failSignin(msg) {
-  S.token = null;
-  try { localStorage.removeItem(LS_TOKEN); } catch (e) {}
-  el('signinErr').textContent = msg;
+/* ================= feed / notifications ================= */
+
+function feedItemVisible(item){
+  const a = item && item.audience;
+  if(a === 'all') return true;
+  if(state.user && a === state.user.username) return true;
+  if(state.user && (state.user.role === 'admin' || state.user.role === 'head') &&
+     (a === 'admin' || a === 'head')) return true;
+  return false;
 }
 
-function signIn() {
-  var token = el('pat').value.trim();
-  if (!token) { el('signinErr').textContent = 'Paste your token first.'; return; }
-  el('signinErr').textContent = 'Checking...';
-  S.token = token;
-  gh('GET', '/user').then(function (res) {
-    if (res.status === 401) { failSignin('Bad token. Check your token and try again.'); return null; }
-    if (!res.ok) { failSignin(ghErrorMessage(res.status)); return null; }
-    return res.json();
-  }).then(function (u) {
-    if (!u) return;
-    var login = u.login;
-    return getFile('sitedesk/data/users.json').then(function (f) {
-      var users = f.status === 200 ? f.data : {};
-      var rec = users[login];
-      if (!rec) {
-        if (login === OWNER) {
-          rec = { role: 'head', status: 'approved', name: 'Head' };
-        } else {
-          failSignin('No staff record for @' + login + '. Ask the head to add you.');
-          return;
-        }
-      }
-      if (rec.status !== 'approved') {
-        failSignin('Your account is ' + rec.status + '. Ask the head or an admin to approve you.');
-        return;
-      }
-      S.me = { login: login, name: rec.name || login, role: rec.role || 'caller', status: 'approved' };
-      S.users = users;
-      try { localStorage.setItem(LS_TOKEN, token); } catch (e) {}
-      try {
-        var saved = JSON.parse(localStorage.getItem(LS_MYCLAIMS) || '[]');
-        S.myClaimSlugs = Array.isArray(saved) ? saved : [];
-      } catch (e) { S.myClaimSlugs = []; }
-      el('pat').value = '';
-      el('signinErr').textContent = '';
-      renderNav();
-      showView('queue');
-      afterSigninNotifSetup();
-      return loadSites();
-    });
-  }).catch(function (e) {
-    failSignin(e.message || 'Sign in failed.');
+async function fetchFeed(announce){
+  let rec = null;
+  try{ rec = await ghGetJson('feed.json'); }catch(e){ toast(e.message); return; }
+  const items = capFeed(rec && rec.data ? rec.data : [], FEED_CAP);
+  const prevMax = state.feedMaxTs;
+  let maxTs = 0;
+  items.forEach(function(n){ const t = new Date(n.created_at || 0).getTime() || 0; if(t > maxTs) maxTs = t; });
+  state.feed = items;
+  if(maxTs > state.feedMaxTs) state.feedMaxTs = maxTs;
+  const unreadList = items.filter(function(n){
+    return feedItemVisible(n) && (new Date(n.created_at || 0).getTime() || 0) > lastReadAt();
+  });
+  state.unread = unreadList.length;
+  if(announce && prevMax){
+    const fresh = items.filter(function(n){
+      return feedItemVisible(n) && (new Date(n.created_at || 0).getTime() || 0) > prevMax;
+    }).slice(0, 3);
+    fresh.forEach(function(n){ notifyUser(n.title, n.body || ''); });
+  }
+  renderBell();
+}
+
+function notifyUser(title, body){
+  toast(title);
+  try{
+    if(typeof Notification !== 'undefined' && Notification.permission === 'granted'){
+      new Notification(String(title), { body: String(body || '').slice(0, 120), icon: 'icon.svg', tag: 'sitedesk-' + String(title).slice(0,40) });
+    }
+  }catch(e){}
+}
+
+async function postEvent(audience, title, body, link){
+  let rec = null;
+  try{ rec = await ghGetJson('feed.json'); }catch(e){ toast(e.message); return false; }
+  const items = capFeed(rec && rec.data ? rec.data : [], FEED_CAP);
+  items.unshift({ id: uid('ev'), audience: audience, title: title, body: body || '',
+    link: link || '', created_at: nowISO() });
+  try{
+    await ghPutJson('feed.json', capFeed(items, FEED_CAP), rec ? rec.sha : null, 'sitedesk: feed event');
+  }catch(e){ toast(e.message); return false; }
+  await fetchFeed(true);
+  return true;
+}
+
+function renderBell(){
+  const b = document.getElementById('btn-bell');
+  if(!b) return;
+  b.className = 'bell' + (state.unread ? ' has-unread' : '');
+  b.innerHTML = (state.unread ? '<span class="dot"></span>' : '') + (state.unread ? state.unread : 'Alerts');
+}
+
+function maybeNotifGate(){
+  try{
+    if(typeof Notification === 'undefined') return;
+    if(Notification.permission !== 'default') return;
+    if(localStorage.getItem(LS_NOTIF_ASKED)) return;
+  }catch(e){ return; }
+  const wrap = document.createElement('div');
+  wrap.className = 'notif-gate';
+  wrap.innerHTML = '<div class="panel"><h2>Turn on notifications</h2>' +
+    '<p class="muted" style="font-size:13px;line-height:1.6;margin-bottom:14px">Enable notifications ' +
+    'so you get a popup on this device when an admin approves you or a builder updates your intake.</p>' +
+    '<div class="row"><button class="btn" id="notif-yes" type="button">Enable</button>' +
+    '<button class="btn ghost" id="notif-no" type="button">Not now</button></div></div>';
+  document.body.appendChild(wrap);
+  function done(){
+    try{ localStorage.setItem(LS_NOTIF_ASKED, '1'); }catch(e){}
+    wrap.remove();
+  }
+  wrap.querySelector('#notif-yes').addEventListener('click', async function(){
+    try{ await Notification.requestPermission(); }catch(e){}
+    done();
+  });
+  wrap.querySelector('#notif-no').addEventListener('click', done);
+}
+
+/* ================= catalog + claims ================= */
+
+async function fetchCatalog(){
+  if(state.catalog.length && Date.now() - state.catalogAt < 10*60*1000) return;
+  const res = await fetch(CATALOG_URL);
+  if(!res.ok) throw new Error('Could not load the lead catalog (bjvfi.com).');
+  const raw = await res.json();
+  const list = Array.isArray(raw) ? raw : (raw.sites || raw.leads || []);
+  state.catalog = list.map(normalizeLead).filter(function(l){ return l.slug; });
+  state.catalogAt = Date.now();
+}
+
+async function refreshTree(){
+  clearTreeCache();
+  const paths = await ghTree();
+  state.treeSlugs = paths.filter(function(p){ return p.indexOf('claims/') === 0 && p.slice(-5) === '.json'; })
+    .map(function(p){ return p.slice(7, -5); });
+}
+
+async function getClaim(slug){
+  if(state.claimsBySlug[slug] !== undefined) return state.claimsBySlug[slug];
+  let rec = null;
+  try{ rec = await ghGetJson('claims/' + slug + '.json'); }catch(e){ toast(e.message); return null; }
+  const claim = rec ? rec.data : null;
+  if(claim) claim._sha = rec.sha;
+  state.claimsBySlug[slug] = claim;
+  return claim;
+}
+
+/* Resolve which slugs are open: no claim file, or claim expired. */
+async function resolveOpenSet(slugs){
+  const claimed = (state.treeSlugs || []).filter(function(s){ return slugs.indexOf(s) !== -1; });
+  const jobs = claimed.map(function(s){ return getClaim(s).then(function(c){ return [s, c]; }); });
+  const pairs = await Promise.all(jobs);
+  const taken = {};
+  pairs.forEach(function(pair){
+    const s = pair[0], c = pair[1];
+    if(c && !claimExpired(c)) taken[s] = true;
+  });
+  return taken;
+}
+
+function catalogBySlug(){
+  const m = {};
+  state.catalog.forEach(function(l){ m[l.slug] = l; });
+  return m;
+}
+
+async function refreshMyClaims(){
+  state.myClaims = [];
+  if(!state.treeSlugs) await refreshTree();
+  const mine = [];
+  for(const slug of state.treeSlugs){
+    const c = await getClaim(slug);
+    if(c && c.claimer === state.user.username && !claimExpired(c)) mine.push(c);
+  }
+  mine.sort(function(a,b){ return (b.claimed_at||0) - (a.claimed_at||0); });
+  state.myClaims = mine;
+  if(state.meSlug && !mine.some(function(c){ return c.slug === state.meSlug; })) state.meSlug = null;
+  if(!state.meSlug && mine.length) state.meSlug = mine[0].slug;
+}
+
+async function refreshMyIntakes(){
+  state.myIntakes = [];
+  const paths = treePaths('intakes/').filter(function(p){ return p.slice(-5) === '.json'; });
+  for(const p of paths){
+    try{
+      const rec = await ghGetJson(p);
+      if(rec && rec.data && rec.data.claimer === state.user.username) state.myIntakes.push(rec.data);
+    }catch(e){}
+  }
+}
+
+function activeClaimCount(){
+  return state.myClaims.filter(function(c){ return ['claimed','interested'].includes(c.status); }).length;
+}
+
+/* ================= auth ================= */
+
+async function loadUsers(){
+  let rec = null;
+  try{ rec = await ghGetJson('users.json'); }catch(e){ throw e; }
+  state.users = rec && rec.data ? rec.data : {};
+  state.usersSha = rec ? rec.sha : null;
+}
+
+function renderLogin(){
+  document.getElementById('app').innerHTML =
+    '<header class="top"><div class="brand">sitedesk<div class="brand-sub">bjvfi</div></div></header>' +
+    '<div class="main auth-main"><div class="card"><h2>Login</h2>' +
+    '<p class="muted" style="margin-bottom:16px;font-size:12px">Welcome back.</p>' +
+    '<div class="field"><label>Username</label><input id="login-user" autocomplete="username" autocapitalize="none"/></div>' +
+    '<div class="field"><label>Password</label><input id="login-pass" type="password" autocomplete="current-password"/></div>' +
+    '<button class="btn block" id="login-go" type="button">Login</button>' +
+    '<div class="err" id="login-err"></div>' +
+    '<p class="muted" style="margin-top:14px;font-size:12px">Need an account? Ask your admin.</p>' +
+    '</div></div>';
+  document.getElementById('login-go').addEventListener('click', doLogin);
+  document.getElementById('login-pass').addEventListener('keydown', function(e){
+    if(e.key === 'Enter') doLogin();
   });
 }
 
-function tryAutoSignin() {
-  var token = null;
-  try { token = localStorage.getItem(LS_TOKEN); } catch (e) {}
-  if (!token) { showView('signin'); return; }
-  S.token = token;
-  gh('GET', '/user').then(function (res) {
-    if (!res.ok) { signOut(); showView('signin'); return null; }
-    return res.json();
-  }).then(function (u) {
-    if (!u) return;
-    return getFile('sitedesk/data/users.json').then(function (f) {
-      var users = f.status === 200 ? f.data : {};
-      var rec = users[u.login] || (u.login === OWNER ? { role: 'head', status: 'approved', name: 'Head' } : null);
-      if (!rec || rec.status !== 'approved') { signOut(); showView('signin'); return; }
-      S.me = { login: u.login, name: rec.name || u.login, role: rec.role || 'caller', status: 'approved' };
-      S.users = users;
-      try {
-        var saved = JSON.parse(localStorage.getItem(LS_MYCLAIMS) || '[]');
-        S.myClaimSlugs = Array.isArray(saved) ? saved : [];
-      } catch (e) { S.myClaimSlugs = []; }
-      renderNav();
-      showView('queue');
-      afterSigninNotifSetup();
-      return loadSites();
-    });
-  }).catch(function () { signOut(); showView('signin'); });
+async function doLogin(){
+  const err = document.getElementById('login-err');
+  err.textContent = '';
+  const username = (document.getElementById('login-user').value || '').trim().toLowerCase();
+  const password = document.getElementById('login-pass').value || '';
+  if(!username || !password){ err.textContent = 'Enter your username and password.'; return; }
+  const btn = document.getElementById('login-go');
+  btn.disabled = true; btn.textContent = 'Checking...';
+  try{
+    await loadUsers();
+    const u = state.users[username];
+    if(!u){ err.textContent = 'No account found for that username.'; return; }
+    const ok = await pbkdf2Verify(password, u.pass);
+    if(!ok){ err.textContent = 'Wrong password.'; return; }
+    if(u.status !== 'approved'){
+      err.textContent = 'Account is ' + u.status + '. Ask your admin for approval.';
+      return;
+    }
+    state.user = { username: username, name: u.name || username, role: u.role || 'caller', phone: u.phone || '' };
+    saveSession(state.user);
+    state.tab = state.user.role === 'builder' ? 'inbox' : 'queue';
+    await bootData(true);
+    maybeNotifGate();
+    renderApp();
+  }catch(e){
+    err.textContent = e.message;
+  }finally{
+    btn.disabled = false; btn.textContent = 'Login';
+    const pw = document.getElementById('login-pass');
+    if(pw) pw.value = '';
+  }
 }
 
-/* ---------------- leads / queue ---------------- */
-
-function loadSites() {
-  if (S.sites) { buildQueue(); return Promise.resolve(); }
-  return fetch(sitesCatalogUrl()).then(function (res) {
-    if (!res.ok) throw new Error('Could not load the site catalog.');
-    return res.json();
-  }).then(function (data) {
-    S.sites = normSites(data);
-    S.sitesBySlug = {};
-    S.sites.forEach(function (l) { S.sitesBySlug[l.slug] = l; });
-    var cats = {};
-    S.sites.forEach(function (l) { if (l.category) cats[l.category] = 1; });
-    var sel = el('fcat');
-    Object.keys(cats).sort().forEach(function (c) {
-      var o = document.createElement('option');
-      o.value = c; o.textContent = c;
-      sel.appendChild(o);
-    });
-    buildQueue();
-  }).catch(function (e) {
-    el('queueList').innerHTML = '<div class="empty">' + esc(e.message) + '</div>';
-  });
+function logout(){
+  clearSession();
+  state.user = null; state.myClaims = []; state.myIntakes = [];
+  state.feed = []; state.unread = 0; state.feedMaxTs = 0;
+  state.claimsBySlug = {}; state.treeSlugs = null;
+  renderLogin();
 }
 
-function filteredSites() {
-  var q = S.filters.q.toLowerCase();
-  return S.sites.filter(function (l) {
-    if (S.filters.cat && l.category !== S.filters.cat) return false;
-    if (S.filters.phone && !phoneDigits(l.phone)) return false;
-    if (q) {
-      var hay = (l.name + ' ' + l.phone + ' ' + l.address).toLowerCase();
-      if (hay.indexOf(q) === -1) return false;
+/* ================= shell ================= */
+
+function isManager(){ return state.user && (state.user.role === 'admin' || state.user.role === 'head'); }
+function canClaim(){ return state.user && (state.user.role === 'caller' || state.user.role === 'admin' || state.user.role === 'head'); }
+function canInbox(){ return state.user && (state.user.role === 'builder' || state.user.role === 'admin' || state.user.role === 'head'); }
+
+function tabDefs(){
+  const u = state.user;
+  if(!u) return [];
+  const tabs = [];
+  if(canClaim()){ tabs.push(['queue','Queue','\u2630'], ['mine','My leads','\u25CF']); }
+  if(canInbox()) tabs.push(['inbox', u.role === 'builder' ? 'Builds' : 'Intakes', '\u25A3']);
+  if(isManager()) tabs.push(['admin','Admin','\u25C6']);
+  tabs.push(['notifs','Alerts', state.unread ? String(state.unread) : '\xB7']);
+  tabs.push(['profile','Profile','\u25CE']);
+  return tabs;
+}
+
+function notifBannerHtml(){
+  try{
+    if(typeof Notification === 'undefined' || Notification.permission !== 'default') return '';
+  }catch(e){ return ''; }
+  return '<div class="notif-banner"><div class="row"><span class="muted" style="font-size:12px">' +
+    'Notifications are off. Turn them on for alerts on this device.</span>' +
+    '<button class="btn sm ghost" id="banner-notif" type="button">Enable</button></div></div>';
+}
+
+function shell(content){
+  const tabs = tabDefs();
+  return '<header class="top">' +
+    '<div class="brand">sitedesk<div class="brand-sub">bjvfi</div></div>' +
+    '<div class="row">' +
+      '<button class="bell' + (state.unread ? ' has-unread' : '') + '" id="btn-bell" type="button" aria-label="Notifications">' +
+      (state.unread ? '<span class="dot"></span>' : '') + (state.unread ? state.unread : 'Alerts') + '</button>' +
+      '<div class="nav-desktop">' + tabs.filter(function(t){ return t[0] !== 'notifs'; }).map(function(t){
+        return '<button class="tab' + (state.tab === t[0] ? ' active' : '') +
+          (t[0] === 'notifs' && state.unread ? ' unread-alert' : '') + '" data-tab="' + t[0] + '" type="button">' + t[1] + '</button>';
+      }).join('') + '</div>' +
+    '</div></header>' +
+    '<main class="main">' + notifBannerHtml() + content + '</main>' +
+    '<nav class="bottom-nav">' + tabs.map(function(t){
+      return '<button class="' + (state.tab === t[0] ? 'active' : '') +
+        (t[0] === 'notifs' && state.unread ? ' unread-alert' : '') + '" data-tab="' + t[0] + '" type="button">' +
+        '<span class="ico">' + esc(t[2]) + '</span><span>' + esc(t[1]) + '</span></button>';
+    }).join('') + '</nav>';
+}
+
+function statsRow(){
+  const today = new Date().toISOString().slice(0,10);
+  const claimedToday = state.myClaims.filter(function(c){ return (c.claimed_at||'').slice(0,10) === today; }).length;
+  const interested = state.myClaims.filter(function(c){ return c.status === 'interested'; }).length;
+  const intakes = state.myIntakes.length;
+  const outcomes = state.myClaims.filter(function(c){ return !['claimed','interested'].includes(c.status); }).length;
+  function stat(n,l){ return '<div class="stat"><div class="n">' + n + '</div><div class="l">' + l + '</div></div>'; }
+  return '<div class="statrow">' + stat(claimedToday,'Claimed today') + stat(interested,'Interested') +
+    stat(intakes,'Intakes') + stat(outcomes,'Outcomes') + '</div>';
+}
+
+/* ================= queue ================= */
+
+function allCategories(){
+  const set = {};
+  state.catalog.forEach(function(l){ if(l.category) set[l.category] = true; });
+  return Object.keys(set).sort();
+}
+
+function filteredOpen(openTaken){
+  const q = state.q.trim().toLowerCase();
+  return state.catalog.filter(function(l){
+    if(openTaken[l.slug]) return false;
+    if(state.hasPhoneOnly && !hasPhone(l.phone)) return false;
+    if(state.cat && l.category !== state.cat) return false;
+    if(q){
+      const hay = (l.name + ' ' + l.slug + ' ' + l.phone).toLowerCase();
+      if(hay.indexOf(q) === -1) return false;
     }
     return true;
   });
 }
 
-function buildQueue() {
-  S.queue = shuffle(filteredSites());
-  S.shown = 0;
-  el('queueList').innerHTML = '';
-  renderMore(true);
+function leadRowHtml(l){
+  return '<div class="lead-row"><div>' +
+    '<div class="lead-row-name">' + esc(l.name) + '</div>' +
+    '<div class="muted" style="font-size:12px">' + (hasPhone(l.phone) ? esc(l.phone) : 'no phone') + '</div>' +
+    '</div><div class="row">' +
+    '<a class="btn ghost sm" href="' + esc(siteUrlFor(l)) + '" target="_blank" rel="noopener">site</a>' +
+    '<button class="btn sm" data-grab="' + esc(l.slug) + '" type="button">Grab</button>' +
+    '</div></div>';
 }
 
-function claimState(slug) {
-  var c = S.claimCache[slug];
-  if (c === undefined) return 'unknown';
-  if (!c) return 'open';
-  if (isExpired(c, Date.now())) return 'open';
-  return c.claimed_by === (S.me && S.me.login) ? 'mine' : 'taken';
-}
-
-function checkClaim(slug) {
-  if (S.claimCache[slug] !== undefined) return Promise.resolve(S.claimCache[slug]);
-  return getFile(claimPath(slug)).then(function (f) {
-    var doc = f.status === 200 ? f.data : null;
-    S.claimCache[slug] = doc;
-    return doc;
-  }).catch(function () { return null; });
-}
-
-function renderMore(reset) {
-  var list = el('queueList');
-  if (reset) list.innerHTML = '';
-  var next = S.queue.slice(S.shown, S.shown + PAGE_SIZE);
-  S.shown += next.length;
-  el('queueMeta').textContent = S.queue.length + ' leads in queue. Showing ' + Math.min(S.shown, S.queue.length) + '.';
-  el('btnMore').style.display = S.shown < S.queue.length ? 'block' : 'none';
-  if (!next.length && reset) {
-    list.innerHTML = '<div class="empty">No leads match. Loosen the filters.</div>';
-    return;
-  }
-  var jobs = next.map(function (lead) {
-    return checkClaim(lead.slug).then(function () { return lead; });
-  });
-  Promise.all(jobs).then(function (leads) {
-    leads.forEach(function (lead) { list.appendChild(queueCard(lead)); });
-  });
-}
-
-function queueCard(lead) {
-  var st = claimState(lead.slug);
-  var div = document.createElement('div');
-  div.className = 'card';
-  div.id = 'q-' + lead.slug;
-  var badge = st === 'mine' ? '<span class="badge claimed">yours</span>'
-    : st === 'taken' ? '<span class="badge">claimed</span>'
-    : '<span class="badge open">open</span>';
-  div.innerHTML =
-    '<div class="leadtitle">' + esc(lead.name) + '</div>' +
-    '<div class="kv">' + esc(lead.category || 'No category') + ' ' + badge + '</div>' +
-    (lead.phone ? '<div class="kv">Phone: <b>' + esc(lead.phone) + '</b></div>' : '') +
-    (lead.address ? '<div class="kv">' + esc(lead.address) + '</div>' : '') +
-    '<div class="row" style="margin-top:10px">' +
-      '<a class="btn ghost small" target="_blank" rel="noopener" href="' + esc(sitePreviewUrl(lead.slug)) + '">Preview</a>' +
-      (st === 'open'
-        ? '<button class="btn small" data-claim="' + esc(lead.slug) + '">Claim</button>'
-        : st === 'mine'
-        ? '<button class="btn ghost small" data-goto-claims>View claim</button>'
-        : '<span class="muted">Claimed by someone else</span>') +
-    '</div>';
-  var cb = div.querySelector('[data-claim]');
-  if (cb) cb.addEventListener('click', function () { claimLead(lead.slug); });
-  var gb = div.querySelector('[data-goto-claims]');
-  if (gb) gb.addEventListener('click', function () { showView('claims'); refreshMyClaims(); });
-  return div;
-}
-
-function rememberClaimSlug(slug) {
-  if (S.myClaimSlugs.indexOf(slug) === -1) {
-    S.myClaimSlugs.push(slug);
-    try { localStorage.setItem(LS_MYCLAIMS, JSON.stringify(S.myClaimSlugs)); } catch (e) {}
-  }
-}
-
-function forgetClaimSlug(slug) {
-  S.myClaimSlugs = S.myClaimSlugs.filter(function (s) { return s !== slug; });
-  try { localStorage.setItem(LS_MYCLAIMS, JSON.stringify(S.myClaimSlugs)); } catch (e) {}
-}
-
-function activeMyClaims() {
-  return S.myClaims.filter(function (c) { return !isExpired(c, Date.now()) && c.status !== 'sold'; });
-}
-
-function claimLead(slug) {
-  var lead = S.sitesBySlug[slug];
-  if (!lead) return;
-  if (activeMyClaims().length >= MAX_ACTIVE_CLAIMS) {
-    toast('You already have ' + MAX_ACTIVE_CLAIMS + ' active claims. Finish or release one first.', true);
-    return;
-  }
-  getFile(claimPath(slug)).then(function (f) {
-    var existing = f.status === 200 ? f.data : null;
-    if (existing && !isExpired(existing, Date.now())) {
-      S.claimCache[slug] = existing;
-      toast(existing.claimed_by === S.me.login ? 'This is already in your claims.' : 'Just claimed by someone else.', true);
-      rerenderQueueCard(slug);
-      return null;
+async function renderQueueInto(el){
+  el.innerHTML = '<div class="card"><div class="empty">Loading leads...</div></div>';
+  try{
+    await fetchCatalog();
+    if(!state.treeSlugs) await refreshTree();
+    const slugs = state.catalog.map(function(l){ return l.slug; });
+    const taken = await resolveOpenSet(slugs);
+    const list = filteredOpen(taken);
+    if(!state.boardOrder.length || state._boardKey !== boardKey()){
+      state.boardOrder = shuffle(list.map(function(l){ return l.slug; }));
+      state._boardKey = boardKey();
     }
-    var doc = newClaimDoc(lead, S.me.login, S.me.name);
-    var p = (existing && existing.claim_expires_at)
-      ? putFile(claimPath(slug), doc, f.sha, 'reclaim ' + slug + ' by ' + S.me.login)
-      : putFile(claimPath(slug), doc, null, 'claim ' + slug + ' by ' + S.me.login);
-    return p.then(function () {
-      S.claimCache[slug] = doc;
-      rememberClaimSlug(slug);
-      rerenderQueueCard(slug);
-      toast('Claimed. Call them now.');
-    });
-  }).catch(function (e) {
-    if (e && e.status === 422) {
-      S.claimCache[slug] = undefined;
-      toast('Just claimed by someone else.', true);
-      checkClaim(slug).then(function () { rerenderQueueCard(slug); });
+    const active = activeClaimCount();
+    const atCap = active >= MAX_ACTIVE_CLAIMS;
+    const cats = allCategories();
+    const shown = state.boardOrder
+      .map(function(s){ return state.catalog.find(function(l){ return l.slug === s; }); })
+      .filter(Boolean)
+      .slice(0, state.boardShown);
+
+    let html = statsRow();
+    html += '<div class="row" style="justify-content:space-between;margin-bottom:14px"><div>' +
+      '<h2 style="font-size:18px">Open leads</h2>' +
+      '<p class="muted" style="font-size:12px">Unclaimed only \xB7 scattered \xB7 45 min claim \xB7 ' +
+      '<strong>' + active + '/' + MAX_ACTIVE_CLAIMS + '</strong> claimed</p></div>' +
+      '<button class="btn sm" id="btn-grab-random" type="button"' + (atCap ? ' disabled' : '') + '>Grab random</button></div>';
+    if(atCap) html += '<p class="err" style="margin-bottom:12px">Claim cap reached (' + active + '/' + MAX_ACTIVE_CLAIMS + '). Release or finish an active lead first.</p>';
+    html += '<p class="review-note"><strong>Review first.</strong> Open the business page and understand who they are, what they do, how they sound, before you call or send a message.</p>';
+    html += '<div class="card"><h2>Board</h2><div class="filters">' +
+      '<input id="queue-q" value="' + esc(state.q) + '" placeholder="Name, slug, phone"/>' +
+      '<div class="chiprow scroll">' +
+      '<button type="button" class="chip' + (state.cat === '' ? ' on' : '') + '" data-cat="">All</button>' +
+      cats.slice(0, 24).map(function(c){
+        return '<button type="button" class="chip' + (state.cat === c ? ' on' : '') + '" data-cat="' + esc(c) + '">' + esc(c) + '</button>';
+      }).join('') + '</div>' +
+      '<div class="chiprow"><button type="button" class="chip' + (state.hasPhoneOnly ? ' on' : '') + '" id="chip-phone">Has phone</button>' +
+      '<button type="button" class="btn sm" id="btn-filter">Apply</button></div></div>';
+    if(shown.length){
+      html += '<div class="open-board">' + shown.map(leadRowHtml).join('') + '</div>' +
+        '<p class="muted" style="font-size:11px;margin:10px 0">' + list.length + ' open match' + (list.length === 1 ? '' : 'es') + '</p>' +
+        '<div class="board-actions"><button class="btn ghost block" id="btn-next-batch" type="button">Next \xB7 scatter more</button></div>';
     } else {
-      toast((e && e.message) || 'Claim failed.', true);
+      html += '<div class="empty">No open leads.<br/><button class="btn" id="btn-grab-empty" type="button">Grab random</button></div>';
     }
-  });
-}
-
-function rerenderQueueCard(slug) {
-  var old = el('q-' + slug);
-  var lead = S.sitesBySlug[slug];
-  if (old && lead) old.replaceWith(queueCard(lead));
-}
-
-/* ---------------- my claims ---------------- */
-
-function scanClaimSlugs() {
-  return listTree('sitedesk/data/claims/').then(function (paths) {
-    return paths.map(function (p) {
-      var m = p.match(/sitedesk\/data\/claims\/(.+)\.json$/);
-      return m ? m[1] : null;
-    }).filter(Boolean);
-  }).catch(function () { return S.myClaimSlugs.slice(); });
-}
-
-function refreshMyClaims() {
-  el('claimsList').innerHTML = '<div class="empty">Loading your claims...</div>';
-  return scanClaimSlugs().then(function (slugs) {
-    var jobs = slugs.map(function (slug) {
-      return getFile(claimPath(slug)).then(function (f) {
-        if (f.status !== 200) { forgetClaimSlug(slug); return null; }
-        S.claimCache[slug] = f.data;
-        f.data._sha = f.sha;
-        return f.data;
-      }).catch(function () { return null; });
-    });
-    return Promise.all(jobs);
-  }).then(function (docs) {
-    var now = Date.now();
-    S.myClaims = docs.filter(function (d) {
-      return d && d.claimed_by === S.me.login && !isExpired(d, now);
-    });
-    S.myClaims.forEach(function (d) { rememberClaimSlug(d.slug); });
-    renderMyClaims();
-  }).catch(function (e) {
-    el('claimsList').innerHTML = '<div class="empty">' + esc(e.message || 'Could not load claims.') + '</div>';
-  });
-}
-
-function renderMyClaims() {
-  var list = el('claimsList');
-  var act = activeMyClaims();
-  el('claimsMeta').textContent = act.length + ' of ' + MAX_ACTIVE_CLAIMS + ' claim slots used.';
-  if (!S.myClaims.length) {
-    list.innerHTML = '<div class="empty">No active claims. Grab one from the queue.</div>';
-    return;
-  }
-  list.innerHTML = '';
-  S.myClaims.forEach(function (c) { list.appendChild(claimCard(c)); });
-}
-
-function claimCard(c) {
-  var div = document.createElement('div');
-  div.className = 'card';
-  var exp = new Date(c.claim_expires_at);
-  var mins = Math.max(0, Math.round((exp.getTime() - Date.now()) / 60000));
-  var statusBadge = c.status === 'sold' ? '<span class="badge sold">sold</span>' : '<span class="badge claimed">claimed</span>';
-  var tel = telHref(c.phone);
-  div.innerHTML =
-    '<div class="leadtitle">' + esc(c.business_name) + '</div>' +
-    '<div class="kv">' + statusBadge +
-    (c.outcome ? ' <span class="badge">' + esc(c.outcome) + '</span>' : '') +
-    ' <span class="muted">expires in ' + mins + ' min</span></div>' +
-    (c.phone ? '<div class="kv">Phone: <b>' + esc(c.phone) + '</b></div>' : '') +
-    (c.address ? '<div class="kv">' + esc(c.address) + '</div>' : '') +
-    '<div class="row" style="margin:10px 0">' +
-      (tel ? '<a class="btn small" href="' + esc(tel) + '">Call</a>' : '') +
-      (tel ? '<button class="btn ghost small" data-sms>Text draft</button>' : '') +
-      '<a class="btn ghost small" target="_blank" rel="noopener" href="' + esc(sitePreviewUrl(c.slug)) + '">Preview</a>' +
-      (c.address ? '<a class="btn ghost small" target="_blank" rel="noopener" href="' + esc(directionsUrl(c.address)) + '">Directions</a>' : '') +
-    '</div>' +
-    '<div class="row" style="margin-bottom:8px">' +
-      ['interested', 'not interested', 'no answer', 'wrong number', 'do not call'].map(function (o) {
-        return '<button class="btn ghost small" data-outcome="' + esc(o) + '">' + esc(o) + '</button>';
-      }).join('') +
-    '</div>' +
-    '<label>Note</label><textarea data-note rows="2">' + esc(c.note || '') + '</textarea>' +
-    '<div class="row" style="margin-top:8px">' +
-      '<button class="btn ghost small" data-savenote>Save note</button>' +
-      '<button class="btn danger small" data-release>Release</button>' +
-    '</div>';
-  var smsBtn = div.querySelector('[data-sms]');
-  if (smsBtn) smsBtn.addEventListener('click', function () {
-    var draft = 'Hi, this is ' + S.me.name + ' from SiteDesk. We built a free preview website for ' +
-      c.business_name + ': ' + sitePreviewUrl(c.slug) +
-      ' Building it was free. Keeping it live with hosting and management is $27 per month. Want me to turn it on for you?';
-    window.location.href = smsHref(c.phone, draft);
-  });
-  var outs = div.querySelectorAll('[data-outcome]');
-  for (var i = 0; i < outs.length; i++) {
-    (function (btn) {
-      btn.addEventListener('click', function () { setOutcome(c, btn.getAttribute('data-outcome'), div); });
-    })(outs[i]);
-  }
-  div.querySelector('[data-savenote]').addEventListener('click', function () {
-    saveClaimNote(c, div.querySelector('[data-note]').value);
-  });
-  div.querySelector('[data-release]').addEventListener('click', function () { releaseClaim(c); });
-  return div;
-}
-
-function setOutcome(c, outcome, cardEl) {
-  var note = cardEl.querySelector('[data-note]').value;
-  getFile(claimPath(c.slug)).then(function (f) {
-    if (f.status !== 200) { toast('Claim file is gone. It may have expired.', true); return; }
-    var doc = f.data;
-    doc.outcome = outcome;
-    doc.note = note;
-    return putFile(claimPath(c.slug), doc, f.sha, 'outcome ' + outcome + ' on ' + c.slug).then(function () {
-      S.claimCache[c.slug] = doc;
-      toast('Outcome saved: ' + outcome);
-      if (outcome === 'interested') openIntakeForm(c);
-      else refreshMyClaims();
-    });
-  }).catch(function (e) { toast((e && e.message) || 'Could not save outcome.', true); });
-}
-
-function saveClaimNote(c, note) {
-  getFile(claimPath(c.slug)).then(function (f) {
-    if (f.status !== 200) { toast('Claim file is gone.', true); return; }
-    var doc = f.data;
-    doc.note = note;
-    return putFile(claimPath(c.slug), doc, f.sha, 'note on ' + c.slug).then(function () {
-      S.claimCache[c.slug] = doc;
-      toast('Note saved.');
-    });
-  }).catch(function (e) { toast((e && e.message) || 'Could not save note.', true); });
-}
-
-function releaseClaim(c) {
-  if (!confirm('Release this claim? It goes back to the open queue.')) return;
-  getFile(claimPath(c.slug)).then(function (f) {
-    if (f.status !== 200) { toast('Claim file is gone already.'); refreshMyClaims(); return; }
-    return deleteFile(claimPath(c.slug), f.sha, 'release ' + c.slug + ' by ' + S.me.login).then(function () {
-      S.claimCache[c.slug] = null;
-      forgetClaimSlug(c.slug);
-      toast('Released back to the queue.');
-      refreshMyClaims();
-    });
-  }).catch(function (e) { toast((e && e.message) || 'Could not release.', true); });
-}
-
-/* ---------------- intake ---------------- */
-
-function openIntakeForm(c) {
-  S.intakeClaimSlug = c.slug;
-  el('intakeFor').textContent = 'For: ' + c.business_name;
-  el('inBiz').value = c.business_name || '';
-  el('inPhone').value = c.phone || '';
-  el('inContact').value = '';
-  el('inEmail').value = '';
-  el('inWants').value = '';
-  el('inNotes').value = c.note || '';
-  el('intakeErr').textContent = '';
-  showView('intake');
-}
-
-function saveIntake() {
-  var f = {
-    biz: el('inBiz').value.trim(),
-    contact: el('inContact').value.trim(),
-    phone: el('inPhone').value.trim(),
-    email: el('inEmail').value.trim(),
-    wants: el('inWants').value.trim(),
-    notes: el('inNotes').value.trim()
-  };
-  if (!f.biz) { el('intakeErr').textContent = 'Business name is required.'; return; }
-  var doc = newIntakeDoc(f, S.me.login, S.intakeClaimSlug);
-  el('intakeErr').textContent = 'Saving...';
-  putFile(intakePath(doc.id), doc, null, 'intake for ' + f.biz + ' by ' + S.me.login)
-    .then(function () {
-      if (!S.intakeClaimSlug) { el('intakeErr').textContent = ''; toast('Intake saved.'); showView('intakes'); refreshIntakes(); return; }
-      return getFile(claimPath(S.intakeClaimSlug)).then(function (cf) {
-        if (cf.status !== 200) return;
-        var cdoc = cf.data;
-        cdoc.status = 'sold';
-        return putFile(claimPath(S.intakeClaimSlug), cdoc, cf.sha, 'sold ' + S.intakeClaimSlug);
-      }).then(function () {
-        S.claimCache[S.intakeClaimSlug] = undefined;
-        el('intakeErr').textContent = '';
-        toast('Intake saved. Claim marked sold.');
-        showView('intakes');
-        refreshIntakes();
-      });
-    })
-    .catch(function (e) { el('intakeErr').textContent = (e && e.message) || 'Could not save intake.'; });
-}
-
-/* ---------------- intakes list ---------------- */
-
-function refreshIntakes() {
-  el('intakesList').innerHTML = '<div class="empty">Loading intakes...</div>';
-  listTree('sitedesk/data/intakes/').then(function (paths) {
-    var jobs = paths.map(function (p) {
-      return getFile(p).then(function (f) {
-        if (f.status !== 200) return null;
-        f.data._sha = f.sha;
-        f.data._path = p;
-        return f.data;
-      }).catch(function () { return null; });
-    });
-    return Promise.all(jobs);
-  }).then(function (docs) {
-    S.intakes = docs.filter(Boolean).sort(function (a, b) {
-      return (b.created_at || '').localeCompare(a.created_at || '');
-    });
-    renderIntakes();
-  }).catch(function (e) {
-    el('intakesList').innerHTML = '<div class="empty">' + esc(e.message || 'Could not load intakes.') + '</div>';
-  });
-}
-
-function canEditBuild() {
-  return S.me && (S.me.role === 'head' || S.me.role === 'admin' || S.me.role === 'builder');
-}
-
-function renderIntakes() {
-  var list = el('intakesList');
-  if (!S.intakes.length) {
-    list.innerHTML = '<div class="empty">No intakes yet.</div>';
-    return;
-  }
-  list.innerHTML = '';
-  S.intakes.forEach(function (d) {
-    var div = document.createElement('div');
-    div.className = 'card';
-    div.innerHTML =
-      '<div class="leadtitle">' + esc(d.business_name) + '</div>' +
-      '<div class="kv"><span class="badge">' + esc(d.status || 'open') + '</span>' +
-      ' <span class="muted">by ' + esc(d.created_by || '?') + ' on ' + esc((d.created_at || '').slice(0, 10)) + '</span></div>' +
-      (d.contact_name ? '<div class="kv">Contact: <b>' + esc(d.contact_name) + '</b></div>' : '') +
-      (d.phone ? '<div class="kv">Phone: <b>' + esc(d.phone) + '</b></div>' : '') +
-      (d.wants ? '<div class="kv">Wants: ' + esc(d.wants) + '</div>' : '') +
-      (d.notes ? '<div class="kv">Notes: ' + esc(d.notes) + '</div>' : '') +
-      (canEditBuild()
-        ? '<div class="row" style="margin-top:8px">' +
-          ['open', 'building', 'done'].map(function (st) {
-            return '<button class="btn ghost small" data-bstatus="' + st + '">' + st + '</button>';
-          }).join('') + '</div>'
-        : '');
-    if (canEditBuild()) {
-      var btns = div.querySelectorAll('[data-bstatus]');
-      for (var i = 0; i < btns.length; i++) {
-        (function (btn) {
-          btn.addEventListener('click', function () { setIntakeStatus(d, btn.getAttribute('data-bstatus')); });
-        })(btns[i]);
-      }
-    }
-    list.appendChild(div);
-  });
-}
-
-function setIntakeStatus(d, status) {
-  getFile(d._path).then(function (f) {
-    if (f.status !== 200) { toast('Intake file is gone.', true); return; }
-    var doc = f.data;
-    doc.status = status;
-    return putFile(d._path, doc, f.sha, 'intake ' + d.id + ' -> ' + status).then(function () {
-      toast('Build status: ' + status);
-      refreshIntakes();
-      if (d.created_by) {
-        postEvent(d.created_by, 'Build update', (d.business_name || 'A build') + ': status is now ' + status + '.', '#intakes')
-          .catch(function () { /* status saved; notification is best effort */ });
-      }
-    });
-  }).catch(function (e) { toast((e && e.message) || 'Could not update status.', true); });
-}
-
-/* ---------------- admin ---------------- */
-
-function isStaff() {
-  return S.me && (S.me.role === 'head' || S.me.role === 'admin');
-}
-
-function renderAdmin() {
-  if (!isStaff()) { showView('queue'); return; }
-  var list = el('usersList');
-  list.innerHTML = '';
-  var logins = Object.keys(S.users || {}).sort();
-  if (!logins.length) list.innerHTML = '<p class="muted">Staff list is empty.</p>';
-  logins.forEach(function (login) {
-    var u = S.users[login];
-    var div = document.createElement('div');
-    div.className = 'card';
-    var roleCtl = (S.me.role === 'head')
-      ? '<select data-role style="max-width:160px">' +
-        ['caller', 'builder', 'admin', 'head'].map(function (r) {
-          return '<option value="' + r + '"' + (u.role === r ? ' selected' : '') + '>' + r + '</option>';
-        }).join('') + '</select>'
-      : '<span class="badge ' + esc(u.role) + '">' + esc(u.role) + '</span>';
-    div.innerHTML =
-      '<div class="row" style="justify-content:space-between">' +
-        '<div><b>' + esc(u.name || login) + '</b> <span class="muted">@' + esc(login) + '</span></div>' +
-        '<span class="badge">' + esc(u.status) + '</span>' +
-      '</div>' +
-      '<div class="row" style="margin-top:8px">' + roleCtl +
-        (u.status === 'pending' ? '<button class="btn small" data-approve>Approve</button><button class="btn ghost small" data-reject>Reject</button>' : '') +
-        (u.status === 'approved' ? '<button class="btn ghost small" data-disable>Disable</button>' : '') +
+    html += '</div>';
+    html += '<div class="card script-card"><h2>Scripts</h2>' +
+      '<p class="muted" style="font-size:12px;margin-bottom:8px;line-height:1.55">Guide only, adapt in your own words.</p>' +
+      '<div class="copybox" id="sales-line">' + esc(salesLine()) + '</div>' +
+      '<div class="row" style="margin-top:8px"><button class="btn ghost sm" data-copy="sales-line" type="button">Copy sales line</button></div>' +
+      '<h3 style="margin-top:14px">SMS draft</h3>' +
+      '<div class="copybox" id="sms-template">' + esc(smsDraft('<name>', '<caller>', '<url>')) + '</div>' +
+      '<div class="row" style="margin-top:8px"><button class="btn ghost sm" data-copy="sms-template" type="button">Copy SMS template</button></div>' +
       '</div>';
-    var ap = div.querySelector('[data-approve]');
-    if (ap) ap.addEventListener('click', function () { setUser(login, { status: 'approved' }); });
-    var rj = div.querySelector('[data-reject]');
-    if (rj) rj.addEventListener('click', function () { setUser(login, { status: 'rejected' }); });
-    var dis = div.querySelector('[data-disable]');
-    if (dis) dis.addEventListener('click', function () { setUser(login, { status: 'disabled' }); });
-    var rs = div.querySelector('[data-role]');
-    if (rs) rs.addEventListener('change', function () { setUser(login, { role: rs.value }); });
-    list.appendChild(div);
+    el.innerHTML = html;
+    wireQueue(el);
+  }catch(e){
+    el.innerHTML = '<div class="card"><div class="empty">' + esc(e.message) +
+      '<br/><button class="btn" id="btn-retry-queue" type="button">Retry</button></div></div>';
+    const r = document.getElementById('btn-retry-queue');
+    if(r) r.addEventListener('click', function(){ renderQueueInto(el); });
+  }
+}
+
+function boardKey(){ return state.q + '|' + state.cat + '|' + (state.hasPhoneOnly ? 1 : 0); }
+
+function wireQueue(el){
+  const q = el.querySelector('#queue-q');
+  const apply = function(){
+    state.q = q ? q.value : '';
+    state.boardShown = 60;
+    state.boardOrder = [];
+    renderQueueInto(el);
+  };
+  const fa = el.querySelector('#btn-filter');
+  if(fa) fa.addEventListener('click', apply);
+  if(q) q.addEventListener('keydown', function(e){ if(e.key === 'Enter') apply(); });
+  el.querySelectorAll('[data-cat]').forEach(function(chip){
+    chip.addEventListener('click', function(){
+      state.cat = chip.getAttribute('data-cat');
+      state.boardShown = 60;
+      state.boardOrder = [];
+      renderQueueInto(el);
+    });
+  });
+  const hp = el.querySelector('#chip-phone');
+  if(hp) hp.addEventListener('click', function(){
+    state.hasPhoneOnly = !state.hasPhoneOnly;
+    state.boardOrder = [];
+    renderQueueInto(el);
+  });
+  const nb = el.querySelector('#btn-next-batch');
+  if(nb) nb.addEventListener('click', function(){
+    state.boardOrder = shuffle(state.boardOrder);
+    state.boardShown = 60;
+    renderQueueInto(el);
+  });
+  el.querySelectorAll('[data-copy]').forEach(function(b){
+    b.addEventListener('click', function(){
+      const src = document.getElementById(b.getAttribute('data-copy'));
+      if(src) copyText(src.textContent, 'Script');
+    });
+  });
+  const gr = el.querySelector('#btn-grab-random') || el.querySelector('#btn-grab-empty');
+  if(gr) gr.addEventListener('click', grabRandom);
+}
+
+async function grabLead(slug){
+  if(activeClaimCount() >= MAX_ACTIVE_CLAIMS){ toast('Claim cap reached. Release a lead first.'); return; }
+  const lead = state.catalog.find(function(l){ return l.slug === slug; });
+  if(!lead){ toast('Lead not found in catalog.'); return; }
+  const claim = {
+    slug: slug, business_name: lead.name, phone: lead.phone,
+    claimer: state.user.username, claimer_name: state.user.name,
+    claimed_at: nowISO(), claim_expires_at: Date.now() + CLAIM_TTL_MS,
+    status: 'claimed', note: '',
+    timeline: [{ t: nowISO(), k: 'claimed', note: 'Claimed by ' + state.user.name }]
+  };
+  try{
+    await ghPutJson('claims/' + slug + '.json', claim, null, 'sitedesk: claim ' + slug);
+  }catch(e){
+    toast(e.message);
+    return;
+  }
+  clearTreeCache();
+  state.claimsBySlug[slug] = claim;
+  toast('Claimed: ' + lead.name);
+  state.boardOrder = [];
+  await refreshMyClaims();
+  state.meSlug = slug;
+  state.tab = 'mine';
+  renderApp();
+}
+
+async function grabRandom(){
+  if(activeClaimCount() >= MAX_ACTIVE_CLAIMS){ toast('Claim cap reached. Release a lead first.'); return; }
+  toast('Finding a lead...');
+  try{
+    await fetchCatalog();
+    if(!state.treeSlugs) await refreshTree();
+    const taken = await resolveOpenSet(state.catalog.map(function(l){ return l.slug; }));
+    const open = filteredOpen(taken);
+    if(!open.length){ toast('No open leads match your filters.'); return; }
+    await grabLead(open[Math.floor(Math.random()*open.length)].slug);
+  }catch(e){ toast(e.message); }
+}
+
+/* ================= my leads ================= */
+
+function claimTimerHtml(claim){
+  const ms = Number(claim.claim_expires_at) - Date.now();
+  const urgent = ms < 10*60*1000;
+  return '<div class="timer' + (urgent ? ' urgent' : '') + '">Claim ' +
+    (ms <= 0 ? 'expired' : 'expires in ' + esc(fmtCountdown(ms))) + '</div>';
+}
+
+function timelineHtml(claim){
+  const tl = claim.timeline || [];
+  if(!tl.length) return '<p class="muted" style="font-size:12px">No history yet.</p>';
+  return '<ul class="timeline">' + tl.slice().reverse().map(function(ev){
+    return '<li><div class="k">' + esc(ev.k || 'update') + '</div>' +
+      (ev.note ? '<div>' + esc(ev.note) + '</div>' : '') +
+      '<div class="t">' + esc(fmtTime(ev.t)) + '</div></li>';
+  }).join('') + '</ul>';
+}
+
+var OUTCOMES = [
+  ['interested','Interested'],
+  ['not_interested','Not interested'],
+  ['no_answer','No answer'],
+  ['wrong_number','Wrong number'],
+  ['do_not_call','Do not call'],
+];
+
+function leadCard(claim){
+  const bySlug = catalogBySlug();
+  const lead = bySlug[claim.slug] || normalizeLead({ s: claim.slug, n: claim.business_name || claim.slug, p: claim.phone || '' });
+  const url = siteUrlFor(lead);
+  const phoneOk = hasPhone(lead.phone);
+  const draft = smsDraft(lead.name, state.user.name, url);
+  const script = callScriptText(lead.name, state.user.name);
+  const canRelease = ['claimed','interested'].indexOf(claim.status) !== -1;
+
+  let html = '<div class="lead-title">' + esc(lead.name) + '</div>' +
+    '<div class="row" style="margin:8px 0 10px">' + badge(claim.status) + '</div>' +
+    claimTimerHtml(claim);
+
+  if(claim.status === 'claimed'){
+    html += '<p class="review-note"><strong>Know them first.</strong> Open their site and learn who they are before you call or text.</p>';
+  }
+
+  html += '<div class="card" style="margin:14px 0"><h2>Know them first</h2>' +
+    '<p class="muted" style="font-size:12px;margin-bottom:10px;line-height:1.55">Everything you need before the call.</p>' +
+    (lead.category ? '<div style="font-size:13px;margin-bottom:6px"><strong>Category:</strong> ' + esc(lead.category) + '</div>' : '') +
+    (lead.address ? '<div style="font-size:13px;margin-bottom:6px"><strong>Address:</strong> ' + esc(lead.address) +
+      ' <a href="' + esc(directionsHref(lead.address)) + '" target="_blank" rel="noopener">Directions</a></div>' : '') +
+    '<div class="row" style="margin:8px 0">' +
+      '<a class="btn sm" href="' + esc(url) + '" target="_blank" rel="noopener">Open site</a>' +
+      '<button class="btn ghost sm" id="btn-copy-link" type="button">Copy site link</button></div>' +
+    '<h3 style="margin-top:14px">Business phone</h3>' +
+    '<div class="phone-line"><span class="num">' + (phoneOk ? esc(lead.phone) : 'No phone on file') + '</span>' +
+    (phoneOk ? '<button class="btn ghost sm" id="btn-copy-phone" type="button">Copy phone</button>' : '') +
+    (phoneOk && claim.status === 'claimed' ? '<a class="btn call sm" href="' + esc(telHref(lead.phone)) + '">Call</a>' : '') +
+    '</div></div>';
+
+  if(claim.status === 'claimed'){
+    html += '<div class="card msg-card" style="margin:14px 0"><h2>Text / SMS</h2>' +
+      '<p class="muted" style="font-size:12px;margin-bottom:10px;line-height:1.55">Guide only, adapt in your own words.</p>' +
+      '<div class="copybox tall" id="draft-text">' + esc(draft) + '</div>' +
+      '<div class="row" style="margin-top:12px">' +
+      '<button class="btn" id="btn-copy-draft" type="button">Copy message</button>' +
+      (phoneOk ? '<a class="btn sms" href="' + esc(smsHref(lead.phone, draft)) + '">Open SMS</a>' : '') +
+      '</div></div>';
+    html += '<div class="card script-card" style="margin:14px 0"><h2>Call script</h2>' +
+      '<p class="muted" style="font-size:12px;margin-bottom:8px;line-height:1.55">Guide only, do not read it rigidly.</p>' +
+      '<div class="copybox" id="call-script-text">' + esc(script) + '</div>' +
+      '<div class="row" style="margin-top:8px"><button class="btn ghost sm" id="btn-copy-script" type="button">Copy call script</button></div>' +
+      '<p class="muted" style="font-size:12px;margin-top:10px;line-height:1.55">' + esc(salesLine()) + '</p></div>';
+  }
+
+  if(claim.status === 'claimed'){
+    html += '<div class="card" style="margin:18px 0"><h2>Log outcome</h2>' +
+      '<p class="muted" style="font-size:12px;margin-bottom:12px;line-height:1.55">When they are <strong>interested</strong>, save that, then you get the <strong>Add build details</strong> form.</p>' +
+      '<div class="field"><label>Outcome</label><div class="pick compact" id="outcome-pick">' +
+      OUTCOMES.map(function(o, i){
+        return '<button type="button" class="' + (i === 0 ? 'on' : '') + '" data-outcome="' + o[0] + '">' + o[1] + '</button>';
+      }).join('') + '</div></div>' +
+      '<div class="field"><label>Note</label><textarea id="outcome-note" placeholder="What did they say?"></textarea></div>' +
+      '<button class="btn block" id="btn-outcome" type="button">Save outcome</button>' +
+      '<div class="err" id="outcome-err"></div></div>';
+  }
+
+  if(claim.status === 'interested'){
+    html += '<div class="card" id="intake-panel" style="margin:18px 0"><h2>Add build details</h2>' +
+      '<p class="muted" style="font-size:12px;margin-bottom:14px;line-height:1.55">They are interested. Capture everything the builder needs.</p>' +
+      '<div class="field"><label>Business *</label><input id="in-business" value="' + esc(lead.name) + '"/></div>' +
+      '<div class="grid2"><div class="field"><label>Contact name *</label><input id="in-contact" placeholder="Who you spoke with"/></div>' +
+      '<div class="field"><label>Phone *</label><input id="in-phone" type="tel" value="' + esc(lead.phone) + '"/></div></div>' +
+      '<div class="field"><label>Email</label><input id="in-email" type="email" inputmode="email" placeholder="owner@business.com"/></div>' +
+      '<div class="field"><label>What they want *</label><textarea id="in-wants" placeholder="Pages, features, vibe, must-haves"></textarea></div>' +
+      '<div class="field"><label>Notes</label><textarea id="in-notes" placeholder="Anything else for the builder"></textarea></div>' +
+      '<button class="btn block" id="btn-intake" type="button">Submit to builders</button>' +
+      '<div class="err" id="intake-err"></div></div>';
+  }
+
+  html += '<div class="row" style="margin-top:8px">' +
+    (canRelease ? '<button class="btn danger sm" id="btn-release" type="button">Release lead</button>' : '') +
+    '</div>';
+
+  html += '<div style="margin:20px 0;height:1px;background:var(--sep)"></div>' +
+    '<h3>History</h3>' + timelineHtml(claim);
+  return html;
+}
+
+function wireLeadCard(claim){
+  const lead = (catalogBySlug()[claim.slug]) || normalizeLead({ s: claim.slug, n: claim.business_name || claim.slug, p: claim.phone || '' });
+  const url = siteUrlFor(lead);
+  function on(id, fn){
+    const el = document.getElementById(id);
+    if(el) el.addEventListener('click', fn);
+  }
+  on('btn-copy-link', function(){ copyText(url, 'Site link'); });
+  on('btn-copy-phone', function(){ copyText(lead.phone, 'Phone'); });
+  on('btn-copy-draft', function(){
+    const d = document.getElementById('draft-text');
+    if(d) copyText(d.textContent, 'Message');
+  });
+  on('btn-copy-script', function(){
+    const d = document.getElementById('call-script-text');
+    if(d) copyText(d.textContent, 'Script');
+  });
+  const pick = document.getElementById('outcome-pick');
+  if(pick){
+    pick.querySelectorAll('[data-outcome]').forEach(function(b){
+      b.addEventListener('click', function(){
+        pick.querySelectorAll('[data-outcome]').forEach(function(x){ x.classList.toggle('on', x === b); });
+      });
+    });
+  }
+  on('btn-outcome', function(){ saveOutcome(claim); });
+  on('btn-release', function(){ releaseLead(claim); });
+  on('btn-intake', function(){ submitIntake(claim); });
+}
+
+async function saveOutcome(claim){
+  const err = document.getElementById('outcome-err');
+  err.textContent = '';
+  const pick = document.querySelector('#outcome-pick .on');
+  const outcome = pick ? pick.getAttribute('data-outcome') : 'interested';
+  const note = (document.getElementById('outcome-note').value || '').trim();
+  claim.status = outcome;
+  claim.note = note;
+  claim.timeline = claim.timeline || [];
+  claim.timeline.push({ t: nowISO(), k: 'outcome: ' + outcome, note: note });
+  try{
+    const rec = await ghGetJson('claims/' + claim.slug + '.json');
+    await ghPutJson('claims/' + claim.slug + '.json', claim, rec ? rec.sha : null, 'sitedesk: outcome ' + claim.slug);
+  }catch(e){ err.textContent = e.message; return; }
+  if(outcome !== 'interested'){
+    await releaseLead(claim, true);
+    return;
+  }
+  toast('Saved: interested');
+  state.claimsBySlug[claim.slug] = claim;
+  renderApp();
+}
+
+async function releaseLead(claim, silent){
+  try{
+    const rec = await ghGetJson('claims/' + claim.slug + '.json');
+    if(rec) await ghDeleteFile('claims/' + claim.slug + '.json', rec.sha);
+  }catch(e){
+    if(!silent) toast(e.message);
+    return;
+  }
+  clearTreeCache();
+  delete state.claimsBySlug[claim.slug];
+  await refreshMyClaims();
+  if(!silent) toast('Lead released');
+  renderApp();
+}
+
+async function submitIntake(claim){
+  const err = document.getElementById('intake-err');
+  err.textContent = '';
+  const v = function(id){ return (document.getElementById(id).value || '').trim(); };
+  const business = v('in-business'), contact = v('in-contact'), phone = v('in-phone');
+  const email = v('in-email'), wants = v('in-wants'), notes = v('in-notes');
+  if(!business || !contact || !phone || !wants){ err.textContent = 'Business, contact, phone, and what they want are required.'; return; }
+  const intake = {
+    id: uid('intake'), slug: claim.slug, business: business, contact_name: contact,
+    phone: phone, email: email, wants: wants, notes: notes,
+    claimer: state.user.username, claimer_name: state.user.name,
+    status: 'open', created_at: nowISO()
+  };
+  try{
+    await ghPutJson('intakes/' + intake.id + '.json', intake, null, 'sitedesk: intake ' + intake.id);
+    claim.status = 'sold';
+    claim.timeline = claim.timeline || [];
+    claim.timeline.push({ t: nowISO(), k: 'intake submitted', note: 'Build details sent to builders' });
+    const rec = await ghGetJson('claims/' + claim.slug + '.json');
+    if(rec) await ghPutJson('claims/' + claim.slug + '.json', claim, rec.sha, 'sitedesk: sold ' + claim.slug);
+  }catch(e){ err.textContent = e.message; return; }
+  await postEvent('admin', 'Intake: ' + business, state.user.name + ' submitted build details for ' + business + '.', '');
+  clearTreeCache();
+  delete state.claimsBySlug[claim.slug];
+  await refreshMyClaims();
+  await refreshMyIntakes();
+  toast('Sent to builders');
+  renderApp();
+}
+
+async function renderMineInto(el){
+  el.innerHTML = '<div class="card"><div class="empty">Loading your leads...</div></div>';
+  try{
+    await fetchCatalog();
+    await refreshMyClaims();
+    await refreshMyIntakes();
+  }catch(e){
+    el.innerHTML = '<div class="card"><div class="empty">' + esc(e.message) +
+      '<br/><button class="btn" id="btn-retry-mine" type="button">Retry</button></div></div>';
+    const r = document.getElementById('btn-retry-mine');
+    if(r) r.addEventListener('click', function(){ renderMineInto(el); });
+    return;
+  }
+  const q = state.mineQ.trim().toLowerCase();
+  let list = state.myClaims.slice();
+  if(state.mineStatus !== 'all') list = list.filter(function(c){ return c.status === state.mineStatus; });
+  if(q) list = list.filter(function(c){
+    return (c.business_name + ' ' + c.slug + ' ' + (c.phone||'')).toLowerCase().indexOf(q) !== -1;
+  });
+  let html = statsRow();
+  html += '<div class="card"><h2>My leads' + (list.length ? ' \xB7 ' + list.length : '') + '</h2>' +
+    '<div class="filters"><input id="mine-q" value="' + esc(state.mineQ) + '" placeholder="Search business or phone"/>' +
+    '<div class="chiprow">' +
+    [['all','All'],['claimed','Claimed'],['interested','Interested'],['sold','Sold']].map(function(p){
+      return '<button type="button" class="chip' + (state.mineStatus === p[0] ? ' on' : '') + '" data-mine-status="' + p[0] + '">' + p[1] + '</button>';
+    }).join('') + '</div></div>';
+  if(!list.length){
+    html += '<div class="empty">No leads match.<br/><button class="btn" data-tab="queue" type="button">Grab from queue</button></div>';
+  } else {
+    html += '<div class="pick compact" style="margin-bottom:14px">' + list.map(function(c){
+      return '<button type="button" class="' + (state.meSlug === c.slug ? 'on' : '') + '" data-open-mine="' + esc(c.slug) + '">' +
+        esc(c.business_name || c.slug) + ' <span class="muted" style="font-size:10px">' + esc(c.status) + '</span></button>';
+    }).join('') + '</div>';
+    const me = list.find(function(c){ return c.slug === state.meSlug; }) || list[0];
+    state.meSlug = me.slug;
+    html += leadCard(me);
+  }
+  html += '</div>';
+  el.innerHTML = html;
+  el.querySelectorAll('[data-mine-status]').forEach(function(chip){
+    chip.addEventListener('click', function(){
+      state.mineStatus = chip.getAttribute('data-mine-status');
+      renderMineInto(el);
+    });
+  });
+  const mq = el.querySelector('#mine-q');
+  if(mq) mq.addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){ state.mineQ = mq.value; renderMineInto(el); }
+  });
+  el.querySelectorAll('[data-open-mine]').forEach(function(b){
+    b.addEventListener('click', function(){
+      state.meSlug = b.getAttribute('data-open-mine');
+      renderMineInto(el);
+    });
+  });
+  const meClaim = list.find(function(c){ return c.slug === state.meSlug; }) || list[0];
+  if(meClaim) wireLeadCard(meClaim);
+}
+
+/* ================= intakes (builder / admin) ================= */
+
+async function loadIntakes(scope){
+  const paths = treePaths('intakes/').filter(function(p){ return p.slice(-5) === '.json'; });
+  const items = [];
+  for(const p of paths){
+    try{
+      const rec = await ghGetJson(p);
+      if(rec && rec.data){
+        if(scope === 'mine' && rec.data.claimer !== state.user.username) continue;
+        rec.data._path = p; rec.data._sha = rec.sha;
+        items.push(rec.data);
+      }
+    }catch(e){}
+  }
+  items.sort(function(a,b){ return (b.created_at||'').localeCompare(a.created_at||''); });
+  return items;
+}
+
+var INTAKE_STATUSES = [['open','Open'],['building','Building'],['done','Done']];
+
+async function renderIntakesInto(el){
+  el.innerHTML = '<div class="card"><div class="empty">Loading intakes...</div></div>';
+  let items = [];
+  try{ items = await loadIntakes('all'); }
+  catch(e){
+    el.innerHTML = '<div class="card"><div class="empty">' + esc(e.message) +
+      '<br/><button class="btn" id="btn-retry-intakes" type="button">Retry</button></div></div>';
+    const r = document.getElementById('btn-retry-intakes');
+    if(r) r.addEventListener('click', function(){ renderIntakesInto(el); });
+    return;
+  }
+  if(state.intakeStatusFilter !== 'all') items = items.filter(function(i){ return i.status === state.intakeStatusFilter; });
+  let html = '<div class="card"><h2>' + (state.user.role === 'builder' ? 'Builds' : 'Intakes') +
+    (items.length ? ' \xB7 ' + items.length : '') + '</h2>' +
+    '<div class="chiprow" style="margin-bottom:12px">' +
+    [['all','All'],['open','Open'],['building','Building'],['done','Done']].map(function(p){
+      return '<button type="button" class="chip' + (state.intakeStatusFilter === p[0] ? ' on' : '') + '" data-istatus="' + p[0] + '">' + p[1] + '</button>';
+    }).join('') + '</div>';
+  if(!items.length){
+    html += '<div class="empty">No intakes yet.</div>';
+  } else {
+    html += items.map(function(i){
+      return '<div class="card" style="margin-bottom:10px;padding:14px">' +
+        '<div class="row" style="justify-content:space-between;margin-bottom:8px"><div>' +
+        '<div style="font-weight:600">' + esc(i.business || i.slug) + '</div>' +
+        '<div class="muted" style="font-size:12px">' + esc(i.contact_name || '') +
+        (i.phone ? ' \xB7 ' + esc(i.phone) : '') + '</div>' +
+        '<div class="muted" style="font-size:11px">from ' + esc(i.claimer_name || i.claimer || '') +
+        ' \xB7 ' + esc(fmtTime(i.created_at)) + '</div></div>' + badge(i.status) + '</div>' +
+        '<div class="copybox" style="margin-bottom:10px">' + esc(i.wants || '') +
+        (i.notes ? '\n\nNotes: ' + i.notes : '') + '</div>' +
+        '<div class="field" style="margin-bottom:0"><label>Build status</label><div class="chiprow">' +
+        INTAKE_STATUSES.map(function(p){
+          return '<button type="button" class="chip' + (i.status === p[0] ? ' on' : '') +
+            '" data-intake="' + esc(i.id) + '" data-inewstatus="' + p[0] + '">' + p[1] + '</button>';
+        }).join('') + '</div></div></div>';
+    }).join('');
+  }
+  html += '</div>';
+  el.innerHTML = html;
+  el.querySelectorAll('[data-istatus]').forEach(function(chip){
+    chip.addEventListener('click', function(){
+      state.intakeStatusFilter = chip.getAttribute('data-istatus');
+      renderIntakesInto(el);
+    });
+  });
+  el.querySelectorAll('[data-intake]').forEach(function(chip){
+    chip.addEventListener('click', function(){ setIntakeStatus(chip, el); });
   });
 }
 
-function setUser(login, patch) {
-  getFile('sitedesk/data/users.json').then(function (f) {
-    if (f.status !== 200) { toast('Staff file is missing.', true); return; }
-    var users = f.data || {};
-    users[login] = Object.assign({}, users[login], patch);
-    return putFile('sitedesk/data/users.json', users, f.sha, 'update staff ' + login + ' by ' + S.me.login).then(function () {
-      S.users = users;
-      toast('Saved.');
-      renderAdmin();
-      var note = null;
-      if (patch.status === 'approved') {
-        note = postEvent(login, 'Account approved', 'You can now sign in and start calling.', '#queue');
-      } else if (patch.status === 'rejected') {
-        note = postEvent(login, 'Account not approved', 'Your SiteDesk access was not approved. Contact the head if this is a mistake.', '#queue');
-      }
-      if (note) note.catch(function () { /* saved; notification is best effort */ });
-    });
-  }).catch(function (e) { toast((e && e.message) || 'Could not save.', true); });
+async function setIntakeStatus(chip, el){
+  const id = chip.getAttribute('data-intake');
+  const ns = chip.getAttribute('data-inewstatus');
+  chip.disabled = true;
+  try{
+    const rec = await ghGetJson('intakes/' + id + '.json');
+    if(!rec){ toast('Intake not found.'); return; }
+    const intake = rec.data;
+    const old = intake.status;
+    intake.status = ns;
+    await ghPutJson('intakes/' + id + '.json', intake, rec.sha, 'sitedesk: intake ' + id + ' -> ' + ns);
+    if(intake.claimer && old !== ns){
+      await postEvent(intake.claimer, 'Intake update: ' + (intake.business || intake.slug),
+        'Build status: ' + ns + '.', '');
+    }
+    toast('Status: ' + ns);
+    renderIntakesInto(el);
+  }catch(e){ toast(e.message); chip.disabled = false; }
 }
 
-function lookupClaim() {
-  var slug = el('adminSlug').value.trim();
-  var box = el('adminClaim');
-  if (!slug) { box.innerHTML = '<p class="muted">Enter a slug.</p>'; return; }
-  box.innerHTML = '<p class="muted">Looking up...</p>';
-  getFile(claimPath(slug)).then(function (f) {
-    if (f.status !== 200) {
-      box.innerHTML = '<p class="muted">No claim file for that slug. The lead is open.</p>';
+/* ================= admin ================= */
+
+async function renderAdminInto(el){
+  el.innerHTML = '<div class="card"><div class="empty">Loading admin...</div></div>';
+  try{ await loadUsers(); await fetchCatalog(); }
+  catch(e){
+    el.innerHTML = '<div class="card"><div class="empty">' + esc(e.message) +
+      '<br/><button class="btn" id="btn-retry-admin" type="button">Retry</button></div></div>';
+    const r = document.getElementById('btn-retry-admin');
+    if(r) r.addEventListener('click', function(){ renderAdminInto(el); });
+    return;
+  }
+  let html = '<div class="chiprow" style="margin-bottom:14px">' +
+    [['users','Users'],['announce','Announcements'],['tools','Tools']].map(function(p){
+      return '<button type="button" class="chip' + (state.adminSec === p[0] ? ' on' : '') + '" data-admin-sec="' + p[0] + '">' + p[1] + '</button>';
+    }).join('') + '</div>';
+  if(state.adminSec === 'users') html += adminUsersHtml();
+  else if(state.adminSec === 'announce') html += adminAnnounceHtml();
+  else html += adminToolsHtml();
+  el.innerHTML = html;
+  el.querySelectorAll('[data-admin-sec]').forEach(function(chip){
+    chip.addEventListener('click', function(){
+      state.adminSec = chip.getAttribute('data-admin-sec');
+      renderAdminInto(el);
+    });
+  });
+  if(state.adminSec === 'users') wireAdminUsers(el);
+  else if(state.adminSec === 'announce') wireAdminAnnounce(el);
+  else wireAdminTools(el);
+}
+
+function adminUsersHtml(){
+  const q = state.userQ.trim().toLowerCase();
+  const names = Object.keys(state.users || {}).sort();
+  const list = names.map(function(k){ return { username: k, u: state.users[k] }; })
+    .filter(function(r){
+      if(state.userStatus && r.u.status !== state.userStatus) return false;
+      if(q){
+        const hay = (r.username + ' ' + (r.u.name||'') + ' ' + (r.u.phone||'')).toLowerCase();
+        if(hay.indexOf(q) === -1) return false;
+      }
+      return true;
+    });
+  let html = '<div class="card"><h2>Users</h2>' +
+    '<div class="row" style="justify-content:space-between;margin-bottom:12px">' +
+    '<p class="muted" style="font-size:11px">' + list.length + ' shown \xB7 chips and search refine live</p>' +
+    '<button class="btn sm" id="btn-new-user" type="button">Create user</button></div>' +
+    '<div class="filters"><input id="user-q" value="' + esc(state.userQ) + '" placeholder="Search name, username, phone"/>' +
+    '<div class="chiprow">' +
+    [['','All'],['pending','Pending'],['approved','Approved'],['rejected','Rejected'],['disabled','Disabled']].map(function(p){
+      return '<button type="button" class="chip' + (state.userStatus === p[0] ? ' on' : '') + '" data-ustatus="' + p[0] + '">' + p[1] + '</button>';
+    }).join('') + '</div></div>';
+  if(!list.length) html += '<div class="empty">No users match.</div>';
+  else html += list.map(function(r){
+    const u = r.u;
+    return '<div class="card" style="margin-bottom:10px;padding:14px">' +
+      '<div class="row" style="justify-content:space-between;margin-bottom:8px"><div>' +
+      '<div style="font-weight:600">' + esc(u.name || r.username) + '</div>' +
+      '<div class="muted" style="font-size:12px">@' + esc(r.username) + '</div>' +
+      '<div class="muted" style="font-size:12px">' + esc(u.phone || 'no phone') + '</div></div>' +
+      badge(u.status) + '</div>' +
+      '<div class="row" style="margin-bottom:8px">' + badge(u.role) + '</div>' +
+      '<div class="row">' +
+      (u.status === 'pending' ? '<button class="btn sm" data-uact="approve" data-u="' + esc(r.username) + '" type="button">Approve</button>' +
+        '<button class="btn ghost sm" data-uact="reject" data-u="' + esc(r.username) + '" type="button">Reject</button>' : '') +
+      (u.status !== 'disabled' ? '<button class="btn danger sm" data-uact="disable" data-u="' + esc(r.username) + '" type="button">Disable</button>' :
+        '<button class="btn ghost sm" data-uact="approve" data-u="' + esc(r.username) + '" type="button">Re-enable</button>') +
+      (state.user.role === 'head' ? '<select data-urole="' + esc(r.username) + '" style="min-height:42px;width:auto">' +
+        ['caller','builder','admin','head'].map(function(ro){
+          return '<option value="' + ro + '"' + (u.role === ro ? ' selected' : '') + '>' + ro + '</option>';
+        }).join('') + '</select>' : '') +
+      '</div></div>';
+  }).join('');
+  return html + '</div>';
+}
+
+function wireAdminUsers(el){
+  const uq = el.querySelector('#user-q');
+  if(uq) uq.addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){ state.userQ = uq.value; renderAdminInto(el); }
+  });
+  el.querySelectorAll('[data-ustatus]').forEach(function(chip){
+    chip.addEventListener('click', function(){
+      state.userStatus = chip.getAttribute('data-ustatus');
+      renderAdminInto(el);
+    });
+  });
+  const nu = el.querySelector('#btn-new-user');
+  if(nu) nu.addEventListener('click', function(){ newUserModal(el); });
+  el.querySelectorAll('[data-uact]').forEach(function(b){
+    b.addEventListener('click', function(){ userAction(b.getAttribute('data-u'), b.getAttribute('data-uact'), el); });
+  });
+  el.querySelectorAll('[data-urole]').forEach(function(sel){
+    sel.addEventListener('change', function(){
+      userAction(sel.getAttribute('data-urole'), 'role:' + sel.value, el);
+    });
+  });
+}
+
+async function saveUsers(){
+  const rec = await ghGetJson('users.json');
+  await ghPutJson('users.json', state.users, rec ? rec.sha : null, 'sitedesk: users update');
+  await loadUsers();
+}
+
+async function userAction(username, act, el){
+  const u = state.users[username];
+  if(!u){ toast('User not found.'); return; }
+  try{
+    if(act === 'approve'){
+      u.status = 'approved';
+      await saveUsers();
+      await postEvent(username, 'Account approved', 'Your SiteDesk account is approved. You can log in now.', '');
+      toast('Approved @' + username);
+    } else if(act === 'reject'){
+      u.status = 'rejected';
+      await saveUsers();
+      await postEvent(username, 'Account not approved', 'Your SiteDesk request was declined. Ask your admin for details.', '');
+      toast('Rejected @' + username);
+    } else if(act === 'disable'){
+      if(username === state.user.username){ toast('You cannot disable yourself.'); return; }
+      u.status = 'disabled';
+      await saveUsers();
+      toast('Disabled @' + username);
+    } else if(act.indexOf('role:') === 0){
+      if(state.user.role !== 'head'){ toast('Only the head can change roles.'); return; }
+      if(username === state.user.username){ toast('You cannot change your own role.'); return; }
+      u.role = act.slice(5);
+      await saveUsers();
+      toast('Role updated');
+    }
+    renderAdminInto(el);
+  }catch(e){ toast(e.message); }
+}
+
+function newUserModal(el){
+  let role = 'caller';
+  openModal('<h2>Create user</h2>' +
+    '<div class="field"><label>Name *</label><input id="nu-name"/></div>' +
+    '<div class="field"><label>Username *</label><input id="nu-user" autocapitalize="none" placeholder="lowercase, no spaces"/></div>' +
+    '<div class="field"><label>Phone</label><input id="nu-phone" type="tel"/></div>' +
+    '<div class="field"><label>Role</label><div class="chiprow" id="nu-role">' +
+    ['caller','builder','admin'].map(function(r){
+      return '<button type="button" class="chip' + (r === role ? ' on' : '') + '" data-r="' + r + '">' + r + '</button>';
+    }).join('') + '</div></div>' +
+    '<button class="btn block" id="nu-go" type="button">Create user</button>' +
+    '<div class="err" id="nu-err"></div>' +
+    '<div id="nu-pass" style="margin-top:12px"></div>');
+  document.querySelectorAll('#nu-role [data-r]').forEach(function(b){
+    b.addEventListener('click', function(){
+      role = b.getAttribute('data-r');
+      document.querySelectorAll('#nu-role [data-r]').forEach(function(x){ x.classList.toggle('on', x === b); });
+    });
+  });
+  document.getElementById('nu-go').addEventListener('click', async function(){
+    const err = document.getElementById('nu-err');
+    err.textContent = '';
+    const name = (document.getElementById('nu-name').value || '').trim();
+    const username = (document.getElementById('nu-user').value || '').trim().toLowerCase().replace(/[^a-z0-9._-]/g,'');
+    const phone = (document.getElementById('nu-phone').value || '').trim();
+    if(!name || !username){ err.textContent = 'Name and username are required.'; return; }
+    if(state.users[username]){ err.textContent = 'Username already exists.'; return; }
+    const btn = document.getElementById('nu-go');
+    btn.disabled = true; btn.textContent = 'Hashing password...';
+    try{
+      const password = genPassword(16);
+      const pass = await pbkdf2Hash(password);
+      state.users[username] = { name: name, role: role, status: 'pending', phone: phone, pass: pass };
+      await saveUsers();
+      document.getElementById('nu-pass').innerHTML =
+        '<p class="helper-warn">Save this password now. It is shown ONCE and cannot be recovered.</p>' +
+        '<div class="copybox mono" id="nu-pass-val">' + esc(password) + '</div>' +
+        '<div class="row" style="margin-top:8px"><button class="btn sm" id="nu-copy" type="button">Copy password</button></div>';
+      document.getElementById('nu-copy').addEventListener('click', function(){ copyText(password, 'Password'); });
+      btn.textContent = 'User created';
+      toast('User created: @' + username);
+      renderAdminInto(el);
+    }catch(e){
+      err.textContent = e.message;
+      btn.disabled = false; btn.textContent = 'Create user';
+    }
+  });
+}
+
+function adminAnnounceHtml(){
+  return '<div class="card"><h2>Announcements</h2>' +
+    '<p class="muted" style="font-size:12px;margin-bottom:12px;line-height:1.55">Posts to every user as a notification.</p>' +
+    '<div class="field"><label>Title *</label><input id="an-title" placeholder="e.g. New payout rules"/></div>' +
+    '<div class="field"><label>Message *</label><textarea id="an-body" placeholder="What should everyone know?"></textarea></div>' +
+    '<button class="btn block" id="an-go" type="button">Send to everyone</button>' +
+    '<div class="err" id="an-err"></div></div>';
+}
+
+function wireAdminAnnounce(el){
+  el.querySelector('#an-go').addEventListener('click', async function(){
+    const err = el.querySelector('#an-err');
+    err.textContent = '';
+    const title = (el.querySelector('#an-title').value || '').trim();
+    const body = (el.querySelector('#an-body').value || '').trim();
+    if(!title || !body){ err.textContent = 'Title and message are required.'; return; }
+    const ok = await postEvent('all', title, body, '');
+    if(ok){
+      el.querySelector('#an-title').value = '';
+      el.querySelector('#an-body').value = '';
+      toast('Announcement sent');
+    }
+  });
+}
+
+function adminToolsHtml(){
+  return '<div class="card"><h2>Tools</h2>' +
+    '<p class="muted" style="font-size:12px;margin-bottom:12px;line-height:1.55">Look up a claim by slug and unlock it (deletes the claim file).</p>' +
+    '<div class="field"><label>Lead slug</label><input id="tool-slug" placeholder="e.g. acme-plumbing"/></div>' +
+    '<button class="btn ghost block" id="tool-lookup" type="button">Look up claim</button>' +
+    '<div class="err" id="tool-err"></div>' +
+    '<div id="tool-result" style="margin-top:12px"></div></div>';
+}
+
+function wireAdminTools(el){
+  el.querySelector('#tool-lookup').addEventListener('click', async function(){
+    const err = el.querySelector('#tool-err');
+    const res = el.querySelector('#tool-result');
+    err.textContent = ''; res.innerHTML = '';
+    const slug = (el.querySelector('#tool-slug').value || '').trim();
+    if(!slug){ err.textContent = 'Enter a slug.'; return; }
+    try{
+      const rec = await ghGetJson('claims/' + slug + '.json');
+      if(!rec){ res.innerHTML = '<p class="muted">No active claim for ' + esc(slug) + '.</p>'; return; }
+      const c = rec.data;
+      res.innerHTML = '<div class="card" style="padding:14px"><div style="font-weight:600">' + esc(c.business_name || slug) + '</div>' +
+        '<div class="muted" style="font-size:12px">claimer: ' + esc(c.claimer_name || c.claimer || '') +
+        ' \xB7 status: ' + esc(c.status || '') + '</div>' +
+        '<div class="muted" style="font-size:12px">expires: ' + esc(fmtTime(c.claim_expires_at)) + '</div>' +
+        '<div class="row" style="margin-top:10px"><button class="btn danger sm" id="tool-unlock" type="button">Unlock (delete claim)</button></div></div>';
+      res.querySelector('#tool-unlock').addEventListener('click', async function(){
+        try{
+          await ghDeleteFile('claims/' + slug + '.json', rec.sha);
+          clearTreeCache();
+          delete state.claimsBySlug[slug];
+          toast('Claim unlocked');
+          res.innerHTML = '<p class="muted">Claim deleted. The lead is open again.</p>';
+        }catch(e){ err.textContent = e.message; }
+      });
+    }catch(e){ err.textContent = e.message; }
+  });
+}
+
+/* ================= alerts / profile ================= */
+
+function renderAlertsInto(el){
+  const list = state.feed.filter(feedItemVisible);
+  let html = '<div class="card"><div class="row" style="justify-content:space-between;margin-bottom:12px">' +
+    '<h2 style="margin:0">Alerts</h2>' +
+    '<button class="btn ghost sm" id="btn-feed-refresh" type="button">Refresh</button></div>';
+  if(!list.length){
+    html += '<div class="empty">No notifications.<br/><span class="muted" style="font-size:12px">Approvals, intakes, and announcements show up here.</span></div>';
+  } else {
+    const lr = lastReadAt();
+    html += list.map(function(n){
+      const isNew = (new Date(n.created_at || 0).getTime() || 0) > lr;
+      return '<div style="padding:12px 0;background-image:var(--sep);background-size:100% 1px;background-repeat:no-repeat;background-position:bottom">' +
+        '<div style="font-weight:600">' + esc(n.title) + (isNew ? ' <span class="badge unread-new">new</span>' : '') + '</div>' +
+        (n.body ? '<div class="muted" style="font-size:12px">' + esc(n.body) + '</div>' : '') +
+        '<div class="muted" style="font-size:11px">' + esc(fmtTime(n.created_at)) + '</div></div>';
+    }).join('');
+  }
+  html += '<button class="btn ghost block" id="mark-read" style="margin-top:12px" type="button">Mark all read</button></div>';
+  el.innerHTML = html;
+  el.querySelector('#mark-read').addEventListener('click', function(){
+    setLastRead(Date.now());
+    state.unread = 0;
+    renderApp();
+  });
+  el.querySelector('#btn-feed-refresh').addEventListener('click', async function(){
+    await fetchFeed(true);
+    renderApp();
+  });
+}
+
+function renderProfileInto(el){
+  const u = state.user;
+  el.innerHTML = '<div class="card"><h2>Profile</h2>' +
+    '<dl class="profile-dl">' +
+    '<div><dt>Name</dt><dd>' + esc(u.name) + '</dd></div>' +
+    '<div><dt>Username</dt><dd>@' + esc(u.username) + '</dd></div>' +
+    '<div><dt>Role</dt><dd>' + badge(u.role) + '</dd></div>' +
+    (u.phone ? '<div><dt>Phone</dt><dd>' + esc(u.phone) + '</dd></div>' : '') +
+    '</dl>' +
+    '<div class="row" style="margin-top:16px">' +
+    '<button class="btn ghost block" id="btn-logout" type="button">Log out</button></div>' +
+    '<p class="muted" style="font-size:11px;margin-top:12px;line-height:1.55">Signed in on this device for 7 days. Your data token is shared by the app and scoped to the data repo only.</p></div>';
+  el.querySelector('#btn-logout').addEventListener('click', logout);
+}
+
+/* ================= render dispatch ================= */
+
+function renderApp(){
+  if(!state.user){ renderLogin(); return; }
+  if(state.user.role === 'builder' && (state.tab === 'queue' || state.tab === 'mine')) state.tab = 'inbox';
+  const app = document.getElementById('app');
+  if(state.tab === 'queue'){
+    app.innerHTML = shell('<div id="view"></div>');
+    bindApp(app);
+    renderQueueInto(app.querySelector('#view'));
+  } else if(state.tab === 'mine'){
+    app.innerHTML = shell('<div id="view"></div>');
+    bindApp(app);
+    renderMineInto(app.querySelector('#view'));
+  } else if(state.tab === 'inbox'){
+    app.innerHTML = shell('<div id="view"></div>');
+    bindApp(app);
+    renderIntakesInto(app.querySelector('#view'));
+  } else if(state.tab === 'admin'){
+    app.innerHTML = shell('<div id="view"></div>');
+    bindApp(app);
+    renderAdminInto(app.querySelector('#view'));
+  } else if(state.tab === 'notifs'){
+    app.innerHTML = shell('<div id="view"></div>');
+    bindApp(app);
+    fetchFeed(false).then(function(){ renderAlertsInto(app.querySelector('#view')); });
+  } else if(state.tab === 'profile'){
+    app.innerHTML = shell('<div id="view"></div>');
+    bindApp(app);
+    renderProfileInto(app.querySelector('#view'));
+  }
+}
+
+function bindApp(app){
+  const bell = app.querySelector('#btn-bell');
+  if(bell) bell.addEventListener('click', function(){
+    state.tab = 'notifs';
+    renderApp();
+  });
+  const bn = app.querySelector('#banner-notif');
+  if(bn) bn.addEventListener('click', async function(){
+    try{ await Notification.requestPermission(); }catch(e){}
+    try{ localStorage.setItem(LS_NOTIF_ASKED, '1'); }catch(e){}
+    renderApp();
+  });
+}
+
+/* Delegated clicks survive async re-renders of the views. */
+function bindGlobal(){
+  document.getElementById('app').addEventListener('click', function(e){
+    const tab = e.target.closest('[data-tab]');
+    if(tab){
+      state.tab = tab.getAttribute('data-tab');
+      renderApp();
       return;
     }
-    var c = f.data;
-    box.innerHTML =
-      '<div class="card"><div class="leadtitle">' + esc(c.business_name || slug) + '</div>' +
-      '<div class="kv">Claimed by <b>' + esc(c.claimed_by_name || c.claimed_by || '?') + '</b> (@' + esc(c.claimed_by || '?') + ')</div>' +
-      '<div class="kv">Status: <b>' + esc(c.status || '?') + '</b>' +
-      (c.outcome ? ', outcome: <b>' + esc(c.outcome) + '</b>' : '') + '</div>' +
-      '<div class="kv">Expires: ' + esc(c.claim_expires_at || '?') + '</div>' +
-      '<div class="row" style="margin-top:8px"><button class="btn danger small" id="btnUnlock">Unlock claim</button></div></div>';
-    el('btnUnlock').addEventListener('click', function () {
-      if (!confirm('Unlock this claim? It goes back to the open queue.')) return;
-      deleteFile(claimPath(slug), f.sha, 'unlock ' + slug + ' by ' + S.me.login)
-        .then(function () {
-          S.claimCache[slug] = null;
-          box.innerHTML = '<p class="muted">Unlocked. The lead is open again.</p>';
-        })
-        .catch(function (e) { toast((e && e.message) || 'Could not unlock.', true); });
-    });
-  }).catch(function (e) { box.innerHTML = '<p class="muted">' + esc(e.message || 'Lookup failed.') + '</p>'; });
-}
-
-/* ---------------- notifications (device popups + bell, no backend) ---------------- */
-
-function lsGetObj(key) {
-  try {
-    var v = JSON.parse(localStorage.getItem(key) || '{}');
-    return (v && typeof v === 'object') ? v : {};
-  } catch (e) { return {}; }
-}
-
-function lsSetObj(key, obj) {
-  try { localStorage.setItem(key, JSON.stringify(obj)); } catch (e) {}
-}
-
-/* Returns null when this login has never seen the feed (first run: seed silently). */
-function getSeenIds(login) {
-  var o = lsGetObj(LS_FEED_SEEN);
-  return Object.prototype.hasOwnProperty.call(o, login) ? o[login] : null;
-}
-
-function setSeenIds(login, ids) {
-  var o = lsGetObj(LS_FEED_SEEN);
-  o[login] = ids;
-  lsSetObj(LS_FEED_SEEN, o);
-}
-
-function loadFeed() {
-  return getFile(FEED_PATH).then(function (f) {
-    if (f.status === 404) return [];
-    return Array.isArray(f.data) ? f.data : [];
+    const grab = e.target.closest('[data-grab]');
+    if(grab){ grabLead(grab.getAttribute('data-grab')); }
   });
 }
 
-/* Appends one event to feed.json (creates it on first use, keeps newest 200). */
-function postEvent(audience, title, body, link) {
-  var item = feedItem(audience, title, body, link);
-  return getFile(FEED_PATH).then(function (f) {
-    var feed = (f.status === 200 && Array.isArray(f.data)) ? f.data : [];
-    var next = feedAppendCap(feed, item, FEED_CAP);
-    return putFile(FEED_PATH, next, f.status === 200 ? f.sha : null, 'notify ' + String(audience))
-      .then(function () { return item; });
-  });
-}
-
-function deviceNotify(item) {
-  try {
-    if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-      new Notification(item.title || 'SiteDesk', {
-        body: item.body || '',
-        icon: 'icon.svg',
-        tag: item.id
-      });
-    }
-  } catch (e) {}
-}
-
-function toastSeq(msgs) {
-  var i = 0;
-  function next() {
-    if (i >= msgs.length) return;
-    toast(msgs[i], false);
-    i++;
-    if (i < msgs.length) setTimeout(next, 4400);
+async function bootData(announce){
+  await refreshTree();
+  await fetchFeed(announce);
+  if(canClaim()){
+    await refreshMyClaims();
+    await refreshMyIntakes();
   }
-  next();
 }
 
-/* Diff feed against last-seen and popup for genuinely new items (max 5). */
-function announceNewItems(feed, seedIfFresh) {
-  var login = S.me && S.me.login;
-  if (!login) return;
-  var seen = getSeenIds(login);
-  if (seen === null) {
-    if (seedIfFresh) {
-      setSeenIds(login, capSeenIds(feed.map(function (it) { return it && it.id; })));
-    }
-    return;
-  }
-  var fresh = feedNewItems(feed, seen, login).slice(0, MAX_POPUPS);
-  if (fresh.length) {
-    fresh.forEach(function (it) { deviceNotify(it); });
-    toastSeq(fresh.map(function (it) { return it.title + ': ' + it.body; }));
-  }
-  var ids = capSeenIds(feed.map(function (it) { return it && it.id; }).concat(seen));
-  setSeenIds(login, ids);
-}
-
-function updateBell(feed) {
-  var btn = el('bellBtn'), badge = el('bellBadge');
-  if (!S.me) { btn.style.display = 'none'; return; }
-  btn.style.display = 'block';
-  var login = S.me.login;
-  var seen = getSeenIds(login) || [];
-  var unread = feedNewItems(feed || [], seen, login).length;
-  if (unread > 0) {
-    badge.textContent = unread > 9 ? '9+' : String(unread);
-    badge.style.display = 'block';
+function init(){
+  if(typeof document === 'undefined') return;
+  if(state.booted) return;
+  state.booted = true;
+  bindGlobal();
+  const s = loadSession();
+  if(s && SITEDESK_DATA_TOKEN && SITEDESK_DATA_TOKEN !== 'PUT_TOKEN_HERE'){
+    state.user = { username: s.username, role: s.role, name: s.name };
+    state.tab = s.role === 'builder' ? 'inbox' : 'queue';
+    renderApp();
+    bootData(false).then(function(){ renderApp(); }).catch(function(e){ toast(e.message); });
   } else {
-    badge.style.display = 'none';
+    if(s && (!SITEDESK_DATA_TOKEN || SITEDESK_DATA_TOKEN === 'PUT_TOKEN_HERE')){
+      clearSession();
+      state.user = null;
+    }
+    renderLogin();
   }
 }
 
-function checkFeedOnSignin() {
-  loadFeed().then(function (feed) {
-    announceNewItems(feed, true);
-    updateBell(feed);
-  }).catch(function () { updateBell([]); });
-}
-
-function openNotifs() {
-  showView('notifs');
-  el('notifList').innerHTML = '<div class="empty">Loading notifications...</div>';
-  loadFeed().then(function (feed) {
-    var login = S.me && S.me.login;
-    if (login) setSeenIds(login, capSeenIds(feed.map(function (it) { return it && it.id; })));
-    renderNotifs(feed);
-    updateBell(feed);
-  }).catch(function (e) {
-    el('notifList').innerHTML = '<div class="empty">' + esc(e.message || 'Could not load notifications.') + '</div>';
-  });
-}
-
-function notifGoto(target) {
-  if (target === 'claims') refreshMyClaims();
-  if (target === 'intakes') refreshIntakes();
-  if (target === 'admin') renderAdmin();
-  showView(target);
-}
-
-function renderNotifs(feed) {
-  var list = el('notifList');
-  var login = S.me && S.me.login;
-  var mine = (feed || []).filter(function (it) {
-    return it && (it.audience === 'all' || it.audience === login);
-  });
-  if (!mine.length) {
-    list.innerHTML = '<div class="empty">No notifications yet.</div>';
-    return;
-  }
-  list.innerHTML = '';
-  mine.forEach(function (it) {
-    var div = document.createElement('div');
-    div.className = 'card';
-    var target = (it.link && it.link.charAt(0) === '#') ? it.link.slice(1) : null;
-    div.innerHTML =
-      '<div class="leadtitle">' + esc(it.title || 'Notification') + '</div>' +
-      (it.body ? '<div class="kv">' + esc(it.body) + '</div>' : '') +
-      '<div class="ntime">' + esc(timeAgo(it.ts, Date.now())) + '</div>' +
-      (target
-        ? '<div class="row" style="margin-top:8px"><button class="btn ghost small" data-goto="' + esc(target) + '">Open</button></div>'
-        : (it.link
-          ? '<div class="row" style="margin-top:8px"><a class="btn ghost small" target="_blank" rel="noopener" href="' + esc(it.link) + '">Open</a></div>'
-          : ''));
-    var go = div.querySelector('[data-goto]');
-    if (go) go.addEventListener('click', function () { notifGoto(go.getAttribute('data-goto')); });
-    list.appendChild(div);
-  });
-}
-
-function markNotifAsked() {
-  if (!S.me) return;
-  var o = lsGetObj(LS_NOTIF_ASKED);
-  o[S.me.login] = 1;
-  lsSetObj(LS_NOTIF_ASKED, o);
-}
-
-function maybeShowNotifAsk() {
-  var ask = el('notifAsk');
-  if (!ask) return;
-  ask.style.display = 'none';
-  if (typeof Notification === 'undefined') return;
-  if (!S.me) return;
-  var asked = lsGetObj(LS_NOTIF_ASKED);
-  if (Notification.permission === 'default' && !asked[S.me.login]) {
-    ask.style.display = 'block';
-  }
-}
-
-function afterSigninNotifSetup() {
-  checkFeedOnSignin();
-  maybeShowNotifAsk();
-}
-
-function sendAnnouncement() {
-  var title = el('ancTitle').value.trim();
-  var body = el('ancBody').value.trim();
-  if (!title || !body) { toast('Write a title and a message first.', true); return; }
-  toast('Sending...');
-  postEvent('all', title, body, null).then(function () {
-    el('ancTitle').value = '';
-    el('ancBody').value = '';
-    toast('Announcement sent to all callers.');
-  }).catch(function (e) {
-    toast((e && e.message) || 'Could not send announcement.', true);
-  });
-}
-
-/* ---------------- wiring ---------------- */
-
-function init() {
-  el('btnSignIn').addEventListener('click', signIn);
-  el('pat').addEventListener('keydown', function (e) { if (e.key === 'Enter') signIn(); });
-
-  var navBtns = document.querySelectorAll('#nav button');
-  for (var i = 0; i < navBtns.length; i++) {
-    (function (btn) {
-      btn.addEventListener('click', function () {
-        var v = btn.getAttribute('data-view');
-        if (v === 'claims') refreshMyClaims();
-        if (v === 'intakes') refreshIntakes();
-        if (v === 'admin') renderAdmin();
-        showView(v);
-      });
-    })(navBtns[i]);
-  }
-
-  el('btnApplyFilters').addEventListener('click', function () {
-    S.filters.q = el('fq').value.trim();
-    S.filters.cat = el('fcat').value;
-    S.filters.phone = el('fphone').checked;
-    buildQueue();
-  });
-  el('btnShuffle').addEventListener('click', buildQueue);
-  el('btnMore').addEventListener('click', function () { renderMore(false); });
-  el('btnRefreshClaims').addEventListener('click', refreshMyClaims);
-  el('btnRefreshIntakes').addEventListener('click', refreshIntakes);
-  el('btnSaveIntake').addEventListener('click', saveIntake);
-  el('btnCancelIntake').addEventListener('click', function () { showView('claims'); });
-  el('btnLookupClaim').addEventListener('click', lookupClaim);
-  el('btnAnnounce').addEventListener('click', sendAnnouncement);
-
-  el('bellBtn').addEventListener('click', openNotifs);
-  el('btnRefreshFeed').addEventListener('click', function () {
-    el('notifList').innerHTML = '<div class="empty">Checking...</div>';
-    loadFeed().then(function (feed) {
-      announceNewItems(feed, false);
-      renderNotifs(feed);
-      updateBell(feed);
-    }).catch(function (e) {
-      el('notifList').innerHTML = '<div class="empty">' + esc(e.message || 'Could not load notifications.') + '</div>';
-    });
-  });
-
-  el('btnNotifEnable').addEventListener('click', function () {
-    markNotifAsked();
-    el('notifAsk').style.display = 'none';
-    if (typeof Notification === 'undefined') return;
-    Notification.requestPermission().then(function (p) {
-      if (p === 'granted') toast('Popups enabled on this device.');
-      else toast('Popups blocked. You can allow them later in browser settings.', true);
-    }).catch(function () {});
-  });
-  el('btnNotifLater').addEventListener('click', function () {
-    markNotifAsked();
-    el('notifAsk').style.display = 'none';
-  });
-
-  var copiers = document.querySelectorAll('[data-copy]');
-  for (var k = 0; k < copiers.length; k++) {
-    (function (btn) {
-      btn.addEventListener('click', function () {
-        var txt = el(btn.getAttribute('data-copy')).textContent;
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(txt).then(function () { toast('Copied.'); });
-        } else {
-          var ta = document.createElement('textarea');
-          ta.value = txt;
-          document.body.appendChild(ta);
-          ta.select();
-          try { document.execCommand('copy'); toast('Copied.'); } catch (e) { toast('Copy failed.', true); }
-          document.body.removeChild(ta);
-        }
-      });
-    })(copiers[k]);
-  }
-
-  tryAutoSignin();
-}
-
-if (typeof document !== 'undefined') {
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+if(typeof document !== 'undefined'){
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
-}
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = {
-    b64encodeUtf8: b64encodeUtf8,
-    b64decodeUtf8: b64decodeUtf8,
-    normLead: normLead,
-    normSites: normSites,
-    isExpired: isExpired,
-    shuffle: shuffle,
-    phoneDigits: phoneDigits,
-    telHref: telHref,
-    smsHref: smsHref,
-    directionsUrl: directionsUrl,
-    sitePreviewUrl: sitePreviewUrl,
-    sitesCatalogUrl: sitesCatalogUrl,
-    newClaimDoc: newClaimDoc,
-    newIntakeDoc: newIntakeDoc,
-    claimPath: claimPath,
-    intakePath: intakePath,
-    ghErrorMessage: ghErrorMessage,
-    feedItem: feedItem,
-    feedAppendCap: feedAppendCap,
-    feedNewItems: feedNewItems,
-    capSeenIds: capSeenIds,
-    timeAgo: timeAgo
-  };
 }
