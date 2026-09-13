@@ -543,8 +543,8 @@ function renderLogin(){
     '<header class="top"><div class="brand">sitedesk<div class="brand-sub">bjvfi</div></div></header>' +
     '<div class="main auth-main"><div class="card"><h2>Login</h2>' +
     '<p class="muted" style="margin-bottom:16px;font-size:12px">Welcome back.</p>' +
-    '<div class="field"><label>Username</label><input id="login-user" autocomplete="username" autocapitalize="none"/></div>' +
-    '<div class="field"><label>Password</label><input id="login-pass" type="password" autocomplete="current-password"/></div>' +
+    '<div class="field"><label for="login-user">Username</label><input id="login-user" autocomplete="username" autocapitalize="none"/></div>' +
+    '<div class="field"><label for="login-pass">Password</label><input id="login-pass" type="password" autocomplete="current-password"/></div>' +
     '<button class="btn block" id="login-go" type="button">Login</button>' +
     '<div class="err" id="login-err"></div>' +
     '<p class="muted" style="margin-top:14px;font-size:12px">Need an account? <a href="#" id="login-signup" style="color:var(--amber)">Create one</a> &middot; <a href="#" id="login-home" style="color:var(--amber)">Home</a></p>' +
