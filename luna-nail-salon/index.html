@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Luna Nail Salon · Manicures and Pedicures, Fairport, NY</title>
+<meta name="description" content="Luna Nail Salon at 1000 Turk Hill Rd, Fairport, NY. Meticulous manicures, pedicures, nail enhancements and more, by appointment. Call (585) 309-2037.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;0,900;1,500;1,600&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --night:#1E1B33; --night-2:#2A2547; --night-soft:#38315E;
+  --moon:#EFEAF7; --moon-2:#E2D9F2;
+  --lav:#9B8BD4; --lav-soft:#DCD3F2;
+  --gold:#E3C878; --gold-soft:#F7ECD2;
+  --blush:#E8A7B8;
+  --ink:#26233C; --ink-soft:#5D5778;
+  --radius:18px;
+  --shadow:0 18px 42px -18px rgba(30,27,51,.4);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Public Sans",system-ui,sans-serif;
+  background:var(--moon);color:var(--ink);line-height:1.65;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+::selection{background:var(--lav);color:#fff}
+.wrap{max-width:1120px;margin:0 auto;padding:0 26px}
+a{color:var(--night-soft)}
+.serif{font-family:"Playfair Display",serif}
+
+/* ---------- top bar + side drawer nav ---------- */
+header.site{
+  position:sticky;top:0;z-index:60;
+  background:rgba(239,234,247,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(30,27,51,.14);
+}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:13px 0}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
+.brand-moon{
+  width:44px;height:44px;border-radius:50%;flex:none;
+  background:radial-gradient(circle at 34% 34%, var(--gold-soft), var(--gold) 62%, #C9A44C);
+  box-shadow:0 0 0 5px rgba(227,200,120,.18), 0 6px 14px rgba(30,27,51,.25);
+  position:relative;
+}
+.brand-moon::after{
+  content:"";position:absolute;top:6px;left:10px;width:30px;height:30px;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.5), transparent 60%);
+}
+.brand-name{font-family:"Playfair Display",serif;font-weight:800;font-size:1.32rem;letter-spacing:-.2px;line-height:1.1}
+.brand-name small{display:block;font-family:"Public Sans",sans-serif;font-weight:700;font-size:.62rem;letter-spacing:3px;text-transform:uppercase;color:var(--ink-soft)}
+.burger{
+  display:flex;align-items:center;gap:10px;background:var(--night);color:#fff;border:0;cursor:pointer;
+  padding:11px 20px;border-radius:999px;font-weight:700;font-size:.92rem;
+}
+.burger:hover{background:var(--night-2)}
+.burger .lines{display:inline-block}
+.burger .lines span{display:block;width:20px;height:2px;background:#fff;margin:4px 0;border-radius:2px}
+nav.main{
+  position:fixed;top:0;right:0;bottom:0;width:min(360px,86vw);z-index:70;
+  background:var(--night);color:#EFEAF7;
+  transform:translateX(105%);transition:transform .32s cubic-bezier(.22,.8,.3,1);
+  display:flex;flex-direction:column;padding:26px 30px 34px;
+  box-shadow:-24px 0 60px rgba(30,27,51,.35);
+}
+nav.main.open{transform:translateX(0)}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px}
+.drawer-head .brand-name{color:#fff}
+.drawer-close{
+  background:rgba(255,255,255,.1);color:#fff;border:0;cursor:pointer;
+  width:40px;height:40px;border-radius:50%;font-size:1.2rem;line-height:1;
+}
+.drawer-close:hover{background:rgba(255,255,255,.2)}
+nav.main a.dlink{
+  color:#EFEAF7;text-decoration:none;font-family:"Playfair Display",serif;font-size:1.5rem;font-weight:600;
+  padding:12px 4px;border-bottom:1px solid rgba(255,255,255,.12);display:flex;justify-content:space-between;align-items:center;
+}
+nav.main a.dlink:hover{color:var(--gold)}
+nav.main a.dlink.active{color:var(--gold)}
+nav.main a.dlink .arr{font-size:1rem;color:var(--lav)}
+.drawer-foot{margin-top:auto;padding-top:26px;color:#B9B2D4;font-size:.9rem}
+.drawer-foot a{color:#fff;font-weight:700;text-decoration:none;font-size:1.1rem}
+.scrim{
+  position:fixed;inset:0;background:rgba(30,27,51,.5);z-index:65;opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.scrim.show{opacity:1;pointer-events:auto}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .35s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- split hero ---------- */
+.hero-split{display:grid;grid-template-columns:1fr 1fr;min-height:560px}
+.hero-copy{background:var(--night);color:#EFEAF7;padding:76px 0;display:flex;align-items:center}
+.hero-copy .inner{max-width:540px;margin:0 auto;padding:0 34px;width:100%}
+.hero-copy .kicker{
+  font-size:.72rem;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:18px;
+}
+.hero-copy h1{
+  font-family:"Playfair Display",serif;font-weight:800;
+  font-size:clamp(2.6rem,5vw,4.2rem);line-height:1.04;letter-spacing:-.5px;margin-bottom:20px;
+}
+.hero-copy h1 em{font-style:italic;color:var(--gold)}
+.hero-copy .lede{color:#C9C2E4;font-size:1.1rem;margin-bottom:30px;max-width:30rem}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:34px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;
+  padding:14px 28px;border-radius:999px;font-size:1rem;transition:transform .18s,background .18s,box-shadow .18s;
+}
+.btn-gold{background:var(--gold);color:var(--night)}
+.btn-gold:hover{background:#EFD58E;transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.35)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+.hero-facts{display:grid;gap:10px;font-size:.93rem;color:#C9C2E4}
+.hero-facts b{color:var(--gold);font-size:.7rem;letter-spacing:2px;text-transform:uppercase;min-width:74px;display:inline-block}
+.hero-art{
+  background:linear-gradient(150deg,var(--night-2),#171430 60%,#100E24);
+  display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:48px;
+}
+.hero-art::before{
+  content:"";position:absolute;width:340px;height:340px;border-radius:50%;
+  background:radial-gradient(circle, rgba(227,200,120,.22), transparent 65%);
+}
+.moon-scene{position:relative;width:min(380px,80%);text-align:center}
+.moon-big{
+  width:200px;height:200px;border-radius:50%;margin:0 auto 26px;position:relative;
+  background:radial-gradient(circle at 34% 30%, #F9F2DC, var(--gold) 60%, #B98F3E);
+  box-shadow:0 0 80px rgba(227,200,120,.45);
+}
+.moon-big::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 70% 78%, rgba(30,27,51,.16), transparent 55%)}
+.nail-row{display:flex;justify-content:center;gap:12px}
+.nail-row span{
+  width:34px;height:56px;border-radius:17px 17px 22px 22px;
+  box-shadow:inset -4px -6px 10px rgba(0,0,0,.22), 0 8px 14px rgba(0,0,0,.3);
+}
+.moon-scene p{color:#C9C2E4;font-family:"Playfair Display",serif;font-style:italic;font-size:1.15rem;margin-top:22px}
+
+/* ---------- alternating bands ---------- */
+.band{padding:70px 0}
+.band.light{background:var(--moon)}
+.band.lav{background:linear-gradient(180deg,var(--lav-soft),var(--moon-2))}
+.band.night{background:var(--night);color:#EFEAF7}
+.band.night h2{color:#fff}
+.band.night p.lead{color:#C9C2E4}
+.sec-head{max-width:44rem;margin:0 auto 42px;text-align:center}
+.sec-head .kicker{font-size:.72rem;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--night-soft);margin-bottom:12px}
+.band.night .sec-head .kicker{color:var(--gold)}
+h2{font-family:"Playfair Display",serif;font-weight:800;font-size:clamp(2rem,4vw,3rem);line-height:1.08;letter-spacing:-.4px;margin-bottom:14px}
+p.lead{color:var(--ink-soft);font-size:1.06rem}
+.cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.card{background:#fff;border-radius:var(--radius);padding:32px 28px;box-shadow:var(--shadow);border-top:5px solid var(--lav)}
+.card:nth-child(2){border-top-color:var(--gold)}
+.card:nth-child(3){border-top-color:var(--blush)}
+.card h3{font-family:"Playfair Display",serif;font-size:1.35rem;margin-bottom:10px}
+.card p{color:var(--ink-soft);font-size:.96rem}
+.split2{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center}
+.split2 p{color:var(--ink-soft);margin-bottom:14px}
+.band.night .split2 p{color:#C9C2E4}
+.check{display:grid;gap:12px;margin:22px 0;list-style:none}
+.check li{display:flex;gap:12px;align-items:flex-start;font-weight:500}
+.check svg{flex:none;width:24px;height:24px;margin-top:2px}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:34px}
+.stat{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:var(--radius);padding:26px 20px;text-align:center}
+.stat .n{font-family:"Playfair Display",serif;font-weight:800;font-size:2.2rem;color:var(--gold)}
+.stat .l{font-size:.82rem;letter-spacing:1.5px;text-transform:uppercase;color:#C9C2E4;margin-top:6px}
+
+/* ---------- tabs (services) ---------- */
+.tabs{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:30px}
+.tab-btn{
+  font-family:"Public Sans",sans-serif;font-weight:700;font-size:.95rem;cursor:pointer;
+  background:#fff;border:2px solid rgba(30,27,51,.18);color:var(--ink);
+  padding:12px 26px;border-radius:999px;transition:all .2s;
+}
+.tab-btn:hover{border-color:var(--night-soft)}
+.tab-btn.active{background:var(--night);color:#fff;border-color:var(--night)}
+.tab-panel{display:none;max-width:720px;margin:0 auto}
+.tab-panel.active{display:block;animation:fadeIn .3s ease}
+.serv-row{display:flex;align-items:baseline;gap:12px;padding:15px 4px;border-bottom:1px dotted rgba(30,27,51,.28)}
+.serv-row .name{font-weight:600;font-size:1.02rem}
+.serv-row .name small{display:block;font-weight:400;color:var(--ink-soft);font-size:.88rem}
+.serv-row .dots{flex:1;border-bottom:2px dotted rgba(155,139,212,.55);transform:translateY(-5px)}
+.serv-row .price{font-family:"Playfair Display",serif;font-weight:700;color:var(--night-soft);white-space:nowrap}
+.price-note{
+  max-width:720px;margin:32px auto 0;background:var(--gold-soft);
+  border:1px solid rgba(227,200,120,.6);border-radius:var(--radius);
+  padding:20px 26px;font-size:.94rem;color:#6B5B28;
+}
+.price-note strong{color:var(--night)}
+
+/* ---------- carousel gallery ---------- */
+.car-wrap{position:relative;max-width:960px;margin:0 auto}
+.carousel{
+  display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;
+  padding:8px 4px 22px;scrollbar-width:thin;
+}
+.car-tile{
+  flex:0 0 300px;scroll-snap-align:center;border-radius:var(--radius);overflow:hidden;
+  background:#fff;box-shadow:var(--shadow);border:1px solid rgba(30,27,51,.08);
+}
+.car-tile .art{height:250px;display:flex;align-items:center;justify-content:center}
+.car-tile .art svg{width:46%;height:auto}
+.car-tile .cap{padding:16px 20px 18px}
+.car-tile .cap strong{font-family:"Playfair Display",serif;font-size:1.08rem;display:block}
+.car-tile .cap small{color:var(--ink-soft)}
+.car-nav{display:flex;gap:12px;justify-content:center;margin-top:6px}
+.car-btn{
+  width:52px;height:52px;border-radius:50%;border:2px solid var(--night);background:#fff;
+  color:var(--night);font-size:1.3rem;cursor:pointer;transition:all .2s;font-weight:700;
+}
+.car-btn:hover{background:var(--night);color:#fff}
+.badge{
+  display:inline-block;font-size:.66rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  background:var(--lav-soft);color:var(--night-soft);padding:5px 13px;border-radius:999px;margin-bottom:10px;
+}
+
+/* ---------- reviews ---------- */
+.rev-band{background:var(--night);color:#EFEAF7;border-radius:26px;padding:52px 48px;max-width:880px;margin:0 auto;box-shadow:var(--shadow)}
+.rev-band .stars{color:var(--gold);font-size:1.25rem;letter-spacing:5px;margin-bottom:16px}
+.rev-band blockquote{font-family:"Playfair Display",serif;font-size:clamp(1.3rem,2.6vw,1.9rem);font-style:italic;line-height:1.45;margin-bottom:16px}
+.rev-band cite{font-style:normal;font-weight:700;font-size:.82rem;letter-spacing:2px;text-transform:uppercase;color:var(--lav)}
+.rev-mini{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:880px;margin:26px auto 0}
+.rev-mini .rev{background:#fff;border-radius:var(--radius);padding:26px;box-shadow:var(--shadow)}
+.rev-mini .stars{color:var(--gold);letter-spacing:4px;margin-bottom:10px}
+.rev-mini p{font-size:.98rem}
+.rev-mini cite{font-style:normal;font-weight:700;font-size:.78rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--night-soft);display:block;margin-top:10px}
+.rs-strip{margin:30px auto 8px;max-width:640px;background:#fff;border:1px solid rgba(155,139,212,.5);border-radius:var(--radius);padding:20px 24px;text-align:center}
+.rs-note{margin:0 0 12px;font-size:.94rem;color:var(--ink-soft);line-height:1.55}
+.rs-btn{display:inline-block;background:var(--night);color:#fff;padding:11px 26px;border-radius:999px;font-weight:700;text-decoration:none;font-size:.95rem}
+.rs-btn:hover{background:var(--night-2)}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-bottom:26px}
+.info-card{background:#fff;border-radius:var(--radius);padding:32px;box-shadow:var(--shadow)}
+.info-card h3{font-family:"Playfair Display",serif;font-size:1.4rem;margin-bottom:12px}
+.info-card p{color:var(--ink-soft);margin-bottom:8px}
+.info-card a.big{font-family:"Playfair Display",serif;font-size:1.5rem;font-weight:700;color:var(--night);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.hours-table{width:100%;border-collapse:collapse;font-size:.97rem}
+.hours-table td{padding:10px 4px;border-bottom:1px dashed rgba(30,27,51,.2)}
+.hours-table td:last-child{text-align:right}
+.map-card{
+  border-radius:var(--radius);min-height:320px;display:flex;align-items:center;justify-content:center;padding:32px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 44px, rgba(155,139,212,.18) 44px 46px),
+    repeating-linear-gradient(90deg, transparent 0 44px, rgba(155,139,212,.18) 44px 46px),
+    linear-gradient(140deg,#DED5F2,#CBC0E8);
+}
+.map-pin{background:#fff;border-radius:16px;padding:26px 32px;text-align:center;box-shadow:var(--shadow);max-width:82%}
+.map-pin strong{font-family:"Playfair Display",serif;font-size:1.15rem;display:block}
+.map-pin small{color:var(--ink-soft)}
+.map-pin .btn{margin-top:14px;background:var(--night);color:#fff}
+.appt-note{
+  max-width:880px;margin:0 auto 56px;text-align:center;background:var(--gold-soft);
+  border-radius:var(--radius);padding:26px 30px;font-size:1rem;color:#5f521f;
+}
+.appt-note strong{color:var(--night)}
+
+/* ---------- multi-column footer ---------- */
+footer{background:var(--night);color:#C9C2E4;margin-top:0}
+.foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:36px;padding:56px 0 36px}
+.foot-grid h4{font-family:"Playfair Display",serif;color:#fff;font-size:1.1rem;margin-bottom:14px}
+.foot-grid p,.foot-grid a{color:#B9B2D4;font-size:.93rem}
+.foot-grid a{text-decoration:none;display:block;padding:4px 0}
+.foot-grid a:hover{color:var(--gold)}
+.foot-brand-name{font-family:"Playfair Display",serif;font-weight:800;color:#fff;font-size:1.35rem;margin-bottom:10px}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.12);padding:20px 0 26px;text-align:center;font-size:.86rem;color:#8E87AC}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+/* page strips */
+.strip{border-radius:22px;padding:54px 48px;position:relative;overflow:hidden;margin-bottom:42px;background:var(--night);color:#EFEAF7}
+.strip::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 88% 18%, rgba(227,200,120,.25), transparent 52%);pointer-events:none}
+.strip h2{color:#fff;position:relative;z-index:1}
+.strip p{color:#C9C2E4;max-width:36rem;position:relative;z-index:1}
+.strip .kicker{color:var(--gold);position:relative;z-index:1;font-size:.72rem;font-weight:700;letter-spacing:4px;text-transform:uppercase;margin-bottom:12px}
+
+@media(max-width:920px){
+  .hero-split{grid-template-columns:1fr}
+  .hero-art{min-height:380px}
+  .cards3,.split2,.visit-grid,.rev-mini{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr 1fr}
+  .strip{padding:40px 28px}
+  .rev-band{padding:38px 28px}
+}
+@media(max-width:600px){
+  .foot-grid{grid-template-columns:1fr}
+  .car-tile{flex-basis:260px}
+}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap bar">
+    <a class="brand" href="#home" data-page="home" aria-label="Luna Nail Salon, home">
+      <span class="brand-moon" aria-hidden="true"></span>
+      <span class="brand-name">Luna Nail Salon<small>Fairport · NY</small></span>
+    </a>
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span class="lines"><span></span><span></span><span></span></span>Menu</button>
+  </div>
+</header>
+
+<nav class="main" id="mainNav" aria-label="Main navigation">
+  <div class="drawer-head">
+    <span class="brand-name">Luna Nail Salon</span>
+    <button class="drawer-close" id="drawerClose" aria-label="Close menu">&times;</button>
+  </div>
+  <a class="dlink active" href="#home" data-page="home" aria-current="page">Home <span class="arr">→</span></a>
+  <a class="dlink" href="#services" data-page="services">Services <span class="arr">→</span></a>
+  <a class="dlink" href="#story" data-page="story">Our Story <span class="arr">→</span></a>
+  <a class="dlink" href="#gallery" data-page="gallery">Gallery <span class="arr">→</span></a>
+  <a class="dlink" href="#reviews" data-page="reviews">Reviews <span class="arr">→</span></a>
+  <a class="dlink" href="#visit" data-page="visit">Visit Us <span class="arr">→</span></a>
+  <div class="drawer-foot">
+    <p>By appointment</p>
+    <a href="tel:+15853092037">(585) 309-2037</a>
+    <p style="margin-top:8px">1000 Turk Hill Rd<br>Fairport, NY 14450</p>
+  </div>
+</nav>
+<div class="scrim" id="scrim"></div>
+
+<section class="page active" id="page-home">
+  <div class="hero-split">
+    <div class="hero-copy">
+      <div class="inner">
+        <div class="kicker">Nail salon · Fairport, NY</div>
+        <h1>Nails worth<br><em>showing off.</em></h1>
+        <p class="lede">Luna Nail Salon is Fairport's quiet little gem for meticulous manicures, relaxing pedicures and creative nail art, all by appointment, all about you.</p>
+        <div class="cta-row">
+          <a class="btn btn-gold" href="#services" data-page="services">See services</a>
+          <a class="btn btn-ghost" href="tel:+15853092037">Call to book</a>
+        </div>
+        <div class="hero-facts">
+          <div><b>Rating</b> 5.0 stars across public reviews</div>
+          <div><b>Style</b> By appointment only · private lot parking</div>
+          <div><b>Find us</b> 1000 Turk Hill Rd, Fairport, NY 14450</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-art">
+      <div class="moon-scene">
+        <div class="moon-big" aria-hidden="true"></div>
+        <div class="nail-row" aria-hidden="true">
+          <span style="background:linear-gradient(160deg,#E8A7B8,#C97A92)"></span>
+          <span style="background:linear-gradient(160deg,#9B8BD4,#6F5CB5)"></span>
+          <span style="background:linear-gradient(160deg,#E3C878,#C9A44C)"></span>
+          <span style="background:linear-gradient(160deg,#F3D9E4,#D9A8BE)"></span>
+          <span style="background:linear-gradient(160deg,#8FB8D8,#5E8FB5)"></span>
+        </div>
+        <p>"Meticulous, creative, and all-around amazing."</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="band light">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="kicker">Why Luna</div>
+        <h2>Small salon, serious craft</h2>
+        <p class="lead">A personal, appointment-only studio where every set of nails gets real attention.</p>
+      </div>
+      <div class="cards3">
+        <div class="card reveal">
+          <h3>Meticulous by reputation</h3>
+          <p>Reviewers call the work meticulous and creative, with careful attention to cleanliness and detail on every nail.</p>
+        </div>
+        <div class="card reveal">
+          <h3>By appointment only</h3>
+          <p>No rushed walk-in line. Your time slot is yours, calm, unhurried, and focused entirely on you.</p>
+        </div>
+        <div class="card reveal">
+          <h3>Easy to reach</h3>
+          <p>At 1000 Turk Hill Rd with private lot parking, plus waxing and lash services alongside nails.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="band night">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="kicker">Loved in Fairport</div>
+        <h2>Five stars, and it shows</h2>
+        <p class="lead">A perfect 5.0 across public reviews, from clients who keep coming back.</p>
+      </div>
+      <div class="stat-row">
+        <div class="stat reveal"><div class="n">5.0</div><div class="l">Star rating</div></div>
+        <div class="stat reveal"><div class="n">100%</div><div class="l">Would recommend</div></div>
+        <div class="stat reveal"><div class="n">1:1</div><div class="l">Personal appointments</div></div>
+      </div>
+      <div style="text-align:center;margin-top:38px">
+        <a class="btn btn-gold" href="#reviews" data-page="reviews">Read the reviews</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="band lav">
+    <div class="wrap split2">
+      <div class="reveal">
+        <div class="kicker" style="font-size:.72rem;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--night-soft);margin-bottom:12px">What we do</div>
+        <h2>From classic manicures to full creative sets</h2>
+        <p>Manicures, pedicures, nail enhancements and nail art, plus waxing and eyelash extensions for a complete refresh.</p>
+        <ul class="check">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#2A2547" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Classic and gel manicures with careful cuticle work</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#2A2547" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Relaxing spa pedicures that leave feet soft and polished</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#2A2547" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Creative nail art and enhancements for any occasion</li>
+        </ul>
+        <a class="btn" style="background:var(--night);color:#fff" href="#services" data-page="services">Browse all services</a>
+      </div>
+      <div class="reveal">
+        <div class="card" style="border-top-color:var(--night)">
+          <h3>New here?</h3>
+          <p>Call <a href="tel:+15853092037" style="font-weight:700;color:var(--night)">(585) 309-2037</a> to talk through what you want. The salon runs by appointment only, so your visit is calm, private, and all about your nails.</p>
+          <p style="margin-top:12px">Gift cards available through major gift platforms, a thoughtful pick for the nail obsessed.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip">
+      <div class="kicker">Services</div>
+      <h2>Pick your pampering</h2>
+      <p>Manicures, pedicures, enhancements and finishing touches, all by appointment at 1000 Turk Hill Rd, Fairport.</p>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Service categories">
+      <button class="tab-btn active" data-tab="manicures" role="tab" aria-selected="true">Manicures</button>
+      <button class="tab-btn" data-tab="pedicures" role="tab" aria-selected="false">Pedicures</button>
+      <button class="tab-btn" data-tab="enhance" role="tab" aria-selected="false">Enhancements</button>
+      <button class="tab-btn" data-tab="extras" role="tab" aria-selected="false">Extras</button>
+    </div>
+
+    <div class="tab-panel active" data-panel="manicures">
+      <div class="serv-row"><div class="name">Classic manicure<small>Shape, cuticle care, massage, polish</small></div><span class="dots"></span><span class="price">Sample</span></div>
+      <div class="serv-row"><div class="name">Gel manicure<small>Chip-resistant color that lasts for weeks</small></div><span class="dots"></span><span class="price">Sample</span></div>
+      <div class="serv-row"><div class="name">French manicure<small>Timeless white tips, classic or gel</small></div><span class="dots"></span><span class="price">Sample</span></div>
+      <div class="serv-row"><div class="name">Nail art and design<small>Hand-painted details, accents, seasonal looks</small></div><span class="dots"></span><span class="price">Sample</span></div>
+      <div class="serv-row"><div class="name">Kids' manicure<small>Gentle, fun polish for little ones</small></div><span class="dots"></span><span class="price">Sample</span></div>
+    </div>
+
+    <div class="tab-panel" data-panel="pedicures">
+      <div class="serv-row"><div class="name">Classic pedicure<small>Soak, exfoliation, massage, polish</small></div><span class="dots"></span><span class="price">Sample</span></div>
+      <div class="serv-row"><div class="name">Spa pedicure<small>Extended massage and deep hydration</small></div><span class="dots"></span><span class="price">Sample</span></div>
+      <div class="serv-row"><div class="name">Gel pedicure<small>Long-wearing color for sandals season and beyond</small></div><span class="dots"></span><span class="price">Sample</span></div>
+      <div class="serv-row"><div class="name">Polish change, toes<small>Quick refresh between full pedicures</small></div><span class="dots"></span><span class="price">Sample</span></div>
+    </div>
+
+    <div class="tab-panel" data-panel="enhance">
+      <div class="serv-row"><div class="name">Full set enhancements<small>Length and shape, built to your liking</small></div><span class="dots"></span><span class="price">Sample</span></div>
+      <div class="serv-row"><div class="name">Fill and rebalance<small>Keep your set fresh as nails grow</small></div><span class="dots"></span><span class="price">Sample</span></div>
+      <div class="serv-row"><div class="name">Nail repair<small>Fix a break or chip, good as new</small></div><span class="dots"></span><span class="price">Sample</span></div>
+      <div class="serv-row"><div class="name">Soak off and restore<small>Gentle removal with nail conditioning</small></div><span class="dots"></span><span class="price">Sample</span></div>
+    </div>
+
+    <div class="tab-panel" data-panel="extras">
+      <div class="serv-row"><div class="name">Eyebrow waxing<small>Clean, defined shape</small></div><span class="dots"></span><span class="price">Sample</span></div>
+      <div class="serv-row"><div class="name">Lip and chin waxing<small>Quick, smooth results</small></div><span class="dots"></span><span class="price">Sample</span></div>
+      <div class="serv-row"><div class="name">Eyelash extensions consult<small>Ask about lash service options</small></div><span class="dots"></span><span class="price">Sample</span></div>
+      <div class="serv-row"><div class="name">Paraffin treatment<small>Deep moisture for hands</small></div><span class="dots"></span><span class="price">Sample</span></div>
+    </div>
+
+    <div class="price-note">
+      <strong>A note on pricing:</strong> prices shown are samples for typical nail salon services. Final pricing is confirmed when you book, since every set of nails is different. <strong>Call (585) 309-2037 to book your appointment.</strong>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-story">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip">
+      <div class="kicker">Our story</div>
+      <h2>Fairport's quiet<br>little gem</h2>
+      <p>Luna Nail Salon has been pampering Fairport from Turk Hill Rd since 2011, one meticulous manicure at a time.</p>
+    </div>
+
+    <div class="band light" style="padding-top:20px">
+      <div class="wrap split2">
+        <div class="reveal">
+          <h2>A studio built on detail</h2>
+          <p>Luna Nail Salon is an appointment-only nail studio on Turk Hill Rd in Fairport, led by owner and nail tech Meredith. Since opening its doors, the salon has built a loyal following the slow way: careful work, honest service, and nails that clients love to show off.</p>
+          <p>Reviewers describe the experience as meticulous and creative, with real attention to cleanliness. It is the kind of place where a first-time manicure turns into a standing appointment.</p>
+        </div>
+        <div class="reveal">
+          <h2>Calm, personal, unhurried</h2>
+          <p>Because every visit is by appointment, there is no crowded waiting room and no rushed chairs. Your time is protected, the atmosphere stays relaxed, and the focus stays exactly where it belongs: on your nails.</p>
+          <p>From everyday manicures to wedding-day sets, from waxing to lashes, Luna is a one-stop refresh in the heart of Fairport.</p>
+          <div style="margin-top:22px">
+            <a class="btn" style="background:var(--night);color:#fff" href="#visit" data-page="visit">Plan your visit</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip">
+      <div class="kicker">Gallery</div>
+      <h2>Fresh from the studio</h2>
+      <p>Artistic previews of Luna's nail craft. Swipe through, real client photos are on the way.</p>
+    </div>
+
+    <div class="car-wrap reveal">
+      <div class="carousel" id="carousel">
+        <div class="car-tile">
+          <div class="art" style="background:linear-gradient(150deg,#F3D9E4,#E8A7B8)">
+            <svg viewBox="0 0 100 100"><g><rect x="18" y="30" width="14" height="44" rx="7" fill="#C97A92"/><rect x="36" y="26" width="14" height="48" rx="7" fill="#D98CA0"/><rect x="54" y="30" width="14" height="44" rx="7" fill="#C97A92"/><rect x="72" y="38" width="12" height="34" rx="6" fill="#D98CA0"/><circle cx="43" cy="40" r="3" fill="#fff" opacity=".7"/><circle cx="61" cy="46" r="3" fill="#fff" opacity=".7"/></g></svg>
+          </div>
+          <div class="cap"><span class="badge">Artwork preview</span><strong>Blush gel set</strong><small>Soft pink, high shine</small></div>
+        </div>
+        <div class="car-tile">
+          <div class="art" style="background:linear-gradient(150deg,#DCD3F2,#9B8BD4)">
+            <svg viewBox="0 0 100 100"><g><rect x="18" y="30" width="14" height="44" rx="7" fill="#6F5CB5"/><rect x="36" y="26" width="14" height="48" rx="7" fill="#8A76C9"/><rect x="54" y="30" width="14" height="44" rx="7" fill="#6F5CB5"/><rect x="72" y="38" width="12" height="34" rx="6" fill="#8A76C9"/><path d="M40 34 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2z" fill="#E3C878"/></g></svg>
+          </div>
+          <div class="cap"><span class="badge">Artwork preview</span><strong>Lavender with gold</strong><small>Accent art that pops</small></div>
+        </div>
+        <div class="car-tile">
+          <div class="art" style="background:linear-gradient(150deg,#F7ECD2,#E3C878)">
+            <svg viewBox="0 0 100 100"><g><rect x="18" y="30" width="14" height="44" rx="7" fill="#C9A44C"/><rect x="36" y="26" width="14" height="48" rx="7" fill="#D9B968"/><rect x="54" y="30" width="14" height="44" rx="7" fill="#C9A44C"/><rect x="72" y="38" width="12" height="34" rx="6" fill="#D9B968"/><circle cx="43" cy="60" r="4" fill="#fff" opacity=".55"/></g></svg>
+          </div>
+          <div class="cap"><span class="badge">Artwork preview</span><strong>Golden French</strong><small>A classic with a twist</small></div>
+        </div>
+        <div class="car-tile">
+          <div class="art" style="background:linear-gradient(150deg,#D6E6F2,#8FB8D8)">
+            <svg viewBox="0 0 100 100"><g><rect x="18" y="30" width="14" height="44" rx="7" fill="#5E8FB5"/><rect x="36" y="26" width="14" height="48" rx="7" fill="#7AA9CC"/><rect x="54" y="30" width="14" height="44" rx="7" fill="#5E8FB5"/><rect x="72" y="38" width="12" height="34" rx="6" fill="#7AA9CC"/><path d="M36 50 q7 -8 14 0" stroke="#fff" stroke-width="2.5" fill="none" opacity=".7"/></g></svg>
+          </div>
+          <div class="cap"><span class="badge">Artwork preview</span><strong>Ocean blue</strong><small>Bold color, clean lines</small></div>
+        </div>
+        <div class="car-tile">
+          <div class="art" style="background:linear-gradient(150deg,#2A2547,#171430)">
+            <svg viewBox="0 0 100 100"><g><rect x="18" y="30" width="14" height="44" rx="7" fill="#3B3560"/><rect x="36" y="26" width="14" height="48" rx="7" fill="#4A4378"/><rect x="54" y="30" width="14" height="44" rx="7" fill="#3B3560"/><rect x="72" y="38" width="12" height="34" rx="6" fill="#4A4378"/><circle cx="43" cy="38" r="2.5" fill="#E3C878"/><circle cx="61" cy="52" r="2.5" fill="#fff"/><circle cx="25" cy="56" r="2" fill="#E8A7B8"/></g></svg>
+          </div>
+          <div class="cap"><span class="badge">Artwork preview</span><strong>Midnight sparkle</strong><small>Evening-ready glam</small></div>
+        </div>
+        <div class="car-tile">
+          <div class="art" style="background:linear-gradient(150deg,#F6E3DA,#EBC4B2)">
+            <svg viewBox="0 0 100 100"><g><rect x="18" y="30" width="14" height="44" rx="7" fill="#F3EDE4"/><rect x="36" y="26" width="14" height="48" rx="7" fill="#F8F4EC"/><rect x="54" y="30" width="14" height="44" rx="7" fill="#F3EDE4"/><rect x="72" y="38" width="12" height="34" rx="6" fill="#F8F4EC"/><rect x="18" y="58" width="14" height="16" rx="7" fill="#C97A92" opacity=".85"/><rect x="36" y="58" width="14" height="16" rx="7" fill="#C97A92" opacity=".85"/></g></svg>
+          </div>
+          <div class="cap"><span class="badge">Artwork preview</span><strong>Ombré tips</strong><small>Soft fade, modern feel</small></div>
+        </div>
+      </div>
+      <div class="car-nav">
+        <button class="car-btn" id="carPrev" aria-label="Previous slide">&#8592;</button>
+        <button class="car-btn" id="carNext" aria-label="Next slide">&#8594;</button>
+      </div>
+    </div>
+
+    <div class="price-note" style="max-width:960px">
+      <strong>Coming soon:</strong> real photos of client sets from the Luna studio. The illustrations above are artistic previews.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip">
+      <div class="kicker">Reviews</div>
+      <h2>Five stars,<br>over and over</h2>
+      <p>A perfect 5.0 across public reviews. Here is what Fairport keeps saying.</p>
+    </div>
+
+    <div class="rs-strip reveal">
+      <p class="rs-note">Review themes on this page are paraphrased from public feedback. Open the source to read current reviews and ratings.</p>
+      <a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJI6nFkCwz0YkRai1pHDGBA_g" target="_blank" rel="noopener">See reviews on Google</a>
+    </div>
+
+    <div class="rev-band reveal" style="margin-top:30px">
+      <div class="stars">★★★★★</div>
+      <blockquote>Reviewers describe the work as meticulous and creative, with careful attention to cleanliness, and clients say they will definitely be going back.</blockquote>
+      <cite>Based on 6 Google reviews</cite>
+    </div>
+
+    <div class="rev-mini">
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>Clients say the salon always does an amazing job on their nails, and they highly recommend it to friends.</p>
+        <cite>Based on 6 Google reviews</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>First-time visitors describe a warm, personal experience, from a great first manicure to nails the whole family loves.</p>
+        <cite>Based on 6 Google reviews</cite>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin:44px 0 56px">
+      <p style="color:var(--ink-soft);margin-bottom:16px">Love your nails? Tell Fairport.</p>
+      <a class="btn" style="background:var(--night);color:#fff" href="https://www.google.com/maps/place/?q=place_id:ChIJI6nFkCwz0YkRai1pHDGBA_g" target="_blank" rel="noopener">Leave a Google review</a>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip">
+      <div class="kicker">Visit</div>
+      <h2>Book your chair</h2>
+      <p>Luna Nail Salon runs by appointment only. Call ahead and your time is all yours.</p>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3>Find us</h3>
+        <p><strong>Luna Nail Salon</strong><br>1000 Turk Hill Rd<br>Fairport, NY 14450</p>
+        <p>Private lot parking right at the door.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3>Call to book</h3>
+        <p>Appointments and questions:</p>
+        <a class="big" href="tel:+15853092037">(585) 309-2037</a>
+        <p style="margin-top:10px">By appointment only, please call ahead.</p>
+      </div>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3>Hours</h3>
+        <table class="hours-table">
+          <tr><td>Monday</td><td>Call for hours</td></tr>
+          <tr><td>Tuesday</td><td>Call for hours</td></tr>
+          <tr><td>Wednesday</td><td>Call for hours</td></tr>
+          <tr><td>Thursday</td><td>Call for hours</td></tr>
+          <tr><td>Friday</td><td>Call for hours</td></tr>
+          <tr><td>Saturday</td><td>Call for hours</td></tr>
+          <tr><td>Sunday</td><td>Call for hours</td></tr>
+        </table>
+        <p style="margin-top:12px;font-size:.9rem">Hours vary by appointment, please call <a href="tel:+15853092037" style="font-weight:700">(585) 309-2037</a> to book.</p>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <strong>1000 Turk Hill Rd</strong>
+          <small>Fairport, NY 14450</small><br>
+          <a class="btn" href="https://www.google.com/maps/place/?q=place_id:ChIJI6nFkCwz0YkRai1pHDGBA_g" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="appt-note reveal">
+      <strong>Good to know:</strong> Luna Nail Salon serves clients by appointment only. A quick call to <strong>(585) 309-2037</strong> is all it takes to reserve your spot.
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand-name">Luna Nail Salon</div>
+        <p>Fairport's appointment-only nail studio for meticulous manicures, relaxing pedicures and creative nail art.</p>
+      </div>
+      <div>
+        <h4>Visit</h4>
+        <p>1000 Turk Hill Rd<br>Fairport, NY 14450<br><a href="tel:+15853092037">(585) 309-2037</a></p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <a href="#home" data-page="home">Home</a>
+        <a href="#services" data-page="services">Services</a>
+        <a href="#gallery" data-page="gallery">Gallery</a>
+        <a href="#reviews" data-page="reviews">Reviews</a>
+      </div>
+      <div>
+        <h4>Good to know</h4>
+        <p>By appointment only<br>Private lot parking<br>Gift cards available</p>
+      </div>
+    </div>
+    <div class="foot-bottom"><span>© Luna Nail Salon</span></div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "story", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+    var scrim = document.getElementById("scrim");
+    if(scrim){ scrim.classList.remove("show"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+      var scrim = document.getElementById("scrim");
+      if(scrim){ scrim.classList.toggle("show", open); }
+    });
+  }
+  var drawerClose = document.getElementById("drawerClose");
+  if(drawerClose){
+    drawerClose.addEventListener("click", closeMenu);
+  }
+  var scrimEl = document.getElementById("scrim");
+  if(scrimEl){
+    scrimEl.addEventListener("click", closeMenu);
+  }
+
+  /* ---------- service tabs ---------- */
+  var tabBtns = document.querySelectorAll(".tab-btn");
+  var panels = document.querySelectorAll(".tab-panel");
+  for(var t = 0; t < tabBtns.length; t++){
+    (function(btn){
+      btn.addEventListener("click", function(){
+        for(var a = 0; a < tabBtns.length; a++){
+          tabBtns[a].classList.remove("active");
+          tabBtns[a].setAttribute("aria-selected", "false");
+        }
+        for(var b = 0; b < panels.length; b++){
+          panels[b].classList.remove("active");
+        }
+        btn.classList.add("active");
+        btn.setAttribute("aria-selected", "true");
+        var panel = document.querySelector('.tab-panel[data-panel="' + btn.getAttribute("data-tab") + '"]');
+        if(panel){ panel.classList.add("active"); }
+      });
+    })(tabBtns[t]);
+  }
+
+  /* ---------- gallery carousel ---------- */
+  var car = document.getElementById("carousel");
+  var prev = document.getElementById("carPrev");
+  var next = document.getElementById("carNext");
+  function carStep(dir){
+    if(!car){ return; }
+    var tile = car.querySelector(".car-tile");
+    var w = tile ? tile.offsetWidth + 20 : 320;
+    car.scrollBy({left: dir * w, behavior: "smooth"});
+  }
+  if(prev){ prev.addEventListener("click", function(){ carStep(-1); }); }
+  if(next){ next.addEventListener("click", function(){ carStep(1); }); }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

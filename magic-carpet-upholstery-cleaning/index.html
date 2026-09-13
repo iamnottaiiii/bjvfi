@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Magic Carpet &amp; Upholstery Cleaning · Carpet Cleaning, Oxon Hill, MD</title>
+<meta name="description" content="Magic Carpet & Upholstery Cleaning at 6912 Grenada Ave, Oxon Hill, MD. Professional carpet cleaning, upholstery cleaning, area rug cleaning and pet stain treatment. Open daily 7 AM to 9:30 PM. Call (240) 262-5677.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --night:#1C2342; --night-2:#2A3360; --night-3:#141A35;
+  --gold:#D9A441; --gold-soft:#F6E8C6; --gold-deep:#A97A22;
+  --cream:#FBF7EE; --paper:#FFFDF8;
+  --ink:#252A4A; --ink-soft:#5A6080;
+  --teal:#1E7E74; --teal-soft:#D9EFEB;
+  --radius:18px;
+  --shadow:0 18px 40px -18px rgba(20,26,53,.35);
+  --shadow-sm:0 8px 22px -10px rgba(20,26,53,.28);
+  --side-w:256px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Inter",system-ui,sans-serif;
+  background:var(--cream);color:var(--ink);line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--gold-deep)}
+::selection{background:var(--gold);color:var(--night-3)}
+
+/* ---------- side drawer nav ---------- */
+.sidebar{
+  position:fixed;top:0;left:0;bottom:0;width:var(--side-w);z-index:60;
+  background:var(--night-3);color:#EDE8D8;
+  display:flex;flex-direction:column;padding:28px 22px;gap:8px;
+  border-right:1px solid rgba(217,164,65,.25);
+  transition:transform .3s ease;
+}
+.sidebar::before{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.10;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Cpath d='M28 6 L50 28 L28 50 L6 28 Z' fill='none' stroke='%23D9A441' stroke-width='2'/%3E%3Ccircle cx='28' cy='28' r='4' fill='%23D9A441'/%3E%3C/svg%3E");
+}
+.side-brand{text-decoration:none;color:#fff;display:flex;align-items:center;gap:12px;margin-bottom:6px;position:relative;z-index:1}
+.side-brand svg{width:48px;height:48px;flex:none}
+.side-brand .t{font-family:"Playfair Display",serif;font-weight:800;font-size:1.02rem;line-height:1.15}
+.side-brand .t small{display:block;font-family:"Inter",sans-serif;font-weight:600;font-size:.58rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);margin-top:3px}
+.side-tag{font-size:.8rem;color:#B9B49E;position:relative;z-index:1;margin-bottom:14px}
+nav.main{display:flex;flex-direction:column;gap:4px;position:relative;z-index:1;flex:1}
+nav.main a{
+  display:flex;align-items:center;gap:12px;text-decoration:none;color:#D8D3BE;
+  font-weight:600;font-size:.98rem;padding:11px 14px;border-radius:12px;
+  transition:background .2s,color .2s;
+}
+nav.main a svg{width:20px;height:20px;flex:none;opacity:.8}
+nav.main a:hover{background:rgba(217,164,65,.14);color:#fff}
+nav.main a.active,nav.main a[aria-current="page"]{background:var(--gold);color:var(--night-3)}
+nav.main a.active svg,nav.main a[aria-current="page"] svg{opacity:1}
+.side-foot{position:relative;z-index:1;border-top:1px solid rgba(217,164,65,.25);padding-top:16px}
+.side-call{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  background:var(--gold);color:var(--night-3);text-decoration:none;font-weight:700;
+  padding:12px;border-radius:12px;margin-bottom:10px;
+}
+.side-call:hover{background:#E7B95C}
+.side-hours{font-size:.78rem;color:#B9B49E;text-align:center}
+.scrim{position:fixed;inset:0;background:rgba(20,26,53,.55);z-index:55;opacity:0;pointer-events:none;transition:opacity .3s}
+.scrim.on{opacity:1;pointer-events:auto}
+.topbar{
+  display:none;position:sticky;top:0;z-index:50;
+  background:rgba(28,35,66,.96);color:#fff;
+  backdrop-filter:blur(8px);
+}
+.topbar-inner{display:flex;align-items:center;gap:14px;padding:12px 18px}
+.topbar .tb-name{font-family:"Playfair Display",serif;font-weight:800;font-size:1.05rem}
+.burger{background:none;border:0;cursor:pointer;padding:8px;margin-left:auto}
+.burger span{display:block;width:26px;height:3px;border-radius:3px;background:#fff;margin:5px 0;transition:.25s}
+.drawer-close{display:none;background:none;border:1px solid rgba(217,164,65,.4);color:#EDE8D8;border-radius:10px;padding:8px 14px;font-weight:600;cursor:pointer;margin-bottom:12px}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+main{margin-left:var(--side-w)}
+.wrap{max-width:1100px;margin:0 auto;padding:0 26px}
+
+/* ---------- split hero ---------- */
+.hero{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--night) 0%,var(--night-2) 60%,#33407A 100%);color:#fff}
+.hero::after{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.14;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72'%3E%3Cpath d='M36 8 L64 36 L36 64 L8 36 Z' fill='none' stroke='%23D9A441' stroke-width='2'/%3E%3C/svg%3E");
+}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:52px;align-items:center;padding:78px 0;position:relative;z-index:1}
+.kicker{
+  display:inline-block;font-size:.78rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;
+  color:var(--gold);border:1px solid rgba(217,164,65,.5);border-radius:999px;
+  padding:7px 18px;margin-bottom:20px;
+}
+h1{
+  font-family:"Playfair Display",serif;font-weight:900;
+  font-size:clamp(2.5rem,5vw,4rem);line-height:1.06;letter-spacing:-.5px;margin-bottom:18px;
+}
+h1 .accent{color:var(--gold)}
+.lede{font-size:1.1rem;color:#D8D3BE;max-width:32rem;margin-bottom:26px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:26px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;
+  padding:14px 26px;border-radius:999px;font-size:1rem;transition:transform .18s,background .18s;
+}
+.btn-solid{background:var(--gold);color:var(--night-3)}
+.btn-solid:hover{background:#E7B95C;transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.45)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-2px)}
+.hours-pill{
+  display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);
+  border:1px solid rgba(217,164,65,.5);color:#fff;
+  padding:10px 20px;border-radius:999px;font-weight:600;font-size:.95rem;
+}
+.hours-pill .dot{width:10px;height:10px;border-radius:50%;background:#7BC47F;box-shadow:0 0 0 4px rgba(123,196,127,.25);animation:pulse 2s infinite}
+.hours-pill.closed .dot{background:#E08A8A;box-shadow:0 0 0 4px rgba(224,138,138,.25)}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+.hero-art{position:relative}
+.carpet-stage{
+  position:relative;border-radius:26px;overflow:hidden;box-shadow:var(--shadow);
+  background:linear-gradient(150deg,#2A3360,#1C2342);border:1px solid rgba(217,164,65,.4);
+  padding:34px;
+}
+.carpet-stage svg{width:100%;height:auto;display:block}
+.stamp{
+  position:absolute;bottom:-16px;left:28px;background:var(--gold);color:var(--night-3);
+  font-weight:800;padding:10px 22px;border-radius:999px;transform:rotate(-3deg);
+  box-shadow:var(--shadow-sm);font-size:.92rem;
+}
+
+/* ---------- alternating bands ---------- */
+.band{padding:64px 0}
+.band.tint{background:var(--paper)}
+.band.dark{background:var(--night-3);color:#EDE8D8}
+.band.dark .sec-sub{color:#C9C3AA}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center}
+.split.flip .txt{order:2}
+.sec-eyebrow{font-size:.78rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold-deep);margin-bottom:10px}
+.band.dark .sec-eyebrow{color:var(--gold)}
+h2{font-family:"Playfair Display",serif;font-weight:800;font-size:clamp(1.9rem,3.4vw,2.6rem);line-height:1.12;margin-bottom:14px;letter-spacing:-.3px}
+.sec-sub{color:var(--ink-soft);margin-bottom:16px}
+.check-list{list-style:none;display:grid;gap:12px;margin:22px 0}
+.check-list li{display:flex;gap:12px;align-items:flex-start;font-weight:500}
+.check-list svg{flex:none;width:24px;height:24px;margin-top:2px}
+.art-card{
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);
+  background:linear-gradient(140deg,var(--teal),#145A52);padding:34px;color:#fff;position:relative;
+}
+.art-card svg{width:100%;height:auto;display:block}
+.art-card .cap{margin-top:16px;font-size:.92rem;color:#EAF5F3}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:26px}
+.stat{background:rgba(255,255,255,.06);border:1px solid rgba(217,164,65,.3);border-radius:14px;padding:18px;text-align:center}
+.stat strong{font-family:"Playfair Display",serif;font-size:1.7rem;color:var(--gold);display:block}
+.stat small{color:#C9C3AA;font-size:.82rem}
+
+/* ---------- tabs (services) ---------- */
+.tabs{display:flex;flex-wrap:wrap;gap:10px;margin:30px 0 8px}
+.tab-btn{
+  border:2px solid rgba(28,35,66,.18);background:var(--paper);color:var(--ink);
+  font-weight:700;font-size:.95rem;padding:12px 24px;border-radius:999px;cursor:pointer;
+  transition:background .2s,border-color .2s,color .2s;
+}
+.tab-btn:hover{border-color:var(--gold-deep)}
+.tab-btn.on{background:var(--night);border-color:var(--night);color:#fff}
+.tab-panel{display:none;padding:28px 0 8px;animation:fadeIn .3s ease}
+.tab-panel.on{display:block}
+.svc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 44px}
+.svc{padding:16px 4px;border-bottom:1px dashed rgba(37,42,74,.25)}
+.svc-top{display:flex;align-items:baseline;gap:10px}
+.svc-top strong{font-size:1.05rem}
+.svc-top .dots{flex:1;border-bottom:2px dotted rgba(217,164,65,.7);transform:translateY(-4px)}
+.svc-top .price{font-family:"Playfair Display",serif;font-weight:700;color:var(--gold-deep);white-space:nowrap}
+.svc small{color:var(--ink-soft)}
+.price-note{background:var(--gold-soft);border:2px dashed rgba(169,122,34,.5);border-radius:var(--radius);padding:18px 24px;margin:26px 0;font-size:.95rem;color:#6B5220}
+.price-note strong{color:var(--gold-deep)}
+
+/* ---------- masonry gallery ---------- */
+.masonry{columns:3;column-gap:20px}
+.m-item{
+  break-inside:avoid;margin-bottom:20px;border-radius:var(--radius);overflow:hidden;
+  background:var(--paper);box-shadow:var(--shadow-sm);transition:transform .2s;position:relative;
+}
+.m-item:hover{transform:translateY(-5px)}
+.m-item .art{display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.m-item .art svg{width:52%;height:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.2))}
+.m-item .cap{padding:14px 18px}
+.m-item .cap strong{font-family:"Playfair Display",serif;font-size:1.02rem;display:block}
+.m-item .cap small{color:var(--ink-soft)}
+.m-item .soon{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.9);font-size:.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 12px;border-radius:999px;color:var(--ink-soft)}
+
+/* ---------- reviews ---------- */
+.rev-list{display:grid;gap:20px;max-width:760px}
+.rev{background:var(--paper);border-radius:var(--radius);padding:28px 30px;box-shadow:var(--shadow-sm);border-left:6px solid var(--gold)}
+.rev .stars{color:var(--gold-deep);font-size:1.15rem;letter-spacing:3px;margin-bottom:10px}
+.rev p{font-size:1.02rem;margin-bottom:12px}
+.rev cite{font-style:normal;font-weight:700;font-size:.85rem;color:var(--teal);letter-spacing:.5px;text-transform:uppercase}
+.rs-strip{margin:26px auto 34px;max-width:640px;background:#FFFDF8;border:1px solid #F6E8C6;border-radius:14px;padding:18px 22px;text-align:center}
+.rs-note{margin:0 0 12px;font-size:.95rem;color:#5A6080;line-height:1.55}
+.rs-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rs-btn{display:inline-block;background:#1C2342;color:#FBF7EE;padding:10px 24px;border-radius:999px;font-weight:700;text-decoration:none;font-size:.95rem;line-height:1.2}
+.rs-btn:hover{filter:brightness(1.25)}
+.cta-band{background:linear-gradient(120deg,var(--teal),#145A52);border-radius:26px;color:#fff;padding:52px 40px;text-align:center;margin:48px 0 8px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.cta-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 20%, rgba(217,164,65,.35), transparent 50%)}
+.cta-band h2{color:#fff;position:relative}
+.cta-band p{color:#EAF5F3;position:relative;max-width:36rem;margin:0 auto 24px}
+.cta-band .btn-solid{position:relative}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
+.info-card{background:var(--paper);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm)}
+.info-card h3{font-family:"Playfair Display",serif;font-size:1.4rem;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.info-card h3 svg{width:28px;height:28px;flex:none}
+.info-card p{color:var(--ink-soft);margin-bottom:8px}
+.info-card a.big{font-family:"Playfair Display",serif;font-size:1.5rem;font-weight:700;color:var(--gold-deep);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.hours-table{width:100%;border-collapse:collapse;font-size:.98rem}
+.hours-table td{padding:10px 6px;border-bottom:1px dashed rgba(37,42,74,.2)}
+.hours-table tr.today td{font-weight:800;color:var(--gold-deep)}
+.hours-table tr.today td:first-child::after{content:"· today";font-weight:700;color:var(--gold-deep);margin-left:6px}
+.hours-table td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.map-card{
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:340px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 46px, rgba(30,126,116,.16) 46px 48px),
+    repeating-linear-gradient(90deg, transparent 0 46px, rgba(30,126,116,.16) 46px 48px),
+    linear-gradient(140deg,#F6E8C6,#EDD9A8);
+  display:flex;align-items:center;justify-content:center;
+}
+.map-pin{text-align:center;background:var(--paper);padding:26px 34px;border-radius:20px;box-shadow:var(--shadow);max-width:80%;position:relative}
+.map-pin::after{content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);border:14px solid transparent;border-top-color:var(--paper);border-bottom:0}
+.map-pin svg{width:44px;height:44px;margin-bottom:8px}
+.map-pin strong{font-family:"Playfair Display",serif;font-size:1.15rem;display:block}
+.map-pin small{color:var(--ink-soft)}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- page strips ---------- */
+.strip{border-radius:26px;padding:54px 46px;color:#fff;position:relative;overflow:hidden;margin:44px 0;box-shadow:var(--shadow);background:linear-gradient(120deg,var(--night),var(--night-2))}
+.strip::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.16;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72'%3E%3Cpath d='M36 8 L64 36 L36 64 L8 36 Z' fill='none' stroke='%23D9A441' stroke-width='2'/%3E%3C/svg%3E")}
+.strip .sec-eyebrow{color:var(--gold);position:relative}
+.strip h2{color:#fff;position:relative;margin:4px 0 10px}
+.strip p{color:#D8D3BE;max-width:38rem;position:relative}
+
+/* ---------- footer ---------- */
+footer{background:var(--night-3);color:#C9C3AA;margin-top:20px}
+.foot-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:34px;padding:56px 0 32px}
+.foot-grid h4{font-family:"Playfair Display",serif;color:#fff;font-size:1.1rem;margin-bottom:14px}
+.foot-grid p,.foot-grid a{color:#A9A48C;font-size:.93rem}
+.foot-grid a{text-decoration:none;display:block;margin-bottom:8px}
+.foot-grid a:hover{color:var(--gold)}
+.foot-brand{font-family:"Playfair Display",serif;font-weight:800;color:#fff;font-size:1.2rem;margin-bottom:12px}
+.foot-bottom{border-top:1px solid rgba(217,164,65,.2);padding:20px 0 26px;display:flex;justify-content:center;font-size:.85rem;color:#8E8972}
+
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:1020px){
+  .sidebar{transform:translateX(-105%)}
+  .sidebar.open{transform:none}
+  .drawer-close{display:block}
+  main{margin-left:0}
+  .topbar{display:block}
+  .scrim{display:block}
+  .hero-grid{grid-template-columns:1fr}
+  .split{grid-template-columns:1fr}
+  .split.flip .txt{order:0}
+  .visit-grid{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr 1fr}
+  .masonry{columns:2}
+}
+@media(max-width:640px){
+  .masonry{columns:1}
+  .svc-grid{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr}
+  .stat-row{grid-template-columns:1fr}
+  .strip{padding:38px 26px}
+}
+</style>
+</head>
+<body>
+
+<aside class="sidebar" id="mainNavWrap">
+  <button class="drawer-close" id="drawerClose">Close menu</button>
+  <a class="side-brand" href="#home" data-page="home" aria-label="Magic Carpet and Upholstery Cleaning, home">
+    <svg viewBox="0 0 64 64" role="img" aria-label="Magic carpet logo"><rect x="8" y="20" width="48" height="26" rx="4" fill="#D9A441"/><rect x="14" y="25" width="36" height="16" rx="2" fill="none" stroke="#1C2342" stroke-width="2.5"/><path d="M14 33 h36" stroke="#1C2342" stroke-width="2"/><circle cx="24" cy="33" r="3" fill="#1C2342"/><circle cx="40" cy="33" r="3" fill="#1C2342"/><path d="M8 20 q-4 13 0 26 M56 20 q4 13 0 26" stroke="#F6E8C6" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+    <span class="t">Magic Carpet<small>Upholstery Cleaning</small></span>
+  </a>
+  <p class="side-tag">Carpet cleaning service<br>Oxon Hill, Maryland</p>
+  <nav class="main" id="mainNav" aria-label="Main navigation">
+    <a href="#home" data-page="home" class="active" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>Home</a>
+    <a href="#services" data-page="services"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 105.7 5.7L22 13.6 13.6 22l-1.6-1.6a4 4 0 10-5.7-5.7L4.7 13 13 4.7z"/></svg>Services</a>
+    <a href="#about" data-page="about"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>About Us</a>
+    <a href="#gallery" data-page="gallery"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M3 17l5-4 4 3 4-4 5 5"/></svg>Gallery</a>
+    <a href="#reviews" data-page="reviews"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg>Reviews</a>
+    <a href="#visit" data-page="visit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Visit Us</a>
+  </nav>
+  <div class="side-foot">
+    <a class="side-call" href="tel:+12402625677">Call (240) 262-5677</a>
+    <p class="side-hours">Open daily · 7:00 AM - 9:30 PM</p>
+  </div>
+</aside>
+<div class="scrim" id="scrim"></div>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <span class="tb-name">Magic Carpet</span>
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+</div>
+
+<main>
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="kicker">Carpet Cleaning · Oxon Hill, MD</span>
+        <h1>Carpets so clean,<br>it feels like <span class="accent">magic</span>.</h1>
+        <p class="lede">Magic Carpet &amp; Upholstery Cleaning brings tired carpets, rugs and furniture back to life across Oxon Hill and the surrounding Maryland communities. Deep cleaning, honest pricing, open every single day.</p>
+        <div class="cta-row">
+          <a class="btn btn-solid" href="#services" data-page="services">See Our Services</a>
+          <a class="btn btn-ghost" href="tel:+12402625677">Call (240) 262-5677</a>
+        </div>
+        <span class="hours-pill" id="hoursPill"><span class="dot"></span><span id="hoursText">Checking today's hours...</span></span>
+      </div>
+      <div class="hero-art">
+        <div class="carpet-stage">
+          <svg viewBox="0 0 320 260" role="img" aria-label="Illustration of a rolled magic carpet">
+            <ellipse cx="160" cy="228" rx="120" ry="14" fill="#000" opacity=".25"/>
+            <g>
+              <rect x="70" y="60" width="180" height="120" rx="6" fill="#D9A441"/>
+              <rect x="86" y="74" width="148" height="92" rx="4" fill="none" stroke="#1C2342" stroke-width="4"/>
+              <rect x="102" y="88" width="116" height="64" rx="3" fill="none" stroke="#1C2342" stroke-width="2.5"/>
+              <path d="M160 88 v64 M102 120 h116" stroke="#1C2342" stroke-width="2"/>
+              <circle cx="160" cy="120" r="10" fill="#1C2342"/>
+              <circle cx="160" cy="120" r="4" fill="#D9A441"/>
+              <path d="M70 60 q-10 60 0 120 M250 60 q10 60 0 120" stroke="#F6E8C6" stroke-width="6" fill="none" stroke-linecap="round"/>
+              <path d="M52 62 l14 6 M52 178 l14 -6 M268 62 l-14 6 M268 178 l-14 -6" stroke="#F6E8C6" stroke-width="4" stroke-linecap="round"/>
+            </g>
+            <path d="M96 40 q64 -30 128 0" stroke="#7BC47F" stroke-width="4" fill="none" stroke-linecap="round" opacity=".8"/>
+            <circle cx="70" cy="46" r="5" fill="#7BC47F" opacity=".8"/>
+            <circle cx="250" cy="46" r="5" fill="#7BC47F" opacity=".8"/>
+          </svg>
+        </div>
+        <div class="stamp">Open daily · 7 AM - 9:30 PM</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap split">
+      <div class="txt reveal">
+        <p class="sec-eyebrow">Why Magic Carpet</p>
+        <h2>A deeper clean for the floors you live on</h2>
+        <p class="sec-sub">Carpets trap dust, allergens, pet dander and everyday spills deep in the fibers where vacuums cannot reach. Our deep-cleaning process lifts it all out, so your home looks brighter and feels fresher.</p>
+        <ul class="check-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#1E7E74" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Deep extraction cleaning for wall-to-wall carpet</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#1E7E74" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Upholstery, sofas and sectionals refreshed</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#1E7E74" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Pet stain and odor treatments that actually work</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#1E7E74" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Open 7 days a week, 7:00 AM to 9:30 PM</li>
+        </ul>
+        <a class="btn btn-solid" href="#services" data-page="services">Explore services</a>
+      </div>
+      <div class="reveal">
+        <div class="art-card">
+          <svg viewBox="0 0 300 220" role="img" aria-label="Illustration of a clean sofa and carpet">
+            <rect x="40" y="90" width="220" height="90" rx="18" fill="#F6E8C6"/>
+            <rect x="40" y="90" width="220" height="90" rx="18" fill="none" stroke="#1C2342" stroke-width="4"/>
+            <rect x="58" y="106" width="90" height="46" rx="10" fill="#D9A441" opacity=".85"/>
+            <rect x="152" y="106" width="90" height="46" rx="10" fill="#D9A441" opacity=".85"/>
+            <rect x="28" y="120" width="22" height="60" rx="10" fill="#1C2342"/>
+            <rect x="250" y="120" width="22" height="60" rx="10" fill="#1C2342"/>
+            <rect x="52" y="180" width="196" height="14" rx="7" fill="#1C2342"/>
+            <circle cx="90" cy="60" r="16" fill="#fff" opacity=".9"/>
+            <circle cx="150" cy="44" r="11" fill="#fff" opacity=".7"/>
+            <circle cx="205" cy="62" r="13" fill="#fff" opacity=".8"/>
+          </svg>
+          <p class="cap">From living room carpet to the family sofa, one call refreshes the whole room.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="band dark">
+    <div class="wrap split flip">
+      <div class="txt reveal">
+        <p class="sec-eyebrow">How it works</p>
+        <h2>Simple from first call to fresh carpet</h2>
+        <p class="sec-sub">No complicated quotes, no upsell pressure. Tell us what needs cleaning, we show up ready to work.</p>
+        <div class="stat-row">
+          <div class="stat"><strong>1</strong><small>Call or stop by for a free estimate</small></div>
+          <div class="stat"><strong>2</strong><small>We deep clean, treat stains and deodorize</small></div>
+          <div class="stat"><strong>3</strong><small>Walk on fresh, soft carpet the same day</small></div>
+        </div>
+        <div style="margin-top:26px">
+          <a class="btn btn-solid" href="tel:+12402625677">Call (240) 262-5677</a>
+        </div>
+      </div>
+      <div class="reveal">
+        <div class="art-card" style="background:linear-gradient(140deg,#2A3360,#141A35)">
+          <svg viewBox="0 0 300 220" role="img" aria-label="Illustration of a cleaning wand over carpet">
+            <rect x="30" y="150" width="240" height="46" rx="8" fill="#D9A441"/>
+            <rect x="30" y="150" width="240" height="46" rx="8" fill="none" stroke="#0E1226" stroke-width="3"/>
+            <path d="M30 162 h240 M30 176 h240" stroke="#0E1226" stroke-width="2" opacity=".4"/>
+            <rect x="130" y="60" width="40" height="90" rx="12" fill="#F6E8C6"/>
+            <rect x="130" y="60" width="40" height="90" rx="12" fill="none" stroke="#0E1226" stroke-width="3"/>
+            <path d="M150 60 V30" stroke="#F6E8C6" stroke-width="10" stroke-linecap="round"/>
+            <circle cx="150" cy="24" r="10" fill="#1E7E74"/>
+            <circle cx="90" cy="120" r="8" fill="#7BC47F" opacity=".85"/>
+            <circle cx="215" cy="112" r="6" fill="#7BC47F" opacity=".85"/>
+          </svg>
+          <p class="cap">Powerful extraction pulls deep-down dirt, allergens and residue out of every fiber.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="band tint">
+    <div class="wrap split">
+      <div class="txt reveal">
+        <p class="sec-eyebrow">Serving Oxon Hill</p>
+        <h2>Your neighborhood carpet cleaners</h2>
+        <p class="sec-sub">Based on Grenada Ave in Oxon Hill, we serve homes and businesses across southern Prince George's County. Pet owners, families with kids, rental turnovers, busy offices: if it has carpet or upholstery, we can clean it.</p>
+        <p class="sec-sub">Open every day from 7:00 AM to 9:30 PM, so scheduling around your life is easy.</p>
+        <div class="cta-row">
+          <a class="btn btn-solid" href="#visit" data-page="visit">Find us</a>
+          <a class="btn btn-ghost" style="color:var(--ink);border-color:rgba(37,42,74,.3)" href="#reviews" data-page="reviews">Read reviews</a>
+        </div>
+      </div>
+      <div class="reveal">
+        <div class="art-card" style="background:linear-gradient(140deg,#D9A441,#A97A22)">
+          <svg viewBox="0 0 300 220" role="img" aria-label="Illustration of a house with clean carpet">
+            <path d="M60 120 L150 50 L240 120" fill="none" stroke="#1C2342" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="85" y="118" width="130" height="70" rx="6" fill="#FBF7EE"/>
+            <rect x="85" y="118" width="130" height="70" rx="6" fill="none" stroke="#1C2342" stroke-width="4"/>
+            <rect x="135" y="145" width="30" height="43" rx="3" fill="#1C2342"/>
+            <rect x="100" y="132" width="26" height="22" rx="3" fill="#1E7E74"/>
+            <rect x="174" y="132" width="26" height="22" rx="3" fill="#1E7E74"/>
+            <circle cx="238" cy="52" r="18" fill="#F6E8C6"/>
+          </svg>
+          <p class="cap" style="color:#3A2E10">Homes, rentals and offices across Oxon Hill and nearby communities.</p>
+        </div>
+      </div>
+    </div>
+    <div class="wrap">
+      <div class="cta-band reveal">
+        <h2>Ready for carpets that look brand new?</h2>
+        <p>Call today for a free estimate. Open daily 7:00 AM - 9:30 PM.</p>
+        <a class="btn btn-solid" href="tel:+12402625677">Call (240) 262-5677</a>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div class="strip">
+      <p class="sec-eyebrow">What we clean</p>
+      <h2>Services that bring fabrics back to life</h2>
+      <p>Pick a category to see what is included. Every job starts with a free estimate and honest, upfront pricing.</p>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Service categories">
+      <button class="tab-btn on" data-tab="tab-carpet" role="tab" aria-selected="true">Carpet Cleaning</button>
+      <button class="tab-btn" data-tab="tab-upholstery" role="tab" aria-selected="false">Upholstery</button>
+      <button class="tab-btn" data-tab="tab-rugs" role="tab" aria-selected="false">Area Rugs</button>
+      <button class="tab-btn" data-tab="tab-commercial" role="tab" aria-selected="false">Commercial</button>
+    </div>
+
+    <div class="tab-panel on" id="tab-carpet" role="tabpanel">
+      <div class="svc-grid">
+        <div class="svc"><div class="svc-top"><strong>Deep carpet cleaning</strong><span class="dots"></span><span class="price">from $35/room*</span></div><small>Hot water extraction that lifts deep-down dirt, dust and allergens.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Pet stain treatment</strong><span class="dots"></span><span class="price">from $25/spot*</span></div><small>Targeted stain removal plus enzyme odor neutralizing.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Deodorizing</strong><span class="dots"></span><span class="price">from $20/room*</span></div><small>Whole-room freshness treatment for lingering smells.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Stairs and hallways</strong><span class="dots"></span><span class="price">from $4/step*</span></div><small>High-traffic areas get special attention where wear shows most.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Scotchgard style protectant</strong><span class="dots"></span><span class="price">from $15/room*</span></div><small>Fabric protector that helps repel future spills and stains.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Whole-home package</strong><span class="dots"></span><span class="price">ask for quote</span></div><small>Bundle every carpeted room for the best value. Free estimate.</small></div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-upholstery" role="tabpanel">
+      <div class="svc-grid">
+        <div class="svc"><div class="svc-top"><strong>Sofa / couch cleaning</strong><span class="dots"></span><span class="price">from $85*</span></div><small>Deep clean for standard three-seat sofas, all fabric types.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Loveseat cleaning</strong><span class="dots"></span><span class="price">from $65*</span></div><small>Two-seat sofas, recliners and love seats.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Sectional cleaning</strong><span class="dots"></span><span class="price">from $120*</span></div><small>Large sectionals cleaned cushion by cushion.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Armchair / recliner</strong><span class="dots"></span><span class="price">from $45*</span></div><small>Single chairs, ottomans and accent seating.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Dining chairs</strong><span class="dots"></span><span class="price">from $12/chair*</span></div><small>Upholstered dining and office chairs, priced per seat.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Mattress cleaning</strong><span class="dots"></span><span class="price">from $75*</span></div><small>Dust mite and allergen reduction for a healthier bedroom.</small></div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-rugs" role="tabpanel">
+      <div class="svc-grid">
+        <div class="svc"><div class="svc-top"><strong>Area rug cleaning</strong><span class="dots"></span><span class="price">from $3/sq ft*</span></div><small>Synthetic and wool area rugs cleaned in your home.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Oriental and Persian style rugs</strong><span class="dots"></span><span class="price">ask for quote</span></div><small>Gentle, careful cleaning for delicate and patterned rugs.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Rug fringe detailing</strong><span class="dots"></span><span class="price">from $15*</span></div><small>Hand detailing to brighten tassels and edges.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Rug deodorizing</strong><span class="dots"></span><span class="price">from $25*</span></div><small>Pet and smoke odor treatment for rugs of any size.</small></div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-commercial" role="tabpanel">
+      <div class="svc-grid">
+        <div class="svc"><div class="svc-top"><strong>Office carpet cleaning</strong><span class="dots"></span><span class="price">ask for quote</span></div><small>After-hours and weekend scheduling to avoid disrupting work.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Rental turnover cleans</strong><span class="dots"></span><span class="price">ask for quote</span></div><small>Fast carpet refresh between tenants for landlords and managers.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Waiting room upholstery</strong><span class="dots"></span><span class="price">ask for quote</span></div><small>Keep lobby and waiting area seating looking professional.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Scheduled maintenance plans</strong><span class="dots"></span><span class="price">ask for quote</span></div><small>Recurring cleaning on a monthly or quarterly schedule.</small></div>
+      </div>
+    </div>
+
+    <div class="price-note reveal">
+      <strong>*Sample prices:</strong> prices shown are examples to give you an idea. Every job is quoted individually with a free estimate before we start, so you always know the exact cost. Call <a href="tel:+12402625677">(240) 262-5677</a> for your price.
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Get your free estimate today</h2>
+      <p>Tell us what needs cleaning and we will give you an honest, upfront price. No obligation.</p>
+      <a class="btn btn-solid" href="tel:+12402625677">Call (240) 262-5677</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-about">
+  <div class="wrap">
+    <div class="strip">
+      <p class="sec-eyebrow">Our story</p>
+      <h2>The local crew behind the magic</h2>
+      <p>Magic Carpet &amp; Upholstery Cleaning is a carpet cleaning service based on Grenada Ave in Oxon Hill, Maryland, built on straightforward work: show up on time, clean deep, charge fair.</p>
+    </div>
+
+    <div class="band" style="padding-top:8px">
+      <div class="wrap split">
+        <div class="txt reveal">
+          <p class="sec-eyebrow">Who we are</p>
+          <h2>Neighbors helping neighbors keep clean homes</h2>
+          <p class="sec-sub">We are a local carpet and upholstery cleaning service serving Oxon Hill and the surrounding communities in Prince George's County. No call centers, no franchises, no games: just a local team that takes pride in visibly cleaner carpets and furniture.</p>
+          <p class="sec-sub">We work around your schedule with hours from 7:00 AM to 9:30 PM every day of the week, including weekends.</p>
+          <ul class="check-list">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#1E7E74" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Locally based at 6912 Grenada Ave, Oxon Hill, MD</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#1E7E74" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Free, honest estimates before any work begins</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#1E7E74" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Pet-friendly stain and odor treatments</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#1E7E74" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Residential and commercial jobs welcome</li>
+          </ul>
+        </div>
+        <div class="reveal">
+          <div class="art-card">
+            <svg viewBox="0 0 300 220" role="img" aria-label="Illustration of sparkling clean carpet">
+              <rect x="40" y="70" width="220" height="110" rx="10" fill="#D9A441"/>
+              <rect x="40" y="70" width="220" height="110" rx="10" fill="none" stroke="#1C2342" stroke-width="4"/>
+              <path d="M40 105 h220 M40 140 h220" stroke="#1C2342" stroke-width="2" opacity=".35"/>
+              <path d="M90 105 q10 -14 20 0 q10 14 20 0 M170 140 q10 -14 20 0 q10 14 20 0" stroke="#1C2342" stroke-width="2.5" fill="none" opacity=".5"/>
+              <path d="M100 40 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4z" fill="#fff"/>
+              <path d="M200 30 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3z" fill="#fff" opacity=".85"/>
+              <path d="M225 70 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3z" fill="#fff" opacity=".7"/>
+            </svg>
+            <p class="cap">That just-cleaned feeling: brighter color, softer fibers, fresher air.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <div class="cta-band reveal">
+        <h2>Experience the difference a deep clean makes</h2>
+        <p>One call is all it takes. Free estimates, friendly service, open daily.</p>
+        <a class="btn btn-solid" href="#visit" data-page="visit">Plan your visit</a>
+      </div>
+      <div style="height:56px"></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div class="strip">
+      <p class="sec-eyebrow">Before and after</p>
+      <h2>See the Magic Carpet difference</h2>
+      <p>Artistic previews of the transformations we deliver every day. Real before-and-after photos from our jobs are on the way.</p>
+    </div>
+
+    <div class="masonry">
+      <div class="m-item reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#D9A441,#A97A22);min-height:230px">
+          <svg viewBox="0 0 100 100"><rect x="14" y="30" width="72" height="44" rx="6" fill="#FBF7EE"/><path d="M14 44 h72 M14 58 h72" stroke="#1C2342" stroke-width="2" opacity=".3"/><circle cx="34" cy="52" r="8" fill="#8A6A2A" opacity=".55"/><circle cx="62" cy="56" r="6" fill="#8A6A2A" opacity=".4"/></svg>
+        </div>
+        <div class="cap"><strong>Stain removal</strong><small>Food, drink and pet stains lifted out</small></div>
+      </div>
+      <div class="m-item reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#1E7E74,#145A52);min-height:180px">
+          <svg viewBox="0 0 100 100"><rect x="20" y="40" width="60" height="36" rx="10" fill="#F6E8C6"/><rect x="28" y="48" width="22" height="20" rx="5" fill="#D9A441"/><rect x="52" y="48" width="20" height="20" rx="5" fill="#D9A441"/><rect x="14" y="50" width="10" height="26" rx="5" fill="#1C2342"/><rect x="76" y="50" width="10" height="26" rx="5" fill="#1C2342"/></svg>
+        </div>
+        <div class="cap"><strong>Sofa refresh</strong><small>Upholstery deep cleaned cushion by cushion</small></div>
+      </div>
+      <div class="m-item reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#2A3360,#141A35);min-height:260px">
+          <svg viewBox="0 0 100 100"><rect x="18" y="28" width="64" height="48" rx="4" fill="#D9A441"/><rect x="26" y="36" width="48" height="32" rx="2" fill="none" stroke="#1C2342" stroke-width="3"/><path d="M50 36 v32 M26 52 h48" stroke="#1C2342" stroke-width="2"/><circle cx="50" cy="52" r="5" fill="#1C2342"/></svg>
+        </div>
+        <div class="cap"><strong>Area rug revival</strong><small>Color and pattern brought back to life</small></div>
+      </div>
+      <div class="m-item reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#F6E8C6,#E8CE9A);min-height:190px">
+          <svg viewBox="0 0 100 100"><rect x="30" y="20" width="14" height="60" rx="7" fill="#1C2342"/><rect x="30" y="20" width="14" height="60" rx="7" fill="none" stroke="#0E1226" stroke-width="2"/><circle cx="37" cy="86" r="8" fill="#1E7E74"/><path d="M60 70 q12 0 20 -10 M62 78 q10 2 16 -4" stroke="#7BC47F" stroke-width="5" fill="none" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>Deep extraction</strong><small>Powerful equipment, professional results</small></div>
+      </div>
+      <div class="m-item reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#8A5A3B,#5A3A24);min-height:220px">
+          <svg viewBox="0 0 100 100"><ellipse cx="50" cy="55" rx="30" ry="22" fill="#D9A441"/><ellipse cx="50" cy="55" rx="18" ry="12" fill="none" stroke="#1C2342" stroke-width="3"/><path d="M20 55 q-8 20 6 28 M80 55 q8 20 -6 28" stroke="#F6E8C6" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>Pet odor treatment</strong><small>Enzyme treatments neutralize odors at the source</small></div>
+      </div>
+      <div class="m-item reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#3E5A7A,#1C2342);min-height:200px">
+          <svg viewBox="0 0 100 100"><rect x="16" y="46" width="68" height="34" rx="6" fill="#FBF7EE"/><rect x="16" y="46" width="68" height="34" rx="6" fill="none" stroke="#0E1226" stroke-width="3"/><rect x="24" y="54" width="20" height="18" rx="3" fill="#1E7E74" opacity=".7"/><rect x="48" y="54" width="20" height="18" rx="3" fill="#1E7E74" opacity=".7"/></svg>
+        </div>
+        <div class="cap"><strong>Commercial spaces</strong><small>Offices and rentals cleaned on your schedule</small></div>
+      </div>
+    </div>
+
+    <div class="price-note reveal" style="margin-top:28px">
+      <strong>Coming soon:</strong> real before-and-after photos from our jobs around Oxon Hill. The illustrations above are artistic previews. The real results look even better.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div class="strip">
+      <p class="sec-eyebrow">Customer reviews</p>
+      <h2>What Oxon Hill says about us</h2>
+      <p>Real feedback from real customers. Here are the themes that come up again and again.</p>
+    </div>
+
+    <div class="rs-strip">
+      <p class="rs-note">Review themes on this page are paraphrased from public feedback. Open the source to read current reviews and ratings.</p>
+      <div class="rs-links"><a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJOXto5995hYARF9VbL6QMkGg" target="_blank" rel="noopener">See reviews on Google</a></div>
+    </div>
+
+    <div class="rev-list">
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>Customers say the carpets come out looking dramatically better, with old stains they had given up on finally gone.</p>
+        <cite>via Google</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>Reviewers mention fair, upfront pricing and free estimates, with no surprises when the job is done.</p>
+        <cite>via Google</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>Pet owners praise the stain and odor treatments, saying rooms smell fresh again after the visit.</p>
+        <cite>via Google</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>People appreciate the long daily hours and weekend availability, making it easy to book around work.</p>
+        <cite>via Google</cite>
+      </div>
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Had a great clean? Tell the neighborhood.</h2>
+      <p>Your review helps a local Oxon Hill business keep growing. It takes a minute, and it means a lot.</p>
+      <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJOXto5995hYARF9VbL6QMkGg" target="_blank" rel="noopener">Leave a Google review</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="wrap">
+    <div class="strip">
+      <p class="sec-eyebrow">Visit or call</p>
+      <h2>Get in touch</h2>
+      <p>We are on Grenada Ave in Oxon Hill. Call for a free estimate, or stop by during business hours.</p>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#A97A22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Find us</h3>
+        <p>Magic Carpet &amp; Upholstery Cleaning, 6912 Grenada Ave, Oxon Hill, MD 20745</p>
+        <p>Serving Oxon Hill and surrounding Prince George's County communities.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#A97A22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg> Call us</h3>
+        <p>Free estimates, 7 days a week:</p>
+        <a class="big" href="tel:+12402625677">(240) 262-5677</a>
+        <p style="margin-top:10px">Call ahead to schedule your cleaning appointment.</p>
+      </div>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#A97A22" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Hours</h3>
+        <table class="hours-table" id="hoursTable">
+          <tr><td>Monday</td><td>7:00 AM - 9:30 PM</td></tr>
+          <tr><td>Tuesday</td><td>7:00 AM - 9:30 PM</td></tr>
+          <tr><td>Wednesday</td><td>7:00 AM - 9:30 PM</td></tr>
+          <tr><td>Thursday</td><td>7:00 AM - 9:30 PM</td></tr>
+          <tr><td>Friday</td><td>7:00 AM - 9:30 PM</td></tr>
+          <tr><td>Saturday</td><td>7:00 AM - 9:30 PM</td></tr>
+          <tr><td>Sunday</td><td>7:00 AM - 9:30 PM</td></tr>
+        </table>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <svg viewBox="0 0 24 24" fill="#A97A22"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#FFFDF8"/></svg>
+          <strong>6912 Grenada Ave</strong>
+          <small>Oxon Hill, MD 20745</small><br>
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJOXto5995hYARF9VbL6QMkGg" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <p class="foot-brand">Magic Carpet</p>
+        <p>Carpet cleaning service on Grenada Ave in Oxon Hill, MD. Deep carpet cleaning, upholstery cleaning and stain treatment, open daily.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <a href="#home" data-page="home">Home</a>
+        <a href="#services" data-page="services">Services</a>
+        <a href="#about" data-page="about">About Us</a>
+      </div>
+      <div>
+        <h4>More</h4>
+        <a href="#gallery" data-page="gallery">Gallery</a>
+        <a href="#reviews" data-page="reviews">Reviews</a>
+        <a href="#visit" data-page="visit">Visit Us</a>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <p>Magic Carpet &amp; Upholstery Cleaning, 6912 Grenada Ave, Oxon Hill, MD 20745</p>
+        <p><a href="tel:+12402625677">(240) 262-5677</a></p>
+        <p>Open daily<br>7:00 AM - 9:30 PM</p>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© Magic Carpet & Upholstery Cleaning</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+    var wrap = document.getElementById("mainNavWrap");
+    if(wrap){ wrap.classList.remove("open"); }
+    var scrim = document.getElementById("scrim");
+    if(scrim){ scrim.classList.remove("on"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var wrap = document.getElementById("mainNavWrap");
+      var open = wrap.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+      var scrim = document.getElementById("scrim");
+      if(scrim){ scrim.classList.toggle("on", open); }
+    });
+  }
+
+  var drawerClose = document.getElementById("drawerClose");
+  if(drawerClose){ drawerClose.addEventListener("click", closeMenu); }
+  var scrimEl = document.getElementById("scrim");
+  if(scrimEl){ scrimEl.addEventListener("click", closeMenu); }
+
+  function fmt(h){
+    var ap = h < 12 ? "AM" : "PM";
+    var hh = Math.floor(h) % 12;
+    if(hh === 0){ hh = 12; }
+    var mm = (h % 1 === 0.5) ? ":30" : ":00";
+    return hh + mm + " " + ap;
+  }
+  try{
+    var parts = new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",weekday:"short",hour:"numeric",hour12:false}).formatToParts(new Date());
+    var DOW = {"Sun":0,"Mon":1,"Tue":2,"Wed":3,"Thu":4,"Fri":5,"Sat":6};
+    var wd = "Mon", hr = 12;
+    parts.forEach(function(p){
+      if(p.type === "weekday"){ wd = p.value; }
+      if(p.type === "hour"){ hr = parseInt(p.value, 10) % 24; }
+    });
+    var day = DOW[wd] !== undefined ? DOW[wd] : 1;
+    var openH = 7, closeH = 21.5;
+    var pill = document.getElementById("hoursPill");
+    var txt = document.getElementById("hoursText");
+    if(pill && txt){
+      if(hr >= openH && hr < closeH){
+        txt.textContent = "Open now · until " + fmt(closeH) + " today";
+      } else if(hr < openH){
+        pill.classList.add("closed");
+        txt.textContent = "Opens today at " + fmt(openH);
+      } else {
+        pill.classList.add("closed");
+        txt.textContent = "Opens tomorrow at " + fmt(openH);
+      }
+    }
+    var rows = document.querySelectorAll("#hoursTable tr");
+    var idx = (day + 6) % 7;
+    if(rows[idx]){ rows[idx].classList.add("today"); }
+  }catch(e){}
+
+  var tabBtns = document.querySelectorAll(".tab-btn");
+  for(var t = 0; t < tabBtns.length; t++){
+    tabBtns[t].addEventListener("click", function(){
+      for(var a = 0; a < tabBtns.length; a++){
+        tabBtns[a].classList.remove("on");
+        tabBtns[a].setAttribute("aria-selected", "false");
+      }
+      this.classList.add("on");
+      this.setAttribute("aria-selected", "true");
+      var panels = document.querySelectorAll(".tab-panel");
+      for(var b = 0; b < panels.length; b++){
+        panels[b].classList.toggle("on", panels[b].id === this.getAttribute("data-tab"));
+      }
+    });
+  }
+
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

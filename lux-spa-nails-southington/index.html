@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lux Spa & Nails · Nail Salon & Spa, Southington, CT</title>
+<meta name="description" content="Lux Spa & Nails at 360 Queen St, Southington, CT. Manicures, pedicures, facials, waxing and massage in a clean, comfortable spa setting. Walk-ins welcome. Call (860) 628-3689.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,500;1,700&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --plum:#351A2A; --plum-2:#4A2440; --gold:#C9A24B; --gold-soft:#EFE0BE;
+  --cream:#FAF5EA; --paper:#FFFDF8; --rose:#B76E79; --ink:#2E1B27; --ink-soft:#6E5563;
+  --radius:16px;
+  --shadow:0 20px 45px -20px rgba(53,26,42,.35);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Jost",system-ui,sans-serif;background:var(--cream);color:var(--ink);line-height:1.7;-webkit-font-smoothing:antialiased}
+a{color:var(--plum-2)}
+::selection{background:var(--gold);color:var(--plum)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.serif{font-family:"Playfair Display",serif}
+
+/* ---------- slim top bar + drawer ---------- */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;gap:16px;
+  padding:10px 18px;background:rgba(53,26,42,.96);color:var(--cream);border-bottom:1px solid rgba(201,162,75,.35)}
+#burger{background:none;border:1px solid rgba(201,162,75,.6);border-radius:10px;cursor:pointer;padding:10px 12px;display:flex;flex-direction:column;gap:5px}
+#burger span{display:block;width:24px;height:2px;background:var(--gold)}
+.topbar .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--cream)}
+.topbar .brand b{font-family:"Playfair Display",serif;font-weight:900;font-size:1.15rem;letter-spacing:.5px}
+.topbar .brand small{display:block;font-size:.62rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold)}
+.topbar .call{margin-left:auto;color:var(--cream);text-decoration:none;font-weight:600;border:1px solid rgba(201,162,75,.6);padding:9px 18px;border-radius:999px;font-size:.92rem;white-space:nowrap}
+.topbar .call:hover{background:var(--gold);color:var(--plum)}
+.scrim{position:fixed;inset:0;background:rgba(35,15,28,.55);opacity:0;pointer-events:none;transition:opacity .3s;z-index:70}
+#mainNav{position:fixed;top:0;left:0;bottom:0;width:min(340px,86vw);z-index:80;background:var(--plum);color:var(--cream);
+  transform:translateX(-105%);transition:transform .32s ease;display:flex;flex-direction:column;padding:28px 26px;box-shadow:var(--shadow)}
+#mainNav.open{transform:translateX(0)}
+.scrim.show{opacity:1;pointer-events:auto}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px}
+.drawer-head b{font-family:"Playfair Display",serif;font-size:1.35rem;color:var(--gold)}
+.drawer-close{background:none;border:1px solid rgba(201,162,75,.5);color:var(--gold);border-radius:10px;font-size:1.2rem;cursor:pointer;padding:6px 12px;line-height:1}
+nav.main{display:flex;flex-direction:column;gap:4px}
+nav.main a{text-decoration:none;color:var(--cream);font-size:1.25rem;font-weight:500;padding:12px 14px;border-radius:12px;font-family:"Playfair Display",serif}
+nav.main a:hover{background:rgba(201,162,75,.15)}
+nav.main a.active{background:var(--gold);color:var(--plum)}
+.drawer-foot{margin-top:auto;padding-top:20px;border-top:1px solid rgba(201,162,75,.25);font-size:.92rem;color:var(--gold-soft)}
+.drawer-foot a{color:var(--gold);text-decoration:none}
+
+/* ---------- pages / router ---------- */
+.page{display:none;padding-top:64px}
+.page.active{display:block;animation:fadeIn .35s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- editorial hero ---------- */
+.hero{position:relative;overflow:hidden;background:var(--plum);color:var(--cream);padding:90px 0 80px}
+.hero .watermark{position:absolute;top:30px;right:-10px;font-family:"Playfair Display",serif;font-weight:900;
+  font-size:clamp(7rem,22vw,17rem);line-height:1;color:transparent;-webkit-text-stroke:1px rgba(201,162,75,.28);pointer-events:none;user-select:none}
+.hero .kicker{display:inline-block;font-size:.78rem;letter-spacing:4px;text-transform:uppercase;color:var(--gold);
+  border-top:1px solid var(--gold);border-bottom:1px solid var(--gold);padding:8px 0;margin-bottom:22px}
+.hero h1{font-family:"Playfair Display",serif;font-weight:900;font-size:clamp(2.7rem,6vw,4.6rem);line-height:1.05;letter-spacing:-.5px;margin-bottom:20px;max-width:16ch}
+.hero h1 em{font-style:italic;color:var(--gold)}
+.hero .lede{font-size:1.12rem;color:var(--gold-soft);max-width:38rem;margin-bottom:30px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px}
+.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:600;padding:14px 28px;border-radius:999px;font-size:1rem;transition:transform .18s,background .18s}
+.btn-solid{background:var(--gold);color:var(--plum)}
+.btn-solid:hover{background:#dab85f;transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:var(--cream);border:2px solid rgba(250,245,234,.5)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-2px)}
+.hero-meta{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px;font-size:.9rem;color:var(--gold-soft)}
+.hero-meta .pill{border:1px solid rgba(201,162,75,.45);border-radius:999px;padding:8px 18px}
+
+/* ---------- alternating bands ---------- */
+.band{padding:74px 0}
+.band.tint{background:var(--paper)}
+.band.plum{background:var(--plum);color:var(--cream)}
+.band.rose{background:linear-gradient(160deg,#F8EDE4,#F3DEDA)}
+.band h2{font-family:"Playfair Display",serif;font-weight:700;font-size:clamp(1.9rem,3.6vw,2.7rem);margin-bottom:8px;letter-spacing:-.3px}
+.band.plum h2{color:var(--gold)}
+.section-kicker{font-size:.76rem;letter-spacing:4px;text-transform:uppercase;color:var(--rose);font-weight:600;margin-bottom:10px}
+.band.plum .section-kicker{color:var(--gold)}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center}
+@media(max-width:820px){.split{grid-template-columns:1fr}}
+.feature-list{list-style:none;margin-top:22px;display:grid;gap:16px}
+.feature-list li{display:flex;gap:14px;align-items:flex-start}
+.feature-list .tick{flex:none;width:34px;height:34px;border-radius:50%;background:var(--gold);color:var(--plum);
+  display:flex;align-items:center;justify-content:center;font-weight:700}
+.art-card{background:var(--paper);border-radius:var(--radius);box-shadow:var(--shadow);padding:26px;border:1px solid rgba(201,162,75,.35)}
+.art-card svg{width:100%;height:auto;display:block}
+.badge{display:inline-block;font-size:.72rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;
+  background:rgba(183,110,121,.14);color:var(--rose);border:1px solid rgba(183,110,121,.4);border-radius:999px;padding:5px 14px;margin-top:14px}
+
+/* ---------- leaders list ---------- */
+.leaders{max-width:860px;margin:26px auto 0}
+.leader-row{display:flex;align-items:baseline;gap:12px;padding:15px 4px;border-bottom:1px solid rgba(53,26,42,.14)}
+.leader-row .name{font-family:"Playfair Display",serif;font-weight:700;font-size:1.18rem;white-space:nowrap}
+.leader-row .dots{flex:1;border-bottom:2px dotted rgba(183,110,121,.55);transform:translateY(-5px);min-width:24px}
+.leader-row .note{font-size:.95rem;color:var(--ink-soft);text-align:right}
+.leaders-note{text-align:center;margin-top:20px;color:var(--ink-soft);font-style:italic}
+
+/* ---------- horizontal strip gallery ---------- */
+.strip{display:flex;gap:18px;overflow-x:auto;padding:26px 4px 14px;scroll-snap-type:x mandatory}
+.strip figure{flex:0 0 300px;scroll-snap-align:start;background:var(--paper);border-radius:var(--radius);
+  overflow:hidden;box-shadow:var(--shadow);border:1px solid rgba(201,162,75,.35)}
+.strip svg{width:100%;height:230px;display:block}
+.strip figcaption{padding:14px 18px;font-size:.92rem}
+.strip figcaption .badge{margin-top:8px}
+
+/* ---------- reviews ---------- */
+.review-summary{display:flex;flex-wrap:wrap;gap:18px;align-items:center;margin:22px 0}
+.stars{font-size:1.6rem;color:var(--gold);letter-spacing:4px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:10px}
+@media(max-width:820px){.cards{grid-template-columns:1fr}}
+.card{background:var(--paper);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);border:1px solid rgba(201,162,75,.35)}
+.card .stars{font-size:1.1rem;letter-spacing:2px;margin-bottom:10px}
+.card p{font-style:italic;color:var(--ink-soft)}
+
+/* ---------- visit ---------- */
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:24px}
+@media(max-width:820px){.info-grid{grid-template-columns:1fr}}
+.info{background:var(--paper);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow);border:1px solid rgba(201,162,75,.35)}
+.info h3{font-family:"Playfair Display",serif;font-size:1.25rem;margin-bottom:10px;color:var(--plum-2)}
+.info a{color:var(--plum-2);font-weight:600}
+
+/* ---------- big-type footer ---------- */
+footer{background:var(--plum);color:var(--cream);padding:64px 0 30px;margin-top:0}
+footer .giant{font-family:"Playfair Display",serif;font-weight:900;font-size:clamp(2.6rem,8vw,6rem);line-height:1.02;color:var(--gold);margin-bottom:18px}
+footer .foot-links{display:flex;flex-wrap:wrap;gap:8px 22px;margin-bottom:22px}
+footer .foot-links a{color:var(--gold-soft);text-decoration:none;font-weight:500}
+footer .foot-links a:hover{color:var(--gold)}
+footer .copy{border-top:1px solid rgba(201,162,75,.3);padding-top:18px;color:var(--gold-soft);font-size:.95rem}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <button id="burger" aria-label="Open navigation menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <a class="brand" href="#home" data-page="home"><b>Lux Spa & Nails</b><small>Southington CT</small></a>
+  <a class="call" href="tel:+18606283689">(860) 628-3689</a>
+</div>
+<div class="scrim" id="scrim"></div>
+
+<aside id="mainNav" aria-label="Site navigation">
+  <div class="drawer-head">
+    <b>Lux Spa & Nails</b>
+    <button class="drawer-close" id="drawerClose" aria-label="Close navigation menu">&times;</button>
+  </div>
+  <nav class="main">
+    <a href="#home" data-page="home" class="active" aria-current="page">Home</a>
+    <a href="#services" data-page="services">Services</a>
+    <a href="#story" data-page="story">Our Story</a>
+    <a href="#gallery" data-page="gallery">Gallery</a>
+    <a href="#reviews" data-page="reviews">Reviews</a>
+    <a href="#visit" data-page="visit">Visit Us</a>
+  </nav>
+  <div class="drawer-foot">
+    360 Queen St, Southington, CT 06489<br>
+    <a href="tel:+18606283689">(860) 628-3689</a><br>
+    Walk-ins welcome
+  </div>
+</aside>
+
+<main>
+<section class="page active" id="page-home">
+  <div class="hero">
+    <span class="watermark" aria-hidden="true">LUX</span>
+    <div class="wrap">
+      <span class="kicker">Nail salon and spa, Queen Street</span>
+      <h1>Nails shaped with <em>precision</em>, finished with care.</h1>
+      <p class="lede">Lux Spa & Nails is a clean, comfortable nail salon and day spa at 360 Queen St in Southington, CT. Manicures, pedicures, facials, waxing and massage, all from a team reviewers call meticulous and detail-obsessed. Walk-ins are welcome.</p>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="#services" data-page="services">Explore services</a>
+        <a class="btn btn-ghost" href="tel:+18606283689">Call (860) 628-3689</a>
+      </div>
+      <div class="hero-meta">
+        <span class="pill">Rated 3.9 stars across 112 reviews</span>
+        <span class="pill">All major credit cards accepted</span>
+        <span class="pill">Parking lot nearby</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="band tint">
+    <div class="wrap split">
+      <div>
+        <p class="section-kicker">Why guests come back</p>
+        <h2>A salon built on the details</h2>
+        <p>Guests describe meticulous filing and cutting, pedicures that keep them coming back for years, and a calm, spotless space where every step feels unhurried.</p>
+        <ul class="feature-list">
+          <li><span class="tick">1</span><span><b>Precision nail work.</b> Detailed filing, shaping and polish application reviewers single out by name.</span></li>
+          <li><span class="tick">2</span><span><b>Full spa menu.</b> Beyond nails: facials, waxing, and massage under one roof.</span></li>
+          <li><span class="tick">3</span><span><b>Clean and comfortable.</b> Long-time guests highlight the spotless stations and relaxed atmosphere.</span></li>
+        </ul>
+      </div>
+      <div class="art-card">
+        <svg viewBox="0 0 400 300" role="img" aria-label="Stylized illustration of a manicured hand beside a polish bottle">
+          <rect width="400" height="300" rx="16" fill="#F8EDE4"/>
+          <rect x="52" y="60" width="70" height="150" rx="12" fill="#351A2A"/>
+          <rect x="62" y="30" width="50" height="34" rx="6" fill="#C9A24B"/>
+          <rect x="70" y="64" width="34" height="8" rx="4" fill="#B76E79"/>
+          <rect x="52" y="120" width="70" height="90" rx="12" fill="#B76E79" opacity=".45"/>
+          <ellipse cx="260" cy="190" rx="95" ry="60" fill="#EFE0BE"/>
+          <path d="M200 190 q20 -46 46 -44 q26 2 34 44 q8 40 -22 46 q-48 10 -58 -46z" fill="#F3D9CE"/>
+          <path d="M196 176 q6 22 0 44 M222 168 q6 24 0 50 M248 168 q-6 24 0 50" stroke="#B76E79" stroke-width="5" fill="none" stroke-linecap="round"/>
+          <ellipse cx="260" cy="150" rx="9" ry="13" fill="#B76E79"/>
+        </svg>
+        <span class="badge">Sample photo</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="band plum">
+    <div class="wrap">
+      <p class="section-kicker">From the review pages</p>
+      <h2>Based on 112 Google reviews</h2>
+      <div class="review-summary">
+        <span class="stars" aria-label="3.9 out of 5 stars">★★★★☆</span>
+        <span>3.9 average rating. Guests praise meticulous nail work, standout pedicures, and a friendly, detail-oriented team.</span>
+      </div>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="#reviews" data-page="reviews">Read guest reviews</a>
+        <a class="btn btn-ghost" href="https://www.google.com/maps/place/?q=place_id:ChIJwfe24RS354kR6XQOzc5Jesc">See reviews on Google</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap split">
+      <div class="art-card">
+        <svg viewBox="0 0 400 300" role="img" aria-label="Stylized illustration of a spa pedicure chair and foot bath">
+          <rect width="400" height="300" rx="16" fill="#351A2A"/>
+          <rect x="70" y="120" width="260" height="120" rx="18" fill="#4A2440"/>
+          <rect x="90" y="100" width="220" height="40" rx="14" fill="#C9A24B"/>
+          <ellipse cx="200" cy="252" rx="90" ry="20" fill="#B76E79" opacity=".5"/>
+          <path d="M150 250 q50 -26 100 0" stroke="#EFE0BE" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <circle cx="120" cy="60" r="26" fill="#B76E79" opacity=".55"/>
+          <circle cx="300" cy="70" r="16" fill="#C9A24B" opacity=".6"/>
+        </svg>
+        <span class="badge">Sample photo</span>
+      </div>
+      <div>
+        <p class="section-kicker">Walk-ins welcome</p>
+        <h2>Ready when you are</h2>
+        <p>No need to plan weeks ahead. Stop in at 360 Queen St, or call (860) 628-3689 and the team will get you settled. All major credit cards accepted, and there is a parking lot right nearby.</p>
+        <div class="cta-row" style="margin-top:22px">
+          <a class="btn btn-solid" href="#visit" data-page="visit">Plan your visit</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="band tint" style="padding-top:90px">
+    <div class="wrap">
+      <p class="section-kicker">Services</p>
+      <h2>The service menu</h2>
+      <p style="max-width:44rem">From everyday manicures to full spa days, every service is delivered with the same meticulous attention to detail guests write about. Call (860) 628-3689 for current pricing and availability.</p>
+      <div class="leaders">
+        <div class="leader-row"><span class="name">Manicures</span><span class="dots"></span><span class="note">Classic and gel options, precise shaping</span></div>
+        <div class="leader-row"><span class="name">Pedicures</span><span class="dots"></span><span class="note">A guest favorite, detailed foot care</span></div>
+        <div class="leader-row"><span class="name">Acrylic and full sets</span><span class="dots"></span><span class="note">Fresh sets with meticulous filing</span></div>
+        <div class="leader-row"><span class="name">Nail art and polish</span><span class="dots"></span><span class="note">Clean, long-lasting finishes</span></div>
+        <div class="leader-row"><span class="name">Facials</span><span class="dots"></span><span class="note">Rejuvenating spa facials</span></div>
+        <div class="leader-row"><span class="name">Eyebrow waxing</span><span class="dots"></span><span class="note">Quick, precise shaping</span></div>
+        <div class="leader-row"><span class="name">Massage</span><span class="dots"></span><span class="note">Relaxing spa massage</span></div>
+      </div>
+      <p class="leaders-note">Walk-ins are welcome. For parties and group visits, please call ahead.</p>
+      <div class="cta-row" style="justify-content:center;margin-top:28px">
+        <a class="btn btn-solid" href="tel:+18606283689">Call to book</a>
+        <a class="btn btn-ghost" href="#visit" data-page="visit" style="color:var(--ink);border-color:rgba(46,27,39,.3)">Get directions</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-story">
+  <div class="band rose" style="padding-top:90px">
+    <div class="wrap split">
+      <div>
+        <p class="section-kicker">Our story</p>
+        <h2>A quiet retreat on Queen Street</h2>
+        <p>Lux Spa & Nails is a nail salon and day spa at 360 Queen St in Southington, Connecticut. Guests describe it as a tranquil retreat: a clean, comfortable space where the team takes its time with every manicure, pedicure, facial and massage.</p>
+        <p style="margin-top:14px">What sets the salon apart, according to reviewers, is precision. Detailed filing, careful cuticle work, and polish applied with a steady hand have earned the team loyal regulars, some of whom have visited for eight years or more.</p>
+        <p style="margin-top:14px">Whether it is your first-ever manicure or your monthly standing appointment, the welcome is the same: walk in, settle in, and let the team handle the details.</p>
+      </div>
+      <div class="art-card">
+        <svg viewBox="0 0 400 300" role="img" aria-label="Stylized illustration of lotus flowers and spa stones">
+          <rect width="400" height="300" rx="16" fill="#F8EDE4"/>
+          <ellipse cx="200" cy="245" rx="130" ry="22" fill="#EFE0BE"/>
+          <ellipse cx="150" cy="228" rx="52" ry="20" fill="#8A8A96"/>
+          <ellipse cx="215" cy="232" rx="62" ry="24" fill="#9A9AA6"/>
+          <ellipse cx="280" cy="226" rx="44" ry="18" fill="#7C7C88"/>
+          <g fill="#B76E79" opacity=".85">
+            <ellipse cx="200" cy="150" rx="26" ry="46"/>
+            <ellipse cx="200" cy="150" rx="26" ry="46" transform="rotate(45 200 150)"/>
+            <ellipse cx="200" cy="150" rx="26" ry="46" transform="rotate(-45 200 150)"/>
+          </g>
+          <circle cx="200" cy="150" r="16" fill="#C9A24B"/>
+        </svg>
+        <span class="badge">Sample photo</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="band tint" style="padding-top:90px">
+    <div class="wrap">
+      <p class="section-kicker">Gallery</p>
+      <h2>Inside the salon</h2>
+      <p>Swipe through the strip to get a feel for the space and the work. Photos shown are styled placeholders.</p>
+      <div class="strip">
+        <figure>
+          <svg viewBox="0 0 300 230" role="img" aria-label="Stylized nail polish bottles"><rect width="300" height="230" fill="#351A2A"/><rect x="40" y="80" width="52" height="100" rx="10" fill="#B76E79"/><rect x="52" y="52" width="28" height="32" rx="5" fill="#C9A24B"/><rect x="124" y="60" width="52" height="120" rx="10" fill="#C9A24B"/><rect x="136" y="32" width="28" height="32" rx="5" fill="#EFE0BE"/><rect x="208" y="90" width="52" height="90" rx="10" fill="#EFE0BE"/><rect x="220" y="62" width="28" height="32" rx="5" fill="#B76E79"/></svg>
+          <figcaption>Polish wall<br><span class="badge">Sample photo</span></figcaption>
+        </figure>
+        <figure>
+          <svg viewBox="0 0 300 230" role="img" aria-label="Stylized manicure station"><rect width="300" height="230" fill="#F3DEDA"/><rect x="30" y="140" width="240" height="60" rx="12" fill="#351A2A"/><rect x="60" y="100" width="180" height="46" rx="10" fill="#EFE0BE"/><ellipse cx="150" cy="100" rx="52" ry="16" fill="#B76E79" opacity=".5"/></svg>
+          <figcaption>Manicure station<br><span class="badge">Sample photo</span></figcaption>
+        </figure>
+        <figure>
+          <svg viewBox="0 0 300 230" role="img" aria-label="Stylized pedicure chairs"><rect width="300" height="230" fill="#4A2440"/><rect x="30" y="90" width="110" height="90" rx="14" fill="#C9A24B"/><rect x="160" y="90" width="110" height="90" rx="14" fill="#B76E79"/><ellipse cx="85" cy="190" rx="44" ry="12" fill="#EFE0BE" opacity=".5"/><ellipse cx="215" cy="190" rx="44" ry="12" fill="#EFE0BE" opacity=".5"/></svg>
+          <figcaption>Pedicure chairs<br><span class="badge">Sample photo</span></figcaption>
+        </figure>
+        <figure>
+          <svg viewBox="0 0 300 230" role="img" aria-label="Stylized nail art close-up"><rect width="300" height="230" fill="#EFE0BE"/><path d="M120 60 q20 -30 44 0 q-6 90 -22 130 q-16 -40 -22 -130z" fill="#F3D9CE"/><ellipse cx="142" cy="44" rx="10" ry="13" fill="#B76E79"/><path d="M170 80 q20 -30 44 0 q-6 90 -22 130 q-16 -40 -22 -130z" fill="#F3D9CE"/><ellipse cx="192" cy="64" rx="10" ry="13" fill="#C9A24B"/></svg>
+          <figcaption>Nail art detail<br><span class="badge">Sample photo</span></figcaption>
+        </figure>
+        <figure>
+          <svg viewBox="0 0 300 230" role="img" aria-label="Stylized facial treatment"><rect width="300" height="230" fill="#351A2A"/><ellipse cx="150" cy="120" rx="70" ry="50" fill="#F3D9CE"/><path d="M100 100 q50 -24 100 0" stroke="#B76E79" stroke-width="6" fill="none" stroke-linecap="round"/><circle cx="150" cy="160" r="14" fill="#C9A24B" opacity=".7"/></svg>
+          <figcaption>Facial treatment<br><span class="badge">Sample photo</span></figcaption>
+        </figure>
+        <figure>
+          <svg viewBox="0 0 300 230" role="img" aria-label="Stylized massage stones and orchid"><rect width="300" height="230" fill="#F8EDE4"/><ellipse cx="120" cy="170" rx="50" ry="20" fill="#8A8A96"/><ellipse cx="180" cy="176" rx="56" ry="22" fill="#9A9AA6"/><g fill="#B76E79"><ellipse cx="220" cy="90" rx="16" ry="30"/><ellipse cx="220" cy="90" rx="16" ry="30" transform="rotate(60 220 90)"/><ellipse cx="220" cy="90" rx="16" ry="30" transform="rotate(-60 220 90)"/></g><circle cx="220" cy="90" r="9" fill="#C9A24B"/></svg>
+          <figcaption>Spa details<br><span class="badge">Sample photo</span></figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="band tint" style="padding-top:90px">
+    <div class="wrap">
+      <p class="section-kicker">Reviews</p>
+      <h2>What guests say</h2>
+      <div class="review-summary">
+        <span class="stars" aria-label="3.9 out of 5 stars">★★★★☆</span>
+        <span><b>3.9 stars, based on 112 Google reviews.</b> Reviewers most often praise meticulous, detail-oriented nail work and some of the best pedicures they have had.</span>
+      </div>
+      <div class="cta-row" style="margin-bottom:8px">
+        <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJwfe24RS354kR6XQOzc5Jesc">See reviews on Google</a>
+        <a class="btn btn-ghost" href="https://reviews.birdeye.com/lux-spa-nails-170119851359054" style="color:var(--ink);border-color:rgba(46,27,39,.3)">Read reviews on Birdeye</a>
+      </div>
+      <div class="cards">
+        <div class="card">
+          <div class="stars" aria-hidden="true">★★★★★</div>
+          <p>Moved to Southington and tried a new salon. Loved the fresh set, meticulous with filing, cutting and polish. Precise with everything. Will absolutely be back.</p>
+          <span class="badge">Sample review card</span>
+        </div>
+        <div class="card">
+          <div class="stars" aria-hidden="true">★★★★★</div>
+          <p>Love the owners. Their nails are beautifully done and they really pay attention to detail. Been going there for 8+ years. The place is very clean and comfortable.</p>
+          <span class="badge">Sample review card</span>
+        </div>
+        <div class="card">
+          <div class="stars" aria-hidden="true">★★★★★</div>
+          <p>Had the best pedicure I have ever had. Prices were actually cheaper than my other place. I would strongly recommend Lux to anyone. I will definitely be back.</p>
+          <span class="badge">Sample review card</span>
+        </div>
+      </div>
+      <p style="margin-top:18px;color:var(--ink-soft)">Review summaries are paraphrased from public Google, Birdeye and Chamber of Commerce listings. Sample cards illustrate typical guest sentiment.</p>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="band plum" style="padding-top:90px">
+    <div class="wrap">
+      <p class="section-kicker">Visit us</p>
+      <h2>Find us on Queen Street</h2>
+      <div class="info-grid">
+        <div class="info" style="background:var(--paper);color:var(--ink)">
+          <h3>Address</h3>
+          <p>360 Queen St<br>Southington, CT 06489</p>
+          <p style="margin-top:12px"><a href="https://www.google.com/maps/place/?q=place_id:ChIJwfe24RS354kR6XQOzc5Jesc">Get directions on Google Maps</a></p>
+        </div>
+        <div class="info" style="background:var(--paper);color:var(--ink)">
+          <h3>Contact</h3>
+          <p>Phone: <a href="tel:+18606283689">(860) 628-3689</a></p>
+          <p style="margin-top:12px"><a href="tel:+18606283689">Call now</a></p>
+        </div>
+        <div class="info" style="background:var(--paper);color:var(--ink)">
+          <h3>Hours</h3>
+          <p>Call for hours. Walk-ins are welcome, and appointments can be booked by phone.</p>
+        </div>
+        <div class="info" style="background:var(--paper);color:var(--ink)">
+          <h3>Good to know</h3>
+          <p>All major credit cards accepted. Parking lot nearby.</p>
+        </div>
+      </div>
+      <div class="cta-row" style="margin-top:28px">
+        <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJwfe24RS354kR6XQOzc5Jesc">Get directions</a>
+        <a class="btn btn-ghost" href="tel:+18606283689">Call (860) 628-3689</a>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="giant">Lux Spa & Nails</div>
+    <div class="foot-links">
+      <a href="#home" data-page="home">Home</a>
+      <a href="#services" data-page="services">Services</a>
+      <a href="#story" data-page="story">Our Story</a>
+      <a href="#gallery" data-page="gallery">Gallery</a>
+      <a href="#reviews" data-page="reviews">Reviews</a>
+      <a href="#visit" data-page="visit">Visit Us</a>
+    </div>
+    <p>360 Queen St, Southington, CT 06489 · <a href="tel:+18606283689" style="color:var(--gold)">(860) 628-3689</a></p>
+    <div class="copy">© Lux Spa & Nails</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "story", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+  var scrim = document.getElementById("scrim");
+  var drawerClose = document.getElementById("drawerClose");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+    if(scrim){ scrim.classList.remove("show"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+      if(scrim){ scrim.classList.toggle("show", open); }
+    });
+  }
+  if(drawerClose){ drawerClose.addEventListener("click", function(){ closeMenu(); }); }
+  if(scrim){ scrim.addEventListener("click", function(){ closeMenu(); }); }
+
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
