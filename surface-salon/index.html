@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Surface Salon · Beauty Salon in Rochester, NY</title>
+<meta name="description" content="Surface Salon is a beauty salon at 661 South Ave, Rochester, NY. Precision cuts, color, styling, and brows in a lux, welcoming space. Call (585) 360-4446.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#23201B; --ink-soft:#5D564C;
+  --paper:#FCFAF6; --paper-2:#F6F1E9;
+  --blush:#F4E7DE; --gold:#B4863C; --gold-soft:#F3E6C8;
+  --char:#2A2520; --line:rgba(35,32,27,.14);
+  --radius:14px;
+  --shadow:0 18px 40px -18px rgba(35,32,27,.28);
+  --shadow-sm:0 8px 22px -12px rgba(35,32,27,.25);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Jost",system-ui,sans-serif;
+  background:var(--paper);color:var(--ink);line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--gold)}
+::selection{background:var(--gold-soft);color:var(--ink)}
+.wrap{max-width:1160px;margin:0 auto;padding:0 26px}
+.serif{font-family:"Cormorant Garamond",serif}
+
+/* ---------- header: top bar ---------- */
+header.site{
+  position:sticky;top:0;z-index:50;background:rgba(252,250,246,.95);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
+.brand svg{width:44px;height:44px;flex:none}
+.brand-name{font-family:"Cormorant Garamond",serif;font-weight:700;font-size:1.45rem;line-height:1;letter-spacing:.5px}
+.brand-name small{display:block;font-family:"Jost",sans-serif;font-weight:600;font-size:.6rem;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-top:3px}
+nav.main{display:flex;align-items:center;gap:2px}
+nav.main a{
+  text-decoration:none;color:var(--ink);font-weight:500;font-size:.95rem;letter-spacing:.4px;
+  padding:9px 14px;border-radius:999px;transition:background .2s,color .2s;white-space:nowrap;
+}
+nav.main a:hover{background:var(--blush)}
+nav.main a[aria-current="page"],nav.main a.active{background:var(--ink);color:var(--paper)}
+.call-btn{
+  display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#fff;text-decoration:none;
+  font-weight:600;padding:11px 22px;border-radius:999px;transition:filter .18s,transform .18s;white-space:nowrap;
+}
+.call-btn:hover{filter:brightness(1.08);transform:translateY(-2px)}
+.burger{display:none;background:none;border:0;cursor:pointer;padding:10px}
+.burger span{display:block;width:26px;height:3px;border-radius:3px;background:var(--ink);margin:5px 0;transition:.25s}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- split hero ---------- */
+.hero{padding:70px 0 64px;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;top:-120px;right:-120px;width:480px;height:480px;border-radius:50%;background:radial-gradient(circle, rgba(180,134,60,.14), transparent 65%)}
+.hero-grid{display:grid;grid-template-columns:1.02fr .98fr;gap:52px;align-items:center;position:relative}
+.kicker{
+  display:inline-block;font-size:.78rem;font-weight:600;letter-spacing:3.5px;text-transform:uppercase;color:var(--gold);
+  border-bottom:2px solid var(--gold);padding-bottom:6px;margin-bottom:20px;
+}
+h1{font-family:"Cormorant Garamond",serif;font-weight:700;font-size:clamp(2.7rem,5.4vw,4.4rem);line-height:1.04;letter-spacing:-.5px;margin-bottom:20px}
+h1 em{font-style:italic;color:var(--gold)}
+.lede{font-size:1.12rem;color:var(--ink-soft);max-width:34rem;margin-bottom:28px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:26px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:600;
+  padding:14px 28px;border-radius:999px;font-size:1rem;transition:transform .18s,filter .18s,background .18s,color .18s;
+}
+.btn-solid{background:var(--ink);color:var(--paper)}
+.btn-solid:hover{background:#000;transform:translateY(-2px)}
+.btn-gold{background:var(--gold);color:#fff}
+.btn-gold:hover{filter:brightness(1.08);transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:var(--ink);border:2px solid var(--line)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-2px)}
+.hours-pill{
+  display:inline-flex;align-items:center;gap:10px;background:var(--ink);color:var(--paper);
+  padding:10px 20px;border-radius:999px;font-weight:500;font-size:.95rem;box-shadow:var(--shadow-sm);
+}
+.hours-pill .dot{width:10px;height:10px;border-radius:50%;background:#7BC47F;box-shadow:0 0 0 4px rgba(123,196,127,.25);animation:pulse 2s infinite}
+.hours-pill.closed .dot{background:#D98A94;box-shadow:0 0 0 4px rgba(217,138,148,.25)}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+.hero-art{position:relative}
+.art-stage{
+  position:relative;background:linear-gradient(150deg,#F9EFE6,#F0DCCF);
+  border-radius:24px;padding:44px;box-shadow:var(--shadow);border:1px solid #fff;overflow:hidden;
+}
+.art-stage::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 85% 12%, rgba(180,134,60,.35), transparent 42%)}
+.art-stage svg{width:100%;height:auto;display:block}
+.stamp{
+  position:absolute;bottom:-18px;left:26px;background:var(--ink);color:var(--gold-soft);
+  font-family:"Cormorant Garamond",serif;font-style:italic;font-size:1.15rem;
+  padding:10px 24px;border-radius:999px;transform:rotate(-3deg);box-shadow:var(--shadow-sm);z-index:2;
+}
+
+/* ---------- magazine home ---------- */
+section.block{padding:64px 0}
+.ed-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:54px;align-items:start}
+.standfirst{font-family:"Cormorant Garamond",serif;font-size:clamp(1.6rem,2.6vw,2.2rem);line-height:1.3;font-weight:600;margin-bottom:16px}
+.dropcap::first-letter{
+  font-family:"Cormorant Garamond",serif;font-weight:700;font-size:4.6rem;line-height:.85;
+  float:left;padding:6px 12px 0 0;color:var(--gold);
+}
+.ed-grid p{color:var(--ink-soft);margin-bottom:14px}
+.byline{font-size:.82rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:12px}
+.band-dark{background:var(--char);color:#F0E8DB}
+.band-dark .standfirst,.band-dark h2{color:#fff}
+.band-dark p{color:#CFC3B2}
+.index-list{list-style:none;border-top:1px solid var(--line)}
+.index-list li{display:grid;grid-template-columns:84px 1fr auto;gap:18px;align-items:baseline;padding:22px 6px;border-bottom:1px solid var(--line);transition:background .2s}
+.index-list li:hover{background:var(--paper-2)}
+.index-num{font-family:"Cormorant Garamond",serif;font-size:1.8rem;color:var(--gold);font-weight:600}
+.index-list h3{font-family:"Cormorant Garamond",serif;font-size:1.5rem;font-weight:700;margin-bottom:4px}
+.index-list p{color:var(--ink-soft);font-size:.98rem;max-width:38rem}
+.index-tag{font-size:.72rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--ink-soft);border:1px solid var(--line);border-radius:999px;padding:6px 14px;white-space:nowrap}
+.pull-quote{
+  text-align:center;max-width:52rem;margin:0 auto;padding:20px 0;
+}
+.pull-quote .mark{font-family:"Cormorant Garamond",serif;font-size:4rem;color:var(--gold);line-height:.5;display:block;margin-bottom:18px}
+.pull-quote p{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:clamp(1.5rem,3vw,2.2rem);line-height:1.4;margin-bottom:14px}
+.pull-quote cite{font-style:normal;font-size:.82rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--ink-soft)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.stat{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:30px 22px;text-align:center;box-shadow:var(--shadow-sm)}
+.stat .n{font-family:"Cormorant Garamond",serif;font-size:2.6rem;font-weight:700;color:var(--gold)}
+.stat .l{font-size:.82rem;letter-spacing:1.8px;text-transform:uppercase;color:var(--ink-soft);margin-top:6px}
+.cta-band{background:linear-gradient(120deg,#2A2520,#171310);border-radius:24px;color:#F0E8DB;padding:56px 40px;text-align:center;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.cta-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 20%, rgba(180,134,60,.3), transparent 50%)}
+.cta-band h2{font-family:"Cormorant Garamond",serif;font-size:clamp(2rem,4vw,3rem);color:#fff;position:relative;margin-bottom:12px}
+.cta-band p{color:#CFC3B2;position:relative;max-width:36rem;margin:0 auto 26px}
+.cta-band .btn-gold{position:relative}
+
+/* ---------- services rows ---------- */
+.svc-row{display:grid;grid-template-columns:1fr auto;gap:8px 24px;padding:20px 6px;border-bottom:1px solid var(--line);align-items:baseline}
+.svc-row h3{font-family:"Cormorant Garamond",serif;font-size:1.45rem;font-weight:700}
+.svc-row .price{font-family:"Cormorant Garamond",serif;font-size:1.3rem;font-weight:600;color:var(--gold);white-space:nowrap}
+.svc-row p{color:var(--ink-soft);font-size:.97rem;grid-column:1/-1;max-width:44rem}
+.svc-cat{margin-bottom:48px}
+.svc-cat-head{display:flex;align-items:baseline;gap:18px;margin-bottom:10px}
+.svc-cat-head h3{font-family:"Cormorant Garamond",serif;font-size:1.9rem;font-weight:700}
+.svc-cat-head .line{flex:1;border-bottom:2px dotted rgba(180,134,60,.5);transform:translateY(-6px)}
+.svc-cat-head .fr{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:1.25rem;color:var(--gold)}
+.price-note{background:var(--gold-soft);border:1px dashed rgba(180,134,60,.6);border-radius:var(--radius);padding:18px 24px;margin-top:8px;font-size:.95rem;color:#6B5326}
+.price-note strong{color:var(--gold)}
+
+/* ---------- carousel gallery ---------- */
+.carousel{position:relative}
+.gal-viewport{overflow-x:auto;scroll-snap-type:x mandatory;display:flex;gap:22px;padding:6px 2px 22px;scrollbar-width:thin}
+.gal-card{
+  flex:0 0 min(420px,82vw);scroll-snap-align:start;border-radius:var(--radius);overflow:hidden;
+  box-shadow:var(--shadow-sm);background:var(--paper);position:relative;
+}
+.gal-card .art{aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;position:relative}
+.gal-card .art svg{width:38%;height:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.16))}
+.gal-card .cap{padding:18px 22px}
+.gal-card .cap strong{font-family:"Cormorant Garamond",serif;font-size:1.3rem;display:block}
+.gal-card .cap small{color:var(--ink-soft)}
+.soon{position:absolute;top:14px;right:14px;background:rgba(255,255,255,.9);font-size:.68rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;padding:5px 14px;border-radius:999px;color:var(--ink-soft);z-index:2}
+.gal-nav{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:6px}
+.gal-btn{
+  width:52px;height:52px;border-radius:50%;border:2px solid var(--line);background:var(--paper);
+  font-size:1.4rem;cursor:pointer;color:var(--ink);transition:all .2s;line-height:1;
+}
+.gal-btn:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.gal-dots{display:flex;gap:8px}
+.gal-dots button{width:10px;height:10px;border-radius:50%;border:0;background:rgba(35,32,27,.2);cursor:pointer;padding:0}
+.gal-dots button.on{background:var(--gold);transform:scale(1.25)}
+
+/* ---------- reviews ---------- */
+.rev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.rev{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow-sm);position:relative}
+.rev .stars{color:var(--gold);font-size:1.2rem;letter-spacing:3px;margin-bottom:12px}
+.rev p{font-size:1.02rem;margin-bottom:14px}
+.rev cite{font-style:normal;font-weight:600;font-size:.82rem;letter-spacing:1.8px;text-transform:uppercase;color:var(--ink-soft)}
+.rev.featured{background:var(--char);color:#F0E8DB;border-color:var(--char)}
+.rev.featured p{color:#E8DFD0}
+.rev.featured cite{color:var(--gold-soft)}
+.rs-strip{margin:0 auto 36px;max-width:660px;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:20px 26px;text-align:center;box-shadow:var(--shadow-sm)}
+.rs-note{margin:0 0 14px;font-size:.95rem;color:var(--ink-soft);line-height:1.55}
+.rs-btn{display:inline-block;background:var(--gold);color:#fff;padding:12px 28px;border-radius:999px;font-weight:600;text-decoration:none;font-size:.95rem;transition:filter .18s}
+.rs-btn:hover{filter:brightness(1.1)}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-bottom:26px}
+.info-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm)}
+.info-card h3{font-family:"Cormorant Garamond",serif;font-size:1.5rem;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.info-card h3 svg{width:28px;height:28px}
+.info-card p{color:var(--ink-soft);margin-bottom:8px}
+.info-card a.big{font-family:"Cormorant Garamond",serif;font-size:1.6rem;font-weight:700;color:var(--ink);text-decoration:none}
+.info-card a.big:hover{color:var(--gold)}
+.hours-table{width:100%;border-collapse:collapse;font-size:.98rem}
+.hours-table td{padding:10px 6px;border-bottom:1px dashed var(--line)}
+.hours-table tr.today td{font-weight:600;color:var(--gold)}
+.hours-table tr.today td:first-child::after{content:" · today";font-size:.85rem;color:var(--gold)}
+.hours-table td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.map-card{
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:340px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 46px, rgba(180,134,60,.16) 46px 48px),
+    repeating-linear-gradient(90deg, transparent 0 46px, rgba(180,134,60,.16) 46px 48px),
+    linear-gradient(140deg,#F6EFE3,#EDDFC8);
+  display:flex;align-items:center;justify-content:center;
+}
+.map-pin{text-align:center;background:var(--paper);padding:26px 34px;border-radius:20px;box-shadow:var(--shadow);max-width:80%;position:relative}
+.map-pin::after{content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);border:14px solid transparent;border-top-color:var(--paper);border-bottom:0}
+.map-pin svg{width:44px;height:44px;margin-bottom:8px}
+.map-pin strong{font-family:"Cormorant Garamond",serif;font-size:1.25rem;display:block}
+.map-pin small{color:var(--ink-soft)}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- big type footer ---------- */
+footer{background:var(--char);color:#CFC3B2;margin-top:24px}
+.foot-big{
+  font-family:"Cormorant Garamond",serif;font-weight:700;text-align:center;color:#fff;
+  font-size:clamp(3rem,11vw,9rem);line-height:1;letter-spacing:.02em;padding:64px 0 10px;white-space:nowrap;
+}
+.foot-big em{font-style:italic;color:var(--gold)}
+.foot-links{display:flex;justify-content:center;flex-wrap:wrap;gap:8px 26px;padding:18px 0 26px}
+.foot-links a{color:#CFC3B2;text-decoration:none;font-size:.95rem}
+.foot-links a:hover{color:var(--gold-soft)}
+.foot-contact{text-align:center;padding-bottom:30px;font-size:.95rem;color:#A99C87}
+.foot-contact a{color:var(--gold-soft);text-decoration:none}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.12);padding:20px 0 26px;display:flex;justify-content:center;font-size:.85rem;color:#A99C87}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+/* page strip headers */
+.strip{border-radius:20px;padding:52px 46px;color:#fff;position:relative;overflow:hidden;margin-bottom:44px;box-shadow:var(--shadow)}
+.strip::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(255,255,255,.2), transparent 50%)}
+.strip h2{font-family:"Cormorant Garamond",serif;color:#fff;font-size:clamp(2rem,4vw,3rem);position:relative;margin:6px 0 10px;font-weight:700}
+.strip p{color:rgba(255,255,255,.88);max-width:38rem;position:relative}
+.strip .k{font-size:.78rem;font-weight:600;letter-spacing:3.5px;text-transform:uppercase;position:relative;color:rgba(255,255,255,.8)}
+.strip.s-services{background:linear-gradient(120deg,#3A322A,#211C17)}
+.strip.s-story{background:linear-gradient(120deg,#6E4A2F,#3E2A1B)}
+.strip.s-gal{background:linear-gradient(120deg,#8A6A2E,#54401A)}
+.strip.s-rev{background:linear-gradient(120deg,#7A3E4A,#4A232B)}
+.strip.s-visit{background:linear-gradient(120deg,#2E4A42,#1A2A26)}
+
+@media(max-width:940px){
+  .hero-grid,.ed-grid,.visit-grid{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr}
+  .rev-grid{grid-template-columns:1fr}
+  nav.main{
+    display:none;position:absolute;top:100%;left:0;right:0;background:var(--paper);
+    flex-direction:column;align-items:stretch;padding:12px 20px 20px;gap:2px;
+    border-bottom:1px solid var(--line);box-shadow:var(--shadow);
+  }
+  nav.main.open{display:flex}
+  nav.main .call-btn{justify-content:center;margin-top:8px}
+  .burger{display:block}
+  .bar .call-btn{display:none}
+  .strip{padding:40px 28px}
+  .index-list li{grid-template-columns:64px 1fr}
+  .index-tag{grid-column:2;justify-self:start}
+}
+@media(max-width:600px){
+  .stats{grid-template-columns:1fr}
+  .hero{padding:48px 0 44px}
+  .cta-band{padding:40px 24px}
+}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap bar">
+    <a class="brand" href="#home" data-page="home" aria-label="Surface Salon, home">
+      <svg viewBox="0 0 64 64" role="img" aria-label="Surface Salon monogram"><circle cx="32" cy="32" r="28" fill="none" stroke="#B4863C" stroke-width="3"/><text x="32" y="43" text-anchor="middle" font-family="Cormorant Garamond, serif" font-size="30" font-weight="700" fill="#23201B">S</text><path d="M14 18 Q32 8 50 18" fill="none" stroke="#B4863C" stroke-width="2" stroke-linecap="round"/></svg>
+      <span class="brand-name">Surface<small>Salon · Rochester</small></span>
+    </a>
+    <nav class="main" id="mainNav" aria-label="Main navigation">
+      <a href="#home" data-page="home" class="active" aria-current="page">Home</a>
+      <a href="#services" data-page="services">Services</a>
+      <a href="#story" data-page="story">Our Story</a>
+      <a href="#gallery" data-page="gallery">Gallery</a>
+      <a href="#reviews" data-page="reviews">Reviews</a>
+      <a href="#visit" data-page="visit">Visit Us</a>
+      <a class="call-btn" href="tel:+15853604446">Call (585) 360-4446</a>
+    </nav>
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="kicker">Beauty salon · South Ave, Rochester</span>
+        <h1>Great hair is a <em>practice,</em> not a product.</h1>
+        <p class="lede">Surface Salon is a lux, welcoming beauty salon on South Ave in Rochester. Precision cuts, dimensional color, styling, and brows, done by stylists who listen first and cut second.</p>
+        <div class="cta-row">
+          <a class="btn btn-solid" href="#services" data-page="services">Explore Services</a>
+          <a class="btn btn-ghost" href="tel:+15853604446">Call (585) 360-4446</a>
+        </div>
+        <span class="hours-pill" id="hoursPill"><span class="dot"></span><span id="hoursText">Checking today&apos;s hours…</span></span>
+      </div>
+      <div class="hero-art">
+        <div class="art-stage">
+          <svg viewBox="0 0 300 260" role="img" aria-label="Illustration of salon shears and comb">
+            <ellipse cx="150" cy="232" rx="100" ry="14" fill="#B4863C" opacity=".18"/>
+            <circle cx="150" cy="120" r="92" fill="#FCFAF6" opacity=".55"/>
+            <g stroke="#23201B" stroke-width="7" stroke-linecap="round" fill="none">
+              <line x1="96" y1="60" x2="200" y2="196"/>
+              <line x1="200" y1="60" x2="96" y2="196"/>
+            </g>
+            <circle cx="82" cy="50" r="16" fill="none" stroke="#23201B" stroke-width="7"/>
+            <circle cx="214" cy="50" r="16" fill="none" stroke="#23201B" stroke-width="7"/>
+            <g stroke="#B4863C" stroke-width="5" stroke-linecap="round">
+              <line x1="228" y1="120" x2="228" y2="200"/>
+              <line x1="238" y1="124" x2="238" y2="204"/>
+              <line x1="248" y1="128" x2="248" y2="208"/>
+              <line x1="258" y1="132" x2="258" y2="212"/>
+              <line x1="268" y1="136" x2="268" y2="216"/>
+            </g>
+            <path d="M60 220 q90 26 180 0" fill="none" stroke="#B4863C" stroke-width="4" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="stamp">cuts · color · styling · brows</div>
+      </div>
+    </div>
+  </div>
+
+  <section class="block">
+    <div class="wrap ed-grid">
+      <div class="reveal">
+        <p class="byline">The Surface Edit · No. 01</p>
+        <p class="standfirst">A salon that feels like self-care, run by people who treat hair like an art form.</p>
+      </div>
+      <div class="reveal">
+        <p class="dropcap">Walk into Surface Salon on South Ave and the first thing you notice is the mood: beautiful, calm, and a little bit lux, with great music on and a team that genuinely loves what they do. Clients call it their favorite self-care stop in Rochester, and the reviews back it up.</p>
+        <p>The stylists here are known for getting it exactly right, the haircut you described, the color you pictured, the brows you have been nervous to trust anyone with. They keep their training current, their prices fair, and their welcome warm. This is not a rush-you-out chair. It is a sit-back, tell-us-everything, leave-gorgeous kind of place.</p>
+        <p><a href="#story" data-page="story" style="font-weight:600">Read our story →</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block band-dark" style="margin:0">
+    <div class="wrap">
+      <div class="reveal" style="margin-bottom:36px">
+        <p class="byline">This Season&apos;s Index</p>
+        <h2 class="serif" style="font-size:clamp(2rem,4vw,3rem);font-weight:700;margin-bottom:8px">The services, at a glance</h2>
+        <p style="max-width:36rem">An editorial skim of what the chair is booked for most. Full details live on the services page.</p>
+      </div>
+      <ol class="index-list">
+        <li class="reveal"><span class="index-num">01</span><div><h3>Precision Cuts</h3><p>Consultation-led cuts tailored to your face shape, texture, and routine. Guests say they leave with exactly what they asked for.</p></div><span class="index-tag">Most booked</span></li>
+        <li class="reveal"><span class="index-num">02</span><div><h3>Color</h3><p>Dimensional color, highlights, and lived-in tones, planned around how your hair grows and how often you want to be back.</p></div><span class="index-tag">Ask for Carrie</span></li>
+        <li class="reveal"><span class="index-num">03</span><div><h3>Blowouts &amp; Styling</h3><p>Event-ready styling and smooth, bouncy blowouts. Come as you are, leave camera ready.</p></div><span class="index-tag">Event favorite</span></li>
+        <li class="reveal"><span class="index-num">04</span><div><h3>Brows &amp; Lashes</h3><p>Microblading and lash enhancements by a specialist guests describe as a master of the craft.</p></div><span class="index-tag">By Jeni</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="pull-quote reveal">
+        <span class="mark">“</span>
+        <p>The best salon experience ever. The stylists are gifted both artistically and technically, the prices are fair, and the shop is lovely.</p>
+        <cite>Paraphrased from Google reviews</cite>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" style="padding-top:0">
+    <div class="wrap">
+      <div class="stats">
+        <div class="stat reveal"><div class="n">4.9</div><div class="l">Star rating, based on 41 Google reviews</div></div>
+        <div class="stat reveal"><div class="n">5</div><div class="l">Days open each week, Tue to Sat</div></div>
+        <div class="stat reveal"><div class="n">Davines</div><div class="l">Italian salon products sold in store</div></div>
+        <div class="stat reveal"><div class="n">1:1</div><div class="l">Consultation before every cut and color</div></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="cta-band reveal">
+      <h2>Your chair is waiting.</h2>
+      <p>661 South Ave, Rochester, NY · Open Tue to Thu 12 to 8, Fri 11 to 7, Sat 10 to 4. Call to book, walk-ins welcome when the chair is free.</p>
+      <a class="btn btn-gold" href="tel:+15853604446">Call (585) 360-4446</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-services">
+      <span class="k">The menu</span>
+      <h2>Services, priced fairly and done properly</h2>
+      <p>Cuts, color, styling, brows, and lashes. Every service starts with a real consultation so you leave with what you actually asked for.</p>
+    </div>
+
+    <div class="svc-cat reveal">
+      <div class="svc-cat-head"><h3>Cuts</h3><span class="line"></span><span class="fr">the signature</span></div>
+      <div class="svc-row"><h3>Women&apos;s Cut &amp; Style</h3><span class="price">Sample: from $60</span><p>Consultation, precision cut, cleanse, and finished style. Guests praise the exact-match results.</p></div>
+      <div class="svc-row"><h3>Men&apos;s Cut</h3><span class="price">Sample: from $35</span><p>Sharp, tailored barbering with a hot-towel finish.</p></div>
+      <div class="svc-row"><h3>Youth Cut</h3><span class="price">Sample: from $30</span><p>Patient, friendly cuts for younger guests.</p></div>
+      <div class="svc-row"><h3>Bang &amp; Neckline Trim</h3><span class="price">Sample: from $15</span><p>A quick tidy-up between full appointments.</p></div>
+    </div>
+
+    <div class="svc-cat reveal">
+      <div class="svc-cat-head"><h3>Color</h3><span class="line"></span><span class="fr">dimensional</span></div>
+      <div class="svc-row"><h3>Full Color</h3><span class="price">Sample: from $85</span><p>Rich, even, single-process color with a gloss finish.</p></div>
+      <div class="svc-row"><h3>Partial &amp; Full Highlights</h3><span class="price">Sample: from $110</span><p>Sun-kissed dimension or bold brightness, toned to perfection.</p></div>
+      <div class="svc-row"><h3>Balayage</h3><span class="price">Sample: from $150</span><p>Hand-painted, low-maintenance color that grows out beautifully.</p></div>
+      <div class="svc-row"><h3>Color Correction</h3><span class="price">By consultation</span><p>A careful plan to get your color back on track. Book a consultation first.</p></div>
+    </div>
+
+    <div class="svc-cat reveal">
+      <div class="svc-cat-head"><h3>Blowouts &amp; Styling</h3><span class="line"></span><span class="fr">event ready</span></div>
+      <div class="svc-row"><h3>Signature Blowout</h3><span class="price">Sample: from $45</span><p>Smooth, bouncy, and long-lasting. The pre-event essential.</p></div>
+      <div class="svc-row"><h3>Updos &amp; Formal Styling</h3><span class="price">Sample: from $65</span><p>Weddings, proms, and nights out. Bring your inspiration photos.</p></div>
+      <div class="svc-row"><h3>Deep Conditioning Treatment</h3><span class="price">Sample: from $30</span><p>Restorative care for dry or over-processed hair. Ask about Davines take-home products.</p></div>
+    </div>
+
+    <div class="svc-cat reveal">
+      <div class="svc-cat-head"><h3>Brows &amp; Lashes</h3><span class="line"></span><span class="fr">by Jeni</span></div>
+      <div class="svc-row"><h3>Microblading</h3><span class="price">By consultation</span><p>Natural-looking, precisely shaped brows. Guests call the results a masterclass.</p></div>
+      <div class="svc-row"><h3>Lash Extensions</h3><span class="price">Sample: from $75</span><p>Full, fluttery sets for the holidays and every day.</p></div>
+      <div class="svc-row"><h3>Brow Shaping</h3><span class="price">Sample: from $20</span><p>Clean, flattering shape that frames your face.</p></div>
+    </div>
+
+    <div class="price-note reveal">
+      <strong>Please note:</strong> prices above are samples to give you an idea of range. Exact pricing is confirmed at consultation and in store. Surface Salon also retails excellent Davines Italian hair products, ask your stylist what is right for your hair.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-story">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-story">
+      <span class="k">Our story</span>
+      <h2>A beautiful room where<br>great hair happens</h2>
+      <p>Surface Salon is an independent beauty salon on South Ave in Rochester, built on talent, training, and treating every guest like a regular.</p>
+    </div>
+
+    <div class="ed-grid" style="margin-bottom:56px">
+      <div class="reveal">
+        <p class="byline">The space</p>
+        <p class="standfirst">Lux but never stuffy. Chill but never careless.</p>
+      </div>
+      <div class="reveal">
+        <p class="dropcap">Guests describe Surface as beautiful, lux, and chill, a space with awesome music where you can actually relax. It is the kind of salon people call their favorite self-care activity, not just an errand. Street parking out front, a warm welcome at the door, and a chair that feels like yours from the first visit.</p>
+        <p>The team takes training and customer service seriously and stays current with style trends. They are, in the words of one guest, kind-hearted people who are gifted both artistically and technically. Fair prices, a lovely shop, and stylists who remember what you asked for last time.</p>
+        <p>They also stock excellent Davines Italian hair products, so the good hair days continue at home.</p>
+      </div>
+    </div>
+
+    <div class="stats" style="margin-bottom:56px">
+      <div class="stat reveal"><div class="n serif">Liz</div><div class="l">Cuts &amp; styling · praised for exact-match results</div></div>
+      <div class="stat reveal"><div class="n serif">Carrie George</div><div class="l">Cuts &amp; color · guests call her the best</div></div>
+      <div class="stat reveal"><div class="n serif">Jen Marks</div><div class="l">Cuts · great hair and an even better experience</div></div>
+      <div class="stat reveal"><div class="n serif">Jeni Earnshaw</div><div class="l">Microblading · a master of the craft</div></div>
+    </div>
+
+    <div class="wrap">
+      <div class="cta-band reveal">
+        <h2>Come see the space for yourself.</h2>
+        <p>661 South Ave, Rochester, NY · Call (585) 360-4446 to book with the stylist who fits your goals.</p>
+        <a class="btn btn-gold" href="#visit" data-page="visit">Plan your visit</a>
+      </div>
+      <div style="height:56px"></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-gal">
+      <span class="k">The gallery</span>
+      <h2>A look inside the salon</h2>
+      <p>Artistic previews of the space and the work. Real photos of our cuts, color, and brows are on the way.</p>
+    </div>
+
+    <div class="carousel reveal">
+      <div class="gal-viewport" id="galViewport">
+        <div class="gal-card"><span class="soon">Photo soon</span>
+          <div class="art" style="background:linear-gradient(140deg,#F4E7DE,#E4CDBD)">
+            <svg viewBox="0 0 100 100"><circle cx="50" cy="44" r="26" fill="#23201B"/><path d="M24 78 q26 -26 52 0 l-4 14 H28 Z" fill="#23201B"/><path d="M30 40 q20 -22 40 0 q-8 -24 -20 -24 q-12 0 -20 24Z" fill="#B4863C"/></svg>
+          </div>
+          <div class="cap"><strong>Precision Cuts</strong><small>Shaped, textured, exactly as asked</small></div>
+        </div>
+        <div class="gal-card"><span class="soon">Photo soon</span>
+          <div class="art" style="background:linear-gradient(140deg,#EAD9C2,#D9BC8E)">
+            <svg viewBox="0 0 100 100"><circle cx="50" cy="42" r="26" fill="#8A5A3B"/><path d="M24 76 q26 -24 52 0 l-4 16 H28 Z" fill="#8A5A3B"/><path d="M34 30 q4 22 -2 40 M46 26 q2 26 -4 46 M58 26 q0 26 4 46 M70 32 q-4 20 2 38" stroke="#E8A93D" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+          </div>
+          <div class="cap"><strong>Dimensional Color</strong><small>Highlights and lived-in tones</small></div>
+        </div>
+        <div class="gal-card"><span class="soon">Photo soon</span>
+          <div class="art" style="background:linear-gradient(140deg,#D8C9B8,#BFA98C)">
+            <svg viewBox="0 0 100 100"><ellipse cx="50" cy="52" rx="30" ry="34" fill="#23201B"/><path d="M32 30 q-8 40 6 62 M68 30 q8 40 -6 62" stroke="#3A342C" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M40 20 q-12 8 -10 24" stroke="#B4863C" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+          </div>
+          <div class="cap"><strong>Blowouts</strong><small>Smooth, bouncy, event ready</small></div>
+        </div>
+        <div class="gal-card"><span class="soon">Photo soon</span>
+          <div class="art" style="background:linear-gradient(140deg,#F3E6C8,#E3C896)">
+            <svg viewBox="0 0 100 100"><ellipse cx="50" cy="52" rx="34" ry="26" fill="#F4E7DE"/><path d="M22 46 q14 -8 28 0 M50 46 q14 -8 28 0" stroke="#23201B" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="36" cy="62" r="4" fill="#23201B"/><circle cx="64" cy="62" r="4" fill="#23201B"/><path d="M42 74 q8 6 16 0" stroke="#B4863C" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+          </div>
+          <div class="cap"><strong>Brows &amp; Lashes</strong><small>Microblading by a specialist</small></div>
+        </div>
+        <div class="gal-card"><span class="soon">Photo soon</span>
+          <div class="art" style="background:linear-gradient(140deg,#C9D2CE,#A8B5AE)">
+            <svg viewBox="0 0 100 100"><rect x="20" y="30" width="60" height="44" rx="6" fill="#FCFAF6"/><rect x="28" y="38" width="44" height="10" rx="3" fill="#B4863C"/><rect x="28" y="52" width="30" height="8" rx="3" fill="#23201B" opacity=".7"/><circle cx="72" cy="66" r="4" fill="#B4863C"/></svg>
+          </div>
+          <div class="cap"><strong>The Space</strong><small>Lux, chill, and welcoming</small></div>
+        </div>
+        <div class="gal-card"><span class="soon">Photo soon</span>
+          <div class="art" style="background:linear-gradient(140deg,#E8D5D8,#D3AEB4)">
+            <svg viewBox="0 0 100 100"><rect x="34" y="20" width="12" height="46" rx="6" fill="#23201B"/><rect x="54" y="20" width="12" height="46" rx="6" fill="#B4863C"/><rect x="28" y="70" width="44" height="8" rx="4" fill="#23201B"/><path d="M40 14 q10 -8 20 0" stroke="#23201B" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+          </div>
+          <div class="cap"><strong>Retail Shelf</strong><small>Davines Italian hair care</small></div>
+        </div>
+      </div>
+      <div class="gal-nav">
+        <button class="gal-btn" id="galPrev" aria-label="Previous photo">‹</button>
+        <div class="gal-dots" id="galDots" aria-hidden="true"></div>
+        <button class="gal-btn" id="galNext" aria-label="Next photo">›</button>
+      </div>
+    </div>
+
+    <div class="price-note reveal" style="margin-top:28px">
+      <strong>Coming soon:</strong> real photos of our work and our space. The illustrations above are artistic previews. The real thing is even better in person.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-rev">
+      <span class="k">Kind words</span>
+      <h2>Loved by Rochester</h2>
+      <p>Around 4.9 stars across Google reviews. Here is what guests keep saying about the chair, the color, and the welcome.</p>
+    </div>
+    <div class="rs-strip">
+      <p class="rs-note">Review themes on this page are paraphrased from public feedback. Open the source to read current reviews and ratings.</p>
+      <a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJb4xE-Ry11okRNA_YUgf5q-Y" target="_blank" rel="noopener">See reviews on Google</a>
+    </div>
+
+    <div class="rev-grid">
+      <div class="rev featured reveal">
+        <div class="stars">★★★★★</div>
+        <p>The best salon experience ever. The stylists are gifted both artistically and technically, they take training and customer service seriously, the prices are fair, and the shop is lovely. They sell excellent Davines Italian hair products too.</p>
+        <cite>Paraphrased · Google review</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>My stylist was absolutely fantastic, so sweet and incredibly talented. I got the exact haircut and style I asked for, and she was so much fun to talk to. I will definitely be back.</p>
+        <cite>Paraphrased · Google review</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>Go see Carrie George for the hottest haircuts and color. She is the best.</p>
+        <cite>Paraphrased · Google review</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>Jen Marks gave me a great haircut and an amazing experience. Her personality is on fire. Jeni Earnshaw did my microblading and I could not have asked for a better outcome. A master of the craft.</p>
+        <cite>Paraphrased · Google review</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>A beautiful, lux, and chill space with awesome music. It is my favorite self-care stop and the only place to go.</p>
+        <cite>Paraphrased · Google review</cite>
+      </div>
+    </div>
+
+    <div class="cta-band reveal" style="margin-top:44px">
+      <h2>Had a great visit? Tell Rochester.</h2>
+      <p>Your review helps an independent salon keep growing. It takes a minute, and it means the world to us.</p>
+      <a class="btn btn-gold" href="https://www.google.com/maps/place/?q=place_id:ChIJb4xE-Ry11okRNA_YUgf5q-Y" target="_blank" rel="noopener">Leave us a Google review</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-visit">
+      <span class="k">Visit us</span>
+      <h2>Come take the chair</h2>
+      <p>On South Ave in Rochester, with street parking nearby. Call ahead to book, or stop in when the chair is free.</p>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#B4863C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Find us</h3>
+        <p><strong>Surface Salon</strong><br>661 South Ave<br>Rochester, NY 14620</p>
+        <p>Street parking available.<br>Look for the salon sign on South Ave.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#B4863C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg> Call us</h3>
+        <p>Bookings, consultations, and questions:</p>
+        <a class="big" href="tel:+15853604446">(585) 360-4446</a>
+        <p style="margin-top:10px">For color and microblading, we recommend booking a consultation first.</p>
+      </div>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#B4863C" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Hours</h3>
+        <table class="hours-table" id="hoursTable">
+          <tr><td>Monday</td><td>Closed</td></tr>
+          <tr><td>Tuesday</td><td>12:00 PM - 8:00 PM</td></tr>
+          <tr><td>Wednesday</td><td>12:00 PM - 8:00 PM</td></tr>
+          <tr><td>Thursday</td><td>12:00 PM - 8:00 PM</td></tr>
+          <tr><td>Friday</td><td>11:00 AM - 7:00 PM</td></tr>
+          <tr><td>Saturday</td><td>10:00 AM - 4:00 PM</td></tr>
+          <tr><td>Sunday</td><td>Closed</td></tr>
+        </table>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <svg viewBox="0 0 24 24" fill="#B4863C"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#FCFAF6"/></svg>
+          <strong>661 South Ave</strong>
+          <small>Rochester, NY 14620</small><br>
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJb4xE-Ry11okRNA_YUgf5q-Y" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-big">Surface <em>Salon</em></div>
+    <div class="foot-links">
+      <a href="#home" data-page="home">Home</a>
+      <a href="#services" data-page="services">Services</a>
+      <a href="#story" data-page="story">Our Story</a>
+      <a href="#gallery" data-page="gallery">Gallery</a>
+      <a href="#reviews" data-page="reviews">Reviews</a>
+      <a href="#visit" data-page="visit">Visit Us</a>
+    </div>
+    <div class="foot-contact">
+      661 South Ave, Rochester, NY 14620 · <a href="tel:+15853604446">(585) 360-4446</a><br>
+      Tue to Thu 12 to 8 · Fri 11 to 7 · Sat 10 to 4
+    </div>
+    <div class="foot-bottom">
+      <span>© Surface Salon</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "story", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+
+  /* ---------- gallery carousel ---------- */
+  var viewport = document.getElementById("galViewport");
+  var dotsWrap = document.getElementById("galDots");
+  if(viewport){
+    var cards = viewport.querySelectorAll(".gal-card");
+    for(var c = 0; c < cards.length; c++){
+      var d = document.createElement("button");
+      d.setAttribute("aria-label", "Go to photo " + (c + 1));
+      (function(idx){
+        d.addEventListener("click", function(){
+          viewport.scrollTo({left: cards[idx].offsetLeft - viewport.offsetLeft - 8, behavior: "smooth"});
+        });
+      })(c);
+      dotsWrap.appendChild(d);
+    }
+    var dots = dotsWrap.querySelectorAll("button");
+    function paintDots(){
+      var w = cards[0].offsetWidth + 22;
+      var idx = Math.round(viewport.scrollLeft / w);
+      for(var m = 0; m < dots.length; m++){
+        dots[m].classList.toggle("on", m === idx);
+      }
+    }
+    viewport.addEventListener("scroll", paintDots, {passive: true});
+    paintDots();
+    var prev = document.getElementById("galPrev");
+    var next = document.getElementById("galNext");
+    function step(dir){
+      var w = cards[0].offsetWidth + 22;
+      viewport.scrollBy({left: dir * w, behavior: "smooth"});
+    }
+    if(prev){ prev.addEventListener("click", function(){ step(-1); }); }
+    if(next){ next.addEventListener("click", function(){ step(1); }); }
+  }
+
+  /* ---------- live hours (America/New_York) ---------- */
+  var HOURS = {0:null,1:null,2:[12,20],3:[12,20],4:[12,20],5:[11,19],6:[10,16]};
+  var DOW = {"Sun":0,"Mon":1,"Tue":2,"Wed":3,"Thu":4,"Fri":5,"Sat":6};
+  function fmt(h){
+    var ap = h < 12 ? "AM" : "PM";
+    var hh = h % 12;
+    if(hh === 0){ hh = 12; }
+    return hh + ":00 " + ap;
+  }
+  try{
+    var parts = new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",weekday:"short",hour:"numeric",hour12:false}).formatToParts(new Date());
+    var wd = "Mon", hr = 12;
+    parts.forEach(function(p){
+      if(p.type === "weekday"){ wd = p.value; }
+      if(p.type === "hour"){ hr = parseInt(p.value, 10) % 24; }
+    });
+    var day = DOW[wd] !== undefined ? DOW[wd] : 1;
+    var dayNames = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+    function isOpen(d){ return HOURS[d] !== null; }
+    function nextOpen(from){
+      for(var k = 0; k < 7; k++){
+        var d2 = (from + k) % 7;
+        if(isOpen(d2)){ return {day: d2, inDays: k}; }
+      }
+      return null;
+    }
+    var pill = document.getElementById("hoursPill");
+    var txt = document.getElementById("hoursText");
+    if(pill && txt){
+      if(isOpen(day)){
+        var openH = HOURS[day][0], closeH = HOURS[day][1];
+        if(hr >= openH && hr < closeH){
+          txt.textContent = "Open now · until " + fmt(closeH) + " today";
+        } else if(hr < openH){
+          txt.textContent = "Opens today at " + fmt(openH);
+        } else {
+          pill.classList.add("closed");
+          var nx = nextOpen(day + 1);
+          txt.textContent = "Opens " + (nx.inDays === 1 ? "tomorrow" : dayNames[nx.day]) + " at " + fmt(HOURS[nx.day][0]);
+        }
+      } else {
+        pill.classList.add("closed");
+        var nx2 = nextOpen(day + 1);
+        txt.textContent = "Opens " + (nx2.inDays === 1 ? "tomorrow" : dayNames[nx2.day]) + " at " + fmt(HOURS[nx2.day][0]);
+      }
+    }
+    var rows = document.querySelectorAll("#hoursTable tr");
+    var idx = (day + 6) % 7;
+    if(rows[idx]){ rows[idx].classList.add("today"); }
+  }catch(e){ /* leave default pill text */ }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
