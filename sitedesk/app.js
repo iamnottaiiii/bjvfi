@@ -292,6 +292,9 @@ var state = {
   intakeStatusFilter: 'all',
   users: null, usersSha: null,
   booted: false,
+  /* Unsaved builder inputs (built site URL / payment link) per intake, so a
+     re-render (e.g. tapping a status chip) never wipes what was typed. */
+  draftBuild: {},
 };
 
 var LS_SESSION = 'sitedesk_session_v1';
@@ -824,12 +827,21 @@ function tabDefs(){
 }
 
 function notifBannerHtml(){
+  let perm = '';
   try{
-    if(typeof Notification === 'undefined' || Notification.permission !== 'default') return '';
+    if(typeof Notification === 'undefined') return '';
+    perm = Notification.permission;
   }catch(e){ return ''; }
+  /* The banner shows whenever notifications are not on (default or denied).
+     Once permission is granted it disappears. */
+  if(perm === 'granted') return '';
+  const msg = perm === 'denied'
+    ? 'Notifications are blocked for SiteDesk in this browser. Allow them in your browser site settings to get alerts on this device.'
+    : 'Notifications are off. Turn them on for alerts on this device.';
+  const btn = perm === 'denied' ? '' :
+    '<button class="btn sm ghost" id="banner-notif" type="button">Enable</button>';
   return '<div class="notif-banner"><div class="row"><span class="muted" style="font-size:12px">' +
-    'Notifications are off. Turn them on for alerts on this device.</span>' +
-    '<button class="btn sm ghost" id="banner-notif" type="button">Enable</button></div></div>';
+    msg + '</span>' + btn + '</div></div>';
 }
 
 function shell(content){
@@ -964,6 +976,22 @@ function wireQueue(el){
   const fa = el.querySelector('#btn-filter');
   if(fa) fa.addEventListener('click', apply);
   if(q) q.addEventListener('keydown', function(e){ if(e.key === 'Enter') apply(); });
+  /* Live filtering as you type (debounced), so typing alone narrows the board.
+     Focus is restored after the re-render so typing is not interrupted. */
+  if(q){
+    let deb = null;
+    q.addEventListener('input', function(){
+      if(deb) clearTimeout(deb);
+      deb = setTimeout(function(){
+        apply();
+        const nq = el.querySelector('#queue-q');
+        if(nq){
+          nq.focus();
+          try{ nq.setSelectionRange(nq.value.length, nq.value.length); }catch(e){}
+        }
+      }, 350);
+    });
+  }
   el.querySelectorAll('[data-cat]').forEach(function(chip){
     chip.addEventListener('click', function(){
       state.cat = chip.getAttribute('data-cat');
@@ -1512,6 +1540,7 @@ async function submitIntake(claim){
     await refreshMyClaims();
     await refreshMyIntakes();
     toast('Sent to builders');
+    closeModal();
     renderApp();
   }
   try{
@@ -1563,6 +1592,9 @@ async function submitIntake(claim){
   }catch(e){
     /* best-effort refresh: still re-render below so the button never sticks */
   }
+  /* The intake form lives in a modal that renderApp() does not touch, so close
+     it explicitly — otherwise the button sits stuck on "Submitting...". */
+  closeModal();
   renderApp();
 }
 
@@ -1625,6 +1657,9 @@ async function markSold(claim){
     await refreshMyClaims();
     await refreshMyIntakes();
     toast('Marked sold');
+    /* The lead detail is a modal renderApp() does not touch: close it so the
+       button cannot sit stuck on "Marking sold...". */
+    closeModal();
     renderApp();
   }catch(e){ if(err) err.textContent = e.message; else toast(e.message); restore(); }
 }
@@ -1758,9 +1793,9 @@ async function renderIntakesInto(el){
         (i.pay_link ? '<div style="margin-top:4px;font-size:13px"><strong>Payment link:</strong> <a href="' + esc(i.pay_link) + '" target="_blank" rel="noopener">Open</a></div>' : '') +
         (canInbox() ?
           '<div class="field" style="margin-top:10px"><label>Built site URL</label>' +
-          '<input id="bs-site-' + esc(i.id) + '" placeholder="https://..." value="' + esc(i.site_url || '') + '"/>' +
+          '<input id="bs-site-' + esc(i.id) + '" placeholder="https://..." value="' + esc(buildDraft(i.id, 'site') || i.site_url || '') + '"/>' +
           '<label style="margin-top:8px">Client payment link</label>' +
-          '<input id="bs-pay-' + esc(i.id) + '" placeholder="https://..." value="' + esc(i.pay_link || '') + '"/>' +
+          '<input id="bs-pay-' + esc(i.id) + '" placeholder="https://..." value="' + esc(buildDraft(i.id, 'pay') || i.pay_link || '') + '"/>' +
           '<div class="row" style="margin-top:8px"><button type="button" class="btn sm" data-submit-build="' + esc(i.id) + '">Submit built site</button></div>' +
           '<div class="err" id="bs-err-' + esc(i.id) + '"></div></div>' +
           (i.builder_name ? '<div class="muted" style="font-size:11px">Builder: ' + esc(i.builder_name) + '</div>' : '')
@@ -1781,6 +1816,13 @@ async function renderIntakesInto(el){
   });
   el.querySelectorAll('[data-submit-build]').forEach(function(b){
     b.addEventListener('click', function(){ submitBuiltSite(b.getAttribute('data-submit-build'), el); });
+  });
+  /* Keep unsaved builder inputs across re-renders. */
+  el.querySelectorAll('[id^="bs-site-"]').forEach(function(inp){
+    inp.addEventListener('input', function(){ buildDraft(inp.id.slice(8), 'site', inp.value); });
+  });
+  el.querySelectorAll('[id^="bs-pay-"]').forEach(function(inp){
+    inp.addEventListener('input', function(){ buildDraft(inp.id.slice(7), 'pay', inp.value); });
   });
   el.querySelectorAll('[data-intake-file]').forEach(function(b){
     b.addEventListener('click', function(){
@@ -1828,6 +1870,13 @@ async function setIntakeStatus(chip, el){
   }catch(e){ toast(e.message); chip.disabled = false; }
 }
 
+/* Builder's unsaved per-intake inputs survive re-renders. */
+function buildDraft(id, key, val){
+  const d = state.draftBuild[id] || (state.draftBuild[id] = {});
+  if(typeof val !== 'undefined') d[key] = val;
+  return d[key] || '';
+}
+
 /* Builder/admin/head submits the finished site plus the client payment link.
    The intake becomes Ready and the caller is notified so they can mark it sold. */
 async function submitBuiltSite(id, el){
@@ -1836,8 +1885,8 @@ async function submitBuiltSite(id, el){
   const siteEl = document.getElementById('bs-site-' + id);
   const payEl = document.getElementById('bs-pay-' + id);
   const err = document.getElementById('bs-err-' + id);
-  const siteUrl = siteEl ? (siteEl.value || '').trim() : '';
-  const payLink = payEl ? (payEl.value || '').trim() : '';
+  const siteUrl = ((siteEl ? siteEl.value : '') || buildDraft(id, 'site') || '').trim();
+  const payLink = ((payEl ? payEl.value : '') || buildDraft(id, 'pay') || '').trim();
   if(err) err.textContent = '';
   function restore(){ if(btn){ btn.disabled = false; btn.textContent = 'Submit built site'; } }
   if(!siteUrl || !payLink){
@@ -1855,6 +1904,7 @@ async function submitBuiltSite(id, el){
     if(applied(intake)){
       /* Already submitted (double tap): nothing to show, just refresh. */
       toast('Submitted. The caller was notified.');
+      delete state.draftBuild[id];
       renderIntakesInto(el);
       return;
     }
@@ -1874,6 +1924,7 @@ async function submitBuiltSite(id, el){
         const rec2 = await ghGetJson('intakes/' + id + '.json');
         if(rec2 && applied(rec2.data)){
           toast('Submitted. The caller was notified.');
+          delete state.draftBuild[id];
           renderIntakesInto(el);
           return;
         }
@@ -1885,6 +1936,7 @@ async function submitBuiltSite(id, el){
         state.user.name + ' finished the site. The client payment link is ready. Open the lead and mark it sold.', 'lead:' + intake.slug);
     }
     toast('Submitted. The caller was notified.');
+    delete state.draftBuild[id];
     renderIntakesInto(el);
   }catch(e){ if(err) err.textContent = e.message; else toast(e.message); restore(); }
 }
@@ -1984,7 +2036,16 @@ function wireAdminUsers(el){
   const nu = el.querySelector('#btn-new-user');
   if(nu) nu.addEventListener('click', function(){ newUserModal(el); });
   el.querySelectorAll('[data-uact]').forEach(function(b){
-    b.addEventListener('click', function(){ userAction(b.getAttribute('data-u'), b.getAttribute('data-uact'), el); });
+    b.addEventListener('click', function(){
+      /* Immediate feedback: disable until the save round-trip finishes, so a
+         slow network does not read as "the click did nothing". */
+      b.disabled = true;
+      const rearm = function(){ try{ b.disabled = false; }catch(e){} };
+      try{
+        const r = userAction(b.getAttribute('data-u'), b.getAttribute('data-uact'), el);
+        if(r && r.then) r.then(rearm, rearm); else rearm();
+      }catch(e){ rearm(); }
+    });
   });
   el.querySelectorAll('[data-udash]').forEach(function(b){
     b.addEventListener('click', function(){ state.adminUser = b.getAttribute('data-udash'); renderAdminInto(el); });
