@@ -524,6 +524,20 @@ async function loadUsers(){
   state.usersSha = rec ? rec.sha : null;
 }
 
+function renderHome(){
+  document.getElementById('app').innerHTML =
+    '<header class="top"><div class="brand">sitedesk<div class="brand-sub">bjvfi</div></div></header>' +
+    '<div class="main auth-main"><div class="card" style="text-align:center;padding:40px 24px">' +
+    '<div class="brand-sub" style="font-size:13px;letter-spacing:3px;margin-bottom:12px">bjvfi</div>' +
+    '<h1 style="font-size:28px;margin:0 0 12px">Welcome to SiteDesk</h1>' +
+    '<p class="muted" style="font-size:13px;margin-bottom:28px">The calling floor for the website crew.<br/>Grab leads, log outcomes, get paid.</p>' +
+    '<button class="btn block" id="home-login" type="button" style="margin-bottom:10px">Login</button>' +
+    '<button class="btn ghost block" id="home-signup" type="button">Create account</button>' +
+    '</div></div>';
+  document.getElementById('home-login').addEventListener('click', renderLogin);
+  document.getElementById('home-signup').addEventListener('click', renderSignup);
+}
+
 function renderLogin(){
   document.getElementById('app').innerHTML =
     '<header class="top"><div class="brand">sitedesk<div class="brand-sub">bjvfi</div></div></header>' +
@@ -533,7 +547,7 @@ function renderLogin(){
     '<div class="field"><label>Password</label><input id="login-pass" type="password" autocomplete="current-password"/></div>' +
     '<button class="btn block" id="login-go" type="button">Login</button>' +
     '<div class="err" id="login-err"></div>' +
-    '<p class="muted" style="margin-top:14px;font-size:12px">Need an account? <a href="#" id="login-signup" style="color:var(--amber)">Create one</a></p>' +
+    '<p class="muted" style="margin-top:14px;font-size:12px">Need an account? <a href="#" id="login-signup" style="color:var(--amber)">Create one</a> &middot; <a href="#" id="login-home" style="color:var(--amber)">Home</a></p>' +
     '</div></div>';
   document.getElementById('login-go').addEventListener('click', doLogin);
   document.getElementById('login-pass').addEventListener('keydown', function(e){
@@ -541,6 +555,9 @@ function renderLogin(){
   });
   document.getElementById('login-signup').addEventListener('click', function(e){
     e.preventDefault(); renderSignup();
+  });
+  document.getElementById('login-home').addEventListener('click', function(e){
+    e.preventDefault(); renderHome();
   });
 }
 
@@ -556,7 +573,7 @@ function renderSignup(){
     '<div class="field"><label>Confirm password *</label><input id="su-pass2" type="password" autocomplete="new-password"/></div>' +
     '<button class="btn block" id="su-go" type="button">Create account</button>' +
     '<div class="err" id="su-err"></div>' +
-    '<p class="muted" style="margin-top:14px;font-size:12px">Already have an account? <a href="#" id="su-login" style="color:var(--amber)">Log in</a></p>' +
+    '<p class="muted" style="margin-top:14px;font-size:12px">Already have an account? <a href="#" id="su-login" style="color:var(--amber)">Log in</a> &middot; <a href="#" id="su-home" style="color:var(--amber)">Home</a></p>' +
     '</div></div>';
   document.getElementById('su-go').addEventListener('click', doSignup);
   document.getElementById('su-pass2').addEventListener('keydown', function(e){
@@ -564,6 +581,9 @@ function renderSignup(){
   });
   document.getElementById('su-login').addEventListener('click', function(e){
     e.preventDefault(); renderLogin();
+  });
+  document.getElementById('su-home').addEventListener('click', function(e){
+    e.preventDefault(); renderHome();
   });
 }
 
@@ -639,7 +659,7 @@ function logout(){
   state.user = null; state.myClaims = []; state.myIntakes = [];
   state.feed = []; state.unread = 0; state.feedMaxTs = 0;
   state.claimsBySlug = {}; state.treeSlugs = null;
-  renderLogin();
+  renderHome();
 }
 
 /* ================= shell ================= */
@@ -1531,7 +1551,7 @@ function renderProfileInto(el){
 /* ================= render dispatch ================= */
 
 function renderApp(){
-  if(!state.user){ renderLogin(); return; }
+  if(!state.user){ renderHome(); return; }
   if(state.user.role === 'builder' && (state.tab === 'queue' || state.tab === 'mine')) state.tab = 'inbox';
   const app = document.getElementById('app');
   if(state.tab === 'queue'){
@@ -1614,7 +1634,7 @@ function init(){
       clearSession();
       state.user = null;
     }
-    renderLogin();
+    renderHome();
   }
 }
 
