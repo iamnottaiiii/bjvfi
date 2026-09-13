@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Look for All Seasons · Hair Salon, Manlius, NY</title>
+<meta name="description" content="A Look for All Seasons, a hair salon at 220 Fayette St, Manlius, NY. Cuts, color and styling. Open Mon-Sat 9 AM-9 PM. Call (315) 682-6003.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FBF6EA; --paper:#FFFFFF; --sand:#F3E9D3;
+  --ink:#24352C; --ink-soft:#5F6F63;
+  --pine:#2F4A3E; --pine-deep:#1E3229; --pine-soft:#DCE6DB;
+  --amber:#D9A441; --amber-deep:#A9761F; --amber-soft:#F7EBCB;
+  --berry:#9C3D54; --berry-soft:#F5DCE1;
+  --radius:14px;
+  --shadow:0 18px 40px -18px rgba(30,50,41,.3);
+  --shadow-sm:0 8px 22px -10px rgba(30,50,41,.24);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"DM Sans",system-ui,sans-serif;
+  background:var(--cream);color:var(--ink);line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%}
+a{color:var(--pine)}
+::selection{background:var(--amber-soft);color:var(--ink)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.dserif{font-family:"DM Serif Display",serif}
+
+/* ---------- header ---------- */
+header.site{
+  position:sticky;top:0;z-index:60;
+  background:rgba(251,246,234,.94);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-bottom:2px solid rgba(47,74,62,.14);
+}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
+.brand svg{width:46px;height:46px;flex:none}
+.brand-name{font-family:"DM Serif Display",serif;font-size:1.35rem;line-height:1.05;letter-spacing:.2px}
+.brand-name small{display:block;font-family:"DM Sans",sans-serif;font-weight:700;font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--amber-deep)}
+.head-actions{display:flex;align-items:center;gap:10px}
+.call-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--pine);color:#fff;text-decoration:none;font-weight:700;
+  padding:11px 22px;border-radius:999px;box-shadow:var(--shadow-sm);
+  transition:transform .18s,background .18s;white-space:nowrap;
+}
+.call-btn:hover{background:var(--pine-deep);transform:translateY(-2px)}
+.burger{background:var(--paper);border:2px solid rgba(47,74,62,.2);border-radius:12px;cursor:pointer;padding:9px 10px;display:block}
+.burger span{display:block;width:24px;height:3px;border-radius:3px;background:var(--ink);margin:4px 0;transition:.25s}
+.burger[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.burger[aria-expanded="true"] span:nth-child(2){opacity:0}
+.burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+/* side drawer nav */
+nav.main{
+  position:fixed;top:0;left:0;bottom:0;width:min(360px,86vw);z-index:70;
+  background:var(--pine-deep);color:#F4EDDA;padding:26px 30px;
+  transform:translateX(-105%);transition:transform .32s cubic-bezier(.22,.8,.3,1);
+  display:flex;flex-direction:column;gap:4px;box-shadow:8px 0 40px rgba(0,0,0,.25);
+  overflow-y:auto;
+}
+nav.main.open{transform:translateX(0)}
+nav.main .drawer-brand{font-family:"DM Serif Display",serif;font-size:1.5rem;color:#fff;margin-bottom:4px}
+nav.main .drawer-sub{font-size:.8rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--amber);font-weight:700;margin-bottom:22px}
+nav.main a.nav-link{
+  text-decoration:none;color:#F4EDDA;font-weight:600;font-size:1.18rem;
+  padding:13px 16px;border-radius:12px;transition:background .2s;display:block;
+}
+nav.main a.nav-link:hover{background:rgba(255,255,255,.1)}
+nav.main a.nav-link.active,nav.main a.nav-link[aria-current="page"]{background:var(--amber);color:var(--pine-deep)}
+nav.main .call-btn{margin-top:auto;justify-content:center;background:var(--amber);color:var(--pine-deep)}
+nav.main .call-btn:hover{background:#fff}
+.scrim{
+  position:fixed;inset:0;background:rgba(30,50,41,.5);z-index:65;opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.scrim.show{opacity:1;pointer-events:auto}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- hero: full bleed ---------- */
+.hero{
+  background:linear-gradient(120deg,var(--pine-deep) 0%,var(--pine) 55%,#3A5A4B 100%);
+  color:#F4EDDA;padding:84px 0 80px;position:relative;overflow:hidden;
+}
+.hero::before{
+  content:"";position:absolute;inset:0;
+  background:
+    radial-gradient(circle at 85% 20%, rgba(217,164,65,.28), transparent 42%),
+    radial-gradient(circle at 8% 85%, rgba(156,61,84,.25), transparent 40%);
+}
+.hero-inner{position:relative;text-align:center;max-width:46rem;margin:0 auto}
+.kicker{
+  display:inline-block;font-weight:700;font-size:.76rem;letter-spacing:4px;text-transform:uppercase;
+  color:var(--amber);border:1px solid rgba(217,164,65,.5);
+  padding:8px 22px;border-radius:999px;margin-bottom:22px;background:rgba(0,0,0,.15);
+}
+h1{
+  font-family:"DM Serif Display",serif;font-weight:400;
+  font-size:clamp(2.9rem,6.4vw,4.8rem);line-height:1.04;letter-spacing:-.5px;margin-bottom:18px;color:#fff;
+}
+h1 em{font-style:italic;color:var(--amber)}
+.lede{font-size:1.12rem;color:#DCE6DB;max-width:36rem;margin:0 auto 28px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-bottom:24px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;
+  padding:14px 28px;border-radius:999px;font-size:1rem;transition:transform .18s,box-shadow .18s,background .18s;
+}
+.btn-solid{background:var(--amber);color:var(--pine-deep);box-shadow:var(--shadow-sm)}
+.btn-solid:hover{background:#fff;transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.5)}
+.btn-ghost:hover{border-color:var(--amber);color:var(--amber);transform:translateY(-2px)}
+.hours-pill{
+  display:inline-flex;align-items:center;gap:10px;background:rgba(0,0,0,.35);color:#fff;
+  padding:10px 22px;border-radius:999px;font-weight:600;font-size:.95rem;border:1px solid rgba(255,255,255,.25);
+}
+.hours-pill .dot{width:10px;height:10px;border-radius:50%;background:#8FD694;box-shadow:0 0 0 4px rgba(143,214,148,.25);animation:pulse 2s infinite}
+.hours-pill.closed .dot{background:#E4658F;box-shadow:0 0 0 4px rgba(228,101,143,.25)}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+.hero-meta{display:flex;gap:22px;justify-content:center;margin-top:30px;flex-wrap:wrap;color:#DCE6DB;font-size:.95rem}
+.hero-meta strong{color:#fff}
+
+/* ---------- marquee ---------- */
+.marquee{background:var(--amber);color:var(--pine-deep);overflow:hidden;padding:14px 0}
+.marquee-track{display:flex;width:max-content;animation:scroll 30s linear infinite}
+.marquee-track span{font-family:"DM Serif Display",serif;font-size:1.1rem;padding:0 26px;white-space:nowrap}
+.marquee-track span i{font-style:normal;padding-right:26px}
+@keyframes scroll{to{transform:translateX(-50%)}}
+
+/* ---------- sections ---------- */
+section.block{padding:64px 0}
+.band-alt{background:var(--paper)}
+.sec-head{max-width:44rem;margin:0 auto 42px;text-align:center}
+.eyebrow{font-weight:700;font-size:.76rem;letter-spacing:3.5px;text-transform:uppercase;color:var(--amber-deep);display:block;margin-bottom:8px}
+h2{font-family:"DM Serif Display",serif;font-weight:400;font-size:clamp(2rem,3.8vw,2.8rem);line-height:1.1;margin-bottom:12px;letter-spacing:-.3px}
+.sec-head p{color:var(--ink-soft)}
+
+/* alternating bands */
+.alt{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center;margin-bottom:64px}
+.alt:last-child{margin-bottom:0}
+.alt.flip .alt-text{order:2}
+.alt-text .eyebrow{margin-bottom:8px}
+.alt-text h3{font-family:"DM Serif Display",serif;font-weight:400;font-size:clamp(1.7rem,3vw,2.3rem);line-height:1.12;margin-bottom:14px}
+.alt-text p{color:var(--ink-soft);margin-bottom:12px}
+.alt-art{
+  border-radius:20px;min-height:300px;display:flex;align-items:center;justify-content:center;
+  box-shadow:var(--shadow);position:relative;overflow:hidden;
+}
+.alt-art svg{width:38%;height:auto;filter:drop-shadow(0 12px 16px rgba(0,0,0,.2))}
+.check-list{list-style:none;margin:20px 0;display:grid;gap:12px}
+.check-list li{display:flex;gap:12px;align-items:flex-start;font-weight:500}
+.check-list svg{flex:none;width:24px;height:24px;margin-top:2px}
+
+/* feature cards */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.card{
+  background:var(--paper);border-radius:var(--radius);padding:30px 28px;box-shadow:var(--shadow-sm);
+  border-left:6px solid var(--amber);transition:transform .2s,box-shadow .2s;
+}
+.card:nth-child(2){border-left-color:var(--pine)}
+.card:nth-child(3){border-left-color:var(--berry)}
+.card:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+.card h3{font-family:"DM Serif Display",serif;font-weight:400;font-size:1.35rem;margin-bottom:8px}
+.card p{color:var(--ink-soft);font-size:.96rem}
+
+/* ---------- services: editorial list ---------- */
+.ed-list{display:grid;gap:0;max-width:52rem;margin:0 auto;border-top:2px solid rgba(47,74,62,.18)}
+.ed-item{display:grid;grid-template-columns:110px 1fr auto;gap:24px;align-items:baseline;padding:26px 8px;border-bottom:2px solid rgba(47,74,62,.18);transition:background .2s}
+.ed-item:hover{background:rgba(217,164,65,.08)}
+.ed-item .no{font-family:"DM Serif Display",serif;font-size:1.6rem;color:var(--amber-deep)}
+.ed-item h3{font-family:"DM Serif Display",serif;font-weight:400;font-size:1.5rem;margin-bottom:6px}
+.ed-item p{color:var(--ink-soft);font-size:.96rem}
+.ed-item .price{font-weight:700;color:var(--pine);white-space:nowrap;font-size:1.02rem}
+.price-note{background:var(--amber-soft);border:2px dashed rgba(169,118,31,.5);border-radius:var(--radius);padding:18px 24px;margin:26px auto 0;max-width:52rem;font-size:.95rem;color:#6B4E23}
+.price-note strong{color:var(--pine)}
+
+/* ---------- gallery: arch tiles ---------- */
+.arch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.arch{
+  background:var(--paper);border-radius:999px 999px var(--radius) var(--radius);overflow:hidden;
+  box-shadow:var(--shadow-sm);transition:transform .2s;position:relative;
+}
+.arch:hover{transform:translateY(-6px)}
+.arch .art{aspect-ratio:3/3.6;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;border-radius:999px 999px 0 0}
+.arch .art svg{width:44%;height:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.18))}
+.arch .cap{padding:16px 20px 22px;text-align:center}
+.arch .cap strong{font-family:"DM Serif Display",serif;font-weight:400;font-size:1.12rem;display:block}
+.arch .cap small{color:var(--ink-soft)}
+.arch .soon{position:absolute;top:56px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.9);font-size:.66rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 12px;border-radius:999px;color:var(--ink-soft)}
+
+/* ---------- reviews ---------- */
+.rev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.rev{background:var(--paper);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow-sm);position:relative;border-top:5px solid var(--amber)}
+.rev .stars{color:var(--amber-deep);font-size:1.15rem;letter-spacing:3px;margin-bottom:12px}
+.rev p{font-size:1.02rem;margin-bottom:14px}
+.rev cite{font-style:normal;font-weight:700;font-size:.85rem;color:var(--pine);letter-spacing:.5px}
+.rev.featured{background:var(--pine-deep);color:#F4EDDA;border-top-color:var(--amber)}
+.rev.featured cite{color:var(--amber)}
+.cta-band{background:linear-gradient(120deg,var(--pine),var(--pine-deep));border-radius:24px;color:#fff;padding:48px;text-align:center;margin-top:44px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.cta-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 82% 18%, rgba(217,164,65,.35), transparent 50%)}
+.cta-band h2{color:#fff;position:relative}
+.cta-band p{color:#DCE6DB;position:relative;max-width:36rem;margin:0 auto 24px}
+.cta-band .btn-solid{background:var(--amber);color:var(--pine-deep);position:relative}
+.cta-band .btn-solid:hover{background:#fff}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-bottom:26px}
+.info-card{background:var(--paper);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm)}
+.info-card h3{font-family:"DM Serif Display",serif;font-weight:400;font-size:1.45rem;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.info-card h3 svg{width:28px;height:28px}
+.info-card p{color:var(--ink-soft);margin-bottom:8px}
+.info-card a.big{font-family:"DM Serif Display",serif;font-size:1.5rem;color:var(--pine);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.hours-table{width:100%;border-collapse:collapse;font-size:.98rem}
+.hours-table td{padding:10px 6px;border-bottom:1px dashed rgba(36,53,44,.22)}
+.hours-table tr.today td{font-weight:700;color:var(--pine)}
+.hours-table tr.today td:first-child::after{content:"· today";font-weight:700;color:var(--amber-deep);margin-left:6px;font-size:.85rem}
+.hours-table td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.map-card{
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:340px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 46px, rgba(47,74,62,.12) 46px 48px),
+    repeating-linear-gradient(90deg, transparent 0 46px, rgba(47,74,62,.12) 46px 48px),
+    linear-gradient(140deg,#F7EBCB,#EFDFAE);
+  display:flex;align-items:center;justify-content:center;
+}
+.map-pin{
+  text-align:center;background:var(--paper);padding:26px 34px;border-radius:18px;box-shadow:var(--shadow);
+  max-width:78%;position:relative;
+}
+.map-pin::after{content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);border:14px solid transparent;border-top-color:var(--paper);border-bottom:0}
+.map-pin svg{width:44px;height:44px;margin-bottom:8px}
+.map-pin strong{font-family:"DM Serif Display",serif;font-weight:400;font-size:1.18rem;display:block}
+.map-pin small{color:var(--ink-soft)}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- page strip headers ---------- */
+.strip{border-radius:20px;padding:56px 46px;color:#fff;position:relative;overflow:hidden;margin-bottom:44px;box-shadow:var(--shadow)}
+.strip::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(255,255,255,.18), transparent 50%)}
+.strip h2{color:#fff;font-size:clamp(2rem,4vw,3rem);position:relative;margin:4px 0 10px}
+.strip p{color:rgba(255,255,255,.88);max-width:38rem;position:relative}
+.strip .eyebrow{color:var(--amber-soft);position:relative}
+.strip.s-menu{background:linear-gradient(120deg,#1E3229,#3A5A4B)}
+.strip.s-story{background:linear-gradient(120deg,#9C3D54,#6E2A3C)}
+.strip.s-gal{background:linear-gradient(120deg,#A9761F,#7A5413)}
+.strip.s-rev{background:linear-gradient(120deg,#3A5A6B,#263D4A)}
+.strip.s-visit{background:linear-gradient(120deg,#2F4A3E,#1E3229)}
+
+/* ---------- footer: big type ---------- */
+footer{background:var(--pine-deep);color:#DCE6DB;margin-top:20px}
+.foot-cta{padding:64px 0 20px;text-align:center;border-bottom:1px solid rgba(255,255,255,.12)}
+.foot-cta .big{font-family:"DM Serif Display",serif;font-size:clamp(2.2rem,5vw,3.6rem);color:#fff;line-height:1.1;margin-bottom:14px}
+.foot-cta .big em{font-style:italic;color:var(--amber)}
+.foot-cta p{color:#AEC4B6;max-width:36rem;margin:0 auto 22px}
+.foot-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px;padding:40px 0 30px}
+.foot-grid h4{font-family:"DM Serif Display",serif;color:#fff;font-weight:400;font-size:1.2rem;margin-bottom:12px}
+.foot-grid p,.foot-grid a{color:#AEC4B6;font-size:.95rem}
+.foot-grid a{text-decoration:none}
+.foot-grid a:hover{color:var(--amber)}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.12);padding:20px 0 26px;text-align:center;font-size:.85rem;color:#8FA394}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+.rs-strip{margin:26px auto 10px;max-width:680px;background:#FFFDFB;border:1px solid #F7EBCB;border-radius:14px;padding:18px 22px;text-align:center}
+.rs-note{margin:0 0 12px;font-size:.95rem;color:#5F6F63;line-height:1.55}
+.rs-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rs-btn{display:inline-block;background:#2F4A3E;color:#FFF9F0;padding:10px 24px;border-radius:999px;font-weight:700;text-decoration:none;font-size:.95rem;line-height:1.2}
+.rs-btn:hover{filter:brightness(1.15)}
+
+@media(max-width:940px){
+  .alt{grid-template-columns:1fr}
+  .alt.flip .alt-text{order:0}
+  .visit-grid{grid-template-columns:1fr}
+  .cards{grid-template-columns:1fr 1fr}
+  .arch-grid{grid-template-columns:1fr 1fr}
+  .rev-grid{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr}
+  .ed-item{grid-template-columns:70px 1fr;grid-template-rows:auto auto}
+  .ed-item .price{grid-column:2}
+  .strip{padding:40px 28px}
+}
+.head-actions .phs{display:none}
+@media(max-width:600px){
+  .cards,.arch-grid{grid-template-columns:1fr}
+  .hero{padding:60px 0 56px}
+  .cta-band{padding:36px 24px}
+  .head-actions .ph{display:none}
+  .head-actions .phs{display:inline}
+  .call-btn{padding:11px 16px}
+}
+</style>
+</head>
+<body>
+
+<div class="scrim" id="scrim"></div>
+
+<header class="site">
+  <div class="wrap bar">
+    <a class="brand" href="#home" data-page="home" aria-label="A Look for All Seasons, home">
+      <svg viewBox="0 0 64 64" role="img" aria-label="A Look for All Seasons logo"><circle cx="32" cy="32" r="28" fill="#2F4A3E"/><circle cx="32" cy="32" r="28" fill="none" stroke="#D9A441" stroke-width="2.5"/><path d="M32 44 C32 32 32 24 32 16 M32 44 C24 40 20 34 20 28 M32 44 C40 40 44 34 44 28" fill="none" stroke="#D9A441" stroke-width="2.5" stroke-linecap="round"/><circle cx="20" cy="26" r="4" fill="#9C3D54"/><circle cx="44" cy="26" r="4" fill="#9C3D54"/><circle cx="32" cy="14" r="4" fill="#D9A441"/></svg>
+      <span class="brand-name">A Look for All Seasons<small>Hair Salon · Manlius</small></span>
+    </a>
+    <div class="head-actions">
+      <a class="call-btn" href="tel:+13156826003"><span class="ph">(315) 682-6003</span><span class="phs">Call</span></a>
+      <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+  <nav class="main" id="mainNav" aria-label="Main navigation">
+    <div class="drawer-brand">A Look for<br>All Seasons</div>
+    <div class="drawer-sub">Manlius · NY</div>
+    <a class="nav-link active" href="#home" data-page="home" aria-current="page">Home</a>
+    <a class="nav-link" href="#menu" data-page="menu">Services</a>
+    <a class="nav-link" href="#story" data-page="story">About</a>
+    <a class="nav-link" href="#gallery" data-page="gallery">Gallery</a>
+    <a class="nav-link" href="#reviews" data-page="reviews">Reviews</a>
+    <a class="nav-link" href="#visit" data-page="visit">Visit Us</a>
+    <a class="call-btn" href="tel:+13156826003">Call (315) 682-6003</a>
+  </nav>
+</header>
+
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="wrap hero-inner">
+      <span class="kicker">Cuts · Color · Styling</span>
+      <h1>A fresh look for <em>every season</em> of you</h1>
+      <p class="lede">A Look for All Seasons is a friendly hair salon on Fayette Street in Manlius, where stylists like Linda and Wendy have been keeping the village looking its best for years.</p>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="tel:+13156826003">Call (315) 682-6003</a>
+        <a class="btn btn-ghost" href="#menu" data-page="menu">See services</a>
+      </div>
+      <span class="hours-pill" id="hoursPill"><span class="dot"></span><span id="hoursText">Checking today's hours…</span></span>
+      <div class="hero-meta">
+        <span><strong>Mon - Sat</strong> · 9 AM - 9 PM</span>
+        <span><strong>220 Fayette St</strong> · Manlius, NY</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track" id="marqueeTrack">
+      <span><i>✿</i>Haircuts</span><span><i>✿</i>Color</span><span><i>✿</i>Highlights</span><span><i>✿</i>Perms</span><span><i>✿</i>Styling</span><span><i>✿</i>Updos</span><span><i>✿</i>Kids Cuts</span><span><i>✿</i>Blowouts</span>
+    </div>
+  </div>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="alt reveal">
+        <div class="alt-text">
+          <span class="eyebrow">The salon</span>
+          <h3>Small-town salon,<br>big on listening</h3>
+          <p>Walk into A Look for All Seasons and you get what village salons do best: a stylist who remembers your name, your hair and the cut you loved last time.</p>
+          <p>Reviewers praise the careful layering and shaping, and the warm, joyful way the team treats every client in the chair.</p>
+          <a class="btn btn-ghost" style="color:var(--pine);border-color:rgba(47,74,62,.4)" href="#story" data-page="story">About the salon</a>
+        </div>
+        <div class="alt-art" style="background:linear-gradient(140deg,#2F4A3E,#1E3229)">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="42" r="25" fill="#8A5A3B"/><path d="M28 42 Q50 18 72 42 Q70 68 50 78 Q30 68 28 42Z" fill="#4A3220"/><path d="M38 32 Q50 52 46 72" fill="none" stroke="#6B4A30" stroke-width="3" stroke-linecap="round"/><circle cx="50" cy="30" r="3" fill="#D9A441"/></svg>
+        </div>
+      </div>
+      <div class="alt flip reveal">
+        <div class="alt-text">
+          <span class="eyebrow">Our promise</span>
+          <h3>Styles that work<br>with real life</h3>
+          <p>Great hair should not need a second job to maintain. We cut and color for the way you actually live: easy mornings, busy weeks, and looks that grow out gracefully.</p>
+          <ul class="check-list">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#2F4A3E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Precision cuts and careful layering</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#2F4A3E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Color that complements your skin tone</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#2F4A3E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Evening hours, open until 9 PM</li>
+          </ul>
+        </div>
+        <div class="alt-art" style="background:linear-gradient(140deg,#D9A441,#A9761F)">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="42" r="24" fill="#7A4A2E"/><path d="M30 38 Q40 22 50 38 Q60 22 70 38" fill="none" stroke="#3A2A1E" stroke-width="4" stroke-linecap="round"/><path d="M32 48 Q42 34 52 48 Q62 34 70 46" fill="none" stroke="#3A2A1E" stroke-width="3.4" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block band-alt" style="padding-top:64px">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow">Why clients stay</span>
+        <h2>Three reasons the village<br>keeps coming back</h2>
+      </div>
+      <div class="cards">
+        <div class="card reveal">
+          <h3>Experienced stylists</h3>
+          <p>Stylists like Linda and Wendy are named by name in reviews, for skill with layering, shaping and thick hair.</p>
+        </div>
+        <div class="card reveal">
+          <h3>Hours that fit your day</h3>
+          <p>Open Monday through Saturday until 9 PM, so you can book after work, after school, after life.</p>
+        </div>
+        <div class="card reveal">
+          <h3>A joyful chair</h3>
+          <p>Clients describe their visits as a pleasure and a joy. Good hair, good company, right on Fayette Street.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="cta-band reveal">
+      <h2>Ready for your seasonal refresh?</h2>
+      <p>220 Fayette St, Manlius, NY · Open Mon - Sat, 9 AM - 9 PM. Call to book your appointment.</p>
+      <a class="btn btn-solid" href="tel:+13156826003">Call (315) 682-6003</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-menu">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-menu">
+      <span class="eyebrow">Services &amp; pricing</span>
+      <h2>Everything your hair needs,<br>under one roof</h2>
+      <p>Cuts, color and styling for the whole family, with evening hours that fit your week.</p>
+    </div>
+
+    <div class="ed-list reveal">
+      <div class="ed-item">
+        <span class="no">01</span>
+        <div><h3>Haircuts</h3><p>Precision cuts, layering and shaping for women, men and kids. Consultation included so you leave with the cut you pictured.</p></div>
+        <span class="price">from $25</span>
+      </div>
+      <div class="ed-item">
+        <span class="no">02</span>
+        <div><h3>Color &amp; Highlights</h3><p>Full color, partial and full highlights, and dimensional color chosen to complement your skin tone and style.</p></div>
+        <span class="price">from $65</span>
+      </div>
+      <div class="ed-item">
+        <span class="no">03</span>
+        <div><h3>Styling &amp; Blowouts</h3><p>Smooth blowouts and everyday styling that holds up through the workday and the weekend.</p></div>
+        <span class="price">from $30</span>
+      </div>
+      <div class="ed-item">
+        <span class="no">04</span>
+        <div><h3>Perms &amp; Texture</h3><p>Classic perms and texture services for lasting body and curl.</p></div>
+        <span class="price">from $70</span>
+      </div>
+      <div class="ed-item">
+        <span class="no">05</span>
+        <div><h3>Kids Cuts</h3><p>Patient, friendly cuts for our youngest clients. A good first salon experience matters.</p></div>
+        <span class="price">from $20</span>
+      </div>
+      <div class="ed-item">
+        <span class="no">06</span>
+        <div><h3>Updos &amp; Occasions</h3><p>Elegant updos for weddings, proms and special nights out in the village.</p></div>
+        <span class="price">from $45</span>
+      </div>
+    </div>
+
+    <div class="price-note reveal">
+      <strong>Sample pricing:</strong> prices above are samples to give you an idea and vary with hair length and service details. Please <strong>call (315) 682-6003</strong> for an exact quote and to book.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-story">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-story">
+      <span class="eyebrow">About the salon</span>
+      <h2>A village salon<br>with a personal touch</h2>
+      <p>A Look for All Seasons is a hair salon on Fayette Street in Manlius, known for skilled stylists and a genuinely joyful chair.</p>
+    </div>
+
+    <div class="alt reveal" style="margin-bottom:56px">
+      <div class="alt-text">
+        <span class="eyebrow">Our way</span>
+        <h3>Stylists you know<br>by name</h3>
+        <p>In a village salon, the relationship matters as much as the result. Clients mention stylists like Linda and Wendy by name, praising careful layering and shaping, especially for thick hair, and the sheer pleasure of the visit itself.</p>
+        <p>That is the standard here: technical skill plus a warm welcome. Whether you need a seasonal refresh, a bold new color or just a trim that behaves, you will be listened to first and styled second.</p>
+        <p>And with doors open until 9 PM Monday through Saturday, great hair fits around your schedule, not the other way around.</p>
+      </div>
+      <div class="alt-art" style="background:linear-gradient(140deg,#9C3D54,#6E2A3C)">
+        <svg viewBox="0 0 100 100"><circle cx="50" cy="42" r="25" fill="#8A5A3B"/><path d="M28 42 Q50 18 72 42 Q70 68 50 78 Q30 68 28 42Z" fill="#4A3220"/><circle cx="32" cy="22" r="4" fill="#D9A441"/><circle cx="68" cy="22" r="4" fill="#D9A441"/></svg>
+      </div>
+    </div>
+
+    <div class="cards" style="margin-bottom:56px">
+      <div class="card reveal">
+        <h3>Careful with thick hair</h3>
+        <p>Reviewers specifically praise the layering and shaping of thick hair, a skill that takes real experience.</p>
+      </div>
+      <div class="card reveal">
+        <h3>A joy to visit</h3>
+        <p>Clients describe their appointments as a pleasure and a joy. We think a salon visit should feel like that.</p>
+      </div>
+      <div class="card reveal">
+        <h3>On Fayette Street</h3>
+        <p>Right in the heart of the village of Manlius, easy to reach and easy to love as a local habit.</p>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <div class="cta-band reveal">
+        <h2>Come meet your stylist.</h2>
+        <p>220 Fayette St, Manlius, NY 13104. Open Monday through Saturday, 9 AM to 9 PM.</p>
+        <a class="btn btn-solid" href="#visit" data-page="visit">Plan your visit</a>
+      </div>
+      <div style="height:56px"></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-gal">
+      <span class="eyebrow">Style gallery</span>
+      <h2>Looks we love to create</h2>
+      <p>Artistic previews of the cuts, color and styling we do every day. Real photos of our work are on the way.</p>
+    </div>
+
+    <div class="arch-grid">
+      <div class="arch reveal">
+        <div class="art" style="background:linear-gradient(140deg,#2F4A3E,#1E3229)">
+          <span class="soon">Photo soon</span>
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="42" r="25" fill="#8A5A3B"/><path d="M28 42 Q50 18 72 42 Q70 68 50 78 Q30 68 28 42Z" fill="#4A3220"/><path d="M40 32 Q50 52 46 70" fill="none" stroke="#6B4A30" stroke-width="3" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>Layered Cuts</strong><small>Movement and shape</small></div>
+      </div>
+      <div class="arch reveal">
+        <div class="art" style="background:linear-gradient(140deg,#D9A441,#A9761F)">
+          <span class="soon">Photo soon</span>
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="42" r="24" fill="#7A4A2E"/><path d="M30 38 Q40 22 50 38 Q60 22 70 38" fill="none" stroke="#B4432A" stroke-width="4" stroke-linecap="round"/><path d="M32 48 Q42 34 52 48 Q62 34 70 46" fill="none" stroke="#FFF9F0" stroke-width="3" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>Highlights</strong><small>Sun-kissed dimension</small></div>
+      </div>
+      <div class="arch reveal">
+        <div class="art" style="background:linear-gradient(140deg,#9C3D54,#6E2A3C)">
+          <span class="soon">Photo soon</span>
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="44" r="24" fill="#6B4A30"/><ellipse cx="50" cy="24" rx="20" ry="10" fill="#2E2018"/><path d="M36 20 Q50 10 64 20" fill="none" stroke="#D9A441" stroke-width="2.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>Updos</strong><small>Elegant and event-ready</small></div>
+      </div>
+      <div class="arch reveal">
+        <div class="art" style="background:linear-gradient(140deg,#3A5A6B,#263D4A)">
+          <span class="soon">Photo soon</span>
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="42" r="25" fill="#8A5A3B"/><path d="M30 40 Q50 60 70 40" fill="none" stroke="#2E2018" stroke-width="4" stroke-linecap="round"/><path d="M34 48 Q50 64 66 48" fill="none" stroke="#2E2018" stroke-width="3" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>Blowouts</strong><small>Smooth and bouncy</small></div>
+      </div>
+      <div class="arch reveal">
+        <div class="art" style="background:linear-gradient(140deg,#5F6F63,#3E4A40)">
+          <span class="soon">Photo soon</span>
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="42" r="24" fill="#4A2E20"/><path d="M28 42 Q50 20 72 42" fill="none" stroke="#2E1C12" stroke-width="4" stroke-linecap="round"/><circle cx="50" cy="66" r="3" fill="#D9A441"/></svg>
+        </div>
+        <div class="cap"><strong>Full Color</strong><small>Rich, even, vibrant</small></div>
+      </div>
+      <div class="arch reveal">
+        <div class="art" style="background:linear-gradient(140deg,#A9761F,#7A5413)">
+          <span class="soon">Photo soon</span>
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="44" r="22" fill="#9A6A42"/><path d="M32 40 Q50 26 68 40" fill="none" stroke="#3A2A1E" stroke-width="3.4" stroke-linecap="round"/><circle cx="50" cy="70" r="3" fill="#9C3D54"/></svg>
+        </div>
+        <div class="cap"><strong>Kids Cuts</strong><small>Fresh and friendly</small></div>
+      </div>
+    </div>
+
+    <div class="price-note reveal" style="margin-top:26px">
+      <strong>Coming soon:</strong> real photos of our cuts and color work. The illustrations above are artistic previews. The real thing looks even better.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-rev">
+      <span class="eyebrow">Client love</span>
+      <h2>What the village<br>is saying</h2>
+      <p>Rated 5 out of 5 on BestProsInTown. Here is what clients are saying.</p>
+    </div>
+    <div class="rs-strip">
+      <p class="rs-note">Review themes on this page are paraphrased from public feedback. Open the source to read current reviews and ratings.</p>
+      <div class="rs-links">
+        <a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJUUA3Xq2O2YkRq39NgNtUD9M" target="_blank" rel="noopener">See reviews on Google</a>
+        <a class="rs-btn" href="https://www.bestprosintown.com/ny/manlius/a-look-for-all-seasons-/" target="_blank" rel="noopener">See reviews on BestProsInTown</a>
+        <a class="rs-btn" href="https://salondiscover.com/a-look-for-all-seasons-13104/" target="_blank" rel="noopener">See reviews on SalonDiscover</a>
+      </div>
+    </div>
+
+    <div class="rev-grid">
+      <div class="rev featured reveal">
+        <div class="stars">★★★★★</div>
+        <p>"Linda does an excellent job in layering and shaping my thick hair."</p>
+        <cite>April M, via BestProsInTown</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>"Always a pleasure/joy to interact with wendy!!!"</p>
+        <cite>via BestProsInTown</cite>
+      </div>
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Had a great visit? Tell Manlius.</h2>
+      <p>Your review helps a village salon keep thriving. It takes a minute, and it means the world to us.</p>
+      <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJUUA3Xq2O2YkRq39NgNtUD9M" target="_blank" rel="noopener">Leave us a Google review</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-visit">
+      <span class="eyebrow">Visit us</span>
+      <h2>Right on Fayette Street</h2>
+      <p>In the heart of the village of Manlius, open evenings until 9 PM. Call to book.</p>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#2F4A3E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Find us</h3>
+        <p><strong>A Look for All Seasons</strong><br>220 Fayette St<br>Manlius, NY 13104</p>
+        <p>On Fayette Street in the village of Manlius, minutes from Fayetteville.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#2F4A3E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg> Call us</h3>
+        <p>Questions and bookings:</p>
+        <a class="big" href="tel:+13156826003">(315) 682-6003</a>
+        <p style="margin-top:10px">Walk-ins welcome when chairs are open. Evenings fill fast, so call ahead.</p>
+      </div>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#2F4A3E" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Hours</h3>
+        <table class="hours-table" id="hoursTable">
+          <tr><td>Monday</td><td>9:00 AM - 9:00 PM</td></tr>
+          <tr><td>Tuesday</td><td>9:00 AM - 9:00 PM</td></tr>
+          <tr><td>Wednesday</td><td>9:00 AM - 9:00 PM</td></tr>
+          <tr><td>Thursday</td><td>9:00 AM - 9:00 PM</td></tr>
+          <tr><td>Friday</td><td>9:00 AM - 9:00 PM</td></tr>
+          <tr><td>Saturday</td><td>9:00 AM - 9:00 PM</td></tr>
+          <tr><td>Sunday</td><td>Closed</td></tr>
+        </table>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <svg viewBox="0 0 24 24" fill="#2F4A3E"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#FFF9F0"/></svg>
+          <strong>220 Fayette St</strong>
+          <small>Manlius, NY 13104</small><br>
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJUUA3Xq2O2YkRq39NgNtUD9M" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-cta">
+      <div class="big">A fresh look for <em>every season</em></div>
+      <p>220 Fayette St, Manlius, NY 13104 · <a href="tel:+13156826003" style="color:var(--amber)">(315) 682-6003</a> · Mon - Sat, 9 AM - 9 PM</p>
+      <a class="btn btn-solid" href="tel:+13156826003">Book your chair</a>
+    </div>
+    <div class="foot-grid">
+      <div>
+        <h4>A Look for All Seasons</h4>
+        <p>A friendly hair salon on Fayette Street in the village of Manlius. Cuts, color and styling.</p>
+      </div>
+      <div>
+        <h4>Visit</h4>
+        <p>220 Fayette St<br>Manlius, NY 13104<br><a href="tel:+13156826003">(315) 682-6003</a></p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <p><a href="#home" data-page="home">Home</a> · <a href="#menu" data-page="menu">Services</a> · <a href="#story" data-page="story">About</a><br><a href="#gallery" data-page="gallery">Gallery</a> · <a href="#reviews" data-page="reviews">Reviews</a> · <a href="#visit" data-page="visit">Visit Us</a></p>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© A Look for All Seasons</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "menu", "story", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+
+  /* ---------- scrim: dim background while drawer is open ---------- */
+  var scrim = document.getElementById("scrim");
+  if(scrim && nav){
+    new MutationObserver(function(){
+      scrim.classList.toggle("show", nav.classList.contains("open"));
+    }).observe(nav, {attributes:true, attributeFilter:["class"]});
+    scrim.addEventListener("click", function(){
+      closeMenu();
+    });
+  }
+
+  /* ---------- marquee: duplicate for seamless loop ---------- */
+  var track = document.getElementById("marqueeTrack");
+  if(track){ track.innerHTML += track.innerHTML; }
+
+  /* ---------- live hours (America/New_York) ---------- */
+  var HOURS = {0:null,1:[9,21],2:[9,21],3:[9,21],4:[9,21],5:[9,21],6:[9,21]};
+  var DAYNAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  var DOW = {"Sun":0,"Mon":1,"Tue":2,"Wed":3,"Thu":4,"Fri":5,"Sat":6};
+  function fmt(h){
+    var ap = h < 12 ? "AM" : "PM";
+    var hh = h % 12;
+    if(hh === 0){ hh = 12; }
+    return hh + ":00 " + ap;
+  }
+  function nextOpenDay(from){
+    for(var k = 1; k <= 7; k++){
+      var d = (from + k) % 7;
+      if(HOURS[d]){ return {day:d, inDays:k}; }
+    }
+    return null;
+  }
+  try{
+    var parts = new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",weekday:"short",hour:"numeric",hour12:false}).formatToParts(new Date());
+    var wd = "Mon", hr = 12;
+    parts.forEach(function(p){
+      if(p.type === "weekday"){ wd = p.value; }
+      if(p.type === "hour"){ hr = parseInt(p.value, 10) % 24; }
+    });
+    var day = DOW[wd] !== undefined ? DOW[wd] : 1;
+    var pill = document.getElementById("hoursPill");
+    var txt = document.getElementById("hoursText");
+    if(pill && txt){
+      var todayH = HOURS[day];
+      if(todayH && hr >= todayH[0] && hr < todayH[1]){
+        txt.textContent = "Open now · until " + fmt(todayH[1]) + " today";
+      } else if(todayH && hr < todayH[0]){
+        txt.textContent = "Opens today at " + fmt(todayH[0]);
+        pill.classList.add("closed");
+      } else {
+        pill.classList.add("closed");
+        var nx = nextOpenDay(day);
+        if(nx){
+          txt.textContent = "Opens " + (nx.inDays === 1 ? "tomorrow" : DAYNAMES[nx.day]) + " at " + fmt(HOURS[nx.day][0]);
+        } else {
+          txt.textContent = "Call for hours";
+        }
+      }
+    }
+    var rows = document.querySelectorAll("#hoursTable tr");
+    var idx = (day + 6) % 7; /* rows run Mon..Sun */
+    if(rows[idx]){ rows[idx].classList.add("today"); }
+  }catch(e){ /* leave default pill text */ }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

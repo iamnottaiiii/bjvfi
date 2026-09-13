@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Addiction Ink · Private Tattoo Studio, Malvern, PA</title>
+<meta name="description" content="Addiction Ink is a private tattoo studio at 81 Lancaster Ave, Malvern, PA, run by award winning artist Don Madison. Realism, neotraditional, black and grey, and bold color work. Call (610) 232-2000.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#161210; --ink-2:#221a14; --ink-3:#2e2318;
+  --paper:#f5eddc; --paper-2:#ece0c6; --paper-3:#faf5e9;
+  --amber:#d9992b; --amber-soft:#f3dfb0;
+  --oxblood:#7c2d1a; --oxblood-deep:#5c2012;
+  --sage:#7a8b6f;
+  --mut:#6d5f4b;
+  --radius:16px;
+  --shadow:0 22px 44px -20px rgba(10,6,3,.55);
+  --shadow-sm:0 10px 24px -12px rgba(10,6,3,.5);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Public Sans",system-ui,sans-serif;
+  background:var(--ink);
+  color:var(--paper);
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(rgba(217,153,43,.06) 1.2px, transparent 1.3px);
+  background-size:28px 28px;
+}
+a{color:var(--amber)}
+::selection{background:var(--amber);color:var(--ink)}
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+.mono{font-family:"IBM Plex Mono",monospace}
+.hand-rule{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.hand-rule::before,.hand-rule::after{content:"";height:1px;flex:1;background:linear-gradient(90deg,transparent,rgba(217,153,43,.55),transparent)}
+
+/* ---------- centered logo header ---------- */
+header.site{
+  position:sticky;top:0;z-index:60;
+  background:rgba(22,18,16,.94);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(217,153,43,.28);
+}
+.masthead{text-align:center;padding:18px 0 6px;position:relative}
+.brand{display:inline-flex;flex-direction:column;align-items:center;gap:8px;text-decoration:none;color:var(--paper)}
+.brand svg{width:58px;height:58px;filter:drop-shadow(0 6px 10px rgba(217,153,43,.35))}
+.brand-name{font-family:"Fraunces",serif;font-weight:900;font-size:1.6rem;letter-spacing:6px;text-transform:uppercase;line-height:1}
+.brand-name small{display:block;font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:.62rem;letter-spacing:5px;color:var(--amber);margin-top:8px}
+nav.main{display:flex;align-items:center;justify-content:center;gap:2px;padding:8px 0 14px;flex-wrap:wrap}
+nav.main a{
+  text-decoration:none;color:var(--paper);font-weight:600;font-size:.92rem;letter-spacing:1px;text-transform:uppercase;
+  padding:9px 16px;border-radius:999px;transition:background .2s,color .2s;white-space:nowrap;
+}
+nav.main a:hover{background:rgba(217,153,43,.16)}
+nav.main a.active,nav.main a[aria-current="page"]{background:var(--amber);color:var(--ink)}
+.burger{display:none;background:none;border:1px solid rgba(217,153,43,.5);border-radius:10px;cursor:pointer;padding:10px 12px;position:absolute;right:20px;top:26px}
+.burger span{display:block;width:24px;height:2px;background:var(--amber);margin:5px 0;border-radius:2px}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .35s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- hero ---------- */
+.hero{position:relative;overflow:hidden;padding:70px 0 56px}
+.hero::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(700px 380px at 78% 40%, rgba(217,153,43,.16), transparent 65%),
+    radial-gradient(520px 340px at 12% 80%, rgba(124,45,26,.28), transparent 65%);
+}
+.hero-grid{position:relative;display:grid;grid-template-columns:1.05fr .95fr;gap:52px;align-items:center}
+.kicker{
+  display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:.78rem;letter-spacing:3px;text-transform:uppercase;
+  color:var(--amber);border:1px solid rgba(217,153,43,.5);padding:8px 18px;border-radius:999px;margin-bottom:20px;
+  background:rgba(217,153,43,.08);
+}
+h1{
+  font-family:"Fraunces",serif;font-weight:900;
+  font-size:clamp(2.7rem,5.6vw,4.4rem);line-height:1.02;letter-spacing:-.5px;margin-bottom:20px;color:var(--paper-3);
+}
+h1 .accent{color:var(--amber);font-style:italic;font-weight:700}
+.lede{font-size:1.12rem;color:#d9cbb2;max-width:35rem;margin-bottom:28px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:28px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;
+  padding:14px 28px;border-radius:999px;font-size:1rem;transition:transform .18s,box-shadow .18s,background .18s,border-color .18s;
+}
+.btn-solid{background:var(--amber);color:var(--ink);box-shadow:var(--shadow-sm)}
+.btn-solid:hover{background:#e8ab3f;transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:var(--paper);border:2px solid rgba(245,237,220,.35)}
+.btn-ghost:hover{border-color:var(--amber);color:var(--amber);transform:translateY(-2px)}
+.stat-strip{display:flex;flex-wrap:wrap;gap:10px 26px;font-family:"IBM Plex Mono",monospace;font-size:.8rem;letter-spacing:1.5px;text-transform:uppercase;color:#b7a686}
+.stat-strip b{color:var(--amber);font-weight:600}
+.hero-art{position:relative}
+.vial-stage{
+  position:relative;background:linear-gradient(160deg,#2b2015,#1a140d 60%,#120d08);
+  border-radius:28px;padding:44px 36px;box-shadow:var(--shadow);
+  border:1px solid rgba(217,153,43,.35);overflow:hidden;
+}
+.vial-stage::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(circle at 82% 10%, rgba(217,153,43,.35), transparent 45%);
+}
+.vial-stage svg{width:100%;height:auto;display:block;animation:floaty 7s ease-in-out infinite}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.seal{
+  position:absolute;bottom:-16px;left:30px;background:var(--oxblood);color:var(--paper-3);
+  font-family:"IBM Plex Mono",monospace;font-size:.75rem;letter-spacing:2px;text-transform:uppercase;
+  padding:12px 22px;border-radius:999px;transform:rotate(-3deg);box-shadow:var(--shadow-sm);z-index:2;
+  border:1px solid rgba(245,237,220,.25);
+}
+
+/* ---------- magazine rhythm ---------- */
+.mag{padding:64px 0}
+.mag-head{max-width:46rem;margin-bottom:44px}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:.78rem;letter-spacing:3px;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:12px}
+h2{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(2rem,3.8vw,2.9rem);line-height:1.08;letter-spacing:-.3px;margin-bottom:14px;color:var(--paper-3)}
+.mag-head p{color:#cbbc9f;font-size:1.05rem}
+.ed-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid rgba(217,153,43,.3);border-radius:var(--radius);overflow:hidden;background:var(--ink-2)}
+.ed-col{padding:44px 42px}
+.ed-col + .ed-col{border-left:1px solid rgba(217,153,43,.3)}
+.ed-col h3{font-family:"Fraunces",serif;font-size:1.55rem;margin-bottom:14px;color:var(--paper-3)}
+.ed-col p{color:#c6b795;margin-bottom:14px}
+.dropcap::first-letter{
+  font-family:"Fraunces",serif;font-weight:900;font-size:3.6rem;line-height:.85;float:left;
+  padding:6px 12px 0 0;color:var(--amber);
+}
+.pull{
+  margin:64px auto;max-width:56rem;text-align:center;position:relative;padding:0 20px;
+}
+.pull p{font-family:"Fraunces",serif;font-style:italic;font-weight:500;font-size:clamp(1.5rem,3vw,2.2rem);line-height:1.4;color:var(--paper-3)}
+.pull cite{display:block;margin-top:16px;font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:.8rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--amber)}
+.formula-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.formula{
+  background:var(--paper-3);color:var(--ink-2);border-radius:var(--radius);padding:30px 28px;position:relative;overflow:hidden;
+  box-shadow:var(--shadow-sm);transition:transform .2s;
+}
+.formula:hover{transform:translateY(-6px)}
+.formula .num{font-family:"IBM Plex Mono",monospace;font-size:.75rem;letter-spacing:2.5px;color:var(--oxblood);text-transform:uppercase;margin-bottom:10px;display:block}
+.formula h3{font-family:"Fraunces",serif;font-size:1.4rem;margin-bottom:10px}
+.formula p{color:#4a3d2c;font-size:.96rem}
+.formula .swatch{position:absolute;top:0;right:0;width:74px;height:74px;background:linear-gradient(135deg,var(--amber),var(--oxblood));clip-path:polygon(100% 0,0 0,100% 100%)}
+
+/* ---------- CTA band ---------- */
+.cta-band{
+  background:linear-gradient(120deg,var(--oxblood),var(--oxblood-deep));border-radius:26px;color:var(--paper-3);
+  padding:52px 44px;text-align:center;margin:20px 0 0;box-shadow:var(--shadow);position:relative;overflow:hidden;
+  border:1px solid rgba(217,153,43,.3);
+}
+.cta-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 20%, rgba(217,153,43,.3), transparent 50%)}
+.cta-band h2{color:#fff;position:relative}
+.cta-band p{color:#e8cfae;position:relative;max-width:38rem;margin:0 auto 26px}
+.cta-band .btn-solid{position:relative}
+
+/* ---------- page strip headers ---------- */
+.strip{border-radius:24px;padding:52px 46px;color:var(--paper-3);position:relative;overflow:hidden;margin:44px 0 48px;box-shadow:var(--shadow);border:1px solid rgba(217,153,43,.3)}
+.strip::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(217,153,43,.25), transparent 50%)}
+.strip .eyebrow{position:relative}
+.strip h2{color:#fff;font-size:clamp(2.1rem,4.2vw,3.1rem);position:relative}
+.strip p{color:#e2d3b4;max-width:38rem;position:relative}
+.strip.s-styles{background:linear-gradient(120deg,#3a2a12,#1c130a)}
+.strip.s-artist{background:linear-gradient(120deg,#4a2313,#241009)}
+.strip.s-gal{background:linear-gradient(120deg,#23331f,#0f160d)}
+.strip.s-rev{background:linear-gradient(120deg,#3d1f2e,#1c0e15)}
+.strip.s-visit{background:linear-gradient(120deg,#2a2f1c,#141507)}
+
+/* ---------- editorial list (styles page) ---------- */
+.ed-list{border-top:1px solid rgba(217,153,43,.3)}
+.ed-item{display:grid;grid-template-columns:90px 1fr auto;gap:28px;align-items:start;padding:34px 6px;border-bottom:1px solid rgba(217,153,43,.3)}
+.ed-item .idx{font-family:"Fraunces",serif;font-weight:900;font-size:2.6rem;color:transparent;-webkit-text-stroke:1.5px var(--amber);line-height:1}
+.ed-item h3{font-family:"Fraunces",serif;font-size:1.65rem;margin-bottom:10px;color:var(--paper-3)}
+.ed-item p{color:#c6b795;max-width:44rem}
+.ed-item .tagrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.tag{font-family:"IBM Plex Mono",monospace;font-size:.72rem;letter-spacing:1.5px;text-transform:uppercase;background:rgba(217,153,43,.12);border:1px solid rgba(217,153,43,.4);color:var(--amber);padding:5px 13px;border-radius:999px;white-space:nowrap}
+.price-hint{font-family:"IBM Plex Mono",monospace;font-size:.85rem;color:#b7a686;text-align:right;white-space:nowrap;padding-top:8px}
+.note-box{background:rgba(217,153,43,.08);border:1px dashed rgba(217,153,43,.55);border-radius:var(--radius);padding:22px 26px;margin:36px 0;font-size:.96rem;color:#d9c9a8}
+.note-box strong{color:var(--amber)}
+
+/* ---------- artist page ---------- */
+.artist-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:52px;align-items:start;margin-bottom:60px}
+.portrait-card{
+  background:linear-gradient(160deg,#2b2015,#150f09);border:1px solid rgba(217,153,43,.35);border-radius:22px;
+  padding:40px 34px;box-shadow:var(--shadow);position:relative;overflow:hidden;text-align:center;
+}
+.portrait-card svg{width:62%;height:auto;margin:0 auto 18px;display:block}
+.portrait-card .sig{font-family:"Fraunces",serif;font-style:italic;font-size:1.9rem;color:var(--amber);margin-top:6px}
+.portrait-card .role{font-family:"IBM Plex Mono",monospace;font-size:.75rem;letter-spacing:2.5px;text-transform:uppercase;color:#b7a686;margin-top:8px}
+.cred-list{list-style:none;display:grid;gap:16px;margin-top:24px}
+.cred-list li{display:flex;gap:14px;align-items:flex-start;background:var(--ink-2);border:1px solid rgba(217,153,43,.25);border-radius:14px;padding:18px 20px}
+.cred-list svg{flex:none;width:26px;height:26px;margin-top:2px}
+.cred-list strong{color:var(--paper-3);display:block;margin-bottom:4px}
+.cred-list p{color:#c6b795;font-size:.95rem}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap masthead">
+    <a class="brand" href="#home" data-page="home" aria-label="Addiction Ink, home">
+      <svg viewBox="0 0 64 64" role="img" aria-label="Ink drop logo"><path d="M32 4 C32 4 14 30 14 42 a18 18 0 0 0 36 0 C50 30 32 4 32 4 Z" fill="#d9992b"/><path d="M32 12 C32 12 21 30 21 40 a11 11 0 0 0 22 0 C43 30 32 12 32 12 Z" fill="#7c2d1a"/><circle cx="26" cy="38" r="3.4" fill="#f5eddc" opacity=".85"/></svg>
+      <span class="brand-name">Addiction Ink<small>Malvern · Pennsylvania</small></span>
+    </a>
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+  <nav class="main" id="mainNav" aria-label="Main navigation">
+    <a href="#home" data-page="home" class="active" aria-current="page">Home</a>
+    <a href="#styles" data-page="styles">Styles</a>
+    <a href="#artist" data-page="artist">Artist</a>
+    <a href="#gallery" data-page="gallery">Gallery</a>
+    <a href="#reviews" data-page="reviews">Reviews</a>
+    <a href="#visit" data-page="visit">Visit</a>
+  </nav>
+</header>
+<style>
+/* ---------- masonry gallery ---------- */
+.masonry{columns:3;column-gap:20px}
+.mtile{
+  break-inside:avoid;margin-bottom:20px;border-radius:var(--radius);overflow:hidden;background:var(--ink-2);
+  border:1px solid rgba(217,153,43,.25);box-shadow:var(--shadow-sm);transition:transform .2s;position:relative;
+}
+.mtile:hover{transform:translateY(-5px)}
+.mtile .art{display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:34px 26px}
+.mtile .art svg{width:58%;height:auto;filter:drop-shadow(0 12px 16px rgba(0,0,0,.4))}
+.mtile .cap{padding:16px 20px 18px;border-top:1px solid rgba(217,153,43,.2)}
+.mtile .cap strong{font-family:"Fraunces",serif;font-size:1.1rem;color:var(--paper-3);display:block}
+.mtile .cap small{color:#b7a686}
+.mtile .badge{position:absolute;top:12px;left:12px;background:rgba(22,18,16,.85);border:1px solid rgba(217,153,43,.5);font-family:"IBM Plex Mono",monospace;font-size:.66rem;letter-spacing:1.8px;text-transform:uppercase;padding:5px 12px;border-radius:999px;color:var(--amber)}
+
+/* ---------- reviews ---------- */
+.rate-band{
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:22px;
+  background:var(--paper-3);color:var(--ink-2);border-radius:var(--radius);padding:30px 34px;margin-bottom:36px;box-shadow:var(--shadow-sm);
+}
+.rate-band .big{font-family:"Fraunces",serif;font-weight:900;font-size:3rem;line-height:1}
+.rate-band .stars{color:#b97c14;font-size:1.4rem;letter-spacing:4px}
+.rate-band p{color:#4a3d2c;max-width:34rem}
+.rev-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.rev{background:var(--ink-2);border:1px solid rgba(217,153,43,.28);border-radius:var(--radius);padding:30px 28px;position:relative}
+.rev .stars{color:var(--amber);font-size:1.15rem;letter-spacing:3px;margin-bottom:12px}
+.rev p{font-size:1rem;color:#ddd0b4;margin-bottom:14px}
+.rev cite{font-style:normal;font-weight:700;font-size:.82rem;color:var(--amber);letter-spacing:1px}
+.rev .sample{position:absolute;top:16px;right:16px;font-family:"IBM Plex Mono",monospace;font-size:.64rem;letter-spacing:1.8px;text-transform:uppercase;border:1px solid rgba(217,153,43,.5);color:var(--amber);padding:4px 11px;border-radius:999px}
+.src-links{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+.src-links .btn{font-size:.92rem;padding:12px 22px}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:22px}
+.info-card{background:var(--ink-2);border:1px solid rgba(217,153,43,.28);border-radius:var(--radius);padding:32px 30px;box-shadow:var(--shadow-sm)}
+.info-card h3{font-family:"Fraunces",serif;font-size:1.45rem;margin-bottom:14px;color:var(--paper-3);display:flex;align-items:center;gap:12px}
+.info-card h3 svg{width:28px;height:28px;flex:none}
+.info-card p{color:#c6b795;margin-bottom:10px}
+.info-card a.big{font-family:"Fraunces",serif;font-size:1.55rem;font-weight:700;color:var(--amber);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.map-card{
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:360px;
+  border:1px solid rgba(217,153,43,.35);
+  background:
+    linear-gradient(rgba(217,153,43,.06), rgba(217,153,43,.06)),
+    repeating-linear-gradient(0deg, transparent 0 46px, rgba(217,153,43,.14) 46px 48px),
+    repeating-linear-gradient(90deg, transparent 0 46px, rgba(217,153,43,.14) 46px 48px),
+    linear-gradient(140deg,#2e2416,#191309);
+  display:flex;align-items:center;justify-content:center;
+}
+.map-pin{
+  text-align:center;background:var(--paper-3);color:var(--ink-2);padding:28px 36px;border-radius:18px;box-shadow:var(--shadow);
+  max-width:80%;position:relative;
+}
+.map-pin::after{content:"";position:absolute;left:50%;bottom:-13px;transform:translateX(-50%);border:13px solid transparent;border-top-color:var(--paper-3);border-bottom:0}
+.map-pin svg{width:44px;height:44px;margin-bottom:8px}
+.map-pin strong{font-family:"Fraunces",serif;font-size:1.2rem;display:block}
+.map-pin small{color:#6d5f4b}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- footer (multi-column) ---------- */
+footer{background:#0e0b08;border-top:1px solid rgba(217,153,43,.3);margin-top:26px}
+.foot-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:36px;padding:58px 0 34px}
+.foot-grid h4{font-family:"IBM Plex Mono",monospace;font-size:.75rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--amber);margin-bottom:16px}
+.foot-grid p,.foot-grid a{color:#a8926f;font-size:.94rem}
+.foot-grid a{text-decoration:none;display:block;margin-bottom:9px}
+.foot-grid a:hover{color:var(--amber)}
+.foot-brand{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.foot-brand svg{width:42px;height:42px}
+.foot-brand span{font-family:"Fraunces",serif;font-weight:900;color:var(--paper-3);font-size:1.2rem;letter-spacing:3px}
+.foot-bottom{border-top:1px solid rgba(217,153,43,.18);padding:20px 0 26px;display:flex;justify-content:center;font-size:.85rem;color:#8a7757}
+
+/* ---------- reveal ---------- */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:940px){
+  .hero-grid,.ed-grid,.artist-grid,.visit-grid{grid-template-columns:1fr}
+  .ed-col + .ed-col{border-left:0;border-top:1px solid rgba(217,153,43,.3)}
+  .formula-cards{grid-template-columns:1fr 1fr}
+  .masonry{columns:2}
+  .rev-grid{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr 1fr}
+  .burger{display:block}
+  nav.main{
+    display:none;position:absolute;top:100%;left:0;right:0;background:#14100c;
+    flex-direction:column;align-items:stretch;padding:12px 20px 20px;gap:2px;
+    border-bottom:1px solid rgba(217,153,43,.3);box-shadow:var(--shadow);
+  }
+  nav.main.open{display:flex}
+  nav.main a{text-align:center}
+  .ed-item{grid-template-columns:64px 1fr}
+  .ed-item .price-hint{grid-column:2;text-align:left}
+  .strip{padding:40px 28px}
+}
+@media(max-width:600px){
+  .formula-cards{grid-template-columns:1fr}
+  .masonry{columns:1}
+  .foot-grid{grid-template-columns:1fr}
+  .hero{padding:48px 0 40px}
+  .cta-band{padding:38px 24px}
+}
+</style>
+
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="kicker">Private studio · Est. 2017</span>
+        <h1>Every drop,<br><span class="accent">deliberate.</span></h1>
+        <p class="lede">Addiction Ink is a private tattoo studio in Malvern, PA, run by award winning artist Don Madison. Realism, neotraditional, black and grey, and bold color, designed with you and inked with obsessive care.</p>
+        <div class="cta-row">
+          <a class="btn btn-solid" href="tel:+16102322000">Book a consult · (610) 232-2000</a>
+          <a class="btn btn-ghost" href="#styles" data-page="styles">Explore styles</a>
+        </div>
+        <div class="stat-strip">
+          <span><b>5.0</b> public rating</span>
+          <span><b>One</b> artist, one chair</span>
+          <span><b>By</b> appointment</span>
+        </div>
+      </div>
+      <div class="hero-art">
+        <div class="vial-stage">
+          <svg viewBox="0 0 300 340" role="img" aria-label="Apothecary bottle of tattoo ink">
+            <ellipse cx="150" cy="318" rx="100" ry="14" fill="#000" opacity=".45"/>
+            <rect x="132" y="18" width="36" height="34" rx="7" fill="#8a6a3c"/>
+            <rect x="126" y="48" width="48" height="10" rx="4" fill="#6d532f"/>
+            <path d="M118 62 h64 v26 c26 10 40 30 40 58 v120 a34 34 0 0 1 -34 34 h-76 a34 34 0 0 1 -34 -34 v-120 c0 -28 14 -48 40 -58 z" fill="#3a2c17"/>
+            <path d="M118 62 h64 v26 c26 10 40 30 40 58 v120 a34 34 0 0 1 -34 34 h-76 a34 34 0 0 1 -34 -34 v-120 c0 -28 14 -48 40 -58 z" fill="url(#glass)" opacity=".9"/>
+            <defs>
+              <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#d9992b" stop-opacity=".55"/>
+                <stop offset=".5" stop-color="#7c2d1a" stop-opacity=".35"/>
+                <stop offset="1" stop-color="#2b1c0e" stop-opacity=".8"/>
+              </linearGradient>
+            </defs>
+            <path d="M96 190 h108 v76 a34 34 0 0 1 -34 34 h-40 a34 34 0 0 1 -34 -34 z" fill="#0d0906"/>
+            <path d="M96 190 h108 v10 h-108 z" fill="#d9992b" opacity=".85"/>
+            <rect x="104" y="196" width="92" height="64" rx="4" fill="#f5eddc"/>
+            <text x="150" y="220" text-anchor="middle" font-family="Georgia,serif" font-weight="bold" font-size="19" fill="#161210" letter-spacing="4">INK</text>
+            <text x="150" y="238" text-anchor="middle" font-family="monospace" font-size="10" fill="#7c2d1a" letter-spacing="2">No. 9 · BLACKWORK</text>
+            <text x="150" y="252" text-anchor="middle" font-family="monospace" font-size="8" fill="#6d5f4b" letter-spacing="1">MALVERN, PA</text>
+            <path d="M150 288 c0 0 -9 13 -9 20 a9 9 0 0 0 18 0 c0 -7 -9 -20 -9 -20z" fill="#d9992b"/>
+            <path d="M112 130 q6 -22 22 -30" stroke="#f5eddc" stroke-width="7" stroke-linecap="round" fill="none" opacity=".5"/>
+          </svg>
+        </div>
+        <div class="seal">Small batch · single needle</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap mag">
+    <div class="mag-head reveal">
+      <span class="eyebrow">The studio</span>
+      <h2>A private room,<br>not a production line</h2>
+      <p>Addiction Ink is a one artist studio inside the Great Valley shops on Lancaster Ave. No walk in chaos, no waiting room crowd. Just you, Don, and the design.</p>
+    </div>
+    <div class="ed-grid reveal">
+      <div class="ed-col">
+        <h3>Designed, not picked off a wall</h3>
+        <p class="dropcap">Clients say Don's depth of knowledge shows most in the design phase. He configures, lays out, and refines each piece with you before a single line goes in, so the tattoo fits your body and your story.</p>
+        <p>Whether it is your first tattoo or your fortieth, the process stays the same: a real conversation, a custom drawing, and zero pressure.</p>
+      </div>
+      <div class="ed-col">
+        <h3>Clean, calm, and comfortable</h3>
+        <p>Review after review mentions the same things: a very clean, relaxed, private setting, and an artist who is easy to talk to for hours in the chair. One client has logged more than 22 hours across four tattoos and would trust no one else.</p>
+        <p>Families come back together. First timers leave planning their second piece. That is the whole business model.</p>
+      </div>
+    </div>
+
+    <div class="pull reveal">
+      <div class="hand-rule"></div>
+      <p>His color tattoos are bright and bold and his black and grey is some of the best I have ever seen.</p>
+      <cite>Public review · Malvern</cite>
+      <div class="hand-rule"></div>
+    </div>
+
+    <div class="mag-head reveal">
+      <span class="eyebrow">The formulary</span>
+      <h2>Styles in the bottle</h2>
+      <p>A short index of what the studio does best. Full notes on the Styles page.</p>
+    </div>
+    <div class="formula-cards">
+      <div class="formula reveal"><span class="swatch"></span><span class="num">Formula 01</span><h3>Realism</h3><p>Lifelike portraits, wildlife, and detail heavy black and grey with soft, seamless shading.</p></div>
+      <div class="formula reveal"><span class="swatch"></span><span class="num">Formula 02</span><h3>Neotraditional</h3><p>Bold illustrated color work with a modern edge. Don's signature focus, and it shows.</p></div>
+      <div class="formula reveal"><span class="swatch"></span><span class="num">Formula 03</span><h3>Black and Grey</h3><p>Classic shading, smooth gradients, timeless pieces that age beautifully.</p></div>
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Your skin deserves a specialist.</h2>
+      <p>Consultations start with a conversation. Call (610) 232-2000 to talk through your idea with Don directly.</p>
+      <a class="btn btn-solid" href="tel:+16102322000">Call (610) 232-2000</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+<section class="page" id="page-styles">
+  <div class="wrap">
+    <div class="strip s-styles">
+      <span class="eyebrow">Styles and services</span>
+      <h2>The formulary</h2>
+      <p>Every style below is mixed to order. Don works in most styles of tattooing, with a focused specialty in realism and new school neotraditional.</p>
+    </div>
+
+    <div class="ed-list">
+      <div class="ed-item reveal">
+        <span class="idx">01</span>
+        <div>
+          <h3>Realism</h3>
+          <p>Portraits, animals, and objects rendered lifelike, with layered shading and fine detail. The studio's most requested specialty, and the one clients travel for.</p>
+          <div class="tagrow"><span class="tag">Black and grey</span><span class="tag">Color realism</span><span class="tag">Portraits</span></div>
+        </div>
+        <span class="price-hint">Quoted per piece<br>call for estimate</span>
+      </div>
+      <div class="ed-item reveal">
+        <span class="idx">02</span>
+        <div>
+          <h3>Neotraditional and New Skool</h3>
+          <p>Bold lines, saturated color, and illustrative punch. A modern evolution of classic tattooing, and Don's self described focus alongside realism.</p>
+          <div class="tagrow"><span class="tag">Bold color</span><span class="tag">Illustrative</span><span class="tag">Large scale</span></div>
+        </div>
+        <span class="price-hint">Quoted per piece<br>call for estimate</span>
+      </div>
+      <div class="ed-item reveal">
+        <span class="idx">03</span>
+        <div>
+          <h3>Black and Grey</h3>
+          <p>Smooth gradients and timeless shading, from soft whip shaded pieces to deep dramatic contrast. Ages gracefully and suits any placement.</p>
+          <div class="tagrow"><span class="tag">Shading</span><span class="tag">Timeless</span></div>
+        </div>
+        <span class="price-hint">Quoted per piece<br>call for estimate</span>
+      </div>
+      <div class="ed-item reveal">
+        <span class="idx">04</span>
+        <div>
+          <h3>Custom Design and Cover Work</h3>
+          <p>Bring a rough idea, a reference photo, or just a feeling. Don configures the layout with you in the design phase, and reworks existing tattoos into pieces you will actually love.</p>
+          <div class="tagrow"><span class="tag">Consultation</span><span class="tag">Custom drawn</span></div>
+        </div>
+        <span class="price-hint">Consult first<br>call to start</span>
+      </div>
+      <div class="ed-item reveal">
+        <span class="idx">05</span>
+        <div>
+          <h3>Tattoo Removal</h3>
+          <p>Removal services are listed for the studio. Talk to Don about your options if you are rethinking an old piece, or planning a cover up.</p>
+          <div class="tagrow"><span class="tag">By consultation</span></div>
+        </div>
+        <span class="price-hint">Call for details</span>
+      </div>
+      <div class="ed-item reveal">
+        <span class="idx">06</span>
+        <div>
+          <h3>Body Piercing</h3>
+          <p>Professional piercing including ear and nose piercings, done in the same clean, private studio setting.</p>
+          <div class="tagrow"><span class="tag">Ear piercing</span><span class="tag">Nose piercing</span><span class="tag">Body piercing</span></div>
+        </div>
+        <span class="price-hint">Call for pricing</span>
+      </div>
+    </div>
+
+    <div class="note-box reveal">
+      <strong>A note on pricing:</strong> every tattoo is quoted individually based on size, detail, and placement. The figures studios post online are samples at best. Call <a href="tel:+16102322000">(610) 232-2000</a> with your idea and get a real number before you commit.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-artist">
+  <div class="wrap">
+    <div class="strip s-artist">
+      <span class="eyebrow">The artist</span>
+      <h2>Don Madison</h2>
+      <p>Owner and sole artist at Addiction Ink. Award winning, published, and obsessed with the craft since long before the shop opened its doors in 2017.</p>
+    </div>
+
+    <div class="artist-grid">
+      <div class="portrait-card reveal">
+        <svg viewBox="0 0 200 200" role="img" aria-label="Illustrated portrait placeholder of the artist">
+          <circle cx="100" cy="100" r="92" fill="#1c140c"/>
+          <circle cx="100" cy="100" r="92" fill="none" stroke="#d9992b" stroke-width="2.5"/>
+          <circle cx="100" cy="78" r="30" fill="#d9b98a"/>
+          <path d="M70 74 q30 -26 60 0 q-4 -22 -30 -22 q-26 0 -30 22" fill="#3a2a18"/>
+          <path d="M62 130 q38 -24 76 0 l-6 44 h-64 z" fill="#7c2d1a"/>
+          <path d="M78 108 q22 14 44 0" stroke="#7c2d1a" stroke-width="3" fill="none"/>
+          <circle cx="88" cy="78" r="3.4" fill="#161210"/><circle cx="112" cy="78" r="3.4" fill="#161210"/>
+          <path d="M90 94 q10 7 20 0" stroke="#161210" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+          <path d="M70 140 l14 -8 M130 140 l-14 -8" stroke="#d9992b" stroke-width="2.4" stroke-linecap="round"/>
+        </svg>
+        <div class="sig">Don Madison</div>
+        <div class="role">Owner · Tattoo artist</div>
+      </div>
+      <div class="reveal">
+        <span class="eyebrow">In his own words</span>
+        <h2 style="font-size:clamp(1.7rem,3vw,2.3rem)">All about the art</h2>
+        <p style="color:#c6b795;margin-bottom:16px">Don describes himself simply: an award winning published tattoo artist who does most styles, with a focus on realism and new school neotraditional. Clients describe him with more words: talented, knowledgeable, easy to talk to, and completely trustworthy with permanent decisions.</p>
+        <p style="color:#c6b795;margin-bottom:16px">The studio has been running since 2017 out of a private shop space on Lancaster Ave in Malvern. One artist, one chair, and a reputation built review by review.</p>
+        <ul class="cred-list">
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="#d9992b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M8.5 14L7 22l5-3 5 3-1.5-8"/></svg>
+            <div><strong>Award winning and published</strong><p>Recognized work in the tattoo press, with a portfolio spanning realism, color, and black and grey.</p></div>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="#d9992b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>
+            <div><strong>Design first philosophy</strong><p>Clients consistently praise the design phase: layout, configuration, and honest guidance before the needle.</p></div>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="#d9992b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21C7 17 3 13.5 3 9.5 3 7 5 5 7.5 5c1.7 0 3.3.9 4.5 2.6C13.2 5.9 14.8 5 16.5 5 19 5 21 7 21 9.5c0 4-4 7.5-9 11.5z"/></svg>
+            <div><strong>First timer friendly</strong><p>A relaxed private setting and a patient artist make this a common choice for first tattoos, and families keep returning.</p></div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div style="height:8px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div class="strip s-gal">
+      <span class="eyebrow">The portfolio</span>
+      <h2>Fresh from the sketchbook</h2>
+      <p>Illustrated previews of the styles Don works in. Real healed photos of client work are on the way.</p>
+    </div>
+
+    <div class="masonry">
+      <div class="mtile reveal">
+        <span class="badge">Illustration</span>
+        <div class="art" style="background:linear-gradient(150deg,#3a2c17,#191309);min-height:300px">
+          <svg viewBox="0 0 100 110"><path d="M50 8 C50 8 24 44 24 66 a26 26 0 0 0 52 0 C76 44 50 8 50 8 Z" fill="#d9992b"/><path d="M50 24 C50 24 36 48 36 62 a14 14 0 0 0 28 0 C64 48 50 24 50 24 Z" fill="#7c2d1a"/><path d="M20 96 q30 10 60 0" stroke="#d9992b" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>Black and Grey Realism</strong><small>Soft shading, lifelike depth</small></div>
+      </div>
+      <div class="mtile reveal">
+        <span class="badge">Illustration</span>
+        <div class="art" style="background:linear-gradient(150deg,#4a2313,#1c0e06);min-height:220px">
+          <svg viewBox="0 0 100 100"><path d="M50 12 L62 40 L90 42 L68 60 L76 88 L50 71 L24 88 L32 60 L10 42 L38 40 Z" fill="none" stroke="#d9992b" stroke-width="4" stroke-linejoin="round"/><circle cx="50" cy="52" r="10" fill="#7c2d1a"/></svg>
+        </div>
+        <div class="cap"><strong>Neotraditional Flash</strong><small>Bold lines, saturated color</small></div>
+      </div>
+      <div class="mtile reveal">
+        <span class="badge">Illustration</span>
+        <div class="art" style="background:linear-gradient(150deg,#23331f,#0d120b);min-height:260px">
+          <svg viewBox="0 0 100 110"><path d="M50 10 q30 26 30 56 a30 30 0 0 1 -60 0 q0 -30 30 -56" fill="none" stroke="#7a8b6f" stroke-width="4"/><path d="M50 30 q18 16 18 34 M50 30 q-18 16 -18 34" stroke="#7a8b6f" stroke-width="2.4" fill="none"/><circle cx="50" cy="66" r="6" fill="#d9992b"/></svg>
+        </div>
+        <div class="cap"><strong>Botanical Fine Line</strong><small>Delicate, precise detail</small></div>
+      </div>
+      <div class="mtile reveal">
+        <span class="badge">Illustration</span>
+        <div class="art" style="background:linear-gradient(150deg,#3d1f2e,#170a10);min-height:230px">
+          <svg viewBox="0 0 100 100"><path d="M30 20 h40 v14 h-40 z M34 40 h32 l-4 44 h-24 z" fill="#d9992b" opacity=".9"/><path d="M50 40 v44" stroke="#7c2d1a" stroke-width="4"/><circle cx="50" cy="27" r="4" fill="#170a10"/></svg>
+        </div>
+        <div class="cap"><strong>Color Work Concept</strong><small>Bright, bold saturation</small></div>
+      </div>
+      <div class="mtile reveal">
+        <span class="badge">Illustration</span>
+        <div class="art" style="background:linear-gradient(150deg,#2a2f1c,#11130a);min-height:290px">
+          <svg viewBox="0 0 100 110"><path d="M20 90 Q50 30 80 90" fill="none" stroke="#d9992b" stroke-width="5" stroke-linecap="round"/><path d="M32 90 Q50 52 68 90" fill="none" stroke="#7c2d1a" stroke-width="4" stroke-linecap="round"/><circle cx="50" cy="44" r="7" fill="#d9992b"/></svg>
+        </div>
+        <div class="cap"><strong>Ornamental Arches</strong><small>Symmetry and flow</small></div>
+      </div>
+      <div class="mtile reveal">
+        <span class="badge">Illustration</span>
+        <div class="art" style="background:linear-gradient(150deg,#33241a,#14100a);min-height:210px">
+          <svg viewBox="0 0 100 100"><text x="50" y="62" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-size="30" fill="#f5eddc">script</text><path d="M22 72 q28 8 56 0" stroke="#d9992b" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>Custom Lettering</strong><small>Designed to fit the body</small></div>
+      </div>
+    </div>
+
+    <div class="note-box reveal">
+      <strong>Coming soon:</strong> real photos of healed client work. The illustrations above are artistic previews of the styles offered. The real thing, in skin, is the portfolio that matters.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div class="strip s-rev">
+      <span class="eyebrow">Word of mouth</span>
+      <h2>Rated 5.0 by the people<br>who wear the work</h2>
+      <p>Based on Google reviews and public feedback. The themes below are paraphrased from real reviews; open the source to read them in full.</p>
+    </div>
+
+    <div class="rate-band reveal">
+      <div>
+        <div class="big">5.0</div>
+        <div class="stars">★★★★★</div>
+      </div>
+      <p>Public listings show a perfect 5.0 rating, with reviewers returning across years, bringing family members, and logging 20 plus hours in the chair.</p>
+      <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJJeg1-6ryxokRNQUF3Syutgg" target="_blank" rel="noopener">See reviews on Google</a>
+    </div>
+
+    <div class="rev-grid">
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>An amazing artist, one of the best I have ever met. So nice and all about the art. His color tattoos are bright and bold and his black and grey is outstanding.</p>
+        <cite>via Roadtrippers</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>Simply the best. Very clean, relaxed atmosphere in a private setting, and an incredible artist who puts his heart and soul into the work.</p>
+        <cite>via tattooideas.help</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>A super talented tattoo artist. His depth of knowledge became most obvious during the design phase, where he perfectly configured, laid out, and inked a very meaningful tattoo.</p>
+        <cite>via Chamber of Commerce</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>An awesome first tattoo experience. Don was super nice, made everything feel relaxed, and took time to reassure every worry. Definitely going back for the next one.</p>
+        <cite>via tattooideas.help</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="sample">Sample</span>
+        <div class="stars">★★★★★</div>
+        <p>Brought in a rough sketch and watched it become something better than I imagined. The design session alone was worth it.</p>
+        <cite>Sample review</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="sample">Sample</span>
+        <div class="stars">★★★★★</div>
+        <p>Quiet private studio, zero rush, and the healed result looks even better than day one. Already booked my next session.</p>
+        <cite>Sample review</cite>
+      </div>
+    </div>
+
+    <div class="src-links reveal">
+      <a class="btn btn-ghost" href="https://tattooideas.help/catalog/malvern/tattoo-shop/addiction-ink-15923" target="_blank" rel="noopener">Reviews on tattooideas.help</a>
+      <a class="btn btn-ghost" href="https://maps.roadtrippers.com/us/malvern-pa/shopping/addiction-ink-malvern" target="_blank" rel="noopener">Reviews on Roadtrippers</a>
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Wearing Don's work? Say so.</h2>
+      <p>Your review helps a one artist studio keep its lights on and its waitlist honest. It takes a minute, and it means everything here.</p>
+      <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJJeg1-6ryxokRNQUF3Syutgg" target="_blank" rel="noopener">Leave a Google review</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="wrap">
+    <div class="strip s-visit">
+      <span class="eyebrow">Visit</span>
+      <h2>Find the studio</h2>
+      <p>Tucked into the Great Valley shops on Lancaster Ave in Malvern. By appointment, so call ahead and come ready to talk ink.</p>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#d9992b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Find us</h3>
+        <p><strong style="color:var(--paper-3)">Addiction Ink</strong><br>81 Lancaster Ave Store 46<br>Malvern, PA 19355</p>
+        <p>Inside the shops at 81 Lancaster Ave, Store 46. Look for the studio signage.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#d9992b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg> Call us</h3>
+        <p>Consultations, bookings, and questions:</p>
+        <a class="big" href="tel:+16102322000">(610) 232-2000</a>
+        <p style="margin-top:10px">Call ahead, the studio runs by appointment.</p>
+      </div>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#d9992b" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Hours</h3>
+        <p>The studio works by appointment, and public listings show <strong style="color:var(--paper-3)">Monday closed</strong>. Day to day hours are not published.</p>
+        <p><strong style="color:var(--amber)">Call for hours:</strong> <a href="tel:+16102322000" style="color:var(--amber)">(610) 232-2000</a></p>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <svg viewBox="0 0 24 24" fill="#7c2d1a"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#f5eddc"/></svg>
+          <strong>81 Lancaster Ave Store 46</strong>
+          <small>Malvern, PA 19355</small><br>
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJJeg1-6ryxokRNQUF3Syutgg" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand">
+          <svg viewBox="0 0 64 64" role="img" aria-label="Ink drop logo"><path d="M32 4 C32 4 14 30 14 42 a18 18 0 0 0 36 0 C50 30 32 4 32 4 Z" fill="#d9992b"/><path d="M32 12 C32 12 21 30 21 40 a11 11 0 0 0 22 0 C43 30 32 12 32 12 Z" fill="#7c2d1a"/></svg>
+          <span>ADDICTION INK</span>
+        </div>
+        <p>A private tattoo studio in Malvern, PA. Award winning artist Don Madison, specializing in realism and neotraditional work since 2017.</p>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <p>81 Lancaster Ave Store 46<br>Malvern, PA 19355<br><a href="tel:+16102322000">(610) 232-2000</a></p>
+      </div>
+      <div>
+        <h4>Hours</h4>
+        <p>By appointment<br>Monday · Closed<br><a href="tel:+16102322000">Call for hours</a></p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <a href="#styles" data-page="styles">Styles</a>
+        <a href="#artist" data-page="artist">Artist</a>
+        <a href="#gallery" data-page="gallery">Gallery</a>
+        <a href="#reviews" data-page="reviews">Reviews</a>
+        <a href="#visit" data-page="visit">Visit</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© Addiction Ink</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "styles", "artist", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
