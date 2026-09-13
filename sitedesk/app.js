@@ -873,7 +873,7 @@ function showGrabPreview(slug){
   let iv = null;
   function fmt(s){ return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
   let html = '<h2>Review before you grab</h2>' +
-    '<p class="muted" style="font-size:13px;line-height:1.55;margin-bottom:14px">Open their site and study it for <strong>2 minutes</strong>. Know who they are before you claim this lead.</p>' +
+    '<p class="muted" style="font-size:13px;line-height:1.55;margin-bottom:14px">Study their site first: what they do, their services, their vibe, so you sound like you know them on the call. The timer gives you <strong>2 minutes</strong> to look, then the grab unlocks.</p>' +
     '<div style="font-size:15px;font-weight:600;margin-bottom:4px">' + esc(l.name) + '</div>' +
     (l.category ? '<div class="muted" style="font-size:12px;margin-bottom:2px">' + esc(l.category) + '</div>' : '') +
     (hasPhone(l.phone) ? '<div style="font-size:13px;margin-bottom:2px">' + esc(l.phone) + '</div>' : '') +
