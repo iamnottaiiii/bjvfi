@@ -1,14 +1,3 @@
-/* TEMP DEBUG - surface JS errors on screen */
-(function(){
-  var box = document.createElement('div');
-  box.id = 'dbg-err';
-  box.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#7a0000;color:#fff;font:12px monospace;padding:8px;white-space:pre-wrap;display:none;max-height:40vh;overflow:auto;';
-  document.addEventListener('DOMContentLoaded', function(){ document.body.appendChild(box); });
-  function show(m){ box.style.display='block'; box.textContent += m + '\n'; }
-  window.addEventListener('error', function(e){ show('ERR: ' + (e.message||e.error)); });
-  window.addEventListener('unhandledrejection', function(e){ show('REJECT: ' + (e.reason && (e.reason.message||e.reason))); });
-  window.__dbg = show;
-})();
 (() => {
   const app = document.getElementById("app");
   const modal = document.getElementById("modal");
@@ -113,7 +102,7 @@
         console.error("poll handler", err);
       }
     };
-    conn.timer = setInterval(tick, slot === "thread" ? 5000 : 30000);
+    conn.timer = setInterval(tick, slot === "thread" ? 2500 : 30000);
   }
 
   function closeRealtime(slot) {
@@ -2616,15 +2605,14 @@ var lastSendAt = 0;
         );
         scrollThreadEnd(scroller);
       }
+      showToast("sent");
       try {
         const sent = await api(`/api/conversations/${id}/messages`, {
           method: "POST",
           body: JSON.stringify({ body: text }),
         });
-        showToast("sent");
         if (sent && sent.message) appendLiveMessage(sent.message);
-        try {
-          const fresh = await api("/api/conversations/" + id);
+        api("/api/conversations/" + id).then(async (fresh) => {
           if (stale(g) || route().parts[1] !== id) return;
           const subEl = document.querySelector(".thread-sub");
           const next = threadSub(fresh.conversation || {});
@@ -2640,9 +2628,7 @@ var lastSendAt = 0;
             otherLastRead = fresh.conversation.other_last_read_at;
             applyReadReceipts(otherLastRead);
           }
-        } catch {
-          /* ignore subtitle refresh */
-        }
+        }).catch(() => { /* ignore subtitle refresh */ });
       } catch (err) {
         alert(err.message);
       } finally {
