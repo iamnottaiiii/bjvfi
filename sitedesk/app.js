@@ -1744,7 +1744,7 @@ function init(){
       bootMain();
     }
   });
-  if(!isStandalone()){
+  if(!isStandalone() && !/testbypass=1/.test(location.search)){
     renderInstallGate();
     return;
   }
