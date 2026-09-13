@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spa Pointe Too · Day Spa in Glastonbury, CT</title>
+<meta name="description" content="Spa Pointe Too, a calm day spa at 1005B Hebron Ave, Glastonbury, CT. Facials, massage, manicures, pedicures and waxing in a clean, cozy setting. Call (860) 430-1003.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F0E4; --paper:#FFFDF8; --ink:#22302B; --ink-soft:#5C6B65;
+  --teal:#0F4C4A; --teal-deep:#0A3634; --teal-soft:#DCE9E3;
+  --gold:#C9A25E; --gold-soft:#F3E7CB;
+  --rose:#D98E96; --rose-soft:#F8DEDC;
+  --radius:18px;
+  --shadow:0 18px 40px -18px rgba(15,76,74,.30);
+  --shadow-sm:0 8px 22px -10px rgba(15,76,74,.22);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Public Sans",system-ui,sans-serif;
+  background:var(--bg);color:var(--ink);line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--teal)}
+::selection{background:var(--gold-soft);color:var(--ink)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.serif{font-family:"Fraunces",serif}
+
+/* ---------- header + side drawer ---------- */
+header.site{
+  position:sticky;top:0;z-index:60;
+  background:rgba(245,240,228,.94);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(15,76,74,.16);
+}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
+.brand svg{width:44px;height:44px;flex:none}
+.brand-name{font-family:"Fraunces",serif;font-weight:900;font-size:1.25rem;line-height:1.05}
+.brand-name small{display:block;font-family:"Public Sans",sans-serif;font-weight:700;font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--teal)}
+.menu-open{
+  display:inline-flex;align-items:center;gap:10px;cursor:pointer;
+  background:var(--teal);color:#fff;border:0;border-radius:999px;
+  padding:11px 20px;font-weight:700;font-size:.95rem;font-family:"Public Sans",sans-serif;
+  box-shadow:var(--shadow-sm);transition:background .18s,transform .18s;
+}
+.menu-open:hover{background:var(--teal-deep);transform:translateY(-2px)}
+.menu-open .lines{display:inline-flex;flex-direction:column;gap:4px}
+.menu-open .lines span{display:block;width:20px;height:2.5px;border-radius:3px;background:#fff}
+#scrim{
+  position:fixed;inset:0;background:rgba(34,48,43,.45);z-index:70;
+  opacity:0;pointer-events:none;transition:opacity .28s;
+}
+#scrim.show{opacity:1;pointer-events:auto}
+nav.main{
+  position:fixed;top:0;left:0;bottom:0;width:min(340px,86vw);z-index:71;
+  background:var(--paper);box-shadow:0 0 60px rgba(10,54,52,.35);
+  transform:translateX(-105%);transition:transform .32s cubic-bezier(.22,.8,.3,1);
+  display:flex;flex-direction:column;padding:26px 26px 30px;overflow-y:auto;
+}
+nav.main.open{transform:translateX(0)}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.drawer-head .brand-name{font-size:1.1rem}
+.drawer-close{
+  background:var(--teal-soft);border:0;border-radius:50%;width:40px;height:40px;cursor:pointer;
+  font-size:1.2rem;color:var(--teal);line-height:1;flex:none;
+}
+nav.main a.navlink{
+  display:flex;align-items:center;justify-content:space-between;
+  text-decoration:none;color:var(--ink);font-weight:600;font-size:1.05rem;
+  padding:13px 16px;border-radius:14px;transition:background .18s;
+}
+nav.main a.navlink:hover{background:var(--teal-soft)}
+nav.main a.navlink.active{background:var(--teal);color:#fff}
+nav.main a.navlink.active .go{color:var(--gold-soft)}
+nav.main a.navlink .go{color:var(--gold);font-weight:700}
+.drawer-foot{margin-top:auto;padding-top:24px}
+.call-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  background:var(--gold);color:var(--ink);text-decoration:none;font-weight:700;
+  padding:14px 20px;border-radius:999px;box-shadow:var(--shadow-sm);
+  transition:transform .18s,background .18s;
+}
+.call-btn:hover{background:#B98F45;transform:translateY(-2px)}
+.drawer-note{margin-top:14px;font-size:.85rem;color:var(--ink-soft);text-align:center}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- snapshot band (home opener) ---------- */
+.snap-band{background:var(--teal);color:#EDE7D6;padding:40px 0 46px;overflow:hidden}
+.snap-band .wrap{max-width:1240px}
+.snap-kicker{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.snap-kicker h1{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(1.7rem,3.4vw,2.5rem);line-height:1.15;color:#fff}
+.snap-kicker p{color:#C9D8D2;max-width:26rem;font-size:.98rem}
+.snap-scroll{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(230px,1fr);gap:16px;overflow-x:auto;padding-bottom:10px;scroll-snap-type:x mandatory}
+.snap{
+  scroll-snap-align:start;background:rgba(255,253,248,.07);border:1px solid rgba(255,255,255,.16);
+  border-radius:var(--radius);padding:24px 22px;backdrop-filter:blur(4px);
+  transition:transform .2s,background .2s;
+}
+.snap:hover{transform:translateY(-5px);background:rgba(255,253,248,.12)}
+.snap .ic{width:52px;height:52px;border-radius:16px;background:var(--gold-soft);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.snap .ic svg{width:28px;height:28px}
+.snap h3{font-family:"Fraunces",serif;font-size:1.18rem;color:#fff;margin-bottom:6px}
+.snap p{font-size:.9rem;color:#C9D8D2}
+.snap-cta{display:flex;flex-wrap:wrap;gap:14px;margin-top:26px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;
+  padding:14px 26px;border-radius:999px;font-size:1rem;transition:transform .18s,background .18s,border-color .18s;
+}
+.btn-solid{background:var(--gold);color:var(--ink);box-shadow:var(--shadow-sm)}
+.btn-solid:hover{background:#B98F45;transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.5)}
+.btn-ghost:hover{border-color:#fff;transform:translateY(-2px)}
+.btn-teal{background:var(--teal);color:#fff}
+.btn-teal:hover{background:var(--teal-deep);transform:translateY(-2px)}
+
+/* ---------- sections ---------- */
+section.block{padding:60px 0}
+.sec-head{max-width:46rem;margin-bottom:40px}
+.sec-head.center{margin-left:auto;margin-right:auto;text-align:center}
+.sec-head .kick{font-weight:700;font-size:.78rem;letter-spacing:3px;text-transform:uppercase;color:var(--teal)}
+h2{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(1.9rem,3.6vw,2.7rem);line-height:1.1;margin:8px 0 12px;letter-spacing:-.3px}
+.sec-head p{color:var(--ink-soft)}
+
+/* asymmetric grid rhythm */
+.asym{display:grid;grid-template-columns:repeat(12,1fr);gap:28px;align-items:center;margin-bottom:70px}
+.asym:last-child{margin-bottom:0}
+.asym .txt{grid-column:1/8}
+.asym .art{grid-column:8/13;transform:rotate(1.4deg)}
+.asym.flip .txt{grid-column:6/13;order:2}
+.asym.flip .art{grid-column:1/6;order:1;transform:rotate(-1.4deg)}
+.asym .txt h3{font-family:"Fraunces",serif;font-size:1.7rem;font-weight:900;margin-bottom:12px}
+.asym .txt p{color:var(--ink-soft);margin-bottom:12px}
+.art-panel{
+  border-radius:26px;min-height:300px;display:flex;align-items:center;justify-content:center;
+  box-shadow:var(--shadow);border:4px solid #fff;position:relative;overflow:hidden;
+}
+.art-panel svg{width:52%;height:auto;filter:drop-shadow(0 12px 16px rgba(0,0,0,.18))}
+.stat-row{display:flex;gap:34px;flex-wrap:wrap;margin-top:20px}
+.stat b{font-family:"Fraunces",serif;font-size:1.9rem;color:var(--teal);display:block;line-height:1.1}
+.stat span{font-size:.88rem;color:var(--ink-soft)}
+
+/* checklist */
+.check-list{list-style:none;margin:18px 0;display:grid;gap:12px}
+.check-list li{display:flex;gap:12px;align-items:flex-start;font-weight:500}
+.check-list svg{flex:none;width:24px;height:24px;margin-top:2px}
+
+/* ---------- services page: price table ---------- */
+.ptable-wrap{background:var(--paper);border-radius:22px;box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:40px}
+.ptable-head{background:var(--teal);color:#fff;padding:22px 28px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.ptable-head h3{font-family:"Fraunces",serif;font-size:1.5rem}
+.sample-pill{background:var(--gold);color:var(--ink);font-size:.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:6px 14px;border-radius:999px;white-space:nowrap}
+table.ptable{width:100%;border-collapse:collapse}
+table.ptable td{padding:15px 28px;border-bottom:1px dashed rgba(34,48,43,.16);vertical-align:top}
+table.ptable tr:last-child td{border-bottom:0}
+table.ptable .svc strong{font-size:1.02rem;display:block}
+table.ptable .svc small{color:var(--ink-soft)}
+table.ptable .dur{color:var(--ink-soft);white-space:nowrap;font-size:.93rem}
+table.ptable .prc{text-align:right;font-family:"Fraunces",serif;font-weight:700;color:var(--teal-deep);white-space:nowrap;font-size:1.05rem}
+.price-note{background:var(--gold-soft);border:2px dashed rgba(201,162,94,.7);border-radius:var(--radius);padding:18px 24px;font-size:.95rem;color:#6B5626;margin-bottom:40px}
+.price-note strong{color:var(--teal-deep)}
+
+/* ---------- gallery carousel ---------- */
+.carousel{position:relative;max-width:880px;margin:0 auto}
+.slides{position:relative;overflow:hidden;border-radius:26px;box-shadow:var(--shadow);background:var(--paper)}
+.slide{display:none}
+.slide.on{display:block;animation:fadeIn .45s ease}
+.slide .art{aspect-ratio:16/9.5;display:flex;align-items:center;justify-content:center;position:relative}
+.slide .art svg{width:26%;height:auto;filter:drop-shadow(0 12px 16px rgba(0,0,0,.2))}
+.slide .soon{position:absolute;top:16px;right:16px;background:rgba(255,253,248,.92);font-size:.68rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:6px 14px;border-radius:999px;color:var(--ink-soft)}
+.slide .cap{background:var(--paper);padding:20px 28px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.slide .cap strong{font-family:"Fraunces",serif;font-size:1.2rem}
+.slide .cap small{color:var(--ink-soft);display:block}
+.slide .num{font-family:"Fraunces",serif;font-weight:700;color:var(--teal);font-size:.95rem;white-space:nowrap}
+.car-btn{
+  position:absolute;top:38%;width:52px;height:52px;border-radius:50%;border:0;cursor:pointer;
+  background:var(--paper);color:var(--teal);font-size:1.4rem;font-weight:700;box-shadow:var(--shadow-sm);
+  transition:transform .18s,background .18s;z-index:2;
+}
+.car-btn:hover{background:var(--gold-soft);transform:scale(1.08)}
+#carPrev{left:-26px}#carNext{right:-26px}
+.dots{display:flex;gap:10px;justify-content:center;margin-top:20px}
+.dots button{width:12px;height:12px;border-radius:50%;border:0;cursor:pointer;background:rgba(15,76,74,.22);padding:0}
+.dots button.on{background:var(--teal);transform:scale(1.25)}
+
+/* ---------- reviews ---------- */
+.rev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px;margin-bottom:44px}
+.rev{background:var(--paper);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow-sm);position:relative}
+.rev .stars{color:var(--gold);font-size:1.15rem;letter-spacing:3px;margin-bottom:12px}
+.rev p{font-size:1.02rem;margin-bottom:14px}
+.rev cite{font-style:normal;font-weight:700;font-size:.85rem;color:var(--teal-deep);letter-spacing:.5px}
+.rev .badge{position:absolute;top:18px;right:18px;background:var(--teal-soft);color:var(--teal-deep);font-size:.66rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;padding:4px 12px;border-radius:999px}
+.rev.featured{background:var(--teal);color:#EDE7D6}
+.rev.featured p{color:#F4EFE0}
+.rev.featured cite{color:var(--gold-soft)}
+.rs-strip{margin:0 auto 34px;max-width:680px;background:var(--paper);border:1px solid var(--gold-soft);border-radius:14px;padding:20px 24px;text-align:center;box-shadow:var(--shadow-sm)}
+.rs-note{margin:0 0 14px;font-size:.95rem;color:var(--ink-soft);line-height:1.55}
+.rs-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rs-btn{display:inline-block;background:var(--teal);color:#fff;padding:12px 26px;border-radius:999px;font-weight:700;text-decoration:none;font-size:.95rem}
+.rs-btn:hover{background:var(--teal-deep)}
+.rating-line{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:26px}
+.rating-line .big{font-family:"Fraunces",serif;font-weight:900;font-size:2.6rem;color:var(--teal)}
+.rating-line .stars{color:var(--gold);font-size:1.4rem;letter-spacing:4px}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-bottom:26px}
+.info-card{background:var(--paper);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm)}
+.info-card h3{font-family:"Fraunces",serif;font-size:1.4rem;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.info-card h3 svg{width:28px;height:28px}
+.info-card p{color:var(--ink-soft);margin-bottom:8px}
+.info-card a.big{font-family:"Fraunces",serif;font-size:1.5rem;font-weight:700;color:var(--teal-deep);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.map-card{
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:320px;
+  background:
+    linear-gradient(rgba(15,76,74,.10), rgba(15,76,74,.10)),
+    repeating-linear-gradient(0deg, transparent 0 46px, rgba(15,76,74,.16) 46px 48px),
+    repeating-linear-gradient(90deg, transparent 0 46px, rgba(15,76,74,.16) 46px 48px),
+    linear-gradient(140deg,#F3E7CB,#EAD9AE);
+  display:flex;align-items:center;justify-content:center;
+}
+.map-pin{text-align:center;background:var(--paper);padding:26px 34px;border-radius:20px;box-shadow:var(--shadow);max-width:80%;position:relative}
+.map-pin::after{content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);border:14px solid transparent;border-top-color:var(--paper);border-bottom:0}
+.map-pin svg{width:44px;height:44px;margin-bottom:8px}
+.map-pin strong{font-family:"Fraunces",serif;font-size:1.15rem;display:block}
+.map-pin small{color:var(--ink-soft)}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- CTA band ---------- */
+.cta-band{background:linear-gradient(120deg,var(--teal),var(--teal-deep));border-radius:26px;color:#fff;padding:52px 40px;text-align:center;margin:56px 0;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.cta-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 82% 18%, rgba(201,162,94,.4), transparent 50%)}
+.cta-band h2{color:#fff;position:relative}
+.cta-band p{color:#DCE9E3;position:relative;max-width:36rem;margin:0 auto 26px}
+.cta-band .btn-solid{background:var(--gold);color:var(--ink);position:relative}
+
+/* ---------- minimal footer ---------- */
+footer.minimal{background:var(--teal-deep);color:#C9D8D2;margin-top:20px;text-align:center}
+footer.minimal .wrap{padding-top:44px;padding-bottom:0}
+.foot-links{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
+.foot-links a{color:#EDE7D6;text-decoration:none;font-weight:600;font-size:.92rem;padding:8px 14px;border-radius:999px}
+.foot-links a:hover{background:rgba(255,255,255,.12)}
+.foot-addr{font-size:.9rem;color:#9FB5AE;margin-bottom:6px}
+.foot-copy{border-top:1px solid rgba(255,255,255,.14);padding:18px 0 22px;font-size:.9rem;color:#EDE7D6}
+
+/* ---------- page strips ---------- */
+.strip{border-radius:26px;padding:52px 44px;color:#fff;position:relative;overflow:hidden;margin-bottom:44px;box-shadow:var(--shadow)}
+.strip::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(255,255,255,.20), transparent 50%)}
+.strip h2{color:#fff;font-size:clamp(2rem,4vw,2.9rem);position:relative;margin:6px 0 10px}
+.strip p{color:rgba(255,255,255,.88);max-width:36rem;position:relative}
+.strip .kick{font-weight:700;font-size:.78rem;letter-spacing:3px;text-transform:uppercase;position:relative;color:#fff;opacity:.85}
+.strip.s-svc{background:linear-gradient(120deg,#0F4C4A,#0A2E2D)}
+.strip.s-story{background:linear-gradient(120deg,#8A6A35,#5C4520)}
+.strip.s-gal{background:linear-gradient(120deg,#2E6E6A,#173F3D)}
+.strip.s-rev{background:linear-gradient(120deg,#A4565E,#6E343B)}
+.strip.s-visit{background:linear-gradient(120deg,#0F4C4A,#123F3E)}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:940px){
+  .asym .txt,.asym .art,.asym.flip .txt,.asym.flip .art{grid-column:1/13;order:initial}
+  .asym .art,.asym.flip .art{transform:none;max-width:520px}
+  .rev-grid,.visit-grid{grid-template-columns:1fr}
+  table.ptable td{padding:13px 18px}
+  #carPrev{left:10px}#carNext{right:10px}
+  .car-btn{top:32%}
+  .strip{padding:40px 28px}
+}
+@media(max-width:600px){
+  .cta-band{padding:38px 24px}
+  .snap-scroll{grid-auto-columns:minmax(210px,82%)}
+}
+</style>
+</head>
+<body>
+
+<div id="scrim"></div>
+
+<header class="site">
+  <div class="wrap bar">
+    <a class="brand" href="#home" data-page="home" aria-label="Spa Pointe Too, home">
+      <svg viewBox="0 0 64 64" role="img" aria-label="Lotus logo"><circle cx="32" cy="32" r="29" fill="#0F4C4A"/><path d="M32 46 C24 38 20 30 22 22 C28 26 32 32 32 38 C32 32 36 26 42 22 C44 30 40 38 32 46 Z" fill="#C9A25E"/><path d="M32 46 C26 42 18 40 12 42 C18 48 26 49 32 46 Z" fill="#DCE9E3"/><path d="M32 46 C38 42 46 40 52 42 C46 48 38 49 32 46 Z" fill="#DCE9E3"/></svg>
+      <span class="brand-name">Spa Pointe Too<small>Day Spa · Glastonbury</small></span>
+    </a>
+    <button class="menu-open" id="burger" aria-label="Open menu" aria-expanded="false"><span class="lines" aria-hidden="true"><span></span><span></span><span></span></span>Menu</button>
+  </div>
+</header>
+
+<nav class="main" id="mainNav" aria-label="Main navigation">
+  <div class="drawer-head">
+    <span class="brand-name serif">Spa Pointe Too</span>
+    <button class="drawer-close" id="drawerClose" aria-label="Close menu">×</button>
+  </div>
+  <a class="navlink active" href="#home" data-page="home" aria-current="page">Home <span class="go">→</span></a>
+  <a class="navlink" href="#services" data-page="services">Services &amp; Pricing <span class="go">→</span></a>
+  <a class="navlink" href="#story" data-page="story">Our Story <span class="go">→</span></a>
+  <a class="navlink" href="#gallery" data-page="gallery">Gallery <span class="go">→</span></a>
+  <a class="navlink" href="#reviews" data-page="reviews">Reviews <span class="go">→</span></a>
+  <a class="navlink" href="#visit" data-page="visit">Visit Us <span class="go">→</span></a>
+  <div class="drawer-foot">
+    <a class="call-btn" href="tel:+18604301003">Call (860) 430-1003</a>
+    <p class="drawer-note">1005B Hebron Ave, Glastonbury, CT</p>
+  </div>
+</nav>
+
+<section class="page active" id="page-home">
+  <div class="snap-band">
+    <div class="wrap">
+      <div class="snap-kicker">
+        <div>
+          <h1>Unwind, right here<br>in Glastonbury Center.</h1>
+        </div>
+        <p>Spa Pointe Too is a calm, cozy day spa on Hebron Avenue. Facials, massage, nails and waxing, without the bustle of a big salon.</p>
+      </div>
+      <div class="snap-scroll" aria-label="Services at a glance">
+        <div class="snap">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#0F4C4A" stroke-width="2" stroke-linecap="round"><path d="M12 21c-5 0-8-3-8-7 0-3 2-5 4-6-1-2 0-4 2-5 3 2 8 2 11 0 2 1 3 3 2 5 2 1 4 3 4 6 0 4-3 7-8 7z" opacity="0"/><path d="M7 13c1.5-1 3-1.5 5-1.5S15.5 12 17 13M12 21v-4M9 8c.8-1.6 2-2.5 3-2.5S13.2 6.4 14 8"/></svg></div>
+          <h3>Signature Facials</h3>
+          <p>Deep cleanse, gentle glow, total calm.</p>
+        </div>
+        <div class="snap">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#0F4C4A" stroke-width="2" stroke-linecap="round"><path d="M4 14c2-1 4-1 6 0s4 1 6 0 4-1 4 0M4 18c2-1 4-1 6 0s4 1 6 0 4-1 4 0M12 3v6M9 5l3 3 3-3"/></svg></div>
+          <h3>Relaxation Massage</h3>
+          <p>Full body, unhurried, melt away tension.</p>
+        </div>
+        <div class="snap">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#0F4C4A" stroke-width="2" stroke-linecap="round"><path d="M7 3h10l-1 18H8L7 3zM7 8h10M12 3v5"/></svg></div>
+          <h3>Gel Manicures</h3>
+          <p>Meticulous, attentive, long lasting.</p>
+        </div>
+        <div class="snap">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#0F4C4A" stroke-width="2" stroke-linecap="round"><path d="M6 21v-8l6-9 6 9v8M6 21h12M10 21v-4h4v4"/></svg></div>
+          <h3>Rejuvenation Pedicure</h3>
+          <p>The guest favorite, deeply relaxing.</p>
+        </div>
+        <div class="snap">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#0F4C4A" stroke-width="2" stroke-linecap="round"><path d="M12 3c3 4 6 7 6 11a6 6 0 01-12 0c0-4 3-7 6-11z"/></svg></div>
+          <h3>Gentle Waxing</h3>
+          <p>Brows to legs, careful and kind.</p>
+        </div>
+      </div>
+      <div class="snap-cta">
+        <a class="btn btn-solid" href="#services" data-page="services">See services and pricing →</a>
+        <a class="btn btn-ghost" href="tel:+18604301003">Call (860) 430-1003</a>
+      </div>
+    </div>
+  </div>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="asym reveal">
+        <div class="txt">
+          <h3>A quieter kind of spa day</h3>
+          <p>Spa Pointe Too is the Hebron Avenue sister location of the well loved Spa Pointe. Guests tell us they come here for the same careful work with a calmer room and an easier schedule, and walk-ins are welcome when the book allows.</p>
+          <p>Come in for an hour, or make an afternoon of it. Either way, you will leave lighter than you arrived.</p>
+          <div class="stat-row">
+            <div class="stat"><b>4.6</b><span>star rating across review sites</span></div>
+            <div class="stat"><b>5</b><span>service families under one roof</span></div>
+            <div class="stat"><b>100%</b><span>focus on your comfort</span></div>
+          </div>
+        </div>
+        <div class="art">
+          <div class="art-panel" style="background:linear-gradient(140deg,#DCE9E3,#A9C6BA)">
+            <svg viewBox="0 0 100 100" role="img" aria-label="Lotus illustration"><ellipse cx="50" cy="50" rx="38" ry="30" fill="#0F4C4A" opacity=".12"/><path d="M50 78 C38 62 32 48 34 34 C42 40 48 48 50 58 C52 48 58 40 66 34 C68 48 62 62 50 78 Z" fill="#0F4C4A"/><path d="M50 78 C40 70 28 68 18 72 C26 82 40 84 50 78 Z" fill="#C9A25E"/><path d="M50 78 C60 70 72 68 82 72 C74 82 60 84 50 78 Z" fill="#C9A25E"/><circle cx="50" cy="30" r="4" fill="#D98E96"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="asym flip reveal">
+        <div class="txt">
+          <h3>Clean, cozy, and genuinely relaxing</h3>
+          <p>Ask recent guests and the same words keep coming up: very clean, cozy atmosphere, friendly and accommodating staff. The rejuvenation pedicure and gel manicures get special praise, done well and done without rushing.</p>
+          <ul class="check-list">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#0F4C4A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Spotless treatment rooms and tools</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#0F4C4A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Attentive, meticulous technicians</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#0F4C4A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Calm setting, easy parking on Hebron Ave</li>
+          </ul>
+          <a class="btn btn-teal" href="#reviews" data-page="reviews">What guests say →</a>
+        </div>
+        <div class="art">
+          <div class="art-panel" style="background:linear-gradient(140deg,#F3E7CB,#E4CFA0)">
+            <svg viewBox="0 0 100 100" role="img" aria-label="Stacked spa stones illustration"><ellipse cx="50" cy="80" rx="30" ry="8" fill="#0F4C4A" opacity=".15"/><ellipse cx="50" cy="66" rx="26" ry="12" fill="#0F4C4A"/><ellipse cx="50" cy="50" rx="20" ry="10" fill="#2E6E6A"/><ellipse cx="50" cy="36" rx="14" ry="8" fill="#C9A25E"/><path d="M38 60 q12 -6 24 0" stroke="#DCE9E3" stroke-width="2.5" fill="none" stroke-linecap="round" opacity=".7"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="cta-band reveal">
+        <h2>Ready to unwind?</h2>
+        <p>Book a facial, a massage, or the full works. Call ahead and we will have everything ready when you walk in.</p>
+        <a class="btn btn-solid" href="tel:+18604301003">Call (860) 430-1003</a>
+      </div>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-svc">
+      <span class="kick">Services and pricing</span>
+      <h2>Choose your kind of calm</h2>
+      <p>Facials, massage, nails and waxing, all in one cozy Hebron Avenue studio. Times and prices below are samples to set expectations.</p>
+    </div>
+
+    <div class="ptable-wrap reveal">
+      <div class="ptable-head"><h3>Skin and Facials</h3><span class="sample-pill">Sample prices</span></div>
+      <table class="ptable">
+        <tr><td class="svc"><strong>Signature Facial</strong><small>Deep cleanse, exfoliation, mask, and relaxing massage</small></td><td class="dur">60 min</td><td class="prc">from $95</td></tr>
+        <tr><td class="svc"><strong>Express Glow Facial</strong><small>Cleanse, polish, and hydrate when time is short</small></td><td class="dur">30 min</td><td class="prc">from $60</td></tr>
+        <tr><td class="svc"><strong>Deep Cleansing Facial</strong><small>Extractions and clarifying care for congested skin</small></td><td class="dur">45 min</td><td class="prc">from $80</td></tr>
+      </table>
+    </div>
+
+    <div class="ptable-wrap reveal">
+      <div class="ptable-head"><h3>Massage</h3><span class="sample-pill">Sample prices</span></div>
+      <table class="ptable">
+        <tr><td class="svc"><strong>Relaxation Massage</strong><small>Full body Swedish style, gentle and unhurried</small></td><td class="dur">60 min</td><td class="prc">from $95</td></tr>
+        <tr><td class="svc"><strong>Deep Tissue Massage</strong><small>Focused pressure for stubborn knots and tension</small></td><td class="dur">60 min</td><td class="prc">from $110</td></tr>
+        <tr><td class="svc"><strong>Hot Stone Massage</strong><small>Warm stones melt tension, pure comfort</small></td><td class="dur">75 min</td><td class="prc">from $125</td></tr>
+      </table>
+    </div>
+
+    <div class="ptable-wrap reveal">
+      <div class="ptable-head"><h3>Nails</h3><span class="sample-pill">Sample prices</span></div>
+      <table class="ptable">
+        <tr><td class="svc"><strong>Classic Manicure</strong><small>Shape, cuticle care, massage, and polish</small></td><td class="dur">30 min</td><td class="prc">from $35</td></tr>
+        <tr><td class="svc"><strong>Gel Manicure</strong><small>Chip resistant color that lasts for weeks</small></td><td class="dur">45 min</td><td class="prc">from $50</td></tr>
+        <tr><td class="svc"><strong>Classic Pedicure</strong><small>Soak, groom, exfoliate, massage, and polish</small></td><td class="dur">45 min</td><td class="prc">from $45</td></tr>
+        <tr><td class="svc"><strong>Rejuvenation Pedicure</strong><small>Our guest favorite: extended massage and pampering</small></td><td class="dur">60 min</td><td class="prc">from $65</td></tr>
+      </table>
+    </div>
+
+    <div class="ptable-wrap reveal">
+      <div class="ptable-head"><h3>Waxing</h3><span class="sample-pill">Sample prices</span></div>
+      <table class="ptable">
+        <tr><td class="svc"><strong>Brow Shaping</strong><small>Clean, natural shape that frames your face</small></td><td class="dur">15 min</td><td class="prc">from $18</td></tr>
+        <tr><td class="svc"><strong>Lip or Chin</strong><small>Quick, gentle, and precise</small></td><td class="dur">15 min</td><td class="prc">from $14</td></tr>
+        <tr><td class="svc"><strong>Full Leg Wax</strong><small>Smooth results with soothing aftercare</small></td><td class="dur">45 min</td><td class="prc">from $55</td></tr>
+      </table>
+    </div>
+
+    <div class="price-note reveal">
+      <strong>Good to know:</strong> prices and times above are samples, shown so you know what to expect. Final pricing is confirmed when you book. <strong>Call (860) 430-1003</strong> for current prices and availability.
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Not sure where to start?</h2>
+      <p>Tell us how you want to feel when you leave, and we will point you to the right treatment.</p>
+      <a class="btn btn-solid" href="tel:+18604301003">Call (860) 430-1003</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-story">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-story">
+      <span class="kick">Our story</span>
+      <h2>The Spa Pointe family,<br>in Glastonbury Center</h2>
+      <p>Spa Pointe Too is the Hebron Avenue sister location of Spa Pointe, bringing the same careful, guest first approach to a cozier corner of town.</p>
+    </div>
+
+    <div class="asym reveal" style="margin-bottom:56px">
+      <div class="txt">
+        <h3>Small room, big exhale</h3>
+        <p>Guests describe Spa Pointe Too as the calmer sibling: the same skilled hands as the original Spa Pointe, with a quieter atmosphere and an easier time getting in. Many visitors say they never have to wait long, and walk-ins are welcome when the schedule allows.</p>
+        <p>The philosophy is simple. Keep the rooms spotless, take your time with every guest, and use quality products that are kind to skin. The Spa Pointe family is known for an eco friendly, cruelty free approach with natural and organic spa products, and that care runs through everything here.</p>
+        <p>Whether it is your wedding week or just a Tuesday that needs rescuing, you are welcome here.</p>
+      </div>
+      <div class="art">
+        <div class="art-panel" style="background:linear-gradient(140deg,#F8DEDC,#EFC3C7)">
+          <svg viewBox="0 0 100 100" role="img" aria-label="Candle illustration"><ellipse cx="50" cy="84" rx="26" ry="7" fill="#0F4C4A" opacity=".15"/><rect x="34" y="44" width="32" height="36" rx="6" fill="#FFFDF8"/><rect x="34" y="44" width="32" height="10" rx="5" fill="#F3E7CB"/><rect x="47" y="30" width="6" height="14" rx="3" fill="#8A6A35"/><path d="M50 14 c4 6 4 10 0 14 c-4 -4 -4 -8 0 -14z" fill="#E8A93D"/><circle cx="50" cy="24" r="3" fill="#F6C453"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="asym flip reveal">
+      <div class="txt">
+        <h3>What guests notice first</h3>
+        <p>Cleanliness, every time. Then the calm. Then the way the staff remembers what matters to you, from a sensitive nail bed to a favorite polish shade.</p>
+        <ul class="check-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#0F4C4A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>A quieter alternative to the busy original location</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#0F4C4A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Walk-ins welcome when the book allows</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#0F4C4A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Attentive to individual needs and preferences</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#0F4C4A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Eco friendly, cruelty free, natural products</li>
+        </ul>
+        <a class="btn btn-teal" href="#visit" data-page="visit">Plan your visit →</a>
+      </div>
+      <div class="art">
+        <div class="art-panel" style="background:linear-gradient(140deg,#DCE9E3,#A9C6BA)">
+          <svg viewBox="0 0 100 100" role="img" aria-label="Orchid illustration"><path d="M50 88 C50 70 48 58 44 46" stroke="#0F4C4A" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M50 62 C40 58 32 58 26 62" stroke="#2E6E6A" stroke-width="4" fill="none" stroke-linecap="round"/><ellipse cx="34" cy="34" rx="14" ry="10" fill="#D98E96" transform="rotate(-24 34 34)"/><ellipse cx="62" cy="30" rx="14" ry="10" fill="#E7A9B0" transform="rotate(24 62 30)"/><ellipse cx="48" cy="22" rx="11" ry="9" fill="#D98E96"/><circle cx="48" cy="32" r="6" fill="#C9A25E"/><circle cx="48" cy="32" r="2.5" fill="#0F4C4A"/></svg>
+        </div>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-gal">
+      <span class="kick">Gallery</span>
+      <h2>A glimpse of the calm</h2>
+      <p>Artistic previews of the Spa Pointe Too experience. Real photos of our rooms and work are on the way.</p>
+    </div>
+
+    <div class="carousel reveal">
+      <div class="slides" id="spaSlides">
+        <div class="slide on">
+          <div class="art" style="background:linear-gradient(140deg,#DCE9E3,#A9C6BA)">
+            <span class="soon">Photo soon</span>
+            <svg viewBox="0 0 100 100" role="img" aria-label="Treatment room illustration"><rect x="14" y="52" width="72" height="26" rx="8" fill="#0F4C4A"/><rect x="14" y="46" width="72" height="10" rx="5" fill="#FFFDF8"/><rect x="20" y="30" width="24" height="16" rx="4" fill="#FFFDF8"/><circle cx="70" cy="30" r="10" fill="#C9A25E"/><path d="M70 18 v-6 M62 22 l-4 -4 M78 22 l4 -4" stroke="#E8A93D" stroke-width="3" stroke-linecap="round"/></svg>
+          </div>
+          <div class="cap"><div><strong>Treatment Rooms</strong><small>Quiet, clean, made for unwinding</small></div><span class="num">1 / 6</span></div>
+        </div>
+        <div class="slide">
+          <div class="art" style="background:linear-gradient(140deg,#F3E7CB,#E4CFA0)">
+            <span class="soon">Photo soon</span>
+            <svg viewBox="0 0 100 100" role="img" aria-label="Facial illustration"><circle cx="50" cy="46" r="26" fill="#F2C9A8"/><path d="M26 40 q-6 -18 10 -24 q16 -6 30 4 q10 8 6 22" fill="#5C4520"/><circle cx="41" cy="46" r="2.5" fill="#22302B"/><circle cx="59" cy="46" r="2.5" fill="#22302B"/><path d="M43 58 q7 5 14 0" stroke="#8A5A3B" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M30 62 q20 10 40 0" stroke="#C9A25E" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+          </div>
+          <div class="cap"><div><strong>Signature Facials</strong><small>Cleanse, glow, and deep calm</small></div><span class="num">2 / 6</span></div>
+        </div>
+        <div class="slide">
+          <div class="art" style="background:linear-gradient(140deg,#CFE0D8,#9DBFAC)">
+            <span class="soon">Photo soon</span>
+            <svg viewBox="0 0 100 100" role="img" aria-label="Massage illustration"><rect x="16" y="56" width="68" height="18" rx="9" fill="#0F4C4A"/><ellipse cx="50" cy="48" rx="30" ry="12" fill="#2E6E6A"/><circle cx="50" cy="34" r="10" fill="#F2C9A8"/><path d="M20 40 q30 -14 60 0" stroke="#C9A25E" stroke-width="3" fill="none" stroke-linecap="round" opacity=".8"/></svg>
+          </div>
+          <div class="cap"><div><strong>Massage Therapy</strong><small>Unhurried, full body relief</small></div><span class="num">3 / 6</span></div>
+        </div>
+        <div class="slide">
+          <div class="art" style="background:linear-gradient(140deg,#F8DEDC,#EFC3C7)">
+            <span class="soon">Photo soon</span>
+            <svg viewBox="0 0 100 100" role="img" aria-label="Manicure illustration"><path d="M30 88 L38 52 q1 -8 8 -8 l8 0 q7 0 8 8 l8 36" fill="#F2C9A8"/><rect x="34" y="44" width="8" height="14" rx="4" fill="#D98E96"/><rect x="45" y="42" width="8" height="16" rx="4" fill="#C9A25E"/><rect x="56" y="44" width="8" height="14" rx="4" fill="#0F4C4A"/></svg>
+          </div>
+          <div class="cap"><div><strong>Gel Manicures</strong><small>Meticulous color that lasts</small></div><span class="num">4 / 6</span></div>
+        </div>
+        <div class="slide">
+          <div class="art" style="background:linear-gradient(140deg,#DCE9E3,#B7D2C5)">
+            <span class="soon">Photo soon</span>
+            <svg viewBox="0 0 100 100" role="img" aria-label="Pedicure illustration"><ellipse cx="50" cy="72" rx="34" ry="14" fill="#9DBFAC"/><ellipse cx="50" cy="68" rx="30" ry="11" fill="#7FB3D9" opacity=".8"/><path d="M34 40 q4 10 0 18 M46 36 q4 12 0 22 M58 36 q-4 12 0 22 M70 40 q-4 10 0 18" stroke="#F2C9A8" stroke-width="9" stroke-linecap="round" fill="none"/></svg>
+          </div>
+          <div class="cap"><div><strong>Rejuvenation Pedicure</strong><small>The guest favorite ritual</small></div><span class="num">5 / 6</span></div>
+        </div>
+        <div class="slide">
+          <div class="art" style="background:linear-gradient(140deg,#F3E7CB,#DFC48F)">
+            <span class="soon">Photo soon</span>
+            <svg viewBox="0 0 100 100" role="img" aria-label="Spa details illustration"><rect x="28" y="52" width="44" height="26" rx="6" fill="#FFFDF8"/><rect x="28" y="52" width="44" height="8" rx="4" fill="#C9A25E"/><path d="M40 40 q10 -8 20 0" stroke="#0F4C4A" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="50" cy="26" r="6" fill="#D98E96"/></svg>
+          </div>
+          <div class="cap"><div><strong>Little Details</strong><small>Thoughtful touches everywhere</small></div><span class="num">6 / 6</span></div>
+        </div>
+      </div>
+      <button class="car-btn" id="carPrev" aria-label="Previous slide">‹</button>
+      <button class="car-btn" id="carNext" aria-label="Next slide">›</button>
+      <div class="dots" id="carDots" aria-label="Choose slide"></div>
+    </div>
+
+    <div class="price-note reveal" style="margin-top:32px">
+      <strong>Coming soon:</strong> real photos of our rooms and treatments. The illustrations above are artistic previews, the real thing is even calmer.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-rev">
+      <span class="kick">Reviews</span>
+      <h2>Guests leave glowing</h2>
+      <p>Here is what people keep saying about their visits to Spa Pointe Too.</p>
+    </div>
+
+    <div class="rs-strip reveal">
+      <p class="rs-note">Review themes on this page are paraphrased from public feedback. Open the source to read current reviews and ratings.</p>
+      <div class="rs-links"><a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJiwSEQMtR5okRtNvT2ef8h_4" target="_blank" rel="noopener">See reviews on Google</a></div>
+    </div>
+
+    <div class="rating-line reveal">
+      <span class="big">4.6</span>
+      <div>
+        <div class="stars">★★★★★</div>
+        <p style="color:var(--ink-soft);font-size:.95rem;margin:0">Based on 15 reviews across review sites</p>
+      </div>
+    </div>
+
+    <div class="rev-grid">
+      <div class="rev featured reveal">
+        <span class="badge">Sample summary</span>
+        <div class="stars">★★★★★</div>
+        <p>Cozy and relaxing from the moment you walk in. Great services, and the kind of place that makes an ordinary week feel special.</p>
+        <cite>Paraphrased from guest feedback</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="badge">Sample summary</span>
+        <div class="stars">★★★★★</div>
+        <p>The rejuvenation pedicure and gel manicure were both deeply relaxing and beautifully done. Attentive, meticulous, and so sweet.</p>
+        <cite>Paraphrased from guest feedback</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="badge">Sample summary</span>
+        <div class="stars">★★★★★</div>
+        <p>Very clean and comfortable. A little pricey, but you are getting what you pay for, and the staff is friendly and accommodating.</p>
+        <cite>Paraphrased from guest feedback</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="badge">Sample summary</span>
+        <div class="stars">★★★★★</div>
+        <p>Had nails done here before a wedding and loved the result. Calmer and easier to get into than the original location.</p>
+        <cite>Paraphrased from guest feedback</cite>
+      </div>
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Had a wonderful visit? Tell Glastonbury.</h2>
+      <p>Your review helps a small local spa keep thriving. It takes a minute, and it means the world to the team.</p>
+      <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJiwSEQMtR5okRtNvT2ef8h_4" target="_blank" rel="noopener">Leave a Google review</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-visit">
+      <span class="kick">Visit us</span>
+      <h2>Come unwind with us</h2>
+      <p>Find us on Hebron Avenue in Glastonbury Center, with easy parking right nearby.</p>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#0F4C4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Find us</h3>
+        <p><strong>Spa Pointe Too</strong><br>1005B Hebron Ave<br>Glastonbury, CT 06033</p>
+        <p>In Glastonbury Center, easy parking nearby.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#0F4C4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg> Call us</h3>
+        <p>Questions, bookings, gift certificates:</p>
+        <a class="big" href="tel:+18604301003">(860) 430-1003</a>
+        <p style="margin-top:10px">Walk-ins welcome when the book allows. Calling ahead guarantees your spot.</p>
+      </div>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#0F4C4A" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Hours</h3>
+        <p><strong>Call for hours.</strong></p>
+        <p>Our schedule changes with the season, so the surest way to plan your visit is a quick call. We will confirm today's hours and help you pick the perfect treatment.</p>
+        <p style="margin-top:14px"><a class="btn btn-teal" href="tel:+18604301003">Call (860) 430-1003</a></p>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <svg viewBox="0 0 24 24" fill="#0F4C4A"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#FFFDF8"/></svg>
+          <strong>1005B Hebron Ave</strong>
+          <small>Glastonbury, CT 06033</small><br>
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJiwSEQMtR5okRtNvT2ef8h_4" target="_blank" rel="noopener">Get Directions →</a>
+        </div>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<footer class="minimal">
+  <div class="wrap">
+    <div class="foot-links">
+      <a href="#home" data-page="home">Home</a>
+      <a href="#services" data-page="services">Services</a>
+      <a href="#story" data-page="story">Our Story</a>
+      <a href="#gallery" data-page="gallery">Gallery</a>
+      <a href="#reviews" data-page="reviews">Reviews</a>
+      <a href="#visit" data-page="visit">Visit Us</a>
+    </div>
+    <p class="foot-addr">1005B Hebron Ave, Glastonbury, CT 06033 · <a href="tel:+18604301003" style="color:#EDE7D6">(860) 430-1003</a></p>
+    <div class="foot-copy"><span>© Spa Pointe Too</span></div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "story", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+  var scrim = document.getElementById("scrim");
+  var drawerClose = document.getElementById("drawerClose");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+    if(scrim){ scrim.classList.remove("show"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+      if(scrim){ scrim.classList.toggle("show", open); }
+    });
+  }
+  if(drawerClose){
+    drawerClose.addEventListener("click", function(){ closeMenu(); });
+  }
+  if(scrim){
+    scrim.addEventListener("click", function(){ closeMenu(); });
+  }
+
+  var carSlides = document.querySelectorAll("#spaSlides .slide");
+  var carDots = document.getElementById("carDots");
+  var carIdx = 0;
+  function showSlide(n){
+    carIdx = (n + carSlides.length) % carSlides.length;
+    for(var i = 0; i < carSlides.length; i++){
+      carSlides[i].classList.toggle("on", i === carIdx);
+    }
+    var dots = carDots.querySelectorAll("button");
+    for(var j = 0; j < dots.length; j++){
+      dots[j].classList.toggle("on", j === carIdx);
+      dots[j].setAttribute("aria-label", "Show slide " + (j + 1));
+    }
+  }
+  for(var k = 0; k < carSlides.length; k++){
+    (function(kk){
+      var b = document.createElement("button");
+      b.setAttribute("type", "button");
+      b.addEventListener("click", function(){ showSlide(kk); resetTimer(); });
+      carDots.appendChild(b);
+    })(k);
+  }
+  document.getElementById("carPrev").addEventListener("click", function(){ showSlide(carIdx - 1); resetTimer(); });
+  document.getElementById("carNext").addEventListener("click", function(){ showSlide(carIdx + 1); resetTimer(); });
+  var carTimer = null;
+  function resetTimer(){
+    if(carTimer){ clearInterval(carTimer); }
+    carTimer = setInterval(function(){ showSlide(carIdx + 1); }, 6000);
+  }
+  showSlide(0);
+  resetTimer();
+
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

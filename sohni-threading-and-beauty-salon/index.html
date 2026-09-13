@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sohni threading and beauty salon | Threading and Beauty in Brooklyn</title>
+<meta name="description" content="Sohni threading and beauty salon at 1356 Coney Island Ave, Brooklyn offers threading, waxing, facials, and beauty services. Call (347) 792-1445.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --maroon:#7a2340; --maroon-deep:#54172c; --saffron:#e0972f; --saffron-soft:#f6d9a8;
+    --cream:#fdf8ef; --rose:#f6e7dd; --ink:#2e1a1e; --muted:#8a6f68; --gold:#c9a24b;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:"Inter",sans-serif;background:var(--cream);color:var(--ink);line-height:1.65}
+  .serif{font-family:"Cormorant Garamond",serif}
+  a{color:inherit}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+  .page{display:none}
+  .page.active{display:block;animation:fadeIn .3s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .55s ease,transform .55s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  /* ---------- top bar ---------- */
+  .topbar{background:var(--maroon-deep);color:var(--cream);display:flex;align-items:center;justify-content:space-between;padding:16px 24px;position:sticky;top:0;z-index:60}
+  .topbar .left{display:flex;align-items:center;gap:16px}
+  #burger{background:none;border:1.5px solid var(--saffron-soft);color:var(--cream);border-radius:6px;padding:9px 14px;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}
+  a.brand{font-family:"Cormorant Garamond",serif;font-size:24px;font-weight:700;text-decoration:none;letter-spacing:.02em}
+  a.brand em{color:var(--saffron-soft);font-style:italic}
+  .top-call{text-decoration:none;font-weight:700;font-size:14px;background:var(--saffron);color:var(--maroon-deep);padding:10px 20px;border-radius:999px;white-space:nowrap}
+
+  /* ---------- side drawer ---------- */
+  .scrim{position:fixed;inset:0;background:rgba(46,26,30,.5);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:70}
+  .scrim.show{opacity:1;pointer-events:auto}
+  nav.drawer{position:fixed;top:0;left:0;bottom:0;width:300px;background:var(--maroon);color:var(--cream);z-index:80;transform:translateX(-105%);transition:transform .3s ease;display:flex;flex-direction:column;padding:26px 0}
+  nav.drawer.open{transform:none}
+  .drawer-head{padding:0 26px 18px;border-bottom:1px solid rgba(255,255,255,.15)}
+  .drawer-head .serif{font-size:24px;font-weight:700}
+  .drawer-head .serif em{color:var(--saffron-soft)}
+  nav.drawer a.dlink{display:block;text-decoration:none;padding:15px 26px;font-size:15px;font-weight:600;letter-spacing:.06em;border-left:4px solid transparent}
+  nav.drawer a.dlink:hover{background:rgba(255,255,255,.06)}
+  nav.drawer a.dlink.active{background:rgba(255,255,255,.08);border-left-color:var(--saffron);color:var(--saffron-soft)}
+  .drawer-foot{margin-top:auto;padding:20px 26px 0;font-size:13.5px;color:#e8cdb9}
+  .drawer-foot a{color:var(--saffron-soft);font-weight:700}
+  #drawerClose{align-self:flex-end;margin:0 18px 12px;background:none;border:1px solid rgba(255,255,255,.4);color:var(--cream);border-radius:6px;padding:7px 13px;cursor:pointer;font-size:13px}
+  nav.main{display:none}
+
+  /* ---------- hero ---------- */
+  .hero{background:
+    radial-gradient(circle at 18% 25%, rgba(224,151,47,.28) 0 90px, transparent 91px),
+    radial-gradient(circle at 85% 70%, rgba(224,151,47,.22) 0 120px, transparent 121px),
+    radial-gradient(circle at 70% 15%, rgba(122,35,64,.25) 0 70px, transparent 71px),
+    linear-gradient(150deg,var(--maroon) 0%,var(--maroon-deep) 75%);
+    color:var(--cream);padding:70px 0 80px}
+  .hero-kicker{font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--saffron-soft);margin-bottom:16px}
+  .hero h1{font-family:"Cormorant Garamond",serif;font-size:clamp(46px,7.5vw,86px);font-weight:700;line-height:1.02;max-width:15ch}
+  .hero h1 em{color:var(--saffron-soft);font-style:italic}
+  .hero p{max-width:54ch;margin-top:18px;color:#eed9c6;font-size:17px}
+  .hero-cta{margin-top:26px;display:flex;gap:14px;flex-wrap:wrap}
+  .btn{display:inline-block;text-decoration:none;font-weight:700;font-size:14px;letter-spacing:.08em;text-transform:uppercase;padding:14px 28px;border-radius:999px}
+  .btn-solid{background:var(--saffron);color:var(--maroon-deep)}
+  .btn-ghost{border:1.5px solid var(--saffron-soft);color:var(--cream)}
+  #hoursPill{display:inline-flex;align-items:center;gap:8px;margin-top:26px;background:rgba(255,255,255,.08);border:1px solid rgba(246,217,168,.5);border-radius:999px;padding:8px 18px;font-size:13px}
+  #hoursPill .dot{width:9px;height:9px;border-radius:50%;background:#7ddf9a;display:inline-block}
+  #hoursPill.closed .dot{background:#f09a9a}
+  .cardstack{display:flex;gap:16px;margin-top:44px;flex-wrap:wrap}
+  .mini-card{background:rgba(255,255,255,.07);border:1px solid rgba(246,217,168,.35);border-radius:12px;padding:20px 22px;flex:1;min-width:180px}
+  .mini-card .serif{font-size:22px;font-weight:700;color:var(--saffron-soft)}
+  .mini-card p{font-size:13.5px;color:#e8cdb9;margin-top:4px}
+
+  /* ---------- bands ---------- */
+  section.band{padding:70px 0}
+  .sec-head{margin-bottom:34px}
+  .sec-head .rule{width:64px;height:3px;background:var(--saffron);margin-bottom:14px}
+  .sec-head h2{font-family:"Cormorant Garamond",serif;font-size:clamp(34px,5vw,52px);font-weight:700;line-height:1.05}
+  .sec-head p{color:var(--muted);max-width:60ch;margin-top:8px}
+
+  /* ---------- card wall ---------- */
+  .cardwall{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .wall-card{background:#fff;border:1px solid #efdfc8;border-radius:14px;padding:30px;box-shadow:0 10px 26px rgba(84,23,44,.07);position:relative;overflow:hidden}
+  .wall-card:before{content:"";position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,var(--saffron),var(--maroon))}
+  .wall-card .icon{font-size:30px}
+  .wall-card h3{font-family:"Cormorant Garamond",serif;font-size:24px;font-weight:700;margin:12px 0 8px}
+  .wall-card p{font-size:14.5px;color:var(--muted)}
+
+  /* ---------- services cards ---------- */
+  .svc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+  .svc{background:#fff;border:1px solid #efdfc8;border-radius:14px;padding:28px;display:flex;gap:18px;align-items:flex-start}
+  .svc .drop{flex:0 0 54px;height:54px;border-radius:50%;background:linear-gradient(140deg,var(--saffron),var(--maroon));display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff}
+  .svc h3{font-family:"Cormorant Garamond",serif;font-size:23px;font-weight:700}
+  .svc p{font-size:14.5px;color:var(--muted);margin-top:6px}
+  .svc .tag{margin-top:10px;display:inline-block;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--maroon);background:var(--rose);padding:5px 12px;border-radius:999px}
+  .sample-note{font-size:12.5px;color:var(--muted);margin-top:22px;font-style:italic}
+
+  /* ---------- gallery arch tiles ---------- */
+  .arches{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  .arch{background:#fff;border:1px solid #efdfc8;border-radius:120px 120px 14px 14px;overflow:hidden;text-align:center;box-shadow:0 10px 26px rgba(84,23,44,.07)}
+  .arch .art{height:210px;display:flex;align-items:center;justify-content:center;position:relative;border-radius:110px 110px 0 0}
+  .arch .art .badge{position:absolute;top:12px;left:50%;transform:translateX(-50%);background:var(--maroon-deep);color:var(--cream);font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:5px 11px;border-radius:999px;white-space:nowrap}
+  .arch .cap{padding:16px 14px 20px;font-size:13.5px}
+  .arch .cap strong{font-family:"Cormorant Garamond",serif;font-size:19px;display:block}
+
+  /* ---------- reviews ---------- */
+  .review-shell{background:var(--maroon);color:var(--cream);border-radius:16px;padding:50px 44px;text-align:center}
+  .review-shell h2{font-family:"Cormorant Garamond",serif;font-size:clamp(32px,4.5vw,48px);font-weight:700}
+  .review-shell p{color:#e8cdb9;max-width:56ch;margin:12px auto 0}
+  .review-shell .btn-row{margin-top:26px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .review-shell a.rbtn{text-decoration:none;font-weight:700;font-size:14px;letter-spacing:.06em;padding:13px 26px;border-radius:999px;background:var(--saffron);color:var(--maroon-deep)}
+  .review-shell a.rbtn.ghost{background:none;border:1.5px solid var(--saffron-soft);color:var(--cream)}
+
+  /* ---------- visit ---------- */
+  .visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  .info-card{background:#fff;border:1px solid #efdfc8;border-radius:14px;padding:34px}
+  .info-card h3{font-family:"Cormorant Garamond",serif;font-size:26px;font-weight:700;margin-bottom:4px}
+  .info-card dl{margin-top:10px}
+  .info-card dt{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-top:16px}
+  .info-card dd{font-size:16px;font-weight:600}
+  .info-card dd a{color:var(--maroon)}
+  table.hours{width:100%;border-collapse:collapse;margin-top:8px;font-size:15px}
+  table.hours td{padding:9px 4px;border-bottom:1px solid #f0e2cd}
+  table.hours tr.today td{font-weight:800;color:var(--maroon)}
+  table.hours tr.today td:first-child:before{content:"\25B8 ";color:var(--saffron)}
+  .maplink{display:block;margin-top:22px;text-align:center;background:var(--maroon);color:var(--cream);text-decoration:none;font-weight:700;padding:15px;border-radius:999px;letter-spacing:.05em}
+
+  /* ---------- footer ---------- */
+  footer{background:var(--maroon-deep);color:var(--cream)}
+  .foot-cols{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:30px;padding:58px 0 40px}
+  .foot-cols h4{font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--saffron-soft);margin-bottom:16px}
+  .foot-cols .serif{font-size:30px;font-weight:700}
+  .foot-cols .serif em{color:var(--saffron-soft)}
+  .foot-cols p,.foot-cols a{font-size:14.5px;color:#e0c4b0;text-decoration:none}
+  .foot-cols ul{list-style:none}
+  .foot-cols li{margin-bottom:10px}
+  .foot-cols a:hover{color:var(--saffron-soft)}
+  .copy{border-top:1px solid rgba(255,255,255,.12);padding:22px;text-align:center;font-size:13px;color:#cba893}
+
+  @media(max-width:860px){
+    .cardwall{grid-template-columns:1fr 1fr}
+    .arches{grid-template-columns:1fr 1fr}
+    .svc-grid,.visit-grid,.foot-cols{grid-template-columns:1fr}
+    a.brand{font-size:19px}
+    .top-call{padding:9px 14px;font-size:12.5px}
+  }
+  @media(max-width:560px){
+    .cardwall{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="left">
+    <button id="burger" aria-expanded="false" aria-controls="drawerNav">&#9776; Menu</button>
+    <a class="brand" href="#home" data-page="home" aria-label="Sohni threading and beauty salon, home">Sohni <em>threading</em> and beauty salon</a>
+  </div>
+  <a class="top-call" href="tel:+13477921445">Call (347) 792-1445</a>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<nav class="main" id="mainNav" aria-label="Primary"></nav>
+<nav class="drawer" id="drawerNav" aria-label="Site">
+  <button id="drawerClose">Close &#10005;</button>
+  <div class="drawer-head"><div class="serif">Sohni <em>threading</em> and beauty salon</div></div>
+  <a class="dlink active" href="#home" data-page="home">Home</a>
+  <a class="dlink" href="#services" data-page="services">Services</a>
+  <a class="dlink" href="#gallery" data-page="gallery">Gallery</a>
+  <a class="dlink" href="#reviews" data-page="reviews">Reviews</a>
+  <a class="dlink" href="#visit" data-page="visit">Visit Us</a>
+  <div class="drawer-foot">
+    1356 Coney Island Ave, Brooklyn, NY 11230<br>
+    <a href="tel:+13477921445">(347) 792-1445</a>
+  </div>
+</nav>
+
+<main>
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="wrap">
+      <div class="hero-kicker reveal">Threading &middot; Waxing &middot; Beauty &middot; Coney Island Ave</div>
+      <h1 class="reveal">Precise brows, <em>radiant</em> skin.</h1>
+      <p class="reveal">Sohni threading and beauty salon brings the gentle art of threading to Brooklyn. Clean lines, smooth skin, and a welcoming chair, right on Coney Island Avenue.</p>
+      <div class="hero-cta reveal">
+        <a class="btn btn-solid" href="tel:+13477921445">Call to Book</a>
+        <a class="btn btn-ghost" href="#services" data-page="services">See Services</a>
+      </div>
+      <div><span id="hoursPill"><span class="dot"></span><span id="hoursText">Open daily, 10:00 AM to 8:00 PM</span></span></div>
+      <div class="cardstack">
+        <div class="mini-card reveal"><div class="serif">Threading</div><p>Eyebrows, full face, and upper lip, shaped with a single cotton thread.</p></div>
+        <div class="mini-card reveal"><div class="serif">Waxing</div><p>Smooth, clean results for face and body.</p></div>
+        <div class="mini-card reveal"><div class="serif">Facials</div><p>Fresh, glowing skin with relaxing care.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <section class="band">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="rule"></div>
+        <h2>Why threading</h2>
+        <p>An ancient technique, loved for modern reasons. Here is what makes it special.</p>
+      </div>
+      <div class="cardwall">
+        <div class="wall-card reveal"><div class="icon">&#10022;</div><h3>Gentle on skin</h3><p>Threading uses no chemicals and no heat, just a twisted cotton thread. It is a favorite for sensitive skin.</p></div>
+        <div class="wall-card reveal"><div class="icon">&#9673;</div><h3>Precise lines</h3><p>Each hair is targeted individually, so brows come out crisp, clean, and shaped to your face.</p></div>
+        <div class="wall-card reveal"><div class="icon">&#10084;</div><h3>Lasts for weeks</h3><p>Hair is removed from the root, so smooth results typically last two to four weeks.</p></div>
+        <div class="wall-card reveal"><div class="icon">&#9788;</div><h3>Quick visits</h3><p>Most threading services take only minutes, easy to fit into a lunch break or errand run.</p></div>
+        <div class="wall-card reveal"><div class="icon">&#10024;</div><h3>Full face care</h3><p>Pair threading with waxing and facials for complete, glowing results in one visit.</p></div>
+        <div class="wall-card reveal"><div class="icon">&#9742;</div><h3>Walk in welcome</h3><p>Open every day from 10:00 AM to 8:00 PM. Call ahead if you want to skip the wait.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" style="background:var(--rose)">
+    <div class="wrap" style="text-align:center">
+      <div class="sec-head reveal" style="margin-bottom:24px">
+        <h2>Your brows deserve an expert</h2>
+        <p style="margin-left:auto;margin-right:auto">Call today and leave with brows you love.</p>
+      </div>
+      <div class="reveal">
+        <a class="btn btn-solid" href="tel:+13477921445">Call (347) 792-1445</a>
+        &nbsp;
+        <a class="btn btn-ghost" href="#visit" data-page="visit" style="border-color:var(--maroon);color:var(--maroon)">Find Us</a>
+      </div>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-services">
+  <section class="band">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="rule"></div>
+        <h2>Services</h2>
+        <p>Threading and beauty services, done with care. Call to confirm services and pricing.</p>
+      </div>
+      <div class="svc-grid">
+        <div class="svc reveal"><div class="drop">&#10022;</div><div><h3>Eyebrow Threading</h3><p>Shaped and cleaned with a twisted cotton thread for crisp, natural lines.</p><span class="tag">Call for price</span></div></div>
+        <div class="svc reveal"><div class="drop">&#9673;</div><div><h3>Full Face Threading</h3><p>Brows, upper lip, chin, and cheeks smoothed in one session.</p><span class="tag">Call for price</span></div></div>
+        <div class="svc reveal"><div class="drop">&#10084;</div><div><h3>Upper Lip Threading</h3><p>Quick, precise, and gentle on delicate skin.</p><span class="tag">Call for price</span></div></div>
+        <div class="svc reveal"><div class="drop">&#9788;</div><div><h3>Waxing</h3><p>Face and body waxing for smooth, clean results.</p><span class="tag">Call for price</span></div></div>
+        <div class="svc reveal"><div class="drop">&#10024;</div><div><h3>Facials</h3><p>Cleansing and glow treatments to refresh your skin.</p><span class="tag">Call for price</span></div></div>
+        <div class="svc reveal"><div class="drop">&#10047;</div><div><h3>Henna and Tinting</h3><p>Ask about brow tinting and henna for fuller looking brows.</p><span class="tag">Call for price</span></div></div>
+      </div>
+      <p class="sample-note reveal">Service list reflects the salon&rsquo;s threading and beauty focus. Please call (347) 792-1445 to confirm availability and current pricing.</p>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-gallery">
+  <section class="band">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="rule"></div>
+        <h2>Gallery</h2>
+        <p>The craft behind every visit, illustrated.</p>
+      </div>
+      <div class="arches">
+        <div class="arch reveal">
+          <div class="art" style="background:linear-gradient(160deg,#f9e3c2,#efb97e)"><span class="badge">Sample art</span>
+            <svg width="110" height="130" viewBox="0 0 110 130"><path d="M20 110 Q55 30 90 110" stroke="#7a2340" stroke-width="3" fill="none"/><circle cx="55" cy="62" r="26" fill="#f0c8a8"/><path d="M34 56 q21 -14 42 0" stroke="#54172c" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M34 56 q21 -14 42 0" stroke="#54172c" stroke-width="4" fill="none" stroke-linecap="round" transform="translate(0,34) scale(1,-1) translate(0,-124)"/></svg>
+          </div>
+          <div class="cap"><strong>Thread</strong><br>Sample art. A single cotton thread, precisely twisted.</div>
+        </div>
+        <div class="arch reveal">
+          <div class="art" style="background:linear-gradient(160deg,#f6d9d3,#e8a8a0)"><span class="badge">Sample art</span>
+            <svg width="110" height="130" viewBox="0 0 110 130"><ellipse cx="55" cy="70" rx="30" ry="38" fill="#f0c8a8"/><path d="M28 62 q27 -20 54 0" stroke="#54172c" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M30 60 q25 -18 50 0" stroke="#54172c" stroke-width="3" fill="none" stroke-linecap="round" opacity=".5"/></svg>
+          </div>
+          <div class="cap"><strong>Brows</strong><br>Sample art. Shaped to frame the face.</div>
+        </div>
+        <div class="arch reveal">
+          <div class="art" style="background:linear-gradient(160deg,#efe3d3,#d9bd93)"><span class="badge">Sample art</span>
+            <svg width="110" height="130" viewBox="0 0 110 130"><circle cx="55" cy="60" r="34" fill="#f0c8a8"/><path d="M40 52 q15 10 30 0" stroke="#c9a24b" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="55" cy="60" r="34" fill="none" stroke="#e0972f" stroke-width="2" stroke-dasharray="6 6"/></svg>
+          </div>
+          <div class="cap"><strong>Glow</strong><br>Sample art. Facials for fresh, radiant skin.</div>
+        </div>
+        <div class="arch reveal">
+          <div class="art" style="background:linear-gradient(160deg,#e5d3e8,#b98fc4)"><span class="badge">Sample art</span>
+            <svg width="110" height="130" viewBox="0 0 110 130"><path d="M55 25 C 75 45 80 75 55 105 C 30 75 35 45 55 25 Z" fill="#7a2340" opacity=".85"/><circle cx="55" cy="62" r="8" fill="#f6d9a8"/></svg>
+          </div>
+          <div class="cap"><strong>Henna</strong><br>Sample art. Rich color, natural beauty.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-reviews">
+  <section class="band">
+    <div class="wrap">
+      <div class="review-shell reveal">
+        <h2>What clients say</h2>
+        <p>See the latest reviews for Sohni threading and beauty salon on Google, and add your own after your visit.</p>
+        <div class="btn-row">
+          <a class="rbtn" href="https://www.google.com/maps/place/?q=place_id:ChIJM16fpS1bwokR04TOAvOYCTA" target="_blank" rel="noopener">See reviews on Google</a>
+          <a class="rbtn ghost" href="https://www.google.com/maps/place/?q=place_id:ChIJM16fpS1bwokR04TOAvOYCTA" target="_blank" rel="noopener">Write a Review</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-visit">
+  <section class="band">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="rule"></div>
+        <h2>Visit Us</h2>
+        <p>On Coney Island Avenue in Brooklyn. Open every day.</p>
+      </div>
+      <div class="visit-grid">
+        <div class="info-card reveal">
+          <h3>Find us</h3>
+          <dl>
+            <dt>Address</dt>
+            <dd>Sohni threading and beauty salon, 1356 Coney Island Ave, Brooklyn, NY 11230</dd>
+            <dt>Phone</dt>
+            <dd><a href="tel:+13477921445">(347) 792-1445</a></dd>
+            <dt>Walk ins</dt>
+            <dd>Welcome, call ahead to skip the wait</dd>
+          </dl>
+          <a class="maplink" href="https://www.google.com/maps/place/?q=place_id:ChIJM16fpS1bwokR04TOAvOYCTA" target="_blank" rel="noopener">Get Directions on Google Maps</a>
+        </div>
+        <div class="info-card reveal">
+          <h3>Hours</h3>
+          <table class="hours" id="hoursTable">
+            <tr><td>Monday</td><td>10:00 AM to 8:00 PM</td></tr>
+            <tr><td>Tuesday</td><td>10:00 AM to 8:00 PM</td></tr>
+            <tr><td>Wednesday</td><td>10:00 AM to 8:00 PM</td></tr>
+            <tr><td>Thursday</td><td>10:00 AM to 8:00 PM</td></tr>
+            <tr><td>Friday</td><td>10:00 AM to 8:00 PM</td></tr>
+            <tr><td>Saturday</td><td>10:00 AM to 8:00 PM</td></tr>
+            <tr><td>Sunday</td><td>10:00 AM to 8:00 PM</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-cols">
+      <div>
+        <div class="serif">Sohni <em>threading</em> and beauty salon</div>
+        <p style="margin-top:10px">Precise threading and beauty care on Coney Island Avenue, Brooklyn.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="#home" data-page="home">Home</a></li>
+          <li><a href="#services" data-page="services">Services</a></li>
+          <li><a href="#gallery" data-page="gallery">Gallery</a></li>
+          <li><a href="#reviews" data-page="reviews">Reviews</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <p>1356 Coney Island Ave<br>Brooklyn, NY 11230<br><a href="tel:+13477921445">(347) 792-1445</a><br><a href="https://www.google.com/maps/place/?q=place_id:ChIJM16fpS1bwokR04TOAvOYCTA" target="_blank" rel="noopener">Get Directions</a></p>
+      </div>
+    </div>
+  </div>
+  <div class="copy">&copy; Sohni threading and beauty salon</div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var drawer = document.getElementById("drawerNav");
+  var burger = document.getElementById("burger");
+  var scrim = document.getElementById("scrim");
+  var drawerClose = document.getElementById("drawerClose");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(drawer){ drawer.classList.remove("open"); }
+    if(scrim){ scrim.classList.remove("show"); }
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function openMenu(){
+    if(drawer){ drawer.classList.add("open"); }
+    if(scrim){ scrim.classList.add("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "true"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.drawer a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger){
+    burger.addEventListener("click", function(){
+      if(drawer.classList.contains("open")){ closeMenu(); }
+      else { openMenu(); }
+    });
+  }
+  if(drawerClose){ drawerClose.addEventListener("click", closeMenu); }
+  if(scrim){ scrim.addEventListener("click", closeMenu); }
+
+  /* ---------- live hours (America/New_York) ---------- */
+  var HOURS = {0:[10,20],1:[10,20],2:[10,20],3:[10,20],4:[10,20],5:[10,20],6:[10,20]};
+  var DOW = {"Sun":0,"Mon":1,"Tue":2,"Wed":3,"Thu":4,"Fri":5,"Sat":6};
+  function fmt(h){
+    var ap = h < 12 ? "AM" : "PM";
+    var hh = h % 12;
+    if(hh === 0){ hh = 12; }
+    return hh + ":00 " + ap;
+  }
+  try{
+    var parts = new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",weekday:"short",hour:"numeric",hour12:false}).formatToParts(new Date());
+    var wd = "Mon", hr = 12;
+    parts.forEach(function(p){
+      if(p.type === "weekday"){ wd = p.value; }
+      if(p.type === "hour"){ hr = parseInt(p.value, 10) % 24; }
+    });
+    var day = DOW[wd] !== undefined ? DOW[wd] : 1;
+    var openH = HOURS[day][0], closeH = HOURS[day][1];
+    var pill = document.getElementById("hoursPill");
+    var txt = document.getElementById("hoursText");
+    if(pill && txt){
+      if(hr >= openH && hr < closeH){
+        txt.textContent = "Open now · until " + fmt(closeH) + " today";
+      } else if(hr < openH){
+        pill.classList.add("closed");
+        txt.textContent = "Opens today at " + fmt(openH);
+      } else {
+        pill.classList.add("closed");
+        var nd = (day + 1) % 7;
+        var dayName = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][nd];
+        txt.textContent = "Opens " + (nd === day + 1 ? "tomorrow" : dayName) + " at " + fmt(HOURS[nd][0]);
+      }
+    }
+    var rows = document.querySelectorAll("#hoursTable tr");
+    var idx = (day + 6) % 7; /* rows run Mon..Sun */
+    if(rows[idx]){ rows[idx].classList.add("today"); }
+  }catch(e){ /* leave default pill text */ }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

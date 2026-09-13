@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Singleton's Auto Repair · Baden, PA Auto Repair Shop</title>
+<meta name="description" content="Singleton's Auto Repair at 1089 Phillips St, Baden, PA 15005. Inspections, emissions, brakes, oil service and diagnostics. Rated 5.0 from 27 reviews. Call (724) 869-5002.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --parchment:#F6F0E2; --paper:#FDFBF4; --parchment-2:#EDE4CC;
+  --oxblood:#6E1E24; --oxblood-deep:#4E1419;
+  --ink:#181311; --ink-soft:#5C5049;
+  --gold:#B98A2E;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"IBM Plex Mono",ui-monospace,monospace;background:var(--parchment);color:var(--ink);line-height:1.7;-webkit-font-smoothing:antialiased}
+img{max-width:100%}
+a{color:var(--oxblood)}
+::selection{background:var(--oxblood);color:var(--parchment)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+.serif{font-family:"Playfair Display",serif}
+
+/* ---------- topbar nav ---------- */
+header.site{position:sticky;top:0;z-index:60;background:var(--parchment);border-bottom:3px double var(--ink)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0}
+.brand{text-decoration:none;color:var(--ink);display:flex;align-items:center;gap:14px}
+.brand-seal{width:52px;height:52px;flex:none;border:2px solid var(--oxblood);border-radius:50%;display:grid;place-items:center;font-family:"Playfair Display",serif;font-weight:900;font-size:1.3rem;color:var(--oxblood);background:var(--paper)}
+.brand-name{font-family:"Playfair Display",serif;font-weight:900;font-size:1.35rem;line-height:1.1}
+.brand-name small{display:block;font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:.62rem;letter-spacing:3.5px;text-transform:uppercase;color:var(--ink-soft)}
+nav.main{display:flex;align-items:center;gap:2px}
+nav.main a{text-decoration:none;color:var(--ink);font-size:.82rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:10px 14px;transition:color .2s}
+nav.main a:hover{color:var(--oxblood)}
+nav.main a.active{color:var(--oxblood);box-shadow:inset 0 -3px 0 var(--oxblood)}
+.call-pill{background:var(--oxblood);color:#fff !important;text-decoration:none;font-weight:600;font-size:.82rem;letter-spacing:1px;padding:10px 20px;border-radius:999px;white-space:nowrap}
+.call-pill:hover{background:var(--oxblood-deep)}
+.burger{display:none;background:none;border:2px solid var(--ink);border-radius:8px;cursor:pointer;padding:8px 10px}
+.burger span{display:block;width:22px;height:2px;background:var(--ink);margin:5px 0}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- editorial hero ---------- */
+.hero{padding:80px 0 60px;text-align:center;position:relative}
+.hero .dateline{font-size:.75rem;letter-spacing:4px;text-transform:uppercase;color:var(--ink-soft);margin-bottom:22px}
+.hero .rule{width:70px;height:3px;background:var(--oxblood);margin:0 auto 30px}
+.hero h1{font-family:"Playfair Display",serif;font-weight:900;font-size:clamp(3rem,8vw,5.6rem);line-height:1.02;letter-spacing:-1px;margin-bottom:24px}
+.hero h1 em{font-style:italic;color:var(--oxblood)}
+.hero .standfirst{font-size:1.05rem;color:var(--ink-soft);max-width:38rem;margin:0 auto 34px}
+.hero-cta{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;margin-bottom:40px}
+.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:600;font-size:.9rem;letter-spacing:.5px;padding:15px 30px;border-radius:2px;transition:transform .18s,background .18s}
+.btn-solid{background:var(--oxblood);color:#fff}
+.btn-solid:hover{background:var(--oxblood-deep);transform:translateY(-2px)}
+.btn-line{background:transparent;color:var(--ink);border:2px solid var(--ink)}
+.btn-line:hover{border-color:var(--oxblood);color:var(--oxblood);transform:translateY(-2px)}
+.hero-meta{display:flex;justify-content:center;flex-wrap:wrap;gap:0;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);max-width:640px;margin:0 auto}
+.hero-meta div{padding:12px 26px;font-size:.8rem;letter-spacing:1px;text-transform:uppercase;font-weight:600}
+.hero-meta div+div{border-left:1px solid var(--ink)}
+.hero-meta .stars{color:var(--gold);font-size:1rem}
+
+/* ---------- magazine rhythm ---------- */
+.edition{padding:64px 0}
+.edition:nth-of-type(even){background:var(--paper);border-top:1px solid rgba(24,19,17,.15);border-bottom:1px solid rgba(24,19,17,.15)}
+.section-kicker{font-size:.72rem;letter-spacing:4px;text-transform:uppercase;color:var(--oxblood);font-weight:600;margin-bottom:12px}
+.edition h2{font-family:"Playfair Display",serif;font-weight:900;font-size:clamp(1.9rem,4vw,2.8rem);line-height:1.1;margin-bottom:14px}
+.edition .deck{color:var(--ink-soft);max-width:40rem;margin-bottom:30px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:48px}
+.two-col p{margin-bottom:16px}
+.dropcap::first-letter{font-family:"Playfair Display",serif;font-weight:900;font-size:3.4rem;line-height:.85;float:left;margin:6px 10px 0 0;color:var(--oxblood)}
+.pullquote{border-left:4px solid var(--oxblood);padding:6px 0 6px 22px;font-family:"Playfair Display",serif;font-style:italic;font-size:1.35rem;line-height:1.5;margin:26px 0}
+
+/* ---------- dotted leader service list ---------- */
+.svc-list{list-style:none;border-top:2px solid var(--ink)}
+.svc-list li{display:flex;align-items:baseline;gap:14px;padding:20px 4px;border-bottom:1px dotted rgba(24,19,17,.45)}
+.svc-list .num{font-size:.75rem;color:var(--oxblood);font-weight:600;flex:none;width:34px}
+.svc-list .name{font-family:"Playfair Display",serif;font-weight:700;font-size:1.25rem;white-space:nowrap}
+.svc-list .dots{flex:1;border-bottom:3px dotted rgba(24,19,17,.35);transform:translateY(-6px)}
+.svc-list .note{font-size:.82rem;color:var(--ink-soft);white-space:nowrap}
+.svc-list .desc{font-size:.88rem;color:var(--ink-soft);margin-top:6px;flex-basis:100%}
+
+/* ---------- arch tile gallery ---------- */
+.arch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.arch{border:2px solid var(--ink);border-radius:150px 150px 6px 6px;overflow:hidden;background:var(--parchment-2);position:relative}
+.arch svg{display:block;width:100%;height:auto}
+.arch .cap{padding:16px 18px 20px;text-align:center}
+.arch .cap strong{font-family:"Playfair Display",serif;font-size:1.02rem;display:block}
+.arch .cap span{font-size:.74rem;letter-spacing:2px;text-transform:uppercase;color:var(--ink-soft)}
+.arch .ph{position:absolute;top:16px;left:50%;transform:translateX(-50%);background:var(--oxblood);color:#fff;font-size:.64rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:6px 14px;border-radius:999px}
+
+/* ---------- reviews ---------- */
+.press-card{background:var(--paper);border:2px solid var(--ink);border-radius:4px;padding:34px 34px 30px;margin-bottom:22px;position:relative}
+.press-card .badge{position:absolute;top:18px;right:20px;border:1px dashed var(--ink-soft);font-size:.66rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:6px 12px;color:var(--ink-soft)}
+.press-card .stars{color:var(--gold);font-size:1.15rem;letter-spacing:2px}
+.press-card p.quote{font-family:"Playfair Display",serif;font-style:italic;font-size:1.2rem;line-height:1.55;margin:14px 0}
+.press-card .who{font-size:.82rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-soft)}
+.rating-line{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:28px}
+.rating-line .big{font-family:"Playfair Display",serif;font-weight:900;font-size:2.6rem}
+.gsrc{display:inline-block;background:var(--oxblood);color:#fff;text-decoration:none;font-weight:600;font-size:.85rem;letter-spacing:1px;padding:15px 30px;border-radius:2px;margin:6px 10px 6px 0}
+.gsrc:hover{background:var(--oxblood-deep)}
+
+/* ---------- visit ---------- */
+.visit-cols{display:grid;grid-template-columns:1fr 1fr;gap:0;border:2px solid var(--ink)}
+.visit-cols>div{padding:36px}
+.visit-cols>div+div{border-left:2px solid var(--ink)}
+.visit-cols h3{font-size:.74rem;letter-spacing:4px;text-transform:uppercase;color:var(--oxblood);margin-bottom:16px}
+.visit-cols a.big{font-family:"Playfair Display",serif;font-weight:900;font-size:1.7rem;color:var(--ink);text-decoration:none}
+.hours-table{width:100%;border-collapse:collapse}
+.hours-table td{padding:10px 2px;border-bottom:1px dotted rgba(24,19,17,.4);font-size:.92rem}
+.hours-table td:last-child{text-align:right;font-weight:600}
+.map-link{display:inline-block;margin-top:18px;background:var(--ink);color:#fff;text-decoration:none;font-weight:600;font-size:.85rem;letter-spacing:1px;padding:14px 28px;border-radius:2px}
+
+/* ---------- minimal footer ---------- */
+footer.site{border-top:3px double var(--ink);padding:40px 0 30px;text-align:center;margin-top:20px}
+footer.site nav{margin-bottom:18px}
+footer.site nav a{color:var(--ink);text-decoration:none;font-size:.78rem;letter-spacing:1.5px;text-transform:uppercase;margin:0 12px;font-weight:600}
+footer.site nav a:hover{color:var(--oxblood)}
+footer.site .addr{font-size:.85rem;color:var(--ink-soft);margin-bottom:18px}
+.copyright{font-size:.88rem;color:var(--ink-soft)}
+
+/* ---------- reveal ---------- */
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .5s ease,transform .5s ease}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:860px){
+  nav.main{display:none;position:absolute;top:100%;left:0;right:0;background:var(--parchment);border-bottom:3px double var(--ink);flex-direction:column;align-items:stretch;padding:10px 24px 18px}
+  nav.main.open{display:flex}
+  nav.main a{padding:13px 4px;border-top:1px dotted rgba(24,19,17,.3)}
+  .burger{display:block}
+  .call-pill{display:none}
+  .arch-grid{grid-template-columns:1fr 1fr}
+  .two-col{grid-template-columns:1fr}
+  .visit-cols{grid-template-columns:1fr}
+  .visit-cols>div+div{border-left:0;border-top:2px solid var(--ink)}
+  .svc-list .note{display:none}
+}
+@media(max-width:520px){.arch-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap bar" style="position:relative">
+    <a class="brand" href="#home" data-page="home" aria-label="Singleton's Auto Repair home">
+      <span class="brand-seal">S</span>
+      <span class="brand-name">Singleton's<small>Auto Repair · Baden, PA</small></span>
+    </a>
+    <nav class="main" id="nav">
+      <a href="#home" data-page="home">Home</a>
+      <a href="#services" data-page="services">Services</a>
+      <a href="#about" data-page="about">Story</a>
+      <a href="#gallery" data-page="gallery">Gallery</a>
+      <a href="#reviews" data-page="reviews">Reviews</a>
+      <a href="#visit" data-page="visit">Visit</a>
+      <a class="call-pill" href="tel:+17248695002">(724) 869-5002</a>
+    </nav>
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<main>
+<section class="page" id="page-home">
+  <div class="wrap hero">
+    <p class="dateline">Est. on Phillips Street · Baden, Pennsylvania</p>
+    <div class="rule"></div>
+    <h1>The garage Baden<br><em>trusts with its keys.</em></h1>
+    <p class="standfirst">Singleton's Auto Repair is a family-style repair shop at 1089 Phillips St. Inspections, emissions, brakes and honest maintenance, rated 5.0 across 27 reviews.</p>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="tel:+17248695002">Call (724) 869-5002</a>
+      <a class="btn btn-line" href="#services" data-page="services">Browse Services</a>
+    </div>
+    <div class="hero-meta">
+      <div><span class="stars">★★★★★</span> 5.0 · 27 reviews</div>
+      <div>1089 Phillips St, Baden PA</div>
+      <div>Mon-Fri · 9 to 5</div>
+    </div>
+  </div>
+
+  <div class="edition">
+    <div class="wrap">
+      <p class="section-kicker">No. 01 · Services</p>
+      <h2>Everything the shop does well</h2>
+      <p class="deck">Known around town for inspections and emissions, plus the full run of repair and maintenance work. Quoted up front, finished on time.</p>
+      <ul class="svc-list">
+        <li><span class="num">01</span><span class="name">PA Inspection &amp; Emissions</span><span class="dots"></span><span class="note">the house specialty</span></li>
+        <li><span class="num">02</span><span class="name">Brake Service</span><span class="dots"></span><span class="note">pads · rotors · lines</span></li>
+        <li><span class="num">03</span><span class="name">Oil &amp; Maintenance</span><span class="dots"></span><span class="note">keep it running</span></li>
+        <li><span class="num">04</span><span class="name">Engine Diagnostics</span><span class="dots"></span><span class="note">find it first</span></li>
+        <li><span class="num">05</span><span class="name">Tires &amp; Rotation</span><span class="dots"></span><span class="note">even wear</span></li>
+      </ul>
+      <p style="margin-top:22px"><a href="#services" data-page="services" style="font-weight:600">See the full service list</a></p>
+    </div>
+  </div>
+
+  <div class="edition">
+    <div class="wrap two-col">
+      <div>
+        <p class="section-kicker">No. 02 · Word on the street</p>
+        <h2>Small shop, big reputation</h2>
+        <p class="dropcap">Drivers in Baden keep coming back to Singleton's for the same reasons: the price is fair, the schedule is kept, and the people are plain good to talk to while you wait.</p>
+        <p>Reviewers call it the place to go for inspection and emissions work, and a small, family-owned shop worth seeking out.</p>
+        <a href="#reviews" data-page="reviews" style="font-weight:600">Read what customers say</a>
+      </div>
+      <div>
+        <div class="pullquote">"If you need emissions this is the place to go. Great place, great guy."</div>
+        <p style="font-size:.85rem;color:var(--ink-soft)">From customer reviews of Singleton's Auto Repair. <a href="#gallery" data-page="gallery">See the shop gallery</a></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="edition">
+    <div class="wrap" style="text-align:center">
+      <p class="section-kicker">No. 03 · Get rolling</p>
+      <h2 class="serif">Due for inspection?<br>Call the shop.</h2>
+      <p class="deck" style="margin-left:auto;margin-right:auto">Same-week appointments when the book allows. Call (724) 869-5002 and tell us what the car needs.</p>
+      <div class="hero-cta">
+        <a class="btn btn-solid" href="tel:+17248695002">Call (724) 869-5002</a>
+        <a class="btn btn-line" href="https://www.google.com/maps/place/?q=place_id:ChIJl_K9kj9kNIgRd67VaOHJT4c" target="_blank" rel="noopener">Get Directions</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap edition">
+    <p class="section-kicker">The full menu</p>
+    <h2>Services</h2>
+    <p class="deck">Repair and maintenance for cars and light trucks. Every job is quoted before work begins.</p>
+    <ul class="svc-list">
+      <li><span class="num">01</span><span class="name">PA State Inspection</span><span class="dots"></span><span class="note">annual</span><span class="desc">Safety inspection for Pennsylvania registration renewal.</span></li>
+      <li><span class="num">02</span><span class="name">Emissions Testing</span><span class="dots"></span><span class="note">the house specialty</span><span class="desc">Reviewers say: if you need emissions, this is the place to go.</span></li>
+      <li><span class="num">03</span><span class="name">Brake Service</span><span class="dots"></span><span class="note">pads · rotors</span><span class="desc">Pads, rotors, calipers, lines and fluid checks.</span></li>
+      <li><span class="num">04</span><span class="name">Oil &amp; Fluid Service</span><span class="dots"></span><span class="note">maintenance</span><span class="desc">Oil changes, filters, coolant and fluid top-offs.</span></li>
+      <li><span class="num">05</span><span class="name">Engine Diagnostics</span><span class="dots"></span><span class="note">check-engine</span><span class="desc">Warning lights, rough running, hard starts traced to the cause.</span></li>
+      <li><span class="num">06</span><span class="name">Tires &amp; Rotation</span><span class="dots"></span><span class="note">seasonal</span><span class="desc">Inspection, rotation, mounting and replacement.</span></li>
+      <li><span class="num">07</span><span class="name">Battery &amp; Electrical</span><span class="dots"></span><span class="note">starts</span><span class="desc">Batteries, starters, alternators and basic electrical work.</span></li>
+      <li><span class="num">08</span><span class="name">Suspension &amp; Steering</span><span class="dots"></span><span class="note">ride quality</span><span class="desc">Shocks, struts, tie rods and alignment checks.</span></li>
+    </ul>
+    <p style="margin-top:22px;color:var(--ink-soft)">Something else on your mind? Call <a href="tel:+17248695002">(724) 869-5002</a> and describe the symptom.</p>
+  </div>
+</section>
+
+<section class="page" id="page-about">
+  <div class="wrap edition">
+    <p class="section-kicker">Our story</p>
+    <h2>A family-style shop on Phillips Street</h2>
+    <div class="two-col" style="margin-top:26px">
+      <div>
+        <p class="dropcap">Singleton's Auto Repair sits at 1089 Phillips St in Baden, PA, and it runs the way neighborhood garages used to run: you talk to the person fixing your car, the price is fair, and the car is ready when promised.</p>
+        <p>Customers describe it as a small, family-owned shop and praise the crew as really nice people, pleasant to talk to while you wait for the car to be done.</p>
+      </div>
+      <div>
+        <div class="pullquote">"Keeps scheduled on time usually, pricing seems fair too."</div>
+        <p style="font-size:.85rem;color:var(--ink-soft)">From customer reviews of Singleton's Auto Repair.</p>
+        <p style="margin-top:18px"><strong>The way it works:</strong> call or stop in, get the car looked at, approve the quote, and drive away. No mystery charges, no upsell.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap edition">
+    <p class="section-kicker">The shop in frames</p>
+    <h2>Gallery</h2>
+    <p class="deck">Service scenes from the shop. Real photos coming soon.</p>
+    <div class="arch-grid">
+      <div class="arch"><span class="ph">Placeholder</span><svg viewBox="0 0 300 340"><rect width="300" height="340" fill="#EDE4CC"/><circle cx="150" cy="170" r="70" fill="none" stroke="#6E1E24" stroke-width="10"/><circle cx="150" cy="170" r="20" fill="#6E1E24"/><path d="M150 100v40M150 200v40M80 170h40M180 170h40" stroke="#6E1E24" stroke-width="10"/></svg><div class="cap"><strong>Brake bay</strong><span>placeholder</span></div></div>
+      <div class="arch"><span class="ph">Placeholder</span><svg viewBox="0 0 300 340"><rect width="300" height="340" fill="#181311"/><rect x="60" y="100" width="180" height="130" rx="16" fill="#6E1E24"/><circle cx="115" cy="230" r="30" fill="#F6F0E2"/><circle cx="185" cy="230" r="30" fill="#F6F0E2"/></svg><div class="cap"><strong>On the lift</strong><span>placeholder</span></div></div>
+      <div class="arch"><span class="ph">Placeholder</span><svg viewBox="0 0 300 340"><rect width="300" height="340" fill="#6E1E24"/><path d="M60 220l60-80 45 50 40-40 60 70" stroke="#F6F0E2" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="cap"><strong>Diagnostics</strong><span>placeholder</span></div></div>
+      <div class="arch"><span class="ph">Placeholder</span><svg viewBox="0 0 300 340"><rect width="300" height="340" fill="#FDFBF4"/><path d="M150 60l16 50 53 2-43 32 16 52-42-31-42 31 16-52-43-32 53-2z" fill="#B98A2E" transform="translate(0,40)"/></svg><div class="cap"><strong>Oil service</strong><span>placeholder</span></div></div>
+      <div class="arch"><span class="ph">Placeholder</span><svg viewBox="0 0 300 340"><rect width="300" height="340" fill="#EDE4CC"/><circle cx="150" cy="170" r="90" fill="none" stroke="#181311" stroke-width="14"/><circle cx="150" cy="170" r="36" fill="#181311"/></svg><div class="cap"><strong>Tires</strong><span>placeholder</span></div></div>
+      <div class="arch"><span class="ph">Placeholder</span><svg viewBox="0 0 300 340"><rect width="300" height="340" fill="#181311"/><rect x="70" y="110" width="160" height="110" rx="10" fill="none" stroke="#F6F0E2" stroke-width="10"/><path d="M115 165h70" stroke="#F6F0E2" stroke-width="10" stroke-linecap="round"/></svg><div class="cap"><strong>Tool wall</strong><span>placeholder</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap edition">
+    <p class="section-kicker">Kind words</p>
+    <h2>Reviews</h2>
+    <div class="rating-line">
+      <span class="big">5.0</span>
+      <span class="stars">★★★★★</span>
+      <span>Based on 27 reviews on Birdeye</span>
+    </div>
+    <a class="gsrc" href="https://reviews.birdeye.com/singletons-auto-repair-156044040365097" target="_blank" rel="noopener">Read reviews on Birdeye</a>
+    <a class="gsrc" href="https://www.google.com/maps/place/?q=place_id:ChIJl_K9kj9kNIgRd67VaOHJT4c" target="_blank" rel="noopener">See reviews on Google</a>
+    <div style="height:30px"></div>
+    <div class="press-card">
+      <span class="badge">Sample</span>
+      <span class="stars">★★★★★</span>
+      <p class="quote">"Really nice people that work there and pleasant to talk to when waiting for your car to be done. Pricing was really good too."</p>
+      <p class="who">Local customer · sample review for illustration</p>
+    </div>
+    <div class="press-card">
+      <span class="badge">Sample</span>
+      <span class="stars">★★★★★</span>
+      <p class="quote">"We just moved to the area and wanted a small, family owned shop. If you're looking for inspection and emissions, this is the place to go."</p>
+      <p class="who">Local customer · sample review for illustration</p>
+    </div>
+    <p style="color:var(--ink-soft);font-size:.9rem">Sample cards above are illustrative. The 5.0 rating reflects 27 reviews collected on Birdeye and Google, where themes include fair pricing, on-time scheduling, and friendly service.</p>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="wrap edition">
+    <p class="section-kicker">Find us</p>
+    <h2>Visit / Contact</h2>
+    <p class="deck">Call ahead to book, or stop by the shop on Phillips Street.</p>
+    <div class="visit-cols">
+      <div>
+        <h3>Contact</h3>
+        <a class="big" href="tel:+17248695002">(724) 869-5002</a>
+        <p style="margin-top:16px">Singleton's Auto Repair<br>1089 Phillips St<br>Baden, PA 15005</p>
+        <a class="map-link" href="https://www.google.com/maps/place/?q=place_id:ChIJl_K9kj9kNIgRd67VaOHJT4c" target="_blank" rel="noopener">Get Directions</a>
+      </div>
+      <div>
+        <h3>Hours</h3>
+        <table class="hours-table">
+          <tr><td>Monday</td><td>9:00 AM  to  5:00 PM</td></tr>
+          <tr><td>Tuesday</td><td>9:00 AM  to  5:00 PM</td></tr>
+          <tr><td>Wednesday</td><td>9:00 AM  to  5:00 PM</td></tr>
+          <tr><td>Thursday</td><td>9:00 AM  to  5:00 PM</td></tr>
+          <tr><td>Friday</td><td>9:00 AM  to  5:00 PM</td></tr>
+          <tr><td>Saturday</td><td>Closed</td></tr>
+          <tr><td>Sunday</td><td>Closed</td></tr>
+        </table>
+        <p style="margin-top:14px;font-size:.85rem;color:var(--ink-soft)">Hours per online listings. Call to confirm before visiting.</p>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <nav>
+      <a href="#home" data-page="home">Home</a>
+      <a href="#services" data-page="services">Services</a>
+      <a href="#about" data-page="about">Story</a>
+      <a href="#gallery" data-page="gallery">Gallery</a>
+      <a href="#reviews" data-page="reviews">Reviews</a>
+      <a href="#visit" data-page="visit">Visit</a>
+    </nav>
+    <p class="addr">Singleton's Auto Repair · 1089 Phillips St, Baden, PA 15005 · <a href="tel:+17248695002">(724) 869-5002</a></p>
+    <p class="copyright">© Singleton's Auto Repair</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var PAGES = ["home","services","about","gallery","reviews","visit"];
+  var nav = document.getElementById("nav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
