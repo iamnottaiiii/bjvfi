@@ -877,6 +877,7 @@ function showGrabPreview(slug){
     '<div style="font-size:15px;font-weight:600;margin-bottom:4px">' + esc(l.name) + '</div>' +
     (l.category ? '<div class="muted" style="font-size:12px;margin-bottom:2px">' + esc(l.category) + '</div>' : '') +
     (hasPhone(l.phone) ? '<div style="font-size:13px;margin-bottom:2px">' + esc(l.phone) + '</div>' : '') +
+    (!hasPhone(l.phone) ? '<p class="muted" style="font-size:12px;margin-bottom:10px;line-height:1.55">No number on this lead? Open their site, it is usually listed there.</p>' : '') +
     (l.address ? '<div class="muted" style="font-size:12px;margin-bottom:10px">' + esc(l.address) + '</div>' : '<div style="margin-bottom:10px"></div>') +
     '<button class="btn block" id="grab-site-open" type="button" style="margin-bottom:10px">Open their site</button>' +
     '<div class="row" style="margin-top:14px">' +
@@ -1012,7 +1013,8 @@ function leadCard(claim){
     '<div class="phone-line"><span class="num">' + (phoneOk ? esc(lead.phone) : 'No phone on file') + '</span>' +
     (phoneOk ? '<button class="btn ghost sm" id="btn-copy-phone" type="button">Copy phone</button>' : '') +
     (phoneOk && claim.status === 'claimed' ? '<a class="btn call sm" href="' + esc(telHref(lead.phone)) + '">Call</a>' : '') +
-    '</div></div>';
+    '</div>' +
+    (phoneOk ? '' : '<p class="muted" style="font-size:12px;margin-top:8px;line-height:1.55">No number on this lead? Open their site above, it is usually listed there.</p>') + '</div>';
 
   if(claim.status === 'claimed'){
     html += '<div class="card msg-card" style="margin:14px 0"><h2>Text / SMS</h2>' +
@@ -1777,8 +1779,42 @@ function renderProfileInto(el){
     '</dl>' +
     '<div class="row" style="margin-top:16px">' +
     '<button class="btn ghost block" id="btn-logout" type="button">Log out</button></div>' +
-    '<p class="muted" style="font-size:11px;margin-top:12px;line-height:1.55">Signed in on this device for 7 days. Your data token is shared by the app and scoped to the data repo only.</p></div>';
+    '<p class="muted" style="font-size:11px;margin-top:12px;line-height:1.55">Signed in on this device for 7 days. Your data token is shared by the app and scoped to the data repo only.</p></div>' +
+    helpHtml();
   el.querySelector('#btn-logout').addEventListener('click', logout);
+}
+
+/* How-to-use guide: how the app works, by role. */
+function helpHtml(){
+  const u = state.user;
+  const caller = u.role === 'caller' || u.role === 'admin' || u.role === 'head';
+  const builder = u.role === 'builder' || u.role === 'admin' || u.role === 'head';
+  const admin = u.role === 'admin' || u.role === 'head';
+  let h = '<div class="card" style="margin-top:14px"><h2>How to use SiteDesk</h2>';
+  if(caller){
+    h += '<h3 style="margin:14px 0 8px">Getting leads</h3>' +
+    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">The <strong>Queue</strong> shows available leads. Tap <strong>Grab</strong> on one to claim it. You can hold up to 5 leads at a time.</p>' +
+    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">Before you grab, a review pops up. You <strong>must open the business site</strong> and study it: what they do, their services, their vibe, so you sound like you know them on the call. A <strong>2-minute timer</strong> runs while you look, then the grab unlocks. Cancel anytime to back out with no claim.</p>' +
+    '<h3 style="margin:14px 0 8px">Your leads and the timer</h3>' +
+    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">Every lead you grab gets its <strong>own 45-minute timer</strong>, counting down every second. Under 5 minutes it turns urgent. At zero the claim expires and the lead goes back to the queue.</p>' +
+    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">Tap a lead in <strong>My leads</strong> to open it: call and text buttons, the message draft, the call script, and outcome logging.</p>' +
+    '<h3 style="margin:14px 0 8px">No number on a lead?</h3>' +
+    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">Open their site from the lead details, the number is usually listed there.</p>' +
+    '<h3 style="margin:14px 0 8px">After the call</h3>' +
+    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">Log what happened. <strong>No answer</strong> or <strong>sent message</strong> resets your 45-minute timer so you can follow up. <strong>Interested</strong> opens the build-details form: write down what they want and <strong>attach photos and files</strong> (logo, menus, site pictures), the builder sees all of it. <strong>Release</strong> gives a lead back to the queue.</p>';
+  }
+  if(builder){
+    h += '<h3 style="margin:14px 0 8px">Builds</h3>' +
+    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">New intakes from callers land in <strong>' + (u.role === 'builder' ? 'Builds' : 'Intakes') + '</strong> with the customer details, what they want, and attached photos and files. Tap a file to view it. Update the build status (Open, Building, Done) so the caller stays in the loop.</p>';
+  }
+  if(admin){
+    h += '<h3 style="margin:14px 0 8px">Admin</h3>' +
+    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">The <strong>Admin</strong> tab is where you approve or reject new accounts, disable users, and change roles. Approving sends the caller an alert that they can log in.</p>';
+  }
+  h += '<h3 style="margin:14px 0 8px">Alerts</h3>' +
+    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:4px">The bell shows approvals, intake updates, and announcements. Opening Alerts marks everything read. If popups are off on your device, use the Enable button in Alerts to turn them on.</p>';
+  h += '</div>';
+  return h;
 }
 
 /* ================= render dispatch ================= */
