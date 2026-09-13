@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kornelias Beauty Studio | Beauty Salon in Bensonhurst, Brooklyn</title>
+<meta name="description" content="Kornelias Beauty Studio is a neighborhood beauty salon at 7812 20th Ave, Brooklyn, NY. Haircuts, color, manicures, and makeup. Call (718) 942-4072 to book.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#faf6f0;
+  --tint:#f4e9df;
+  --rose:#b4656f;
+  --rose-deep:#8c4450;
+  --ink:#2e2226;
+  --ink-soft:#5c4a4e;
+  --gold:#c39a2b;
+  --white:#ffffff;
+  --line:#e8d9cd;
+  --shadow:0 18px 45px rgba(46,34,38,.12);
+  --radius:18px;
+  --head:"Playfair Display",Georgia,serif;
+  --body:"Jost",system-ui,-apple-system,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--body);background:var(--cream);color:var(--ink);line-height:1.65;font-weight:400;-webkit-font-smoothing:antialiased}
+img{max-width:100%}
+a{color:inherit}
+h1,h2,h3{font-family:var(--head);font-weight:600;line-height:1.18;letter-spacing:.01em}
+.wrap{max-width:1140px;margin:0 auto;padding:0 22px}
+.eyebrow{display:inline-block;font-size:.78rem;letter-spacing:.28em;text-transform:uppercase;color:var(--rose-deep);font-weight:600;margin-bottom:14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:15px 30px;border-radius:999px;font-weight:600;font-size:.95rem;letter-spacing:.04em;text-decoration:none;border:2px solid transparent;cursor:pointer;transition:transform .25s,box-shadow .25s,background .25s}
+.btn-solid{background:var(--rose);color:#fff;box-shadow:0 12px 26px rgba(180,101,111,.35)}
+.btn-solid:hover{background:var(--rose-deep);transform:translateY(-2px)}
+.btn-ghost{border-color:var(--rose);color:var(--rose-deep);background:transparent}
+.btn-ghost:hover{background:var(--rose);color:#fff;transform:translateY(-2px)}
+.btn-light{background:#fff;color:var(--rose-deep)}
+.btn-light:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.page{display:none}
+.page.active{display:block;animation:fadeIn .45s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+.topbar{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:14px 22px;background:rgba(250,246,240,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.brand-mini{font-family:var(--head);font-size:1.25rem;font-weight:700;color:var(--rose-deep);text-decoration:none}
+.brand-mini em{font-style:italic;color:var(--rose)}
+.burger{width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer}
+.burger span{display:block;width:20px;height:2px;background:var(--ink);border-radius:2px;transition:transform .3s,opacity .3s}
+.call-pill{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:999px;background:var(--ink);color:#fff;text-decoration:none;font-weight:500;font-size:.9rem}
+.call-pill:hover{background:var(--rose-deep)}
+nav.main{position:fixed;top:0;left:0;bottom:0;width:320px;max-width:86vw;background:var(--ink);color:#f6ece4;z-index:70;transform:translateX(-105%);transition:transform .38s cubic-bezier(.22,.9,.3,1);display:flex;flex-direction:column;padding:26px 30px;overflow-y:auto}
+nav.main.open{transform:translateX(0)}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:34px}
+.drawer-head strong{font-family:var(--head);font-size:1.3rem}
+.drawer-close{background:none;border:1px solid rgba(255,255,255,.25);color:#fff;width:40px;height:40px;border-radius:50%;font-size:1.1rem;cursor:pointer}
+nav.main a.dlink{display:block;padding:14px 4px;font-size:1.12rem;text-decoration:none;color:#e9d9cf;border-bottom:1px solid rgba(255,255,255,.1);letter-spacing:.03em;transition:padding-left .25s,color .25s}
+nav.main a.dlink:hover,nav.main a.dlink.active{color:#fff;padding-left:12px}
+nav.main a.dlink.active{border-left:3px solid var(--rose);padding-left:12px}
+.drawer-foot{margin-top:auto;padding-top:26px;font-size:.9rem;color:#c9b3a8}
+.drawer-foot a{color:#fff;text-decoration:none;font-weight:600}
+.scrim{position:fixed;inset:0;background:rgba(46,34,38,.45);z-index:65;opacity:0;pointer-events:none;transition:opacity .3s}
+.scrim.show{opacity:1;pointer-events:auto}
+main{padding-top:74px}
+.hero{min-height:92vh;display:flex;align-items:center;position:relative;overflow:hidden;background:
+  radial-gradient(900px 520px at 85% 12%,rgba(195,154,43,.22),transparent 60%),
+  radial-gradient(760px 620px at 8% 88%,rgba(180,101,111,.28),transparent 62%),
+  linear-gradient(160deg,#3a2a30 0%,#59363d 55%,#8c4450 100%)}
+.hero::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 78% 30%,rgba(255,255,255,.14),transparent 42%);pointer-events:none}
+.hero-inner{position:relative;z-index:2;color:#fdf8f3;padding:70px 0;max-width:1140px;margin:0 auto;padding-left:22px;padding-right:22px;width:100%}
+.hero h1{font-size:clamp(2.5rem,6vw,4.4rem);max-width:640px;margin-bottom:20px}
+.hero h1 em{color:#f3cf9a;font-style:italic}
+.hero p.lead{font-size:1.15rem;max-width:560px;color:#f0e2d6;margin-bottom:32px;font-weight:300}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:44px}
+.hero-meta{display:flex;gap:26px;flex-wrap:wrap;font-size:.92rem;color:#ecd9c8}
+.hero-meta strong{display:block;font-size:1.25rem;color:#fff;font-family:var(--head)}
+.hero-orb{position:absolute;right:-120px;top:50%;transform:translateY(-50%);width:560px;height:560px;border-radius:50%;background:radial-gradient(circle,rgba(243,207,154,.35),rgba(243,207,154,0) 65%);filter:blur(6px)}
+.hero-ring{position:absolute;border:1px solid rgba(255,255,255,.18);border-radius:50%}
+.band{padding:88px 0}
+.band.tint{background:var(--tint)}
+.band.dark{background:var(--ink);color:#f6ece4}
+.band.dark h2{color:#fff}
+.band.dark .eyebrow{color:#e8b7c0}
+.sec-head{max-width:640px;margin-bottom:48px}
+.sec-head h2{font-size:clamp(1.8rem,3.6vw,2.6rem);margin-bottom:14px}
+.sec-head p{color:var(--ink-soft)}
+.band.dark .sec-head p{color:#d9c4b8}
+.cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:34px 30px;box-shadow:var(--shadow);transition:transform .3s}
+.card:hover{transform:translateY(-6px)}
+.card .icon{width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,var(--rose),var(--rose-deep));display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:20px;color:#fff}
+.card h3{font-size:1.3rem;margin-bottom:10px}
+.card p{color:var(--ink-soft);font-size:.98rem}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.art-panel{border-radius:var(--radius);min-height:380px;position:relative;overflow:hidden;background:
+  radial-gradient(420px 300px at 30% 20%,rgba(255,255,255,.5),transparent 60%),
+  linear-gradient(150deg,#e9b8a8,#c9808b 55%,#8c4450);box-shadow:var(--shadow)}
+.art-panel .badge{position:absolute;top:18px;left:18px;background:rgba(255,255,255,.9);color:var(--rose-deep);font-size:.75rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:8px 14px;border-radius:999px}
+.art-panel .cap{position:absolute;bottom:0;left:0;right:0;padding:22px;background:linear-gradient(transparent,rgba(46,34,38,.55));color:#fff;font-family:var(--head);font-size:1.15rem}
+ul.tick{list-style:none;margin:22px 0}
+ul.tick li{padding:10px 0 10px 34px;position:relative;color:var(--ink-soft)}
+ul.tick li::before{content:"✓";position:absolute;left:0;top:10px;width:24px;height:24px;border-radius:50%;background:var(--rose);color:#fff;font-size:.8rem;display:flex;align-items:center;justify-content:center}
+.quote-band{background:linear-gradient(140deg,var(--rose-deep),var(--rose));color:#fff;border-radius:26px;padding:56px 48px;text-align:center;box-shadow:var(--shadow)}
+.quote-band blockquote{font-family:var(--head);font-size:clamp(1.4rem,3vw,2rem);font-style:italic;margin-bottom:18px}
+.quote-band cite{font-style:normal;opacity:.85;font-size:.95rem}
+.cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:28px}
+.page-head{padding:76px 0 40px;text-align:center}
+.page-head h1{font-size:clamp(2.1rem,4.6vw,3.2rem);margin-bottom:12px}
+.page-head p{color:var(--ink-soft);max-width:620px;margin:0 auto}
+.price-note{display:inline-flex;align-items:center;gap:10px;background:#fff8e6;border:1px dashed var(--gold);color:#7a5c12;border-radius:12px;padding:12px 18px;font-size:.92rem;margin:0 auto 34px;max-width:640px}
+.price-table{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);margin-bottom:18px}
+.price-table th{background:var(--ink);color:#fff;text-align:left;padding:18px 24px;font-family:var(--head);font-size:1.05rem;letter-spacing:.03em}
+.price-table th:last-child,.price-table td:last-child{text-align:right}
+.price-table td{padding:20px 24px;border-top:1px solid var(--line);vertical-align:top}
+.price-table tr:first-child td{border-top:none}
+.price-table .svc{font-weight:600;font-size:1.05rem;margin-bottom:4px}
+.price-table .desc{color:var(--ink-soft);font-size:.93rem}
+.price-table .pr{font-family:var(--head);font-size:1.25rem;color:var(--rose-deep);white-space:nowrap}
+.price-table .tag{display:inline-block;font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;background:var(--tint);color:var(--rose-deep);padding:4px 10px;border-radius:999px;margin-left:10px;vertical-align:middle}
+.fineprint{text-align:center;color:var(--ink-soft);font-size:.9rem;margin-bottom:60px}
+.story-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:start;margin-bottom:70px}
+.story-grid h2{font-size:clamp(1.7rem,3.2vw,2.3rem);margin-bottom:18px}
+.story-grid p{color:var(--ink-soft);margin-bottom:16px}
+.values{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.value{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:30px 26px;box-shadow:var(--shadow)}
+.value h3{font-size:1.15rem;margin-bottom:8px;color:var(--rose-deep)}
+.value p{font-size:.93rem;color:var(--ink-soft)}
+.masonry{columns:3 250px;column-gap:20px}
+.tile{break-inside:avoid;margin-bottom:20px;border-radius:var(--radius);overflow:hidden;position:relative;box-shadow:var(--shadow);min-height:220px;display:flex;align-items:flex-end}
+.tile .ph{position:absolute;inset:0}
+.tile .cap{position:relative;z-index:2;width:100%;padding:18px;background:linear-gradient(transparent,rgba(46,34,38,.6));color:#fff;font-size:.95rem}
+.tile .sample{position:absolute;z-index:3;top:14px;left:14px;background:rgba(255,255,255,.92);color:var(--rose-deep);font-size:.7rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:6px 12px;border-radius:999px}
+.gallery-note{text-align:center;color:var(--ink-soft);font-size:.92rem;margin:34px auto 60px;max-width:620px}
+.rev-summary{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:44px;text-align:center;max-width:720px;margin:0 auto 50px}
+.rev-summary .stars{font-size:2rem;color:var(--gold);letter-spacing:.2em;margin-bottom:8px}
+.rev-summary .score{font-family:var(--head);font-size:3rem;color:var(--ink)}
+.rev-summary p{color:var(--ink-soft);margin:10px 0 24px}
+.rev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:60px}
+.rev-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:30px 28px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:14px}
+.rev-card .stars{color:var(--gold);letter-spacing:.15em}
+.rev-card p{color:var(--ink-soft);font-size:.96rem;font-style:italic}
+.rev-card .who{font-weight:600;font-size:.92rem}
+.rev-card .sample{display:inline-block;align-self:flex-start;font-size:.7rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;background:var(--tint);color:var(--rose-deep);padding:5px 12px;border-radius:999px}
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-bottom:60px}
+.visit-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:38px 34px;box-shadow:var(--shadow)}
+.visit-card h2{font-size:1.4rem;margin-bottom:16px;color:var(--rose-deep)}
+.visit-card p{color:var(--ink-soft);margin-bottom:10px}
+.visit-card a.tel{font-family:var(--head);font-size:1.6rem;color:var(--ink);text-decoration:none}
+.visit-card a.tel:hover{color:var(--rose-deep)}
+.hours-table{width:100%;border-collapse:collapse;margin-top:8px}
+.hours-table td{padding:10px 4px;border-bottom:1px solid var(--line);color:var(--ink-soft)}
+.hours-table td:last-child{text-align:right;font-weight:500;color:var(--ink)}
+.map-ph{border-radius:var(--radius);min-height:420px;position:relative;overflow:hidden;background:linear-gradient(150deg,#e8d3c5,#d9b8a8 60%,#c69a90);box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center}
+.map-ph .pin{width:74px;height:74px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--rose-deep);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow)}
+.map-ph .pin::after{content:"";width:26px;height:26px;border-radius:50%;background:#fff;transform:rotate(45deg)}
+.map-ph .sample{position:absolute;top:16px;left:16px;background:rgba(255,255,255,.92);color:var(--rose-deep);font-size:.7rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:6px 12px;border-radius:999px}
+footer{background:var(--ink);color:#d9c4b8;margin-top:0}
+.foot-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:36px;padding:64px 0 44px}
+.foot-grid h4{font-family:var(--head);color:#fff;font-size:1.05rem;margin-bottom:16px;letter-spacing:.04em}
+.foot-grid p{font-size:.93rem;margin-bottom:10px}
+.foot-grid a{color:#d9c4b8;text-decoration:none;font-size:.93rem}
+.foot-grid a:hover{color:#fff}
+.foot-grid ul{list-style:none}
+.foot-grid li{margin-bottom:10px}
+.foot-brand{font-family:var(--head);font-size:1.5rem;color:#fff;margin-bottom:12px}
+.foot-brand em{color:#e8a9b3;font-style:italic}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.12);padding:22px 0;text-align:center;font-size:.92rem;color:#bfa9a0}
+@media(max-width:920px){
+  .cards3,.rev-grid,.values{grid-template-columns:1fr 1fr}
+  .split,.story-grid,.visit-grid{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr 1fr}
+  .hero-orb{display:none}
+}
+@media(max-width:600px){
+  .cards3,.rev-grid,.values{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr}
+  .band{padding:60px 0}
+  .price-table th,.price-table td{padding:14px 16px}
+  .quote-band{padding:40px 26px}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <button class="burger" id="burger" aria-label="Open navigation menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <a class="brand-mini" href="#home" data-page="home" aria-label="Kornelias Beauty Studio, home">Kornelia<em>s</em> Beauty Studio</a>
+  <a class="call-pill" href="tel:+17189424072">Call (718) 942-4072</a>
+</header>
+
+<nav class="main" id="mainNav" aria-label="Main navigation">
+  <div class="drawer-head">
+    <strong>Kornelias</strong>
+    <button class="drawer-close" id="drawerClose" aria-label="Close navigation menu">✕</button>
+  </div>
+  <a class="dlink active" href="#home" data-page="home">Home</a>
+  <a class="dlink" href="#services" data-page="services">Services and Pricing</a>
+  <a class="dlink" href="#story" data-page="story">Our Story</a>
+  <a class="dlink" href="#gallery" data-page="gallery">Gallery</a>
+  <a class="dlink" href="#reviews" data-page="reviews">Reviews</a>
+  <a class="dlink" href="#visit" data-page="visit">Visit Us</a>
+  <div class="drawer-foot">
+    <p>7812 20th Ave<br>Brooklyn, NY 11214</p>
+    <p><a href="tel:+17189424072">(718) 942-4072</a></p>
+  </div>
+</nav>
+<div class="scrim" id="scrim"></div>
+
+<main>
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-orb"></div>
+    <div class="hero-ring" style="width:340px;height:340px;right:6%;top:12%"></div>
+    <div class="hero-inner">
+      <span class="eyebrow" style="color:#f3cf9a">Beauty salon on 20th Ave, Brooklyn</span>
+      <h1>Look in the mirror and <em>love</em> what you see</h1>
+      <p class="lead">Kornelias Beauty Studio is a neighborhood beauty salon in Bensonhurst, Brooklyn, known for careful haircuts, beautiful color, manicures, and makeup for every occasion.</p>
+      <div class="hero-cta">
+        <a class="btn btn-solid" href="tel:+17189424072">Call to Book</a>
+        <a class="btn btn-light" href="#services" data-page="services">See Services</a>
+      </div>
+      <div class="hero-meta">
+        <div><strong>4.7 ★</strong>Google rating</div>
+        <div><strong>Tue to Sun</strong>Open 8 AM to 8 PM</div>
+        <div><strong>2014</strong>Licensed NY salon</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow">Why clients stay</span>
+        <h2>Personal care, from first visit to regular</h2>
+        <p>Reviewers call it the best place in Brooklyn for hair, and many have trusted Kornelia with their look for years.</p>
+      </div>
+      <div class="cards3">
+        <div class="card reveal">
+          <div class="icon">✂</div>
+          <h3>Haircut and Styling</h3>
+          <p>Precision cuts with styling advice you can actually use at home, so your hair looks great long after you leave the chair.</p>
+        </div>
+        <div class="card reveal">
+          <div class="icon">◍</div>
+          <h3>Color and Makeup</h3>
+          <p>Rich, even color and polished makeup looks for weddings, parties, photo days, and nights out.</p>
+        </div>
+        <div class="card reveal">
+          <div class="icon">✦</div>
+          <h3>Nails in One Visit</h3>
+          <p>Shape, cuticle care, and a clean polish finish, easy to add on to your hair appointment.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="band tint">
+    <div class="wrap split">
+      <div class="reveal">
+        <span class="eyebrow">The studio</span>
+        <h2 style="font-size:clamp(1.8rem,3.4vw,2.5rem);margin-bottom:16px">A calm chair on a busy avenue</h2>
+        <p style="color:var(--ink-soft);margin-bottom:8px">Tucked into 20th Avenue in Bensonhurst, the studio keeps things simple: honest advice, steady hands, and a friendly, easygoing atmosphere clients mention again and again.</p>
+        <ul class="tick">
+          <li>One on one attention from an experienced stylist</li>
+          <li>Hair, nails, and makeup under one roof</li>
+          <li>Evening hours, open Tuesday through Sunday</li>
+        </ul>
+        <a class="btn btn-ghost" href="#story" data-page="story">Read Our Story</a>
+      </div>
+      <div class="art-panel reveal">
+        <span class="badge">Photo placeholder</span>
+        <div class="cap">Inside the studio on 20th Ave</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap">
+      <div class="quote-band reveal">
+        <blockquote>"If you want to make something perfect with your hair, you should come here. The best place in Brooklyn."</blockquote>
+        <cite>Paraphrased from Google reviews · Based on 15 Google reviews</cite>
+        <div class="cta-row">
+          <a class="btn btn-light" href="#reviews" data-page="reviews">Read Reviews</a>
+          <a class="btn btn-ghost" style="border-color:#fff;color:#fff" href="https://www.google.com/maps/place/?q=place_id:ChIJmXTBrxpFwokR6fkqPneccPM">See Reviews on Google</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="band dark">
+    <div class="wrap" style="text-align:center">
+      <span class="eyebrow">Visit us</span>
+      <h2 style="margin-bottom:14px">Ready when you are</h2>
+      <p style="color:#d9c4b8;max-width:560px;margin:0 auto 28px">Call ahead to reserve your chair, or stop by the studio on 20th Avenue. Evening appointments available Tuesday through Sunday.</p>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="tel:+17189424072">Call (718) 942-4072</a>
+        <a class="btn btn-ghost" style="border-color:#e8b7c0;color:#fff" href="#visit" data-page="visit">Plan Your Visit</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div class="page-head">
+      <span class="eyebrow">Services and pricing</span>
+      <h1>What we do best</h1>
+      <p>Hair, nails, and makeup, all in one friendly Bensonhurst studio. Services below reflect the salon's listed specialties.</p>
+    </div>
+    <div style="text-align:center"><span class="price-note">Sample pricing shown. Call <a href="tel:+17189424072" style="color:inherit;font-weight:600">(718) 942-4072</a> for current prices.</span></div>
+    <table class="price-table">
+      <thead><tr><th>Service</th><th>Price</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><div class="svc">Signature Haircut and Style<span class="tag">Popular</span></div><div class="desc">Consultation, precision cut, and blowout finish with at home styling tips.</div></td>
+          <td class="pr">from $45</td>
+        </tr>
+        <tr>
+          <td><div class="svc">Hair Color and Highlights</div><div class="desc">Full color, partial or full highlights, and gloss for shine.</div></td>
+          <td class="pr">from $90</td>
+        </tr>
+        <tr>
+          <td><div class="svc">Manicure</div><div class="desc">Nail shaping, cuticle care, and your choice of polish.</div></td>
+          <td class="pr">from $30</td>
+        </tr>
+        <tr>
+          <td><div class="svc">Makeup Application<span class="tag">Events</span></div><div class="desc">Day, evening, or special occasion makeup, tailored to your features.</div></td>
+          <td class="pr">from $60</td>
+        </tr>
+        <tr>
+          <td><div class="svc">Special Occasion Styling</div><div class="desc">Updos and polished styling for weddings, parties, and photo days.</div></td>
+          <td class="pr">from $75</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="fineprint">Prices are samples only and may vary by hair length and service detail. Please call to confirm before your visit.</p>
+    <div style="text-align:center;margin-bottom:70px">
+      <a class="btn btn-solid" href="tel:+17189424072">Call to Book an Appointment</a>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-story">
+  <div class="wrap">
+    <div class="page-head">
+      <span class="eyebrow">Our story</span>
+      <h1>A Bensonhurst staple for beautiful hair</h1>
+      <p>Kornelias Beauty Studio has served the 20th Avenue neighborhood as a licensed New York beauty salon since 2014.</p>
+    </div>
+    <div class="story-grid">
+      <div class="reveal">
+        <h2>Built on trust, one client at a time</h2>
+        <p>The studio was founded by Kornelia, a stylist who believes a great appointment is about more than the cut. Clients describe leaving with hair they love and the know how to recreate the look at home, with extra volume and easy styling that fits real life.</p>
+        <p>Over the years, the chair has become a neighborhood fixture. Regulars return not just for the results, but for the friendly, easygoing atmosphere: a place where you are remembered, listened to, and never rushed.</p>
+        <p>As a licensed New York State appearance enhancement business, the studio meets the state's professional standards for cleanliness and care, so you can relax into every visit.</p>
+        <a class="btn btn-ghost" href="#services" data-page="services">See Our Services</a>
+      </div>
+      <div class="art-panel reveal">
+        <span class="badge">Photo placeholder</span>
+        <div class="cap">Kornelia at work in the studio</div>
+      </div>
+    </div>
+    <div class="values">
+      <div class="value reveal">
+        <h3>Honest advice</h3>
+        <p>Styles recommended for your hair, your routine, and your life, never a one size fits all cut.</p>
+      </div>
+      <div class="value reveal">
+        <h3>Teaching touch</h3>
+        <p>Clients leave knowing how to style their own hair, a detail reviewers praise again and again.</p>
+      </div>
+      <div class="value reveal">
+        <h3>Warm welcome</h3>
+        <p>A friendly, easygoing studio where first timers become regulars.</p>
+      </div>
+    </div>
+    <div style="height:70px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div class="page-head">
+      <span class="eyebrow">Gallery</span>
+      <h1>Recent work and the studio</h1>
+      <p>A look at the styles, color, nails, and makeup coming out of the studio. Photos below are placeholders the owner can swap with real work.</p>
+    </div>
+    <div class="masonry">
+      <div class="tile" style="height:340px"><span class="sample">Sample photo</span><div class="ph" style="background:linear-gradient(150deg,#e9b8a8,#b4656f)"></div><div class="cap">Precision haircut and blowout</div></div>
+      <div class="tile" style="height:250px"><span class="sample">Sample photo</span><div class="ph" style="background:linear-gradient(150deg,#d9a7a0,#8c4450)"></div><div class="cap">Rich, even hair color</div></div>
+      <div class="tile" style="height:300px"><span class="sample">Sample photo</span><div class="ph" style="background:linear-gradient(150deg,#f0d7c3,#c9808b)"></div><div class="cap">Special occasion updo</div></div>
+      <div class="tile" style="height:230px"><span class="sample">Sample photo</span><div class="ph" style="background:linear-gradient(150deg,#c9808b,#5c2f38)"></div><div class="cap">Manicure and polish</div></div>
+      <div class="tile" style="height:320px"><span class="sample">Sample photo</span><div class="ph" style="background:linear-gradient(150deg,#eec9b8,#a8525f)"></div><div class="cap">Evening makeup look</div></div>
+      <div class="tile" style="height:260px"><span class="sample">Sample photo</span><div class="ph" style="background:linear-gradient(150deg,#dfb3a4,#7a3a44)"></div><div class="cap">Highlights and dimension</div></div>
+      <div class="tile" style="height:290px"><span class="sample">Sample photo</span><div class="ph" style="background:linear-gradient(150deg,#e5bfae,#96505c)"></div><div class="cap">Inside the studio</div></div>
+      <div class="tile" style="height:240px"><span class="sample">Sample photo</span><div class="ph" style="background:linear-gradient(150deg,#d8a49a,#63323b)"></div><div class="cap">Bridal styling</div></div>
+      <div class="tile" style="height:310px"><span class="sample">Sample photo</span><div class="ph" style="background:linear-gradient(150deg,#f2ddc9,#b4656f)"></div><div class="cap">Soft waves and gloss</div></div>
+    </div>
+    <p class="gallery-note">Every tile is a clearly badged placeholder. Send the studio your favorite photos and they will appear here.</p>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div class="page-head">
+      <span class="eyebrow">Reviews</span>
+      <h1>What clients say</h1>
+      <p>Real themes from the studio's Google reviews, plus a link to read them all.</p>
+    </div>
+    <div class="rev-summary reveal">
+      <div class="stars">★★★★★</div>
+      <div class="score">4.7</div>
+      <p>Based on 15 Google reviews, clients rate Kornelias Beauty Studio 4.7 out of 5 stars.</p>
+      <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJmXTBrxpFwokR6fkqPneccPM">See Reviews on Google</a>
+    </div>
+    <div class="rev-grid">
+      <div class="rev-card reveal">
+        <span class="sample">Sample review</span>
+        <div class="stars">★★★★★</div>
+        <p>"Kornelia did a great job on my haircut and even taught me how to style it myself for extra volume. Highly professional."</p>
+        <div class="who">Paraphrased from a Google review</div>
+      </div>
+      <div class="rev-card reveal">
+        <span class="sample">Sample review</span>
+        <div class="stars">★★★★★</div>
+        <p>"A wonderful salon with great service and a friendly, easygoing atmosphere. I have been coming for years and plan to keep it that way."</p>
+        <div class="who">Paraphrased from a Google review</div>
+      </div>
+      <div class="rev-card reveal">
+        <span class="sample">Sample review</span>
+        <div class="stars">★★★★★</div>
+        <p>"If you want your hair done perfectly, this is the place. The best salon in Brooklyn."</p>
+        <div class="who">Paraphrased from a Google review</div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-bottom:70px">
+      <a class="btn btn-ghost" href="https://www.google.com/maps/place/?q=place_id:ChIJmXTBrxpFwokR6fkqPneccPM">Read All Reviews on Google</a>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="wrap">
+    <div class="page-head">
+      <span class="eyebrow">Visit us</span>
+      <h1>Find the studio</h1>
+      <p>On 20th Avenue in Bensonhurst, Brooklyn, with evening hours Tuesday through Sunday.</p>
+    </div>
+    <div class="visit-grid">
+      <div>
+        <div class="visit-card reveal" style="margin-bottom:24px">
+          <h2>Address and Phone</h2>
+          <p>Kornelias Beauty Studio<br>7812 20th Ave, Brooklyn, NY 11214</p>
+          <p><a class="tel" href="tel:+17189424072">(718) 942-4072</a></p>
+          <p>Call to book an appointment or ask about services and pricing.</p>
+          <div style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap">
+            <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJmXTBrxpFwokR6fkqPneccPM">Get Directions</a>
+            <a class="btn btn-ghost" href="tel:+17189424072">Call Now</a>
+          </div>
+        </div>
+        <div class="visit-card reveal">
+          <h2>Hours</h2>
+          <table class="hours-table">
+            <tr><td>Monday</td><td>Closed</td></tr>
+            <tr><td>Tuesday</td><td>8:00 AM to 8:00 PM</td></tr>
+            <tr><td>Wednesday</td><td>8:00 AM to 8:00 PM</td></tr>
+            <tr><td>Thursday</td><td>8:00 AM to 8:00 PM</td></tr>
+            <tr><td>Friday</td><td>8:00 AM to 8:00 PM</td></tr>
+            <tr><td>Saturday</td><td>8:00 AM to 8:00 PM</td></tr>
+            <tr><td>Sunday</td><td>8:00 AM to 8:00 PM</td></tr>
+          </table>
+          <p style="margin-top:12px;font-size:.88rem">Hours as listed online. Please call to confirm before visiting.</p>
+        </div>
+      </div>
+      <div class="map-ph reveal">
+        <span class="sample">Map preview</span>
+        <div class="pin"></div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand">Kornelia<em>s</em> Beauty Studio</div>
+        <p>A neighborhood beauty salon on 20th Avenue in Bensonhurst, Brooklyn. Haircuts, color, manicures, and makeup with personal care.</p>
+        <p><a href="tel:+17189424072">(718) 942-4072</a></p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="#home" data-page="home">Home</a></li>
+          <li><a href="#services" data-page="services">Services and Pricing</a></li>
+          <li><a href="#story" data-page="story">Our Story</a></li>
+          <li><a href="#gallery" data-page="gallery">Gallery</a></li>
+          <li><a href="#reviews" data-page="reviews">Reviews</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <ul>
+          <li>7812 20th Ave</li>
+          <li>Brooklyn, NY 11214</li>
+          <li><a href="tel:+17189424072">(718) 942-4072</a></li>
+          <li><a href="https://www.google.com/maps/place/?q=place_id:ChIJmXTBrxpFwokR6fkqPneccPM">Get Directions</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Hours</h4>
+        <ul>
+          <li>Mon: Closed</li>
+          <li>Tue to Sun: 8 AM to 8 PM</li>
+          <li><a href="https://www.google.com/maps/place/?q=place_id:ChIJmXTBrxpFwokR6fkqPneccPM">See Reviews on Google</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© Kornelias Beauty Studio</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "story", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+    var s = document.getElementById("scrim");
+    if(s){ s.classList.remove("show"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+      var s = document.getElementById("scrim");
+      if(s){ s.classList.toggle("show", open); }
+    });
+  }
+
+  var dc = document.getElementById("drawerClose");
+  if(dc){ dc.addEventListener("click", closeMenu); }
+  var scrim = document.getElementById("scrim");
+  if(scrim){ scrim.addEventListener("click", closeMenu); }
+
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laface Salon | Hair and Nail Salon in Syracuse, NY</title>
+<meta name="description" content="Laface Salon, 3150 Erie Blvd E, Syracuse, NY 13214. Hair and nail services. Call (315) 299-4190 for appointments.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blush:#f6e7e3;
+    --rose:#c98a8a;
+    --deep:#3d2b2b;
+    --ink:#4a3a3a;
+    --cream:#fbf7f4;
+    --gold:#b08d57;
+    --line:#e8d6d1;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:"Jost",system-ui,sans-serif;background:var(--cream);color:var(--ink);line-height:1.7;-webkit-font-smoothing:antialiased}
+  h1,h2,h3,.serif{font-family:"Playfair Display",Georgia,serif;color:var(--deep);font-weight:600;line-height:1.2}
+  img{max-width:100%}
+  a{color:inherit}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+
+  /* ---------- header + side drawer ---------- */
+  header{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:16px 24px;background:rgba(251,247,244,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .brand{font-family:"Playfair Display",serif;font-size:1.45rem;letter-spacing:.06em;color:var(--deep);text-decoration:none}
+  .brand small{display:block;font-family:"Jost",sans-serif;font-size:.62rem;letter-spacing:.32em;color:var(--rose);text-transform:uppercase;margin-top:2px}
+  #burger{background:none;border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;flex-direction:column;gap:5px}
+  #burger span{display:block;width:26px;height:2px;background:var(--deep)}
+  #burger[aria-expanded="true"] span:nth-child(2){opacity:0}
+  #burger[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+  #burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+  nav.main{position:fixed;top:0;left:-320px;width:300px;height:100vh;background:var(--deep);z-index:70;transition:left .32s ease;display:flex;flex-direction:column;padding:96px 34px 40px}
+  nav.main.open{left:0;box-shadow:12px 0 44px rgba(61,43,43,.35)}
+  nav.main a{display:block;color:#f3e6e2;text-decoration:none;padding:13px 0;font-size:1.12rem;letter-spacing:.04em;border-bottom:1px solid rgba(243,230,226,.14)}
+  nav.main a.active{color:var(--gold)}
+  nav.main .drawer-foot{margin-top:auto;color:#cbb3ad;font-size:.85rem;line-height:1.9}
+  .scrim{position:fixed;inset:0;background:rgba(61,43,43,.45);z-index:65;opacity:0;pointer-events:none;transition:opacity .3s}
+  .scrim.on{opacity:1;pointer-events:auto}
+
+  /* ---------- page routing ---------- */
+  .page{display:none;animation:fadeIn .5s ease}
+  .page.active{display:block}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  main{padding-top:96px;min-height:70vh}
+
+  /* ---------- shared bits ---------- */
+  .eyebrow{display:inline-block;font-size:.72rem;letter-spacing:.34em;text-transform:uppercase;color:var(--rose);margin-bottom:14px}
+  .btn{display:inline-block;padding:14px 30px;border-radius:999px;text-decoration:none;font-weight:500;letter-spacing:.08em;font-size:.92rem;transition:transform .2s, box-shadow .2s}
+  .btn-solid{background:var(--deep);color:#fff}
+  .btn-solid:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(61,43,43,.3)}
+  .btn-ghost{border:1.5px solid var(--deep);color:var(--deep)}
+  .btn-ghost:hover{background:var(--deep);color:#fff}
+  .badge{display:inline-block;font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;background:var(--blush);border:1px dashed var(--rose);color:var(--rose);padding:5px 12px;border-radius:999px;margin-bottom:16px}
+  section.band{padding:88px 0}
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  /* ---------- split hero (home) ---------- */
+  .hero{display:grid;grid-template-columns:1.05fr .95fr;min-height:calc(100vh - 96px)}
+  .hero-copy{padding:80px 8vw;display:flex;flex-direction:column;justify-content:center;background:var(--cream)}
+  .hero-copy h1{font-size:clamp(2.6rem,5.4vw,4.4rem);margin:10px 0 22px}
+  .hero-copy h1 em{font-style:italic;color:var(--rose)}
+  .hero-copy p{max-width:44ch;margin-bottom:30px;font-size:1.05rem}
+  .hero-cta{display:flex;gap:14px;flex-wrap:wrap}
+  .hero-meta{margin-top:34px;font-size:.88rem;color:var(--ink);letter-spacing:.04em}
+  .hero-meta a{text-decoration:none;border-bottom:1px solid var(--rose)}
+  .hero-art{position:relative;background:linear-gradient(135deg,#e9c9c2 0%,#c98a8a 55%,#8f5b63 100%);display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .hero-art .orb{width:min(60%,360px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 35% 30%,#f9e9e4,#e2a8a0 60%,#b97f7f);box-shadow:0 40px 90px rgba(61,43,43,.35);position:relative}
+  .hero-art .ring{position:absolute;border:1.5px solid rgba(255,255,255,.5);border-radius:50%}
+  .hero-art .stars{position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.7) 1.2px,transparent 1.2px);background-size:34px 34px;opacity:.35}
+  .hero-caption{position:absolute;bottom:22px;left:0;right:0;text-align:center;color:#fff;font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;opacity:.85}
+
+  /* ---------- asymmetric grid (home highlights) ---------- */
+  .asym{display:grid;grid-template-columns:repeat(12,1fr);gap:22px;align-items:start}
+  .asym .card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:34px}
+  .asym .c1{grid-column:1/8}
+  .asym .c2{grid-column:8/13;margin-top:56px}
+  .asym .c3{grid-column:2/12;background:var(--deep);color:#f3e6e2}
+  .asym .c3 h3{color:#fff}
+  .asym h3{font-size:1.5rem;margin-bottom:12px}
+  .kicker{font-size:.74rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:10px}
+  .rating-row{display:flex;align-items:center;gap:10px;margin:8px 0 16px;font-size:.95rem}
+  .stars{color:var(--gold);letter-spacing:2px}
+
+  /* ---------- split feature (about preview on home) ---------- */
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+  .split .art-tile{border-radius:22px;min-height:380px;background:linear-gradient(160deg,var(--blush),#e3bcb4);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+  .art-tile svg{width:56%;height:auto;opacity:.9}
+  .tile-badge{position:absolute;top:16px;right:16px}
+
+  /* ---------- services page ---------- */
+  .svc-head{text-align:center;max-width:720px;margin:0 auto 46px}
+  .tabs{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:38px}
+  .tab-btn{border:1.5px solid var(--line);background:#fff;color:var(--ink);padding:12px 26px;border-radius:999px;cursor:pointer;font-family:inherit;font-size:.95rem;letter-spacing:.06em}
+  .tab-btn.on{background:var(--deep);color:#fff;border-color:var(--deep)}
+  .tab-panel{display:none}
+  .tab-panel.on{display:block;animation:fadeIn .4s ease}
+  .svc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px}
+  .svc{background:#fff;border:1px solid var(--line);border-radius:16px;padding:30px}
+  .svc h3{font-size:1.25rem;margin-bottom:8px}
+  .svc .price{color:var(--rose);font-weight:600;letter-spacing:.06em}
+  .note-strip{background:var(--blush);border:1px dashed var(--rose);border-radius:14px;padding:22px 26px;margin-top:40px;font-size:.95rem}
+
+  /* ---------- gallery horizontal strip ---------- */
+  .strip{display:flex;gap:20px;overflow-x:auto;padding:6px 4px 18px;scroll-snap-type:x mandatory}
+  .frame{flex:0 0 300px;height:360px;border-radius:18px;scroll-snap-align:start;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+  .frame svg{width:46%;opacity:.85}
+  .f1{background:linear-gradient(150deg,#f3ddd7,#d9a49b)}
+  .f2{background:linear-gradient(150deg,#e8c9c2,#b97f7f)}
+  .f3{background:linear-gradient(150deg,#f7e9e4,#c98a8a)}
+  .f4{background:linear-gradient(150deg,#d9a49b,#8f5b63)}
+  .f5{background:linear-gradient(150deg,#eed2cb,#a96f6f)}
+  .f6{background:linear-gradient(150deg,#f3ddd7,#c98a8a)}
+
+  /* ---------- reviews ---------- */
+  .review-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px;margin-top:36px}
+  .review-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:30px}
+  .review-card .who{margin-top:16px;font-size:.85rem;letter-spacing:.1em;color:var(--rose);text-transform:uppercase}
+  .src-links{display:flex;gap:14px;flex-wrap:wrap;margin-top:30px}
+
+  /* ---------- visit ---------- */
+  .visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+  .vcard{background:#fff;border:1px solid var(--line);border-radius:18px;padding:36px}
+  .vcard h3{margin-bottom:14px}
+  .vcard a.tel{font-size:1.5rem;color:var(--deep);text-decoration:none;font-family:"Playfair Display",serif}
+  .hours-list{list-style:none;margin-top:8px}
+  .hours-list li{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-size:.95rem}
+
+  /* ---------- footer multi column ---------- */
+  footer{background:var(--deep);color:#d9c2bb;padding:64px 0 30px;margin-top:40px}
+  .foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:30px;margin-bottom:44px}
+  .foot-grid h4{color:#fff;font-family:"Playfair Display",serif;font-size:1.05rem;margin-bottom:14px;letter-spacing:.04em}
+  .foot-grid a{display:block;color:#d9c2bb;text-decoration:none;padding:5px 0;font-size:.92rem}
+  .foot-grid a:hover{color:var(--gold)}
+  .foot-grid p{font-size:.92rem}
+  .foot-bottom{border-top:1px solid rgba(217,194,187,.2);padding-top:26px;text-align:center;font-size:.85rem;letter-spacing:.04em}
+  .foot-copy{margin:0}
+
+  @media (max-width:860px){
+    .hero{grid-template-columns:1fr}
+    .hero-art{min-height:340px}
+    .split{grid-template-columns:1fr}
+    .asym .c1,.asym .c2,.asym .c3{grid-column:1/-1;margin-top:0}
+    .visit-grid{grid-template-columns:1fr}
+    .foot-grid{grid-template-columns:1fr 1fr}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="brand" href="#home" data-page="home">Laface Salon<small>Syracuse NY</small></a>
+  <button id="burger" aria-expanded="false" aria-label="Open menu" aria-controls="mainNav"><span></span><span></span><span></span></button>
+</header>
+<nav id="mainNav" class="main" aria-label="Primary">
+  <a href="#home" data-page="home" class="active" aria-current="page">Home</a>
+  <a href="#services" data-page="services">Services</a>
+  <a href="#about" data-page="about">About</a>
+  <a href="#gallery" data-page="gallery">Gallery</a>
+  <a href="#reviews" data-page="reviews">Reviews</a>
+  <a href="#visit" data-page="visit">Visit Us</a>
+  <div class="drawer-foot">
+    3150 Erie Blvd E<br>Syracuse, NY 13214<br>
+    <a href="tel:+13152994190" style="border:none;padding:0;color:#fff">(315) 299-4190</a>
+  </div>
+</nav>
+<div class="scrim" id="scrim"></div>
+
+<main>
+
+<section class="page" id="page-home">
+  <div class="hero">
+    <div class="hero-copy">
+      <span class="eyebrow">Hair and Nail Salon, Syracuse NY</span>
+      <h1>Your <em>best hair days</em> start here.</h1>
+      <p>Laface Salon is a full service beauty salon on Erie Boulevard East, offering haircuts, styling, color, and nail services in a warm, welcoming space. Every guest gets one on one attention and styling tailored to them.</p>
+      <div class="hero-cta">
+        <a class="btn btn-solid" href="#visit" data-page="visit">Book by Phone</a>
+        <a class="btn btn-ghost" href="#services" data-page="services">See Services</a>
+      </div>
+      <div class="hero-meta">
+        <span class="stars">★★★★★</span> 5.0 on Birdeye (38 reviews) · <a href="tel:+13152994190">Call (315) 299-4190</a>
+      </div>
+    </div>
+    <div class="hero-art">
+      <div class="stars"></div>
+      <div class="ring" style="width:70%;aspect-ratio:1"></div>
+      <div class="ring" style="width:52%;aspect-ratio:1"></div>
+      <div class="orb"></div>
+      <div class="hero-caption">Signature looks, made for you</div>
+    </div>
+  </div>
+
+  <section class="band">
+    <div class="wrap">
+      <div class="asym">
+        <div class="card c1 reveal">
+          <span class="kicker">Why Laface</span>
+          <h3>A salon that treats you like family</h3>
+          <p>Guests say the team at Laface goes above and beyond, from thorough consultations to finishing touches that keep hair looking its best between visits. Walk in a client, walk out a friend.</p>
+          <div class="rating-row"><span class="stars">★★★★★</span><span>4.89 of 5 across 52 reviews on Cylex</span></div>
+          <a class="btn btn-ghost" href="#reviews" data-page="reviews">Read Reviews</a>
+        </div>
+        <div class="card c2 reveal">
+          <span class="kicker">Hair and Nails</span>
+          <h3>One chair for it all</h3>
+          <p>Haircuts, styling, color, plus nail services and beauty treatments, so you can refresh your whole look in a single visit.</p>
+        </div>
+        <div class="card c3 reveal">
+          <span class="kicker">Empire Plaza</span>
+          <h3>Easy to reach, easy to love</h3>
+          <p style="margin-bottom:20px">Find us at 3150 Erie Blvd E in Syracuse, with convenient parking right outside the door.</p>
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJq8W5tymN2YkR-Bg82bDDUl4" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" style="background:var(--blush)">
+    <div class="wrap split">
+      <div class="art-tile reveal">
+        <span class="badge tile-badge">Placeholder image</span>
+        <svg viewBox="0 0 200 200" fill="none" aria-hidden="true"><circle cx="100" cy="82" r="34" stroke="#8f5b63" stroke-width="6"/><path d="M66 82c0-30 14-52 34-52s34 22 34 52" stroke="#8f5b63" stroke-width="6" stroke-linecap="round"/><path d="M70 140c8-14 20-20 30-20s22 6 30 20" stroke="#8f5b63" stroke-width="6" stroke-linecap="round"/></svg>
+      </div>
+      <div class="reveal">
+        <span class="eyebrow">Our Story</span>
+        <h2 style="font-size:2.2rem;margin-bottom:18px">Independent stylists, personal service</h2>
+        <p>Laface Salon is home to independent stylists who set their own hours and bring their own craft to every appointment. That means flexible scheduling and a stylist who truly knows your hair.</p>
+        <p style="margin:18px 0 28px">Guests praise the meticulous work and the friendly, family feel of the salon, with many returning for years.</p>
+        <a class="btn btn-solid" href="#about" data-page="about">More About Us</a>
+      </div>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-services">
+  <section class="band">
+    <div class="wrap">
+      <div class="svc-head reveal">
+        <span class="badge">Sample service menu</span>
+        <span class="eyebrow">What We Do</span>
+        <h2 style="font-size:2.4rem;margin-bottom:16px">Services</h2>
+        <p>Laface Salon offers hair and nail services. The menu below is a sample, call <a href="tel:+13152994190">(315) 299-4190</a> to confirm services, availability, and pricing with your stylist.</p>
+      </div>
+      <div class="tabs reveal" role="tablist">
+        <button class="tab-btn on" data-tab="t-hair" role="tab" aria-selected="true">Hair</button>
+        <button class="tab-btn" data-tab="t-color" role="tab" aria-selected="false">Color</button>
+        <button class="tab-btn" data-tab="t-nails" role="tab" aria-selected="false">Nails</button>
+      </div>
+      <div class="tab-panel on reveal" id="t-hair">
+        <div class="svc-grid">
+          <div class="svc"><h3>Women's Cut and Style</h3><p>Consultation, precision cut, and a finished style.</p><p class="price">From $45</p></div>
+          <div class="svc"><h3>Men's Cut</h3><p>Clean, sharp cuts tailored to your look.</p><p class="price">From $30</p></div>
+          <div class="svc"><h3>Blowout and Styling</h3><p>Smooth, bouncy blowouts for any occasion.</p><p class="price">From $35</p></div>
+          <div class="svc"><h3>Special Occasion Styling</h3><p>Updos and event styling that lasts all night.</p><p class="price">From $60</p></div>
+        </div>
+      </div>
+      <div class="tab-panel" id="t-color">
+        <div class="svc-grid">
+          <div class="svc"><h3>Single Process Color</h3><p>Rich, even color from roots to ends.</p><p class="price">From $70</p></div>
+          <div class="svc"><h3>Partial Highlights</h3><p>Face framing dimension and brightness.</p><p class="price">From $95</p></div>
+          <div class="svc"><h3>Full Highlights</h3><p>All over light and dimension.</p><p class="price">From $130</p></div>
+          <div class="svc"><h3>Balayage</h3><p>Hand painted, sun kissed color that grows out softly.</p><p class="price">From $150</p></div>
+        </div>
+      </div>
+      <div class="tab-panel" id="t-nails">
+        <div class="svc-grid">
+          <div class="svc"><h3>Classic Manicure</h3><p>Shape, cuticle care, and polish.</p><p class="price">From $25</p></div>
+          <div class="svc"><h3>Gel Manicure</h3><p>Long wearing gel polish with a high shine finish.</p><p class="price">From $40</p></div>
+          <div class="svc"><h3>Classic Pedicure</h3><p>Soak, exfoliation, and polish for happy feet.</p><p class="price">From $40</p></div>
+          <div class="svc"><h3>Nail Art</h3><p>Custom designs to make your nails stand out.</p><p class="price">From $10</p></div>
+        </div>
+      </div>
+      <div class="note-strip reveal">All services and prices shown are samples for illustration. Laface Salon stylists are independent and set their own schedules, so please call <a href="tel:+13152994190"><strong>(315) 299-4190</strong></a> to book and confirm pricing.</div>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-about">
+  <section class="band">
+    <div class="wrap split">
+      <div class="reveal">
+        <span class="eyebrow">About</span>
+        <h2 style="font-size:2.4rem;margin-bottom:18px">A neighborhood salon with a loyal following</h2>
+        <p>Laface Salon sits in Empire Plaza on Erie Boulevard East in Syracuse, serving guests from Syracuse and De Witt. The salon brings together independent hair stylists and nail artists who each run their own book, so appointments are personal and unhurried.</p>
+        <p style="margin:18px 0">Reviewers describe the work as meticulous and passionate, and many say the people at Laface have become like family. That word of mouth has earned the salon a 5 star rating across dozens of reviews.</p>
+        <a class="btn btn-solid" href="#visit" data-page="visit">Plan Your Visit</a>
+      </div>
+      <div class="art-tile reveal" style="min-height:420px">
+        <span class="badge tile-badge">Placeholder image</span>
+        <svg viewBox="0 0 200 200" fill="none" aria-hidden="true"><rect x="60" y="50" width="80" height="100" rx="14" stroke="#8f5b63" stroke-width="6"/><circle cx="100" cy="100" r="18" stroke="#8f5b63" stroke-width="6"/><path d="M84 140h32" stroke="#8f5b63" stroke-width="6" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+  </section>
+  <section class="band" style="background:var(--blush)">
+    <div class="wrap">
+      <div class="asym">
+        <div class="card c1 reveal">
+          <span class="kicker">Hair</span>
+          <h3>Stylists who listen</h3>
+          <p>From everyday cuts to full color transformations, your stylist takes the time to understand what you want before the first snip.</p>
+        </div>
+        <div class="card c2 reveal">
+          <span class="kicker">Nails</span>
+          <h3>Detail obsessed</h3>
+          <p>Manicures, gel, pedicures, and nail art done with a careful hand.</p>
+        </div>
+        <div class="card c3 reveal">
+          <span class="kicker">Booking</span>
+          <h3>Call to reserve your chair</h3>
+          <p style="margin-bottom:20px">Hours vary by stylist, so calling ahead is the best way to get the time you want.</p>
+          <a class="btn btn-solid" href="tel:+13152994190">Call (315) 299-4190</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-gallery">
+  <section class="band">
+    <div class="wrap">
+      <div class="svc-head reveal">
+        <span class="badge">Placeholder gallery</span>
+        <span class="eyebrow">The Work</span>
+        <h2 style="font-size:2.4rem;margin-bottom:16px">Gallery</h2>
+        <p>Real photos of salon work will appear here. Swipe through the style tiles below.</p>
+      </div>
+      <div class="strip reveal" aria-label="Gallery placeholder tiles">
+        <div class="frame f1"><span class="badge tile-badge">Placeholder</span><svg viewBox="0 0 200 200" fill="none" aria-hidden="true"><circle cx="100" cy="80" r="30" stroke="#fff" stroke-width="5"/><path d="M70 150c10-18 22-24 30-24s20 6 30 24" stroke="#fff" stroke-width="5" stroke-linecap="round"/></svg></div>
+        <div class="frame f2"><span class="badge tile-badge">Placeholder</span><svg viewBox="0 0 200 200" fill="none" aria-hidden="true"><path d="M60 140c20-40 60-40 80 0" stroke="#fff" stroke-width="5" stroke-linecap="round"/><circle cx="100" cy="70" r="16" stroke="#fff" stroke-width="5"/></svg></div>
+        <div class="frame f3"><span class="badge tile-badge">Placeholder</span><svg viewBox="0 0 200 200" fill="none" aria-hidden="true"><rect x="70" y="60" width="60" height="80" rx="12" stroke="#fff" stroke-width="5"/><path d="M85 110h30" stroke="#fff" stroke-width="5" stroke-linecap="round"/></svg></div>
+        <div class="frame f4"><span class="badge tile-badge">Placeholder</span><svg viewBox="0 0 200 200" fill="none" aria-hidden="true"><path d="M100 50v100M70 90h60" stroke="#fff" stroke-width="5" stroke-linecap="round"/><circle cx="100" cy="50" r="10" stroke="#fff" stroke-width="5"/></svg></div>
+        <div class="frame f5"><span class="badge tile-badge">Placeholder</span><svg viewBox="0 0 200 200" fill="none" aria-hidden="true"><path d="M65 130c15-30 55-30 70 0" stroke="#fff" stroke-width="5" stroke-linecap="round"/><path d="M80 95c8-12 32-12 40 0" stroke="#fff" stroke-width="5" stroke-linecap="round"/></svg></div>
+        <div class="frame f6"><span class="badge tile-badge">Placeholder</span><svg viewBox="0 0 200 200" fill="none" aria-hidden="true"><circle cx="100" cy="100" r="42" stroke="#fff" stroke-width="5"/><circle cx="100" cy="100" r="20" stroke="#fff" stroke-width="5"/></svg></div>
+      </div>
+      <p class="reveal" style="margin-top:26px;font-size:.9rem;color:var(--rose)">Love what you see here? It will get even better with real salon photos, ask in store.</p>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-reviews">
+  <section class="band">
+    <div class="wrap">
+      <div class="svc-head reveal">
+        <span class="eyebrow">Guest Love</span>
+        <h2 style="font-size:2.4rem;margin-bottom:16px">Reviews</h2>
+        <div class="rating-row" style="justify-content:center"><span class="stars">★★★★★</span><span>5.0 on Birdeye, based on 38 reviews</span></div>
+        <p>Based on reviews posted on Birdeye and Cylex. Read them all at the sources below.</p>
+      </div>
+      <div class="review-cards">
+        <div class="review-card reveal">
+          <span class="stars">★★★★★</span>
+          <p style="margin-top:10px">"She is extremely passionate about her work and meticulous, that is an understatement. Job well done."</p>
+          <p class="who">Birdeye review</p>
+        </div>
+        <div class="review-card reveal">
+          <span class="stars">★★★★★</span>
+          <p style="margin-top:10px">"Love Laface Salon. The people have become like family. Above and beyond service. Highly recommend."</p>
+          <p class="who">Google review</p>
+        </div>
+        <div class="review-card reveal">
+          <span class="stars">★★★★★</span>
+          <p style="margin-top:10px">"Awesome job on my hair every time."</p>
+          <p class="who">Google review</p>
+        </div>
+      </div>
+      <div class="src-links reveal">
+        <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJq8W5tymN2YkR-Bg82bDDUl4" target="_blank" rel="noopener">See reviews on Google</a>
+        <a class="btn btn-ghost" href="https://reviews.birdeye.com/laface-salon-149519510117757" target="_blank" rel="noopener">See reviews on Birdeye</a>
+        <a class="btn btn-ghost" href="https://www.yelp.com/biz/laface-salon-syracuse" target="_blank" rel="noopener">See reviews on Yelp</a>
+      </div>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-visit">
+  <section class="band">
+    <div class="wrap">
+      <div class="svc-head reveal">
+        <span class="eyebrow">Visit Us</span>
+        <h2 style="font-size:2.4rem;margin-bottom:16px">Find Laface Salon</h2>
+        <p>Call ahead to book, hours vary by stylist.</p>
+      </div>
+      <div class="visit-grid">
+        <div class="vcard reveal">
+          <h3>Contact</h3>
+          <a class="tel" href="tel:+13152994190">(315) 299-4190</a>
+          <p style="margin:14px 0">3150 Erie Blvd E<br>Syracuse, NY 13214</p>
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJq8W5tymN2YkR-Bg82bDDUl4" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+        <div class="vcard reveal">
+          <h3>Hours</h3>
+          <p>Call for hours, stylists keep their own schedules and hours may vary. The best way to book is to call <a href="tel:+13152994190"><strong>(315) 299-4190</strong></a>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <h4>Laface Salon</h4>
+        <p>Hair and nail salon at 3150 Erie Blvd E, Syracuse, NY 13214. Call (315) 299-4190 to book your appointment.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <a href="#home" data-page="home">Home</a>
+        <a href="#services" data-page="services">Services</a>
+        <a href="#about" data-page="about">About</a>
+      </div>
+      <div>
+        <h4>More</h4>
+        <a href="#gallery" data-page="gallery">Gallery</a>
+        <a href="#reviews" data-page="reviews">Reviews</a>
+        <a href="#visit" data-page="visit">Visit Us</a>
+      </div>
+      <div>
+        <h4>Connect</h4>
+        <a href="tel:+13152994190">(315) 299-4190</a>
+        <a href="https://www.google.com/maps/place/?q=place_id:ChIJq8W5tymN2YkR-Bg82bDDUl4" target="_blank" rel="noopener">Directions</a>
+        <a href="https://www.yelp.com/biz/laface-salon-syracuse" target="_blank" rel="noopener">Yelp</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <p class="foot-copy">© Laface Salon</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+  var scrim = document.getElementById("scrim");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+    if(scrim){ scrim.classList.remove("on"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+      if(scrim){ scrim.classList.toggle("on", open); }
+    });
+  }
+  if(scrim){
+    scrim.addEventListener("click", closeMenu);
+  }
+
+  /* ---------- service tabs ---------- */
+  var tabBtns = document.querySelectorAll(".tab-btn");
+  for(var t = 0; t < tabBtns.length; t++){
+    tabBtns[t].addEventListener("click", function(){
+      for(var a = 0; a < tabBtns.length; a++){
+        tabBtns[a].classList.remove("on");
+        tabBtns[a].setAttribute("aria-selected", "false");
+      }
+      this.classList.add("on");
+      this.setAttribute("aria-selected", "true");
+      var panels = document.querySelectorAll(".tab-panel");
+      for(var b = 0; b < panels.length; b++){
+        panels[b].classList.toggle("on", panels[b].id === this.getAttribute("data-tab"));
+      }
+    });
+  }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
