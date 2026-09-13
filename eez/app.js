@@ -6,7 +6,6 @@
   const toastEl = document.getElementById("toast");
 
   const HISTORY_MAX = 12;
-  const THEME_KEY = "eez_theme";
   const SORT_KEY = "eez_stack_sort";
   const INSTALL_KEY = "eez_install_dismissed_at";
   const SHARE_KEY = "eez_share_nudge_at";
@@ -247,48 +246,15 @@
     return g != null && g !== renderGen;
   }
 
-  function systemTheme() {
-    try {
-      return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-    } catch {
-      return "light";
-    }
-  }
-
-  function storedTheme() {
-    try {
-      const t = localStorage.getItem(THEME_KEY);
-      return t === "light" || t === "dark" ? t : null;
-    } catch {
-      return null;
-    }
-  }
-
-  function currentTheme() {
-    return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
-  }
-
-  function applyTheme(theme) {
-    const t = theme === "dark" ? "dark" : "light";
-    document.documentElement.setAttribute("data-theme", t);
-    document.documentElement.style.colorScheme = t;
-    document.documentElement.style.background = t === "dark" ? "#000000" : "";
-    if (document.body) document.body.style.background = t === "dark" ? "#000000" : "";
-    const color = t === "dark" ? "#000000" : "#e8eaee";
+  function applyBaseTheme() {
+    // The app is dark by default, always. Whole-UI themes recolor from here.
+    const root = document.documentElement;
+    root.setAttribute("data-theme", "dark");
+    root.style.colorScheme = "dark";
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute("content", color);
+    if (meta) meta.setAttribute("content", "#000000");
     const apple = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
-    if (apple) apple.setAttribute("content", t === "dark" ? "black-translucent" : "default");
-  }
-
-  function setTheme(theme) {
-    const t = theme === "dark" ? "dark" : "light";
-    try {
-      localStorage.setItem(THEME_KEY, t);
-    } catch {
-      /* ignore */
-    }
-    applyTheme(t);
+    if (apple) apple.setAttribute("content", "black-translucent");
   }
 
   function applyAccent(accent) {
@@ -299,18 +265,6 @@
     try { localStorage.setItem("eez_accent", a); } catch { /* ignore */ }
   }
 
-  function applyAppBg(url) {
-    const shell = document.querySelector(".app-shell");
-    if (!shell) return;
-    if (url) {
-      shell.classList.add("has-bg");
-      shell.style.setProperty("--app-bg-image", `url("${url}")`);
-    } else {
-      shell.classList.remove("has-bg");
-      shell.style.removeProperty("--app-bg-image");
-    }
-  }
-
   function applyUserAppearance(user) {
     if (!user) {
       try {
@@ -319,12 +273,10 @@
         applyAccent("default");
       }
       applyUitheme(storedUitheme(), storedUithemeCustom());
-      applyAppBg(null);
       return;
     }
     applyAccent(user.theme_accent || "default");
     applyUitheme(user.theme_preset || "", user.theme_custom || "");
-    applyAppBg(user.theme_bg_url || null);
   }
 
   function accentPicksHtml(current) {
@@ -337,8 +289,8 @@
       .join("");
   }
 
-  /* ---- whole-UI themes: presets + custom color ---- */
-  const UITHEMES = ["midnight", "paper", "ocean", "forest", "sunset", "mono", "sand", "custom"];
+  /* whole-UI themes: 3 presets + custom color. Replaces the old dark/light toggle. */
+  const UITHEMES = ["midnight", "paper", "ocean", "custom"];
   const UITHEME_KEY = "eez_uitheme";
   const UITHEME_CUSTOM_KEY = "eez_uitheme_custom";
   const CUSTOM_THEME_VARS = ["--bg", "--bg2", "--bg3", "--surface", "--ink", "--muted", "--muted2",
@@ -421,8 +373,30 @@
       const hex = /^#[0-9a-fA-F]{6}$/.test(customHex || "") ? customHex : storedUithemeCustom();
       applyCustomThemeVars(hex);
     }
-    if (t) root.setAttribute("data-uitheme", t);
-    else root.removeAttribute("data-uitheme");
+    if (t) {
+      root.setAttribute("data-uitheme", t);
+      // The theme owns the whole canvas: drop the flat base background so the
+      // theme's --bg (and light color-scheme for light themes) actually applies.
+      root.style.background = "";
+      if (document.body) document.body.style.background = "";
+      if (t !== "custom") root.style.colorScheme = "";
+    } else {
+      root.removeAttribute("data-uitheme");
+      root.style.background = "";
+      if (document.body) document.body.style.background = "";
+      root.style.colorScheme = "dark";
+    }
+    try {
+      const m = document.querySelector('meta[name="theme-color"]');
+      if (m) {
+        const bg = t ? getComputedStyle(root).getPropertyValue("--bg").trim() : "";
+        m.setAttribute("content", bg || "#000000");
+      }
+      const apple = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+      if (apple) apple.setAttribute("content", t === "paper" ? "default" : "black-translucent");
+    } catch {
+      /* ignore */
+    }
     try {
       if (t) localStorage.setItem(UITHEME_KEY, t);
       else localStorage.removeItem(UITHEME_KEY);
@@ -448,7 +422,7 @@
   }
   function uithemePicksHtml(current) {
     const cur = current || "";
-    return ["midnight", "paper", "ocean", "forest", "sunset", "mono", "sand"]
+    return ["midnight", "paper", "ocean"]
       .map(
         (n) =>
           `<button type="button" class="theme-pick ${n === cur ? "on" : ""}" data-uitheme="${n}" title="${n}" aria-label="theme ${n}"></button>`,
@@ -506,8 +480,8 @@
   }
 
   function initTheme() {
-    // Default dark / solid black; light remains available via settings.
-    applyTheme(storedTheme() || "dark");
+    // Base look is always dark now. Whole-UI themes (3 presets + custom) recolor from here.
+    applyBaseTheme();
     try {
       applyAccent(localStorage.getItem("eez_accent") || "default");
     } catch {
@@ -525,26 +499,6 @@
     } catch {
       /* ignore */
     }
-  }
-
-  function themeToggleHtml() {
-    const on = currentTheme() === "dark";
-    return `<label class="toggle">
-      <span>dark mode</span>
-      <span class="switch">
-        <input type="checkbox" id="theme-toggle" ${on ? "checked" : ""} />
-        <span class="knob"></span>
-      </span>
-    </label>`;
-  }
-
-  function bindThemeToggle(onChange) {
-    const el = document.getElementById("theme-toggle");
-    if (!el) return;
-    el.addEventListener("change", () => {
-      setTheme(el.checked ? "dark" : "light");
-      if (onChange) onChange();
-    });
   }
 
   function clip(s, n) {
@@ -2836,7 +2790,6 @@ var lastSendAt = 0;
         <h1>you</h1>
         <section class="settings-block">
           <h2>appearance</h2>
-          <div class="settings-card">${themeToggleHtml()}</div>
           <p class="settings-note">theme — recolors the whole app (this device until you log in)</p>
           <div class="theme-picks" id="theme-picks">${uithemePicksHtml(storedUitheme())}</div>
           <div class="theme-custom-row">
@@ -2860,7 +2813,6 @@ var lastSendAt = 0;
           <p class="fine"><a href="#/terms">terms</a> · <a href="#/privacy">privacy</a></p>
         </section>
       </div>`);
-      bindThemeToggle(() => clearUitheme(false));
       bindUithemeControls(false);
       document.querySelectorAll("#accent-picks .accent-pick").forEach((btn) => {
         btn.addEventListener("click", () => {
@@ -2878,7 +2830,6 @@ var lastSendAt = 0;
       <h1>you</h1>
       <section class="settings-block">
         <h2>appearance</h2>
-        <div class="settings-card">${themeToggleHtml()}</div>
         <p class="settings-note">theme — recolors the whole app</p>
         <div class="theme-picks" id="theme-picks">${uithemePicksHtml(u.theme_preset || "")}</div>
         <div class="theme-custom-row">
@@ -2888,12 +2839,6 @@ var lastSendAt = 0;
         </div>
         <p class="settings-note">accent color (buttons + highlights)</p>
         <div class="accent-picks" id="accent-picks">${accentPicksHtml(u.theme_accent || "default")}</div>
-        <div class="settings-card" style="margin-top:12px">
-          <label>background image
-            <input type="file" id="bg-upload" accept="image/jpeg,image/png,image/webp,image/gif" />
-          </label>
-          ${u.theme_bg_url ? `<p class="settings-note">custom background on · <button type="button" class="btn ghost sm" id="bg-clear">clear</button></p>` : `<p class="settings-note">optional. soft overlay behind the app.</p>`}
-        </div>
       </section>
       <section class="settings-block">
         <h2>bookmarks</h2>
@@ -2949,7 +2894,6 @@ var lastSendAt = 0;
         <p class="fine"><a href="#/terms">terms</a> · <a href="#/privacy">privacy</a></p>
       </section>
     </div>`);
-    bindThemeToggle(() => clearUitheme(true));
     bindUithemeControls(true);
     applyUserAppearance(u);
     document.querySelectorAll("#accent-picks .accent-pick").forEach((btn) => {
@@ -2967,46 +2911,6 @@ var lastSendAt = 0;
         }
       });
     });
-    const bgUp = document.getElementById("bg-upload");
-    if (bgUp) {
-      bgUp.addEventListener("change", async () => {
-        const f = bgUp.files && bgUp.files[0];
-        if (!f) return;
-        try {
-          const fd = new FormData();
-          fd.append("file", f);
-          fd.append("purpose", "bg");
-          const uploaded = await api("/api/upload", { method: "POST", body: fd });
-          const data = await api("/api/me", {
-            method: "PATCH",
-            body: JSON.stringify({ theme_bg_key: uploaded.key }),
-          });
-          state.me = data.user;
-          applyAppBg(data.user.theme_bg_url);
-          showToast("background set");
-          renderYou();
-        } catch (err) {
-          alert(err.message);
-        }
-      });
-    }
-    const bgClear = document.getElementById("bg-clear");
-    if (bgClear) {
-      bgClear.addEventListener("click", async () => {
-        try {
-          const data = await api("/api/me", {
-            method: "PATCH",
-            body: JSON.stringify({ clear_theme_bg: true }),
-          });
-          state.me = data.user;
-          applyAppBg(null);
-          showToast("background cleared");
-          renderYou();
-        } catch (err) {
-          alert(err.message);
-        }
-      });
-    }
     (async () => {
       const box = document.getElementById("bookmarks-box");
       if (box) {
