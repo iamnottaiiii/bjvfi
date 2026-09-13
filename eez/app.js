@@ -1,3 +1,14 @@
+/* TEMP DEBUG - surface JS errors on screen */
+(function(){
+  var box = document.createElement('div');
+  box.id = 'dbg-err';
+  box.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#7a0000;color:#fff;font:12px monospace;padding:8px;white-space:pre-wrap;display:none;max-height:40vh;overflow:auto;';
+  document.addEventListener('DOMContentLoaded', function(){ document.body.appendChild(box); });
+  function show(m){ box.style.display='block'; box.textContent += m + '\n'; }
+  window.addEventListener('error', function(e){ show('ERR: ' + (e.message||e.error)); });
+  window.addEventListener('unhandledrejection', function(e){ show('REJECT: ' + (e.reason && (e.reason.message||e.reason))); });
+  window.__dbg = show;
+})();
 (() => {
   const app = document.getElementById("app");
   const modal = document.getElementById("modal");
