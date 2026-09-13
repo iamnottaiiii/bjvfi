@@ -162,11 +162,18 @@ function smsDraft(businessName, callerName, siteUrl){
     ' with BJ VFI. We built you a free preview site: ' + siteUrl +
     '. Worth a 2-min look?';
 }
-function callScriptText(businessName, callerName, siteUrl){
-  return 'Hi, I\'m ' + callerName + ', from bjvfi, we build websites for businesses and we built ' +
-    businessName + ' a website at ' + siteUrl +
-    '. We used information I could find publicly, and could add things you want to it, to make it as you want. ' +
-    'The building is free, and we\'ll manage and host them for $27/monthly. Thanks for your time \uD83D\uDE01';
+function callScriptText(businessName, callerName){
+  return [
+    'Opener: Hi, is this ' + businessName + '? I am ' + callerName + ' with BJ VFI.',
+    '',
+    'Hook: We built a free preview website for your business. No catch, it is already made.',
+    '',
+    'Value: ' + salesLine() + ' If you like it we can put your real info on it this week.',
+    '',
+    'Ask: Can I text you the link so you can see it? What is the best email to send it to?',
+    '',
+    'Close: Great, I will send it now. If you want changes, just reply and we handle it.'
+  ].join('\n');
 }
 
 if(typeof module !== 'undefined' && module.exports){
@@ -434,41 +441,6 @@ async function postEvent(audience, title, body, link){
   return true;
 }
 
-/* True when a save failed only because someone (or a double tap) already
-   saved first: the second write hit a stale SHA. Callers re-fetch and check
-   whether their change is already applied, then continue silently. */
-function isConflictError(e){
-  return !!e && (e.status === 409 || e.status === 422);
-}
-
-function openLeadModal(slug){
-  const claim = (state.myClaims || []).find(function(c){ return c.slug === slug; });
-  if(!claim){ toast('Lead not found.'); return; }
-  showModal('<div style="text-align:right;margin-bottom:8px"><button class="btn ghost sm" id="modal-close" type="button">Close</button></div>' + leadCard(claim));
-  wireLeadCard(claim);
-  const mc = document.getElementById('modal-close');
-  if(mc) mc.addEventListener('click', closeModal);
-}
-
-/* Jump straight to whatever an alert points at: lead:<slug>, intake:<id>, tab:profile. */
-function goAlertLink(link){
-  if(!link) return;
-  closeModal();
-  if(link.indexOf('lead:') === 0){
-    state.tab = 'mine';
-    state.pendingLeadSlug = link.slice(5);
-    renderApp();
-  } else if(link.indexOf('intake:') === 0){
-    if(!canInbox()){ toast('You do not have builder access.'); return; }
-    state.tab = 'inbox';
-    state.pendingIntakeId = link.slice(7);
-    renderApp();
-  } else if(link === 'tab:profile'){
-    state.tab = 'profile';
-    renderApp();
-  }
-}
-
 function renderBell(){
   const b = document.getElementById('btn-bell');
   if(!b) return;
@@ -729,8 +701,6 @@ async function doLogin(){
 
 function logout(){
   stopFeedPoll();
-  state.pendingLeadSlug = null;
-  state.pendingIntakeId = null;
   clearSession();
   state.user = null; state.myClaims = []; state.myIntakes = [];
   state.feed = []; state.unread = 0; state.feedMaxTs = 0;
@@ -1062,7 +1032,7 @@ function leadCard(claim){
   const url = siteUrlFor(lead);
   const phoneOk = hasPhone(lead.phone);
   const draft = smsDraft(lead.name, state.user.name, url);
-  const script = callScriptText(lead.name, state.user.name, url);
+  const script = callScriptText(lead.name, state.user.name);
   const canRelease = ['claimed','interested'].indexOf(claim.status) !== -1;
 
   let html = '<div class="lead-title">' + esc(lead.name) + '</div>' +
@@ -1342,8 +1312,6 @@ async function viewIntakeFile(path, name){
 }
 
 async function saveOutcome(claim){
-  const btn = document.getElementById('btn-outcome');
-  if(btn){ btn.disabled = true; btn.textContent = 'Saving...'; }
   const err = document.getElementById('outcome-err');
   err.textContent = '';
   const pick = document.querySelector('#outcome-pick .on');
@@ -1353,22 +1321,12 @@ async function saveOutcome(claim){
   claim.note = note;
   claim.timeline = claim.timeline || [];
   claim.timeline.push({ t: nowISO(), k: 'outcome: ' + outcome, note: note });
-  function fail(msg){
-    err.textContent = msg;
-    if(btn){ btn.disabled = false; btn.textContent = 'Save outcome'; }
-  }
   try{
     const rec = await ghGetJson('claims/' + claim.slug + '.json');
     await ghPutJson('claims/' + claim.slug + '.json', claim, rec ? rec.sha : null, 'sitedesk: outcome ' + claim.slug);
   }catch(e){
-    /* Double tap: the first tap already saved. Verify and move on silently. */
-    if(isConflictError(e)){
-      try{
-        const rec2 = await ghGetJson('claims/' + claim.slug + '.json');
-        if(rec2 && rec2.data && rec2.data.status === outcome){ /* already saved, continue */ }
-        else { fail(e.message); return; }
-      }catch(e2){ fail(e.message); return; }
-    } else { fail(e.message); return; }
+    err.textContent = e.message;
+    return;
   }
   if(outcome !== 'interested'){
     await releaseLead(claim, true);
@@ -1376,13 +1334,7 @@ async function saveOutcome(claim){
   }
   toast('Saved: interested');
   state.claimsBySlug[claim.slug] = claim;
-  state.meSlug = claim.slug;
-  /* Advance straight to the build-details form instead of leaving the caller waiting. */
-  openLeadModal(claim.slug);
-  setTimeout(function(){
-    const p = document.getElementById('intake-panel');
-    if(p && p.scrollIntoView) p.scrollIntoView({ block: 'start' });
-  }, 80);
+  renderApp();
 }
 
 async function releaseLead(claim, silent){
@@ -1410,73 +1362,37 @@ async function submitIntake(claim){
   const business = v('in-business'), contact = v('in-contact'), phone = v('in-phone');
   const email = v('in-email'), wants = v('in-wants'), notes = v('in-notes');
   if(!business || !contact || !phone || !wants){ err.textContent = 'Business, contact, phone, and what they want are required.'; return; }
-  const btn = document.getElementById('btn-intake');
-  if(btn){ btn.disabled = true; btn.textContent = 'Submitting...'; }
-  /* One intake per lead: a double tap reuses the same record instead of
-     creating a duplicate or showing a GitHub error. */
-  const intakeId = 'intake-' + claim.slug;
   const intake = {
-    id: intakeId, slug: claim.slug, business: business, contact_name: contact,
+    id: uid('intake'), slug: claim.slug, business: business, contact_name: contact,
     phone: phone, email: email, wants: wants, notes: notes,
     claimer: state.user.username, claimer_name: state.user.name,
     status: 'open', created_at: nowISO(), files: []
   };
+  const btn = document.getElementById('btn-intake');
   const fileInput = document.getElementById('in-files');
   const nFiles = fileInput && fileInput.files ? Math.min(fileInput.files.length, 12) : 0;
-  function fail(msg){
-    err.textContent = msg;
-    if(btn){ btn.disabled = false; btn.textContent = 'Submit to builders'; }
-  }
-  async function finishAlreadySaved(){
-    /* Everything is already saved (e.g. double tap): move on silently. */
-    await postEvent('staff', 'Intake: ' + business, state.user.name + ' submitted build details for ' + business + '.', 'intake:' + intakeId);
-    clearTreeCache();
-    delete state.claimsBySlug[claim.slug];
-    await refreshMyClaims();
-    await refreshMyIntakes();
-    toast('Sent to builders');
-    renderApp();
-  }
   try{
     if(nFiles){
+      if(btn){ btn.disabled = true; }
       err.textContent = '';
       intake.files = await uploadIntakeFiles(intake.id, fileInput, function(d, total){
         if(btn) btn.textContent = 'Uploading ' + d + '/' + total + '...';
       });
-      if(btn) btn.textContent = 'Submitting...';
+      if(btn){ btn.disabled = false; btn.textContent = 'Submit to builders'; }
     }
-    try{
-      await ghPutJson('intakes/' + intake.id + '.json', intake, null, 'sitedesk: intake ' + intake.id);
-    }catch(e){
-      if(isConflictError(e)){
-        const existing = await ghGetJson('intakes/' + intake.id + '.json');
-        if(existing && existing.data && existing.data.claimer === state.user.username){
-          /* Already submitted: keep the existing record, no error shown. */
-        } else { throw e; }
-      } else { throw e; }
-    }
+    await ghPutJson('intakes/' + intake.id + '.json', intake, null, 'sitedesk: intake ' + intake.id);
     claim.status = 'build';
     claim.intake_id = intake.id;
     claim.timeline = claim.timeline || [];
     claim.timeline.push({ t: nowISO(), k: 'intake submitted', note: 'Build details sent to builders' });
-    try{
-      const rec = await ghGetJson('claims/' + claim.slug + '.json');
-      if(rec) await ghPutJson('claims/' + claim.slug + '.json', claim, rec.sha, 'sitedesk: build ' + claim.slug);
-    }catch(e){
-      if(isConflictError(e)){
-        const rec2 = await ghGetJson('claims/' + claim.slug + '.json');
-        if(rec2 && rec2.data && rec2.data.status === 'build' && rec2.data.intake_id === intake.id){
-          await finishAlreadySaved();
-          return;
-        }
-      }
-      throw e;
-    }
+    const rec = await ghGetJson('claims/' + claim.slug + '.json');
+    if(rec) await ghPutJson('claims/' + claim.slug + '.json', claim, rec.sha, 'sitedesk: build ' + claim.slug);
   }catch(e){
-    fail(e.message);
+    err.textContent = e.message;
+    if(btn){ btn.disabled = false; btn.textContent = 'Submit to builders'; }
     return;
   }
-  await postEvent('staff', 'Intake: ' + business, state.user.name + ' submitted build details for ' + business + '.', 'intake:' + intake.id);
+  await postEvent('staff', 'Intake: ' + business, state.user.name + ' submitted build details for ' + business + '.', '');
   clearTreeCache();
   delete state.claimsBySlug[claim.slug];
   await refreshMyClaims();
@@ -1488,64 +1404,43 @@ async function submitIntake(claim){
 /* Caller marks a lead sold. Only allowed once the builder submitted the
    finished site and the client payment link (intake is Ready). */
 async function markSold(claim){
-  const btn = document.getElementById('btn-mark-sold');
-  if(btn){ btn.disabled = true; btn.textContent = 'Marking sold...'; }
   const err = document.getElementById('sold-err');
   if(err) err.textContent = '';
-  function restore(){ if(btn){ btn.disabled = false; btn.textContent = 'Mark sold'; } }
   try{
     let intakeId = claim.intake_id;
     if(!intakeId){
       const found = ((state.myIntakes || []).filter(function(x){ return x.slug === claim.slug; })[0]) || null;
       if(found) intakeId = found.id;
     }
-    if(!intakeId){ if(err) err.textContent = 'Build record not found.'; restore(); return; }
+    if(!intakeId){ if(err) err.textContent = 'Build record not found.'; return; }
     const rec = await ghGetJson('intakes/' + intakeId + '.json');
-    if(!rec){ if(err) err.textContent = 'Build record not found.'; restore(); return; }
+    if(!rec){ if(err) err.textContent = 'Build record not found.'; return; }
     const intake = rec.data;
     if(intake.status !== 'ready' || !intake.pay_link){
       if(err) err.textContent = 'Not ready yet. The builder still needs to submit the finished site and the client payment link.';
-      restore();
       return;
     }
     intake.status = 'done';
     intake.sold_at = nowISO();
     intake.sold_by = state.user.username;
-    try{
-      await ghPutJson('intakes/' + intakeId + '.json', intake, rec.sha, 'sitedesk: intake ' + intakeId + ' sold');
-    }catch(e){
-      if(isConflictError(e)){
-        const rec2 = await ghGetJson('intakes/' + intakeId + '.json');
-        if(rec2 && rec2.data && rec2.data.status === 'done'){ /* already sold, continue silently */ }
-        else { throw e; }
-      } else { throw e; }
-    }
+    await ghPutJson('intakes/' + intakeId + '.json', intake, rec.sha, 'sitedesk: intake ' + intakeId + ' sold');
     const crec = await ghGetJson('claims/' + claim.slug + '.json');
     if(crec){
       const c = crec.data;
-      if(c.status !== 'sold'){
-        c.status = 'sold';
-        c.timeline = c.timeline || [];
-        c.timeline.push({ t: nowISO(), k: 'sold', note: 'Marked sold by ' + state.user.name });
-        try{
-          await ghPutJson('claims/' + claim.slug + '.json', c, crec.sha, 'sitedesk: sold ' + claim.slug);
-        }catch(e){
-          if(isConflictError(e)){
-            const c2 = await ghGetJson('claims/' + claim.slug + '.json');
-            if(!(c2 && c2.data && c2.data.status === 'sold')) throw e;
-          } else { throw e; }
-        }
-      }
+      c.status = 'sold';
+      c.timeline = c.timeline || [];
+      c.timeline.push({ t: nowISO(), k: 'sold', note: 'Marked sold by ' + state.user.name });
+      await ghPutJson('claims/' + claim.slug + '.json', c, crec.sha, 'sitedesk: sold ' + claim.slug);
     }
     await postEvent('staff', 'Sold: ' + (claim.business_name || claim.slug),
-      state.user.name + ' marked ' + (claim.business_name || claim.slug) + ' sold.', 'intake:' + intakeId);
+      state.user.name + ' marked ' + (claim.business_name || claim.slug) + ' sold.', '');
     clearTreeCache();
     delete state.claimsBySlug[claim.slug];
     await refreshMyClaims();
     await refreshMyIntakes();
     toast('Marked sold');
     renderApp();
-  }catch(e){ if(err) err.textContent = e.message; else toast(e.message); restore(); }
+  }catch(e){ if(err) err.textContent = e.message; else toast(e.message); }
 }
 
 async function renderMineInto(el){
@@ -1597,17 +1492,17 @@ async function renderMineInto(el){
   });
   el.querySelectorAll('[data-open-mine]').forEach(function(b){
     b.addEventListener('click', function(){
-      openLeadModal(b.getAttribute('data-open-mine'));
+      const slug = b.getAttribute('data-open-mine');
+      const claim = state.myClaims.find(function(c){ return c.slug === slug; });
+      if(!claim) return;
+      showModal('<div style="text-align:right;margin-bottom:8px"><button class="btn ghost sm" id="modal-close" type="button">Close</button></div>' + leadCard(claim));
+      wireLeadCard(claim);
+      const mc = document.getElementById('modal-close');
+      if(mc) mc.addEventListener('click', closeModal);
     });
   });
   const meClaim = list.find(function(c){ return c.slug === state.meSlug; }) || list[0];
   if(meClaim) wireLeadCard(meClaim);
-  /* Deep link from a tapped alert: open the lead straight away. */
-  if(state.pendingLeadSlug){
-    const slug = state.pendingLeadSlug;
-    state.pendingLeadSlug = null;
-    if(list.some(function(c){ return c.slug === slug; })) openLeadModal(slug);
-  }
 }
 
 /* ================= intakes (builder / admin) ================= */
@@ -1653,7 +1548,7 @@ async function renderIntakesInto(el){
     html += '<div class="empty">No intakes yet.</div>';
   } else {
     html += items.map(function(i){
-      return '<div class="card" id="intake-card-' + esc(i.id) + '" style="margin-bottom:10px;padding:14px">' +
+      return '<div class="card" style="margin-bottom:10px;padding:14px">' +
         '<div class="row" style="justify-content:space-between;margin-bottom:8px"><div>' +
         '<div style="font-weight:600">' + esc(i.business || i.slug) + '</div>' +
         '<div class="muted" style="font-size:12px">' + esc(i.contact_name || '') +
@@ -1705,19 +1600,6 @@ async function renderIntakesInto(el){
       viewIntakeFile(b.getAttribute('data-intake-file'), b.getAttribute('data-intake-filename'));
     });
   });
-  /* Deep link from a tapped alert: scroll to the intake and flash it. */
-  if(state.pendingIntakeId){
-    const pid = state.pendingIntakeId;
-    state.pendingIntakeId = null;
-    setTimeout(function(){
-      const card = document.getElementById('intake-card-' + pid);
-      if(card){
-        card.scrollIntoView({ block: 'start' });
-        card.style.outline = '2px solid var(--amber)';
-        setTimeout(function(){ card.style.outline = ''; }, 2600);
-      }
-    }, 120);
-  }
 }
 
 async function setIntakeStatus(chip, el){
@@ -1739,7 +1621,7 @@ async function setIntakeStatus(chip, el){
     await ghPutJson('intakes/' + id + '.json', intake, rec.sha, 'sitedesk: intake ' + id + ' -> ' + ns);
     if(intake.claimer && old !== ns){
       await postEvent(intake.claimer, 'Intake update: ' + (intake.business || intake.slug),
-        'Build status: ' + ns + '.', 'lead:' + intake.slug);
+        'Build status: ' + ns + '.', '');
     }
     toast('Status: ' + ns);
     renderIntakesInto(el);
@@ -1749,33 +1631,20 @@ async function setIntakeStatus(chip, el){
 /* Builder/admin/head submits the finished site plus the client payment link.
    The intake becomes Ready and the caller is notified so they can mark it sold. */
 async function submitBuiltSite(id, el){
-  const btn = el ? el.querySelector('[data-submit-build="' + id + '"]') : null;
-  if(btn){ btn.disabled = true; btn.textContent = 'Submitting...'; }
   const siteEl = document.getElementById('bs-site-' + id);
   const payEl = document.getElementById('bs-pay-' + id);
   const err = document.getElementById('bs-err-' + id);
   const siteUrl = siteEl ? (siteEl.value || '').trim() : '';
   const payLink = payEl ? (payEl.value || '').trim() : '';
   if(err) err.textContent = '';
-  function restore(){ if(btn){ btn.disabled = false; btn.textContent = 'Submit built site'; } }
   if(!siteUrl || !payLink){
     if(err) err.textContent = 'Add the built site URL and the client payment link.';
-    restore();
     return;
-  }
-  function applied(it){
-    return it && it.status === 'ready' && it.site_url === siteUrl && it.pay_link === payLink;
   }
   try{
     const rec = await ghGetJson('intakes/' + id + '.json');
-    if(!rec){ if(err) err.textContent = 'Intake not found.'; restore(); return; }
+    if(!rec){ if(err) err.textContent = 'Intake not found.'; return; }
     const intake = rec.data;
-    if(applied(intake)){
-      /* Already submitted (double tap): nothing to show, just refresh. */
-      toast('Submitted. The caller was notified.');
-      renderIntakesInto(el);
-      return;
-    }
     intake.site_url = siteUrl;
     intake.pay_link = payLink;
     intake.status = 'ready';
@@ -1785,26 +1654,14 @@ async function submitBuiltSite(id, el){
     intake.builder_name = intake.builder_name || state.user.name;
     const u = (state.users || {})[state.user.username];
     if(u && u.phone && !intake.builder_phone) intake.builder_phone = u.phone;
-    try{
-      await ghPutJson('intakes/' + id + '.json', intake, rec.sha, 'sitedesk: intake ' + id + ' ready');
-    }catch(e){
-      if(isConflictError(e)){
-        const rec2 = await ghGetJson('intakes/' + id + '.json');
-        if(rec2 && applied(rec2.data)){
-          toast('Submitted. The caller was notified.');
-          renderIntakesInto(el);
-          return;
-        }
-      }
-      throw e;
-    }
+    await ghPutJson('intakes/' + id + '.json', intake, rec.sha, 'sitedesk: intake ' + id + ' ready');
     if(intake.claimer){
       await postEvent(intake.claimer, 'Site ready: ' + (intake.business || intake.slug),
-        state.user.name + ' finished the site. The client payment link is ready. Open the lead and mark it sold.', 'lead:' + intake.slug);
+        state.user.name + ' finished the site. The client payment link is ready. Open the lead and mark it sold.', '');
     }
     toast('Submitted. The caller was notified.');
     renderIntakesInto(el);
-  }catch(e){ if(err) err.textContent = e.message; else toast(e.message); restore(); }
+  }catch(e){ if(err) err.textContent = e.message; else toast(e.message); }
 }
 
 /* ================= admin ================= */
@@ -2025,7 +1882,7 @@ function logPaymentModal(username, el){
         u.payments = u.payments || [];
         u.payments.push(entry);
       }, 'sitedesk: payment logged @' + username);
-      await postEvent(username, 'Payment sent', '$' + amount + (note ? ' \xB7 ' + note : ''), 'tab:profile');
+      await postEvent(username, 'Payment sent', '$' + amount + (note ? ' \xB7 ' + note : ''), '');
       closeModal();
       toast('Payment logged');
       renderUserDashboardInto(el);
@@ -2200,21 +2057,14 @@ function renderAlertsInto(el){
     const lr = lastReadAt();
     html += list.map(function(n){
       const isNew = (new Date(n.created_at || 0).getTime() || 0) > lr;
-      const inner = '<div style="font-weight:600">' + esc(n.title) + (isNew ? ' <span class="badge unread-new">new</span>' : '') + '</div>' +
+      return '<div style="padding:12px 0;background-image:var(--sep);background-size:100% 1px;background-repeat:no-repeat;background-position:bottom">' +
+        '<div style="font-weight:600">' + esc(n.title) + (isNew ? ' <span class="badge unread-new">new</span>' : '') + '</div>' +
         (n.body ? '<div class="muted" style="font-size:12px">' + esc(n.body) + '</div>' : '') +
-        '<div class="muted" style="font-size:11px">' + esc(fmtTime(n.created_at)) + '</div>' +
-        (n.link ? '<div style="font-size:11px;color:var(--amber);margin-top:4px">Tap to open &rsaquo;</div>' : '');
-      const wrap = n.link
-        ? '<button type="button" class="alert-item" data-alink="' + esc(n.link) + '">' + inner + '</button>'
-        : '<div class="alert-item-static">' + inner + '</div>';
-      return '<div style="background-image:var(--sep);background-size:100% 1px;background-repeat:no-repeat;background-position:bottom">' + wrap + '</div>';
+        '<div class="muted" style="font-size:11px">' + esc(fmtTime(n.created_at)) + '</div></div>';
     }).join('');
   }
   html += '<button class="btn ghost block" id="mark-read" style="margin-top:12px" type="button">Mark all read</button></div>';
   el.innerHTML = html;
-  el.querySelectorAll('[data-alink]').forEach(function(b){
-    b.addEventListener('click', function(){ goAlertLink(b.getAttribute('data-alink')); });
-  });
   el.querySelector('#mark-read').addEventListener('click', function(){
     setLastRead(Date.now());
     state.unread = 0;
@@ -2244,13 +2094,9 @@ function renderProfileInto(el){
     '<div class="err" id="pay-err"></div></div>' +
     '<div class="card" style="margin-top:14px"><h2>Payments received</h2>' +
     '<div id="pay-history">' + payHistoryHtml(u) + '</div></div>' +
-    '<div class="card" style="margin-top:14px"><button class="btn ghost block" id="btn-howto" type="button">How to use SiteDesk</button></div>';
+    helpHtml();
   el.querySelector('#btn-logout').addEventListener('click', logout);
   el.querySelector('#btn-save-pay').addEventListener('click', saveOwnPaymentMethod);
-  el.querySelector('#btn-howto').addEventListener('click', function(){
-    state.tab = 'help';
-    renderApp();
-  });
 }
 
 function payHistoryHtml(u){
@@ -2295,16 +2141,6 @@ async function saveOwnPaymentMethod(){
 }
 
 /* How-to-use guide: how the app works, by role. */
-function renderHelpInto(el){
-  el.innerHTML = '<div class="row" style="margin-bottom:12px">' +
-    '<button class="btn ghost sm" id="help-back" type="button">&lsaquo; Back to profile</button></div>' +
-    helpHtml();
-  el.querySelector('#help-back').addEventListener('click', function(){
-    state.tab = 'profile';
-    renderApp();
-  });
-}
-
 function helpHtml(){
   const u = state.user;
   const caller = u.role === 'caller' || u.role === 'admin' || u.role === 'head';
@@ -2332,7 +2168,7 @@ function helpHtml(){
     '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">The <strong>Admin</strong> tab is where you approve or reject new accounts, disable users, and change roles. Approving sends the caller an alert that they can log in.</p>';
   }
   h += '<h3 style="margin:14px 0 8px">Alerts</h3>' +
-    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:4px">The bell shows approvals, intake updates, and announcements. Tap an alert to jump straight to what it is about: the lead, the build, or your payments. Opening Alerts marks everything read. If popups are off on your device, use the Enable button in Alerts to turn them on.</p>';
+    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:4px">The bell shows approvals, intake updates, and announcements. Opening Alerts marks everything read. If popups are off on your device, use the Enable button in Alerts to turn them on.</p>';
   h += '</div>';
   return h;
 }
@@ -2375,10 +2211,6 @@ function renderApp(){
     app.innerHTML = shell('<div id="view"></div>');
     bindApp(app);
     renderProfileInto(app.querySelector('#view'));
-  } else if(state.tab === 'help'){
-    app.innerHTML = shell('<div id="view"></div>');
-    bindApp(app);
-    renderHelpInto(app.querySelector('#view'));
   }
 }
 
