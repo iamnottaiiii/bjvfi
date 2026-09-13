@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TS Carpentry LLC · Carpentry and Construction, Orlando, FL</title>
+<meta name="description" content="TS Carpentry LLC in Orlando, FL: interior trim and decorative moldings, decks, fences, porches, kitchens and baths. Call (617) 513-0285 for an estimate.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sawdust:#F7F1E5; --paper:#FDFBF5;
+  --walnut:#3E2C20; --ink:#241A12; --ink-soft:#6E5C4B;
+  --amber:#D9A441; --amber-deep:#A96F1F; --amber-soft:#F5E3BB;
+  --pine:#3F5A3C; --pine-soft:#DCE5D6;
+  --line:rgba(62,44,32,.16);
+  --radius:16px;
+  --shadow:0 16px 38px -18px rgba(36,26,18,.28);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Inter",system-ui,sans-serif;background:var(--sawdust);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.5;
+  background-image:repeating-linear-gradient(90deg, rgba(217,164,65,.06) 0 2px, transparent 2px 46px);
+}
+h1,h2,h3,.slab{font-family:"Zilla Slab",serif}
+a{color:var(--amber-deep)}
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+
+/* ---------- minimal nav ---------- */
+header.site{position:sticky;top:0;z-index:50;background:rgba(253,251,245,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--ink)}
+.brand .mark{width:40px;height:40px;flex:none}
+.brand-name{font-family:"Zilla Slab",serif;font-weight:700;font-size:1.15rem;line-height:1.05}
+.brand-name small{display:block;font-family:"Inter",sans-serif;font-weight:600;font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--amber-deep)}
+nav.main{display:flex;align-items:center;gap:2px}
+nav.main a{text-decoration:none;color:var(--ink);font-weight:600;font-size:.93rem;padding:8px 13px;border-radius:8px}
+nav.main a:hover{background:var(--amber-soft)}
+nav.main a.active{background:var(--walnut);color:var(--sawdust)}
+.call-btn{display:inline-flex;align-items:center;gap:8px;background:var(--pine);color:#fff;text-decoration:none;font-weight:700;padding:10px 20px;border-radius:10px;font-size:.95rem;box-shadow:var(--shadow)}
+.call-btn:hover{background:#33492f}
+.burger{display:none;background:none;border:1px solid var(--line);border-radius:8px;cursor:pointer;padding:9px 11px}
+.burger span{display:block;width:22px;height:2.5px;background:var(--ink);margin:4px 0;border-radius:2px}
+
+/* ---------- pages ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- masthead (hero: none) ---------- */
+.mast{padding:34px 0 8px;border-bottom:2px solid var(--walnut);margin-bottom:34px}
+.mast-row{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:18px}
+.eyebrow{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--amber-deep);margin-bottom:8px}
+.mast h1{font-size:clamp(1.9rem,4vw,2.9rem);line-height:1.08;max-width:16ch}
+.mast h1 .wood{color:var(--amber-deep)}
+.mast .sub{color:var(--ink-soft);max-width:30rem;font-size:1.02rem}
+.pillrow{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.pill{display:inline-flex;align-items:center;gap:8px;background:var(--walnut);color:var(--sawdust);padding:8px 16px;border-radius:999px;font-size:.85rem;font-weight:600}
+.pill .dot{width:9px;height:9px;border-radius:50%;background:#8CC084}
+.pill.closed .dot{background:#E07A5F}
+.pill.alt{background:var(--paper);color:var(--ink);border:1px solid var(--line)}
+
+/* ---------- asymmetric rhythm ---------- */
+.asym{display:grid;grid-template-columns:1fr 1.25fr;gap:44px;align-items:center;margin:44px 0}
+.asym.flip{grid-template-columns:1.2fr .8fr}
+.asym h2{font-size:clamp(1.5rem,2.8vw,2.1rem);line-height:1.15;margin-bottom:12px}
+.asym h2 .wood{color:var(--amber-deep)}
+.asym p{color:var(--ink-soft);margin-bottom:14px}
+.rule{width:64px;height:5px;background:var(--amber);border-radius:3px;margin-bottom:16px}
+.checks{list-style:none;margin:16px 0}
+.checks li{position:relative;padding-left:30px;margin-bottom:10px;font-weight:500}
+.checks li::before{content:"";position:absolute;left:0;top:6px;width:16px;height:10px;border-left:3.5px solid var(--pine);border-bottom:3.5px solid var(--pine);transform:rotate(-45deg)}
+.sketch{position:relative;background:linear-gradient(145deg,#EAD9B4,#D9BC7F);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;min-height:280px;display:flex;align-items:center;justify-content:center}
+.sketch::after{content:"";position:absolute;inset:0;background-image:repeating-linear-gradient(115deg, rgba(62,44,32,.08) 0 3px, transparent 3px 14px)}
+.sketch .badge{position:absolute;top:14px;left:14px;background:var(--walnut);color:var(--sawdust);font-size:.7rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:6px 12px;border-radius:999px;z-index:2}
+.sketch svg{width:64%;height:auto;position:relative;z-index:1}
+.offset-note{background:var(--paper);border:1px solid var(--line);border-left:6px solid var(--amber);border-radius:0 var(--radius) var(--radius) 0;padding:18px 22px;box-shadow:var(--shadow);margin:10px 0 10px 6%}
+.offset-note strong{display:block;margin-bottom:4px}
+.offset-note p{margin:0;color:var(--ink-soft);font-size:.96rem}
+.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;padding:13px 26px;border-radius:10px;transition:transform .18s,background .18s}
+.btn-solid{background:var(--amber-deep);color:#fff}
+.btn-solid:hover{background:#8C5A18;transform:translateY(-2px)}
+.btn-ghost{background:var(--paper);color:var(--ink);border:2px solid var(--line)}
+.btn-ghost:hover{border-color:var(--amber-deep);transform:translateY(-2px)}
+.cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
+
+/* ---------- services cards ---------- */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin:28px 0 10px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow);position:relative;overflow:hidden;transition:transform .18s}
+.card:hover{transform:translateY(-4px)}
+.card::before{content:"";position:absolute;top:0;left:0;right:0;height:6px;background:linear-gradient(90deg,var(--amber),var(--amber-deep))}
+.card .ico{width:52px;height:52px;border-radius:12px;background:var(--amber-soft);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.card h3{font-size:1.25rem;margin-bottom:8px}
+.card p{color:var(--ink-soft);font-size:.95rem;margin-bottom:12px}
+.card ul{list-style:none;color:var(--ink-soft);font-size:.9rem}
+.card ul li{padding:4px 0 4px 22px;position:relative}
+.card ul li::before{content:"";position:absolute;left:2px;top:12px;width:9px;height:9px;border-radius:50%;background:var(--amber)}
+.sample-tag{display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--amber-deep);background:var(--amber-soft);padding:4px 10px;border-radius:999px;margin-top:10px}
+
+/* ---------- gallery arch ---------- */
+.arches{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin:28px 0}
+.arch{background:linear-gradient(160deg,#E7D3A5,#CDA961);border:1px solid var(--line);border-radius:999px 999px var(--radius) var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:340px;display:flex;flex-direction:column}
+.arch .pic{flex:1;background-image:repeating-linear-gradient(100deg, rgba(62,44,32,.09) 0 4px, transparent 4px 16px);display:flex;align-items:center;justify-content:center;padding:30px 18px 12px}
+.arch .pic svg{width:78%;height:auto}
+.arch .cap{padding:12px 16px 18px;text-align:center;background:rgba(253,251,245,.85)}
+.arch .cap strong{display:block;font-family:"Zilla Slab",serif;font-size:1rem}
+.arch .cap span{font-size:.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--amber-deep)}
+.arch .swatch{position:absolute;top:18px;left:50%;transform:translateX(-50%);background:var(--walnut);color:var(--sawdust);font-size:.62rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 11px;border-radius:999px;white-space:nowrap}
+
+/* ---------- reviews ---------- */
+.rev-band{background:var(--walnut);color:var(--sawdust);border-radius:var(--radius);padding:34px 30px;margin:30px 0;box-shadow:var(--shadow)}
+.rev-band h2{color:var(--sawdust)}
+.rev-band p{color:#D9CBB8}
+.rev-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:22px}
+.rev{background:var(--paper);color:var(--ink);border-radius:var(--radius);padding:24px;position:relative}
+.rev .stars{color:var(--amber-deep);letter-spacing:3px;font-size:1.05rem;margin-bottom:8px}
+.rev p{font-size:.95rem}
+.rev .meta{margin-top:12px;font-size:.8rem;color:var(--ink-soft);font-weight:600}
+.src-links{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
+.src-links a{display:inline-flex;align-items:center;gap:8px;background:var(--amber);color:var(--walnut);font-weight:700;text-decoration:none;padding:12px 22px;border-radius:999px}
+.src-links a:hover{background:#E8B95C}
+.src-links a.plain{background:transparent;color:var(--sawdust);border:2px solid rgba(247,241,229,.4)}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin:28px 0}
+.vcard{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow)}
+.vcard h3{margin-bottom:12px;font-size:1.3rem}
+.vcard .big{font-size:1.5rem;font-weight:700;color:var(--amber-deep);text-decoration:none;font-family:"Zilla Slab",serif}
+.hours-table{width:100%;border-collapse:collapse;margin-top:6px}
+.hours-table tr{border-bottom:1px dashed var(--line)}
+.hours-table tr.today td{font-weight:700;color:var(--amber-deep)}
+.hours-table td{padding:9px 4px}
+.hours-table td:last-child{text-align:right}
+
+/* ---------- multicolumn footer ---------- */
+footer.site{background:var(--walnut);color:#D9CBB8;margin-top:60px}
+.foot-cols{display:grid;grid-template-columns:1.4fr 1fr 1fr 1.2fr;gap:30px;padding:48px 0 30px}
+.foot-cols h4{font-family:"Zilla Slab",serif;color:var(--sawdust);font-size:1.05rem;margin-bottom:12px}
+.foot-cols p{font-size:.9rem}
+.foot-cols ul{list-style:none}
+.foot-cols ul li{margin-bottom:8px}
+.foot-cols a{color:#D9CBB8;text-decoration:none;font-size:.9rem}
+.foot-cols a:hover{color:var(--amber)}
+.copy{border-top:1px solid rgba(247,241,229,.18);padding:20px 0;text-align:center;color:var(--sawdust);font-size:.92rem}
+
+@media(max-width:900px){
+  .asym,.asym.flip{grid-template-columns:1fr}
+  .cards{grid-template-columns:1fr 1fr}
+  .arches{grid-template-columns:1fr 1fr}
+  .rev-grid,.visit-grid{grid-template-columns:1fr}
+  .foot-cols{grid-template-columns:1fr 1fr}
+  nav.main{display:none;position:absolute;top:100%;left:0;right:0;background:var(--paper);flex-direction:column;align-items:stretch;padding:10px;border-bottom:1px solid var(--line)}
+  nav.main.open{display:flex}
+  nav.main a{padding:12px 16px}
+  .burger{display:block}
+  header.site .bar{position:relative}
+  .call-btn{display:none}
+}
+@media(max-width:560px){
+  .cards,.arches{grid-template-columns:1fr}
+  .foot-cols{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap bar">
+    <a class="brand" href="#home" data-page="home" aria-label="TS Carpentry LLC, home">
+      <svg class="mark" viewBox="0 0 44 44" aria-hidden="true"><rect x="2" y="2" width="40" height="40" rx="9" fill="#3E2C20"/><path d="M10 30 L26 14 M26 14 l6 -2 l2 6 l-4 2 M14 28 l8 -8" stroke="#D9A441" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="9" y="29" width="16" height="6" rx="2" transform="rotate(-45 17 32)" fill="#D9A441"/></svg>
+      <span class="brand-name">TS Carpentry<small>LLC · Orlando FL</small></span>
+    </a>
+    <button class="burger" id="navBurger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    <nav class="main" id="mainNav" aria-label="Main">
+      <a href="#home" data-page="home" class="active" aria-current="page">Home</a>
+      <a href="#services" data-page="services">Services</a>
+      <a href="#story" data-page="story">Our Story</a>
+      <a href="#gallery" data-page="gallery">Gallery</a>
+      <a href="#reviews" data-page="reviews">Reviews</a>
+      <a href="#visit" data-page="visit">Visit</a>
+    </nav>
+    <a class="call-btn" href="tel:+16175130285">Call (617) 513-0285</a>
+  </div>
+</header>
+
+<main class="wrap">
+
+<section class="page" id="page-home">
+  <div class="mast">
+    <div class="mast-row">
+      <div>
+        <span class="eyebrow">Carpentry · Orlando, Florida</span>
+        <h1>Fine <span class="wood">woodwork</span>, built to last.</h1>
+      </div>
+      <p class="sub">TS Carpentry LLC handles the details that make a house feel finished: crisp trim, solid decks, sturdy fences, and cabinet work done right.</p>
+    </div>
+    <div class="pillrow">
+      <span class="pill" id="hoursPill"><span class="dot"></span><span id="hoursText">Mon to Fri 7 AM to 5 PM</span></span>
+      <span class="pill alt">Licensed trade crew</span>
+      <a class="pill alt" href="tel:+16175130285" style="text-decoration:none">Free estimates: (617) 513-0285</a>
+    </div>
+  </div>
+
+  <div class="asym">
+    <div class="sketch">
+      <span class="badge">Sample art</span>
+      <svg viewBox="0 0 220 150" aria-hidden="true"><rect x="30" y="20" width="160" height="14" rx="3" fill="#3E2C20"/><rect x="30" y="52" width="160" height="14" rx="3" fill="#3E2C20" opacity=".75"/><rect x="30" y="84" width="160" height="14" rx="3" fill="#3E2C20" opacity=".5"/><path d="M60 110 h100 M80 124 h60" stroke="#A96F1F" stroke-width="5" stroke-linecap="round"/><circle cx="180" cy="120" r="12" fill="none" stroke="#3F5A3C" stroke-width="4"/></svg>
+    </div>
+    <div>
+      <div class="rule"></div>
+      <h2>The <span class="wood">finish work</span> specialists.</h2>
+      <p>Most contractors rush the trim. We slow down for it. Crown molding that meets clean at the corners, baseboards with tight seams, door casings that line up square. That is the work people notice every day.</p>
+      <ul class="checks">
+        <li>Interior trim and decorative moldings</li>
+        <li>Decks, fences, and porch repairs</li>
+        <li>Kitchen and bath woodwork</li>
+        <li>Free, no-pressure estimates</li>
+      </ul>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="#services" data-page="services">See our services</a>
+        <a class="btn btn-ghost" href="#gallery" data-page="gallery">View project gallery</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="asym flip">
+    <div>
+      <div class="rule"></div>
+      <h2>Straight talk, <span class="wood">fair pricing.</span></h2>
+      <p>Call or text and you talk to someone who actually swings a hammer. We measure, we write it down, we show up when we say we will. If a job is not a fit, we tell you that too.</p>
+      <div class="offset-note">
+        <strong>Serving greater Orlando</strong>
+        <p>Based at 5212 Santa Ana Dr, Orlando, FL 32837. We travel to nearby neighborhoods across the metro area.</p>
+      </div>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="tel:+16175130285">Call (617) 513-0285</a>
+      </div>
+    </div>
+    <div class="sketch">
+      <span class="badge">Sample art</span>
+      <svg viewBox="0 0 220 150" aria-hidden="true"><rect x="50" y="30" width="120" height="90" rx="6" fill="none" stroke="#3E2C20" stroke-width="6"/><path d="M50 60 h120 M50 90 h120 M110 30 v90" stroke="#A96F1F" stroke-width="4"/><path d="M140 100 l30 0 M155 85 l0 30" stroke="#3F5A3C" stroke-width="5" stroke-linecap="round"/></svg>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="mast">
+    <span class="eyebrow">What we do</span>
+    <h1>Carpentry <span class="wood">services</span></h1>
+    <p class="sub">Residential carpentry across Orlando. Every job starts with a free on-site estimate.</p>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="ico"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><rect x="4" y="12" width="22" height="6" rx="2" fill="#A96F1F"/><path d="M6 12 l4 -6 h14 l-4 6" fill="#3E2C20"/></svg></div>
+      <h3>Trim and Molding</h3>
+      <p>Interior trim and decorative moldings installed with tight miters and clean caulk lines.</p>
+      <ul><li>Crown molding</li><li>Baseboards</li><li>Door and window casings</li><li>Chair rail and wainscoting</li></ul>
+    </div>
+    <div class="card">
+      <div class="ico"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M5 20 h20 M8 20 v-8 h14 v8 M10 12 v-4 h10 v4" stroke="#A96F1F" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg></div>
+      <h3>Decks and Porches</h3>
+      <p>New builds, repairs, and refreshes for outdoor living spaces that take Florida weather.</p>
+      <ul><li>Deck builds and rebuilds</li><li>Board replacement</li><li>Railings and stairs</li><li>Clean and seal service</li></ul>
+    </div>
+    <div class="card">
+      <div class="ico"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M5 25 V10 M25 25 V10 M5 14 h20 M5 19 h20" stroke="#3E2C20" stroke-width="2.6" stroke-linecap="round"/><circle cx="15" cy="6" r="2.4" fill="#A96F1F"/></svg></div>
+      <h3>Fences</h3>
+      <p>Wood fence installation and repair, plus vinyl and PVC options for low upkeep.</p>
+      <ul><li>Wood fence install</li><li>Fence repair</li><li>Vinyl and PVC fence install</li><li>Gates and hardware</li></ul>
+    </div>
+    <div class="card">
+      <div class="ico"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><rect x="6" y="6" width="18" height="18" rx="2" fill="none" stroke="#3E2C20" stroke-width="2.6"/><path d="M6 13 h18 M13 13 v11" stroke="#A96F1F" stroke-width="2.6"/></svg></div>
+      <h3>Kitchen and Bath Woodwork</h3>
+      <p>Cabinetry, vanities, and built-ins that fit the room, not the other way around.</p>
+      <ul><li>Cabinet installs</li><li>Vanities and shelving</li><li>Custom built-ins</li><li>Remodel carpentry</li></ul>
+    </div>
+    <div class="card">
+      <div class="ico"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M8 22 L20 8 M20 8 l5 -1 l1 5 l-3 3" stroke="#3E2C20" stroke-width="2.6" fill="none" stroke-linecap="round"/><rect x="6" y="20" width="12" height="4" rx="1.5" transform="rotate(-45 12 22)" fill="#A96F1F"/></svg></div>
+      <h3>Repairs</h3>
+      <p>Rotted trim, sagging gates, wobbly rails. Small fixes done properly, before they grow.</p>
+      <ul><li>Rot and damage repair</li><li>Trim touch-ups</li><li>Gate and hardware fixes</li><li>Storm damage carpentry</li></ul>
+    </div>
+    <div class="card">
+      <div class="ico"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><rect x="9" y="4" width="12" height="22" rx="2" fill="none" stroke="#3E2C20" stroke-width="2.6"/><path d="M13 10 h4 M13 15 h4 M13 20 h4" stroke="#A96F1F" stroke-width="2.6" stroke-linecap="round"/></svg></div>
+      <h3>Doors</h3>
+      <p>Interior and exterior door hangs, replacements, and hardware upgrades.</p>
+      <ul><li>Door installation</li><li>Pre-hung and slab hangs</li><li>Hardware and locks</li><li>Threshold and weather seal</li></ul>
+      <span class="sample-tag">Service list is illustrative</span>
+    </div>
+  </div>
+
+  <div class="offset-note">
+    <strong>How estimates work</strong>
+    <p>Call (617) 513-0285, describe the job, and we will schedule a look. Written quote, clear timeline, no surprises.</p>
+  </div>
+</section>
+
+<section class="page" id="page-story">
+  <div class="mast">
+    <span class="eyebrow">Who we are</span>
+    <h1>Our <span class="wood">story</span></h1>
+    <p class="sub">A working carpentry crew in Orlando, Florida.</p>
+  </div>
+
+  <div class="asym">
+    <div class="sketch">
+      <span class="badge">Sample art</span>
+      <svg viewBox="0 0 220 150" aria-hidden="true"><path d="M40 110 h140 M60 110 V60 h100 v50" stroke="#3E2C20" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M60 60 L110 28 L160 60" stroke="#3E2C20" stroke-width="6" fill="none" stroke-linecap="round"/><rect x="98" y="82" width="24" height="28" fill="#A96F1F"/></svg>
+    </div>
+    <div>
+      <div class="rule"></div>
+      <h2>Built on <span class="wood">the basics.</span></h2>
+      <p>TS Carpentry LLC is a working carpentry business based in south Orlando. We grew the way most good trades do: one referral at a time, from kitchens and baths to full trim packages and outdoor builds.</p>
+      <p>Our crew handles the full arc of a job, from the first measurement to the last coat of caulk. The owner is on site, the crew knows the plan, and the customer knows the price before we start.</p>
+    </div>
+  </div>
+
+  <div class="asym flip">
+    <div>
+      <div class="rule"></div>
+      <h2>What <span class="wood">guides</span> the work.</h2>
+      <ul class="checks">
+        <li>Measure twice, cut once, every time</li>
+        <li>Clean job sites at the end of each day</li>
+        <li>Honest timelines, honest pricing</li>
+        <li>Finish work we would sign our name to</li>
+      </ul>
+    </div>
+    <div class="sketch">
+      <span class="badge">Sample art</span>
+      <svg viewBox="0 0 220 150" aria-hidden="true"><circle cx="110" cy="70" r="34" fill="none" stroke="#3E2C20" stroke-width="6"/><path d="M110 70 L110 46 M110 70 L130 78" stroke="#A96F1F" stroke-width="5" stroke-linecap="round"/><path d="M60 120 h100" stroke="#3F5A3C" stroke-width="5" stroke-linecap="round"/></svg>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="mast">
+    <span class="eyebrow">Recent work</span>
+    <h1>Project <span class="wood">gallery</span></h1>
+    <p class="sub">Sample project tiles. The owner can swap these placeholders for real job photos.</p>
+  </div>
+
+  <div class="arches">
+    <div class="arch">
+      <span class="swatch">Sample photo</span>
+      <div class="pic"><svg viewBox="0 0 120 120" aria-hidden="true"><rect x="20" y="30" width="80" height="70" rx="4" fill="none" stroke="#3E2C20" stroke-width="5"/><path d="M20 52 h80 M20 74 h80" stroke="#A96F1F" stroke-width="4"/><path d="M52 30 v70 M68 30 v70" stroke="#A96F1F" stroke-width="4"/></svg></div>
+      <div class="cap"><strong>Crown Molding</strong><span>Living room finish</span></div>
+    </div>
+    <div class="arch">
+      <span class="swatch">Sample photo</span>
+      <div class="pic"><svg viewBox="0 0 120 120" aria-hidden="true"><path d="M20 90 h80 M28 90 V55 h64 v35 M36 55 V40 h48 v15" stroke="#3E2C20" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="60" cy="78" r="10" fill="#A96F1F"/></svg></div>
+      <div class="cap"><strong>Back Deck</strong><span>Rebuild and rails</span></div>
+    </div>
+    <div class="arch">
+      <span class="swatch">Sample photo</span>
+      <div class="pic"><svg viewBox="0 0 120 120" aria-hidden="true"><path d="M30 95 V40 M90 95 V40 M30 55 h60 M30 72 h60" stroke="#3E2C20" stroke-width="5" stroke-linecap="round"/><path d="M30 40 L60 24 L90 40" stroke="#A96F1F" stroke-width="4" fill="none"/></svg></div>
+      <div class="cap"><strong>Wood Fence</strong><span>Full perimeter</span></div>
+    </div>
+    <div class="arch">
+      <span class="swatch">Sample photo</span>
+      <div class="pic"><svg viewBox="0 0 120 120" aria-hidden="true"><rect x="30" y="35" width="60" height="60" rx="3" fill="none" stroke="#3E2C20" stroke-width="5"/><path d="M30 55 h60 M45 35 v60 M75 35 v60" stroke="#A96F1F" stroke-width="4"/><rect x="52" y="62" width="16" height="10" fill="#3F5A3C"/></svg></div>
+      <div class="cap"><strong>Built-In Shelving</strong><span>Home office</span></div>
+    </div>
+    <div class="arch">
+      <span class="swatch">Sample photo</span>
+      <div class="pic"><svg viewBox="0 0 120 120" aria-hidden="true"><rect x="35" y="25" width="50" height="75" rx="4" fill="none" stroke="#3E2C20" stroke-width="5"/><circle cx="78" cy="62" r="4" fill="#A96F1F"/><path d="M25 100 h70" stroke="#A96F1F" stroke-width="4" stroke-linecap="round"/></svg></div>
+      <div class="cap"><strong>Door Hangs</strong><span>Interior refresh</span></div>
+    </div>
+    <div class="arch">
+      <span class="swatch">Sample photo</span>
+      <div class="pic"><svg viewBox="0 0 120 120" aria-hidden="true"><rect x="25" y="60" width="70" height="30" rx="3" fill="none" stroke="#3E2C20" stroke-width="5"/><path d="M25 60 L60 35 L95 60" stroke="#A96F1F" stroke-width="4" fill="none"/><rect x="45" y="72" width="30" height="18" fill="none" stroke="#3F5A3C" stroke-width="4"/></svg></div>
+      <div class="cap"><strong>Kitchen Trim</strong><span>Remodel finish</span></div>
+    </div>
+    <div class="arch">
+      <span class="swatch">Sample photo</span>
+      <div class="pic"><svg viewBox="0 0 120 120" aria-hidden="true"><path d="M25 90 h70 M35 90 V60 M60 90 V50 M85 90 V60 M35 60 h50" stroke="#3E2C20" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M35 60 L60 45 L85 60" stroke="#A96F1F" stroke-width="4" fill="none"/></svg></div>
+      <div class="cap"><strong>Porch Repair</strong><span>Boards and rails</span></div>
+    </div>
+    <div class="arch">
+      <span class="swatch">Sample photo</span>
+      <div class="pic"><svg viewBox="0 0 120 120" aria-hidden="true"><rect x="30" y="45" width="60" height="50" rx="3" fill="none" stroke="#3E2C20" stroke-width="5"/><path d="M30 62 h60 M55 45 v50" stroke="#A96F1F" stroke-width="4"/><circle cx="72" cy="78" r="6" fill="#3F5A3C"/></svg></div>
+      <div class="cap"><strong>Vanity Install</strong><span>Bath update</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="mast">
+    <span class="eyebrow">Word of mouth</span>
+    <h1>Customer <span class="wood">reviews</span></h1>
+    <p class="sub">What neighbors are saying about working with our crew.</p>
+  </div>
+
+  <div class="rev-band">
+    <h2>Based on Google and directory reviews</h2>
+    <p>Based on 6 Google reviews, customers describe the crew as punctual, professional, and easy to talk to. Reviewers on project directories also praise strong bathroom and kitchen remodel work. A couple of reviews on a contractor directory were critical of scheduling and follow-through, so we publish the links below and let you read for yourself.</p>
+    <div class="src-links">
+      <a href="https://www.google.com/maps/place/?q=place_id:ChIJ3WnArF2B3YgRoRGaib2OVbg" target="_blank" rel="noopener">See reviews on Google</a>
+      <a class="plain" href="https://www.bbb.org/us/fl/orlando/profile/carpenter/ts-carpentry-llc-0733-235958178/customer-reviews" target="_blank" rel="noopener">BBB profile</a>
+    </div>
+  </div>
+
+  <div class="rev-grid">
+    <div class="rev">
+      <div class="stars">★★★★★</div>
+      <p>Reviewers say the crew is professional, on time, and great to talk with about the project. They made customers feel confident having the team in their home.</p>
+      <div class="meta">Theme from customer reviews · sample card</div>
+    </div>
+    <div class="rev">
+      <div class="stars">★★★★★</div>
+      <p>Customers describe fantastic kitchen and bathroom remodel work, saying they could not be happier with the finished result.</p>
+      <div class="meta">Theme from customer reviews · sample card</div>
+    </div>
+    <div class="rev">
+      <div class="stars">★★★★★</div>
+      <p>Reviewers call the work punctual and affordable, and say they would definitely hire the crew for other projects.</p>
+      <div class="meta">Theme from customer reviews · sample card</div>
+    </div>
+    <div class="rev">
+      <div class="stars">★★★★★</div>
+      <p>A few directory reviews were critical of job completion and communication on larger projects. We link every source above so you can read the full picture.</p>
+      <div class="meta">Full picture from directory reviews · sample card</div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="mast">
+    <span class="eyebrow">Get in touch</span>
+    <h1>Visit or <span class="wood">call</span></h1>
+    <p class="sub">Call for hours and free estimates. We answer during business hours.</p>
+  </div>
+
+  <div class="visit-grid">
+    <div class="vcard">
+      <h3>Contact</h3>
+      <p><a class="big" href="tel:+16175130285">(617) 513-0285</a></p>
+      <p style="margin-top:12px;color:var(--ink-soft)">TS Carpentry LLC, 5212 Santa Ana Dr, Orlando, FL 32837</p>
+      <div class="cta-row" style="margin-top:16px">
+        <a class="btn btn-solid" href="tel:+16175130285">Call now</a>
+        <a class="btn btn-ghost" href="https://www.google.com/maps/place/?q=place_id:ChIJ3WnArF2B3YgRoRGaib2OVbg" target="_blank" rel="noopener">Get directions</a>
+      </div>
+    </div>
+    <div class="vcard">
+      <h3>Hours</h3>
+      <table class="hours-table" id="hoursTable">
+        <tr><td>Monday</td><td>7:00 AM - 5:00 PM</td></tr>
+        <tr><td>Tuesday</td><td>7:00 AM - 5:00 PM</td></tr>
+        <tr><td>Wednesday</td><td>7:00 AM - 5:00 PM</td></tr>
+        <tr><td>Thursday</td><td>7:00 AM - 5:00 PM</td></tr>
+        <tr><td>Friday</td><td>7:00 AM - 5:00 PM</td></tr>
+        <tr><td>Saturday</td><td>8:00 AM - 4:00 PM</td></tr>
+        <tr><td>Sunday</td><td>Closed</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-cols">
+      <div>
+        <h4>TS Carpentry LLC</h4>
+        <p>Finish carpentry, decks, fences, and remodels across greater Orlando, Florida. Measure twice, cut once.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="#home" data-page="home">Home</a></li>
+          <li><a href="#services" data-page="services">Services</a></li>
+          <li><a href="#story" data-page="story">Our Story</a></li>
+          <li><a href="#gallery" data-page="gallery">Gallery</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Services</h4>
+        <ul>
+          <li><a href="#services" data-page="services">Trim and Molding</a></li>
+          <li><a href="#services" data-page="services">Decks and Porches</a></li>
+          <li><a href="#services" data-page="services">Fences</a></li>
+          <li><a href="#services" data-page="services">Kitchen and Bath</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <p><a href="tel:+16175130285">(617) 513-0285</a></p>
+        <p style="margin-top:6px">5212 Santa Ana Dr<br>Orlando, FL 32837</p>
+        <p style="margin-top:6px"><a href="#reviews" data-page="reviews">Reviews</a> · <a href="#visit" data-page="visit">Visit</a></p>
+      </div>
+    </div>
+    <div class="copy">© TS Carpentry LLC</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var PAGES = ["home","services","story","gallery","reviews","visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("navBurger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+
+  /* ---------- live hours (America/New_York) ---------- */
+  var HOURS = {0:null,1:[7,17],2:[7,17],3:[7,17],4:[7,17],5:[7,17],6:[8,16]};
+  var DOW = {"Sun":0,"Mon":1,"Tue":2,"Wed":3,"Thu":4,"Fri":5,"Sat":6};
+  function fmt(h){
+    var ap = h < 12 ? "AM" : "PM";
+    var hh = h % 12;
+    if(hh === 0){ hh = 12; }
+    return hh + ":00 " + ap;
+  }
+  try{
+    var parts = new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",weekday:"short",hour:"numeric",hour12:false}).formatToParts(new Date());
+    var wd = "Mon", hr = 12;
+    parts.forEach(function(p){
+      if(p.type === "weekday"){ wd = p.value; }
+      if(p.type === "hour"){ hr = parseInt(p.value, 10) % 24; }
+    });
+    var day = DOW[wd] !== undefined ? DOW[wd] : 1;
+    var pill = document.getElementById("hoursPill");
+    var txt = document.getElementById("hoursText");
+    var sched = HOURS[day];
+    if(pill && txt){
+      if(sched && hr >= sched[0] && hr < sched[1]){
+        txt.textContent = "Open now · until " + fmt(sched[1]) + " today";
+      }else{
+        pill.classList.add("closed");
+        if(sched && hr < sched[0]){
+          txt.textContent = "Opens today at " + fmt(sched[0]);
+        }else{
+          var nd = (day + 1) % 7, hops = 1;
+          while(!HOURS[nd] && hops < 8){ nd = (nd + 1) % 7; hops++; }
+          var dayName = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][nd];
+          txt.textContent = "Opens " + (hops === 1 ? "tomorrow" : dayName) + " at " + fmt(HOURS[nd][0]);
+        }
+      }
+    }
+    var rows = document.querySelectorAll("#hoursTable tr");
+    var idx = (day + 6) % 7;
+    if(rows[idx]){ rows[idx].classList.add("today"); }
+  }catch(e){ /* leave default pill text */ }
+
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

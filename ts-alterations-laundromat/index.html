@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>T's Alterations &amp; Laundromat · Wash, Dry and Tailor in North Haven, CT</title>
+<meta name="description" content="T's Alterations &amp; Laundromat at 127 Middletown Ave, North Haven, CT. Coin op self serve laundry, expert alterations by Theresa, and professional linen service with pickup and drop off. Open daily 7 AM to 10 PM. Call (203) 752-1960.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Work+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --teal:#0F6B62; --teal-deep:#0A4F47; --teal-ink:#08352F;
+  --aqua:#8FD8C8; --aqua-soft:#DFF3ED;
+  --cream:#FBF7EE; --paper:#FFFEFA;
+  --coral:#E4694E; --coral-soft:#FADFD4;
+  --sun:#F4B942; --sun-soft:#FBE8BE;
+  --ink:#22312F; --ink-soft:#5B6F6B;
+  --radius:16px;
+  --shadow:0 18px 42px -18px rgba(8,53,47,.28);
+  --shadow-sm:0 8px 22px -10px rgba(8,53,47,.22);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Work Sans",system-ui,sans-serif;
+  background:var(--cream);color:var(--ink);line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--teal)}
+::selection{background:var(--sun);color:var(--ink)}
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+.serif{font-family:"DM Serif Display",serif;font-weight:400}
+.badge{
+  display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  background:var(--sun-soft);color:#7A5410;border:1px solid #E8C87E;border-radius:999px;padding:4px 12px;
+}
+
+/* ---------- header + side drawer ---------- */
+header.site{
+  position:sticky;top:0;z-index:60;
+  background:var(--teal-ink);color:var(--cream);
+  box-shadow:0 6px 22px -10px rgba(8,53,47,.5);
+}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--cream)}
+.brand svg{width:46px;height:46px;flex:none}
+.brand-name{font-family:"DM Serif Display",serif;font-size:1.3rem;line-height:1.05}
+.brand-name small{display:block;font-family:"Work Sans",sans-serif;font-weight:700;font-size:.6rem;letter-spacing:3.2px;text-transform:uppercase;color:var(--aqua)}
+.burger{display:inline-flex;align-items:center;gap:10px;background:var(--teal);border:0;cursor:pointer;color:#fff;font-weight:700;font-size:.95rem;padding:11px 18px;border-radius:999px;transition:background .2s}
+.burger:hover{background:var(--teal-deep)}
+.burger .bars{display:block}
+.burger .bars span{display:block;width:22px;height:3px;border-radius:3px;background:#fff;margin:4px 0}
+.call-pill{
+  display:inline-flex;align-items:center;gap:8px;background:var(--coral);color:#fff;text-decoration:none;
+  font-weight:700;padding:11px 20px;border-radius:999px;box-shadow:var(--shadow-sm);transition:transform .18s,background .18s;white-space:nowrap;
+}
+.call-pill:hover{background:#C75234;transform:translateY(-2px)}
+.scrim{position:fixed;inset:0;background:rgba(8,53,47,.55);opacity:0;pointer-events:none;transition:opacity .3s;z-index:70}
+.scrim.show{opacity:1;pointer-events:auto}
+nav.drawer{
+  position:fixed;top:0;left:0;bottom:0;width:min(340px,88vw);z-index:80;
+  background:var(--paper);transform:translateX(-105%);transition:transform .32s cubic-bezier(.2,.8,.25,1);
+  display:flex;flex-direction:column;padding:22px;box-shadow:var(--shadow);
+}
+nav.drawer.open{transform:translateX(0)}
+.drawer-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.drawer-top .brand-name{color:var(--teal-ink)}
+.close-x{background:var(--aqua-soft);border:0;width:42px;height:42px;border-radius:50%;font-size:1.2rem;cursor:pointer;color:var(--teal-ink)}
+nav.drawer a.dlink{
+  display:flex;align-items:center;gap:14px;text-decoration:none;color:var(--ink);
+  font-weight:700;font-size:1.05rem;padding:14px 12px;border-radius:12px;transition:background .18s;
+}
+nav.drawer a.dlink:hover{background:var(--aqua-soft)}
+nav.drawer a.dlink .ico{width:38px;height:38px;flex:none;border-radius:12px;background:var(--aqua-soft);display:flex;align-items:center;justify-content:center;font-size:1.15rem}
+nav.drawer a.dlink.active{background:var(--teal-ink);color:#fff}
+.drawer-call{margin-top:auto}
+.drawer-call .call-pill{width:100%;justify-content:center;padding:15px}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- full bleed hero ---------- */
+.hero-full{
+  position:relative;overflow:hidden;color:#fff;
+  background:linear-gradient(160deg,var(--teal-deep) 0%,var(--teal) 55%,#12807A 100%);
+}
+.hero-full::before{
+  content:"";position:absolute;inset:0;
+  background-image:radial-gradient(rgba(255,255,255,.14) 1.5px, transparent 1.6px);
+  background-size:30px 30px;
+}
+.hero-inner{position:relative;padding:96px 0 110px;display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.kicker{
+  display:inline-block;font-weight:800;font-size:.78rem;letter-spacing:2.5px;text-transform:uppercase;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.35);
+  padding:7px 18px;border-radius:999px;margin-bottom:20px;color:#fff;
+}
+.hero-full h1{font-family:"DM Serif Display",serif;font-weight:400;font-size:clamp(2.7rem,5.6vw,4.5rem);line-height:1.04;margin-bottom:18px}
+.hero-full h1 em{font-style:italic;color:var(--sun)}
+.lede{font-size:1.12rem;color:#EAF6F2;max-width:32rem;margin-bottom:28px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:26px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;
+  padding:14px 26px;border-radius:999px;font-size:1rem;transition:transform .18s,box-shadow .18s,background .18s;
+}
+.btn-solid{background:var(--sun);color:#3B2A08;box-shadow:var(--shadow-sm)}
+.btn-solid:hover{background:#E6A72F;transform:translateY(-2px)}
+.btn-outline{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.6)}
+.btn-outline:hover{border-color:#fff;background:rgba(255,255,255,.1);transform:translateY(-2px)}
+.hours-strip{display:flex;flex-wrap:wrap;gap:10px}
+.hours-strip span{background:rgba(8,53,47,.55);border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:8px 16px;font-size:.92rem;font-weight:600}
+.hero-art{position:relative;display:flex;justify-content:center}
+.washer-card{
+  width:min(380px,90%);background:var(--paper);border-radius:26px;padding:30px;color:var(--ink);
+  box-shadow:var(--shadow);transform:rotate(2.5deg);
+}
+.washer-card svg{width:100%;height:auto;display:block}
+.stamp{
+  position:absolute;bottom:-18px;left:8px;background:var(--coral);color:#fff;font-weight:800;
+  padding:12px 22px;border-radius:999px;box-shadow:var(--shadow-sm);transform:rotate(-4deg);font-size:.95rem;
+}
+.wave{display:block;width:100%;height:70px;margin-top:-2px}
+
+/* ---------- sections ---------- */
+.section{padding:72px 0}
+.section.alt{background:var(--paper)}
+.sec-head{max-width:44rem;margin-bottom:36px}
+.sec-head h2{font-family:"DM Serif Display",serif;font-weight:400;font-size:clamp(1.9rem,3.6vw,2.7rem);line-height:1.1;margin-bottom:12px;color:var(--teal-ink)}
+.sec-head p{color:var(--ink-soft);font-size:1.06rem}
+
+/* card wall rhythm */
+.card-wall{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.card{
+  background:var(--paper);border-radius:var(--radius);padding:30px 26px;box-shadow:var(--shadow-sm);
+  border-top:5px solid var(--aqua);transition:transform .2s;
+}
+.card:hover{transform:translateY(-5px)}
+.card .glyph{font-size:2.2rem;margin-bottom:12px}
+.card h3{font-size:1.18rem;margin-bottom:8px;color:var(--teal-ink)}
+.card p{color:var(--ink-soft);font-size:.98rem;margin-bottom:14px}
+.card a.more{font-weight:700;text-decoration:none}
+.card.c1{border-top-color:var(--teal)}
+.card.c2{border-top-color:var(--coral)}
+.card.c3{border-top-color:var(--sun)}
+
+/* trust band */
+.trust{background:var(--teal-ink);color:#fff;border-radius:24px;padding:34px 40px;display:flex;flex-wrap:wrap;gap:26px;align-items:center;justify-content:space-between;margin-top:48px}
+.trust .stars{font-size:1.6rem;letter-spacing:4px;color:var(--sun)}
+.trust strong{font-size:1.15rem}
+.trust p{color:#CFE4DE;font-size:.95rem}
+
+/* leaders offerings */
+.leaders-group{margin-bottom:44px}
+.leaders-group h3{font-family:"DM Serif Display",serif;font-weight:400;font-size:1.6rem;color:var(--teal-ink);margin-bottom:6px}
+.leaders-group .group-note{color:var(--ink-soft);margin-bottom:18px;font-size:.98rem}
+.leader{
+  display:flex;align-items:baseline;gap:12px;padding:16px 4px;border-bottom:1px dashed #C9D8D4;
+}
+.leader .lname{font-weight:700;font-size:1.06rem;color:var(--ink)}
+.leader .dots{flex:1;border-bottom:3px dotted #B9CFCB;transform:translateY(-5px);min-width:30px}
+.leader .lval{font-weight:700;color:var(--teal);white-space:nowrap}
+.leader .ldesc{font-size:.92rem;color:var(--ink-soft);flex-basis:100%;margin-top:4px}
+.leader-wrap{display:flex;flex-wrap:wrap}
+.price-flag{font-size:.85rem;color:#7A5410;background:var(--sun-soft);border-radius:8px;padding:2px 10px;font-weight:700}
+.svc-cta{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-top:30px;background:var(--aqua-soft);border-radius:var(--radius);padding:28px}
+.svc-cta p{flex:1;min-width:220px;font-weight:600;color:var(--teal-ink)}
+
+/* story */
+.story-grid{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center}
+.thread-card{background:var(--paper);border-radius:24px;padding:44px;box-shadow:var(--shadow);border:2px solid var(--aqua-soft)}
+.thread-card svg{width:100%;height:auto;display:block}
+.quote{background:var(--coral-soft);border-left:6px solid var(--coral);border-radius:0 16px 16px 0;padding:22px 26px;margin:24px 0;font-size:1.05rem;color:#6B3A2C;font-style:italic}
+.fact-row{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:34px}
+.fact{background:var(--aqua-soft);border-radius:14px;padding:20px;text-align:center}
+.fact b{display:block;font-size:1.5rem;color:var(--teal-ink)}
+.fact span{font-size:.9rem;color:var(--ink-soft)}
+
+/* carousel gallery */
+.carousel{position:relative;max-width:860px;margin:0 auto}
+.car-view{overflow:hidden;border-radius:22px;box-shadow:var(--shadow)}
+.car-track{display:flex;transition:transform .45s ease}
+.slide{position:relative;flex:0 0 100%;min-height:420px;display:flex;align-items:center;justify-content:center;background:linear-gradient(140deg,var(--aqua-soft),#fff)}
+.slide svg{width:min(420px,80%);height:auto}
+.slide .tag{
+  position:absolute;top:16px;left:16px;
+}
+.slide .caption{
+  position:absolute;bottom:0;left:0;right:0;padding:34px 26px 20px;color:#fff;
+  background:linear-gradient(transparent,rgba(8,53,47,.85));font-weight:700;font-size:1.05rem;
+}
+.car-btn{
+  position:absolute;top:50%;transform:translateY(-50%);z-index:5;
+  width:52px;height:52px;border-radius:50%;border:0;cursor:pointer;
+  background:var(--teal-ink);color:#fff;font-size:1.4rem;box-shadow:var(--shadow-sm);transition:background .2s;
+}
+.car-btn:hover{background:var(--teal)}
+.car-prev{left:-20px}
+.car-next{right:-20px}
+.car-dots{display:flex;gap:10px;justify-content:center;margin-top:20px}
+.car-dots button{width:12px;height:12px;border-radius:50%;border:0;background:#BFD6D1;cursor:pointer;transition:background .2s}
+.car-dots button.on{background:var(--teal)}
+.gal-note{text-align:center;color:var(--ink-soft);margin-top:18px;font-size:.95rem}
+
+/* reviews */
+.rev-summary{background:var(--teal-ink);color:#fff;border-radius:22px;padding:38px;display:grid;grid-template-columns:auto 1fr auto;gap:32px;align-items:center;margin-bottom:34px}
+.rev-score{font-family:"DM Serif Display",serif;font-size:4rem;line-height:1}
+.rev-summary .stars{font-size:1.4rem;letter-spacing:5px;color:var(--sun)}
+.rev-summary p{color:#CFE4DE}
+.rev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.rev-card{background:var(--paper);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow-sm)}
+.rev-card .stars{color:#D99A26;letter-spacing:3px;margin-bottom:10px}
+.rev-card p{color:var(--ink-soft);font-size:.98rem;margin-bottom:12px}
+.rev-card .who{font-weight:700;font-size:.92rem}
+.google-link{display:inline-flex;align-items:center;gap:10px;margin-top:26px;background:#fff;border:2px solid var(--teal);color:var(--teal);font-weight:700;text-decoration:none;padding:13px 26px;border-radius:999px;transition:background .2s}
+.google-link:hover{background:var(--aqua-soft)}
+
+/* visit */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:start}
+.visit-card{background:var(--paper);border-radius:var(--radius);padding:34px;box-shadow:var(--shadow-sm)}
+.visit-card h3{font-family:"DM Serif Display",serif;font-weight:400;font-size:1.45rem;color:var(--teal-ink);margin-bottom:14px}
+.addr{font-size:1.08rem;font-weight:600;margin-bottom:8px}
+.hours-table{width:100%;border-collapse:collapse;margin-top:8px}
+.hours-table td{padding:10px 6px;border-bottom:1px dashed #C9D8D4;font-size:.98rem}
+.hours-table td:last-child{text-align:right;font-weight:700;color:var(--teal-ink)}
+.big-actions{display:grid;gap:14px;margin-top:24px}
+.big-actions a{display:flex;align-items:center;justify-content:center;gap:10px}
+
+/* footer minimal */
+footer{background:var(--teal-ink);color:#CFE4DE;padding:44px 0 30px;text-align:center}
+footer .flinks{display:flex;flex-wrap:wrap;gap:6px 22px;justify-content:center;margin-bottom:18px}
+footer .flinks a{color:#fff;text-decoration:none;font-weight:600;font-size:.95rem}
+footer .flinks a:hover{text-decoration:underline}
+footer .fline{font-size:.92rem}
+footer .fline a{color:#fff}
+.foot-copy{margin-top:14px;font-size:.95rem;color:#fff}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .5s ease,transform .5s ease}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:900px){
+  .hero-inner{grid-template-columns:1fr;padding:64px 0 80px}
+  .story-grid{grid-template-columns:1fr}
+  .visit-grid{grid-template-columns:1fr}
+  .card-wall{grid-template-columns:1fr 1fr}
+  .rev-grid{grid-template-columns:1fr 1fr}
+  .rev-summary{grid-template-columns:1fr;text-align:center}
+  .rev-summary .stars{margin:0 auto}
+  .car-prev{left:8px}
+  .car-next{right:8px}
+}
+@media(max-width:600px){
+  .card-wall{grid-template-columns:1fr}
+  .rev-grid{grid-template-columns:1fr}
+  .fact-row{grid-template-columns:1fr 1fr}
+  .call-pill .ctext{display:none}
+}
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="wrap bar">
+    <a class="brand" href="#home" data-page="home" aria-label="T's Alterations and Laundromat, home">
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <circle cx="24" cy="24" r="22" fill="#F4B942"/>
+        <circle cx="24" cy="24" r="17" fill="#FFFEFA"/>
+        <rect x="18" y="12" width="12" height="18" rx="2" fill="#E4694E"/>
+        <rect x="20" y="9" width="8" height="4" rx="1.5" fill="#0F6B62"/>
+        <path d="M21 12 C 26 16, 22 22, 27 27" stroke="#FFFEFA" stroke-width="1.6" fill="none"/>
+        <circle cx="24" cy="36" r="5" fill="none" stroke="#0F6B62" stroke-width="2.4"/>
+      </svg>
+      <span class="brand-name">T's Alterations<small>&amp; Laundromat</small></span>
+    </a>
+    <div style="display:flex;gap:12px;align-items:center">
+      <a class="call-pill" href="tel:+12037521960"><span aria-hidden="true">☎</span><span class="ctext">(203) 752-1960</span><span class="ctext" style="display:none">Call</span></a>
+      <button class="burger" id="burger" aria-expanded="false" aria-controls="mainNav" aria-label="Open site menu">
+        <span class="bars"><span></span><span></span><span></span></span> Menu
+      </button>
+    </div>
+  </div>
+</header>
+<div class="scrim" id="scrim"></div>
+<nav class="drawer" id="mainNav" aria-label="Site menu">
+  <div class="drawer-top">
+    <span class="brand-name serif">T's Alterations<small>&amp; Laundromat</small></span>
+    <button class="close-x" id="closeX" aria-label="Close site menu">✕</button>
+  </div>
+  <a class="dlink active" href="#home" data-page="home" aria-current="page"><span class="ico" aria-hidden="true">◈</span>Home</a>
+  <a class="dlink" href="#services" data-page="services"><span class="ico" aria-hidden="true">✂</span>Services</a>
+  <a class="dlink" href="#story" data-page="story"><span class="ico" aria-hidden="true">♥</span>Our Story</a>
+  <a class="dlink" href="#gallery" data-page="gallery"><span class="ico" aria-hidden="true">▦</span>Gallery</a>
+  <a class="dlink" href="#reviews" data-page="reviews"><span class="ico" aria-hidden="true">★</span>Reviews</a>
+  <a class="dlink" href="#visit" data-page="visit"><span class="ico" aria-hidden="true">◎</span>Visit Us</a>
+  <div class="drawer-call">
+    <a class="call-pill" href="tel:+12037521960"><span aria-hidden="true">☎</span> Call (203) 752-1960</a>
+  </div>
+</nav>
+
+<main>
+<section class="page" id="page-home">
+  <div class="hero-full">
+    <div class="wrap hero-inner">
+      <div>
+        <span class="kicker">North Haven, Connecticut</span>
+        <h1>Wash it fresh. <em>Wear it perfect.</em></h1>
+        <p class="lede">One friendly neighborhood shop for sparkling clean laundry and alterations done right. Self serve machines, expert tailoring by Theresa, and linen service with pickup and drop off.</p>
+        <div class="cta-row">
+          <a class="btn btn-solid" href="#services" data-page="services">See services →</a>
+          <a class="btn btn-outline" href="#visit" data-page="visit">Visit us</a>
+        </div>
+        <div class="hours-strip">
+          <span>◷ Open daily 7 AM to 10 PM</span>
+          <span>✂ Alterations by appointment</span>
+        </div>
+      </div>
+      <div class="hero-art">
+        <div class="washer-card" role="img" aria-label="Illustration of a front load washing machine with suds">
+          <svg viewBox="0 0 340 300">
+            <rect x="70" y="30" width="200" height="240" rx="22" fill="#0F6B62"/>
+            <rect x="70" y="30" width="200" height="240" rx="22" fill="none" stroke="#08352F" stroke-width="4"/>
+            <rect x="92" y="48" width="156" height="26" rx="13" fill="#08352F"/>
+            <circle cx="112" cy="61" r="7" fill="#F4B942"/>
+            <circle cx="134" cy="61" r="7" fill="#8FD8C8"/>
+            <circle cx="170" cy="166" r="66" fill="#08352F"/>
+            <circle cx="170" cy="166" r="52" fill="#DFF3ED"/>
+            <circle cx="170" cy="166" r="52" fill="none" stroke="#8FD8C8" stroke-width="5"/>
+            <g fill="#8FD8C8" opacity=".85">
+              <circle cx="150" cy="150" r="10"/><circle cx="186" cy="142" r="13"/><circle cx="192" cy="182" r="9"/>
+              <circle cx="152" cy="190" r="12"/><circle cx="170" cy="168" r="8"/>
+            </g>
+            <g fill="#fff" opacity=".9">
+              <circle cx="142" cy="140" r="5"/><circle cx="190" cy="160" r="6"/><circle cx="162" cy="186" r="5"/>
+            </g>
+            <path d="M52 120 q14 -10 28 0 q14 10 28 0" stroke="#E4694E" stroke-width="5" fill="none" stroke-linecap="round"/>
+            <circle cx="52" cy="120" r="6" fill="#E4694E"/>
+            <path d="M288 190 q-14 -10 -28 0 q-14 10 -28 0" stroke="#F4B942" stroke-width="5" fill="none" stroke-linecap="round"/>
+            <circle cx="288" cy="190" r="6" fill="#F4B942"/>
+            <rect x="120" y="252" width="100" height="10" rx="5" fill="#08352F" opacity=".5"/>
+          </svg>
+        </div>
+        <span class="stamp">★ 5.0 on Google</span>
+      </div>
+    </div>
+    <svg class="wave" viewBox="0 0 1440 70" preserveAspectRatio="none" aria-hidden="true"><path d="M0,40 C240,80 480,0 720,30 C960,60 1200,10 1440,45 L1440,70 L0,70 Z" fill="#FBF7EE"/></svg>
+  </div>
+
+  <div class="section">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <h2>Two shops in one, both done with care</h2>
+        <p>Bring the laundry basket and the too long pants. T's handles the wash and the stitching under one roof, so you make one stop instead of two.</p>
+      </div>
+      <div class="card-wall">
+        <div class="card c1 reveal">
+          <div class="glyph" aria-hidden="true">◍</div>
+          <h3>Coin Op Laundry</h3>
+          <p>Bright, clean machines for everyday loads, bulky bedding, and everything in between. A calm place to get the wash done right.</p>
+          <a class="more" href="#services" data-page="services">Laundry services →</a>
+        </div>
+        <div class="card c2 reveal">
+          <div class="glyph" aria-hidden="true">✂</div>
+          <h3>Expert Alterations</h3>
+          <p>Hems, zippers, tailoring, and formal wear by Theresa, the seamstress customers call the best around. Careful measurements, every time.</p>
+          <a class="more" href="#services" data-page="services">Alteration services →</a>
+        </div>
+        <div class="card c3 reveal">
+          <div class="glyph" aria-hidden="true">❖</div>
+          <h3>Linen Service</h3>
+          <p>Professional linen service for local businesses, with pickup and drop off available. Crisp, fresh, and on schedule.</p>
+          <a class="more" href="#visit" data-page="visit">Get in touch →</a>
+        </div>
+      </div>
+      <div class="trust reveal">
+        <div>
+          <div class="stars" aria-hidden="true">★★★★★</div>
+          <strong>5.0 stars on Google</strong>
+          <p>Customers praise the spotless shop, the fair prices, and Theresa's kind, careful alteration work.</p>
+        </div>
+        <a class="btn btn-solid" href="#reviews" data-page="reviews">Read reviews →</a>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="page" id="page-services">
+  <div class="section">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Services and prices</h2>
+        <p>Everything below is offered right here at 127 Middletown Ave. Prices marked <span class="price-flag">sample</span> are typical starting points. Call for an exact quote.</p>
+      </div>
+
+      <div class="leaders-group">
+        <h3>Laundry</h3>
+        <p class="group-note">Self serve, with big machines for comforters and work gear.</p>
+        <div class="leader"><div class="leader-wrap" style="flex:1"><span class="lname">Top load washers</span><div class="ldesc">Everyday loads, quick cycles</div></div><span class="dots"></span><span class="lval"><span class="price-flag">sample</span> from $3.50</span></div>
+        <div class="leader"><div class="leader-wrap" style="flex:1"><span class="lname">Large capacity washers</span><div class="ldesc">Comforters, blankets, sleeping bags</div></div><span class="dots"></span><span class="lval"><span class="price-flag">sample</span> from $6.00</span></div>
+        <div class="leader"><div class="leader-wrap" style="flex:1"><span class="lname">Dryers</span><div class="ldesc">High heat and delicates settings</div></div><span class="dots"></span><span class="lval"><span class="price-flag">sample</span> $0.25 / 6 min</span></div>
+        <div class="leader"><div class="leader-wrap" style="flex:1"><span class="lname">Soap and supplies</span><div class="ldesc">Detergent, softener, and dryer sheets on site</div></div><span class="dots"></span><span class="lval">On site</span></div>
+      </div>
+
+      <div class="leaders-group">
+        <h3>Alterations by Theresa</h3>
+        <p class="group-note">Measured carefully, sewn to last. Drop off during shop hours.</p>
+        <div class="leader"><div class="leader-wrap" style="flex:1"><span class="lname">Pants and skirt hems</span><div class="ldesc">Original hem kept on jeans when possible</div></div><span class="dots"></span><span class="lval"><span class="price-flag">sample</span> from $12</span></div>
+        <div class="leader"><div class="leader-wrap" style="flex:1"><span class="lname">Zipper replacement</span><div class="ldesc">Jackets, pants, and dresses</div></div><span class="dots"></span><span class="lval"><span class="price-flag">sample</span> from $18</span></div>
+        <div class="leader"><div class="leader-wrap" style="flex:1"><span class="lname">Take in or let out</span><div class="ldesc">Waists, sides, and sleeves</div></div><span class="dots"></span><span class="lval"><span class="price-flag">sample</span> from $15</span></div>
+        <div class="leader"><div class="leader-wrap" style="flex:1"><span class="lname">Formal and wedding wear</span><div class="ldesc">Bridesmaid dresses, gowns, and suits</div></div><span class="dots"></span><span class="lval">Quote in shop</span></div>
+        <div class="leader"><div class="leader-wrap" style="flex:1"><span class="lname">Patches and repairs</span><div class="ldesc">Tears, seams, and buttons</div></div><span class="dots"></span><span class="lval"><span class="price-flag">sample</span> from $8</span></div>
+      </div>
+
+      <div class="leaders-group">
+        <h3>Professional linen service</h3>
+        <p class="group-note">For restaurants, offices, rentals, and events.</p>
+        <div class="leader"><div class="leader-wrap" style="flex:1"><span class="lname">Table and kitchen linens</span><div class="ldesc">Washed, pressed, and folded</div></div><span class="dots"></span><span class="lval">Call for quote</span></div>
+        <div class="leader"><div class="leader-wrap" style="flex:1"><span class="lname">Pickup and drop off</span><div class="ldesc">Scheduled routes around North Haven</div></div><span class="dots"></span><span class="lval">Included</span></div>
+      </div>
+
+      <div class="svc-cta">
+        <p>Have a rush job or a tricky zipper? Call ahead and Theresa will tell you honestly what it needs and when it will be ready.</p>
+        <a class="btn btn-solid" href="tel:+12037521960">☎ Call (203) 752-1960</a>
+        <a class="btn btn-outline" style="color:var(--teal-ink);border-color:var(--teal)" href="#visit" data-page="visit">Plan a visit →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-story">
+  <div class="section">
+    <div class="wrap">
+      <div class="story-grid">
+        <div>
+          <div class="sec-head" style="margin-bottom:20px">
+            <h2>Meet Theresa</h2>
+            <p>The needle behind T's</p>
+          </div>
+          <p>T's Alterations &amp; Laundromat started with a simple idea: one shop where North Haven can get laundry done in a place that feels clean and calm, and get clothes fitted by someone who truly cares about the result.</p>
+          <p style="margin-top:14px">Theresa, the owner and seamstress, takes her time with every fitting. Customers notice. They talk about how she double checks measurements, explains the options, and treats every garment, from work pants to wedding dresses, like it matters. Because to her, it does.</p>
+          <div class="quote">"Theresa is the best seamstress around. She is such a caring person." <span style="display:block;margin-top:8px;font-size:.85rem;font-style:normal;color:#8A6A5E">Paraphrased from customer reviews</span></div>
+          <p>Pair that care with bright coin op machines, fair prices, and a shop that stays spotless, and you get the kind of neighborhood place people recommend to their friends.</p>
+        </div>
+        <div class="thread-card" role="img" aria-label="Illustration of a spool of thread with a needle and measuring tape">
+          <svg viewBox="0 0 360 320">
+            <ellipse cx="180" cy="286" rx="120" ry="16" fill="#DFF3ED"/>
+            <rect x="140" y="70" width="80" height="170" rx="10" fill="#E4694E"/>
+            <path d="M140 95 C 165 105, 195 105, 220 95 M140 125 C 165 135, 195 135, 220 125 M140 155 C 165 165, 195 165, 220 155 M140 185 C 165 195, 195 195, 220 185 M140 215 C 165 225, 195 225, 220 215" stroke="#FFFEFA" stroke-width="5" fill="none" opacity=".85"/>
+            <rect x="126" y="50" width="108" height="26" rx="8" fill="#0F6B62"/>
+            <rect x="126" y="238" width="108" height="26" rx="8" fill="#0F6B62"/>
+            <path d="M220 110 C 270 130, 290 190, 250 250" stroke="#0F6B62" stroke-width="4" fill="none" stroke-linecap="round"/>
+            <ellipse cx="248" cy="258" rx="10" ry="4" fill="none" stroke="#0F6B62" stroke-width="3.4"/>
+            <path d="M240 252 L 300 150" stroke="#9AA9A6" stroke-width="5" stroke-linecap="round"/>
+            <rect x="60" y="60" width="46" height="180" rx="6" fill="#F4B942" transform="rotate(12 83 150)"/>
+            <g transform="rotate(12 83 150)" stroke="#7A5410" stroke-width="2">
+              <line x1="66" y1="80" x2="100" y2="80"/><line x1="66" y1="100" x2="100" y2="100"/>
+              <line x1="66" y1="120" x2="100" y2="120"/><line x1="66" y1="140" x2="100" y2="140"/>
+              <line x1="66" y1="160" x2="100" y2="160"/><line x1="66" y1="180" x2="100" y2="180"/>
+              <line x1="66" y1="200" x2="100" y2="200"/><line x1="66" y1="220" x2="100" y2="220"/>
+            </g>
+          </svg>
+          <p style="text-align:center;margin-top:16px;color:var(--ink-soft);font-size:.9rem">Illustration: spool, needle, and measuring tape</p>
+        </div>
+      </div>
+      <div class="fact-row">
+        <div class="fact"><b>7 to 10</b><span>Open every day, 7 AM to 10 PM</span></div>
+        <div class="fact"><b>5.0 ★</b><span>Google rating from customers</span></div>
+        <div class="fact"><b>2 in 1</b><span>Laundromat plus alterations</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="page" id="page-gallery">
+  <div class="section alt">
+    <div class="wrap">
+      <div class="sec-head" style="text-align:center;margin-left:auto;margin-right:auto">
+        <h2>A look around the shop</h2>
+        <p>Clean machines, careful stitching, and a shop that stays spotless. Photos below are illustrations until real shop photos are added.</p>
+      </div>
+      <div class="carousel" id="carousel">
+        <button class="car-btn car-prev" id="carPrev" aria-label="Previous photo">‹</button>
+        <div class="car-view">
+          <div class="car-track" id="carTrack">
+            <div class="slide">
+              <span class="badge tag">Sample photo</span>
+              <svg viewBox="0 0 340 300" aria-hidden="true"><rect x="60" y="40" width="220" height="230" rx="20" fill="#0F6B62"/><circle cx="170" cy="165" r="62" fill="#08352F"/><circle cx="170" cy="165" r="48" fill="#DFF3ED"/><g fill="#8FD8C8" opacity=".8"><circle cx="150" cy="150" r="10"/><circle cx="188" cy="146" r="12"/><circle cx="190" cy="184" r="9"/><circle cx="154" cy="188" r="11"/></g></svg>
+              <div class="caption">Row of bright, well kept washers</div>
+            </div>
+            <div class="slide">
+              <span class="badge tag">Sample photo</span>
+              <svg viewBox="0 0 340 300" aria-hidden="true"><rect x="90" y="90" width="160" height="40" rx="10" fill="#E4694E"/><rect x="90" y="140" width="160" height="40" rx="10" fill="#0F6B62"/><rect x="90" y="190" width="160" height="40" rx="10" fill="#F4B942"/><rect x="150" y="60" width="40" height="190" rx="8" fill="#08352F" opacity=".25"/></svg>
+              <div class="caption">Fresh folded laundry, ready to go</div>
+            </div>
+            <div class="slide">
+              <span class="badge tag">Sample photo</span>
+              <svg viewBox="0 0 340 300" aria-hidden="true"><path d="M60 230 L280 230" stroke="#08352F" stroke-width="8" stroke-linecap="round"/><path d="M80 230 L80 120 M140 230 L140 100 M200 230 L200 120 M260 230 L260 110" stroke="#0F6B62" stroke-width="6" stroke-linecap="round"/><circle cx="80" cy="105" r="14" fill="#E4694E"/><circle cx="140" cy="85" r="14" fill="#F4B942"/><circle cx="200" cy="105" r="14" fill="#8FD8C8"/><circle cx="260" cy="95" r="14" fill="#0F6B62"/></svg>
+              <div class="caption">Garments pressed and waiting on the rack</div>
+            </div>
+            <div class="slide">
+              <span class="badge tag">Sample photo</span>
+              <svg viewBox="0 0 340 300" aria-hidden="true"><rect x="120" y="80" width="100" height="150" rx="8" fill="#8FD8C8"/><path d="M120 105 C 150 115, 190 115, 220 105 M120 135 C 150 145, 190 145, 220 135 M120 165 C 150 175, 190 175, 220 165" stroke="#FFFEFA" stroke-width="6" fill="none"/><rect x="108" y="60" width="124" height="26" rx="8" fill="#0F6B62"/><rect x="108" y="228" width="124" height="26" rx="8" fill="#0F6B62"/><ellipse cx="250" cy="240" rx="34" ry="10" fill="none" stroke="#0F6B62" stroke-width="5"/></svg>
+              <div class="caption">Theresa's thread and tools at the sewing station</div>
+            </div>
+            <div class="slide">
+              <span class="badge tag">Sample photo</span>
+              <svg viewBox="0 0 340 300" aria-hidden="true"><rect x="70" y="120" width="200" height="120" rx="14" fill="#0F6B62"/><rect x="70" y="120" width="200" height="44" rx="14" fill="#08352F"/><circle cx="110" cy="142" r="9" fill="#F4B942"/><rect x="140" y="134" width="110" height="16" rx="8" fill="#8FD8C8" opacity=".6"/><rect x="90" y="180" width="160" height="40" rx="10" fill="#DFF3ED"/><path d="M100 200 h140" stroke="#0F6B62" stroke-width="4" stroke-dasharray="8 8"/></svg>
+              <div class="caption">The linen counter, ready for pickup routes</div>
+            </div>
+          </div>
+        </div>
+        <button class="car-btn car-next" id="carNext" aria-label="Next photo">›</button>
+        <div class="car-dots" id="carDots" role="tablist" aria-label="Choose photo"></div>
+      </div>
+      <p class="gal-note">Own this shop? Send real photos and we will swap them in, no more sample badges.</p>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="section">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>What neighbors say</h2>
+        <p>Based on Google reviews for T's Alterations &amp; Laundromat. The cards below are paraphrased samples; the full reviews live on Google.</p>
+      </div>
+      <div class="rev-summary">
+        <div class="rev-score">5.0</div>
+        <div>
+          <div class="stars" aria-hidden="true">★★★★★</div>
+          <p style="margin-top:8px"><strong style="color:#fff">Perfect rating on Google.</strong> Reviewers keep coming back to three things: the shop is spotless, the prices are fair, and Theresa's alteration work is careful and kind.</p>
+        </div>
+        <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJk1KYrtHQ54kRBghBRTn6W7w">See reviews on Google →</a>
+      </div>
+      <div class="rev-grid">
+        <div class="rev-card">
+          <div class="stars" aria-hidden="true">★★★★★</div>
+          <p>"Incredibly clean, and the owner is a genuinely kind person. A peaceful, clean, affordable place to do laundry."</p>
+          <div class="who">Google reviewer</div>
+          <span class="badge" style="margin-top:10px">Sample, paraphrased</span>
+        </div>
+        <div class="rev-card">
+          <div class="stars" aria-hidden="true">★★★★★</div>
+          <p>"Very nice and friendly owner. She took time to make sure the measurements were exactly right."</p>
+          <div class="who">Google reviewer</div>
+          <span class="badge" style="margin-top:10px">Sample, paraphrased</span>
+        </div>
+        <div class="rev-card">
+          <div class="stars" aria-hidden="true">★★★★★</div>
+          <p>"Theresa is the best seamstress around. Such a caring person, and her work is outstanding."</p>
+          <div class="who">Google reviewer</div>
+          <span class="badge" style="margin-top:10px">Sample, paraphrased</span>
+        </div>
+      </div>
+      <div style="text-align:center">
+        <a class="google-link" href="https://www.google.com/maps/place/?q=place_id:ChIJk1KYrtHQ54kRBghBRTn6W7w"><span aria-hidden="true">◎</span> See all reviews on Google</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="section alt">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Visit us</h2>
+        <p>Right on Middletown Ave in North Haven, with easy parking out front. Walk in with the laundry, walk out with a better fit.</p>
+      </div>
+      <div class="visit-grid">
+        <div class="visit-card">
+          <h3>Find us</h3>
+          <p class="addr">T's Alterations &amp; Laundromat<br>127 Middletown Ave<br>North Haven, CT 06473</p>
+          <p style="color:var(--ink-soft);margin-bottom:16px">Phone: <a href="tel:+12037521960" style="font-weight:700">(203) 752-1960</a></p>
+          <div class="big-actions">
+            <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJk1KYrtHQ54kRBghBRTn6W7w">Get directions →</a>
+            <a class="btn btn-outline" style="color:var(--teal-ink);border-color:var(--teal)" href="tel:+12037521960">☎ Call the shop</a>
+          </div>
+        </div>
+        <div class="visit-card">
+          <h3>Hours</h3>
+          <table class="hours-table">
+            <tr><td>Monday</td><td>7 AM to 10 PM</td></tr>
+            <tr><td>Tuesday</td><td>7 AM to 10 PM</td></tr>
+            <tr><td>Wednesday</td><td>7 AM to 10 PM</td></tr>
+            <tr><td>Thursday</td><td>7 AM to 10 PM</td></tr>
+            <tr><td>Friday</td><td>7 AM to 10 PM</td></tr>
+            <tr><td>Saturday</td><td>7 AM to 10 PM</td></tr>
+            <tr><td>Sunday</td><td>7 AM to 10 PM</td></tr>
+          </table>
+          <p style="margin-top:16px;color:var(--ink-soft);font-size:.95rem">Last wash starts 45 minutes before closing. For alterations, call ahead so Theresa can plan your fitting.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="flinks">
+      <a href="#home" data-page="home">Home</a>
+      <a href="#services" data-page="services">Services</a>
+      <a href="#story" data-page="story">Our Story</a>
+      <a href="#gallery" data-page="gallery">Gallery</a>
+      <a href="#reviews" data-page="reviews">Reviews</a>
+      <a href="#visit" data-page="visit">Visit Us</a>
+    </div>
+    <p class="fline">127 Middletown Ave, North Haven, CT 06473 · <a href="tel:+12037521960">(203) 752-1960</a></p>
+    <p class="foot-copy">© T's Alterations &amp; Laundromat</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "story", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    var scrim = document.getElementById("scrim");
+    if(scrim){ scrim.classList.remove("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.drawer a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+      var scrim = document.getElementById("scrim");
+      if(scrim){ scrim.classList.toggle("show", open); }
+    });
+  }
+  var closeX = document.getElementById("closeX");
+  if(closeX){ closeX.addEventListener("click", closeMenu); }
+  var scrimEl = document.getElementById("scrim");
+  if(scrimEl){ scrimEl.addEventListener("click", closeMenu); }
+
+  /* ---------- carousel ---------- */
+  var track = document.getElementById("carTrack");
+  var dotsBox = document.getElementById("carDots");
+  var idx = 0;
+  var slides = track ? track.children.length : 0;
+  function buildDots(){
+    if(!dotsBox) return;
+    dotsBox.innerHTML = "";
+    for(var d = 0; d < slides; d++){
+      (function(n){
+        var b = document.createElement("button");
+        b.setAttribute("aria-label", "Show photo " + (n + 1));
+        b.addEventListener("click", function(){ go(n); });
+        dotsBox.appendChild(b);
+      })(d);
+    }
+  }
+  function paint(){
+    if(!track) return;
+    track.style.transform = "translateX(-" + (idx * 100) + "%)";
+    var dots = dotsBox ? dotsBox.children : [];
+    for(var k = 0; k < dots.length; k++){
+      dots[k].classList.toggle("on", k === idx);
+    }
+  }
+  function go(n){
+    idx = (n + slides) % slides;
+    paint();
+  }
+  var prev = document.getElementById("carPrev");
+  var next = document.getElementById("carNext");
+  if(prev){ prev.addEventListener("click", function(){ go(idx - 1); }); }
+  if(next){ next.addEventListener("click", function(){ go(idx + 1); }); }
+  buildDots();
+  paint();
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unique Barber Shop · Barber Shop, Lyndhurst, NJ</title>
+<meta name="description" content="Unique Barber Shop at 290 Ridge Rd, Lyndhurst, NJ. Classic cuts, fades, hot towel shaves and beard trims. Call (201) 528-7840.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sand:#F4EBD8; --sand-2:#EADFC3; --paper:#FBF6EA;
+  --forest:#1E4D2B; --forest-deep:#12331B; --forest-soft:#DDE8D5;
+  --gold:#B98A2F; --gold-soft:#F0E2C2;
+  --ink:#24301F; --ink-soft:#5C6650;
+  --radius:16px;
+  --shadow:0 18px 42px -18px rgba(18,51,27,.28);
+  --shadow-sm:0 8px 22px -10px rgba(18,51,27,.22);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Inter",system-ui,sans-serif;background:var(--sand);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:var(--forest)}
+::selection{background:var(--gold);color:var(--forest-deep)}
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+.serif{font-family:"Playfair Display",Georgia,serif}
+
+/* ---------- top strip + drawer ---------- */
+header.strip{position:sticky;top:0;z-index:60;background:rgba(244,235,216,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:2px solid rgba(30,77,43,.15)}
+.strip-in{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
+.brand svg{width:44px;height:44px;flex:none}
+.brand-name{font-family:"Playfair Display",serif;font-weight:800;font-size:1.22rem;line-height:1.05}
+.brand-name small{display:block;font-family:"Inter",sans-serif;font-weight:700;font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--forest)}
+.strip-actions{display:flex;align-items:center;gap:12px}
+.call-btn{display:inline-flex;align-items:center;gap:8px;background:var(--forest);color:#fff;text-decoration:none;font-weight:700;padding:11px 20px;border-radius:999px;box-shadow:var(--shadow-sm);transition:transform .18s,background .18s;white-space:nowrap}
+.call-btn:hover{background:var(--forest-deep);transform:translateY(-2px)}
+.burger{background:var(--paper);border:2px solid rgba(30,77,43,.25);border-radius:12px;cursor:pointer;padding:9px 12px;display:inline-flex;flex-direction:column;gap:5px;align-items:center}
+.burger span{display:block;width:24px;height:3px;border-radius:3px;background:var(--forest)}
+.burger:hover{border-color:var(--forest)}
+#drawer{position:fixed;top:0;left:0;bottom:0;width:min(380px,86vw);background:var(--forest-deep);color:var(--sand);z-index:80;transform:translateX(-105%);transition:transform .32s ease;display:flex;flex-direction:column;padding:28px 30px;box-shadow:20px 0 60px rgba(0,0,0,.35)}
+#drawer.open{transform:translateX(0)}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px}
+.drawer-head .serif{font-size:1.3rem;font-weight:800}
+.drawer-close{background:none;border:2px solid rgba(244,235,216,.4);color:var(--sand);border-radius:10px;width:40px;height:40px;font-size:1.2rem;cursor:pointer;line-height:1}
+.drawer-close:hover{border-color:var(--sand)}
+nav.main{display:flex;flex-direction:column;gap:2px}
+nav.main a{display:flex;align-items:baseline;gap:16px;text-decoration:none;color:var(--sand);padding:13px 6px;border-bottom:1px solid rgba(244,235,216,.14);font-family:"Playfair Display",serif;font-size:1.5rem;font-weight:700;transition:padding-left .2s,color .2s}
+nav.main a .num{font-family:"Inter",sans-serif;font-size:.72rem;font-weight:700;letter-spacing:2px;color:var(--gold)}
+nav.main a:hover{padding-left:14px;color:var(--gold-soft)}
+nav.main a.active{color:var(--gold)}
+.drawer-foot{margin-top:auto;padding-top:24px;font-size:.92rem;color:rgba(244,235,216,.75)}
+.drawer-foot a{color:var(--gold-soft);text-decoration:none;font-weight:600}
+#scrim{position:fixed;inset:0;background:rgba(18,30,20,.5);z-index:70;opacity:0;pointer-events:none;transition:opacity .3s}
+#scrim.show{opacity:1;pointer-events:auto}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- editorial hero ---------- */
+.hero{position:relative;overflow:hidden;padding:88px 0 70px;border-bottom:2px solid rgba(30,77,43,.12)}
+.hero .bignum{position:absolute;top:6px;right:-10px;font-family:"Playfair Display",serif;font-weight:900;font-size:clamp(10rem,26vw,22rem);line-height:1;color:rgba(30,77,43,.07);user-select:none;pointer-events:none}
+.kicker{display:inline-flex;align-items:center;gap:10px;font-weight:700;font-size:.78rem;letter-spacing:3px;text-transform:uppercase;color:var(--forest);background:var(--paper);border:2px solid rgba(30,77,43,.25);padding:8px 18px;border-radius:999px;margin-bottom:22px}
+h1.hero-h{font-family:"Playfair Display",serif;font-weight:900;font-size:clamp(2.8rem,6.4vw,5rem);line-height:1.02;letter-spacing:-1px;margin-bottom:20px;max-width:14ch}
+h1.hero-h .accent{color:var(--forest);font-style:italic}
+.lede{font-size:1.14rem;color:var(--ink-soft);max-width:36rem;margin-bottom:28px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:30px}
+.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;padding:14px 26px;border-radius:999px;font-size:1rem;transition:transform .18s,box-shadow .18s,background .18s}
+.btn-solid{background:var(--forest);color:#fff;box-shadow:var(--shadow-sm)}
+.btn-solid:hover{background:var(--forest-deep);transform:translateY(-2px)}
+.btn-ghost{background:var(--paper);color:var(--ink);border:2px solid rgba(36,48,31,.25)}
+.btn-ghost:hover{border-color:var(--forest);color:var(--forest);transform:translateY(-2px)}
+.hero-facts{display:flex;flex-wrap:wrap;gap:26px}
+.hfact{display:flex;flex-direction:column}
+.hfact b{font-family:"Playfair Display",serif;font-size:1.6rem;color:var(--forest)}
+.hfact span{font-size:.82rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
+
+/* ---------- asymmetric rhythm ---------- */
+section.band{padding:70px 0}
+.band.alt{background:var(--paper);border-top:2px solid rgba(30,77,43,.1);border-bottom:2px solid rgba(30,77,43,.1)}
+.asym{display:grid;grid-template-columns:7fr 5fr;gap:56px;align-items:center}
+.asym.flip{grid-template-columns:5fr 7fr}
+.sec-num{font-family:"Playfair Display",serif;font-weight:900;font-size:3.4rem;color:transparent;-webkit-text-stroke:2px var(--forest);line-height:1;margin-bottom:10px}
+h2.sec-h{font-family:"Playfair Display",serif;font-weight:800;font-size:clamp(1.9rem,3.6vw,2.7rem);line-height:1.1;margin-bottom:16px}
+.sec-h .it{font-style:italic;color:var(--forest)}
+p.body{color:var(--ink-soft);margin-bottom:16px;max-width:38rem}
+.art-card{background:var(--forest);border-radius:24px;padding:36px;box-shadow:var(--shadow);position:relative;overflow:hidden;color:var(--sand)}
+.art-card svg{width:100%;height:auto;display:block}
+.art-card .tag{position:absolute;top:18px;left:18px;background:var(--gold);color:var(--forest-deep);font-weight:700;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;padding:7px 14px;border-radius:999px}
+.check-list{list-style:none;margin-top:6px}
+.check-list li{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px dashed rgba(30,77,43,.25);color:var(--ink)}
+.check-list li:last-child{border-bottom:0}
+.check-list .tick{flex:none;width:26px;height:26px;border-radius:50%;background:var(--forest);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:.85rem;margin-top:2px}
+
+/* ---------- editorial service rows ---------- */
+.svc-row{display:grid;grid-template-columns:90px 1fr auto;gap:24px;align-items:center;padding:26px 10px;border-bottom:2px solid rgba(30,77,43,.15);transition:background .2s,padding-left .2s}
+.svc-row:hover{background:rgba(30,77,43,.05);padding-left:22px}
+.svc-row .n{font-family:"Playfair Display",serif;font-weight:900;font-size:2.2rem;color:var(--gold)}
+.svc-row h3{font-family:"Playfair Display",serif;font-size:1.45rem;font-weight:700;margin-bottom:4px}
+.svc-row p{color:var(--ink-soft);font-size:.96rem;max-width:34rem}
+.svc-row .price{text-align:right;font-weight:700;color:var(--forest);white-space:nowrap}
+.svc-row .price small{display:block;font-weight:600;font-size:.72rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-soft)}
+.note{margin-top:18px;font-size:.9rem;color:var(--ink-soft);background:var(--gold-soft);border:2px dashed rgba(185,138,47,.6);border-radius:14px;padding:14px 18px}
+
+/* ---------- carousel ---------- */
+.carousel-shell{position:relative}
+.carousel{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 4px 18px;scrollbar-width:thin}
+.car-card{flex:0 0 min(360px,82vw);scroll-snap-align:start;background:var(--paper);border:2px solid rgba(30,77,43,.18);border-radius:20px;overflow:hidden;box-shadow:var(--shadow-sm)}
+.car-visual{height:220px;background:linear-gradient(150deg,var(--forest-soft),var(--sand-2));display:flex;align-items:center;justify-content:center;position:relative}
+.car-visual .soon{background:var(--forest-deep);color:var(--sand);font-weight:700;font-size:.75rem;letter-spacing:2.5px;text-transform:uppercase;padding:9px 18px;border-radius:999px}
+.car-visual svg{position:absolute;inset:0;width:100%;height:100%;opacity:.5}
+.car-body{padding:18px 20px}
+.car-body h3{font-family:"Playfair Display",serif;font-size:1.2rem;margin-bottom:4px}
+.car-body p{font-size:.9rem;color:var(--ink-soft)}
+.car-nav{display:flex;gap:12px;margin-top:6px}
+.car-btn{background:var(--forest);color:#fff;border:0;border-radius:999px;width:52px;height:52px;font-size:1.3rem;cursor:pointer;box-shadow:var(--shadow-sm);transition:background .2s,transform .18s}
+.car-btn:hover{background:var(--forest-deep);transform:translateY(-2px)}
+
+/* ---------- review cards ---------- */
+.rev-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;margin-bottom:26px}
+.rev-summary{font-size:1.05rem;color:var(--ink-soft)}
+.rev-summary b{color:var(--forest)}
+.rev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.rev-card{background:var(--paper);border:2px solid rgba(30,77,43,.16);border-radius:18px;padding:24px;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;gap:12px}
+.rev-card .stars{color:var(--gold);font-size:1.1rem;letter-spacing:3px}
+.rev-card p{font-size:.96rem;color:var(--ink)}
+.badge{align-self:flex-start;background:var(--forest);color:#fff;font-size:.68rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:6px 14px;border-radius:999px}
+.badge.sample{background:var(--gold);color:var(--forest-deep)}
+.src-links{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.src-links a{font-weight:700;text-decoration:none;border:2px solid var(--forest);color:var(--forest);padding:12px 22px;border-radius:999px;transition:background .2s,color .2s}
+.src-links a:hover{background:var(--forest);color:#fff}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:6fr 6fr;gap:28px}
+.visit-card{background:var(--paper);border:2px solid rgba(30,77,43,.16);border-radius:20px;padding:30px;box-shadow:var(--shadow-sm)}
+.visit-card h3{font-family:"Playfair Display",serif;font-size:1.4rem;margin-bottom:14px;color:var(--forest)}
+.visit-card .row{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px dashed rgba(30,77,43,.2)}
+.visit-card .row:last-child{border-bottom:0}
+.visit-card .lbl{font-weight:700;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--ink-soft);width:88px;flex:none;padding-top:3px}
+.visit-card a{color:var(--forest);font-weight:600}
+
+/* ---------- footer ---------- */
+footer.site{background:var(--forest-deep);color:var(--sand);margin-top:0}
+.foot-cols{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:36px;padding:60px 0 40px}
+.foot-cols h4{font-size:.75rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;font-weight:700}
+.foot-cols .brand-name{color:var(--sand)}
+.foot-cols p,.foot-cols a{color:rgba(244,235,216,.8);font-size:.95rem}
+.foot-cols a{text-decoration:none;display:block;padding:5px 0}
+.foot-cols a:hover{color:var(--gold-soft)}
+.copyright{border-top:1px solid rgba(244,235,216,.2);padding:20px 0;text-align:center;color:rgba(244,235,216,.85);font-size:.95rem}
+
+/* ---------- reveal ---------- */
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:none}
+
+@media (max-width:900px){
+  .asym,.asym.flip{grid-template-columns:1fr;gap:32px}
+  .rev-grid{grid-template-columns:1fr}
+  .visit-grid{grid-template-columns:1fr}
+  .foot-cols{grid-template-columns:1fr 1fr}
+  .call-btn span.num{display:none}
+}
+@media (max-width:560px){
+  .foot-cols{grid-template-columns:1fr}
+  .svc-row{grid-template-columns:56px 1fr;grid-template-rows:auto auto}
+  .svc-row .price{grid-column:2;text-align:left}
+}
+</style>
+</head>
+<body>
+
+<header class="strip">
+  <div class="wrap strip-in">
+    <a class="brand" href="#home" data-page="home" aria-label="Unique Barber Shop home">
+      <svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="24" cy="24" r="21" stroke="#1E4D2B" stroke-width="3"/><path d="M14 30 L26 18 M26 18 l7 -2 M26 18 l-1 7" stroke="#1E4D2B" stroke-width="2.6" stroke-linecap="round"/><circle cx="14.5" cy="32.5" r="3.4" stroke="#1E4D2B" stroke-width="2.6"/><path d="M24 14 L34 28" stroke="#B98A2F" stroke-width="2.6" stroke-linecap="round"/></svg>
+      <span class="brand-name">Unique Barber Shop<small>Lyndhurst, NJ</small></span>
+    </a>
+    <div class="strip-actions">
+      <a class="call-btn" href="tel:+12015287840"><span aria-hidden="true">&#9742;</span> <span class="num">(201) 528-7840</span><span class="mob" style="display:none">Call</span></a>
+      <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div id="scrim"></div>
+<aside id="drawer" aria-label="Site menu">
+  <div class="drawer-head">
+    <span class="serif">Menu</span>
+    <button class="drawer-close" id="drawerClose" aria-label="Close menu">&times;</button>
+  </div>
+  <nav class="main" id="mainNav">
+    <a href="#home" data-page="home"><span class="num">01</span> Home</a>
+    <a href="#services" data-page="services"><span class="num">02</span> Services</a>
+    <a href="#about" data-page="about"><span class="num">03</span> Our Story</a>
+    <a href="#gallery" data-page="gallery"><span class="num">04</span> Gallery</a>
+    <a href="#reviews" data-page="reviews"><span class="num">05</span> Reviews</a>
+    <a href="#visit" data-page="visit"><span class="num">06</span> Visit Us</a>
+  </nav>
+  <div class="drawer-foot">
+    <p>290 Ridge Rd, Lyndhurst, NJ 07071</p>
+    <p><a href="tel:+12015287840">(201) 528-7840</a></p>
+    <p>Call for hours</p>
+  </div>
+</aside>
+
+<main>
+<section class="page" id="page-home">
+  <div class="hero">
+    <span class="bignum" aria-hidden="true">01</span>
+    <div class="wrap">
+      <span class="kicker">Barber Shop · Ridge Road, Lyndhurst</span>
+      <h1 class="hero-h">Sharp looks, <span class="accent">honest craft.</span></h1>
+      <p class="lede">Unique Barber Shop is a neighborhood barbershop on Ridge Road in Lyndhurst, New Jersey. Classic cuts, clean fades, hot towel shaves and careful beard work, done the traditional way.</p>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="tel:+12015287840">Call (201) 528-7840</a>
+        <a class="btn btn-ghost" href="#services" data-page="services">See Services</a>
+      </div>
+      <div class="hero-facts">
+        <div class="hfact"><b>290 Ridge Rd</b><span>Lyndhurst, NJ 07071</span></div>
+        <div class="hfact"><b>Call for hours</b><span>Walk-ins welcome</span></div>
+        <div class="hfact"><b>(201) 528-7840</b><span>Call to book</span></div>
+      </div>
+    </div>
+  </div>
+
+  <section class="band">
+    <div class="wrap asym reveal">
+      <div>
+        <div class="sec-num">02</div>
+        <h2 class="sec-h">A chair that feels like <span class="it">your chair.</span></h2>
+        <p class="body">No rushed clippers, no guesswork. Every cut starts with a conversation about how you wear your hair, what you do for a living, and how much upkeep you want. Then the barber gets to work.</p>
+        <ul class="check-list">
+          <li><span class="tick">&#10003;</span><span>Consultation before every cut, so the result matches the picture in your head.</span></li>
+          <li><span class="tick">&#10003;</span><span>Precision fades, tapers and classic scissor cuts for all hair types.</span></li>
+          <li><span class="tick">&#10003;</span><span>Hot towel shaves and detailed beard shaping with a straight razor finish.</span></li>
+        </ul>
+        <div class="cta-row" style="margin-top:24px">
+          <a class="btn btn-solid" href="#about" data-page="about">Our Story</a>
+          <a class="btn btn-ghost" href="#gallery" data-page="gallery">See the Shop</a>
+        </div>
+      </div>
+      <div class="art-card reveal">
+        <span class="tag">The Craft</span>
+        <svg viewBox="0 0 400 300" role="img" aria-label="Barber tools illustration"><rect x="30" y="120" width="340" height="14" rx="7" fill="#B98A2F"/><rect x="120" y="60" width="160" height="200" rx="18" fill="#F4EBD8" opacity=".92"/><rect x="140" y="84" width="120" height="14" rx="7" fill="#1E4D2B"/><rect x="140" y="110" width="86" height="10" rx="5" fill="#5C6650"/><rect x="140" y="130" width="100" height="10" rx="5" fill="#5C6650"/><circle cx="200" cy="200" r="34" fill="none" stroke="#1E4D2B" stroke-width="8"/><path d="M200 166 v-28 M200 234 v28 M166 200 h-28 M234 200 h28" stroke="#B98A2F" stroke-width="8" stroke-linecap="round"/><circle cx="330" cy="70" r="26" fill="none" stroke="#B98A2F" stroke-width="6"/><circle cx="330" cy="70" r="10" fill="#B98A2F"/></svg>
+      </div>
+    </div>
+  </section>
+
+  <section class="band alt">
+    <div class="wrap asym flip reveal">
+      <div class="art-card reveal" style="background:var(--sand-2);color:var(--ink)">
+        <span class="tag">Visit</span>
+        <svg viewBox="0 0 400 300" role="img" aria-label="Map pin illustration"><rect x="60" y="40" width="280" height="220" rx="18" fill="#FBF6EA"/><path d="M60 120 h280 M60 180 h280 M150 40 v220 M240 40 v220" stroke="#1E4D2B" stroke-width="3" opacity=".25"/><path d="M200 90 c-34 0 -56 24 -56 52 c0 38 56 88 56 88 s56 -50 56 -88 c0 -28 -22 -52 -56 -52 z" fill="#1E4D2B"/><circle cx="200" cy="142" r="20" fill="#F4EBD8"/></svg>
+      </div>
+      <div>
+        <div class="sec-num">03</div>
+        <h2 class="sec-h">On Ridge Road, <span class="it">easy to reach.</span></h2>
+        <p class="body">Find us at 290 Ridge Rd in Lyndhurst, right on the main strip. Street parking nearby, and a quick trip from Rutherford, North Arlington and Kearny.</p>
+        <p class="body">Hours change from time to time, so give us a call before you head over. Walk-ins are welcome whenever a chair is open.</p>
+        <div class="cta-row" style="margin-top:24px">
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJR_VvYfRXwokRhAd-efHfBB0" target="_blank" rel="noopener">Get Directions</a>
+          <a class="btn btn-ghost" href="#visit" data-page="visit">Plan Your Visit</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap reveal">
+      <div class="sec-num">04</div>
+      <h2 class="sec-h">What neighbors <span class="it">say.</span></h2>
+      <p class="body">Based on Google reviews. Read them all with the link below.</p>
+      <div class="rev-grid">
+        <div class="rev-card"><span class="badge sample">Sample</span><span class="stars" aria-label="5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><p>Clean shop, steady hand, and a cut that grows out well. My go-to on Ridge Road now.</p></div>
+        <div class="rev-card"><span class="badge sample">Sample</span><span class="stars" aria-label="5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><p>Great fade and a proper hot towel shave. Took his time and it showed in the result.</p></div>
+        <div class="rev-card"><span class="badge sample">Sample</span><span class="stars" aria-label="5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><p>Walked in without an appointment and was in the chair in ten minutes. Fair price.</p></div>
+      </div>
+      <div class="src-links">
+        <a href="https://www.google.com/maps/place/?q=place_id:ChIJR_VvYfRXwokRhAd-efHfBB0" target="_blank" rel="noopener">See reviews on Google</a>
+        <a href="#reviews" data-page="reviews">All Reviews</a>
+      </div>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-services">
+  <div class="hero">
+    <span class="bignum" aria-hidden="true">02</span>
+    <div class="wrap">
+      <span class="kicker">Services &amp; Pricing</span>
+      <h1 class="hero-h">Every service, <span class="accent">numbered.</span></h1>
+      <p class="lede">Straightforward grooming with straightforward pricing. Walk-ins welcome; call ahead for the shortest wait.</p>
+    </div>
+  </div>
+  <section class="band">
+    <div class="wrap">
+      <div class="svc-row reveal"><span class="n">01</span><div><h3>Classic Haircut</h3><p>Consultation, precision cut, wash and style. Scissor work or clipper, your call.</p></div><div class="price">$30+<small>Sample</small></div></div>
+      <div class="svc-row reveal"><span class="n">02</span><div><h3>Skin Fade</h3><p>Seamless blend from skin to length, finished with a razor lineup.</p></div><div class="price">$32+<small>Sample</small></div></div>
+      <div class="svc-row reveal"><span class="n">03</span><div><h3>Hot Towel Shave</h3><p>Traditional straight razor shave with hot lather and a cooling finish.</p></div><div class="price">$28+<small>Sample</small></div></div>
+      <div class="svc-row reveal"><span class="n">04</span><div><h3>Beard Trim &amp; Shape</h3><p>Sculpting, detailing and conditioning for a beard that looks intentional.</p></div><div class="price">$18+<small>Sample</small></div></div>
+      <div class="svc-row reveal"><span class="n">05</span><div><h3>Kids Cut (12 &amp; under)</h3><p>Patient, friendly cuts for young gentlemen. First-timers welcome.</p></div><div class="price">$24+<small>Sample</small></div></div>
+      <div class="svc-row reveal"><span class="n">06</span><div><h3>Buzz Cut</h3><p>One length, clean edges, done right. Quick and sharp.</p></div><div class="price">$20+<small>Sample</small></div></div>
+      <div class="svc-row reveal"><span class="n">07</span><div><h3>Cut &amp; Shave Combo</h3><p>The full works: haircut plus hot towel shave in one visit.</p></div><div class="price">$52+<small>Sample</small></div></div>
+      <div class="svc-row reveal"><span class="n">08</span><div><h3>Lineup / Edge-Up</h3><p>Crisp hairline, temples and neckline between full cuts.</p></div><div class="price">$14+<small>Sample</small></div></div>
+      <p class="note">Pricing shown is sample pricing. Call <a href="tel:+12015287840">(201) 528-7840</a> for exact prices and current availability.</p>
+      <div class="cta-row" style="margin-top:26px">
+        <a class="btn btn-solid" href="tel:+12015287840">Call to Book</a>
+        <a class="btn btn-ghost" href="#visit" data-page="visit">Visit Us</a>
+      </div>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-about">
+  <div class="hero">
+    <span class="bignum" aria-hidden="true">03</span>
+    <div class="wrap">
+      <span class="kicker">Our Story</span>
+      <h1 class="hero-h">A barbershop with <span class="accent">a point of view.</span></h1>
+      <p class="lede">The name says it all. Unique Barber Shop set out to do one thing differently: treat every head of hair like it matters.</p>
+    </div>
+  </div>
+  <section class="band">
+    <div class="wrap asym reveal">
+      <div>
+        <div class="sec-num">01</div>
+        <h2 class="sec-h">Old school values, <span class="it">modern cuts.</span></h2>
+        <p class="body">Walk into our shop on Ridge Road and you will notice the difference right away. The chairs are classic, the conversation is easy, and nobody is watching the clock. We believe a haircut is a small ritual worth doing well.</p>
+        <p class="body">From timeless side parts and pompadours to skin fades and textured crops, our barbers keep up with what is current while respecting what is classic. Bring a photo, describe a feeling, or just say "make it look good." We will take it from there.</p>
+        <p class="body">Lyndhurst is our neighborhood. Many of our clients live a few blocks away, and plenty drive in from Rutherford, North Arlington and beyond. First visit or fiftieth, you get the same care.</p>
+      </div>
+      <div class="art-card reveal">
+        <span class="tag">Since Day One</span>
+        <svg viewBox="0 0 400 300" role="img" aria-label="Barber pole illustration"><rect x="150" y="30" width="100" height="240" rx="50" fill="#F4EBD8"/><rect x="150" y="30" width="100" height="240" rx="50" fill="none" stroke="#1E4D2B" stroke-width="6"/><path d="M150 70 l100 40 M150 120 l100 40 M150 170 l100 40 M150 220 l100 40" stroke="#B98A2F" stroke-width="14"/><path d="M150 90 l100 40 M150 140 l100 40 M150 190 l100 40" stroke="#1E4D2B" stroke-width="10"/><rect x="185" y="8" width="30" height="24" rx="6" fill="#B98A2F"/><rect x="185" y="268" width="30" height="24" rx="6" fill="#B98A2F"/></svg>
+      </div>
+    </div>
+  </section>
+  <section class="band alt">
+    <div class="wrap asym flip reveal">
+      <div class="art-card reveal" style="background:var(--forest-soft);color:var(--ink)">
+        <span class="tag">The Promise</span>
+        <svg viewBox="0 0 400 300" role="img" aria-label="Handshake illustration"><circle cx="200" cy="140" r="90" fill="#FBF6EA"/><path d="M140 150 l44 44 l76 -88" stroke="#1E4D2B" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="200" cy="140" r="90" fill="none" stroke="#1E4D2B" stroke-width="6"/></svg>
+      </div>
+      <div>
+        <div class="sec-num">02</div>
+        <h2 class="sec-h">What we <span class="it">promise.</span></h2>
+        <ul class="check-list">
+          <li><span class="tick">&#10003;</span><span><b>A real consultation.</b> We listen first, cut second.</span></li>
+          <li><span class="tick">&#10003;</span><span><b>Clean tools, clean shop.</b> Sanitized blades and a tidy station for every client.</span></li>
+          <li><span class="tick">&#10003;</span><span><b>Honest pricing.</b> You will know the price before we start.</span></li>
+          <li><span class="tick">&#10003;</span><span><b>No rushed chairs.</b> Your appointment gets the time it deserves.</span></li>
+        </ul>
+        <div class="cta-row" style="margin-top:24px">
+          <a class="btn btn-solid" href="tel:+12015287840">Call (201) 528-7840</a>
+          <a class="btn btn-ghost" href="#services" data-page="services">See Services</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="hero">
+    <span class="bignum" aria-hidden="true">04</span>
+    <div class="wrap">
+      <span class="kicker">Gallery</span>
+      <h1 class="hero-h">The work <span class="accent">speaks.</span></h1>
+      <p class="lede">A look inside the shop. Photos are on the way; these placeholders hold their place.</p>
+    </div>
+  </div>
+  <section class="band">
+    <div class="wrap">
+      <div class="carousel-shell">
+        <div class="carousel" id="carousel">
+          <div class="car-card"><div class="car-visual"><svg viewBox="0 0 360 220" preserveAspectRatio="none"><rect width="360" height="220" fill="#DDE8D5"/><circle cx="180" cy="110" r="60" fill="#1E4D2B" opacity=".18"/></svg><span class="soon">Photo soon</span></div><div class="car-body"><h3>The Chairs</h3><p>Classic barber chairs, ready for the next cut.</p></div></div>
+          <div class="car-card"><div class="car-visual"><svg viewBox="0 0 360 220" preserveAspectRatio="none"><rect width="360" height="220" fill="#EADFC3"/><rect x="60" y="60" width="240" height="100" rx="16" fill="#1E4D2B" opacity=".18"/></svg><span class="soon">Photo soon</span></div><div class="car-body"><h3>The Station</h3><p>Tools of the trade, kept sharp and sanitized.</p></div></div>
+          <div class="car-card"><div class="car-visual"><svg viewBox="0 0 360 220" preserveAspectRatio="none"><rect width="360" height="220" fill="#DDE8D5"/><path d="M40 180 Q180 60 320 180" stroke="#1E4D2B" stroke-width="10" fill="none" opacity=".25"/></svg><span class="soon">Photo soon</span></div><div class="car-body"><h3>Fresh Fades</h3><p>Clean blends and crisp lineups from recent cuts.</p></div></div>
+          <div class="car-card"><div class="car-visual"><svg viewBox="0 0 360 220" preserveAspectRatio="none"><rect width="360" height="220" fill="#EADFC3"/><circle cx="120" cy="110" r="44" fill="#B98A2F" opacity=".25"/><circle cx="240" cy="110" r="44" fill="#1E4D2B" opacity=".2"/></svg><span class="soon">Photo soon</span></div><div class="car-body"><h3>Hot Towel Shaves</h3><p>The traditional ritual, lather to finish.</p></div></div>
+          <div class="car-card"><div class="car-visual"><svg viewBox="0 0 360 220" preserveAspectRatio="none"><rect width="360" height="220" fill="#DDE8D5"/><rect x="140" y="40" width="80" height="140" rx="40" fill="#1E4D2B" opacity=".18"/></svg><span class="soon">Photo soon</span></div><div class="car-body"><h3>The Pole</h3><p>The landmark on Ridge Road you cannot miss.</p></div></div>
+          <div class="car-card"><div class="car-visual"><svg viewBox="0 0 360 220" preserveAspectRatio="none"><rect width="360" height="220" fill="#EADFC3"/><path d="M60 160 h240 M60 110 h240" stroke="#1E4D2B" stroke-width="8" opacity=".2"/></svg><span class="soon">Photo soon</span></div><div class="car-body"><h3>Beard Work</h3><p>Sculpted, detailed, and conditioned.</p></div></div>
+        </div>
+        <div class="car-nav">
+          <button class="car-btn" id="carPrev" aria-label="Previous photos">&#8592;</button>
+          <button class="car-btn" id="carNext" aria-label="Next photos">&#8594;</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="hero">
+    <span class="bignum" aria-hidden="true">05</span>
+    <div class="wrap">
+      <span class="kicker">Reviews</span>
+      <h1 class="hero-h">Word on <span class="accent">the street.</span></h1>
+      <p class="rev-summary">Based on Google reviews. The cards below are samples of the kind of feedback our clients leave.</p>
+    </div>
+  </div>
+  <section class="band">
+    <div class="wrap">
+      <div class="rev-grid">
+        <div class="rev-card reveal"><span class="badge sample">Sample</span><span class="stars" aria-label="5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><p>Clean shop, steady hand, and a cut that grows out well. My go-to on Ridge Road now.</p></div>
+        <div class="rev-card reveal"><span class="badge sample">Sample</span><span class="stars" aria-label="5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><p>Great fade and a proper hot towel shave. Took his time and it showed in the result.</p></div>
+        <div class="rev-card reveal"><span class="badge sample">Sample</span><span class="stars" aria-label="5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><p>Walked in without an appointment and was in the chair in ten minutes. Fair price.</p></div>
+        <div class="rev-card reveal"><span class="badge sample">Sample</span><span class="stars" aria-label="5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><p>Brought my son for his first real haircut. Patient, friendly, and the cut looks great.</p></div>
+        <div class="rev-card reveal"><span class="badge sample">Sample</span><span class="stars" aria-label="5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><p>Best beard trim I have had in years. Detailed work with the razor, zero nicks.</p></div>
+        <div class="rev-card reveal"><span class="badge sample">Sample</span><span class="stars" aria-label="5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><p>Showed a photo of what I wanted and he matched it exactly. Booking my next visit.</p></div>
+      </div>
+      <div class="src-links">
+        <a href="https://www.google.com/maps/place/?q=place_id:ChIJR_VvYfRXwokRhAd-efHfBB0" target="_blank" rel="noopener">See reviews on Google</a>
+        <a href="https://www.bestprosintown.com/nj/lyndhurst/unique-barber-shop-/" target="_blank" rel="noopener">See reviews on BestProsInTown</a>
+      </div>
+      <div class="cta-row" style="margin-top:26px">
+        <a class="btn btn-solid" href="tel:+12015287840">Book Your Chair</a>
+      </div>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="hero">
+    <span class="bignum" aria-hidden="true">06</span>
+    <div class="wrap">
+      <span class="kicker">Visit / Contact</span>
+      <h1 class="hero-h">Come sit <span class="accent">in the chair.</span></h1>
+      <p class="lede">Walk-ins welcome. Call ahead and we will have a chair ready for you.</p>
+    </div>
+  </div>
+  <section class="band">
+    <div class="wrap visit-grid">
+      <div class="visit-card reveal">
+        <h3>Find Us</h3>
+        <div class="row"><span class="lbl">Address</span><span>Unique Barber Shop<br>290 Ridge Rd<br>Lyndhurst, NJ 07071</span></div>
+        <div class="row"><span class="lbl">Phone</span><span><a href="tel:+12015287840">(201) 528-7840</a></span></div>
+        <div class="row"><span class="lbl">Hours</span><span>Call for hours</span></div>
+        <div class="row"><span class="lbl">Parking</span><span>Street parking available nearby</span></div>
+        <div class="cta-row" style="margin-top:20px">
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJR_VvYfRXwokRhAd-efHfBB0" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+      </div>
+      <div class="visit-card reveal">
+        <h3>Good to Know</h3>
+        <div class="row"><span class="lbl">Walk-ins</span><span>Welcome whenever a chair is open</span></div>
+        <div class="row"><span class="lbl">Booking</span><span>Call <a href="tel:+12015287840">(201) 528-7840</a> to reserve a time</span></div>
+        <div class="row"><span class="lbl">Services</span><span>Cuts, fades, shaves, beard trims, kids cuts</span></div>
+        <div class="row"><span class="lbl">Area</span><span>Serving Lyndhurst, Rutherford, North Arlington, Kearny</span></div>
+        <div class="cta-row" style="margin-top:20px">
+          <a class="btn btn-ghost" href="#services" data-page="services">See Services</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-cols">
+      <div>
+        <span class="brand-name serif" style="font-size:1.4rem;font-weight:800">Unique Barber Shop</span>
+        <p style="margin-top:12px">A neighborhood barbershop on Ridge Road in Lyndhurst, NJ. Classic cuts, fades, hot towel shaves and beard work.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <a href="#home" data-page="home">Home</a>
+        <a href="#services" data-page="services">Services</a>
+        <a href="#about" data-page="about">Our Story</a>
+        <a href="#gallery" data-page="gallery">Gallery</a>
+      </div>
+      <div>
+        <h4>More</h4>
+        <a href="#reviews" data-page="reviews">Reviews</a>
+        <a href="#visit" data-page="visit">Visit Us</a>
+        <a href="https://www.google.com/maps/place/?q=place_id:ChIJR_VvYfRXwokRhAd-efHfBB0" target="_blank" rel="noopener">Get Directions</a>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <p>290 Ridge Rd<br>Lyndhurst, NJ 07071</p>
+        <a href="tel:+12015287840">(201) 528-7840</a>
+        <p style="margin-top:8px">Call for hours</p>
+      </div>
+    </div>
+    <div class="copyright">© Unique Barber Shop</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+  var drawer = document.getElementById("drawer");
+  var scrim = document.getElementById("scrim");
+  var drawerClose = document.getElementById("drawerClose");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(drawer){ drawer.classList.remove("open"); }
+    if(scrim){ scrim.classList.remove("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+    if(nav){ nav.classList.remove("open"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  function openDrawer(){
+    if(drawer){ drawer.classList.add("open"); }
+    if(scrim){ scrim.classList.add("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "true"); }
+  }
+
+  if(burger){
+    burger.addEventListener("click", function(){
+      if(drawer && drawer.classList.contains("open")){ closeMenu(); }
+      else { openDrawer(); }
+    });
+  }
+  if(drawerClose){ drawerClose.addEventListener("click", closeMenu); }
+  if(scrim){ scrim.addEventListener("click", closeMenu); }
+
+  /* ---------- carousel ---------- */
+  var car = document.getElementById("carousel");
+  var prev = document.getElementById("carPrev");
+  var next = document.getElementById("carNext");
+  function carStep(dir){
+    if(!car){ return; }
+    var card = car.querySelector(".car-card");
+    var w = card ? card.offsetWidth + 20 : 380;
+    car.scrollBy({left: dir * w, behavior: "smooth"});
+  }
+  if(prev){ prev.addEventListener("click", function(){ carStep(-1); }); }
+  if(next){ next.addEventListener("click", function(){ carStep(1); }); }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
