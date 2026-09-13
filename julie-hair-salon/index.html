@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Julie Hair Salon | Hair Salon in Brooklyn, NY</title>
+<meta name="description" content="Julie Hair Salon at 6913 Fort Hamilton Pkwy, Brooklyn, NY 11228. Call (918) 807-6666 to book your visit.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#faf6ef; --ink:#2b2320; --rose:#b4586b; --rose-deep:#8f3c50;
+  --cream:#f3e9da; --line:#e4d6c2; --muted:#7a6a5e;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--paper);color:var(--ink);line-height:1.65}
+h1,h2,h3{font-family:'Fraunces',serif;line-height:1.12;font-weight:600}
+a{color:var(--rose-deep)}
+.page{display:none}
+.page.active{display:block;animation:fadeIn .45s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+
+/* top bar + side drawer */
+.topbar{position:sticky;top:0;z-index:60;background:rgba(250,246,239,.96);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:14px 24px}
+.brand{font-family:'Fraunces',serif;font-weight:700;font-size:1.25rem;color:var(--ink);text-decoration:none}
+.brand span{color:var(--rose-deep)}
+#burger{background:none;border:1px solid var(--line);border-radius:10px;padding:9px 12px;cursor:pointer;font-size:1.15rem;color:var(--ink)}
+nav.main{position:fixed;top:0;left:0;bottom:0;width:min(320px,84vw);background:#241c19;color:#f6ede2;z-index:70;padding:28px 26px;transform:translateX(-105%);transition:transform .3s ease;display:flex;flex-direction:column;gap:6px;box-shadow:0 0 40px rgba(0,0,0,.25)}
+nav.main.open{transform:none}
+nav.main a{color:#f6ede2;text-decoration:none;font-family:'Fraunces',serif;font-size:1.35rem;padding:10px 4px;border-bottom:1px solid rgba(255,255,255,.08)}
+nav.main a.active,nav.main a:hover{color:#f3c2cf}
+.nav-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.nav-head strong{font-family:'Fraunces',serif;font-size:1.1rem}
+.closebtn{background:none;border:none;color:#f6ede2;font-size:1.4rem;cursor:pointer}
+.scrim{position:fixed;inset:0;background:rgba(30,20,18,.45);z-index:65;opacity:0;pointer-events:none;transition:opacity .3s}
+.scrim.show{opacity:1;pointer-events:auto}
+
+/* editorial hero */
+.hero{padding:90px 0 70px;text-align:left;border-bottom:1px solid var(--line)}
+.kicker{letter-spacing:.28em;text-transform:uppercase;font-size:.75rem;color:var(--rose-deep);font-weight:600;margin-bottom:18px}
+.hero h1{font-size:clamp(2.9rem,7.5vw,5.4rem);font-weight:700;margin-bottom:20px}
+.hero h1 em{font-style:italic;color:var(--rose-deep)}
+.hero p.lede{font-size:1.15rem;color:var(--muted);max-width:560px;margin-bottom:30px}
+.rating-row{display:flex;align-items:center;gap:12px;margin-bottom:30px}
+.stars{color:#c98f2d;letter-spacing:.15em;font-size:1.05rem}
+.rating-row small{color:var(--muted)}
+.btn{display:inline-block;text-decoration:none;font-weight:600;padding:13px 26px;border-radius:999px;border:2px solid var(--rose-deep);transition:.2s}
+.btn-solid{background:var(--rose-deep);color:#fff}
+.btn-solid:hover{background:var(--rose)}
+.btn-ghost{color:var(--rose-deep);margin-left:10px}
+.btn-ghost:hover{background:var(--rose-deep);color:#fff}
+
+/* alternating bands */
+.band{padding:70px 0;border-bottom:1px solid var(--line)}
+.band.alt{background:var(--cream)}
+.band h2{font-size:clamp(1.8rem,4vw,2.6rem);margin-bottom:14px}
+.band p{color:#4c4239;max-width:620px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+@media(max-width:760px){.two{grid-template-columns:1fr}}
+.art{border-radius:18px;background:linear-gradient(135deg,#e9c6cf 0%,#f6e7d3 60%,#e6d3bd 100%);min-height:300px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.art svg{width:70%;height:auto;opacity:.9}
+.badge{position:absolute;top:14px;left:14px;background:rgba(36,28,25,.85);color:#fff;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;padding:6px 12px;border-radius:999px}
+
+/* leaders services */
+.leader-row{display:flex;align-items:baseline;gap:12px;padding:20px 0;border-bottom:1px solid var(--line)}
+.leader-row .name{font-family:'Fraunces',serif;font-size:1.25rem;font-weight:600;white-space:nowrap}
+.leader-row .dots{flex:1;border-bottom:2px dotted var(--muted);transform:translateY(-5px);min-width:30px}
+.leader-row .note{font-size:.9rem;color:var(--rose-deep);font-weight:600;white-space:nowrap}
+.leader-row p.desc{flex-basis:100%;color:var(--muted);font-size:.95rem;margin-top:2px}
+.leader-block{display:flex;flex-wrap:wrap}
+
+/* arch gallery */
+.arches{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-top:34px}
+@media(max-width:760px){.arches{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.arches{grid-template-columns:1fr}}
+.arch{border-radius:160px 160px 18px 18px;min-height:320px;position:relative;overflow:hidden;display:flex;align-items:flex-end;justify-content:center;padding-bottom:22px}
+.arch.a1{background:linear-gradient(160deg,#d98ba0,#f0d3ba)}
+.arch.a2{background:linear-gradient(160deg,#b4586b,#e9c6cf)}
+.arch.a3{background:linear-gradient(160deg,#8f3c50,#caa07e)}
+.arch.a4{background:linear-gradient(160deg,#caa07e,#f6e7d3)}
+.arch.a5{background:linear-gradient(160deg,#e9c6cf,#d98ba0)}
+.arch.a6{background:linear-gradient(160deg,#a9714b,#b4586b)}
+.arch svg{width:55%;opacity:.92}
+.ph-tag{background:rgba(255,255,255,.9);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;padding:7px 14px;border-radius:999px;color:var(--ink)}
+
+/* reviews */
+.review-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:28px;margin:16px 0}
+.review-card .who{font-weight:600;margin-top:12px}
+.big-score{font-family:'Fraunces',serif;font-size:3.4rem;color:var(--rose-deep);font-weight:700}
+
+/* contact */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:30px}
+@media(max-width:760px){.contact-grid{grid-template-columns:1fr}}
+.info-box{background:#fff;border:1px solid var(--line);border-radius:16px;padding:28px}
+.info-box h3{margin-bottom:10px;font-size:1.3rem}
+.tel-big{font-family:'Fraunces',serif;font-size:1.8rem;color:var(--rose-deep);text-decoration:none;font-weight:700}
+.tel-big:hover{color:var(--rose)}
+
+/* minimal footer */
+footer{padding:44px 24px 30px;text-align:center;background:#241c19;color:#d9c9bb}
+footer nav{margin-bottom:16px}
+footer nav a{color:#d9c9bb;text-decoration:none;margin:0 12px;font-size:.95rem}
+footer nav a:hover{color:#fff}
+.copyright{font-size:.9rem;color:#a89888}
+
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="#home" data-page="home">Julie <span>Hair Salon</span></a>
+  <button id="burger" aria-label="Open menu" aria-expanded="false">&#9776;</button>
+</header>
+<div class="scrim" id="scrim"></div>
+<nav class="main" id="mainNav" aria-label="Main">
+  <div class="nav-head"><strong>Julie Hair Salon</strong><button class="closebtn" id="navClose" aria-label="Close menu">&times;</button></div>
+  <a href="#home" data-page="home" class="active" aria-current="page">Home</a>
+  <a href="#services" data-page="services">Services</a>
+  <a href="#about" data-page="about">About</a>
+  <a href="#gallery" data-page="gallery">Gallery</a>
+  <a href="#reviews" data-page="reviews">Reviews</a>
+  <a href="#contact" data-page="contact">Contact</a>
+</nav>
+
+<main>
+<section class="page" id="page-home">
+  <div class="hero wrap reveal">
+    <div class="kicker">Brooklyn, New York</div>
+    <h1>Great hair,<br><em>made personal.</em></h1>
+    <p class="lede">Julie Hair Salon on Fort Hamilton Parkway is known for attentive cuts, beautiful color, and blowouts that last. Call ahead and we will have a chair ready for you.</p>
+    <div class="rating-row"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><small>4.8 based on 240 reviews on Google</small></div>
+    <a class="btn btn-solid" href="#services" data-page="services">Explore services</a>
+    <a class="btn btn-ghost" href="#contact" data-page="contact">Book by phone</a>
+  </div>
+  <div class="band">
+    <div class="wrap two">
+      <div class="reveal">
+        <h2>A neighborhood favorite for cuts and color</h2>
+        <p>Clients come back for years for consistent color and careful blowouts. Reviewers mention affordable pricing, a friendly atmosphere, and a stylist who listens to what you want.</p>
+        <p style="margin-top:14px"><a href="#reviews" data-page="reviews">See what clients are saying</a></p>
+      </div>
+      <div class="art reveal">
+        <span class="badge">Photo placeholder</span>
+        <svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="80" r="52" fill="#fff" opacity=".55"/><path d="M48 82 C48 40 152 40 152 82 C152 108 128 96 126 122 C124 150 150 160 140 188 C120 176 84 176 64 188 C54 160 80 150 78 122 C76 96 48 108 48 82 Z" fill="#8f3c50" opacity=".75"/></svg>
+      </div>
+    </div>
+  </div>
+  <div class="band alt">
+    <div class="wrap two">
+      <div class="art reveal">
+        <span class="badge">Photo placeholder</span>
+        <svg viewBox="0 0 200 200" aria-hidden="true"><rect x="60" y="40" width="80" height="120" rx="40" fill="#fff" opacity=".55"/><path d="M70 70 h60 M70 100 h60 M70 130 h42" stroke="#8f3c50" stroke-width="8" stroke-linecap="round" opacity=".6"/></svg>
+      </div>
+      <div class="reveal">
+        <h2>Walk in or call ahead</h2>
+        <p>We are easy to find on Fort Hamilton Parkway in Brooklyn. Call <a href="tel:+19188076666">(918) 807-6666</a> to ask about same day availability or to plan your next cut and color.</p>
+        <p style="margin-top:14px"><a href="#contact" data-page="contact">Find us and book</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap" style="padding-top:70px;padding-bottom:70px">
+    <div class="kicker">What we do</div>
+    <h2 style="font-size:clamp(2rem,5vw,3.2rem);margin-bottom:10px">Services</h2>
+    <p style="color:var(--muted);max-width:600px;margin-bottom:36px">Pricing varies by hair length and service. Call <a href="tel:+19188076666">(918) 807-6666</a> for current pricing and availability.</p>
+    <div class="leader-block">
+      <div class="leader-row reveal" style="flex-basis:100%"><span class="name">Haircuts</span><span class="dots"></span><span class="note">Call for price</span><p class="desc">Cuts tailored to your face shape, hair texture, and how much time you want to spend styling at home.</p></div>
+      <div class="leader-row reveal" style="flex-basis:100%"><span class="name">Hair coloring</span><span class="dots"></span><span class="note">Call for price</span><p class="desc">From touch ups to full color changes, with attention to even, lasting results clients return for.</p></div>
+      <div class="leader-row reveal" style="flex-basis:100%"><span class="name">Blowouts</span><span class="dots"></span><span class="note">Call for price</span><p class="desc">Smooth, bouncy blowouts for everyday polish or special occasions.</p></div>
+      <div class="leader-row reveal" style="flex-basis:100%"><span class="name">Wash and style</span><span class="dots"></span><span class="note">Call for price</span><p class="desc">A relaxing wash followed by a style that suits your day, your event, or your week.</p></div>
+    </div>
+    <p style="margin-top:36px"><a class="btn btn-solid" href="tel:+19188076666">Call to book</a></p>
+  </div>
+</section>
+
+<section class="page" id="page-about">
+  <div class="wrap" style="padding-top:70px;padding-bottom:70px">
+    <div class="kicker">Our story</div>
+    <h2 style="font-size:clamp(2rem,5vw,3.2rem);margin-bottom:18px">About Julie Hair Salon</h2>
+    <div class="two">
+      <div class="reveal">
+        <p>Julie Hair Salon is a Brooklyn hair salon serving the Fort Hamilton neighborhood. Reviewers describe a stylist with a kind personality and real attention to detail, patient and fun staff, and results that keep clients returning for years.</p>
+        <p style="margin-top:14px">The salon is known for reliable hair coloring and blowouts, affordable prices, and a warm, friendly atmosphere where individual needs come first.</p>
+        <p style="margin-top:14px">Visit us at:<br><strong>Julie Hair Salon, 6913 Fort Hamilton Pkwy, Brooklyn, NY 11228</strong></p>
+      </div>
+      <div class="art reveal">
+        <span class="badge">Photo placeholder</span>
+        <svg viewBox="0 0 200 200" aria-hidden="true"><ellipse cx="100" cy="100" rx="70" ry="60" fill="#fff" opacity=".5"/><text x="100" y="112" text-anchor="middle" font-family="serif" font-size="44" fill="#8f3c50" opacity=".8">J</text></svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap" style="padding-top:70px;padding-bottom:70px">
+    <div class="kicker">The look</div>
+    <h2 style="font-size:clamp(2rem,5vw,3.2rem);margin-bottom:10px">Gallery</h2>
+    <p style="color:var(--muted);max-width:600px">Sample placeholders below. The finished site will feature real photos of the salon and its work.</p>
+    <div class="arches">
+      <div class="arch a1 reveal"><span class="badge">Photo placeholder</span><svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="85" r="46" fill="#fff" opacity=".6"/><path d="M54 88 C54 50 146 50 146 88 C146 110 126 100 124 124 C122 148 144 158 136 182 C118 172 82 172 64 182 C56 158 78 148 76 124 C74 100 54 110 54 88 Z" fill="#fff" opacity=".55"/></svg><span class="ph-tag">Placeholder</span></div>
+      <div class="arch a2 reveal"><span class="badge">Photo placeholder</span><svg viewBox="0 0 200 200" aria-hidden="true"><rect x="66" y="46" width="68" height="108" rx="34" fill="#fff" opacity=".6"/><circle cx="100" cy="80" r="18" fill="#8f3c50" opacity=".35"/></svg><span class="ph-tag">Placeholder</span></div>
+      <div class="arch a3 reveal"><span class="badge">Photo placeholder</span><svg viewBox="0 0 200 200" aria-hidden="true"><path d="M60 150 q40 -80 80 0" stroke="#fff" stroke-width="14" fill="none" opacity=".6" stroke-linecap="round"/><circle cx="100" cy="78" r="16" fill="#fff" opacity=".6"/></svg><span class="ph-tag">Placeholder</span></div>
+      <div class="arch a4 reveal"><span class="badge">Photo placeholder</span><svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="52" fill="#fff" opacity=".5"/><circle cx="100" cy="100" r="34" fill="none" stroke="#8f3c50" stroke-width="8" opacity=".5"/></svg><span class="ph-tag">Placeholder</span></div>
+      <div class="arch a5 reveal"><span class="badge">Photo placeholder</span><svg viewBox="0 0 200 200" aria-hidden="true"><rect x="56" y="70" width="88" height="70" rx="20" fill="#fff" opacity=".55"/><path d="M70 100 h60" stroke="#8f3c50" stroke-width="10" stroke-linecap="round" opacity=".5"/></svg><span class="ph-tag">Placeholder</span></div>
+      <div class="arch a6 reveal"><span class="badge">Photo placeholder</span><svg viewBox="0 0 200 200" aria-hidden="true"><path d="M100 40 L160 150 L40 150 Z" fill="#fff" opacity=".5"/><circle cx="100" cy="118" r="16" fill="#8f3c50" opacity=".45"/></svg><span class="ph-tag">Placeholder</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap" style="padding-top:70px;padding-bottom:70px">
+    <div class="kicker">Client love</div>
+    <h2 style="font-size:clamp(2rem,5vw,3.2rem);margin-bottom:10px">Reviews</h2>
+    <div style="display:flex;align-items:center;gap:18px;margin:20px 0 30px">
+      <span class="big-score">4.8</span>
+      <div><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><small style="color:var(--muted)">Based on 240 Google reviews</small></div>
+    </div>
+    <div class="review-card reveal">
+      <p>Based on 240 Google reviews, clients consistently praise beautiful, consistent hair coloring and blowouts, affordable prices, a kind and detail oriented stylist, and a friendly, welcoming atmosphere that keeps them coming back for years.</p>
+      <p class="who">Summary of Google reviews</p>
+    </div>
+    <div class="review-card reveal">
+      <p>Reviewers highlight patience and a fun atmosphere from the staff, plus extra care for individual needs. Many note the salon as highly recommended for both cuts and color.</p>
+      <p class="who">Summary of Google reviews</p>
+    </div>
+    <p style="margin-top:28px"><a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJ41uAf0ZFwokRcC0zoK9US7E" target="_blank" rel="noopener">See reviews on Google</a></p>
+  </div>
+</section>
+
+<section class="page" id="page-contact">
+  <div class="wrap" style="padding-top:70px;padding-bottom:70px">
+    <div class="kicker">Visit us</div>
+    <h2 style="font-size:clamp(2rem,5vw,3.2rem);margin-bottom:10px">Contact</h2>
+    <div class="contact-grid">
+      <div class="info-box reveal">
+        <h3>Book an appointment</h3>
+        <p style="margin-bottom:12px"><a class="tel-big" href="tel:+19188076666">(918) 807-6666</a></p>
+        <p style="color:var(--muted)">Call for hours and availability. Walk ins welcome when chairs are open.</p>
+      </div>
+      <div class="info-box reveal">
+        <h3>Find the salon</h3>
+        <p>Julie Hair Salon<br>6913 Fort Hamilton Pkwy<br>Brooklyn, NY 11228</p>
+        <p style="margin-top:12px"><a class="btn btn-ghost" style="margin-left:0" href="https://www.google.com/maps/place/?q=place_id:ChIJ41uAf0ZFwokRcC0zoK9US7E" target="_blank" rel="noopener">Get directions</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <nav>
+    <a href="#home" data-page="home">Home</a>
+    <a href="#services" data-page="services">Services</a>
+    <a href="#about" data-page="about">About</a>
+    <a href="#gallery" data-page="gallery">Gallery</a>
+    <a href="#reviews" data-page="reviews">Reviews</a>
+    <a href="#contact" data-page="contact">Contact</a>
+  </nav>
+  <div class="copyright">© Julie Hair Salon</div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "contact"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+  var scrim = document.getElementById("scrim");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+    if(scrim){ scrim.classList.remove("show"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  function toggleMenu(){
+    if(!nav || !burger){ return; }
+    var open = nav.classList.toggle("open");
+    burger.setAttribute("aria-expanded", open ? "true" : "false");
+    if(scrim){ scrim.classList.toggle("show", open); }
+  }
+  if(burger){
+    burger.addEventListener("click", function(e){ e.stopPropagation(); toggleMenu(); });
+  }
+  var navClose = document.getElementById("navClose");
+  if(navClose){ navClose.addEventListener("click", closeMenu); }
+  if(scrim){ scrim.addEventListener("click", closeMenu); }
+
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

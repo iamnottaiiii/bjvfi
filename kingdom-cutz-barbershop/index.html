@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kingdom Cutz Barbershop · Auburn, MA</title>
+<meta name="description" content="Kingdom Cutz Barbershop at 123 Central St Unit 4, Auburn, MA. Precision fades, beard work and kids cuts from a 5-star rated crew. Call (774) 808-6070.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16120c; --ink-2:#241d13;
+  --paper:#f7f2e7; --paper-2:#efe6d2;
+  --gold:#c9973a; --gold-soft:#f3e3bd;
+  --pine:#1e4d3b; --pine-deep:#123324;
+  --rust:#b0522b;
+  --muted:#6f6250; --muted-light:#b9ac94;
+  --line:rgba(22,18,12,.14);
+  --shadow:0 18px 44px -18px rgba(22,18,12,.35);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Inter",system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased}
+img{max-width:100%}
+a{color:inherit}
+::selection{background:var(--gold);color:var(--ink)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+.display{font-family:"Oswald",sans-serif;text-transform:uppercase;letter-spacing:.5px;line-height:.98}
+
+/* ---------- top bar + side drawer ---------- */
+.topbar{position:sticky;top:0;z-index:60;background:rgba(247,242,231,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.topbar-inner{display:flex;align-items:center;gap:16px;padding:12px 0}
+.menu-btn{display:inline-flex;align-items:center;gap:10px;background:var(--ink);color:var(--paper);border:0;cursor:pointer;padding:11px 18px;border-radius:999px;font-weight:700;font-size:.85rem;letter-spacing:1.5px;text-transform:uppercase}
+.menu-btn .bars{display:block}
+.menu-btn .bars span{display:block;width:22px;height:2.5px;background:var(--gold);margin:4px 0;border-radius:2px}
+.menu-btn:hover{background:var(--pine-deep)}
+.brand-mini{display:flex;align-items:center;gap:12px;text-decoration:none;font-family:"Oswald",sans-serif;font-weight:700;font-size:1.15rem;text-transform:uppercase;letter-spacing:1px}
+.brand-mini svg{width:40px;height:40px}
+.brand-mini small{display:block;font-family:"Inter",sans-serif;font-size:.62rem;letter-spacing:3px;color:var(--rust);font-weight:700}
+.topbar-call{margin-left:auto;display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:var(--ink);text-decoration:none;font-weight:800;padding:11px 22px;border-radius:999px;font-size:.95rem}
+.topbar-call:hover{background:var(--ink);color:var(--paper)}
+.scrim{position:fixed;inset:0;background:rgba(22,18,12,.55);z-index:70;opacity:0;pointer-events:none;transition:opacity .3s}
+.scrim.open{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:min(360px,86vw);background:var(--ink);color:var(--paper);z-index:80;transform:translateX(-102%);transition:transform .38s cubic-bezier(.22,.8,.3,1);display:flex;flex-direction:column;box-shadow:var(--shadow)}
+.drawer.open{transform:none}
+.drawer-top{display:flex;align-items:center;justify-content:space-between;padding:22px 26px;border-bottom:1px solid rgba(247,242,231,.12)}
+.drawer-top strong{font-family:"Oswald",sans-serif;text-transform:uppercase;letter-spacing:2px;font-size:1rem;color:var(--gold)}
+.drawer-close{background:none;border:1px solid rgba(247,242,231,.3);color:var(--paper);width:42px;height:42px;border-radius:50%;font-size:1.2rem;cursor:pointer}
+.drawer-close:hover{border-color:var(--gold);color:var(--gold)}
+nav.main{display:flex;flex-direction:column;padding:18px 14px;gap:4px}
+nav.main a{display:flex;align-items:baseline;gap:16px;text-decoration:none;color:var(--paper);padding:16px 18px;border-radius:14px;font-family:"Oswald",sans-serif;font-size:1.5rem;text-transform:uppercase;letter-spacing:1px;transition:background .2s}
+nav.main a .n{font-size:.85rem;color:var(--gold);font-family:"Inter",sans-serif;font-weight:700}
+nav.main a:hover{background:rgba(201,151,58,.14)}
+nav.main a.active{background:var(--gold);color:var(--ink)}
+nav.main a.active .n{color:var(--ink)}
+.drawer-foot{margin-top:auto;padding:26px;border-top:1px solid rgba(247,242,231,.12);font-size:.9rem;color:var(--muted-light)}
+.drawer-foot a{color:var(--gold);font-weight:700;text-decoration:none}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- type-led home (no hero banner) ---------- */
+.typeblock{padding:88px 0 64px;border-bottom:1px solid var(--line)}
+.kicker{display:inline-flex;align-items:center;gap:12px;font-size:.78rem;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--pine);margin-bottom:26px}
+.kicker::before{content:"";width:44px;height:3px;background:var(--gold)}
+.giant{font-family:"Oswald",sans-serif;font-weight:700;text-transform:uppercase;font-size:clamp(3rem,9.5vw,7.6rem);line-height:.96;letter-spacing:-.5px;margin-bottom:28px}
+.giant .stroke{color:transparent;-webkit-text-stroke:2.5px var(--ink)}
+.giant .gold{color:var(--gold)}
+.lede{font-size:1.18rem;color:var(--muted);max-width:38rem;margin-bottom:32px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:44px}
+.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:800;padding:15px 30px;border-radius:999px;font-size:1rem;transition:transform .18s,background .18s,color .18s;letter-spacing:.3px}
+.btn-solid{background:var(--ink);color:var(--paper)}
+.btn-solid:hover{background:var(--pine-deep);transform:translateY(-2px)}
+.btn-line{background:transparent;color:var(--ink);border:2px solid var(--ink)}
+.btn-line:hover{background:var(--gold);border-color:var(--gold);transform:translateY(-2px)}
+.fact-row{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--paper)}
+.fact{padding:22px 24px;border-right:1px solid var(--line)}
+.fact:last-child{border-right:0}
+.fact strong{display:block;font-family:"Oswald",sans-serif;font-size:1.9rem;color:var(--pine);line-height:1}
+.fact small{font-size:.82rem;color:var(--muted);font-weight:600}
+
+/* ---------- alternating bands ---------- */
+.band{padding:80px 0}
+.band.dark{background:var(--ink);color:var(--paper)}
+.band.dark .lede{color:var(--muted-light)}
+.band.dark .kicker{color:var(--gold)}
+.band-head{max-width:46rem;margin-bottom:48px}
+.band-head h2{font-family:"Oswald",sans-serif;text-transform:uppercase;font-size:clamp(2rem,4.6vw,3.4rem);line-height:1;margin-bottom:16px}
+.band.dark .band-head h2{color:var(--paper)}
+.band-head h2 em{font-style:normal;color:var(--rust)}
+.band.dark .band-head h2 em{color:var(--gold)}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
+.duo h3{font-family:"Oswald",sans-serif;text-transform:uppercase;font-size:1.4rem;margin-bottom:12px;letter-spacing:.5px}
+.duo p{color:var(--muted);margin-bottom:14px}
+.band.dark .duo p{color:var(--muted-light)}
+.tick{list-style:none;display:grid;gap:14px;margin-top:20px}
+.tick li{display:flex;gap:14px;align-items:flex-start;font-weight:500}
+.tick .box{flex:none;width:30px;height:30px;border-radius:9px;background:var(--pine);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;margin-top:2px}
+.band.dark .tick .box{background:var(--gold);color:var(--ink)}
+.pole-card{background:linear-gradient(140deg,var(--pine),var(--pine-deep));border-radius:22px;padding:44px 40px;color:#fff;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.pole-card::before{content:"";position:absolute;top:0;bottom:0;left:0;width:26px;background:repeating-linear-gradient(-45deg,var(--gold) 0 14px,#fff 14px 28px,var(--rust) 28px 42px,#fff 42px 56px);opacity:.9}
+.pole-card h3{font-family:"Oswald",sans-serif;text-transform:uppercase;font-size:1.8rem;margin-bottom:14px;margin-left:26px}
+.pole-card p{color:#e7dcc3;margin-bottom:12px;margin-left:26px}
+.pole-card .big-quote{font-family:"Oswald",sans-serif;font-size:1.6rem;text-transform:uppercase;line-height:1.25;color:var(--gold);margin:22px 0 8px 26px}
+.stat-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.stat{background:var(--ink);color:var(--paper);border-radius:18px;padding:32px 28px;border-left:6px solid var(--gold)}
+.stat strong{display:block;font-family:"Oswald",sans-serif;font-size:2.6rem;color:var(--gold);line-height:1;margin-bottom:8px}
+.stat span{font-size:.95rem;color:var(--muted-light)}
+
+/* ---------- editorial services ---------- */
+.ed-list{border-top:2px solid var(--ink)}
+.ed-item{display:grid;grid-template-columns:110px 1fr auto;gap:28px;align-items:start;padding:34px 0;border-bottom:1px solid var(--line)}
+.ed-item .num{font-family:"Oswald",sans-serif;font-size:3rem;font-weight:700;color:var(--gold);line-height:1}
+.ed-item h3{font-family:"Oswald",sans-serif;text-transform:uppercase;font-size:1.7rem;letter-spacing:.5px;margin-bottom:8px}
+.ed-item p{color:var(--muted);max-width:36rem}
+.ed-item .meta{text-align:right;font-weight:700;font-size:.85rem;color:var(--pine);white-space:nowrap}
+.ed-item .meta .tag{display:block;margin-top:8px;font-size:.68rem;letter-spacing:2px;text-transform:uppercase;background:var(--gold-soft);color:#8a5f14;padding:5px 12px;border-radius:999px}
+.sample-note{background:var(--gold-soft);border:1px dashed rgba(180,120,20,.5);border-radius:16px;padding:20px 26px;margin-top:28px;font-size:.95rem;color:#6b4a12}
+
+/* ---------- horizontal strip gallery ---------- */
+.hstrip{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 4px 22px;scrollbar-width:thin}
+.hstrip::-webkit-scrollbar{height:8px}
+.hstrip::-webkit-scrollbar-thumb{background:var(--gold);border-radius:8px}
+.shot{flex:0 0 290px;scroll-snap-align:start;background:#fff;border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:var(--shadow)}
+.shot .art{height:220px;display:flex;align-items:center;justify-content:center;position:relative}
+.shot .art svg{width:38%;height:auto;filter:drop-shadow(0 12px 16px rgba(0,0,0,.2))}
+.shot .ph{position:absolute;top:12px;left:12px;background:rgba(22,18,12,.78);color:#fff;font-size:.66rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 12px;border-radius:999px}
+.shot .cap{padding:16px 20px}
+.shot .cap strong{font-family:"Oswald",sans-serif;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:2px}
+.shot .cap small{color:var(--muted)}
+.hint{font-size:.85rem;color:var(--muted);font-weight:600;margin-bottom:14px}
+
+/* ---------- reviews ---------- */
+.rev-list{display:grid;gap:22px}
+.rev{background:#fff;border:1px solid var(--line);border-radius:20px;padding:32px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.rev::before{content:"";position:absolute;left:0;top:0;bottom:0;width:8px;background:var(--gold)}
+.rev .stars{color:var(--gold);font-size:1.2rem;letter-spacing:4px;margin-bottom:12px}
+.rev p{font-size:1.08rem;margin-bottom:12px}
+.rev cite{font-style:normal;font-weight:700;font-size:.85rem;color:var(--pine);letter-spacing:.5px}
+.rs-strip{margin:0 auto 34px;max-width:660px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 26px;text-align:center}
+.rs-note{margin:0 0 14px;font-size:.95rem;color:var(--muted);line-height:1.6}
+.rs-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rs-btn{display:inline-block;background:var(--pine);color:#fff;padding:11px 26px;border-radius:999px;font-weight:700;text-decoration:none;font-size:.95rem}
+.rs-btn:hover{background:var(--pine-deep)}
+
+/* ---------- contact ---------- */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-bottom:26px}
+.info-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:36px;box-shadow:var(--shadow)}
+.info-card h3{font-family:"Oswald",sans-serif;text-transform:uppercase;font-size:1.35rem;letter-spacing:.5px;margin-bottom:14px}
+.info-card p{color:var(--muted);margin-bottom:8px}
+.info-card a.big{font-family:"Oswald",sans-serif;font-size:1.7rem;font-weight:700;color:var(--pine);text-decoration:none;letter-spacing:.5px}
+.info-card a.big:hover{text-decoration:underline}
+
+/* ---------- page strips ---------- */
+.strip{padding:64px 0 8px}
+.strip .kicker{margin-bottom:18px}
+.strip h2{font-family:"Oswald",sans-serif;text-transform:uppercase;font-size:clamp(2.2rem,5.4vw,3.8rem);line-height:1;margin-bottom:14px}
+.strip p{color:var(--muted);max-width:40rem}
+
+/* ---------- multi-column footer ---------- */
+footer{background:var(--ink);color:#e9dfca;margin-top:0}
+.foot-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:40px;padding:64px 0 40px}
+.foot-grid h4{font-family:"Oswald",sans-serif;text-transform:uppercase;letter-spacing:2px;color:var(--gold);font-size:.95rem;margin-bottom:16px}
+.foot-grid p,.foot-grid a{color:#b9ac94;font-size:.93rem}
+.foot-grid a{text-decoration:none;display:block;padding:5px 0}
+.foot-grid a:hover{color:var(--gold)}
+.foot-logo{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.foot-logo svg{width:46px;height:46px}
+.foot-logo span{font-family:"Oswald",sans-serif;font-weight:700;color:#fff;font-size:1.3rem;text-transform:uppercase;letter-spacing:1px}
+.foot-bottom{border-top:1px solid rgba(247,242,231,.12);padding:22px 0 28px;text-align:center;font-size:.88rem;color:#8d7f66}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:940px){
+  .duo,.contact-grid{grid-template-columns:1fr}
+  .fact-row{grid-template-columns:1fr 1fr}
+  .fact:nth-child(2){border-right:0}
+  .fact{border-bottom:1px solid var(--line)}
+  .stat-strip{grid-template-columns:1fr}
+  .ed-item{grid-template-columns:64px 1fr}
+  .ed-item .meta{grid-column:2;text-align:left}
+  .foot-grid{grid-template-columns:1fr 1fr}
+  .topbar-call span.lbl{display:none}
+}
+@media(max-width:600px){
+  .foot-grid{grid-template-columns:1fr}
+  .fact-row{grid-template-columns:1fr}
+  .fact{border-right:0}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap topbar-inner">
+    <button class="menu-btn" id="burger" aria-label="Open navigation" aria-expanded="false"><span class="bars"><span></span><span></span><span></span></span>Menu</button>
+    <a class="brand-mini" href="#home" data-page="home" aria-label="Kingdom Cutz Barbershop, home">
+      <svg viewBox="0 0 64 64" role="img" aria-label="Barber pole logo"><rect x="20" y="8" width="24" height="48" rx="12" fill="#f7f2e7" stroke="#16120c" stroke-width="2.5"/><clipPath id="poleclip"><rect x="20" y="8" width="24" height="48" rx="12"/></clipPath><g clip-path="url(#poleclip)"><rect x="20" y="8" width="24" height="48" fill="repeating-linear-gradient(-45deg,#c9973a 0 7px,#f7f2e7 7px 14px,#b0522b 14px 21px,#f7f2e7 21px 28px)"/></g><rect x="28" y="2" width="8" height="8" rx="2" fill="#16120c"/><rect x="28" y="54" width="8" height="8" rx="2" fill="#16120c"/></svg>
+      <span>Kingdom Cutz<small>Barbershop · Auburn</small></span>
+    </a>
+    <a class="topbar-call" href="tel:+17748086070">Call <span class="lbl">(774) 808-6070</span></a>
+  </div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Site navigation">
+  <div class="drawer-top">
+    <strong>Kingdom Cutz</strong>
+    <button class="drawer-close" id="drawerClose" aria-label="Close navigation">✕</button>
+  </div>
+  <nav class="main" id="mainNav" aria-label="Main navigation">
+    <a href="#home" data-page="home" class="active" aria-current="page"><span class="n">01</span>Home</a>
+    <a href="#services" data-page="services"><span class="n">02</span>Services</a>
+    <a href="#about" data-page="about"><span class="n">03</span>The Shop</a>
+    <a href="#gallery" data-page="gallery"><span class="n">04</span>Gallery</a>
+    <a href="#reviews" data-page="reviews"><span class="n">05</span>Reviews</a>
+    <a href="#contact" data-page="contact"><span class="n">06</span>Contact</a>
+  </nav>
+  <div class="drawer-foot">
+    <p>123 Central St Unit 4<br>Auburn, MA 01501<br><a href="tel:+17748086070">(774) 808-6070</a></p>
+  </div>
+</aside>
+
+<section class="page active" id="page-home">
+  <div class="typeblock">
+    <div class="wrap">
+      <span class="kicker">Auburn, Massachusetts · Est. on Central St</span>
+      <h1 class="giant">Sharp <span class="stroke">fades.</span><br>Honest <span class="gold">work.</span><br>Zero attitude.</h1>
+      <p class="lede">Kingdom Cutz Barbershop is Auburn's 5-star rated chair for precision cuts, beard sculpting and kids cuts, with a crew reviewers name by name and a shop that stays spotless.</p>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="tel:+17748086070">Call (774) 808-6070</a>
+        <a class="btn btn-line" href="https://booksy.com/en-us/838496_kingdom-cutz-barbershop-auburn_barber-shop_22431_auburn" target="_blank" rel="noopener">Book on Booksy</a>
+        <a class="btn btn-line" href="#services" data-page="services">See services</a>
+      </div>
+      <div class="fact-row reveal">
+        <div class="fact"><strong>5.0</strong><small>Rating on Booksy, based on 157 reviews</small></div>
+        <div class="fact"><strong>5</strong><small>Barbers in the chair rotation</small></div>
+        <div class="fact"><strong>Unit 4</strong><small>123 Central St, Auburn, MA 01501</small></div>
+        <div class="fact"><strong>Walk-ins</strong><small>Call ahead for the shortest wait</small></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap">
+      <div class="band-head reveal">
+        <span class="kicker">The cut menu</span>
+        <h2>Every cut, <em>dialed in</em></h2>
+        <p class="lede">From skin fades to hot towel shaves, every service is done with the same obsession over the details. Full menu on the services page.</p>
+      </div>
+      <div class="ed-list">
+        <div class="ed-item reveal">
+          <span class="num">01</span>
+          <div><h3>Men's Haircut</h3><p>Consultation, precision cut, styled finish. Fades, tapers, scissor work, whatever your head calls for.</p></div>
+          <span class="meta">Chair time<br><span class="tag">Most booked</span></span>
+        </div>
+        <div class="ed-item reveal">
+          <span class="num">02</span>
+          <div><h3>Haircut and Beard</h3><p>The full reset: cut plus beard sculpt, line up and hot lather finish.</p></div>
+          <span class="meta">Cut + beard<br><span class="tag">Best value</span></span>
+        </div>
+        <div class="ed-item reveal">
+          <span class="num">03</span>
+          <div><h3>Kids Cut, 12 and Under</h3><p>Patient, friendly cuts for young gentlemen. Parents consistently call this shop kid-approved.</p></div>
+          <span class="meta">12 and under<br><span class="tag">Family pick</span></span>
+        </div>
+      </div>
+      <div class="cta-row" style="margin-top:34px">
+        <a class="btn btn-solid" href="#services" data-page="services">Full service menu</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="band dark">
+    <div class="wrap">
+      <div class="duo">
+        <div class="reveal">
+          <span class="kicker">Why Kingdom Cutz</span>
+          <h2 class="display" style="font-size:clamp(2rem,4.4vw,3.2rem);margin-bottom:18px">A crew Auburn<br>asks for <span style="color:var(--gold)">by name</span></h2>
+          <p class="lede">Reviewers do not just rate the shop, they name their barber: Adam, Friz, Jose, Mickey and Jay all have loyal followings built cut by cut.</p>
+          <ul class="tick">
+            <li><span class="box">✓</span><span>5.0 rating across 157 Booksy reviews, with 156 of them five stars</span></li>
+            <li><span class="box">✓</span><span>Spotless shop with original artwork on the walls, done by Adam himself</span></li>
+            <li><span class="box">✓</span><span>Child-friendly chairs, free Wi-Fi, accessible entrance, on-site parking</span></li>
+            <li><span class="box">✓</span><span>Online booking through Booksy, or just call the shop</span></li>
+          </ul>
+          <div class="cta-row" style="margin-top:28px">
+            <a class="btn btn-line" style="color:var(--paper);border-color:var(--paper)" href="#about" data-page="about">Meet the shop</a>
+          </div>
+        </div>
+        <div class="pole-card reveal">
+          <h3>What regulars say</h3>
+          <p class="big-quote">"No matter what style or challenge I throw at Adam, he bodies it."</p>
+          <p>Paraphrased from a Booksy review of a haircut with Adam Sharkus.</p>
+          <p class="big-quote">"Best cut in the area you will get."</p>
+          <p>Paraphrased from a Booksy review. The sentiment repeats across dozens of five-star reviews.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap">
+      <div class="band-head reveal">
+        <span class="kicker">Rated and reviewed</span>
+        <h2>5.0 stars, <em>157 reviews</em></h2>
+        <p class="lede">Based on public Booksy reviews. Open the source to read current reviews and ratings.</p>
+      </div>
+      <div class="stat-strip">
+        <div class="stat reveal"><strong>5.0 / 5</strong><span>Booksy rating, based on 157 reviews</span></div>
+        <div class="stat reveal"><strong>4.6 / 5</strong><span>Birdeye rating, based on 53 reviews</span></div>
+        <div class="stat reveal"><strong>156</strong><span>Five-star reviews on Booksy</span></div>
+      </div>
+      <div class="cta-row" style="margin-top:34px">
+        <a class="btn btn-solid" href="#reviews" data-page="reviews">Read review themes</a>
+        <a class="btn btn-line" href="https://www.google.com/maps/place/?q=place_id:ChIJ458_WGEF5IkRHq0XMUI-E_g" target="_blank" rel="noopener">See reviews on Google</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="band dark" style="padding:64px 0">
+    <div class="wrap" style="display:flex;flex-wrap:wrap;align-items:center;gap:24px;justify-content:space-between">
+      <div>
+        <h2 class="display" style="font-size:clamp(1.8rem,4vw,2.8rem);color:var(--paper)">Your chair is waiting.</h2>
+        <p style="color:var(--muted-light);margin-top:8px">123 Central St Unit 4, Auburn, MA 01501. Call for today's hours.</p>
+      </div>
+      <div class="cta-row" style="margin:0">
+        <a class="btn btn-solid" style="background:var(--gold);color:var(--ink)" href="tel:+17748086070">Call (774) 808-6070</a>
+        <a class="btn btn-line" style="color:var(--paper);border-color:var(--paper)" href="#contact" data-page="contact">Find us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div class="strip">
+      <span class="kicker">Services</span>
+      <h2>The full menu</h2>
+      <p>Services below are drawn from the shop's public booking listings. Prices vary, so call (774) 808-6070 for today's pricing before you book.</p>
+    </div>
+    <div class="ed-list" style="margin-top:36px">
+      <div class="ed-item reveal">
+        <span class="num">01</span>
+        <div><h3>Men's Haircut</h3><p>Consultation, precision cut and styled finish. Fades, tapers, textured tops, classic scissor cuts. This is the bread and butter of the shop and the most reviewed service on Booksy.</p></div>
+        <span class="meta">Any barber<br><span class="tag">Most booked</span></span>
+      </div>
+      <div class="ed-item reveal">
+        <span class="num">02</span>
+        <div><h3>Haircut and Beard</h3><p>The full reset in one visit: haircut plus beard shaping, crisp line up and a clean neckline finish.</p></div>
+        <span class="meta">Cut + beard<br><span class="tag">Best value</span></span>
+      </div>
+      <div class="ed-item reveal">
+        <span class="num">03</span>
+        <div><h3>Kids Cut, 12 and Under</h3><p>Patient, friendly service for young gentlemen. Reviewers consistently praise how well the crew handles first cuts and fidgety little clients.</p></div>
+        <span class="meta">12 and under<br><span class="tag">Family pick</span></span>
+      </div>
+      <div class="ed-item reveal">
+        <span class="num">04</span>
+        <div><h3>Beard Trim</h3><p>Shape, detail and line up for the beard, with hot lather on the neckline for that barbershop finish.</p></div>
+        <span class="meta">Beard only</span>
+      </div>
+      <div class="ed-item reveal">
+        <span class="num">05</span>
+        <div><h3>Head Shave</h3><p>Clean, smooth full head shave with hot lather and a soothing finish.</p></div>
+        <span class="meta">Hot lather</span>
+      </div>
+      <div class="ed-item reveal">
+        <span class="num">06</span>
+        <div><h3>Hot Towel Shave</h3><p>The classic straight-razor experience: hot towel prep, rich lather, close shave, cool towel finish.</p></div>
+        <span class="meta">Straight razor<br><span class="tag">Classic</span></span>
+      </div>
+    </div>
+    <div class="sample-note reveal">
+      <strong>Good to know:</strong> service names come from the shop's public booking listings, but prices change, so treat any price you see online as a guide only. For exact pricing, call <a href="tel:+17748086070" style="font-weight:800;color:inherit">(774) 808-6070</a> or check the live Booksy page. Online booking is available at <a href="https://booksy.com/en-us/838496_kingdom-cutz-barbershop-auburn_barber-shop_22431_auburn" target="_blank" rel="noopener" style="font-weight:800;color:inherit">Kingdom Cutz on Booksy</a>.
+    </div>
+    <div style="height:64px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-about">
+  <div class="wrap">
+    <div class="strip">
+      <span class="kicker">The shop</span>
+      <h2>Kingdom Cutz,<br>Auburn's chair</h2>
+      <p>A neighborhood barbershop on Central Street where the cuts are sharp, the shop is spotless and the regulars are on a first-name basis with their barber.</p>
+    </div>
+  </div>
+  <div class="band">
+    <div class="wrap duo">
+      <div class="reveal">
+        <span class="kicker">What the shop is known for</span>
+        <h2 class="display" style="font-size:clamp(1.9rem,4vw,2.9rem);margin-bottom:18px">Clean shop.<br>Serious <span style="color:var(--rust)">craft.</span></h2>
+        <p>Reviewers keep coming back to the same themes: a shop that is always extremely clean, a cool vibe, and barbers who take on any style challenge. The walls carry original artwork done by Adam himself.</p>
+        <p>Families drive in from surrounding towns. One reviewer moved to the area and now brings their son back every time. Another has trusted Jay with their cut for nearly five years without a single disappointment.</p>
+        <ul class="tick">
+          <li><span class="box">✓</span><span>On-site parking, wheelchair accessible entrance, child-friendly chairs</span></li>
+          <li><span class="box">✓</span><span>Free Wi-Fi while you wait</span></li>
+          <li><span class="box">✓</span><span>Online booking through Booksy, or call the shop directly</span></li>
+        </ul>
+      </div>
+      <div class="pole-card reveal">
+        <h3>The crew</h3>
+        <p>Barbers named in public reviews include Adam Sharkus, Fred D (Friz), Jose Reyes, Mickey Palomares and Jay Mark. Ask for your favorite, or take the first open chair, reviewers say every barber in the shop delivers.</p>
+        <p class="big-quote">"Best haircuts as always. Four, nearly five years now, never disappoints."</p>
+        <p>Paraphrased from a Booksy review of a haircut with Jay Mark.</p>
+      </div>
+    </div>
+  </div>
+  <div class="band dark" style="padding:64px 0">
+    <div class="wrap" style="display:flex;flex-wrap:wrap;align-items:center;gap:24px;justify-content:space-between">
+      <div>
+        <h2 class="display" style="font-size:clamp(1.8rem,4vw,2.8rem);color:var(--paper)">Come see the shop.</h2>
+        <p style="color:var(--muted-light);margin-top:8px">123 Central St Unit 4, Auburn, MA 01501</p>
+      </div>
+      <div class="cta-row" style="margin:0">
+        <a class="btn btn-solid" style="background:var(--gold);color:var(--ink)" href="tel:+17748086070">Call (774) 808-6070</a>
+        <a class="btn btn-line" style="color:var(--paper);border-color:var(--paper)" href="#gallery" data-page="gallery">See the gallery</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div class="strip">
+      <span class="kicker">Gallery</span>
+      <h2>Fresh off the chair</h2>
+      <p>Artistic placeholders for now. Real photos of cuts, the shop and the crew are on the way.</p>
+    </div>
+    <p class="hint" style="margin-top:34px">Scroll sideways to browse</p>
+    <div class="hstrip">
+      <div class="shot reveal">
+        <div class="art" style="background:linear-gradient(140deg,#1e4d3b,#123324)"><span class="ph">Photo soon</span>
+          <svg viewBox="0 0 100 100"><rect x="18" y="42" width="26" height="14" rx="4" fill="#c9973a"/><rect x="44" y="38" width="38" height="22" rx="6" fill="#f7f2e7"/><circle cx="52" cy="49" r="4" fill="#16120c"/><path d="M82 44 l12 -8 M82 54 l12 8" stroke="#16120c" stroke-width="5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>Skin fades</strong><small>Placeholder, real cut photo coming</small></div>
+      </div>
+      <div class="shot reveal">
+        <div class="art" style="background:linear-gradient(140deg,#c9973a,#8a5f14)"><span class="ph">Photo soon</span>
+          <svg viewBox="0 0 100 100"><circle cx="34" cy="36" r="10" fill="none" stroke="#16120c" stroke-width="5"/><circle cx="66" cy="36" r="10" fill="none" stroke="#16120c" stroke-width="5"/><path d="M40 44 L26 84 M60 44 L74 84" stroke="#16120c" stroke-width="5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>Scissor work</strong><small>Placeholder, real cut photo coming</small></div>
+      </div>
+      <div class="shot reveal">
+        <div class="art" style="background:linear-gradient(140deg,#b0522b,#7c3a1e)"><span class="ph">Photo soon</span>
+          <svg viewBox="0 0 100 100"><path d="M30 20 h40 v60 a6 6 0 01-6 6 h-28 a6 6 0 01-6 -6 z" fill="#f7f2e7"/><path d="M30 32 h40 M30 46 h40 M30 60 h40" stroke="#b0522b" stroke-width="4"/><rect x="42" y="8" width="16" height="12" rx="3" fill="#16120c"/></svg>
+        </div>
+        <div class="cap"><strong>Beard sculpting</strong><small>Placeholder, real cut photo coming</small></div>
+      </div>
+      <div class="shot reveal">
+        <div class="art" style="background:linear-gradient(140deg,#241d13,#16120c)"><span class="ph">Photo soon</span>
+          <svg viewBox="0 0 100 100"><rect x="34" y="18" width="32" height="52" rx="14" fill="#f7f2e7"/><g><rect x="34" y="26" width="32" height="8" fill="#b0522b"/><rect x="34" y="42" width="32" height="8" fill="#c9973a"/><rect x="34" y="58" width="32" height="8" fill="#b0522b"/></g><rect x="44" y="70" width="12" height="16" fill="#16120c"/></svg>
+        </div>
+        <div class="cap"><strong>The pole</strong><small>Placeholder, real shop photo coming</small></div>
+      </div>
+      <div class="shot reveal">
+        <div class="art" style="background:linear-gradient(140deg,#efe6d2,#d8c9a6)"><span class="ph">Photo soon</span>
+          <svg viewBox="0 0 100 100"><path d="M28 78 h44 l-4 -34 h-36 z" fill="#1e4d3b"/><rect x="24" y="74" width="52" height="8" rx="4" fill="#16120c"/><path d="M36 40 v-14 M50 40 v-20 M64 40 v-14" stroke="#16120c" stroke-width="5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>The chairs</strong><small>Placeholder, real shop photo coming</small></div>
+      </div>
+      <div class="shot reveal">
+        <div class="art" style="background:linear-gradient(140deg,#123324,#1e4d3b)"><span class="ph">Photo soon</span>
+          <svg viewBox="0 0 100 100"><path d="M20 62 q15 -26 30 0 q15 26 30 0" fill="none" stroke="#c9973a" stroke-width="6" stroke-linecap="round"/><circle cx="50" cy="30" r="10" fill="#f7f2e7"/><path d="M44 26 l6 4 8 -8" stroke="#1e4d3b" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>Hot towel finish</strong><small>Placeholder, real service photo coming</small></div>
+      </div>
+    </div>
+    <div class="sample-note reveal" style="margin-bottom:64px">
+      <strong>Coming soon:</strong> real photos of actual cuts, the shop interior and the crew. The illustrations above are placeholders the shop can swap in a minute.
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div class="strip">
+      <span class="kicker">Reviews</span>
+      <h2>What Auburn says</h2>
+      <p>Themes below are paraphrased from public feedback. Open the source to read current reviews and ratings.</p>
+    </div>
+    <div class="rs-strip" style="margin-top:36px">
+      <p class="rs-note">Review themes on this page are paraphrased from public feedback. Open the source to read current reviews and ratings.</p>
+      <div class="rs-links">
+        <a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJ458_WGEF5IkRHq0XMUI-E_g" target="_blank" rel="noopener">See reviews on Google</a>
+        <a class="rs-btn" href="https://booksy.com/en-us/838496_kingdom-cutz-barbershop-auburn_barber-shop_22431_auburn" target="_blank" rel="noopener">See reviews on Booksy</a>
+        <a class="rs-btn" href="https://reviews.birdeye.com/kingdom-cutz-barbershop-auburn-ma-170256777704218" target="_blank" rel="noopener">See reviews on Birdeye</a>
+      </div>
+    </div>
+    <div class="rev-list">
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>Regulars say Adam takes on any style or challenge and nails it. Reviewers name him again and again as the barber who never misses.</p>
+        <cite>Theme from Booksy reviews</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>Parents praise the crew for how well they handle kids cuts. One reviewer moved to the area and now brings their son back every visit.</p>
+        <cite>Theme from Booksy reviews</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>Long-term loyalty is the pattern: multiple reviewers report years of consistent cuts, including one who has trusted Jay for nearly five years.</p>
+        <cite>Theme from Booksy reviews</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>The shop itself gets love: always extremely clean, cool original artwork on the walls, and a vibe that makes the drive worth it.</p>
+        <cite>Theme from Birdeye and local listings</cite>
+      </div>
+    </div>
+    <div style="height:64px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-contact">
+  <div class="wrap">
+    <div class="strip">
+      <span class="kicker">Contact</span>
+      <h2>Get in the chair</h2>
+      <p>Call, book online, or just stop by 123 Central St.</p>
+    </div>
+    <div class="contact-grid" style="margin-top:36px">
+      <div class="info-card reveal">
+        <h3>Call or book</h3>
+        <p>Questions, pricing, or to lock in a chair:</p>
+        <a class="big" href="tel:+17748086070">(774) 808-6070</a>
+        <p style="margin-top:12px">Online booking is available on the shop's <a href="https://booksy.com/en-us/838496_kingdom-cutz-barbershop-auburn_barber-shop_22431_auburn" target="_blank" rel="noopener" style="font-weight:700;color:var(--pine)">Booksy page</a>.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3>Find us</h3>
+        <p><strong>Kingdom Cutz Barbershop, 123 Central St Unit 4, Auburn, MA 01501</strong></p>
+        <p>On-site parking available. Wheelchair accessible entrance.</p>
+        <p style="margin-top:12px"><a href="https://www.google.com/maps/place/?q=place_id:ChIJ458_WGEF5IkRHq0XMUI-E_g" target="_blank" rel="noopener" style="font-weight:700;color:var(--pine)">Get directions on Google Maps</a></p>
+      </div>
+    </div>
+    <div class="info-card reveal" style="margin-bottom:64px">
+      <h3>Hours</h3>
+      <p><strong>Call for hours.</strong> Online listings show varying schedules, so call <a href="tel:+17748086070" style="font-weight:700;color:var(--pine)">(774) 808-6070</a> to confirm before you head over.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-logo">
+          <svg viewBox="0 0 64 64" role="img" aria-label="Barber pole logo"><rect x="20" y="8" width="24" height="48" rx="12" fill="#f7f2e7"/><rect x="20" y="8" width="24" height="48" rx="12" fill="none" stroke="#c9973a" stroke-width="2.5"/><g><rect x="24" y="16" width="16" height="6" fill="#b0522b"/><rect x="24" y="28" width="16" height="6" fill="#c9973a"/><rect x="24" y="40" width="16" height="6" fill="#b0522b"/></g></svg>
+          <span>Kingdom Cutz</span>
+        </div>
+        <p>Auburn's 5-star rated barbershop on Central Street. Precision fades, beard work, kids cuts, zero attitude.</p>
+      </div>
+      <div>
+        <h4>Visit</h4>
+        <p>Kingdom Cutz Barbershop, 123 Central St Unit 4, Auburn, MA 01501</p>
+        <a href="tel:+17748086070">(774) 808-6070</a>
+        <a href="https://www.google.com/maps/place/?q=place_id:ChIJ458_WGEF5IkRHq0XMUI-E_g" target="_blank" rel="noopener">Directions</a>
+      </div>
+      <div>
+        <h4>Hours</h4>
+        <p>Call for hours:<br><a href="tel:+17748086070">(774) 808-6070</a></p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <a href="#home" data-page="home">Home</a>
+        <a href="#services" data-page="services">Services</a>
+        <a href="#about" data-page="about">The Shop</a>
+        <a href="#gallery" data-page="gallery">Gallery</a>
+        <a href="#reviews" data-page="reviews">Reviews</a>
+        <a href="#contact" data-page="contact">Contact</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© Kingdom Cutz Barbershop</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "contact"];
+  var drawer = document.getElementById("drawer");
+  var scrim = document.getElementById("scrim");
+  var burger = document.getElementById("burger");
+  var drawerClose = document.getElementById("drawerClose");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(drawer){ drawer.classList.remove("open"); }
+    if(scrim){ scrim.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function openMenu(){
+    if(drawer){ drawer.classList.add("open"); }
+    if(scrim){ scrim.classList.add("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "true"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger){
+    burger.addEventListener("click", function(){
+      if(drawer && drawer.classList.contains("open")){ closeMenu(); }
+      else { openMenu(); }
+    });
+  }
+  if(drawerClose){ drawerClose.addEventListener("click", closeMenu); }
+  if(scrim){ scrim.addEventListener("click", closeMenu); }
+
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
