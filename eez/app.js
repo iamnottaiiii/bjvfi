@@ -257,42 +257,21 @@
     if (apple) apple.setAttribute("content", "black-translucent");
   }
 
-  function applyAccent(accent) {
-    const a = ["default", "blue", "violet", "green", "amber", "rose"].includes(accent)
-      ? accent
-      : "default";
-    document.documentElement.setAttribute("data-accent", a);
-    try { localStorage.setItem("eez_accent", a); } catch { /* ignore */ }
-  }
-
   function applyUserAppearance(user) {
     if (!user) {
-      try {
-        applyAccent(localStorage.getItem("eez_accent") || "default");
-      } catch {
-        applyAccent("default");
-      }
       applyUitheme(storedUitheme(), storedUithemeCustom());
       return;
     }
-    applyAccent(user.theme_accent || "default");
-    applyUitheme(user.theme_preset || "", user.theme_custom || "");
+    applyUitheme(user.theme_preset || "", parsePackedCustom(user.theme_custom || ""));
   }
 
-  function accentPicksHtml(current) {
-    const cur = current || "default";
-    return ["default", "blue", "violet", "green", "amber", "rose"]
-      .map(
-        (a) =>
-          `<button type="button" class="accent-pick ${a === cur ? "on" : ""}" data-accent="${a}" title="${a}" aria-label="accent ${a}"></button>`,
-      )
-      .join("");
-  }
-
-  /* whole-UI themes: 3 presets + custom color. Replaces the old dark/light toggle. */
+  /* whole-UI themes: 3 presets + custom (background / highlight / text). Replaces the old dark/light toggle. */
   const UITHEMES = ["midnight", "paper", "ocean", "custom"];
   const UITHEME_KEY = "eez_uitheme";
-  const UITHEME_CUSTOM_KEY = "eez_uitheme_custom";
+  const UITHEME_BG_KEY = "eez_theme_bg";
+  const UITHEME_ACCENT_KEY = "eez_theme_accent";
+  const UITHEME_TEXT_KEY = "eez_theme_text";
+  const CUSTOM_DEFAULTS = { bg: "#101318", accent: "#5b9cff", text: "#f4f5f7" };
   const CUSTOM_THEME_VARS = ["--bg", "--bg2", "--bg3", "--surface", "--ink", "--muted", "--muted2",
     "--accent", "--accent-soft", "--accent-ink", "--btn-bg", "--btn-fg", "--toast-bg", "--toast-fg",
     "--modal", "--unread", "--red", "--bubble-theirs"];
@@ -305,57 +284,98 @@
       return "";
     }
   }
+  function validHex(c) {
+    return /^#[0-9a-fA-F]{6}$/.test(c || "") ? c : "";
+  }
   function storedUithemeCustom() {
+    const out = { ...CUSTOM_DEFAULTS };
     try {
-      const c = localStorage.getItem(UITHEME_CUSTOM_KEY);
-      return /^#[0-9a-fA-F]{6}$/.test(c || "") ? c : "#5b9cff";
+      const bg = validHex(localStorage.getItem(UITHEME_BG_KEY));
+      const ac = validHex(localStorage.getItem(UITHEME_ACCENT_KEY));
+      const tx = validHex(localStorage.getItem(UITHEME_TEXT_KEY));
+      if (bg) out.bg = bg;
+      if (ac) out.accent = ac;
+      if (tx) out.text = tx;
+      // migrate the old single-color custom theme: it becomes the highlight
+      const legacy = validHex(localStorage.getItem("eez_uitheme_custom"));
+      if (legacy && !ac) out.accent = legacy;
     } catch {
-      return "#5b9cff";
+      /* ignore */
     }
+    return out;
   }
-  function hexToHsl(hex) {
+  function parsePackedCustom(packed) {
+    const out = { ...CUSTOM_DEFAULTS };
+    const parts = String(packed || "").split(",");
+    const bg = validHex(parts[0]), ac = validHex(parts[1]), tx = validHex(parts[2]);
+    if (bg) out.bg = bg;
+    if (ac) out.accent = ac;
+    if (tx) out.text = tx;
+    return out;
+  }
+  function packCustom(c) {
+    return [c.bg, c.accent, c.text].join(",");
+  }
+  function hexToRgb(hex) {
     const n = parseInt(hex.slice(1), 16);
-    const r = ((n >> 16) & 255) / 255, g = ((n >> 8) & 255) / 255, b = (n & 255) / 255;
-    const mx = Math.max(r, g, b), mn = Math.min(r, g, b);
-    let h = 0, s = 0;
-    const l = (mx + mn) / 2;
-    if (mx !== mn) {
-      const d = mx - mn;
-      s = l > 0.5 ? d / (2 - mx - mn) : d / (mx + mn);
-      if (mx === r) h = (g - b) / d + (g < b ? 6 : 0);
-      else if (mx === g) h = (b - r) / d + 2;
-      else h = (r - g) / d + 4;
-      h *= 60;
-    }
-    return [Math.round(h), Math.round(s * 100), Math.round(l * 100)];
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
   }
-  function applyCustomThemeVars(hex) {
+  function rgbToHex(r, g, b) {
+    const c = (v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, "0");
+    return "#" + c(r) + c(g) + c(b);
+  }
+  function shade(hex, pct) {
+    // pct -100..100: negative darkens toward black, positive lightens toward white
+    const [r, g, b] = hexToRgb(hex);
+    const t = pct < 0 ? 0 : 255;
+    const p = Math.abs(pct) / 100;
+    return rgbToHex(r + (t - r) * p, g + (t - g) * p, b + (t - b) * p);
+  }
+  function mixHex(a, b, t) {
+    const [r1, g1, b1] = hexToRgb(a), [r2, g2, b2] = hexToRgb(b);
+    return rgbToHex(r1 + (r2 - r1) * t, g1 + (g2 - g1) * t, b1 + (b2 - b1) * t);
+  }
+  function hexAlpha(hex, a) {
+    const [r, g, b] = hexToRgb(hex);
+    return `rgba(${r}, ${g}, ${b}, ${a})`;
+  }
+  function lum(hex) {
+    const [r, g, b] = hexToRgb(hex).map((v) => {
+      v /= 255;
+      return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  }
+  function applyCustomThemeVars(custom) {
     const root = document.documentElement;
-    const [h, s0] = hexToHsl(hex);
-    const s = Math.max(s0, 30);
-    const bgS = Math.round(s * 0.45);
+    const c = { ...CUSTOM_DEFAULTS, ...(custom || {}) };
+    const bg = validHex(c.bg) || CUSTOM_DEFAULTS.bg;
+    const accent = validHex(c.accent) || CUSTOM_DEFAULTS.accent;
+    const ink = validHex(c.text) || CUSTOM_DEFAULTS.text;
+    const dark = lum(bg) < 0.4;
+    const onAccent = lum(accent) > 0.5 ? "#0b0e12" : "#f4f5f7";
     const vars = {
-      "--bg": `hsl(${h}, ${bgS}%, 6%)`,
-      "--bg2": `hsl(${h}, ${bgS}%, 9%)`,
-      "--bg3": `hsl(${h}, ${Math.round(s * 0.4)}%, 13%)`,
-      "--surface": `hsla(${h}, ${Math.round(s * 0.5)}%, 16%, 0.85)`,
-      "--ink": `hsl(${h}, 14%, 93%)`,
-      "--muted": `hsl(${h}, 16%, 64%)`,
-      "--muted2": `hsl(${h}, 14%, 46%)`,
-      "--accent": `hsl(${h}, ${s}%, 62%)`,
-      "--accent-soft": `hsl(${h}, ${s}%, 48%)`,
-      "--accent-ink": "#0b0e12",
-      "--btn-bg": `hsl(${h}, 14%, 93%)`,
-      "--btn-fg": `hsl(${h}, ${bgS}%, 9%)`,
-      "--toast-bg": `hsl(${h}, 14%, 93%)`,
-      "--toast-fg": `hsl(${h}, ${bgS}%, 9%)`,
-      "--modal": `hsla(${h}, ${bgS}%, 9%, 0.96)`,
-      "--unread": `hsl(${h}, ${s}%, 62%)`,
+      "--bg": bg,
+      "--bg2": shade(bg, dark ? 5 : -4),
+      "--bg3": shade(bg, dark ? 10 : -8),
+      "--surface": hexAlpha(shade(bg, dark ? 8 : -6), 0.85),
+      "--ink": ink,
+      "--muted": mixHex(ink, bg, 0.35),
+      "--muted2": mixHex(ink, bg, 0.55),
+      "--accent": accent,
+      "--accent-soft": shade(accent, -12),
+      "--accent-ink": onAccent,
+      "--btn-bg": accent,
+      "--btn-fg": onAccent,
+      "--toast-bg": accent,
+      "--toast-fg": onAccent,
+      "--modal": hexAlpha(bg, 0.96),
+      "--unread": accent,
       "--red": "#e08080",
-      "--bubble-theirs": `hsla(${h}, ${s}%, 62%, 0.08)`,
+      "--bubble-theirs": hexAlpha(accent, 0.08),
     };
     Object.keys(vars).forEach((k) => root.style.setProperty(k, vars[k]));
-    root.style.colorScheme = "dark";
+    root.style.colorScheme = dark ? "dark" : "light";
   }
   function clearCustomThemeVars() {
     const root = document.documentElement;
@@ -365,13 +385,15 @@
   function currentUitheme() {
     return document.documentElement.getAttribute("data-uitheme") || "";
   }
-  function applyUitheme(name, customHex) {
+  function applyUitheme(name, custom) {
     const t = UITHEMES.includes(name) ? name : "";
     const root = document.documentElement;
     clearCustomThemeVars();
     if (t === "custom") {
-      const hex = /^#[0-9a-fA-F]{6}$/.test(customHex || "") ? customHex : storedUithemeCustom();
-      applyCustomThemeVars(hex);
+      const c = custom && (custom.bg || custom.accent || custom.text)
+        ? { ...storedUithemeCustom(), ...custom }
+        : storedUithemeCustom();
+      applyCustomThemeVars(c);
     }
     if (t) {
       root.setAttribute("data-uitheme", t);
@@ -400,20 +422,23 @@
     try {
       if (t) localStorage.setItem(UITHEME_KEY, t);
       else localStorage.removeItem(UITHEME_KEY);
-      if (/^#[0-9a-fA-F]{6}$/.test(customHex || "")) localStorage.setItem(UITHEME_CUSTOM_KEY, customHex);
+      if (custom && (custom.bg || custom.accent || custom.text)) {
+        const c = { ...storedUithemeCustom(), ...custom };
+        localStorage.setItem(UITHEME_BG_KEY, c.bg);
+        localStorage.setItem(UITHEME_ACCENT_KEY, c.accent);
+        localStorage.setItem(UITHEME_TEXT_KEY, c.text);
+      }
     } catch {
       /* ignore */
     }
   }
-  async function saveUitheme(name, customHex) {
+  async function saveUitheme(name, custom) {
     const t = UITHEMES.includes(name) ? name : "";
-    applyUitheme(t, customHex);
-    if (t) applyAccent("default");
+    applyUitheme(t, custom);
     if (!state.me) return;
     try {
       const patch = { theme_preset: t };
-      if (t) patch.theme_accent = "default";
-      if (/^#[0-9a-fA-F]{6}$/.test(customHex || "")) patch.theme_custom = customHex;
+      if (t === "custom" && custom) patch.theme_custom = packCustom({ ...storedUithemeCustom(), ...custom });
       const data = await api("/api/me", { method: "PATCH", body: JSON.stringify(patch) });
       state.me = data.user;
     } catch {
@@ -440,32 +465,50 @@
     applyUitheme("");
     return Promise.resolve();
   }
+  function themeCustomHtml(values) {
+    const v = { ...storedUithemeCustom(), ...(values || {}) };
+    return `<div class="theme-custom-row">
+      <label class="color-pick"><input type="color" id="theme-bg-color" value="${v.bg}" aria-label="background color" /><span>background</span></label>
+      <label class="color-pick"><input type="color" id="theme-accent-color" value="${v.accent}" aria-label="highlight color" /><span>highlight</span></label>
+      <label class="color-pick"><input type="color" id="theme-text-color" value="${v.text}" aria-label="text color" /><span>text</span></label>
+      <span class="settings-note" id="theme-custom-on"${currentUitheme() === "custom" ? "" : " hidden"}>custom on</span>
+      <button type="button" class="btn ghost sm" id="theme-default">default</button>
+    </div>`;
+  }
+  function readCustomInputs() {
+    const g = (id) => {
+      const el = document.getElementById(id);
+      return el ? el.value : "";
+    };
+    return {
+      bg: validHex(g("theme-bg-color")) || CUSTOM_DEFAULTS.bg,
+      accent: validHex(g("theme-accent-color")) || CUSTOM_DEFAULTS.accent,
+      text: validHex(g("theme-text-color")) || CUSTOM_DEFAULTS.text,
+    };
+  }
   function bindUithemeControls(persist) {
     document.querySelectorAll("#theme-picks .theme-pick").forEach((btn) => {
       btn.addEventListener("click", async () => {
         const t = btn.getAttribute("data-uitheme");
-        applyAccent("default");
         markPicks("#theme-picks .theme-pick", btn);
-        markPicks("#accent-picks .accent-pick", document.querySelector('#accent-picks [data-accent="default"]'));
         if (persist) await saveUitheme(t);
         else applyUitheme(t);
         showToast("theme set");
       });
     });
-    const cc = document.getElementById("theme-custom-color");
-    if (cc) {
-      const applyCustom = () => {
-        applyAccent("default");
+    ["theme-bg-color", "theme-accent-color", "theme-text-color"].forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener("input", () => {
         markPicks("#theme-picks .theme-pick", null);
-        markPicks("#accent-picks .accent-pick", document.querySelector('#accent-picks [data-accent="default"]'));
-        document.getElementById("theme-custom-on").hidden = false;
-        applyUitheme("custom", cc.value);
-      };
-      cc.addEventListener("input", applyCustom);
-      cc.addEventListener("change", async () => {
-        if (persist) await saveUitheme("custom", cc.value);
+        const cust = document.getElementById("theme-custom-on");
+        if (cust) cust.hidden = false;
+        applyUitheme("custom", readCustomInputs());
       });
-    }
+      el.addEventListener("change", async () => {
+        if (persist) await saveUitheme("custom", readCustomInputs());
+      });
+    });
     const td = document.getElementById("theme-default");
     if (td) {
       td.addEventListener("click", async () => {
@@ -482,11 +525,6 @@
   function initTheme() {
     // Base look is always dark now. Whole-UI themes (3 presets + custom) recolor from here.
     applyBaseTheme();
-    try {
-      applyAccent(localStorage.getItem("eez_accent") || "default");
-    } catch {
-      applyAccent("default");
-    }
     applyUitheme(storedUitheme(), storedUithemeCustom());
   }
 
@@ -2783,23 +2821,41 @@ var lastSendAt = 0;
     });
   }
 
+  async function renderSettings() {
+    setNav("you");
+    const u = state.me;
+    const persist = !!u;
+    const customVals = persist ? parsePackedCustom(u.theme_custom || "") : storedUithemeCustom();
+    const currentPreset = persist ? u.theme_preset || "" : storedUitheme();
+    app.innerHTML = fadeWrap(`<div class="settings">
+      <div class="row-btns settings-back-row">
+        <a class="btn ghost sm" href="#/you">&larr; back</a>
+      </div>
+      <h1>settings</h1>
+      <section class="settings-block">
+        <h2>appearance</h2>
+        <p class="settings-note">theme — recolors the whole app${persist ? "" : " (this device until you log in)"}</p>
+        <div class="theme-picks" id="theme-picks">${uithemePicksHtml(currentPreset)}</div>
+        ${themeCustomHtml(customVals)}
+      </section>
+      ${persist ? "" : `<section class="settings-block">
+        <h2>account</h2>
+        <p class="hint">log in to sync your look across devices.</p>
+        <div class="row-btns">
+          <a class="btn primary" href="#/login">log in</a>
+          <a class="btn" href="#/register">create an account</a>
+        </div>
+      </section>`}
+    </div>`);
+    bindUithemeControls(persist);
+    applyUserAppearance(u);
+  }
+
   async function renderYou() {
     setNav("you");
     if (!state.me) {
       app.innerHTML = fadeWrap(`<div class="settings">
         <h1>you</h1>
-        <section class="settings-block">
-          <h2>appearance</h2>
-          <p class="settings-note">theme — recolors the whole app (this device until you log in)</p>
-          <div class="theme-picks" id="theme-picks">${uithemePicksHtml(storedUitheme())}</div>
-          <div class="theme-custom-row">
-            <input type="color" id="theme-custom-color" value="${storedUithemeCustom()}" aria-label="custom theme color" />
-            <span class="settings-note" id="theme-custom-on"${storedUitheme() === "custom" ? "" : " hidden"}>custom on</span>
-            <button type="button" class="btn ghost sm" id="theme-default">default</button>
-          </div>
-          <p class="settings-note">accent (buttons + highlights)</p>
-          <div class="accent-picks" id="accent-picks">${accentPicksHtml((() => { try { return localStorage.getItem("eez_accent") || "default"; } catch { return "default"; } })())}</div>
-        </section>
         <section class="settings-block">
           <h2>account</h2>
           <p class="hint">log in to edit your answers and read messages.</p>
@@ -2809,37 +2865,25 @@ var lastSendAt = 0;
           </div>
         </section>
         <section class="settings-block">
+          <h2>more</h2>
+          <div class="row-btns">
+            <a class="btn" href="#/settings">settings</a>
+          </div>
+        </section>
+        <section class="settings-block">
           <h2>legal</h2>
           <p class="fine"><a href="#/terms">terms</a> · <a href="#/privacy">privacy</a></p>
         </section>
       </div>`);
-      bindUithemeControls(false);
-      document.querySelectorAll("#accent-picks .accent-pick").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const accent = btn.getAttribute("data-accent");
-          if (accent !== "default") clearUitheme(false);
-          applyAccent(accent);
-          document.querySelectorAll("#accent-picks .accent-pick").forEach((b) => b.classList.toggle("on", b === btn));
-          showToast("accent set");
-        });
-      });
+      applyUserAppearance(null);
       return;
     }
     const u = state.me;
     app.innerHTML = fadeWrap(`<div class="settings">
       <h1>you</h1>
-      <section class="settings-block">
-        <h2>appearance</h2>
-        <p class="settings-note">theme — recolors the whole app</p>
-        <div class="theme-picks" id="theme-picks">${uithemePicksHtml(u.theme_preset || "")}</div>
-        <div class="theme-custom-row">
-          <input type="color" id="theme-custom-color" value="${/^#[0-9a-fA-F]{6}$/.test(u.theme_custom || "") ? u.theme_custom : "#5b9cff"}" aria-label="custom theme color" />
-          <span class="settings-note" id="theme-custom-on"${(u.theme_preset || "") === "custom" ? "" : " hidden"}>custom on</span>
-          <button type="button" class="btn ghost sm" id="theme-default">default</button>
-        </div>
-        <p class="settings-note">accent color (buttons + highlights)</p>
-        <div class="accent-picks" id="accent-picks">${accentPicksHtml(u.theme_accent || "default")}</div>
-      </section>
+      <div class="row-btns settings-link-row">
+        <a class="btn" href="#/settings">settings</a>
+      </div>
       <section class="settings-block">
         <h2>bookmarks</h2>
         <div id="bookmarks-box" class="bookmark-list"><p class="hint">loading…</p></div>
@@ -2894,23 +2938,7 @@ var lastSendAt = 0;
         <p class="fine"><a href="#/terms">terms</a> · <a href="#/privacy">privacy</a></p>
       </section>
     </div>`);
-    bindUithemeControls(true);
     applyUserAppearance(u);
-    document.querySelectorAll("#accent-picks .accent-pick").forEach((btn) => {
-      btn.addEventListener("click", async () => {
-        const accent = btn.getAttribute("data-accent");
-        if (accent !== "default") await clearUitheme(false);
-        applyAccent(accent);
-        document.querySelectorAll("#accent-picks .accent-pick").forEach((b) => b.classList.toggle("on", b === btn));
-        try {
-          const data = await api("/api/me", { method: "PATCH", body: JSON.stringify({ theme_accent: accent, theme_preset: accent === "default" ? currentUitheme() : "" }) });
-          state.me = data.user;
-          showToast("accent saved");
-        } catch (err) {
-          alert(err.message);
-        }
-      });
-    });
     (async () => {
       const box = document.getElementById("bookmarks-box");
       if (box) {
@@ -3158,6 +3186,7 @@ var lastSendAt = 0;
       if (r.parts[0] === "messages" && r.parts[1]) return await renderThread(r.parts[1], g);
       if (r.parts[0] === "messages") return await renderMessages(g);
       if (r.parts[0] === "you") return await renderYou(g);
+      if (r.parts[0] === "settings") return await renderSettings();
       if (r.parts[0] === "login") return await renderLogin();
       if (r.parts[0] === "register") return await renderRegister();
       if (r.parts[0] === "terms") return renderLegal("terms");
