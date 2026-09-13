@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jonny's | Barber Shop in Emmaus, PA</title>
+<meta name="description" content="Jonny's Barber Shop at 423 Chestnut St, Emmaus, PA. Classic cuts, fades, shaves, and trims for men and boys. Call (610) 965-1715.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1d1a16;
+    --cream:#faf6ef;
+    --paper:#fffdf8;
+    --red:#a63a2b;
+    --navy:#22303c;
+    --gold:#c99b3f;
+    --muted:#6f655a;
+    --line:#e7ddcb;
+    --radius:14px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--cream);color:var(--ink);line-height:1.6}
+  h1,h2,h3,h4{font-family:'Oswald',sans-serif;letter-spacing:.02em;line-height:1.15}
+  img{max-width:100%;display:block}
+  a{color:var(--red)}
+  .wrap{max-width:1140px;margin:0 auto;padding:0 22px}
+
+  /* ---------- pages / router ---------- */
+  .page{display:none}
+  .page.active{display:block;animation:fadeIn .35s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  /* ---------- top bar nav ---------- */
+  header.topbar{position:sticky;top:0;z-index:50;background:var(--navy);color:#fff;box-shadow:0 2px 12px rgba(0,0,0,.25)}
+  .topbar-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 22px;max-width:1140px;margin:0 auto}
+  .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:#fff}
+  .brand-mark{width:38px;height:38px;border-radius:50%;background:repeating-linear-gradient(45deg,var(--red) 0 6px,#fff 6px 12px,var(--navy) 12px 18px,#fff 18px 24px);border:2px solid var(--gold)}
+  .brand-name{font-family:'Oswald',sans-serif;font-size:1.5rem;font-weight:700;letter-spacing:.04em}
+  .brand-name small{display:block;font-family:'Inter',sans-serif;font-size:.65rem;font-weight:500;letter-spacing:.28em;color:var(--gold)}
+  nav.main{display:flex;align-items:center;gap:6px}
+  nav.main a{color:#f3ecdd;text-decoration:none;font-weight:600;font-size:.92rem;padding:9px 14px;border-radius:8px;transition:background .2s,color .2s}
+  nav.main a:hover{background:rgba(255,255,255,.12)}
+  nav.main a.active{background:var(--red);color:#fff}
+  .nav-call{background:var(--gold);color:#221a08 !important;font-weight:700}
+  #burger{display:none;background:none;border:0;color:#fff;font-size:1.6rem;cursor:pointer;padding:6px 10px}
+
+  /* ---------- buttons ---------- */
+  .btn{display:inline-block;padding:13px 26px;border-radius:10px;font-weight:700;text-decoration:none;border:2px solid transparent;cursor:pointer;font-size:1rem;transition:transform .15s, box-shadow .15s}
+  .btn:hover{transform:translateY(-2px)}
+  .btn-red{background:var(--red);color:#fff;box-shadow:0 6px 18px rgba(166,58,43,.35)}
+  .btn-ghost{border-color:var(--navy);color:var(--navy);background:transparent}
+  .btn-light{background:#fff;color:var(--navy)}
+
+  /* ---------- split hero ---------- */
+  .hero-split{background:var(--navy);color:#fff;overflow:hidden}
+  .hero-split .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center;padding:84px 22px}
+  .kicker{display:inline-block;background:rgba(201,155,63,.18);border:1px solid var(--gold);color:var(--gold);font-size:.78rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;padding:7px 14px;border-radius:999px;margin-bottom:18px}
+  .hero-split h1{font-size:clamp(2.6rem,5vw,4.2rem);color:#fff;margin-bottom:16px}
+  .hero-split h1 em{font-style:normal;color:var(--gold)}
+  .hero-split p.lede{font-size:1.1rem;color:#d9d2c2;max-width:34rem;margin-bottom:26px}
+  .hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:28px}
+  .hero-facts{display:flex;gap:26px;flex-wrap:wrap}
+  .hero-facts div strong{display:block;font-family:'Oswald',sans-serif;font-size:1.35rem;color:#fff}
+  .hero-facts div span{font-size:.82rem;color:#b9b09c}
+  .hero-art{background:var(--paper);border-radius:18px;padding:26px;position:relative;box-shadow:0 24px 60px rgba(0,0,0,.35)}
+  .hero-art .pole{width:120px;height:300px;margin:0 auto;border-radius:60px;background:repeating-linear-gradient(-45deg,var(--red) 0 22px,#fff 22px 44px,var(--navy) 44px 66px,#fff 66px 88px);border:6px solid #d8cdb6;box-shadow:inset 0 0 30px rgba(0,0,0,.25)}
+  .hero-art .cap{width:150px;height:26px;background:var(--navy);border-radius:12px;margin:0 auto}
+  .hero-art .badge{position:absolute;top:18px;right:18px;background:var(--red);color:#fff;font-weight:700;font-size:.8rem;padding:8px 14px;border-radius:999px;transform:rotate(6deg)}
+
+  /* ---------- asymmetric grid rhythm ---------- */
+  .section{padding:76px 0}
+  .section h2{font-size:clamp(1.9rem,3.4vw,2.7rem);margin-bottom:8px}
+  .section .sub{color:var(--muted);max-width:40rem;margin-bottom:34px}
+  .agrid{display:grid;grid-template-columns:repeat(12,1fr);gap:22px}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:30px;box-shadow:0 8px 24px rgba(34,48,60,.06)}
+  .card h3{font-size:1.35rem;margin:14px 0 8px}
+  .card p{color:var(--muted);font-size:.97rem}
+  .icon{width:52px;height:52px;border-radius:12px;background:var(--navy);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:1.5rem}
+  .span-5{grid-column:span 5}.span-7{grid-column:span 7}.span-4{grid-column:span 4}.span-8{grid-column:span 8}.span-6{grid-column:span 6}
+  .offset{margin-top:44px}
+  .stripe{background:var(--navy);color:#fff;border-radius:18px;padding:38px;color:#fff}
+  .stripe h3{color:var(--gold);font-size:1.6rem;margin-bottom:10px}
+  .stripe p{color:#d9d2c2}
+  .stat-row{display:flex;gap:36px;flex-wrap:wrap;margin-top:22px}
+  .stat-row div strong{font-family:'Oswald',sans-serif;font-size:2rem;color:var(--gold);display:block}
+  .stat-row div span{font-size:.85rem;color:#c9c2b2}
+
+  /* ---------- tabs offerings ---------- */
+  .tabs-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px}
+  .tab-btn{font-family:'Oswald',sans-serif;font-size:1.05rem;letter-spacing:.04em;padding:12px 26px;border-radius:999px;border:2px solid var(--navy);background:transparent;color:var(--navy);cursor:pointer;font-weight:600;transition:all .2s}
+  .tab-btn:hover{background:var(--navy);color:#fff}
+  .tab-btn.active{background:var(--red);border-color:var(--red);color:#fff}
+  .tab-panel{display:none}
+  .tab-panel.active{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;animation:fadeIn .3s ease}
+  .svc{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:26px;position:relative}
+  .svc h4{font-size:1.25rem;margin-bottom:6px}
+  .svc .price{font-family:'Oswald',sans-serif;color:var(--red);font-weight:700;font-size:1.05rem}
+  .svc p{color:var(--muted);font-size:.93rem;margin-top:8px}
+  .sample-note{background:#fdf3e3;border:1px dashed var(--gold);border-radius:10px;padding:12px 18px;font-size:.85rem;color:#7a5c1e;margin-bottom:22px}
+
+  /* ---------- masonry gallery ---------- */
+  .masonry{columns:3;column-gap:20px}
+  .tile{break-inside:avoid;margin-bottom:20px;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line);position:relative}
+  .tile svg{display:block;width:100%}
+  .tile .cap{position:absolute;left:0;right:0;bottom:0;padding:26px 18px 14px;background:linear-gradient(transparent,rgba(20,16,12,.8));color:#fff;font-weight:600;font-size:.92rem}
+  .tile .ph{position:absolute;top:12px;left:12px;background:rgba(0,0,0,.65);color:#fff;font-size:.72rem;padding:5px 11px;border-radius:999px;letter-spacing:.06em}
+
+  /* ---------- reviews ---------- */
+  .rev-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+  .rev{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:26px}
+  .stars{color:var(--gold);font-size:1.1rem;letter-spacing:.1em;margin-bottom:10px}
+  .rev p{color:var(--muted);font-style:italic}
+  .rev .who{margin-top:14px;font-weight:700;font-size:.9rem}
+  .rev .src{font-size:.78rem;color:#a09a8b}
+  .review-links{display:flex;gap:14px;flex-wrap:wrap;margin-top:30px}
+
+  /* ---------- contact ---------- */
+  .contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px}
+  .hours-table{width:100%;border-collapse:collapse;margin-top:10px}
+  .hours-table td{padding:10px 4px;border-bottom:1px solid var(--line);font-size:.95rem}
+  .hours-table td:last-child{text-align:right;font-weight:600}
+  .map-frame{border-radius:var(--radius);overflow:hidden;border:1px solid var(--line);min-height:280px;background:#e9e2d2;display:flex;align-items:center;justify-content:center;color:var(--muted);font-weight:600;padding:30px;text-align:center}
+
+  /* ---------- multi-column footer ---------- */
+  footer.site{background:var(--ink);color:#d9d2c2;margin-top:60px}
+  .foot-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:34px;padding:56px 0 34px}
+  .foot-cols h4{color:#fff;font-size:1.05rem;margin-bottom:14px;letter-spacing:.06em}
+  .foot-cols p,.foot-cols a{font-size:.93rem;color:#b9b09c;text-decoration:none}
+  .foot-cols a:hover{color:var(--gold)}
+  .foot-cols ul{list-style:none}
+  .foot-cols li{margin-bottom:9px}
+  .foot-bottom{border-top:1px solid #38322b;padding:18px 0 26px;font-size:.88rem;color:#8f877a;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .copy-line{width:100%;text-align:center;color:#b9b09c;margin-top:8px}
+
+  /* ---------- reveal ---------- */
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .5s ease,transform .5s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  @media(max-width:860px){
+    nav.main{position:fixed;top:0;right:-260px;width:240px;height:100vh;background:var(--navy);flex-direction:column;align-items:stretch;padding:70px 18px 18px;transition:right .25s;gap:4px}
+    nav.main.open{right:0}
+    nav.main a{padding:13px 16px}
+    #burger{display:block}
+    .hero-split .wrap{grid-template-columns:1fr;padding:56px 22px}
+    .span-5,.span-7,.span-4,.span-8,.span-6{grid-column:span 12}
+    .offset{margin-top:0}
+    .masonry{columns:2}
+  }
+  @media(max-width:520px){.masonry{columns:1}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="#home" data-page="home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">Jonny's<small>BARBER SHOP</small></span>
+    </a>
+    <nav class="main" id="mainNav" aria-label="Main navigation">
+      <a href="#home" data-page="home">Home</a>
+      <a href="#services" data-page="services">Services</a>
+      <a href="#about" data-page="about">About</a>
+      <a href="#gallery" data-page="gallery">Gallery</a>
+      <a href="#reviews" data-page="reviews">Reviews</a>
+      <a href="#contact" data-page="contact">Visit Us</a>
+      <a class="nav-call" href="tel:+16109651715">Call (610) 965-1715</a>
+    </nav>
+    <button id="burger" aria-label="Open menu" aria-expanded="false">&#9776;</button>
+  </div>
+</header>
+
+<main>
+<section class="page" id="page-home">
+  <div class="hero-split">
+    <div class="wrap">
+      <div class="reveal">
+        <span class="kicker">Emmaus, PA Barbershop</span>
+        <h1>Sharp looks, <em>old school</em> service.</h1>
+        <p class="lede">Jonny's is the neighborhood barbershop on Chestnut Street where the cuts are clean, the conversation is good, and everybody leaves looking sharp. Walk in, sit down, walk out fresh.</p>
+        <div class="hero-cta">
+          <a class="btn btn-red" href="tel:+16109651715">Call (610) 965-1715</a>
+          <a class="btn btn-light" href="#services" data-page="services">See Services</a>
+        </div>
+        <div class="hero-facts">
+          <div><strong>4.7 / 5</strong><span>Google rating</span></div>
+          <div><strong>Walk-ins</strong><span>Welcome daily</span></div>
+          <div><strong>423 Chestnut St</strong><span>Emmaus, PA 18049</span></div>
+        </div>
+      </div>
+      <div class="hero-art reveal">
+        <span class="badge">Since 2010</span>
+        <div class="cap"></div>
+        <div class="pole" role="img" aria-label="Classic barber pole"></div>
+        <div class="cap"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="wrap">
+      <h2 class="reveal">Why the neighborhood chooses Jonny's</h2>
+      <p class="sub reveal">A classic four-chair shop built on steady hands, honest prices, and cuts that hold their shape.</p>
+      <div class="agrid">
+        <div class="card span-5 reveal">
+          <div class="icon">&#10022;</div>
+          <h3>Classic and modern cuts</h3>
+          <p>From timeless tapers and scissor cuts to skin fades and sharp lineups, every cut is tailored to your head shape and style.</p>
+        </div>
+        <div class="card span-7 reveal">
+          <div class="icon">&#9824;</div>
+          <h3>Shaves and beard work</h3>
+          <p>Hot towel shaves, beard sculpting, and clean lineups that finish the job. Trims, shaves, and full grooming services for men and boys.</p>
+        </div>
+        <div class="card span-7 offset reveal">
+          <div class="icon">&#9835;</div>
+          <h3>A shop with character</h3>
+          <p>Four stations, lively music, and a friendly crowd. Customers call it the go-to spot in Emmaus for a good cut and a good time.</p>
+        </div>
+        <div class="card span-5 offset reveal">
+          <div class="icon">&#36;</div>
+          <h3>Honest prices</h3>
+          <p>An inexpensive price point with premium results. Cash friendly and always worth the visit.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="padding-top:0">
+    <div class="wrap">
+      <div class="stripe reveal">
+        <h3>Need a cut today?</h3>
+        <p>Walk-ins are welcome all day. Call ahead and we will have a chair ready for you.</p>
+        <div class="stat-row">
+          <div><strong>4.7</strong><span>Average Google rating</span></div>
+          <div><strong>150+</strong><span>Google reviews</span></div>
+          <div><strong>4</strong><span>Barber stations</span></div>
+        </div>
+        <div style="margin-top:26px;display:flex;gap:14px;flex-wrap:wrap">
+          <a class="btn btn-red" href="tel:+16109651715">Call Now</a>
+          <a class="btn btn-light" href="#contact" data-page="contact">Get Directions</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="section">
+    <div class="wrap">
+      <span class="kicker">Services and Pricing</span>
+      <h2>Pick your cut</h2>
+      <p class="sub">Browse by category. Every service includes a consultation so you get exactly the look you want.</p>
+      <div class="sample-note"><strong>Sample pricing:</strong> prices below are samples to show the range. Call (610) 965-1715 to confirm current pricing.</div>
+      <div class="tabs-bar" role="tablist">
+        <button class="tab-btn active" data-tab="cuts" role="tab">Haircuts</button>
+        <button class="tab-btn" data-tab="beard" role="tab">Beard and Shave</button>
+        <button class="tab-btn" data-tab="extras" role="tab">Extras</button>
+      </div>
+      <div class="tab-panel active" id="panel-cuts" role="tabpanel">
+        <div class="svc"><h4>Classic Haircut</h4><div class="price">$22+ sample</div><p>Scissor work, clipper work, and a clean neckline. The timeless cut that never goes out of style.</p></div>
+        <div class="svc"><h4>Skin Fade</h4><div class="price">$25+ sample</div><p>Seamless blend from skin to length with crisp edges and a sharp finish.</p></div>
+        <div class="svc"><h4>Taper Cut</h4><div class="price">$22+ sample</div><p>A clean, professional taper on the sides and back with length on top.</p></div>
+        <div class="svc"><h4>Kids Cut (12 and under)</h4><div class="price">$18+ sample</div><p>Patient, careful cuts for young gentlemen. First haircut friendly.</p></div>
+      </div>
+      <div class="tab-panel" id="panel-beard" role="tabpanel">
+        <div class="svc"><h4>Beard Trim and Shape</h4><div class="price">$12+ sample</div><p>Sculpted lines, even length, and a conditioned finish for a sharp beard.</p></div>
+        <div class="svc"><h4>Hot Towel Shave</h4><div class="price">$20+ sample</div><p>Traditional straight razor shave with hot towels and warm lather.</p></div>
+        <div class="svc"><h4>Cut and Beard Combo</h4><div class="price">$32+ sample</div><p>The full package: haircut plus beard trim and hot towel finish.</p></div>
+      </div>
+      <div class="tab-panel" id="panel-extras" role="tabpanel">
+        <div class="svc"><h4>Lineup and Edge Up</h4><div class="price">$10+ sample</div><p>Crisp hairline, temples, and neckline to keep your cut looking fresh between visits.</p></div>
+        <div class="svc"><h4>Eyebrow Cleanup</h4><div class="price">$8+ sample</div><p>Quick, tidy brow cleanup that frames the face.</p></div>
+        <div class="svc"><h4>Gray Blending</h4><div class="price">$25+ sample</div><p>Subtle camouflage color that takes years off without looking dyed.</p></div>
+      </div>
+      <div style="margin-top:34px">
+        <a class="btn btn-red" href="tel:+16109651715">Call to Book: (610) 965-1715</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-about">
+  <div class="section">
+    <div class="wrap">
+      <span class="kicker">Our Story</span>
+      <h2>A Chestnut Street classic</h2>
+      <p class="sub">Serving Emmaus since 2010.</p>
+      <div class="agrid">
+        <div class="card span-7 reveal">
+          <h3>The shop</h3>
+          <p>Jonny's opened its doors on Chestnut Street in 2010 and has been the neighborhood's barbershop ever since. Four stations, a lively atmosphere with festive music, and barbers who take pride in every cut. It is the kind of shop where regulars are known by name and first timers leave as regulars.</p>
+          <p style="margin-top:12px">Directory listings describe Jonny's as a local favorite for quality shaves, trims, and haircuts for men and boys, with an inexpensive price point that keeps the chairs full.</p>
+        </div>
+        <div class="card span-5 reveal">
+          <h3>Good to know</h3>
+          <p><strong>Walk-ins:</strong> welcome<br><strong>Price level:</strong> inexpensive<br><strong>Wheelchair accessible:</strong> yes<br><strong>Payment:</strong> cash friendly, call to confirm</p>
+          <div style="margin-top:18px"><a class="btn btn-ghost" href="#contact" data-page="contact">Plan Your Visit</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="section">
+    <div class="wrap">
+      <span class="kicker">Gallery</span>
+      <h2>The work speaks</h2>
+      <p class="sub">Sample gallery placeholders the shop can swap for real photos anytime.</p>
+      <div class="masonry">
+        <div class="tile"><span class="ph">Placeholder</span><svg viewBox="0 0 300 380" aria-label="Fade haircut placeholder"><rect width="300" height="380" fill="#22303c"/><circle cx="150" cy="150" r="70" fill="#c99b3f"/><rect x="80" y="230" width="140" height="120" rx="14" fill="#faf6ef"/></svg><div class="cap">Signature skin fade</div></div>
+        <div class="tile"><span class="ph">Placeholder</span><svg viewBox="0 0 300 260" aria-label="Barber tools placeholder"><rect width="300" height="260" fill="#a63a2b"/><rect x="40" y="60" width="220" height="18" rx="9" fill="#faf6ef"/><rect x="40" y="100" width="160" height="18" rx="9" fill="#e7ddcb"/><rect x="40" y="140" width="190" height="18" rx="9" fill="#faf6ef"/></svg><div class="cap">Tools of the trade</div></div>
+        <div class="tile"><span class="ph">Placeholder</span><svg viewBox="0 0 300 420" aria-label="Hot towel shave placeholder"><rect width="300" height="420" fill="#faf6ef"/><rect x="60" y="60" width="180" height="240" rx="20" fill="#22303c"/><circle cx="150" cy="180" r="50" fill="#c99b3f"/><rect x="110" y="320" width="80" height="60" rx="10" fill="#a63a2b"/></svg><div class="cap">Hot towel shave</div></div>
+        <div class="tile"><span class="ph">Placeholder</span><svg viewBox="0 0 300 300" aria-label="Shop interior placeholder"><rect width="300" height="300" fill="#1d1a16"/><rect x="30" y="40" width="240" height="120" rx="12" fill="#22303c"/><rect x="30" y="180" width="110" height="80" rx="12" fill="#a63a2b"/><rect x="160" y="180" width="110" height="80" rx="12" fill="#c99b3f"/></svg><div class="cap">Inside the shop</div></div>
+        <div class="tile"><span class="ph">Placeholder</span><svg viewBox="0 0 300 340" aria-label="Beard trim placeholder"><rect width="300" height="340" fill="#c99b3f"/><circle cx="150" cy="130" r="60" fill="#1d1a16"/><rect x="100" y="200" width="100" height="110" rx="14" fill="#faf6ef"/></svg><div class="cap">Beard sculpting</div></div>
+        <div class="tile"><span class="ph">Placeholder</span><svg viewBox="0 0 300 250" aria-label="Lineup placeholder"><rect width="300" height="250" fill="#22303c"/><path d="M40 200 L150 60 L260 200" stroke="#faf6ef" stroke-width="14" fill="none"/><circle cx="150" cy="120" r="26" fill="#a63a2b"/></svg><div class="cap">Crisp lineups</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="section">
+    <div class="wrap">
+      <span class="kicker">Reviews</span>
+      <h2>What Emmaus is saying</h2>
+      <p class="sub">Based on 150+ Google reviews with an average rating of 4.7 out of 5.</p>
+      <div class="rev-grid">
+        <div class="rev reveal"><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p>"Best haircut I have had in years. Clean fade, sharp lines, and a great price. I will not go anywhere else."</p><div class="who">Sample review</div><div class="src">Illustrative only, see Google for real reviews</div></div>
+        <div class="rev reveal"><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p>"Walked in on a Saturday and was in the chair in ten minutes. The shop has great energy and the cut was perfect."</p><div class="who">Sample review</div><div class="src">Illustrative only, see Google for real reviews</div></div>
+        <div class="rev reveal"><div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p>"Takes his time and gets every detail right. My beard has never looked better. Highly recommend."</p><div class="who">Sample review</div><div class="src">Illustrative only, see Google for real reviews</div></div>
+      </div>
+      <div class="review-links">
+        <a class="btn btn-red" href="https://www.google.com/maps/place/?q=place_id:ChIJ9xx2Kds6xIkRc3iSk3To3Wo" target="_blank" rel="noopener">See reviews on Google</a>
+        <a class="btn btn-ghost" href="#contact" data-page="contact">Visit the Shop</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-contact">
+  <div class="section">
+    <div class="wrap">
+      <span class="kicker">Visit Us</span>
+      <h2>Find us on Chestnut Street</h2>
+      <p class="sub">Jonny's, 423 Chestnut St, Emmaus, PA 18049</p>
+      <div class="contact-grid">
+        <div class="card reveal">
+          <h3>Contact</h3>
+          <p><strong>Phone:</strong> <a href="tel:+16109651715">(610) 965-1715</a><br><strong>Address:</strong> 423 Chestnut St, Emmaus, PA 18049</p>
+          <div style="margin-top:18px;display:flex;gap:12px;flex-wrap:wrap">
+            <a class="btn btn-red" href="tel:+16109651715">Call Now</a>
+            <a class="btn btn-ghost" href="https://www.google.com/maps/place/?q=place_id:ChIJ9xx2Kds6xIkRc3iSk3To3Wo" target="_blank" rel="noopener">Get Directions</a>
+          </div>
+        </div>
+        <div class="card reveal">
+          <h3>Hours</h3>
+          <table class="hours-table">
+            <tr><td>Monday - Thursday</td><td>10:00 AM - 5:30 PM</td></tr>
+            <tr><td>Friday</td><td>9:00 AM - 6:30 PM</td></tr>
+            <tr><td>Saturday</td><td>9:00 AM - 3:00 PM</td></tr>
+            <tr><td>Sunday</td><td>Closed</td></tr>
+          </table>
+          <p style="font-size:.85rem;margin-top:10px">Hours reported by directory listings. Call to confirm.</p>
+        </div>
+        <div class="map-frame reveal">
+          <a href="https://www.google.com/maps/place/?q=place_id:ChIJ9xx2Kds6xIkRc3iSk3To3Wo" target="_blank" rel="noopener" style="color:inherit">Open Jonny's in Google Maps</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-cols">
+      <div>
+        <h4>Jonny's</h4>
+        <p>Classic barbershop on Chestnut Street in Emmaus, PA. Cuts, fades, shaves, and trims for men and boys since 2010.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="#home" data-page="home">Home</a></li>
+          <li><a href="#services" data-page="services">Services</a></li>
+          <li><a href="#about" data-page="about">About</a></li>
+          <li><a href="#gallery" data-page="gallery">Gallery</a></li>
+          <li><a href="#reviews" data-page="reviews">Reviews</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <p><a href="tel:+16109651715">(610) 965-1715</a><br>423 Chestnut St<br>Emmaus, PA 18049</p>
+      </div>
+      <div>
+        <h4>Hours</h4>
+        <p>Mon - Thu: 10:00 AM - 5:30 PM<br>Fri: 9:00 AM - 6:30 PM<br>Sat: 9:00 AM - 3:00 PM<br>Sun: Closed</p>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span><a href="#contact" data-page="contact">Visit Us</a> &nbsp;·&nbsp; <a href="https://www.google.com/maps/place/?q=place_id:ChIJ9xx2Kds6xIkRc3iSk3To3Wo" target="_blank" rel="noopener">Google Maps</a></span>
+      <span class="copy-line">© Jonny's</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "contact"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+
+  /* ---------- service tabs ---------- */
+  var tabBtns = document.querySelectorAll(".tab-btn");
+  for(var t = 0; t < tabBtns.length; t++){
+    tabBtns[t].addEventListener("click", function(){
+      var target = this.getAttribute("data-tab");
+      for(var k = 0; k < tabBtns.length; k++){ tabBtns[k].classList.remove("active"); }
+      this.classList.add("active");
+      var panels = document.querySelectorAll(".tab-panel");
+      for(var m = 0; m < panels.length; m++){
+        panels[m].classList.toggle("active", panels[m].id === "panel-" + target);
+      }
+    });
+  }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Joseph J Cusano Electric LLC · Electrician, West Boylston, MA</title>
+<meta name="description" content="Joseph J Cusano Electric LLC, electrician at 395 Prospect St, West Boylston, MA. Repairs, panel upgrades, EV charger installs and outage response. 5-star rated. Call (978) 505-3977.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --char:#1C1F24; --char-2:#262B33; --char-deep:#121418;
+  --volt:#FFC400; --volt-soft:#FFDE59; --volt-dim:rgba(255,196,0,.14);
+  --paper:#F6F7F9; --card:#FFFFFF; --ink:#23262B; --muted:#5C636D;
+  --radius:14px;
+  --shadow:0 18px 40px -18px rgba(18,20,24,.35);
+  --shadow-sm:0 8px 22px -10px rgba(18,20,24,.28);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Inter",system-ui,sans-serif;
+  background:var(--paper);color:var(--ink);line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%}
+a{color:#0F6FDB}
+::selection{background:var(--volt);color:var(--char-deep)}
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+
+/* ---------- header + side drawer ---------- */
+header.site{
+  position:sticky;top:0;z-index:60;
+  background:var(--char);color:#fff;
+  box-shadow:0 6px 24px -8px rgba(0,0,0,.5);
+}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:#fff}
+.brand .mark{
+  width:46px;height:46px;flex:none;border-radius:12px;background:var(--volt);
+  display:flex;align-items:center;justify-content:center;
+}
+.brand .mark svg{width:28px;height:28px}
+.brand-name{font-family:"Archivo",sans-serif;font-weight:800;font-size:1.12rem;line-height:1.15;letter-spacing:.2px}
+.brand-name small{display:block;font-family:"Inter",sans-serif;font-weight:600;font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--volt)}
+.head-right{display:flex;align-items:center;gap:10px}
+.call-chip{
+  display:inline-flex;align-items:center;gap:8px;background:var(--volt);color:var(--char-deep);
+  text-decoration:none;font-weight:700;padding:10px 18px;border-radius:999px;font-size:.94rem;
+  transition:transform .18s,background .18s;white-space:nowrap;
+}
+.call-chip:hover{background:var(--volt-soft);transform:translateY(-2px)}
+.burger{background:none;border:0;cursor:pointer;padding:10px}
+.burger span{display:block;width:28px;height:3px;border-radius:3px;background:#fff;margin:5px 0;transition:.25s}
+.scrim{
+  position:fixed;inset:0;background:rgba(18,20,24,.55);z-index:70;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+.scrim.show{opacity:1;pointer-events:auto}
+nav.drawer{
+  position:fixed;top:0;left:0;bottom:0;width:300px;max-width:84vw;z-index:80;
+  background:var(--char-deep);color:#fff;padding:26px 22px;
+  transform:translateX(-105%);transition:transform .3s cubic-bezier(.22,.8,.3,1);
+  display:flex;flex-direction:column;gap:4px;box-shadow:20px 0 60px rgba(0,0,0,.4);
+}
+nav.drawer.open{transform:none}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.drawer-head strong{font-family:"Archivo",sans-serif;font-weight:800;font-size:1.02rem;color:var(--volt);letter-spacing:2px;text-transform:uppercase;font-size:.78rem}
+.drawer-close{background:none;border:0;color:#fff;font-size:1.6rem;cursor:pointer;line-height:1;padding:6px}
+nav.drawer a.dlink{
+  display:flex;align-items:center;justify-content:space-between;
+  color:#EDEFF2;text-decoration:none;font-weight:600;font-size:1.02rem;
+  padding:13px 14px;border-radius:10px;transition:background .2s;
+}
+nav.drawer a.dlink:hover{background:rgba(255,196,0,.12)}
+nav.drawer a.dlink.active{background:var(--volt);color:var(--char-deep)}
+nav.drawer a.dlink .arr{opacity:.5}
+.drawer-foot{margin-top:auto;padding-top:18px;border-top:1px solid rgba(255,255,255,.1);color:#9AA1AB;font-size:.88rem}
+.drawer-foot a{color:var(--volt);text-decoration:none;font-weight:700}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- full-bleed dark hero ---------- */
+.hero{
+  background:
+    radial-gradient(circle at 88% 18%, rgba(255,196,0,.16), transparent 42%),
+    radial-gradient(circle at 10% 90%, rgba(255,196,0,.08), transparent 40%),
+    linear-gradient(160deg,var(--char-2),var(--char-deep));
+  color:#fff;position:relative;overflow:hidden;
+}
+.hero::after{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background:repeating-linear-gradient(115deg, transparent 0 46px, rgba(255,196,0,.05) 46px 48px);
+}
+.hero-inner{position:relative;z-index:1;padding:88px 0 96px;display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:center}
+.kicker{
+  display:inline-flex;align-items:center;gap:10px;font-weight:700;font-size:.76rem;letter-spacing:2.6px;text-transform:uppercase;
+  color:var(--volt);border:1.5px solid rgba(255,196,0,.5);padding:8px 18px;border-radius:999px;margin-bottom:20px;
+}
+h1{
+  font-family:"Archivo",sans-serif;font-weight:900;color:#fff;
+  font-size:clamp(2.6rem,5.6vw,4.4rem);line-height:1.02;letter-spacing:-1px;margin-bottom:18px;
+}
+h1 .accent{color:var(--volt)}
+.lede{font-size:1.13rem;color:#C9CED6;max-width:34rem;margin-bottom:28px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:24px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;
+  padding:14px 26px;border-radius:12px;font-size:1rem;transition:transform .18s,background .18s;
+}
+.btn-solid{background:var(--volt);color:var(--char-deep);box-shadow:0 12px 26px -10px rgba(255,196,0,.5)}
+.btn-solid:hover{background:var(--volt-soft);transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.35)}
+.btn-ghost:hover{border-color:var(--volt);color:var(--volt);transform:translateY(-2px)}
+.hours-pill{
+  display:inline-flex;align-items:center;gap:10px;color:#C9CED6;
+  border:1.5px dashed rgba(255,255,255,.35);
+  padding:10px 20px;border-radius:999px;font-weight:600;font-size:.95rem;
+}
+.hours-pill .dot{width:10px;height:10px;border-radius:50%;background:var(--volt);box-shadow:0 0 0 4px rgba(255,196,0,.22)}
+.hero-art{display:flex;align-items:center;justify-content:center}
+.bolt-card{
+  background:rgba(255,255,255,.05);border:1.5px solid rgba(255,196,0,.35);
+  border-radius:26px;padding:44px;box-shadow:var(--shadow);backdrop-filter:blur(4px);
+  position:relative;width:100%;max-width:400px;
+}
+.bolt-card svg{width:100%;height:auto;display:block;animation:glow 3.2s ease-in-out infinite}
+@keyframes glow{0%,100%{filter:drop-shadow(0 0 0 rgba(255,196,0,0))}50%{filter:drop-shadow(0 0 26px rgba(255,196,0,.55))}}
+.bolt-tag{
+  position:absolute;bottom:-16px;left:50%;transform:translateX(-50%) rotate(-2deg);
+  background:var(--volt);color:var(--char-deep);font-family:"Archivo",sans-serif;font-weight:800;
+  padding:10px 22px;border-radius:999px;font-size:.92rem;white-space:nowrap;box-shadow:var(--shadow-sm);
+}
+.stat-row{display:flex;gap:26px;margin-top:34px;flex-wrap:wrap;position:relative;z-index:1}
+.stat{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:16px 22px}
+.stat strong{font-family:"Archivo",sans-serif;font-weight:900;font-size:1.7rem;color:var(--volt);display:block;line-height:1.1}
+.stat small{color:#9AA1AB;font-size:.85rem}
+
+/* ---------- card wall ---------- */
+.block{padding:64px 0}
+.sec-head{max-width:46rem;margin:0 auto 40px;text-align:center}
+h2{font-family:"Archivo",sans-serif;font-weight:800;color:var(--char-deep);font-size:clamp(1.9rem,3.6vw,2.7rem);line-height:1.12;letter-spacing:-.5px;margin-bottom:12px}
+.sec-head p{color:var(--muted)}
+.eyebrow{font-weight:700;font-size:.76rem;letter-spacing:2.6px;text-transform:uppercase;color:#B07E00;display:block;margin-bottom:8px}
+.wall{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.wcard{
+  background:var(--card);border-radius:var(--radius);padding:30px 26px;box-shadow:var(--shadow-sm);
+  border-top:5px solid var(--volt);transition:transform .2s,box-shadow .2s;
+}
+.wcard:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+.wcard .icon{width:52px;height:52px;border-radius:12px;background:var(--volt-dim);display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.wcard .icon svg{width:28px;height:28px}
+.wcard h3{font-family:"Archivo",sans-serif;font-weight:800;font-size:1.2rem;color:var(--char-deep);margin-bottom:8px}
+.wcard p{color:var(--muted);font-size:.95rem}
+
+/* ---------- tabs ---------- */
+.tabs-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:26px}
+.tab-btn{
+  font-family:"Archivo",sans-serif;font-weight:700;font-size:.95rem;
+  background:#EDEFF2;color:var(--ink);border:0;border-radius:999px;padding:12px 22px;cursor:pointer;
+  transition:background .2s,color .2s;
+}
+.tab-btn:hover{background:#DFE2E8}
+.tab-btn.active{background:var(--char-deep);color:var(--volt)}
+.tab-panels{background:var(--char-deep);color:#EDEFF2;border-radius:22px;padding:44px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.tab-panels::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 88% 12%, rgba(255,196,0,.14), transparent 45%);pointer-events:none}
+.tab-panel{display:none;position:relative}
+.tab-panel.active{display:block;animation:fadeIn .3s ease}
+.tab-panel h3{font-family:"Archivo",sans-serif;font-weight:800;font-size:1.7rem;color:var(--volt);margin-bottom:12px}
+.tab-panel p{color:#C9CED6;max-width:40rem;margin-bottom:18px}
+.tab-panel ul{list-style:none;display:grid;gap:10px;margin-bottom:22px}
+.tab-panel li{display:flex;gap:12px;align-items:flex-start;color:#EDEFF2;font-weight:500}
+.tab-panel li svg{flex:none;width:22px;height:22px;margin-top:3px}
+
+/* ---------- page strips ---------- */
+.strip{border-radius:22px;padding:54px 46px;color:#fff;position:relative;overflow:hidden;margin-bottom:44px;box-shadow:var(--shadow)}
+.strip h2{color:#fff;font-size:clamp(2rem,4vw,2.9rem);margin-bottom:10px;position:relative}
+.strip p{color:rgba(255,255,255,.85);max-width:36rem;position:relative}
+.strip.s-services{background:linear-gradient(120deg,#262B33,#121418)}
+.strip.s-services::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(255,196,0,.25), transparent 50%)}
+.strip.s-about{background:linear-gradient(120deg,#1F3A5F,#101C2E)}
+.strip.s-gal{background:linear-gradient(120deg,#3A3F47,#1C1F24)}
+.strip.s-rev{background:linear-gradient(120deg,#5F4A1F,#2B220E)}
+.strip.s-contact{background:linear-gradient(120deg,#121418,#262B33)}
+
+/* ---------- horizontal strip gallery ---------- */
+.hstrip{
+  display:flex;gap:20px;overflow-x:auto;padding:6px 4px 22px;
+  scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
+}
+.htile{
+  flex:0 0 300px;scroll-snap-align:start;background:var(--card);border-radius:var(--radius);
+  overflow:hidden;box-shadow:var(--shadow-sm);transition:transform .2s;
+}
+.htile:hover{transform:translateY(-6px)}
+.htile .art{height:190px;display:flex;align-items:center;justify-content:center;position:relative}
+.htile .art svg{width:34%;height:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.25))}
+.htile .cap{padding:18px 20px}
+.htile .cap strong{font-family:"Archivo",sans-serif;font-weight:800;font-size:1.05rem;color:var(--char-deep);display:block;margin-bottom:2px}
+.htile .cap small{color:var(--muted)}
+.htile .badge{position:absolute;top:12px;left:12px;background:rgba(255,255,255,.92);font-size:.66rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;padding:4px 12px;border-radius:999px;color:var(--ink)}
+.sample-note{background:#FFF6DA;border:2px dashed rgba(176,126,0,.5);border-radius:var(--radius);padding:18px 24px;margin-top:26px;font-size:.95rem;color:#6B5A1E}
+.sample-note strong{color:var(--char-deep)}
+
+/* ---------- reviews ---------- */
+.rev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.rev{background:var(--card);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow-sm)}
+.rev .stars{color:#E8A100;font-size:1.15rem;letter-spacing:3px;margin-bottom:12px}
+.rev p{font-size:1.02rem;margin-bottom:14px}
+.rev cite{font-style:normal;font-weight:700;font-size:.85rem;color:#0F6FDB;letter-spacing:.5px}
+.rev.featured{background:var(--char-deep);color:#EDEFF2}
+.rev.featured p{color:#EDEFF2}
+.rev.featured cite{color:var(--volt)}
+.rs-strip{margin:0 auto 40px;max-width:660px;background:var(--card);border:1.5px solid #E2E5EA;border-radius:14px;padding:20px 24px;text-align:center;box-shadow:var(--shadow-sm)}
+.rs-note{margin:0 0 14px;font-size:.95rem;color:var(--muted);line-height:1.55}
+.rs-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rs-btn{display:inline-block;background:var(--char-deep);color:var(--volt);padding:10px 24px;border-radius:999px;font-weight:700;text-decoration:none;font-size:.95rem;line-height:1.2}
+.rs-btn:hover{background:var(--char-2)}
+.cta-band{background:linear-gradient(120deg,#262B33,#121418);border-radius:24px;color:#fff;padding:48px;text-align:center;margin-top:44px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.cta-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 20%, rgba(255,196,0,.25), transparent 50%)}
+.cta-band h2{color:#fff;position:relative}
+.cta-band p{color:#C9CED6;position:relative;max-width:36rem;margin:0 auto 24px}
+.cta-band .btn-solid{position:relative}
+
+/* ---------- contact ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
+.info-card{background:var(--card);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm)}
+.info-card h3{font-family:"Archivo",sans-serif;font-weight:800;font-size:1.35rem;color:var(--char-deep);margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.info-card h3 svg{width:28px;height:28px}
+.info-card p{color:var(--muted);margin-bottom:8px}
+.info-card a.big{font-family:"Archivo",sans-serif;font-size:1.5rem;font-weight:800;color:#0F6FDB;text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.map-card{
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:340px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 46px, rgba(28,31,36,.12) 46px 48px),
+    repeating-linear-gradient(90deg, transparent 0 46px, rgba(28,31,36,.12) 46px 48px),
+    linear-gradient(140deg,#EDEFF2,#D9DEE6);
+  display:flex;align-items:center;justify-content:center;
+}
+.map-pin{
+  text-align:center;background:#fff;padding:26px 34px;border-radius:18px;box-shadow:var(--shadow);
+  max-width:78%;position:relative;
+}
+.map-pin::after{content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);border:14px solid transparent;border-top-color:#fff;border-bottom:0}
+.map-pin svg{width:44px;height:44px;margin-bottom:8px}
+.map-pin strong{font-family:"Archivo",sans-serif;font-weight:800;font-size:1.15rem;color:var(--char-deep);display:block}
+.map-pin small{color:var(--muted)}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- split copy ---------- */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center}
+.split p{color:var(--muted);margin-bottom:14px}
+.quote-card{
+  background:var(--char-deep);color:#EDEFF2;border-radius:22px;padding:38px 34px;position:relative;box-shadow:var(--shadow);
+  border-left:6px solid var(--volt);
+}
+.quote-card::before{content:"\201C";position:absolute;top:2px;left:24px;font-family:"Archivo",sans-serif;font-size:5rem;color:var(--volt);opacity:.4}
+.quote-card p{font-family:"Archivo",sans-serif;font-weight:600;font-size:1.28rem;line-height:1.5;margin-bottom:12px;position:relative;color:#fff}
+.quote-card cite{font-style:normal;font-weight:700;color:var(--volt);font-size:.85rem;letter-spacing:1.4px;text-transform:uppercase}
+.check-list{list-style:none;margin:20px 0;display:grid;gap:12px}
+.check-list li{display:flex;gap:12px;align-items:flex-start;font-weight:500}
+.check-list svg{flex:none;width:24px;height:24px;margin-top:2px}
+
+/* ---------- minimal footer ---------- */
+footer{background:var(--char-deep);color:#9AA1AB;text-align:center}
+.foot-inner{max-width:720px;margin:0 auto;padding:52px 24px 30px}
+.foot-mark{width:56px;height:56px;border-radius:14px;background:var(--volt);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.foot-mark svg{width:32px;height:32px}
+.foot-name{font-family:"Archivo",sans-serif;font-weight:800;color:#fff;font-size:1.25rem;margin-bottom:6px}
+.foot-inner p{font-size:.94rem;margin-bottom:6px}
+.foot-inner a{color:var(--volt);text-decoration:none;font-weight:600}
+.foot-inner a:hover{text-decoration:underline}
+.foot-links{margin:16px 0 0;display:flex;gap:18px;justify-content:center;flex-wrap:wrap;font-size:.92rem}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.1);padding:18px 0 24px;font-size:.86rem;color:#6E757F}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:940px){
+  .hero-inner,.split,.visit-grid{grid-template-columns:1fr}
+  .wall{grid-template-columns:1fr 1fr}
+  .rev-grid{grid-template-columns:1fr}
+  .tab-panels{padding:32px 26px}
+  .strip{padding:40px 28px}
+  .stat-row{gap:14px}
+}
+@media(max-width:600px){
+  .wall{grid-template-columns:1fr}
+  .hero-inner{padding:60px 0 70px}
+  .cta-band{padding:36px 24px}
+  .head-right .call-chip{display:none}
+}
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="wrap bar">
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    <a class="brand" href="#home" data-page="home" aria-label="Joseph J Cusano Electric LLC, home">
+      <span class="mark"><svg viewBox="0 0 24 24" fill="#121418"><path d="M13 2L4.5 13.5H11L9.5 22 19 9.5h-6.5z"/></svg></span>
+      <span class="brand-name">Joseph J Cusano Electric LLC<small>West Boylston · MA</small></span>
+    </a>
+    <div class="head-right">
+      <a class="call-chip" href="tel:+19785053977">(978) 505-3977</a>
+    </div>
+  </div>
+</header>
+<div class="scrim" id="scrim"></div>
+<nav class="drawer" id="mainNav" aria-label="Main navigation">
+  <div class="drawer-head">
+    <strong>Menu</strong>
+    <button class="drawer-close" id="drawerClose" aria-label="Close menu">&times;</button>
+  </div>
+  <a class="dlink active" href="#home" data-page="home" aria-current="page">Home <span class="arr">&rsaquo;</span></a>
+  <a class="dlink" href="#services" data-page="services">Services <span class="arr">&rsaquo;</span></a>
+  <a class="dlink" href="#about" data-page="about">About <span class="arr">&rsaquo;</span></a>
+  <a class="dlink" href="#gallery" data-page="gallery">Gallery <span class="arr">&rsaquo;</span></a>
+  <a class="dlink" href="#reviews" data-page="reviews">Reviews <span class="arr">&rsaquo;</span></a>
+  <a class="dlink" href="#contact" data-page="contact">Contact <span class="arr">&rsaquo;</span></a>
+  <div class="drawer-foot">
+    24/7 emergency help<br>
+    <a href="tel:+19785053977">(978) 505-3977</a>
+  </div>
+</nav>
+
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="wrap">
+      <div class="hero-inner">
+        <div>
+          <span class="kicker">Licensed Electrician · West Boylston, MA</span>
+          <h1>Power done <span class="accent">right,</span> the first time.</h1>
+          <p class="lede">Joseph J Cusano Electric LLC is a 5-star rated electrical contractor serving West Boylston and surrounding towns. Repairs, panel upgrades, EV chargers and outage response, done on time and done clean.</p>
+          <div class="cta-row">
+            <a class="btn btn-solid" href="#services" data-page="services">See Services</a>
+            <a class="btn btn-ghost" href="https://www.google.com/maps/place/?q=place_id:ChIJy6i2wSQlk68Re2M09Bps9o8" target="_blank" rel="noopener">Get Directions</a>
+          </div>
+          <span class="hours-pill"><span class="dot"></span>Call for hours: <a href="tel:+19785053977" style="color:#fff;font-weight:700">(978) 505-3977</a></span>
+          <div class="stat-row">
+            <div class="stat"><strong>5.0</strong><small>Average review rating</small></div>
+            <div class="stat"><strong>Small jobs</strong><small>Welcome, big jobs too</small></div>
+            <div class="stat"><strong>Same-day</strong><small>Outage response</small></div>
+          </div>
+        </div>
+        <div class="hero-art">
+          <div class="bolt-card">
+            <svg viewBox="0 0 200 240" role="img" aria-label="Lightning bolt illustration"><path d="M112 8 L44 132 h44 L78 232 L158 100 h-46 z" fill="#FFC400" stroke="#E8A100" stroke-width="6" stroke-linejoin="round"/><path d="M112 8 L44 132 h44 L78 232 L158 100 h-46 z" fill="none" stroke="#fff" stroke-width="2" opacity=".35" transform="translate(-6,-6) scale(.96)"/></svg>
+            <div class="bolt-tag">On time · Thorough · Fair</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow">What we do</span>
+        <h2>Every electrical job,<br>handled like it matters</h2>
+        <p>Customers say it best: knowledgeable, on time, responsive, and fair on price. Here is what that covers.</p>
+      </div>
+      <div class="wall">
+        <div class="wcard reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#B07E00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4.5 4.5 0 00-6 6L3 18l3 3 5.7-5.7a4.5 4.5 0 006-6L14 13l-3-3z"/></svg></div>
+          <h3>Repairs &amp; Troubleshooting</h3>
+          <p>From flickering lights to mysterious dead outlets, Joe finds the real problem and fixes it right.</p>
+        </div>
+        <div class="wcard reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#B07E00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg></div>
+          <h3>Panel Upgrades &amp; Wiring</h3>
+          <p>Panel replacements, new circuits and wiring upgrades that bring your home up to speed, safely.</p>
+        </div>
+        <div class="wcard reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#B07E00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4.5 13.5H11L9.5 22 19 9.5h-6.5z"/></svg></div>
+          <h3>Surge &amp; Outage Response</h3>
+          <p>Power surges and outages get same-day attention. One customer was back up and running the same day.</p>
+        </div>
+        <div class="wcard reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#B07E00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M7 17V9a2 2 0 012-2h6a2 2 0 012 2v8M12 7V4M9 4h6"/><circle cx="12" cy="13" r="2.5"/></svg></div>
+          <h3>EV Charger Installation</h3>
+          <p>Level 2 home charging installs, including rebate-eligible projects, wired to code and ready to charge.</p>
+        </div>
+        <div class="wcard reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#B07E00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4M12 2a7 7 0 00-4 12.7c.6.5 1 1.4 1 2.3h6c0-.9.4-1.8 1-2.3A7 7 0 0012 2z"/></svg></div>
+          <h3>Lighting &amp; Fixtures</h3>
+          <p>New fixtures, switches, dimmers and outdoor lighting, installed cleanly with the mess taken away.</p>
+        </div>
+        <div class="wcard reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#B07E00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 2M21 12a9 9 0 11-9-9"/></svg></div>
+          <h3>Small Jobs Welcome</h3>
+          <p>Small job? No problem. Fair pricing and honest estimates, even when the bill is at the low end of the quote.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block" style="background:#fff;padding-top:0">
+    <div class="wrap">
+      <div class="split" style="padding-top:64px">
+        <div class="reveal">
+          <span class="eyebrow">Why customers call Joe</span>
+          <h2>The electrician your<br>neighbors recommend</h2>
+          <p>Every public review says the same thing: Joe is extremely knowledgeable, always on time, thorough and responsive. Customers say the work is perfect, the space is left clean, and the price is more than fair.</p>
+          <ul class="check-list">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#B07E00" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>On time, every time</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#B07E00" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Listens, advises, gives you options</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#B07E00" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Clean work area when he leaves</li>
+          </ul>
+          <a class="btn btn-solid" href="#reviews" data-page="reviews">Read Reviews</a>
+        </div>
+        <div class="quote-card reveal">
+          <p>Joe is the ultimate professional. On time, listened to our needs, gave his advice, and gave us options. The work itself was perfect.</p>
+          <cite>Paraphrased from a customer review</cite>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block" style="padding-top:0">
+    <div class="wrap">
+      <div class="cta-band reveal">
+        <h2>Sparks, flickers, or a dead outlet?</h2>
+        <p>Do not wait on electrical problems. Call Joe at (978) 505-3977 and get it handled right, the first time.</p>
+        <a class="btn btn-solid" href="tel:+19785053977">Call (978) 505-3977</a>
+      </div>
+      <div style="height:48px"></div>
+    </div>
+  </div>
+</section>
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-services">
+      <span class="eyebrow" style="color:var(--volt)">Services</span>
+      <h2>Electrical work,<br>done to code</h2>
+      <p>Pick a service to see what it covers. Not sure what you need? Call and describe the symptoms, Joe will know.</p>
+    </div>
+
+    <div class="tabs-bar reveal" role="tablist" aria-label="Services">
+      <button class="tab-btn active" data-tab="repairs" role="tab" aria-selected="true">Repairs &amp; Troubleshooting</button>
+      <button class="tab-btn" data-tab="panels" role="tab" aria-selected="false">Panel Upgrades &amp; Wiring</button>
+      <button class="tab-btn" data-tab="surge" role="tab" aria-selected="false">Surge &amp; Outage Response</button>
+      <button class="tab-btn" data-tab="ev" role="tab" aria-selected="false">EV Charger Installs</button>
+      <button class="tab-btn" data-tab="small" role="tab" aria-selected="false">Small Jobs &amp; Fixtures</button>
+    </div>
+
+    <div class="tab-panels reveal">
+      <div class="tab-panel active" id="tab-repairs" role="tabpanel">
+        <h3>Repairs &amp; Troubleshooting</h3>
+        <p>Electrical gremlins are Joe's specialty. Customers say he finds problems other electricians left behind and handles them with grace.</p>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#FFC400" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Dead outlets, flickering lights and faulty switches</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#FFC400" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Breakers that trip again and again</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#FFC400" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Cleanup of other electricians' mistakes</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#FFC400" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Thorough diagnosis before any work starts</li>
+        </ul>
+        <a class="btn btn-solid" href="tel:+19785053977">Call (978) 505-3977</a>
+      </div>
+      <div class="tab-panel" id="tab-panels" role="tabpanel">
+        <h3>Panel Upgrades &amp; Wiring</h3>
+        <p>Older panels and tired wiring are a safety risk and a bottleneck. Joe brings your electrical system up to speed.</p>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#FFC400" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Electrical panel replacements and upgrades</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#FFC400" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>New circuits for additions and remodels</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#FFC400" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Rewiring and code corrections</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#FFC400" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Work explained in plain language, with options</li>
+        </ul>
+        <a class="btn btn-solid" href="tel:+19785053977">Call (978) 505-3977</a>
+      </div>
+      <div class="tab-panel" id="tab-surge" role="tabpanel">
+        <h3>Surge &amp; Outage Response</h3>
+        <p>When the power goes wrong, speed matters. Customers report Joe responding quickly and staying late to get everything fixed the same day.</p>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#FFC400" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Same-day outage diagnosis and repair</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#FFC400" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Power surge damage repair</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#FFC400" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Whole-home surge protection advice</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#FFC400" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Stays until the job is done</li>
+        </ul>
+        <a class="btn btn-solid" href="tel:+19785053977">Call (978) 505-3977</a>
+      </div>
+      <div class="tab-panel" id="tab-ev" role="tabpanel">
+        <h3>EV Charger Installation</h3>
+        <p>Joe has installed Level 2 home charging systems, including rebate-eligible projects. Get a safe, code-compliant setup for your EV.</p>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#FFC400" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Level 2 home charger installs</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#FFC400" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Dedicated circuits sized for your vehicle</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#FFC400" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Experience with utility rebate programs</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#FFC400" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Panel capacity checked before you buy</li>
+        </ul>
+        <a class="btn btn-solid" href="tel:+19785053977">Call (978) 505-3977</a>
+      </div>
+      <div class="tab-panel" id="tab-small" role="tabpanel">
+        <h3>Small Jobs &amp; Fixtures</h3>
+        <p>Small jobs get the same care as big ones. Customers say even small bills came in at the low end of the estimate.</p>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#FFC400" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Light fixtures, ceiling fans and switches</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#FFC400" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Dimmers and smart switches</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#FFC400" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Outdoor and landscape lighting</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#FFC400" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Honest estimates, fair pricing</li>
+        </ul>
+        <a class="btn btn-solid" href="tel:+19785053977">Call (978) 505-3977</a>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-about">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-about">
+      <span class="eyebrow" style="color:var(--volt)">About</span>
+      <h2>One electrician,<br>one reputation</h2>
+      <p>Joseph J Cusano Electric LLC is built on the kind of service that earns repeat business: show up, do it right, charge fairly.</p>
+    </div>
+
+    <div class="split" style="margin-bottom:56px">
+      <div class="reveal">
+        <span class="eyebrow">Our story</span>
+        <h2>The name on the truck<br>is the name on the work</h2>
+        <p>Joseph J Cusano Electric LLC is a West Boylston electrical contractor run by Joe Cusano, a working electrician, not a call center. When you call (978) 505-3977, you talk to the person who shows up.</p>
+        <p>Customers describe Joe as extremely knowledgeable, thorough and responsive. He listens, explains the options, and does the work perfectly, then leaves the space clean. That is why reviewers say they will always call Joe for all things electric.</p>
+        <p>From small repairs to panel upgrades to Level 2 EV charger installs, every job gets the same approach: diagnose honestly, quote fairly, and finish the same day whenever possible.</p>
+      </div>
+      <div class="quote-card reveal">
+        <p>Great service, easy to reach, quality work. Came on time. The job was small but the bill was at the very low end of the estimate. Great value.</p>
+        <cite>Paraphrased from a customer review</cite>
+      </div>
+    </div>
+
+    <div class="wall" style="margin-bottom:56px">
+      <div class="wcard reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#B07E00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></div>
+        <h3>On time, every time</h3>
+        <p>Punctuality is the most repeated praise in Joe's reviews. He shows up when he says he will.</p>
+      </div>
+      <div class="wcard reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#B07E00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-9-9M21 3v6h-6"/></svg></div>
+        <h3>Knows his stuff</h3>
+        <p>Reviewers call him extremely knowledgeable. He diagnoses the real problem and explains your options.</p>
+      </div>
+      <div class="wcard reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#B07E00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+        <h3>Fair pricing</h3>
+        <p>More than fair pricing, reasonable rates, and honest estimates. Small jobs are welcome here.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-gal">
+      <span class="eyebrow" style="color:var(--volt)">Gallery</span>
+      <h2>The tools of<br>the trade</h2>
+      <p>Artistic previews of typical electrical work. Real job photos are on the way.</p>
+    </div>
+
+    <div class="hstrip">
+      <div class="htile reveal">
+        <div class="art" style="background:linear-gradient(150deg,#FFC400,#E8A100)">
+          <span class="badge">Sample preview</span>
+          <svg viewBox="0 0 100 100"><rect x="28" y="14" width="44" height="72" rx="6" fill="#1C1F24"/><rect x="38" y="26" width="24" height="8" rx="3" fill="#FFC400"/><rect x="38" y="40" width="24" height="8" rx="3" fill="#FFC400"/><rect x="38" y="54" width="24" height="8" rx="3" fill="#3A3F47"/><rect x="38" y="68" width="24" height="8" rx="3" fill="#FFC400"/></svg>
+        </div>
+        <div class="cap"><strong>Panel upgrades</strong><small>Clean, code-compliant panels</small></div>
+      </div>
+      <div class="htile reveal">
+        <div class="art" style="background:linear-gradient(150deg,#262B33,#121418)">
+          <span class="badge">Sample preview</span>
+          <svg viewBox="0 0 100 100"><path d="M56 8 L26 56 h22 L40 92 L76 42 h-24 z" fill="#FFC400"/></svg>
+        </div>
+        <div class="cap"><strong>EV charger installs</strong><small>Level 2 home charging</small></div>
+      </div>
+      <div class="htile reveal">
+        <div class="art" style="background:linear-gradient(150deg,#3A3F47,#23262B)">
+          <span class="badge">Sample preview</span>
+          <svg viewBox="0 0 100 100"><path d="M50 8 a22 22 0 00-13 39.6c1.8 1.4 3 4 3 6.4h20c0-2.4 1.2-5 3-6.4A22 22 0 0050 8z" fill="#FFC400"/><rect x="42" y="76" width="16" height="6" rx="3" fill="#1C1F24"/><rect x="44" y="84" width="12" height="6" rx="3" fill="#1C1F24"/></svg>
+        </div>
+        <div class="cap"><strong>Lighting &amp; fixtures</strong><small>Installed cleanly</small></div>
+      </div>
+      <div class="htile reveal">
+        <div class="art" style="background:linear-gradient(150deg,#5F4A1F,#2B220E)">
+          <span class="badge">Sample preview</span>
+          <svg viewBox="0 0 100 100"><rect x="32" y="18" width="36" height="64" rx="6" fill="#1C1F24"/><circle cx="50" cy="38" r="8" fill="#FFC400"/><path d="M38 60 h24 M38 68 h24" stroke="#FFC400" stroke-width="4" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>Troubleshooting</strong><small>Found and fixed right</small></div>
+      </div>
+      <div class="htile reveal">
+        <div class="art" style="background:linear-gradient(150deg,#1F3A5F,#101C2E)">
+          <span class="badge">Sample preview</span>
+          <svg viewBox="0 0 100 100"><path d="M50 12 L82 88 H18 z" fill="none" stroke="#FFC400" stroke-width="7" stroke-linejoin="round"/><path d="M50 42 v22" stroke="#FFC400" stroke-width="7" stroke-linecap="round"/><circle cx="50" cy="74" r="4.5" fill="#FFC400"/></svg>
+        </div>
+        <div class="cap"><strong>Surge protection</strong><small>Same-day outage response</small></div>
+      </div>
+      <div class="htile reveal">
+        <div class="art" style="background:linear-gradient(150deg,#4A5A70,#232B38)">
+          <span class="badge">Sample preview</span>
+          <svg viewBox="0 0 100 100"><rect x="24" y="40" width="52" height="10" rx="4" fill="#FFC400"/><rect x="24" y="56" width="52" height="10" rx="4" fill="#E8A100"/><rect x="24" y="72" width="52" height="10" rx="4" fill="#FFC400"/><circle cx="50" cy="28" r="8" fill="#1C1F24"/></svg>
+        </div>
+        <div class="cap"><strong>New circuits</strong><small>Wired for remodels</small></div>
+      </div>
+    </div>
+
+    <div class="sample-note reveal">
+      <strong>Coming soon:</strong> real photos from Joe's jobs. The illustrations above are sample previews.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-rev">
+      <span class="eyebrow" style="color:var(--volt)">Reviews</span>
+      <h2>Five stars,<br>every single one</h2>
+      <p>Joseph J Cusano Electric LLC holds a 5.0 rating. Here is what customers keep saying.</p>
+    </div>
+    <div class="rs-strip">
+      <p class="rs-note">Review themes on this page are paraphrased from public feedback. Open the source to read current reviews and ratings.</p>
+      <div class="rs-links"><a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJy6i2wSQlk68Re2M09Bps9o8" target="_blank" rel="noopener">See reviews on Google</a><a class="rs-btn" href="https://reviews.birdeye.com/joseph-j-cusano-electric-llc-170433270870778" target="_blank" rel="noopener">See reviews on Birdeye</a></div>
+    </div>
+
+    <div class="rev-grid">
+      <div class="rev featured reveal">
+        <div class="stars">★★★★★</div>
+        <p>"Joe is extremely knowledgeable and provides a great service at more than fair pricing."</p>
+        <cite>Paraphrased from a customer review</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>"Joe is just the best. Always on time, thorough, responsive and knows his stuff! We will always call Joe for all things electric!"</p>
+        <cite>Paraphrased from a customer review</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>"Great service, easy to reach, quality work. Came on time. The job was small but the bill was at the very low end of the estimate. Great value."</p>
+        <cite>Paraphrased from a customer review</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>"Quick and efficient. Job well done. Dependable and with reasonable rates."</p>
+        <cite>Paraphrased from a customer review</cite>
+      </div>
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Joe earned your five stars? Say so.</h2>
+      <p>Your review helps a local West Boylston electrician keep the lights on for the whole neighborhood.</p>
+      <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJy6i2wSQlk68Re2M09Bps9o8" target="_blank" rel="noopener">Leave us a Google review</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-contact">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-contact">
+      <span class="eyebrow" style="color:var(--volt)">Contact</span>
+      <h2>Call Joe.<br>He will pick up.</h2>
+      <p>Describe the problem and get an honest answer. Electrical emergencies get priority.</p>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#B07E00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Find us</h3>
+        <p><strong>Joseph J Cusano Electric LLC, 395 Prospect St, West Boylston, MA 01583</strong></p>
+        <p>Serving West Boylston and surrounding towns.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#B07E00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg> Call us</h3>
+        <p>Estimates, scheduling, emergencies:</p>
+        <a class="big" href="tel:+19785053977">(978) 505-3977</a>
+        <p style="margin-top:10px">Small jobs welcome. Fair pricing, honest estimates.</p>
+      </div>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#B07E00" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Hours</h3>
+        <p style="font-size:1.1rem">Call for hours:</p>
+        <a class="big" href="tel:+19785053977">(978) 505-3977</a>
+        <p style="margin-top:10px">Emergency outage and surge response gets same-day priority.</p>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <svg viewBox="0 0 24 24" fill="#B07E00"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#fff"/></svg>
+          <strong>395 Prospect St</strong>
+          <small>West Boylston, MA 01583</small><br>
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJy6i2wSQlk68Re2M09Bps9o8" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-inner">
+    <div class="foot-mark"><svg viewBox="0 0 24 24" fill="#121418"><path d="M13 2L4.5 13.5H11L9.5 22 19 9.5h-6.5z"/></svg></div>
+    <div class="foot-name">Joseph J Cusano Electric LLC</div>
+    <p>Joseph J Cusano Electric LLC, 395 Prospect St, West Boylston, MA 01583</p>
+    <p><a href="tel:+19785053977">(978) 505-3977</a> · Call for hours</p>
+    <div class="foot-links">
+      <a href="#home" data-page="home">Home</a>
+      <a href="#services" data-page="services">Services</a>
+      <a href="#about" data-page="about">About</a>
+      <a href="#gallery" data-page="gallery">Gallery</a>
+      <a href="#reviews" data-page="reviews">Reviews</a>
+      <a href="#contact" data-page="contact">Contact</a>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <span>© Joseph J Cusano Electric LLC</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "contact"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+  var scrim = document.getElementById("scrim");
+  var drawerClose = document.getElementById("drawerClose");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+    if(scrim){ scrim.classList.remove("show"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.drawer a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  function openDrawer(){
+    if(nav){ nav.classList.add("open"); }
+    if(scrim){ scrim.classList.add("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "true"); }
+  }
+
+  if(burger){
+    burger.addEventListener("click", function(){
+      if(nav && nav.classList.contains("open")){ closeMenu(); }
+      else { openDrawer(); }
+    });
+  }
+  if(drawerClose){ drawerClose.addEventListener("click", closeMenu); }
+  if(scrim){ scrim.addEventListener("click", closeMenu); }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+
+(function(){
+  "use strict";
+  var btns = document.querySelectorAll(".tab-btn");
+  var panels = document.querySelectorAll(".tab-panel");
+  for(var i = 0; i < btns.length; i++){
+    btns[i].addEventListener("click", function(){
+      var target = this.getAttribute("data-tab");
+      for(var a = 0; a < btns.length; a++){
+        btns[a].classList.remove("active");
+        btns[a].setAttribute("aria-selected", "false");
+      }
+      for(var b = 0; b < panels.length; b++){
+        panels[b].classList.toggle("active", panels[b].id === "tab-" + target);
+      }
+      this.classList.add("active");
+      this.setAttribute("aria-selected", "true");
+    });
+  }
+})();
+</script>
+</body>
+</html>

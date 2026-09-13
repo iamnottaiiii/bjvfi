@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>J S painting · House Painter in Clementon, NJ</title>
+<meta name="description" content="J S painting at 66 Higgins Ave, Clementon, NJ. Interior and exterior house painting plus drywall repair. 5 star rated. Call (856) 723-1931.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#141B26; --navy-2:#1E2839; --slate:#3D4A60;
+  --cream:#FAF6EE; --paper:#FFFFFF;
+  --amber:#F2A01B; --amber-deep:#C97F0A; --amber-soft:#FCEBCB;
+  --teal:#0E7C7B; --teal-soft:#DCEEEA;
+  --ink:#232B3B; --muted:#5C6A82;
+  --radius:16px;
+  --shadow:0 20px 44px -20px rgba(20,27,38,.35);
+  --shadow-sm:0 10px 24px -12px rgba(20,27,38,.28);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Inter",system-ui,sans-serif;background:var(--cream);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:var(--teal)}
+::selection{background:var(--amber);color:var(--navy)}
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+h1,h2,h3{font-family:"Sora",sans-serif;letter-spacing:-.4px}
+
+/* ---------- top bar + side drawer ---------- */
+header.site{position:sticky;top:0;z-index:60;background:var(--navy);color:#fff;box-shadow:0 2px 18px rgba(0,0,0,.25)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:#fff}
+.brand svg{width:44px;height:44px;flex:none}
+.brand-name{font-family:"Sora",sans-serif;font-weight:800;font-size:1.3rem;line-height:1.05}
+.brand-name small{display:block;font-family:"Inter",sans-serif;font-weight:600;font-size:.62rem;letter-spacing:3px;text-transform:uppercase;color:var(--amber)}
+.head-call{display:inline-flex;align-items:center;gap:8px;background:var(--amber);color:var(--navy);text-decoration:none;font-weight:700;padding:10px 20px;border-radius:999px;font-size:.95rem;transition:transform .18s,background .18s;white-space:nowrap}
+.head-call:hover{background:#fff;transform:translateY(-2px)}
+.burger{display:flex;flex-direction:column;justify-content:center;gap:5px;background:none;border:0;cursor:pointer;padding:10px 6px}
+.burger span{display:block;width:28px;height:3px;border-radius:3px;background:#fff;transition:.25s}
+.drawer-scrim{position:fixed;inset:0;background:rgba(10,14,22,.55);opacity:0;pointer-events:none;transition:opacity .3s;z-index:70}
+.drawer-scrim.show{opacity:1;pointer-events:auto}
+nav.drawer{
+  position:fixed;top:0;left:0;bottom:0;width:320px;max-width:86vw;z-index:80;
+  background:var(--navy-2);color:#fff;transform:translateX(-105%);transition:transform .32s cubic-bezier(.22,.8,.3,1);
+  display:flex;flex-direction:column;padding:22px 26px 30px;box-shadow:20px 0 60px rgba(0,0,0,.4);
+}
+nav.drawer.open{transform:translateX(0)}
+.drawer-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px}
+.drawer-top .brand-name{font-size:1.1rem}
+.drawer-close{background:none;border:0;color:#fff;font-size:2rem;line-height:1;cursor:pointer;padding:4px 8px}
+nav.drawer a.dlink{
+  display:flex;align-items:center;gap:14px;text-decoration:none;color:#E7E0D2;font-weight:600;font-size:1.06rem;
+  padding:14px 14px;border-radius:12px;transition:background .2s,color .2s;margin-bottom:4px;
+}
+nav.drawer a.dlink .n{font-family:"Sora",sans-serif;font-size:.75rem;color:var(--amber);font-weight:800;width:26px}
+nav.drawer a.dlink:hover{background:rgba(255,255,255,.08)}
+nav.drawer a.dlink.active{background:var(--amber);color:var(--navy)}
+nav.drawer a.dlink.active .n{color:var(--navy)}
+.drawer-foot{margin-top:auto;padding-top:24px;border-top:1px solid rgba(255,255,255,.12);font-size:.9rem;color:#B9C2D4}
+.drawer-foot a{color:var(--amber);text-decoration:none;font-weight:700;font-size:1.05rem}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .32s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- split hero ---------- */
+.hero{display:grid;grid-template-columns:1fr 1fr;min-height:640px}
+.hero-copy{background:var(--navy);color:#fff;display:flex;align-items:center;padding:64px 0;position:relative;overflow:hidden}
+.hero-copy::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 12% 88%, rgba(242,160,27,.16), transparent 46%)}
+.hero-copy .inner{position:relative;max-width:560px;margin-left:auto;padding:0 48px 0 24px}
+.kicker{display:inline-block;background:rgba(242,160,27,.14);border:1px solid rgba(242,160,27,.5);color:var(--amber);font-weight:700;font-size:.78rem;letter-spacing:2.5px;text-transform:uppercase;padding:8px 18px;border-radius:999px;margin-bottom:20px}
+.hero-copy h1{font-size:clamp(2.4rem,4.6vw,3.9rem);line-height:1.04;color:#fff;margin-bottom:18px}
+.hero-copy h1 .hl{color:var(--amber)}
+.hero-copy .lede{color:#C6CFDD;font-size:1.1rem;margin-bottom:28px;max-width:30rem}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:30px}
+.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;padding:14px 28px;border-radius:999px;font-size:1rem;transition:transform .18s,box-shadow .18s,background .18s}
+.btn-amber{background:var(--amber);color:var(--navy);box-shadow:var(--shadow-sm)}
+.btn-amber:hover{transform:translateY(-2px);background:#FFB53D}
+.btn-line{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.35)}
+.btn-line:hover{border-color:var(--amber);color:var(--amber);transform:translateY(-2px)}
+.rating-line{display:flex;align-items:center;gap:12px;color:#C6CFDD;font-size:.95rem}
+.rating-line .stars{color:var(--amber);letter-spacing:2px;font-size:1.1rem}
+.hours-pill{display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:#EDE7D8;padding:10px 20px;border-radius:999px;font-weight:600;font-size:.92rem;margin-top:22px}
+.hours-pill .dot{width:10px;height:10px;border-radius:50%;background:#7BC47F;box-shadow:0 0 0 4px rgba(123,196,127,.22);animation:pulse 2s infinite}
+.hours-pill.closed .dot{background:#E4658F;box-shadow:0 0 0 4px rgba(228,101,143,.22)}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.28)}}
+.hero-art{background:var(--amber-soft);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:48px}
+.hero-art::before{content:"";position:absolute;inset:0;background:
+  linear-gradient(115deg, transparent 62%, rgba(20,27,38,.06) 62.5%),
+  repeating-linear-gradient(115deg, transparent 0 34px, rgba(242,160,27,.14) 34px 37px)}
+.hero-art svg{position:relative;width:min(78%,420px);height:auto;filter:drop-shadow(0 24px 30px rgba(20,27,38,.25));animation:floaty 6s ease-in-out infinite}
+@keyframes floaty{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-14px) rotate(1deg)}}
+.swatch-row{position:absolute;bottom:26px;left:0;right:0;display:flex;justify-content:center;gap:10px;z-index:2}
+.swatch{width:44px;height:44px;border-radius:12px;border:3px solid #fff;box-shadow:var(--shadow-sm)}
+
+/* ---------- sections ---------- */
+section.block{padding:64px 0}
+.sec-head{max-width:46rem;margin:0 auto 44px;text-align:center}
+.sec-head .tag{font-weight:800;font-size:.78rem;letter-spacing:3px;text-transform:uppercase;color:var(--teal)}
+.sec-head h2{font-size:clamp(1.9rem,3.6vw,2.8rem);margin:8px 0 12px;color:var(--navy)}
+.sec-head p{color:var(--muted)}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.feat{background:var(--paper);border-radius:var(--radius);padding:32px 28px;box-shadow:var(--shadow-sm);border-left:6px solid var(--amber);transition:transform .2s,box-shadow .2s}
+.feat:nth-child(2){border-left-color:var(--teal)}
+.feat:nth-child(3){border-left-color:var(--navy)}
+.feat:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+.feat h3{font-size:1.25rem;margin-bottom:10px;color:var(--navy)}
+.feat p{color:var(--muted);font-size:.97rem}
+.split-band{display:grid;grid-template-columns:1fr 1fr;gap:0;border-radius:22px;overflow:hidden;box-shadow:var(--shadow);margin:64px 0 0}
+.split-band .sb-copy{background:var(--navy);color:#fff;padding:56px 52px}
+.split-band .sb-copy h2{color:#fff;font-size:clamp(1.7rem,3vw,2.4rem);margin-bottom:14px}
+.split-band .sb-copy p{color:#C6CFDD;margin-bottom:12px}
+.split-band .sb-art{background:linear-gradient(140deg,var(--teal),#0A5B5A);display:flex;align-items:center;justify-content:center;padding:48px;position:relative;overflow:hidden}
+.split-band .sb-art::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 70% 25%, rgba(255,255,255,.22), transparent 52%)}
+.check-list{list-style:none;display:grid;gap:12px;margin:22px 0}
+.check-list li{display:flex;gap:12px;align-items:flex-start;font-weight:500}
+.check-list svg{flex:none;width:24px;height:24px;margin-top:2px}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.step{background:var(--paper);border-radius:var(--radius);padding:28px 24px;box-shadow:var(--shadow-sm);position:relative}
+.step .num{font-family:"Sora",sans-serif;font-weight:800;font-size:2.2rem;color:var(--amber);line-height:1}
+.step h3{font-size:1.1rem;margin:10px 0 6px;color:var(--navy)}
+.step p{font-size:.93rem;color:var(--muted)}
+
+/* ---------- services page ---------- */
+.svc-list{display:grid;gap:20px}
+.svc{display:grid;grid-template-columns:120px 1fr;gap:26px;background:var(--paper);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm);align-items:center}
+.svc .badge{width:120px;height:120px;border-radius:20px;display:flex;align-items:center;justify-content:center;background:var(--amber-soft)}
+.svc:nth-child(2) .badge{background:var(--teal-soft)}
+.svc:nth-child(3) .badge{background:#E4E9F2}
+.svc:nth-child(4) .badge{background:#F7DDE4}
+.svc:nth-child(5) .badge{background:#E6F0E0}
+.svc .badge svg{width:60px;height:60px}
+.svc h3{font-size:1.4rem;color:var(--navy);margin-bottom:8px}
+.svc p{color:var(--muted)}
+.svc .flag{display:inline-block;background:var(--navy);color:#fff;font-size:.7rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 12px;border-radius:999px;margin-left:10px;vertical-align:2px}
+.note{background:var(--amber-soft);border:2px dashed rgba(201,127,10,.5);border-radius:var(--radius);padding:20px 26px;margin-top:26px;color:#6B4A12;font-size:.95rem}
+.note strong{color:var(--amber-deep)}
+
+/* ---------- about ---------- */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center}
+.about-grid h2{color:var(--navy);font-size:clamp(1.9rem,3.4vw,2.7rem);margin-bottom:16px}
+.about-grid p{color:var(--muted);margin-bottom:14px}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:26px}
+.stat{background:var(--paper);border-radius:var(--radius);padding:22px 18px;text-align:center;box-shadow:var(--shadow-sm)}
+.stat strong{font-family:"Sora",sans-serif;font-size:1.9rem;color:var(--navy);display:block}
+.stat small{color:var(--muted);font-weight:600;letter-spacing:.5px}
+
+/* ---------- masonry gallery ---------- */
+.masonry{columns:3;column-gap:20px}
+.mtile{break-inside:avoid;margin-bottom:20px;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);background:var(--paper);transition:transform .2s}
+.mtile:hover{transform:translateY(-4px)}
+.mtile .art{display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.mtile .art svg{width:52%;height:auto;filter:drop-shadow(0 12px 16px rgba(0,0,0,.18));transition:transform .3s}
+.mtile:hover .art svg{transform:scale(1.08) rotate(-3deg)}
+.mtile .cap{padding:16px 20px}
+.mtile .cap strong{font-family:"Sora",sans-serif;font-size:1.02rem;color:var(--navy);display:block}
+.mtile .cap small{color:var(--muted)}
+.mtile .ph{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.88);font-size:.66rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;padding:4px 12px;border-radius:999px;color:var(--muted)}
+
+/* ---------- reviews ---------- */
+.rev-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.rev{background:var(--paper);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow-sm);border-top:6px solid var(--teal)}
+.rev .stars{color:var(--amber);letter-spacing:3px;font-size:1.15rem;margin-bottom:12px}
+.rev p{font-size:1.02rem;margin-bottom:14px}
+.rev cite{font-style:normal;font-weight:700;font-size:.85rem;color:var(--teal);letter-spacing:.5px}
+.rev .sample-badge{display:inline-block;background:var(--amber-soft);color:var(--amber-deep);font-size:.68rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:4px 12px;border-radius:999px;margin-bottom:10px}
+.rev.featured{background:var(--navy);color:#EDE7D8;border-top-color:var(--amber)}
+.rev.featured p{color:#D8DCE6}
+.rev.featured cite{color:var(--amber)}
+.rs-strip{margin:26px auto 34px;max-width:660px;background:var(--paper);border:1px solid var(--amber-soft);border-radius:14px;padding:20px 24px;text-align:center;box-shadow:var(--shadow-sm)}
+.rs-note{margin:0 0 14px;font-size:.95rem;color:var(--muted);line-height:1.55}
+.rs-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rs-btn{display:inline-block;background:var(--navy);color:#fff;padding:11px 26px;border-radius:999px;font-weight:700;text-decoration:none;font-size:.95rem;line-height:1.2}
+.rs-btn:hover{background:var(--teal)}
+.cta-band{background:linear-gradient(120deg,var(--teal),#0A5B5A);border-radius:24px;color:#fff;padding:52px;text-align:center;margin-top:44px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.cta-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 82% 18%, rgba(242,160,27,.35), transparent 52%)}
+.cta-band h2{color:#fff;position:relative;font-size:clamp(1.8rem,3.4vw,2.6rem)}
+.cta-band p{color:#DCEEEA;position:relative;max-width:36rem;margin:10px auto 26px}
+.cta-band .btn-amber{position:relative}
+
+/* ---------- contact ---------- */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
+.info-card{background:var(--paper);border-radius:var(--radius);padding:34px;box-shadow:var(--shadow-sm)}
+.info-card h3{font-size:1.35rem;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.info-card h3 svg{width:28px;height:28px}
+.info-card p{color:var(--muted);margin-bottom:8px}
+.info-card a.big{font-family:"Sora",sans-serif;font-size:1.45rem;font-weight:800;color:var(--amber-deep);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.hours-table{width:100%;border-collapse:collapse;font-size:.98rem}
+.hours-table td{padding:10px 6px;border-bottom:1px dashed rgba(35,43,59,.2)}
+.hours-table tr.today td{font-weight:800;color:var(--amber-deep)}
+.hours-table td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.map-card{border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:360px;background:linear-gradient(140deg,#E9ECF2,#D7DCE6);display:flex;align-items:center;justify-content:center}
+.map-pin{text-align:center;background:var(--paper);padding:28px 36px;border-radius:20px;box-shadow:var(--shadow);max-width:80%}
+.map-pin svg{width:44px;height:44px;margin-bottom:8px}
+.map-pin strong{font-family:"Sora",sans-serif;font-size:1.15rem;display:block;color:var(--navy)}
+.map-pin small{color:var(--muted)}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- strip headers ---------- */
+.strip{border-radius:22px;padding:54px 48px;color:#fff;position:relative;overflow:hidden;margin-bottom:44px;box-shadow:var(--shadow)}
+.strip::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(255,255,255,.2), transparent 52%)}
+.strip h2{color:#fff;font-size:clamp(2rem,4vw,3rem);position:relative;margin:6px 0 10px}
+.strip p{color:rgba(255,255,255,.88);max-width:38rem;position:relative}
+.strip .tag{font-weight:800;font-size:.78rem;letter-spacing:3px;text-transform:uppercase;position:relative;color:rgba(255,255,255,.85)}
+.strip.s-services{background:linear-gradient(120deg,#0E7C7B,#0A4F4E)}
+.strip.s-about{background:linear-gradient(120deg,#141B26,#3A4A63)}
+.strip.s-gal{background:linear-gradient(120deg,#C97F0A,#8A5607)}
+.strip.s-rev{background:linear-gradient(120deg,#7A3E5E,#4E2740)}
+.strip.s-contact{background:linear-gradient(120deg,#24344D,#141B26)}
+
+/* ---------- minimal footer ---------- */
+footer{background:var(--navy);color:#B9C2D4;margin-top:20px}
+.foot-mini{padding:34px 0;display:flex;flex-wrap:wrap;gap:14px 34px;align-items:center;justify-content:space-between;font-size:.95rem}
+.foot-mini a{color:#E7E0D2;text-decoration:none;font-weight:600}
+.foot-mini a:hover{color:var(--amber)}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.12);padding:18px 0 24px;text-align:center;font-size:.88rem;color:#8E99AD}
+
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:940px){
+  .hero{grid-template-columns:1fr;min-height:0}
+  .hero-copy .inner{margin:0;padding:0 24px}
+  .hero-art{min-height:380px}
+  .feat-grid{grid-template-columns:1fr 1fr}
+  .split-band{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr 1fr}
+  .about-grid,.contact-grid,.rev-grid{grid-template-columns:1fr}
+  .masonry{columns:2}
+  .svc{grid-template-columns:1fr;text-align:left}
+  .svc .badge{width:88px;height:88px}
+  .strip{padding:40px 28px}
+  .head-call{display:none}
+}
+@media(max-width:600px){
+  .feat-grid,.steps{grid-template-columns:1fr}
+  .masonry{columns:1}
+  .cta-band{padding:36px 24px}
+}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap bar">
+    <button class="burger" id="burger" aria-label="Open navigation" aria-expanded="false" aria-controls="mainNav"><span></span><span></span><span></span></button>
+    <a class="brand" href="#home" data-page="home" aria-label="J S painting, home">
+      <svg viewBox="0 0 64 64" role="img" aria-label="Paint roller logo"><rect x="14" y="10" width="36" height="16" rx="8" fill="#F2A01B"/><rect x="14" y="10" width="36" height="16" rx="8" fill="none" stroke="#0d1522" stroke-width="2.5"/><rect x="10" y="26" width="44" height="7" rx="3.5" fill="#C97F0A"/><rect x="28" y="33" width="8" height="12" fill="#3D4A60"/><rect x="22" y="44" width="20" height="9" rx="4.5" fill="#0E7C7B"/><path d="M14 18 h36" stroke="#fff" stroke-width="2.5" stroke-linecap="round" opacity=".6"/></svg>
+      <span class="brand-name">J S painting<small>Clementon, NJ</small></span>
+    </a>
+    <a class="head-call" href="tel:+18567231931">Call (856) 723-1931</a>
+  </div>
+</header>
+
+<div class="drawer-scrim" id="drawerScrim"></div>
+<nav class="drawer main" id="mainNav" aria-label="Main navigation">
+  <div class="drawer-top">
+    <span class="brand-name" style="font-family:'Sora',sans-serif;font-weight:800;color:#fff">J S painting</span>
+    <button class="drawer-close" id="drawerClose" aria-label="Close navigation">&times;</button>
+  </div>
+  <a class="dlink active" href="#home" data-page="home" aria-current="page"><span class="n">01</span>Home</a>
+  <a class="dlink" href="#services" data-page="services"><span class="n">02</span>Services</a>
+  <a class="dlink" href="#about" data-page="about"><span class="n">03</span>About</a>
+  <a class="dlink" href="#gallery" data-page="gallery"><span class="n">04</span>Gallery</a>
+  <a class="dlink" href="#reviews" data-page="reviews"><span class="n">05</span>Reviews</a>
+  <a class="dlink" href="#contact" data-page="contact"><span class="n">06</span>Contact</a>
+  <div class="drawer-foot">
+    Ready when you are.<br>
+    <a href="tel:+18567231931">(856) 723-1931</a>
+  </div>
+</nav>
+
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-copy">
+      <div class="inner">
+        <span class="kicker">Painter · Clementon, NJ</span>
+        <h1>Fresh paint.<br>Clean lines.<br><span class="hl">Zero hassle.</span></h1>
+        <p class="lede">J S painting is a Clementon house painter known for careful prep, sharp edges, and drywall repairs that disappear into the wall. Call and get your rooms, your whole home, or your exterior looking new again.</p>
+        <div class="cta-row">
+          <a class="btn btn-amber" href="tel:+18567231931">Call (856) 723-1931</a>
+          <a class="btn btn-line" href="#services" data-page="services">See services</a>
+        </div>
+        <div class="rating-line"><span class="stars">★★★★★</span><span>5.0 rated across 5 public reviews</span></div>
+        <span class="hours-pill" id="hoursPill"><span class="dot"></span><span id="hoursText">Checking today's hours</span></span>
+      </div>
+    </div>
+    <div class="hero-art">
+      <svg viewBox="0 0 300 320" role="img" aria-label="Illustration of a paint roller and can">
+        <ellipse cx="150" cy="292" rx="98" ry="14" fill="#141B26" opacity=".12"/>
+        <rect x="86" y="196" width="128" height="92" rx="10" fill="#fff"/>
+        <rect x="86" y="196" width="128" height="92" rx="10" fill="none" stroke="#141B26" stroke-width="5"/>
+        <ellipse cx="150" cy="196" rx="64" ry="13" fill="#F2A01B"/>
+        <ellipse cx="150" cy="196" rx="64" ry="13" fill="none" stroke="#141B26" stroke-width="5"/>
+        <path d="M120 158 q-6 -34 22 -40" stroke="#141B26" stroke-width="9" fill="none" stroke-linecap="round"/>
+        <rect x="58" y="96" width="120" height="46" rx="23" fill="#0E7C7B"/>
+        <rect x="58" y="96" width="120" height="46" rx="23" fill="none" stroke="#141B26" stroke-width="5"/>
+        <rect x="58" y="96" width="120" height="18" rx="9" fill="#fff" opacity=".35"/>
+        <rect x="170" y="112" width="44" height="12" rx="6" fill="#141B26"/>
+        <rect x="204" y="118" width="14" height="60" rx="7" fill="#141B26"/>
+        <path d="M96 176 q54 -14 108 0" stroke="#0E7C7B" stroke-width="7" fill="none" stroke-linecap="round"/>
+      </svg>
+      <div class="swatch-row" aria-hidden="true">
+        <span class="swatch" style="background:#F2A01B"></span>
+        <span class="swatch" style="background:#0E7C7B"></span>
+        <span class="swatch" style="background:#E4658F"></span>
+        <span class="swatch" style="background:#3D6FB4"></span>
+        <span class="swatch" style="background:#5C7A3A"></span>
+      </div>
+    </div>
+  </div>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="tag">Why J S painting</span>
+        <h2>The prep work is the promise</h2>
+        <p>Paint looks good on day one because of day zero. Masking, patching, sanding, priming: the unglamorous work that makes a finish last.</p>
+      </div>
+      <div class="feat-grid">
+        <div class="feat reveal">
+          <h3>Drywall repair that vanishes</h3>
+          <p>Holes, cracks, dents and rough patches get patched, sanded and primed before a drop of paint goes on. Reviewers call out the drywall work by name.</p>
+        </div>
+        <div class="feat reveal">
+          <h3>Interior and exterior</h3>
+          <p>Bedrooms, kitchens, living rooms, trim and ceilings inside. Siding, doors, shutters and porches outside. One call covers the whole property.</p>
+        </div>
+        <div class="feat reveal">
+          <h3>Respect for your home</h3>
+          <p>Floors and furniture protected, work areas kept tidy, and the place left cleaner than we found it. That is just how a job is done right.</p>
+        </div>
+      </div>
+
+      <div class="split-band reveal">
+        <div class="sb-copy">
+          <h2>Selling, moving in, or just tired of the old color?</h2>
+          <p>A fresh coat is the fastest way to make a room feel new. Whether it is one accent wall or the whole house, inside and out, we will walk the space with you and plan the job properly.</p>
+          <ul class="check-list">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#F2A01B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Color and finish guidance for every room</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#F2A01B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Full prep: patching, sanding, caulking, priming</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#F2A01B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Crisp lines at trim, ceilings and edges</li>
+          </ul>
+          <a class="btn btn-amber" href="tel:+18567231931">Call for a quote</a>
+        </div>
+        <div class="sb-art">
+          <svg viewBox="0 0 240 240" role="img" aria-label="Illustration of a paintbrush" style="width:min(70%,300px);position:relative">
+            <rect x="96" y="150" width="48" height="70" rx="12" fill="#141B26"/>
+            <path d="M96 150 h48 l-8 -70 h-32 Z" fill="#F2A01B"/>
+            <path d="M104 80 h32 l-6 -34 h-20 Z" fill="#8A8F99"/>
+            <path d="M110 46 q10 -22 20 0 q-10 8 -20 0" fill="#141B26"/>
+            <circle cx="80" cy="60" r="5" fill="#fff" opacity=".8"/>
+            <circle cx="168" cy="96" r="7" fill="#fff" opacity=".6"/>
+            <circle cx="196" cy="52" r="4" fill="#F2A01B"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="tag">How it works</span>
+        <h2>Simple, from call to clean finish</h2>
+      </div>
+      <div class="steps">
+        <div class="step reveal"><span class="num">1</span><h3>Call</h3><p>Tell us about the rooms or the exterior. We will set a time to look at it in person.</p></div>
+        <div class="step reveal"><span class="num">2</span><h3>Walkthrough</h3><p>We measure, talk colors and finishes, and plan the prep the walls actually need.</p></div>
+        <div class="step reveal"><span class="num">3</span><h3>Prep and paint</h3><p>Protection goes down, drywall gets repaired, then clean coats with sharp lines.</p></div>
+        <div class="step reveal"><span class="num">4</span><h3>Final check</h3><p>We walk it with you, touch up anything you spot, and leave the place tidy.</p></div>
+      </div>
+      <div class="wrap" style="padding:0;margin-top:44px">
+        <div class="cta-band reveal">
+          <h2>Ready for a fresh coat?</h2>
+          <p>66 Higgins Ave, Clementon, NJ 08021. Call during business hours and we will take it from there.</p>
+          <a class="btn btn-amber" href="tel:+18567231931">Call (856) 723-1931</a>
+        </div>
+        <div style="height:56px"></div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-services">
+      <span class="tag">What we do</span>
+      <h2>Painting and repair,<br>done the right way</h2>
+      <p>Interior rooms, whole homes, exteriors, and the drywall repair that makes paint look its best. Every job starts with a look and an honest plan.</p>
+    </div>
+
+    <div class="svc-list">
+      <div class="svc reveal">
+        <div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="#C97F0A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V10l7-6 7 6v11M9 21v-6h6v6"/></svg></div>
+        <div><h3>Interior house painting</h3><p>Bedrooms, living rooms, kitchens, hallways, ceilings and trim. We protect floors and furniture, patch the walls, and leave crisp lines where wall meets ceiling and trim.</p></div>
+      </div>
+      <div class="svc reveal">
+        <div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="#0E7C7B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5M5 8.5V15"/></svg></div>
+        <div><h3>Exterior painting</h3><p>Siding, doors, shutters, trim and porches. Proper scraping, caulking and priming first, so the finish stands up to New Jersey weather.</p></div>
+      </div>
+      <div class="svc reveal">
+        <div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="#3D4A60" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16M6 16l6-11 6 11M9.5 12h5"/></svg></div>
+        <div><h3>Drywall repair <span class="flag">Customer favorite</span></h3><p>Holes, cracks, water stains and rough patches. Patched, sanded and primed until the repair disappears, then painted to blend. This is the work our reviewers praise most.</p></div>
+      </div>
+      <div class="svc reveal">
+        <div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="#B23A63" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M4 12l3-3M4 12l3 3M20 12l-3-3M20 12l-3 3M8 5v14M16 5v14"/></svg></div>
+        <div><h3>Trim, doors and touch ups</h3><p>Baseboards, crown molding, interior doors and the little scuffs and marks that make a room look tired. Small jobs welcome.</p></div>
+      </div>
+      <div class="svc reveal">
+        <div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="#5C7A3A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l2.5 2.5M8 3.5h8M10 3.5V6h4V3.5"/></svg></div>
+        <div><h3>Move in and move out painting</h3><p>Fresh, neutral walls for a sale or a clean start in a new place. Fast scheduling when closing dates are tight.</p></div>
+      </div>
+    </div>
+
+    <div class="note reveal"><strong>Good to know:</strong> every project is priced on its own after we see the space, so there are no fixed price lists here. Call <a href="tel:+18567231931" style="font-weight:700;color:var(--amber-deep)">(856) 723-1931</a> and describe the job for an honest quote.</div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-about">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-about">
+      <span class="tag">About</span>
+      <h2>A Clementon painter<br>with a simple standard</h2>
+      <p>Do the prep, use good paint, leave it clean. That is the whole business plan.</p>
+    </div>
+
+    <div class="about-grid">
+      <div class="reveal">
+        <h2>Local, careful, and easy to reach</h2>
+        <p>J S painting is based at 66 Higgins Ave in Clementon, NJ, serving Clementon and the surrounding South Jersey towns. We are a painting contractor focused on houses: the rooms you live in and the exterior your neighbors see.</p>
+        <p>What sets a paint job apart is rarely the color. It is the hours of patching, sanding, caulking and masking that happen before the roller comes out. That is where we spend our time, and it shows in the finish and in the reviews.</p>
+        <p>When you call <a href="tel:+18567231931" style="font-weight:700;color:var(--amber-deep)">(856) 723-1931</a>, you talk to the person who will show up and do the work.</p>
+        <div class="stat-row">
+          <div class="stat"><strong>5.0</strong><small>average rating</small></div>
+          <div class="stat"><strong>5</strong><small>public reviews</small></div>
+          <div class="stat"><strong>100%</strong><small>would recommend</small></div>
+        </div>
+      </div>
+      <div class="reveal" style="background:linear-gradient(140deg,var(--navy),var(--navy-2));border-radius:22px;padding:52px 44px;color:#fff;box-shadow:var(--shadow);position:relative;overflow:hidden">
+        <div style="position:absolute;inset:0;background:radial-gradient(circle at 78% 18%, rgba(242,160,27,.35), transparent 52%)"></div>
+        <div style="position:relative">
+          <div style="font-size:3rem;color:var(--amber);line-height:1;margin-bottom:12px">&ldquo;</div>
+          <p style="font-family:'Sora',sans-serif;font-size:1.3rem;line-height:1.5;margin-bottom:14px">The drywall repair and paint is really good. Very recommend.</p>
+          <cite style="font-style:normal;font-weight:700;font-size:.85rem;color:var(--amber);letter-spacing:1px;text-transform:uppercase">Public review theme</cite>
+        </div>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-gal">
+      <span class="tag">Gallery</span>
+      <h2>What a good paint<br>job looks like</h2>
+      <p>Artistic previews of the finishes we deliver. Real photos of our recent work are on the way.</p>
+    </div>
+
+    <div class="masonry">
+      <div class="mtile reveal">
+        <span class="ph">Photo soon</span>
+        <div class="art" style="height:300px;background:linear-gradient(150deg,#FCEBCB,#F2A01B)">
+          <svg viewBox="0 0 100 100"><rect x="18" y="30" width="64" height="52" rx="4" fill="#fff" opacity=".85"/><rect x="18" y="30" width="64" height="14" rx="4" fill="#141B26" opacity=".12"/><rect x="44" y="52" width="12" height="30" fill="#0E7C7B"/><rect x="30" y="42" width="40" height="6" rx="3" fill="#141B26" opacity=".2"/></svg>
+        </div>
+        <div class="cap"><strong>Living room refresh</strong><small>Warm neutral walls, crisp white trim</small></div>
+      </div>
+      <div class="mtile reveal">
+        <span class="ph">Photo soon</span>
+        <div class="art" style="height:220px;background:linear-gradient(150deg,#DCEEEA,#0E7C7B)">
+          <svg viewBox="0 0 100 100"><path d="M20 80 h60 v-52 h-60 Z" fill="#fff" opacity=".9"/><path d="M28 80 v-38 h14 v38 M58 80 v-38 h14 v38" fill="#141B26" opacity=".25"/><rect x="20" y="24" width="60" height="8" fill="#141B26" opacity=".3"/></svg>
+        </div>
+        <div class="cap"><strong>Bedroom repaint</strong><small>Calm color, smooth ceiling line</small></div>
+      </div>
+      <div class="mtile reveal">
+        <span class="ph">Photo soon</span>
+        <div class="art" style="height:340px;background:linear-gradient(150deg,#E4E9F2,#8E99AD)">
+          <svg viewBox="0 0 100 100"><rect x="30" y="14" width="40" height="72" rx="20" fill="#F2A01B"/><path d="M42 16v68M50 16v68M58 16v68" stroke="#141B26" stroke-width="3" opacity=".4"/><circle cx="50" cy="50" r="4" fill="#fff" opacity=".85"/></svg>
+        </div>
+        <div class="cap"><strong>Front door, bold and clean</strong><small>Exterior accent in one day</small></div>
+      </div>
+      <div class="mtile reveal">
+        <span class="ph">Photo soon</span>
+        <div class="art" style="height:250px;background:linear-gradient(150deg,#F7DDE4,#E4658F)">
+          <svg viewBox="0 0 100 100"><rect x="22" y="36" width="56" height="44" rx="4" fill="#fff" opacity=".9"/><path d="M22 58 h56" stroke="#E4658F" stroke-width="6"/><circle cx="50" cy="47" r="6" fill="#141B26" opacity=".2"/></svg>
+        </div>
+        <div class="cap"><strong>Kitchen walls</strong><small>Scrub friendly finish</small></div>
+      </div>
+      <div class="mtile reveal">
+        <span class="ph">Photo soon</span>
+        <div class="art" style="height:300px;background:linear-gradient(150deg,#E6F0E0,#5C7A3A)">
+          <svg viewBox="0 0 100 100"><path d="M15 85 L50 20 L85 85 Z" fill="#fff" opacity=".92"/><path d="M28 68 L72 68" stroke="#5C7A3A" stroke-width="7"/><path d="M36 54 L64 54" stroke="#E4658F" stroke-width="5"/><circle cx="50" cy="34" r="6" fill="#F2A01B"/></svg>
+        </div>
+        <div class="cap"><strong>Full exterior</strong><small>Siding, trim and shutters</small></div>
+      </div>
+      <div class="mtile reveal">
+        <span class="ph">Photo soon</span>
+        <div class="art" style="height:220px;background:linear-gradient(150deg,#EDE7D8,#C9B294)">
+          <svg viewBox="0 0 100 100"><rect x="25" y="25" width="50" height="55" rx="4" fill="#fff"/><path d="M25 45 h50 M25 60 h50" stroke="#141B26" stroke-width="3" opacity=".25"/><rect x="60" y="14" width="10" height="18" rx="5" fill="#0E7C7B"/></svg>
+        </div>
+        <div class="cap"><strong>Drywall repair</strong><small>Patched, sanded, invisible</small></div>
+      </div>
+      <div class="mtile reveal">
+        <span class="ph">Photo soon</span>
+        <div class="art" style="height:280px;background:linear-gradient(150deg,#D9E2F2,#3D6FB4)">
+          <svg viewBox="0 0 100 100"><rect x="20" y="40" width="60" height="40" rx="4" fill="#fff" opacity=".9"/><rect x="28" y="48" width="44" height="8" rx="4" fill="#3D6FB4" opacity=".5"/><rect x="28" y="62" width="30" height="8" rx="4" fill="#141B26" opacity=".2"/></svg>
+        </div>
+        <div class="cap"><strong>Hallway and trim</strong><small>Sharp edges throughout</small></div>
+      </div>
+      <div class="mtile reveal">
+        <span class="ph">Photo soon</span>
+        <div class="art" style="height:250px;background:linear-gradient(150deg,#FFF3DF,#E8A93D)">
+          <svg viewBox="0 0 100 100"><ellipse cx="50" cy="54" rx="30" ry="22" fill="#F2A01B"/><path d="M36 46 l10 -8 4 10 10 -6 -2 12" stroke="#fff" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M62 66 q10 2 8 12 q-8 2 -12 -6" fill="#5C7A3A"/></svg>
+        </div>
+        <div class="cap"><strong>Accent wall</strong><small>One wall, big difference</small></div>
+      </div>
+    </div>
+
+    <div class="note reveal" style="margin-top:28px"><strong>Coming soon:</strong> real photos of finished rooms and exteriors. The illustrations above are artistic previews. The real work looks even better.</div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-rev">
+      <span class="tag">Reviews</span>
+      <h2>Five stars,<br>five for five</h2>
+      <p>Based on 5 public reviews. Every reviewer gave the top rating, and the drywall and paint quality comes up again and again.</p>
+    </div>
+    <div class="rs-strip">
+      <p class="rs-note">Review themes on this page are paraphrased from public feedback. Open the source to read current reviews and ratings.</p>
+      <div class="rs-links">
+        <a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJkTjf9eLTxokRZdeFlx687G4" target="_blank" rel="noopener">See reviews on Google</a>
+        <a class="rs-btn" href="https://reviews.birdeye.com/j-s-painting-169745051683741" target="_blank" rel="noopener">See reviews on Birdeye</a>
+      </div>
+    </div>
+
+    <div class="rev-grid">
+      <div class="rev featured reveal">
+        <div class="stars">★★★★★</div>
+        <span class="sample-badge">Sample card</span>
+        <p>"The drywall repair and paint is really good. Very recommend."</p>
+        <cite>Public review theme</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <span class="sample-badge">Sample card</span>
+        <p>"Patched every crack and hole before painting. You cannot tell where the repairs were."</p>
+        <cite>Sample, based on review themes</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <span class="sample-badge">Sample card</span>
+        <p>"Clean edges, tidy work area, and the rooms look brand new. Happy with the whole job."</p>
+        <cite>Sample, based on review themes</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <span class="sample-badge">Sample card</span>
+        <p>"Fair price, showed up when promised, and the finish is smooth and even throughout."</p>
+        <cite>Sample, based on review themes</cite>
+      </div>
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Used our services? Say so.</h2>
+      <p>A quick review helps a local Clementon painter more than you know. It takes a minute.</p>
+      <a class="btn btn-amber" href="https://www.google.com/maps/place/?q=place_id:ChIJkTjf9eLTxokRZdeFlx687G4" target="_blank" rel="noopener">Leave a Google review</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-contact">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-contact">
+      <span class="tag">Contact</span>
+      <h2>Let us talk<br>about your project</h2>
+      <p>Call during business hours, describe the rooms or the exterior, and we will set up a time to see it.</p>
+    </div>
+
+    <div class="contact-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#C97F0A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Find us</h3>
+        <p><strong>J S painting</strong><br>66 Higgins Ave<br>Clementon, NJ 08021</p>
+        <p>Serving Clementon and nearby South Jersey towns.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#C97F0A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg> Call us</h3>
+        <p>Quotes and scheduling:</p>
+        <a class="big" href="tel:+18567231931">(856) 723-1931</a>
+        <p style="margin-top:10px">Call during business hours for the fastest response.</p>
+      </div>
+    </div>
+
+    <div class="contact-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#C97F0A" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Hours</h3>
+        <table class="hours-table" id="hoursTable">
+          <tr><td>Monday</td><td>7:30 AM - 4:30 PM</td></tr>
+          <tr><td>Tuesday</td><td>8:00 AM - 4:30 PM</td></tr>
+          <tr><td>Wednesday</td><td>8:00 AM - 4:30 PM</td></tr>
+          <tr><td>Thursday</td><td>8:00 AM - 4:30 PM</td></tr>
+          <tr><td>Friday</td><td>8:00 AM - 4:30 PM</td></tr>
+          <tr><td>Saturday</td><td>8:00 AM - 3:00 PM</td></tr>
+          <tr><td>Sunday</td><td>Closed</td></tr>
+        </table>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <svg viewBox="0 0 24 24" fill="#C97F0A"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#FAF6EE"/></svg>
+          <strong>66 Higgins Ave</strong>
+          <small>Clementon, NJ 08021</small><br>
+          <a class="btn btn-amber" href="https://www.google.com/maps/place/?q=place_id:ChIJkTjf9eLTxokRZdeFlx687G4" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-mini">
+      <span><strong style="color:#fff;font-family:'Sora',sans-serif">J S painting</strong> · 66 Higgins Ave, Clementon, NJ 08021</span>
+      <span><a href="tel:+18567231931">(856) 723-1931</a></span>
+      <span><a href="#services" data-page="services">Services</a> · <a href="#gallery" data-page="gallery">Gallery</a> · <a href="#reviews" data-page="reviews">Reviews</a> · <a href="#contact" data-page="contact">Contact</a></span>
+    </div>
+    <div class="foot-bottom">
+      <span>© J S painting</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "contact"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+  var scrim = document.getElementById("drawerScrim");
+  var drawerClose = document.getElementById("drawerClose");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(scrim){ scrim.classList.remove("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function openMenu(){
+    if(nav){ nav.classList.add("open"); }
+    if(scrim){ scrim.classList.add("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "true"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      if(nav.classList.contains("open")){ closeMenu(); } else { openMenu(); }
+    });
+  }
+  if(drawerClose){ drawerClose.addEventListener("click", closeMenu); }
+  if(scrim){ scrim.addEventListener("click", closeMenu); }
+
+  var HOURS = {0:null, 1:[7.5,16.5], 2:[8,16.5], 3:[8,16.5], 4:[8,16.5], 5:[8,16.5], 6:[8,15]};
+  var DOW = {"Sun":0,"Mon":1,"Tue":2,"Wed":3,"Thu":4,"Fri":5,"Sat":6};
+  var DAYNAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  function fmt(h){
+    var ap = h < 12 ? "AM" : "PM";
+    var hh = Math.floor(h) % 12;
+    if(hh === 0){ hh = 12; }
+    var mm = (h % 1) ? ":30" : ":00";
+    return hh + mm + " " + ap;
+  }
+  function openStr(pair){ return fmt(pair[0]) + " - " + fmt(pair[1]); }
+  try{
+    var parts = new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",weekday:"short",hour:"numeric",hour12:false}).formatToParts(new Date());
+    var wd = "Mon", hr = 12, min = 0;
+    parts.forEach(function(p){
+      if(p.type === "weekday"){ wd = p.value; }
+      if(p.type === "hour"){ hr = parseInt(p.value, 10) % 24; }
+      if(p.type === "minute"){ min = parseInt(p.value, 10); }
+    });
+    var nowH = hr + min / 60;
+    var day = DOW[wd] !== undefined ? DOW[wd] : 1;
+    var pill = document.getElementById("hoursPill");
+    var txt = document.getElementById("hoursText");
+    if(pill && txt){
+      var today = HOURS[day];
+      if(today && nowH >= today[0] && nowH < today[1]){
+        txt.textContent = "Open now, until " + fmt(today[1]) + " today";
+      } else if(today && nowH < today[0]){
+        pill.classList.add("closed");
+        txt.textContent = "Opens today at " + fmt(today[0]);
+      } else {
+        pill.classList.add("closed");
+        var nd = day, guard = 0;
+        do { nd = (nd + 1) % 7; guard++; } while(!HOURS[nd] && guard < 8);
+        var label = (nd === (day + 1) % 7) ? "tomorrow" : DAYNAMES[nd];
+        txt.textContent = "Opens " + label + " at " + fmt(HOURS[nd][0]);
+      }
+    }
+    var rows = document.querySelectorAll("#hoursTable tr");
+    var idx = (day + 6) % 7;
+    if(rows[idx]){ rows[idx].classList.add("today"); }
+  }catch(e){ /* leave default pill text */ }
+
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

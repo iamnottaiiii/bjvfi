@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jerry's Lawn Services Inc · Landscaper, Grafton MA</title>
+<meta name="description" content="Jerry's Lawn Services Inc, a Grafton, MA lawn and landscaping company at 57 George Hill Rd. Lawn mowing, cleanups, mulch, and shrub care. Call (508) 839-9304.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --leaf:#2F7A3D; --leaf-deep:#1E5A29; --leaf-ink:#123B1B;
+  --lime:#A9D65C; --lime-soft:#EAF3D4;
+  --bark:#4A3826; --bark-soft:#EFE6D4;
+  --cream:#FAF7EC; --paper:#FFFDF6;
+  --ink:#26301F; --ink-soft:#5E6B54;
+  --line:rgba(47,122,61,.16);
+  --radius:18px;
+  --shadow:0 18px 40px -18px rgba(18,59,27,.3);
+  --shadow-sm:0 8px 22px -10px rgba(18,59,27,.22);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Inter",system-ui,sans-serif;background:var(--cream);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:var(--leaf-deep)}
+img{max-width:100%}
+::selection{background:var(--lime);color:var(--leaf-ink)}
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+h1,h2,h3,h4{font-family:"Bitter",serif;line-height:1.15;letter-spacing:-.3px}
+
+/* ---------- top strip (brand + hamburger) ---------- */
+.topbar{position:sticky;top:0;z-index:60;background:rgba(250,247,236,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:2px solid var(--line)}
+.topbar .wrap{display:flex;align-items:center;gap:16px;padding-top:12px;padding-bottom:12px}
+.burger{background:var(--leaf);border:0;cursor:pointer;padding:11px 12px;border-radius:12px;flex:none}
+.burger span{display:block;width:24px;height:3px;border-radius:3px;background:#fff;margin:4.5px 0;transition:.25s}
+.burger:hover{background:var(--leaf-deep)}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
+.brand svg{width:44px;height:44px;flex:none}
+.brand-name{font-family:"Bitter",serif;font-weight:800;font-size:1.15rem;line-height:1.05}
+.brand-name small{display:block;font-family:"Inter",sans-serif;font-weight:700;font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--leaf-deep)}
+.top-call{margin-left:auto;display:inline-flex;align-items:center;gap:8px;background:var(--leaf);color:#fff;text-decoration:none;font-weight:700;padding:10px 20px;border-radius:999px;white-space:nowrap;box-shadow:var(--shadow-sm)}
+.top-call:hover{background:var(--leaf-deep)}
+
+/* ---------- side drawer nav ---------- */
+nav.main{position:fixed;top:0;left:0;bottom:0;width:320px;max-width:86vw;z-index:100;background:var(--leaf-ink);color:#EAF3D4;display:flex;flex-direction:column;padding:28px 26px;transform:translateX(-105%);transition:transform .32s cubic-bezier(.22,.8,.3,1);box-shadow:var(--shadow);overflow-y:auto}
+nav.main.open{transform:translateX(0)}
+nav.main .drawer-brand{display:flex;align-items:center;gap:12px;margin-bottom:34px;text-decoration:none;color:#fff}
+nav.main .drawer-brand svg{width:46px;height:46px}
+nav.main .drawer-brand span{font-family:"Bitter",serif;font-weight:800;font-size:1.1rem;line-height:1.1}
+nav.main a.dlink{display:flex;align-items:center;gap:14px;text-decoration:none;color:#DDE8D2;font-weight:600;font-size:1.05rem;padding:13px 16px;border-radius:14px;margin-bottom:6px;transition:background .2s,color .2s}
+nav.main a.dlink svg{width:22px;height:22px;flex:none;opacity:.85}
+nav.main a.dlink:hover{background:rgba(255,255,255,.1);color:#fff}
+nav.main a.dlink.active{background:var(--lime);color:var(--leaf-ink)}
+nav.main .drawer-call{margin-top:auto;background:#fff;color:var(--leaf-ink);text-decoration:none;font-weight:700;text-align:center;padding:14px;border-radius:14px;font-size:1.02rem}
+nav.main .drawer-call:hover{background:var(--lime)}
+.scrim{position:fixed;inset:0;background:rgba(18,59,27,.5);z-index:90;opacity:0;pointer-events:none;transition:opacity .3s}
+.scrim.show{opacity:1;pointer-events:auto}
+
+/* ---------- pages / sacred router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- split hero ---------- */
+.hero{padding:64px 0 72px;position:relative;overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:52px;align-items:center}
+.kicker{display:inline-flex;align-items:center;gap:10px;font-weight:700;font-size:.78rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--leaf-deep);background:var(--lime-soft);border:1px solid var(--line);padding:8px 18px;border-radius:999px;margin-bottom:20px}
+.hero h1{font-size:clamp(2.4rem,4.8vw,3.8rem);font-weight:800;margin-bottom:18px}
+.hero h1 .accent{color:var(--leaf)}
+.lede{font-size:1.08rem;color:var(--ink-soft);max-width:33rem;margin-bottom:28px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:26px}
+.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;padding:14px 26px;border-radius:999px;font-size:1rem;transition:transform .18s,box-shadow .18s,background .18s}
+.btn-solid{background:var(--leaf);color:#fff;box-shadow:var(--shadow-sm)}
+.btn-solid:hover{background:var(--leaf-deep);transform:translateY(-2px)}
+.btn-ghost{background:var(--paper);color:var(--ink);border:2px solid var(--line)}
+.btn-ghost:hover{border-color:var(--leaf);color:var(--leaf-deep);transform:translateY(-2px)}
+.hours-note{display:inline-flex;align-items:center;gap:10px;background:var(--paper);border:1px solid var(--line);padding:10px 20px;border-radius:999px;font-weight:600;font-size:.93rem;color:var(--ink-soft)}
+.hours-note .dot{width:10px;height:10px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 4px rgba(169,214,92,.3)}
+.hero-art{position:relative}
+.lawn-scene{background:linear-gradient(160deg,#DFF0C8,#A9D65C);border-radius:28px;padding:36px;box-shadow:var(--shadow);border:4px solid #fff;overflow:hidden;position:relative}
+.lawn-scene svg{width:100%;height:auto;display:block}
+.lawn-tag{position:absolute;bottom:-16px;left:28px;background:var(--bark);color:#F3EAD6;font-weight:700;padding:11px 22px;border-radius:999px;transform:rotate(-2deg);box-shadow:var(--shadow-sm);font-size:.92rem;z-index:2}
+
+/* ---------- alternating bands ---------- */
+.band{padding:64px 0}
+.band-a{background:var(--cream)}
+.band-b{background:var(--leaf-ink);color:#EAF3D4}
+.band-b h2{color:#fff}
+.band-b p.lead-p{color:#C4D6B4}
+.band-c{background:var(--bark-soft)}
+.sec-head{max-width:44rem;margin:0 auto 42px;text-align:center}
+.sec-head .eyebrow{font-weight:700;font-size:.76rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--leaf-deep)}
+.band-b .sec-head .eyebrow{color:var(--lime)}
+h2{font-size:clamp(1.9rem,3.6vw,2.7rem);font-weight:800;margin:8px 0 12px}
+.sec-head p{color:var(--ink-soft)}
+.band-b .sec-head p{color:#C4D6B4}
+
+/* ---------- cards offerings ---------- */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.card{background:var(--paper);border-radius:var(--radius);padding:30px 26px;box-shadow:var(--shadow-sm);border-top:6px solid var(--leaf);transition:transform .2s,box-shadow .2s}
+.card:nth-child(2){border-top-color:var(--lime)}
+.card:nth-child(3){border-top-color:var(--bark)}
+.card:nth-child(4){border-top-color:var(--leaf-deep)}
+.card:nth-child(5){border-top-color:var(--lime)}
+.card:nth-child(6){border-top-color:var(--bark)}
+.card:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+.card .icon{width:52px;height:52px;border-radius:50%;background:var(--lime-soft);display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.card .icon svg{width:28px;height:28px}
+.card h3{font-size:1.2rem;margin-bottom:8px}
+.card p{color:var(--ink-soft);font-size:.95rem}
+
+/* ---------- how it works (band b) ---------- */
+.steps3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.s3{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:var(--radius);padding:30px 26px}
+.s3 .n{font-family:"Bitter",serif;font-weight:800;font-size:1.7rem;color:var(--lime);margin-bottom:10px}
+.s3 h3{color:#fff;font-size:1.2rem;margin-bottom:8px}
+.s3 p{color:#C4D6B4;font-size:.95rem}
+
+/* ---------- horizontal strip gallery ---------- */
+.strip-x{display:flex;gap:18px;overflow-x:auto;padding:6px 4px 22px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+.tile{flex:0 0 270px;scroll-snap-align:start;border-radius:var(--radius);overflow:hidden;background:var(--paper);box-shadow:var(--shadow-sm);border:1px solid var(--line);position:relative;transition:transform .2s}
+.tile:hover{transform:translateY(-5px)}
+.tile .art{height:190px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.tile .art svg{width:46%;height:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.18))}
+.tile .soon{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.9);font-size:.66rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;padding:4px 12px;border-radius:999px;color:var(--ink-soft)}
+.tile .cap{padding:14px 18px 16px}
+.tile .cap strong{font-family:"Bitter",serif;font-size:1.02rem;display:block}
+.tile .cap small{color:var(--ink-soft)}
+.strip-hint{text-align:center;color:var(--ink-soft);font-size:.85rem;margin-top:4px}
+
+/* ---------- page strips ---------- */
+.strip{border-radius:26px;padding:52px 44px;color:#fff;position:relative;overflow:hidden;margin-bottom:40px;box-shadow:var(--shadow)}
+.strip::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%,rgba(255,255,255,.22),transparent 50%)}
+.strip h2{color:#fff;font-size:clamp(1.9rem,3.8vw,2.8rem);position:relative;margin:6px 0 10px}
+.strip p{color:rgba(255,255,255,.9);max-width:38rem;position:relative}
+.strip .eyebrow{font-weight:700;font-size:.76rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--lime);position:relative}
+.strip.s-svc{background:linear-gradient(120deg,#2F7A3D,#123B1B)}
+.strip.s-gal{background:linear-gradient(120deg,#4A3826,#2A1F12)}
+.strip.s-rev{background:linear-gradient(120deg,#1E5A29,#0F2E15)}
+.strip.s-con{background:linear-gradient(120deg,#123B1B,#0A2410)}
+.price-note{background:var(--lime-soft);border:2px dashed rgba(47,122,61,.45);border-radius:var(--radius);padding:18px 24px;margin-top:22px;font-size:.95rem;color:#3E5230}
+.price-note strong{color:var(--leaf-deep)}
+
+/* ---------- reviews ---------- */
+.rs-strip{margin:0 auto 36px;max-width:640px;background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:22px 26px;text-align:center;box-shadow:var(--shadow-sm)}
+.rs-note{margin:0 0 14px;font-size:.95rem;color:var(--ink-soft);line-height:1.55}
+.rs-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rs-btn{display:inline-block;background:var(--leaf);color:#fff;padding:11px 26px;border-radius:999px;font-weight:700;text-decoration:none;font-size:.95rem}
+.rs-btn:hover{background:var(--leaf-deep)}
+.rs-btn.alt{background:var(--bark)}
+.rs-btn.alt:hover{background:#3A2C1D}
+.rev-row{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.rev-card{background:var(--paper);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow-sm);border:1px solid var(--line)}
+.rev-card h3{font-size:1.18rem;margin-bottom:8px}
+.rev-card p{color:var(--ink-soft)}
+
+/* ---------- contact ---------- */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+.info-card{background:var(--paper);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm);border:1px solid var(--line)}
+.info-card h3{font-size:1.3rem;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.info-card h3 svg{width:28px;height:28px;flex:none}
+.info-card p{color:var(--ink-soft);margin-bottom:8px}
+.info-card a.big{font-family:"Bitter",serif;font-size:1.55rem;font-weight:800;color:var(--leaf-deep);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.map-card{border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:340px;background:linear-gradient(rgba(47,122,61,.07),rgba(47,122,61,.07)),repeating-linear-gradient(0deg,transparent 0 46px,rgba(47,122,61,.18) 46px 48px),repeating-linear-gradient(90deg,transparent 0 46px,rgba(47,122,61,.18) 46px 48px),linear-gradient(140deg,#F2EDDE,#E2D5B2);display:flex;align-items:center;justify-content:center}
+.map-pin{text-align:center;background:var(--paper);padding:26px 34px;border-radius:20px;box-shadow:var(--shadow);max-width:80%;position:relative}
+.map-pin::after{content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);border:14px solid transparent;border-top-color:var(--paper);border-bottom:0}
+.map-pin svg{width:44px;height:44px;margin-bottom:8px}
+.map-pin strong{font-family:"Bitter",serif;font-size:1.1rem;display:block}
+.map-pin small{color:var(--ink-soft)}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- minimal footer ---------- */
+footer{background:var(--leaf-ink);color:#C4D6B4;margin-top:20px}
+.foot-min{padding:40px 0 8px;text-align:center}
+.foot-min .fname{font-family:"Bitter",serif;font-weight:800;color:#fff;font-size:1.3rem;margin-bottom:8px}
+.foot-min p{font-size:.92rem;margin-bottom:6px}
+.foot-min a{color:var(--lime);text-decoration:none}
+.foot-min a:hover{text-decoration:underline}
+.foot-min .flinks{margin:14px 0 6px;font-size:.9rem}
+.foot-min .flinks a{margin:0 10px}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.12);margin-top:18px;padding:18px 0 24px;display:flex;justify-content:center;font-size:.85rem;color:#93A984}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:940px){
+  .hero-grid{grid-template-columns:1fr}
+  .cards{grid-template-columns:1fr 1fr}
+  .steps3{grid-template-columns:1fr}
+  .rev-row{grid-template-columns:1fr}
+  .contact-grid{grid-template-columns:1fr}
+  .strip{padding:38px 26px}
+  .top-call{display:none}
+}
+@media(max-width:600px){
+  .cards{grid-template-columns:1fr}
+  .hero{padding:44px 0 56px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    <a class="brand" href="#home" data-page="home" aria-label="Jerry's Lawn Services Inc, home">
+      <svg viewBox="0 0 64 64" role="img" aria-label="Lawn leaf logo"><circle cx="32" cy="32" r="28" fill="#2F7A3D"/><path d="M32 12 C20 24 18 40 32 52 C46 40 44 24 32 12 Z" fill="#A9D65C"/><path d="M32 16 L32 48" stroke="#1E5A29" stroke-width="2.5" stroke-linecap="round"/><path d="M32 26 L40 22 M32 34 L42 30 M32 26 L24 22 M32 34 L22 30" stroke="#1E5A29" stroke-width="2" stroke-linecap="round"/></svg>
+      <span class="brand-name">Jerry's Lawn Services<small>Inc · Grafton MA</small></span>
+    </a>
+    <a class="top-call" href="tel:+15088399304">(508) 839-9304</a>
+  </div>
+</div>
+
+<nav class="main" id="mainNav" aria-label="Main navigation">
+  <a class="drawer-brand" href="#home" data-page="home">
+    <svg viewBox="0 0 64 64" role="img" aria-label="Lawn leaf logo"><circle cx="32" cy="32" r="28" fill="#A9D65C"/><path d="M32 12 C20 24 18 40 32 52 C46 40 44 24 32 12 Z" fill="#2F7A3D"/><path d="M32 16 L32 48" stroke="#123B1B" stroke-width="2.5" stroke-linecap="round"/></svg>
+    <span>Jerry's Lawn<br>Services Inc</span>
+  </a>
+  <a class="dlink active" href="#home" data-page="home" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5V21a1 1 0 01-1 1h-5v-7h-6v7H4a1 1 0 01-1-1z"/></svg>Home</a>
+  <a class="dlink" href="#services" data-page="services"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-5 0-8-3-8-8 0-6 5-10 8-10 1.5 0 3 .5 4 1.5C14 5 12 8 12 12c0 2 .5 3.5 1.5 5"/></svg>Services</a>
+  <a class="dlink" href="#gallery" data-page="gallery"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5-9 9"/></svg>Gallery</a>
+  <a class="dlink" href="#reviews" data-page="reviews"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg>Reviews</a>
+  <a class="dlink" href="#contact" data-page="contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Contact</a>
+  <a class="drawer-call" href="tel:+15088399304">Call (508) 839-9304</a>
+</nav>
+<div class="scrim" id="scrim"></div>
+
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="kicker">Landscaping · Grafton, MA</span>
+        <h1>A healthier lawn, <span class="accent">without the weekend work.</span></h1>
+        <p class="lede">Jerry's Lawn Services Inc is a Grafton, Massachusetts lawn and landscaping company. From weekly mowing to spring cleanups and mulch, we keep your yard looking its best while you get your weekends back.</p>
+        <div class="cta-row">
+          <a class="btn btn-solid" href="tel:+15088399304">Call (508) 839-9304</a>
+          <a class="btn btn-ghost" href="#services" data-page="services">See Services</a>
+        </div>
+        <span class="hours-note"><span class="dot"></span>Hours: call for hours · (508) 839-9304</span>
+      </div>
+      <div class="hero-art">
+        <div class="lawn-scene">
+          <svg viewBox="0 0 300 240" role="img" aria-label="Illustration of a freshly mowed lawn with a house">
+            <rect x="0" y="150" width="300" height="90" fill="#2F7A3D"/>
+            <path d="M0 150 Q75 138 150 150 T300 150 L300 165 Q225 153 150 165 T0 165 Z" fill="#3E8F4C"/>
+            <path d="M0 185 Q75 173 150 185 T300 185 L300 200 Q225 188 150 200 T0 200 Z" fill="#3E8F4C" opacity=".7"/>
+            <rect x="96" y="70" width="108" height="84" rx="6" fill="#FFFDF6"/>
+            <path d="M84 74 L150 26 L216 74 Z" fill="#4A3826"/>
+            <rect x="136" y="112" width="28" height="42" fill="#4A3826"/>
+            <rect x="108" y="90" width="26" height="24" fill="#A9D65C"/>
+            <rect x="166" y="90" width="26" height="24" fill="#A9D65C"/>
+            <circle cx="52" cy="120" r="26" fill="#1E5A29"/>
+            <circle cx="248" cy="116" r="30" fill="#1E5A29"/>
+            <circle cx="248" cy="100" r="18" fill="#2F7A3D"/>
+            <rect x="228" y="150" width="10" height="34" fill="#6B532F" transform="rotate(8 233 167)"/>
+            <rect x="232" y="138" width="46" height="12" rx="4" fill="#4A3826" transform="rotate(8 233 144)"/>
+            <circle cx="60" cy="52" r="20" fill="#F5C453"/>
+            <path d="M60 24 v-8 M88 52 h8 M60 80 v8 M32 52 h-8" stroke="#F5C453" stroke-width="5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="lawn-tag">Mowed, edged, and cleaned up</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="band band-a">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow">What we do</span>
+        <h2>Yard care, handled start to finish</h2>
+        <p>One call covers the mowing, the edges, the beds, and the seasonal cleanups. Here is what a typical visit can include.</p>
+      </div>
+      <div class="cards">
+        <div class="card reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#2F7A3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17h9M7 17V8h4v9M7 11h4M17 17l3-9h2"/></svg></div>
+          <h3>Lawn Mowing and Edging</h3>
+          <p>Regular cuts at the right height for the season, with crisp edges along walks, drives, and beds.</p>
+        </div>
+        <div class="card reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#2F7A3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v10M12 13c-4 0-7 2-7 6h14c0-4-3-6-7-6zM9 6l3-3 3 3"/></svg></div>
+          <h3>Spring and Fall Cleanups</h3>
+          <p>Clear winter debris in spring, leaves and branches in fall, so the lawn wakes up ready to grow.</p>
+        </div>
+        <div class="card reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#2F7A3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20c4-1 6-4 6-8V6H8v6c0 4-2 7-4 8zM14 20c4-1 6-4 6-8V6h-2v6c0 4-2 7-4 8z"/></svg></div>
+          <h3>Mulch and Bed Care</h3>
+          <p>Fresh mulch, weeded beds, and tidy borders that make the whole property look cared for.</p>
+        </div>
+        <div class="card reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#2F7A3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><path d="M8 7.5L20 19M8 16.5L20 5"/></svg></div>
+          <h3>Shrub and Hedge Trimming</h3>
+          <p>Shaped shrubs and hedges that stay neat between visits and keep walkways clear.</p>
+        </div>
+        <div class="card reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#2F7A3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-4 4-6 8-6 12a6 6 0 0012 0c0-4-2-8-6-12z"/></svg></div>
+          <h3>Leaf Removal</h3>
+          <p>Full leaf cleanup in the fall, so leaves do not smother the lawn over winter.</p>
+        </div>
+        <div class="card reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#2F7A3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-8M12 13c0-4 3-8 8-9-1 5-4 8-8 9zM12 13c0-4-3-8-8-9 1 5 4 8 8 9z"/></svg></div>
+          <h3>Seasonal Property Care</h3>
+          <p>Ongoing care through the growing season, timed to what your lawn actually needs.</p>
+        </div>
+      </div>
+      <div class="price-note reveal">
+        <strong>Good to know:</strong> every yard is different, so pricing is by estimate. Call <strong>(508) 839-9304</strong> and tell us about your property for a straight answer on cost and scheduling.
+      </div>
+    </div>
+  </div>
+
+  <div class="band band-b">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow">How it works</span>
+        <h2>Three steps to a better yard</h2>
+        <p class="lead-p">No forms, no waiting on quotes for weeks. Just a conversation and a plan.</p>
+      </div>
+      <div class="steps3">
+        <div class="s3 reveal">
+          <div class="n">1</div>
+          <h3>Call us</h3>
+          <p>Reach Jerry's Lawn Services Inc at (508) 839-9304. Tell us what your yard needs, or just that it needs help.</p>
+        </div>
+        <div class="s3 reveal">
+          <div class="n">2</div>
+          <h3>Walk the property</h3>
+          <p>We look at the lawn, the beds, and the trouble spots, then agree on the work and the price before anything starts.</p>
+        </div>
+        <div class="s3 reveal">
+          <div class="n">3</div>
+          <h3>Enjoy the yard</h3>
+          <p>We handle the mowing, the edges, and the cleanups on schedule. You handle the relaxing.</p>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:32px" class="reveal">
+        <a class="btn btn-solid" href="tel:+15088399304" style="background:var(--lime);color:var(--leaf-ink)">Call (508) 839-9304</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="band band-c">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow">Local and ready</span>
+        <h2>Based in Grafton, working nearby</h2>
+        <p>Jerry's Lawn Services Inc works from 57 George Hill Rd in Grafton, MA. If your yard is in the area, we would be glad to take a look.</p>
+      </div>
+      <div style="text-align:center" class="reveal">
+        <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJqZ1BuBUM5IkR01ynOf7uuqc" target="_blank" rel="noopener">Get Directions</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div style="height:40px"></div>
+    <div class="strip s-svc">
+      <span class="eyebrow">Services</span>
+      <h2>Everything your yard needs,<br>one phone call away</h2>
+      <p>Mix and match services, or hand us the whole yard for the season. Pricing is by estimate, so call for a straight answer.</p>
+    </div>
+
+    <div class="cards">
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#2F7A3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17h9M7 17V8h4v9M7 11h4M17 17l3-9h2"/></svg></div>
+        <h3>Lawn Mowing and Edging</h3>
+        <p>Weekly or biweekly cuts at the right height, with clean edges along every walk, drive, and bed.</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#2F7A3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v10M12 13c-4 0-7 2-7 6h14c0-4-3-6-7-6zM9 6l3-3 3 3"/></svg></div>
+        <h3>Spring Cleanups</h3>
+        <p>Winter debris, matted leaves, and dead growth cleared away so the lawn can wake up and grow.</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#2F7A3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-4 4-6 8-6 12a6 6 0 0012 0c0-4-2-8-6-12z"/></svg></div>
+        <h3>Fall Cleanups and Leaf Removal</h3>
+        <p>Leaves picked up and hauled away before they smother the lawn through winter.</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#2F7A3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20c4-1 6-4 6-8V6H8v6c0 4-2 7-4 8zM14 20c4-1 6-4 6-8V6h-2v6c0 4-2 7-4 8z"/></svg></div>
+        <h3>Mulch and Bed Care</h3>
+        <p>Fresh mulch, weeded beds, and crisp borders for instant curb appeal.</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#2F7A3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><path d="M8 7.5L20 19M8 16.5L20 5"/></svg></div>
+        <h3>Shrub and Hedge Trimming</h3>
+        <p>Shaped, healthy shrubs and hedges that keep their form and keep walkways clear.</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#2F7A3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-8M12 13c0-4 3-8 8-9-1 5-4 8-8 9zM12 13c0-4-3-8-8-9 1 5 4 8 8 9z"/></svg></div>
+        <h3>Seasonal Yard Care</h3>
+        <p>Ongoing care through the growing season, timed to what your property actually needs.</p>
+      </div>
+    </div>
+
+    <div class="price-note reveal">
+      <strong>Pricing by estimate:</strong> every yard is different, so we price by looking at the property, not by guessing over the phone. Call <strong>(508) 839-9304</strong> to set up a walkthrough.
+    </div>
+    <div style="height:52px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div style="height:40px"></div>
+    <div class="strip s-gal">
+      <span class="eyebrow">Gallery</span>
+      <h2>The kind of yard<br>we leave behind</h2>
+      <p>Illustrated previews of our work. Real photos of finished yards are on the way.</p>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="strip-x">
+      <div class="tile reveal">
+        <div class="art" style="background:linear-gradient(150deg,#DFF0C8,#A9D65C)"><span class="soon">Photo soon</span>
+          <svg viewBox="0 0 100 100"><rect x="8" y="62" width="84" height="30" fill="#2F7A3D"/><path d="M8 62 Q29 54 50 62 T92 62 L92 70 Q71 62 50 70 T8 70 Z" fill="#3E8F4C"/><rect x="40" y="30" width="8" height="34" fill="#6B532F" transform="rotate(10 44 47)"/><rect x="34" y="24" width="34" height="9" rx="3" fill="#4A3826" transform="rotate(10 51 28)"/></svg>
+        </div>
+        <div class="cap"><strong>Fresh Mow Lines</strong><small>Even cuts, striped and sharp</small></div>
+      </div>
+      <div class="tile reveal">
+        <div class="art" style="background:linear-gradient(150deg,#EAF3D4,#C4DE8E)"><span class="soon">Photo soon</span>
+          <svg viewBox="0 0 100 100"><ellipse cx="50" cy="66" rx="36" ry="14" fill="#4A3826"/><ellipse cx="50" cy="60" rx="30" ry="10" fill="#6B532F"/><circle cx="34" cy="48" r="10" fill="#2F7A3D"/><circle cx="52" cy="44" r="12" fill="#3E8F4C"/><circle cx="68" cy="50" r="9" fill="#2F7A3D"/></svg>
+        </div>
+        <div class="cap"><strong>Mulched Beds</strong><small>Fresh mulch, clean borders</small></div>
+      </div>
+      <div class="tile reveal">
+        <div class="art" style="background:linear-gradient(150deg,#F3E3B8,#E0B45C)"><span class="soon">Photo soon</span>
+          <svg viewBox="0 0 100 100"><rect x="20" y="58" width="60" height="26" rx="6" fill="#8A6B45"/><path d="M28 58 q6 -18 16 -20 q10 2 14 20" fill="#D98E3B"/><path d="M48 58 q6 -18 16 -20 q10 2 14 20" fill="#C47B2E"/><path d="M30 40 q10 -8 20 0" stroke="#A8621F" stroke-width="3" fill="none"/></svg>
+        </div>
+        <div class="cap"><strong>Fall Leaf Cleanup</strong><small>Leaves gone before winter</small></div>
+      </div>
+      <div class="tile reveal">
+        <div class="art" style="background:linear-gradient(150deg,#D8EAC0,#9CCB6E)"><span class="soon">Photo soon</span>
+          <svg viewBox="0 0 100 100"><rect x="26" y="52" width="48" height="28" rx="14" fill="#2F7A3D"/><rect x="32" y="58" width="36" height="16" rx="8" fill="#3E8F4C"/><path d="M50 52 v-16 M38 52 v-10 M62 52 v-10" stroke="#1E5A29" stroke-width="5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>Trimmed Hedges</strong><small>Shaped and even, top to bottom</small></div>
+      </div>
+      <div class="tile reveal">
+        <div class="art" style="background:linear-gradient(150deg,#E4F0D2,#B5D67E)"><span class="soon">Photo soon</span>
+          <svg viewBox="0 0 100 100"><path d="M14 78 L50 30 L86 78 Z" fill="#FFFDF6"/><rect x="42" y="58" width="16" height="20" fill="#4A3826"/><path d="M14 78 h72" stroke="#2F7A3D" stroke-width="6"/><circle cx="24" cy="66" r="8" fill="#2F7A3D"/><circle cx="78" cy="64" r="9" fill="#2F7A3D"/></svg>
+        </div>
+        <div class="cap"><strong>Curb Appeal</strong><small>The whole property, pulled together</small></div>
+      </div>
+      <div class="tile reveal">
+        <div class="art" style="background:linear-gradient(150deg,#DFF0C8,#8FC455)"><span class="soon">Photo soon</span>
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="42" r="24" fill="#F5C453"/><path d="M50 12 v-6 M78 42 h6 M50 72 v6 M22 42 h-6" stroke="#F5C453" stroke-width="5" stroke-linecap="round"/><rect x="10" y="66" width="80" height="26" fill="#2F7A3D"/><path d="M10 66 Q30 60 50 66 T90 66" stroke="#3E8F4C" stroke-width="4" fill="none"/></svg>
+        </div>
+        <div class="cap"><strong>Spring Wake-Up</strong><small>Debris cleared, lawn ready to grow</small></div>
+      </div>
+    </div>
+    <p class="strip-hint reveal">Swipe sideways to see more</p>
+    <div style="height:52px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div style="height:40px"></div>
+    <div class="strip s-rev">
+      <span class="eyebrow">Reviews</span>
+      <h2>What neighbors say</h2>
+      <p>We could not find published online reviews for Jerry's Lawn Services Inc yet. If we have worked on your yard, your review would mean a great deal.</p>
+    </div>
+
+    <div class="rs-strip">
+      <p class="rs-note">Check our Google business listing for the latest reviews and ratings, or be the first to share your experience.</p>
+      <div class="rs-links">
+        <a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJqZ1BuBUM5IkR01ynOf7uuqc" target="_blank" rel="noopener">See our Google listing</a>
+        <a class="rs-btn alt" href="https://www.google.com/maps/place/?q=place_id:ChIJqZ1BuBUM5IkR01ynOf7uuqc" target="_blank" rel="noopener">Leave a Google review</a>
+      </div>
+    </div>
+
+    <div class="rev-row">
+      <div class="rev-card reveal">
+        <h3>Yards we are proud of</h3>
+        <p>Every visit ends the same way: mowed, edged, and cleaned up, with the gate closed and the yard looking its best.</p>
+      </div>
+      <div class="rev-card reveal">
+        <h3>Straightforward service</h3>
+        <p>Call (508) 839-9304 and talk through what your property needs. We agree on the work and the price before anything starts.</p>
+      </div>
+    </div>
+    <div style="height:52px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-contact">
+  <div class="wrap">
+    <div style="height:40px"></div>
+    <div class="strip s-con">
+      <span class="eyebrow">Contact</span>
+      <h2>Get your yard on the schedule</h2>
+      <p>Based in Grafton, Massachusetts. Call for hours and to talk about your property.</p>
+    </div>
+
+    <div class="contact-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#2F7A3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Find us</h3>
+        <p><strong>Jerry's Lawn Services Inc</strong><br>57 George Hill Rd<br>Grafton, MA 01519</p>
+        <p>Full address: Jerry's Lawn Services Inc, 57 George Hill Rd, Grafton, MA 01519</p>
+      </div>
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#2F7A3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg> Call us</h3>
+        <p>Estimates and scheduling:</p>
+        <a class="big" href="tel:+15088399304">(508) 839-9304</a>
+        <p style="margin-top:10px">Hours: call for hours. We are usually out on jobs, so leave a message and we will call back.</p>
+      </div>
+    </div>
+
+    <div class="map-card reveal">
+      <div class="map-pin">
+        <svg viewBox="0 0 24 24" fill="#2F7A3D"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#FFFDF6"/></svg>
+        <strong>57 George Hill Rd</strong>
+        <small>Grafton, MA 01519</small><br>
+        <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJqZ1BuBUM5IkR01ynOf7uuqc" target="_blank" rel="noopener">Get Directions</a>
+      </div>
+    </div>
+    <div style="height:52px"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-min">
+      <div class="fname">Jerry's Lawn Services Inc</div>
+      <p>57 George Hill Rd, Grafton, MA 01519 · <a href="tel:+15088399304">(508) 839-9304</a></p>
+      <p>Hours: call for hours</p>
+      <div class="flinks">
+        <a href="#home" data-page="home">Home</a>
+        <a href="#services" data-page="services">Services</a>
+        <a href="#gallery" data-page="gallery">Gallery</a>
+        <a href="#reviews" data-page="reviews">Reviews</a>
+        <a href="#contact" data-page="contact">Contact</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© Jerry's Lawn Services Inc</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "gallery", "reviews", "contact"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+  var scrim = document.getElementById("scrim");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(scrim){ scrim.classList.remove("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      if(scrim){ scrim.classList.toggle("show", open); }
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+  if(scrim){
+    scrim.addEventListener("click", closeMenu);
+  }
+
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

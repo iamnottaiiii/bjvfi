@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>J1 Hair Salon · Hair Salon, 5907 7th Ave, Brooklyn, NY</title>
+<meta name="description" content="J1 Hair Salon at 5907 7th Ave, Brooklyn, NY 11220. Hair coloring, balayage, perms and cuts from stylists reviewers praise for color and detail. Call (718) 374-5288.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FFF9F1; --cream:#FDEEDC;
+  --ink:#26211C; --ink-soft:#6B5F52;
+  --coral:#E8446B; --coral-deep:#BE2C51; --coral-soft:#FBDCE4;
+  --teal:#0E9E97; --teal-deep:#0B7A75; --teal-soft:#D8F0EE;
+  --sun:#F5A524; --sun-soft:#FDEBC8;
+  --violet:#7C4DBE; --violet-soft:#E7DBF7;
+  --radius:20px;
+  --shadow:0 20px 44px -18px rgba(38,33,28,.28);
+  --shadow-sm:0 8px 22px -10px rgba(38,33,28,.22);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Inter",system-ui,sans-serif;
+  background:var(--paper);color:var(--ink);line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%}
+a{color:var(--coral-deep)}
+::selection{background:var(--sun);color:var(--ink)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.display{font-family:"Archivo",sans-serif}
+
+/* ---------- slim top bar ---------- */
+header.site{
+  position:sticky;top:0;z-index:60;
+  background:rgba(255,249,241,.94);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-bottom:2px solid var(--ink);
+}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 0}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
+.brand-badge{
+  width:46px;height:46px;flex:none;border-radius:14px;background:var(--coral);
+  display:flex;align-items:center;justify-content:center;color:#fff;
+  font-family:"Archivo",sans-serif;font-weight:900;font-size:1.3rem;
+  box-shadow:3px 3px 0 var(--ink);
+}
+.brand-name{font-family:"Archivo",sans-serif;font-weight:900;font-size:1.3rem;line-height:1.05}
+.brand-name small{display:block;font-family:"Inter",sans-serif;font-weight:600;font-size:.62rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--coral-deep)}
+.bar-actions{display:flex;align-items:center;gap:12px}
+.call-pill{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--ink);color:#fff;text-decoration:none;font-weight:700;
+  padding:10px 20px;border-radius:999px;box-shadow:3px 3px 0 var(--coral);
+  transition:transform .18s;white-space:nowrap;font-size:.95rem;
+}
+.call-pill:hover{transform:translate(-1px,-1px)}
+.burger{background:var(--sun);border:2px solid var(--ink);border-radius:12px;cursor:pointer;padding:10px 12px;box-shadow:3px 3px 0 var(--ink)}
+.burger span{display:block;width:24px;height:3px;border-radius:3px;background:var(--ink);margin:4px 0}
+
+/* ---------- side drawer + scrim ---------- */
+.scrim{
+  position:fixed;inset:0;background:rgba(38,33,28,.55);z-index:70;
+  opacity:0;pointer-events:none;transition:opacity .28s;
+}
+.scrim.on{opacity:1;pointer-events:auto}
+nav.main{
+  position:fixed;top:0;left:0;bottom:0;width:min(340px,86vw);z-index:80;
+  background:var(--paper);border-right:3px solid var(--ink);
+  transform:translateX(-104%);transition:transform .3s cubic-bezier(.22,.8,.3,1);
+  display:flex;flex-direction:column;padding:28px 26px;gap:6px;
+}
+nav.main.open{transform:translateX(0)}
+nav.main .drawer-brand{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+nav.main .drawer-brand .brand-badge{width:52px;height:52px;font-size:1.5rem}
+nav.main a.dlink{
+  text-decoration:none;color:var(--ink);font-family:"Archivo",sans-serif;font-weight:800;font-size:1.5rem;
+  padding:12px 16px;border-radius:14px;border:2px solid transparent;
+  transition:background .18s,border-color .18s;
+}
+nav.main a.dlink:hover{background:var(--coral-soft)}
+nav.main a.dlink.active,nav.main a.dlink[aria-current="page"]{background:var(--coral);color:#fff;border-color:var(--ink);box-shadow:3px 3px 0 var(--ink)}
+nav.main .drawer-foot{margin-top:auto;padding-top:20px;border-top:2px dashed rgba(38,33,28,.2)}
+nav.main .drawer-foot p{font-size:.9rem;color:var(--ink-soft)}
+nav.main .drawer-foot a{font-weight:700;color:var(--coral-deep);text-decoration:none;font-size:1.05rem}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- full-bleed hero ---------- */
+.hero-full{
+  background:
+    radial-gradient(circle at 88% 12%, rgba(245,165,36,.5), transparent 42%),
+    radial-gradient(circle at 8% 88%, rgba(14,158,151,.35), transparent 40%),
+    linear-gradient(135deg,var(--coral) 0%,var(--coral-deep) 55%,#8E1F3E 100%);
+  color:#fff;overflow:hidden;position:relative;
+}
+.hero-inner{max-width:1120px;margin:0 auto;padding:88px 24px 72px;position:relative;z-index:2}
+.hero-kicker{
+  display:inline-block;font-weight:700;font-size:.78rem;letter-spacing:2.5px;text-transform:uppercase;
+  background:rgba(255,255,255,.16);border:1.5px solid rgba(255,255,255,.5);
+  padding:8px 18px;border-radius:999px;margin-bottom:22px;
+}
+.hero-full h1{
+  font-family:"Archivo",sans-serif;font-weight:900;letter-spacing:-1px;
+  font-size:clamp(3rem,8vw,5.6rem);line-height:.98;margin-bottom:20px;
+}
+.hero-full h1 .hl{background:var(--sun);color:var(--ink);padding:0 14px;border-radius:12px;display:inline-block;transform:rotate(-1.5deg)}
+.hero-sub{font-size:1.15rem;color:#FFE3EA;max-width:36rem;margin-bottom:30px}
+.hero-cta{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:28px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;
+  padding:15px 28px;border-radius:999px;font-size:1rem;transition:transform .18s;
+  border:2px solid var(--ink);
+}
+.btn-solid{background:#fff;color:var(--ink);box-shadow:4px 4px 0 rgba(0,0,0,.35)}
+.btn-solid:hover{transform:translate(-2px,-2px)}
+.btn-line{background:transparent;color:#fff;border-color:#fff}
+.btn-line:hover{background:rgba(255,255,255,.14)}
+.hours-chip{
+  display:inline-flex;align-items:center;gap:10px;background:rgba(0,0,0,.28);
+  border:1.5px solid rgba(255,255,255,.4);color:#fff;
+  padding:10px 20px;border-radius:999px;font-weight:600;font-size:.95rem;
+}
+.hero-swirl{position:absolute;right:-40px;bottom:-60px;width:min(520px,60vw);opacity:.5;z-index:1}
+
+/* marquee */
+.marquee{background:var(--ink);color:var(--paper);overflow:hidden;padding:15px 0;transform:rotate(-1deg) scale(1.02);margin:18px 0 0}
+.marquee-track{display:flex;width:max-content;animation:scroll 26s linear infinite}
+.marquee-track span{font-family:"Archivo",sans-serif;font-weight:800;font-size:1.1rem;padding:0 24px;white-space:nowrap}
+.marquee-track span i{font-style:normal;color:var(--sun);padding-right:24px}
+@keyframes scroll{to{transform:translateX(-50%)}}
+
+/* ---------- alternating bands ---------- */
+.band{padding:64px 0}
+.band.alt{background:var(--cream);border-top:3px solid var(--ink);border-bottom:3px solid var(--ink)}
+.band-grid{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center}
+.band.flip .band-grid > div:first-child{order:2}
+.over{font-size:.76rem;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:var(--coral-deep)}
+h2{font-family:"Archivo",sans-serif;font-weight:900;font-size:clamp(1.9rem,3.6vw,2.8rem);line-height:1.05;letter-spacing:-.5px;margin:8px 0 14px}
+.band p{color:var(--ink-soft);margin-bottom:14px;max-width:32rem}
+.check-list{list-style:none;margin:20px 0;display:grid;gap:12px}
+.check-list li{display:flex;gap:12px;align-items:flex-start;font-weight:600}
+.check-list svg{flex:none;width:24px;height:24px;margin-top:2px}
+.art-card{
+  border-radius:var(--radius);border:3px solid var(--ink);box-shadow:6px 6px 0 var(--ink);
+  padding:36px;position:relative;overflow:hidden;min-height:300px;
+  display:flex;align-items:center;justify-content:center;
+}
+.art-card svg{width:72%;height:auto;position:relative;z-index:2}
+.art-card .tag{
+  position:absolute;top:16px;left:16px;z-index:3;background:#fff;border:2px solid var(--ink);
+  font-size:.7rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;
+  padding:5px 14px;border-radius:999px;box-shadow:2px 2px 0 var(--ink);
+}
+.stat-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:22px}
+.stat{
+  background:#fff;border:2px solid var(--ink);border-radius:16px;box-shadow:4px 4px 0 var(--ink);
+  padding:16px 22px;min-width:150px;
+}
+.stat strong{font-family:"Archivo",sans-serif;font-weight:900;font-size:1.7rem;display:block;color:var(--coral-deep)}
+.stat small{color:var(--ink-soft);font-weight:600}
+
+/* cta band */
+.cta-band{
+  background:var(--ink);border-radius:28px;color:#fff;padding:52px 40px;text-align:center;
+  margin:56px auto;box-shadow:var(--shadow);position:relative;overflow:hidden;max-width:1120px;
+}
+.cta-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 82% 18%, rgba(232,68,107,.4), transparent 52%)}
+.cta-band h2{color:#fff;position:relative}
+.cta-band h2 .hl{color:var(--sun)}
+.cta-band p{color:#D8CFC2;position:relative;max-width:36rem;margin:0 auto 26px}
+.cta-band .btn{position:relative}
+
+/* ---------- services tabs ---------- */
+.strip{border-radius:26px;padding:56px 48px;color:#fff;position:relative;overflow:hidden;margin-bottom:40px;box-shadow:var(--shadow);border:3px solid var(--ink)}
+.strip h2{color:#fff;font-size:clamp(2rem,4vw,3rem);position:relative;margin:6px 0 10px}
+.strip p{color:rgba(255,255,255,.9);max-width:36rem;position:relative}
+.strip .over{color:var(--sun-soft);position:relative}
+.strip.s-svc{background:linear-gradient(120deg,var(--coral-deep),#8E1F3E)}
+.strip.s-gal{background:linear-gradient(120deg,var(--teal-deep),#0A5A56)}
+.strip.s-rev{background:linear-gradient(120deg,var(--violet),#4E2F83)}
+.strip.s-visit{background:linear-gradient(120deg,#C77F16,#8E5A0B)}
+.tabs-bar{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:26px}
+.tab-btn{
+  font-family:"Archivo",sans-serif;font-weight:800;font-size:1.02rem;cursor:pointer;
+  background:#fff;color:var(--ink);border:2.5px solid var(--ink);border-radius:999px;
+  padding:12px 26px;box-shadow:3px 3px 0 var(--ink);transition:transform .15s,background .15s;
+}
+.tab-btn:hover{transform:translate(-1px,-1px)}
+.tab-btn.on{background:var(--coral);color:#fff}
+.tab-panel{display:none}
+.tab-panel.on{display:block;animation:fadeIn .3s ease}
+.svc-list{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.svc{
+  background:#fff;border:2.5px solid var(--ink);border-radius:var(--radius);
+  padding:24px;box-shadow:4px 4px 0 var(--ink);transition:transform .18s;
+}
+.svc:hover{transform:translate(-2px,-2px)}
+.svc .pill{display:inline-block;font-size:.68rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:4px 12px;border-radius:999px;margin-bottom:10px}
+.svc h3{font-family:"Archivo",sans-serif;font-size:1.25rem;margin-bottom:6px}
+.svc p{color:var(--ink-soft);font-size:.95rem}
+.svc .pill.c1{background:var(--coral-soft);color:var(--coral-deep)}
+.svc .pill.c2{background:var(--teal-soft);color:var(--teal-deep)}
+.svc .pill.c3{background:var(--sun-soft);color:#8E5A0B}
+.svc-note{background:var(--sun-soft);border:2px dashed #8E5A0B;border-radius:var(--radius);padding:18px 24px;margin-top:26px;font-size:.95rem;color:#6B4A0D}
+.svc-note strong{color:#8E5A0B}
+
+/* ---------- horizontal scroll gallery ---------- */
+.strip-x{
+  display:flex;gap:20px;overflow-x:auto;padding:10px 4px 24px;
+  scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
+}
+.gcard{
+  flex:0 0 300px;scroll-snap-align:start;border-radius:var(--radius);overflow:hidden;
+  background:#fff;border:2.5px solid var(--ink);box-shadow:5px 5px 0 var(--ink);
+  transition:transform .2s;position:relative;
+}
+.gcard:hover{transform:translateY(-5px) rotate(-.5deg)}
+.gcard .art{height:230px;display:flex;align-items:center;justify-content:center;position:relative}
+.gcard .art svg{width:44%;height:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.2))}
+.gcard .cap{padding:16px 20px;border-top:2.5px solid var(--ink)}
+.gcard .cap strong{font-family:"Archivo",sans-serif;font-size:1.05rem;display:block}
+.gcard .cap small{color:var(--ink-soft)}
+.gcard .soon{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.9);font-size:.64rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:4px 12px;border-radius:999px;color:var(--ink-soft);border:1.5px solid var(--ink)}
+
+/* ---------- reviews ---------- */
+.rev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.rev{
+  background:#fff;border:2.5px solid var(--ink);border-radius:var(--radius);
+  padding:30px;box-shadow:5px 5px 0 var(--ink);position:relative;
+}
+.rev .who{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.rev .ava{
+  width:52px;height:52px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;
+  font-family:"Archivo",sans-serif;font-weight:900;color:#fff;font-size:1.2rem;border:2px solid var(--ink);
+}
+.rev h4{font-family:"Archivo",sans-serif;font-size:1.1rem}
+.rev .src{font-size:.78rem;color:var(--ink-soft);font-weight:600}
+.rev p{font-size:.98rem;color:var(--ink-soft)}
+.rs-strip{margin:26px auto 10px;max-width:660px;background:#fff;border:2.5px solid var(--ink);border-radius:16px;padding:18px 22px;text-align:center;box-shadow:4px 4px 0 var(--ink)}
+.rs-note{margin:0 0 12px;font-size:.95rem;color:var(--ink-soft);line-height:1.55}
+.rs-btn{display:inline-block;background:var(--coral);color:#fff;padding:11px 26px;border-radius:999px;font-weight:700;text-decoration:none;font-size:.95rem;border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink)}
+.rs-btn:hover{filter:brightness(1.1)}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-bottom:26px}
+.info-card{background:#fff;border:2.5px solid var(--ink);border-radius:var(--radius);padding:32px;box-shadow:5px 5px 0 var(--ink)}
+.info-card h3{font-family:"Archivo",sans-serif;font-size:1.35rem;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.info-card h3 svg{width:28px;height:28px}
+.info-card p{color:var(--ink-soft);margin-bottom:8px}
+.info-card a.big{font-family:"Archivo",sans-serif;font-size:1.5rem;font-weight:800;color:var(--coral-deep);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.map-card{
+  border-radius:var(--radius);overflow:hidden;border:2.5px solid var(--ink);box-shadow:5px 5px 0 var(--ink);
+  position:relative;min-height:340px;
+  background:
+    linear-gradient(rgba(232,68,107,.08), rgba(232,68,107,.08)),
+    repeating-linear-gradient(0deg, transparent 0 46px, rgba(38,33,28,.14) 46px 48px),
+    repeating-linear-gradient(90deg, transparent 0 46px, rgba(38,33,28,.14) 46px 48px),
+    linear-gradient(140deg,var(--cream),var(--sun-soft));
+  display:flex;align-items:center;justify-content:center;
+}
+.map-pin{
+  text-align:center;background:#fff;padding:26px 34px;border-radius:20px;border:2.5px solid var(--ink);
+  box-shadow:5px 5px 0 var(--ink);max-width:80%;position:relative;
+}
+.map-pin svg{width:44px;height:44px;margin-bottom:8px}
+.map-pin strong{font-family:"Archivo",sans-serif;font-size:1.15rem;display:block}
+.map-pin small{color:var(--ink-soft)}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- big-type centered footer ---------- */
+footer{background:var(--ink);color:#D8CFC2;margin-top:20px;text-align:center}
+.foot-inner{max-width:900px;margin:0 auto;padding:64px 24px 30px}
+.foot-giant{
+  font-family:"Archivo",sans-serif;font-weight:900;letter-spacing:-1px;
+  font-size:clamp(2.6rem,8vw,5rem);line-height:1;color:#fff;margin-bottom:10px;
+}
+.foot-giant .hl{color:var(--sun)}
+.foot-tag{color:#A89C8B;margin-bottom:28px}
+.foot-links{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:28px}
+.foot-links a{
+  color:#fff;text-decoration:none;font-weight:700;padding:9px 18px;border-radius:999px;
+  border:1.5px solid rgba(255,255,255,.35);font-size:.92rem;transition:background .18s;
+}
+.foot-links a:hover{background:rgba(255,255,255,.12)}
+.foot-contact{display:flex;gap:26px;justify-content:center;flex-wrap:wrap;margin-bottom:8px}
+.foot-contact a,.foot-contact span{color:#D8CFC2;text-decoration:none;font-weight:600;font-size:.95rem}
+.foot-contact a:hover{color:var(--sun)}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.14);padding:20px 0 26px;font-size:.85rem;color:#A89C8B;text-align:center}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:940px){
+  .band-grid,.visit-grid{grid-template-columns:1fr}
+  .band.flip .band-grid > div:first-child{order:0}
+  .bar .call-pill{display:none}
+  .svc-list{grid-template-columns:1fr}
+  .rev-grid{grid-template-columns:1fr}
+  .strip{padding:40px 28px}
+  .hero-inner{padding:64px 24px 56px}
+}
+@media(max-width:600px){
+  .cta-band{padding:36px 24px;margin:40px 16px}
+}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap bar">
+    <a class="brand" href="#home" data-page="home" aria-label="J1 Hair Salon, home">
+      <span class="brand-badge">J1</span>
+      <span class="brand-name">J1<small>Hair Salon · Brooklyn</small></span>
+    </a>
+    <div class="bar-actions">
+      <a class="call-pill" href="tel:+17183745288">Call (718) 374-5288</a>
+      <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="scrim" id="scrim"></div>
+<nav class="main" id="mainNav" aria-label="Main navigation">
+  <div class="drawer-brand">
+    <span class="brand-badge">J1</span>
+    <span class="brand-name">J1<small>Hair Salon · Brooklyn</small></span>
+  </div>
+  <a class="dlink active" href="#home" data-page="home" aria-current="page">Home</a>
+  <a class="dlink" href="#services" data-page="services">Services</a>
+  <a class="dlink" href="#gallery" data-page="gallery">Gallery</a>
+  <a class="dlink" href="#reviews" data-page="reviews">Reviews</a>
+  <a class="dlink" href="#visit" data-page="visit">Visit Us</a>
+  <div class="drawer-foot">
+    <p>5907 7th Ave, Brooklyn, NY 11220</p>
+    <a href="tel:+17183745288">(718) 374-5288</a>
+  </div>
+</nav>
+
+<section class="page active" id="page-home">
+  <div class="hero-full">
+    <svg class="hero-swirl" viewBox="0 0 400 400" aria-hidden="true">
+      <path d="M60 340 Q120 200 200 220 T360 100" fill="none" stroke="#F5A524" stroke-width="26" stroke-linecap="round" opacity=".8"/>
+      <path d="M40 300 Q140 180 230 200 T380 60" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" opacity=".5"/>
+      <path d="M80 370 Q160 260 240 270 T340 160" fill="none" stroke="#0E9E97" stroke-width="14" stroke-linecap="round" opacity=".7"/>
+    </svg>
+    <div class="hero-inner">
+      <span class="hero-kicker">5907 7th Ave · Brooklyn, NY</span>
+      <h1>Color that<br><span class="hl">turns heads.</span></h1>
+      <p class="hero-sub">J1 Hair Salon is a Brooklyn salon known for color, balayage and careful cuts. Reviewers praise the stylists for detail, patience and transformations that keep hair healthy.</p>
+      <div class="hero-cta">
+        <a class="btn btn-solid" href="#services" data-page="services">Explore Services</a>
+        <a class="btn btn-line" href="https://www.google.com/maps/place/?q=place_id:ChIJy2eGVntFwokRvR_zp9Wngvs" target="_blank" rel="noopener">Get Directions</a>
+      </div>
+      <span class="hours-chip">Call for hours: (718) 374-5288</span>
+    </div>
+  </div>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track" id="marqueeTrack">
+      <span><i>✦</i>Balayage</span><span><i>✦</i>Hair Coloring</span><span><i>✦</i>Highlights</span><span><i>✦</i>Perms</span><span><i>✦</i>Haircuts</span><span><i>✦</i>Straightening</span>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap band-grid">
+      <div class="reveal">
+        <span class="over">Why J1</span>
+        <h2>Stylists who take<br>their time with you</h2>
+        <p>Reviewers describe stylists who communicate every step, test dye shades with you, and spend hours repairing damaged hair when it needs it. One reviewer notes a stylist spent over four hours restoring their hair, checking in the whole way.</p>
+        <div class="stat-row">
+          <div class="stat"><strong>3.9 / 5</strong><small>51 reviews compiled by BestProsInTown</small></div>
+          <div class="stat"><strong>Color</strong><small>reviewers' top praise</small></div>
+        </div>
+      </div>
+      <div class="art-card reveal" style="background:linear-gradient(140deg,#FBDCE4,#F5A8BD)">
+        <span class="tag">Color studio</span>
+        <svg viewBox="0 0 200 200" role="img" aria-label="Illustration of hair color swatches">
+          <circle cx="60" cy="70" r="34" fill="#3A2415"/>
+          <circle cx="120" cy="60" r="34" fill="#B4552D"/>
+          <circle cx="165" cy="95" r="34" fill="#E8A93D"/>
+          <circle cx="90" cy="125" r="34" fill="#7A3B1E"/>
+          <circle cx="145" cy="145" r="30" fill="#D97B8F"/>
+          <path d="M20 180 q60 -20 160 -10" stroke="#26211C" stroke-width="6" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="band alt">
+    <div class="wrap band-grid flip">
+      <div class="reveal">
+        <span class="over">What to expect</span>
+        <h2>Attentive service,<br>honest prices</h2>
+        <p>Reviewers call the pricing reasonable for the quality, and note the clean salon with snacks and water offered during longer appointments. Bring cash or use a payment app, and bring a reference photo if you have a specific look in mind.</p>
+        <ul class="check-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#E8446B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Consultations before color, shades tested with you</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#E8446B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Known for balayage and bleach without wrecking hair</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#E8446B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Stylists praised by name in reviews: Jason and Anson</li>
+        </ul>
+        <a class="btn btn-solid" href="#reviews" data-page="reviews" style="border:2px solid var(--ink)">Read reviewer themes</a>
+      </div>
+      <div class="art-card reveal" style="background:linear-gradient(140deg,#D8F0EE,#A8DCD8)">
+        <span class="tag">The chair</span>
+        <svg viewBox="0 0 200 200" role="img" aria-label="Illustration of a salon chair">
+          <rect x="70" y="40" width="60" height="90" rx="16" fill="#26211C"/>
+          <rect x="58" y="120" width="84" height="26" rx="12" fill="#E8446B"/>
+          <rect x="92" y="146" width="16" height="34" fill="#26211C"/>
+          <ellipse cx="100" cy="186" rx="34" ry="8" fill="#26211C" opacity=".25"/>
+          <circle cx="150" cy="60" r="14" fill="#F5A524"/>
+          <path d="M40 90 q20 -30 44 -34" stroke="#26211C" stroke-width="8" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap band-grid">
+      <div class="reveal">
+        <span class="over">Good to know</span>
+        <h2>Plan your visit</h2>
+        <p>J1 sits at 5907 7th Ave in Brooklyn. Appointments are recommended for color work, and longer sessions can run a few hours, so plan accordingly.</p>
+        <p>Call <a href="tel:+17183745288" style="font-weight:700">(718) 374-5288</a> to book, ask about pricing, or check today's hours.</p>
+      </div>
+      <div class="art-card reveal" style="background:linear-gradient(140deg,#E7DBF7,#C3A9E8)">
+        <span class="tag">7th Ave</span>
+        <svg viewBox="0 0 200 200" role="img" aria-label="Illustration of a storefront">
+          <rect x="40" y="80" width="120" height="80" rx="8" fill="#fff" stroke="#26211C" stroke-width="5"/>
+          <rect x="60" y="105" width="34" height="30" fill="#0E9E97"/>
+          <rect x="106" y="105" width="34" height="30" fill="#E8446B"/>
+          <path d="M30 80 L100 40 L170 80 Z" fill="#F5A524" stroke="#26211C" stroke-width="5" stroke-linejoin="round"/>
+          <rect x="88" y="128" width="24" height="32" fill="#26211C"/>
+          <circle cx="100" cy="28" r="8" fill="#E8446B" stroke="#26211C" stroke-width="4"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="cta-band reveal">
+      <h2>Your next great <span class="hl">hair day</span> starts here.</h2>
+      <p>5907 7th Ave, Brooklyn, NY 11220. Call (718) 374-5288 to book your chair.</p>
+      <a class="btn btn-solid" href="tel:+17183745288" style="border:2px solid #fff">Call (718) 374-5288</a>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-svc">
+      <span class="over">Services</span>
+      <h2>Pick your<br>transformation</h2>
+      <p>Services below are drawn from the salon's booking listings and reviewer reports. Call for current pricing and availability.</p>
+    </div>
+
+    <div data-tabs>
+      <div class="tabs-bar reveal" role="tablist" aria-label="Service categories">
+        <button class="tab-btn on" data-tab="color" role="tab" aria-selected="true">Color</button>
+        <button class="tab-btn" data-tab="cuts" role="tab" aria-selected="false">Cuts</button>
+        <button class="tab-btn" data-tab="texture" role="tab" aria-selected="false">Texture</button>
+      </div>
+
+      <div class="tab-panel on reveal" id="panel-color" role="tabpanel">
+        <div class="svc-list">
+          <div class="svc"><span class="pill c1">Reviewer favorite</span><h3>Hair Coloring</h3><p>Full color with consultation first. Reviewers praise careful shade testing and communication through every step.</p></div>
+          <div class="svc"><span class="pill c1">Most requested</span><h3>Balayage</h3><p>Hand-painted, dimensional color. Reviewers rave about the results and the healthy condition of their hair after.</p></div>
+          <div class="svc"><span class="pill c1">Color</span><h3>Highlights</h3><p>Classic foiled highlights to brighten and add dimension. Call for pricing.</p></div>
+          <div class="svc"><span class="pill c1">Color</span><h3>Bleach and Tone</h3><p>Lightening work reviewers say is done without wrecking the hair, even with repeated bleaching.</p></div>
+        </div>
+      </div>
+
+      <div class="tab-panel reveal" id="panel-cuts" role="tabpanel">
+        <div class="svc-list">
+          <div class="svc"><span class="pill c2">Cuts</span><h3>Women's Haircut</h3><p>Consultation-style cuts where the stylist helps you land the right look, even if you arrive unsure.</p></div>
+          <div class="svc"><span class="pill c2">Cuts</span><h3>Haircut and Style</h3><p>Cut finished with a style so you leave photo-ready. Call for pricing.</p></div>
+        </div>
+      </div>
+
+      <div class="tab-panel reveal" id="panel-texture" role="tabpanel">
+        <div class="svc-list">
+          <div class="svc"><span class="pill c3">Texture</span><h3>Perm</h3><p>Permanent waves and curls. Book ahead, longer appointments can run several hours.</p></div>
+          <div class="svc"><span class="pill c3">Texture</span><h3>Permanent Hair Straightening</h3><p>Sleek, long-lasting straightening. Call to discuss your hair type and pricing.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="svc-note reveal">
+      <strong>Good to know:</strong> reviewers describe the pricing as reasonable for the quality of work. Bring cash or use a payment app, and bring a reference photo if you have a specific look in mind. <strong>Call (718) 374-5288</strong> for current prices.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-gal">
+      <span class="over">Gallery</span>
+      <h2>Fresh looks,<br>fresh color</h2>
+      <p>Artistic previews of our work. Real photos of cuts, color and the salon are on the way. Scroll sideways to browse.</p>
+    </div>
+
+    <div class="strip-x">
+      <div class="gcard reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#FBDCE4,#F5A8BD)"><svg viewBox="0 0 100 100"><circle cx="50" cy="42" r="26" fill="#B4552D"/><path d="M28 42 Q50 20 72 42" fill="none" stroke="#3A2415" stroke-width="5" stroke-linecap="round"/></svg></div>
+        <div class="cap"><strong>Copper Color</strong><small>Warm, rich transformations</small></div>
+      </div>
+      <div class="gcard reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#D8F0EE,#A8DCD8)"><svg viewBox="0 0 100 100"><path d="M30 20 Q50 12 70 20 L66 70 Q50 78 34 70 Z" fill="#3A2415"/><path d="M38 26 Q50 20 62 26" stroke="#E8A93D" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M42 40 Q50 36 58 40" stroke="#E8A93D" stroke-width="4" fill="none" stroke-linecap="round"/></svg></div>
+        <div class="cap"><strong>Balayage</strong><small>Hand-painted dimension</small></div>
+      </div>
+      <div class="gcard reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#E7DBF7,#C3A9E8)"><svg viewBox="0 0 100 100"><circle cx="6" cy="6" r="3" fill="none" stroke="#7C4DBE" stroke-width="4" transform="translate(38,38)"/><path d="M20 20 L80 80 M20 80 L80 20" stroke="#26211C" stroke-width="5" stroke-linecap="round"/></svg></div>
+        <div class="cap"><strong>Precision Cuts</strong><small>Clean lines, sharp shape</small></div>
+      </div>
+      <div class="gcard reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#FDEBC8,#F5C86E)"><svg viewBox="0 0 100 100"><path d="M35 25 Q50 15 65 25 Q62 60 50 68 Q38 60 35 25" fill="#26211C"/><path d="M40 30 q10 -6 20 0 M42 44 q8 -5 16 0" stroke="#F5A524" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg></div>
+        <div class="cap"><strong>Perms and Waves</strong><small>Texture with bounce</small></div>
+      </div>
+      <div class="gcard reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#FFE3EA,#F7B9C9)"><svg viewBox="0 0 100 100"><rect x="30" y="30" width="40" height="44" rx="8" fill="none" stroke="#BE2C51" stroke-width="5"/><path d="M38 46 h24 M38 56 h24 M38 66 h16" stroke="#BE2C51" stroke-width="4" stroke-linecap="round"/></svg></div>
+        <div class="cap"><strong>Consultations</strong><small>Shades tested with you</small></div>
+      </div>
+      <div class="gcard reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#26211C,#4A4239)"><svg viewBox="0 0 100 100"><rect x="32" y="24" width="36" height="52" rx="10" fill="#F5A524"/><circle cx="50" cy="50" r="10" fill="#26211C"/><path d="M50 24v-8M38 30l-6-6M62 30l6-6" stroke="#F5A524" stroke-width="4" stroke-linecap="round"/></svg></div>
+        <div class="cap"><strong>The Salon</strong><small>Clean, welcoming space</small></div>
+      </div>
+      <div class="gcard reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#F5A8BD,#E8446B)"><svg viewBox="0 0 100 100"><path d="M12 21C7 17 3 13.5 3 9.5 3 7 5 5 7.5 5c1.7 0 3.3.9 4.5 2.6C13.2 5.9 14.8 5 16.5 5 19 5 21 7 21 9.5c0 4-4 7.5-9 11.5z" fill="#fff" transform="translate(28,30) scale(2.4)"/></svg></div>
+        <div class="cap"><strong>Happy Regulars</strong><small>Clients who come back</small></div>
+      </div>
+    </div>
+
+    <div class="svc-note reveal" style="margin-top:10px">
+      <strong>Coming soon:</strong> real photos of our color work, cuts and salon interior. The illustrations above are artistic placeholders the owner can swap for actual photos.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-rev">
+      <span class="over">Reviews</span>
+      <h2>Loved by<br>Brooklyn</h2>
+      <p>Review themes on this page are paraphrased from public feedback. Open the source to read current reviews and ratings.</p>
+    </div>
+    <div class="rs-strip">
+      <p class="rs-note">Themes below are paraphrased from public reviews. See the live listing for the latest ratings.</p>
+      <div class="rs-links"><a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJy2eGVntFwokRvR_zp9Wngvs" target="_blank" rel="noopener">See reviews on Google</a></div>
+    </div>
+
+    <div class="rev-grid">
+      <div class="rev reveal">
+        <div class="who"><span class="ava" style="background:var(--coral)">C</span><div><h4>Color expertise</h4><span class="src">Theme across reviewer reports</span></div></div>
+        <p>Reviewers praise the stylists for color work, from natural black to copper transformations, with careful communication at every step and dye shades tested before committing.</p>
+      </div>
+      <div class="rev reveal">
+        <div class="who"><span class="ava" style="background:var(--teal)">B</span><div><h4>Balayage and bleach, done gently</h4><span class="src">Theme across reviewer reports</span></div></div>
+        <p>Reviewers highlight balayage results they love, and note the team delivers repeated bleaching without wrecking the hair, plus patient repair work on damaged hair.</p>
+      </div>
+      <div class="rev reveal">
+        <div class="who"><span class="ava" style="background:var(--sun)">S</span><div><h4>Stylists by name</h4><span class="src">Theme across reviewer reports</span></div></div>
+        <p>Jason is praised for friendly, precise color and cutting advice, and Anson for dedication, including a four-hour hair restoration one reviewer will not forget.</p>
+      </div>
+      <div class="rev reveal">
+        <div class="who"><span class="ava" style="background:var(--violet)">V</span><div><h4>Value and care</h4><span class="src">Based on 51 reviews compiled by BestProsInTown</span></div></div>
+        <p>Reviewers call the pricing reasonable for the quality, and describe a clean, welcoming salon where snacks and water appear during longer appointments.</p>
+      </div>
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Had a great visit? <span class="hl">Tell Brooklyn.</span></h2>
+      <p>Your review helps a local salon keep growing. It takes a minute, and it means a lot.</p>
+      <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJy2eGVntFwokRvR_zp9Wngvs" target="_blank" rel="noopener">Leave a Google review</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-visit">
+      <span class="over">Visit us</span>
+      <h2>Come take<br>a seat</h2>
+      <p>Find us on 7th Ave in Brooklyn. Call ahead to book, especially for color.</p>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#E8446B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Find us</h3>
+        <p><strong>J1 Hair Salon</strong><br>5907 7th Ave<br>Brooklyn, NY 11220</p>
+        <p>Right on 7th Ave. Color appointments can run a few hours, so plan ahead.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#E8446B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg> Call us</h3>
+        <p>Bookings, pricing and questions:</p>
+        <a class="big" href="tel:+17183745288">(718) 374-5288</a>
+        <p style="margin-top:10px">Bring cash or use a payment app, and a reference photo if you have one.</p>
+      </div>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#E8446B" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Hours</h3>
+        <p><strong>Call for hours:</strong> (718) 374-5288</p>
+        <p>Hours are not published on an official site, so give the salon a quick call before heading over.</p>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <svg viewBox="0 0 24 24" fill="#E8446B"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#FFF9F1"/></svg>
+          <strong>5907 7th Ave</strong>
+          <small>Brooklyn, NY 11220</small><br>
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJy2eGVntFwokRvR_zp9Wngvs" target="_blank" rel="noopener" style="border:2px solid var(--ink)">Get Directions</a>
+        </div>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-inner">
+    <div class="foot-giant">J1 <span class="hl">Hair Salon</span></div>
+    <p class="foot-tag">Color, balayage and careful cuts on 7th Ave in Brooklyn.</p>
+    <div class="foot-links">
+      <a href="#home" data-page="home">Home</a>
+      <a href="#services" data-page="services">Services</a>
+      <a href="#gallery" data-page="gallery">Gallery</a>
+      <a href="#reviews" data-page="reviews">Reviews</a>
+      <a href="#visit" data-page="visit">Visit Us</a>
+    </div>
+    <div class="foot-contact">
+      <span>5907 7th Ave, Brooklyn, NY 11220</span>
+      <a href="tel:+17183745288">(718) 374-5288</a>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <span>© J1 Hair Salon</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+  var scrim = document.getElementById("scrim");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(scrim){ scrim.classList.remove("on"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      if(scrim){ scrim.classList.toggle("on", open); }
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+  if(scrim){
+    scrim.addEventListener("click", function(){ closeMenu(); });
+  }
+
+  /* ---------- marquee: duplicate for seamless loop ---------- */
+  var track = document.getElementById("marqueeTrack");
+  if(track){ track.innerHTML += track.innerHTML; }
+
+  /* ---------- service tabs (separate from the page router) ---------- */
+  document.addEventListener("click", function(e){
+    var btn = e.target.closest("[data-tab]");
+    if(!btn) return;
+    var group = btn.closest("[data-tabs]");
+    if(!group) return;
+    var target = btn.getAttribute("data-tab");
+    var btns = group.querySelectorAll("[data-tab]");
+    for(var i = 0; i < btns.length; i++){
+      var on = btns[i] === btn;
+      btns[i].classList.toggle("on", on);
+      btns[i].setAttribute("aria-selected", on ? "true" : "false");
+    }
+    var panels = group.querySelectorAll(".tab-panel");
+    for(var j = 0; j < panels.length; j++){
+      panels[j].classList.toggle("on", panels[j].id === "panel-" + target);
+    }
+  });
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

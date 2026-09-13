@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Joe's Barber Shop · Classic Barber in North Grafton, MA</title>
+<meta name="description" content="Joe's Barber Shop is a classic neighborhood barbershop at 22 Shrewsbury St, North Grafton, MA. Haircuts, beard trims, and hot towel shaves. Call (508) 839-5506.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#17222E; --navy-2:#22303F; --ink:#1C2530;
+  --paper:#F7F2E9; --cream:#FFFDF7;
+  --red:#B03A2E; --red-deep:#8C2A21; --red-soft:#F5DCD6;
+  --gold:#C99A3C;
+  --radius:14px;
+  --shadow:0 18px 40px -18px rgba(23,34,46,.35);
+  --shadow-sm:0 10px 24px -12px rgba(23,34,46,.3);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Inter",system-ui,sans-serif;
+  background:var(--paper);color:var(--ink);line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--red)}
+::selection{background:var(--red-soft);color:var(--ink)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.display{font-family:"Oswald",sans-serif;text-transform:uppercase;letter-spacing:1px}
+
+/* ---------- header: top bar ---------- */
+header.site{
+  position:sticky;top:0;z-index:50;background:var(--navy);color:#fff;
+  border-bottom:4px solid var(--red);
+}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 24px;max-width:1200px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:#fff}
+.brand .pole{width:34px;height:44px;border-radius:8px;flex:none;
+  background:repeating-linear-gradient(45deg,var(--red) 0 8px,#fff 8px 16px,var(--navy) 16px 20px,#fff 20px 28px);
+  border:2px solid rgba(255,255,255,.5);
+}
+.brand-name{font-family:"Oswald",sans-serif;font-weight:700;font-size:1.25rem;text-transform:uppercase;letter-spacing:1px;line-height:1}
+.brand-name small{display:block;font-family:"Inter",sans-serif;font-weight:600;font-size:.6rem;letter-spacing:3px;color:var(--gold)}
+nav.main{display:flex;align-items:center;gap:2px}
+nav.main a{
+  text-decoration:none;color:#fff;font-weight:600;font-size:.9rem;text-transform:uppercase;letter-spacing:1px;
+  padding:10px 14px;border-radius:6px;transition:background .2s;white-space:nowrap;
+}
+nav.main a:hover{background:rgba(255,255,255,.1)}
+nav.main a.active{background:var(--red)}
+.call-btn{
+  display:inline-flex;align-items:center;gap:8px;background:var(--red);color:#fff;text-decoration:none;
+  font-weight:700;padding:10px 20px;border-radius:8px;transition:background .18s,transform .18s;white-space:nowrap;
+}
+.call-btn:hover{background:var(--red-deep);transform:translateY(-2px)}
+.burger{display:none;background:none;border:0;cursor:pointer;padding:10px}
+.burger span{display:block;width:26px;height:3px;border-radius:3px;background:#fff;margin:5px 0}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- hero: split ---------- */
+.hero{background:var(--navy);color:#fff;overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center;padding:72px 0}
+.kicker{
+  display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;
+  color:var(--gold);border:1px solid var(--gold);border-radius:4px;padding:7px 14px;margin-bottom:20px;
+}
+.hero h1{font-family:"Oswald",sans-serif;font-weight:700;font-size:clamp(2.4rem,5.6vw,4rem);line-height:1.04;text-transform:uppercase;letter-spacing:.5px;margin-bottom:18px}
+.hero h1 span{color:var(--red);-webkit-text-stroke:0}
+.hero p{color:#C9D2DC;max-width:48ch;margin-bottom:28px}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap}
+.btn-ghost{
+  display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:700;color:#fff;
+  border:2px solid #fff;padding:9px 22px;border-radius:8px;transition:all .18s;
+}
+.btn-ghost:hover{background:#fff;color:var(--navy)}
+.hero-art{
+  background:var(--navy-2);border:1px solid rgba(255,255,255,.12);border-radius:var(--radius);
+  min-height:380px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;
+}
+.hero-art svg{width:46%;height:auto}
+.hours-strip{display:inline-block;margin-top:22px;font-size:.9rem;color:#C9D2DC;background:rgba(255,255,255,.06);border:1px dashed rgba(255,255,255,.35);padding:8px 18px;border-radius:8px}
+.badge{
+  position:absolute;top:14px;left:14px;background:rgba(0,0,0,.55);color:#fff;
+  font-size:.68rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  padding:6px 12px;border-radius:6px;
+}
+
+/* ---------- card wall rhythm ---------- */
+.section{padding:68px 0}
+.section.alt{background:var(--cream)}
+.section-head{max-width:660px;margin-bottom:40px}
+.section-head.center{margin-left:auto;margin-right:auto;text-align:center}
+.section-head h2{font-family:"Oswald",sans-serif;font-size:clamp(1.7rem,3.4vw,2.4rem);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.section-head h2 span{color:var(--red)}
+.section-head p{color:#5B6673}
+.card-wall{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.wall-card{
+  background:var(--cream);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm);
+  border-top:5px solid var(--red);
+}
+.section.alt .wall-card{background:#fff}
+.wall-card .num{font-family:"Oswald",sans-serif;font-size:2rem;color:var(--red);font-weight:700}
+.wall-card h3{font-family:"Oswald",sans-serif;font-size:1.25rem;text-transform:uppercase;letter-spacing:1px;margin:10px 0 8px}
+.wall-card p{color:#5B6673;font-size:.96rem}
+.wall-card a{font-weight:700}
+
+/* ---------- offerings: cards ---------- */
+.svc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;max-width:900px;margin:0 auto}
+.svc-card{
+  background:var(--navy);color:#fff;border-radius:var(--radius);padding:34px;position:relative;overflow:hidden;
+}
+.svc-card::after{
+  content:"";position:absolute;top:0;right:0;width:110px;height:110px;
+  background:radial-gradient(circle at top right, rgba(176,58,46,.5), transparent 70%);
+}
+.svc-card h3{font-family:"Oswald",sans-serif;font-size:1.4rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.svc-card p{color:#C9D2DC;font-size:.95rem;margin-bottom:14px}
+.svc-card .tag{font-size:.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold)}
+.price-note{text-align:center;margin-top:28px;color:#5B6673;font-size:.95rem}
+
+/* ---------- story bands ---------- */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.split h2{font-family:"Oswald",sans-serif;font-size:clamp(1.7rem,3.4vw,2.4rem);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
+.split p{color:#5B6673;margin-bottom:14px}
+.art-panel{
+  border-radius:var(--radius);min-height:360px;display:flex;align-items:center;justify-content:center;position:relative;
+  background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 100%);box-shadow:var(--shadow);
+}
+.art-panel svg{width:44%;height:auto}
+.check-list{list-style:none;margin:18px 0}
+.check-list li{padding:8px 0 8px 34px;position:relative;color:#3E4854}
+.check-list li::before{content:"✓";position:absolute;left:0;top:8px;color:var(--red);font-weight:700;font-size:1.1rem}
+
+/* ---------- gallery: horizontal strip ---------- */
+.strip{display:flex;gap:20px;overflow-x:auto;padding:6px 4px 22px;scroll-snap-type:x mandatory}
+.strip::-webkit-scrollbar{height:10px}
+.strip::-webkit-scrollbar-track{background:rgba(23,34,46,.08);border-radius:6px}
+.strip::-webkit-scrollbar-thumb{background:var(--red);border-radius:6px}
+.shot{
+  flex:0 0 300px;height:360px;border-radius:var(--radius);scroll-snap-align:start;position:relative;
+  background:linear-gradient(160deg,var(--navy) 0%,var(--red-deep) 130%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;box-shadow:var(--shadow-sm);
+}
+.shot svg{width:38%;height:auto}
+.shot .cap{color:#fff;font-weight:700;font-size:.82rem;letter-spacing:2px;text-transform:uppercase}
+.strip-hint{text-align:center;color:#5B6673;font-size:.85rem;margin-top:6px}
+
+/* ---------- reviews ---------- */
+.rev-band{background:var(--navy);color:#fff;border-radius:var(--radius);padding:44px;text-align:center;margin-bottom:36px}
+.rev-band .big{font-family:"Oswald",sans-serif;font-size:3rem;font-weight:700}
+.stars{color:var(--gold);font-size:1.4rem;letter-spacing:4px}
+.rev-band p{color:#C9D2DC}
+.rev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-bottom:36px}
+.rev{
+  background:var(--cream);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow-sm);
+  border-left:5px solid var(--red);
+}
+.rev p{font-style:italic;margin-bottom:10px}
+.rev .src{font-size:.76rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#5B6673;font-style:normal}
+.source-links{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px}
+.visit-card{background:var(--cream);border-radius:var(--radius);padding:36px;box-shadow:var(--shadow-sm)}
+.visit-card h3{font-family:"Oswald",sans-serif;font-size:1.3rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.visit-card p{color:#5B6673;margin-bottom:8px}
+.dir-card{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;
+  background:var(--navy);color:#fff;border-radius:var(--radius);padding:36px;text-decoration:none;
+  transition:transform .18s;
+}
+.dir-card:hover{transform:translateY(-3px)}
+.dir-card strong{font-family:"Oswald",sans-serif;font-size:1.3rem;text-transform:uppercase;letter-spacing:1px}
+.dir-card span{color:#C9D2DC;font-size:.9rem}
+
+/* ---------- footer: big type ---------- */
+footer.site{background:var(--navy);color:#fff;margin-top:0;border-top:4px solid var(--red)}
+.foot-big{
+  font-family:"Oswald",sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:2px;
+  font-size:clamp(2.6rem,9vw,6.5rem);line-height:1;padding:56px 0 8px;text-align:center;color:#fff;
+}
+.foot-big span{color:var(--red)}
+.foot-row{display:flex;justify-content:center;gap:32px;flex-wrap:wrap;padding:18px 0 30px;color:#C9D2DC;font-size:.95rem;text-align:center}
+.foot-row a{color:#fff;text-decoration:none;font-weight:600}
+.foot-row a:hover{text-decoration:underline}
+.copy{border-top:1px solid rgba(255,255,255,.14);padding:16px 0 20px;text-align:center;font-size:.88rem;color:#C9D2DC}
+
+/* ---------- reveal ---------- */
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .5s,transform .5s}
+.reveal.in{opacity:1;transform:none}
+
+@media (max-width:900px){
+  .hero-grid,.split,.visit-grid{grid-template-columns:1fr}
+  .card-wall{grid-template-columns:1fr 1fr}
+  .svc-grid{grid-template-columns:1fr}
+  .rev-grid{grid-template-columns:1fr}
+  nav.main{display:none;position:absolute;top:100%;left:0;right:0;background:var(--navy);flex-direction:column;align-items:stretch;padding:10px 16px 18px;border-bottom:4px solid var(--red)}
+  nav.main.open{display:flex}
+  nav.main a{text-align:left}
+  .burger{display:block}
+  header.site .call-btn{display:none}
+}
+@media (max-width:600px){ .card-wall{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="bar">
+    <a class="brand" href="#home" data-page="home" aria-label="Joe's Barber Shop home">
+      <span class="pole" aria-hidden="true"></span>
+      <span class="brand-name">Joe's Barber Shop<small>North Grafton, MA</small></span>
+    </a>
+    <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    <nav class="main" id="mainNav" aria-label="Primary">
+      <a href="#home" data-page="home">Home</a>
+      <a href="#services" data-page="services">Services</a>
+      <a href="#story" data-page="story">Our Story</a>
+      <a href="#gallery" data-page="gallery">Gallery</a>
+      <a href="#reviews" data-page="reviews">Reviews</a>
+      <a href="#visit" data-page="visit">Visit Us</a>
+    </nav>
+    <a class="call-btn" href="tel:+15088395506">Call (508) 839-5506</a>
+  </div>
+</header>
+
+<main>
+
+<section class="page" id="page-home">
+  <div class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="kicker">North Grafton's classic barbershop</span>
+        <h1>Old school cuts.<br><span>No fuss.</span></h1>
+        <p>A classic neighborhood barbershop on Shrewsbury Street. Haircuts, beard trims, and hot towel shaves from Joe and his team, with the kind of conversation you only get in a real barbershop.</p>
+        <div class="hero-cta">
+          <a class="call-btn" href="tel:+15088395506">Call (508) 839-5506</a>
+          <a class="btn-ghost" href="#services" data-page="services">See services</a>
+        </div>
+        <div><span class="hours-strip">Hours vary. Please call ahead for hours.</span></div>
+      </div>
+      <div class="hero-art">
+        <span class="badge">Photo placeholder</span>
+        <svg viewBox="0 0 200 240" fill="none" aria-hidden="true">
+          <rect x="78" y="20" width="44" height="150" rx="22" stroke="#fff" stroke-width="6"/>
+          <path d="M78 55 l44 -18 M78 95 l44 -18 M78 135 l44 -18" stroke="#B03A2E" stroke-width="10"/>
+          <rect x="70" y="8" width="60" height="16" rx="6" fill="#C99A3C"/>
+          <rect x="70" y="176" width="60" height="16" rx="6" fill="#C99A3C"/>
+          <path d="M100 192 v36" stroke="#C99A3C" stroke-width="8" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="wrap">
+      <div class="section-head center reveal">
+        <h2>Why Grafton <span>keeps coming back</span></h2>
+        <p>A no-frills shop where the cut is personal, the price is fair, and everybody knows your name.</p>
+      </div>
+      <div class="card-wall">
+        <div class="wall-card reveal">
+          <div class="num">01</div>
+          <h3>The Cut</h3>
+          <p>Classic and modern men's cuts, done the way you ask. Joe listens first, then gets to work.</p>
+          <p><a href="#services" data-page="services">See services</a></p>
+        </div>
+        <div class="wall-card reveal">
+          <div class="num">02</div>
+          <h3>The Shave</h3>
+          <p>Hot towel shaves, beard trims, and head shaves with old-school attention to detail.</p>
+          <p><a href="#services" data-page="services">See services</a></p>
+        </div>
+        <div class="wall-card reveal">
+          <div class="num">03</div>
+          <h3>The Shop</h3>
+          <p>Quaint, cozy, and full of character. A neighborhood gathering spot as much as a barbershop.</p>
+          <p><a href="#story" data-page="story">Our story</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section alt">
+    <div class="wrap">
+      <div class="section-head center reveal">
+        <h2>Rated <span>4.5 stars</span> by locals</h2>
+        <p class="stars">★★★★½</p>
+        <p>Based on 44 reviews on Birdeye. Sentiments below are paraphrased from public reviews.</p>
+      </div>
+      <div class="rev-grid">
+        <div class="rev reveal"><p>"Excellent place to get your haircut! Joe is always there for a great conversation and a cut!"</p><span class="src">Paraphrased from public reviews</span></div>
+        <div class="rev reveal"><p>"Rock solid, old school, five star barbershop. Clean, friendly, solid and skilled."</p><span class="src">Paraphrased from public reviews</span></div>
+      </div>
+      <div class="source-links reveal">
+        <a class="call-btn" href="#reviews" data-page="reviews">Read all reviews</a>
+        <a class="btn-ghost" style="color:var(--navy);border-color:var(--navy)" href="#visit" data-page="visit">Find the shop</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="wrap split">
+      <div class="reveal">
+        <h2>Walk-ins welcome.<br><span style="color:var(--red)">Appointments smart.</span></h2>
+        <p>Reviewers recommend booking ahead, especially on Saturdays. One call is all it takes to lock in your chair.</p>
+        <ul class="check-list">
+          <li>22 Shrewsbury St, North Grafton, MA 01536</li>
+          <li><a href="tel:+15088395506">(508) 839-5506</a></li>
+          <li>Call ahead for current hours</li>
+        </ul>
+        <a class="call-btn" href="tel:+15088395506">Call (508) 839-5506</a>
+      </div>
+      <div class="art-panel reveal">
+        <span class="badge">Photo placeholder</span>
+        <svg viewBox="0 0 200 200" fill="none" aria-hidden="true">
+          <rect x="45" y="90" width="110" height="70" rx="10" stroke="#fff" stroke-width="6"/>
+          <path d="M70 90 v-25 a30 30 0 0 1 60 0 v25" stroke="#B03A2E" stroke-width="6"/>
+          <circle cx="70" cy="125" r="8" stroke="#C99A3C" stroke-width="5"/>
+          <circle cx="130" cy="125" r="8" stroke="#C99A3C" stroke-width="5"/>
+          <path d="M45 160 h110" stroke="#fff" stroke-width="6" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="section">
+    <div class="wrap">
+      <div class="section-head center reveal">
+        <span class="kicker" style="display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:12px">Services</span>
+        <h2>Classic services, <span>done right</span></h2>
+        <p>Straightforward barbering with no upsells and no surprises.</p>
+      </div>
+      <div class="svc-grid">
+        <div class="svc-card reveal">
+          <span class="tag">Most popular</span>
+          <h3>Men's Haircut</h3>
+          <p>Classic tapers, fades, and scissor cuts tailored to your style. Whether you want old-school or modern, the cut comes out exactly how you asked.</p>
+        </div>
+        <div class="svc-card reveal">
+          <span class="tag">Detail work</span>
+          <h3>Beard Trim</h3>
+          <p>Shape, line up, and tidy your beard with precision. The finishing touch that pulls the whole look together.</p>
+        </div>
+        <div class="svc-card reveal">
+          <span class="tag">Old school</span>
+          <h3>Hot Towel Shave</h3>
+          <p>The full traditional treatment. Hot towels, steady hands, and a close, comfortable shave like they used to do it.</p>
+        </div>
+        <div class="svc-card reveal">
+          <span class="tag">Clean finish</span>
+          <h3>Head Shave</h3>
+          <p>Smooth, even head shaves done carefully and comfortably. Ask about pairing it with a beard trim.</p>
+        </div>
+      </div>
+      <p class="price-note">Pricing and availability change over time. Please call <a href="tel:+15088395506">(508) 839-5506</a> for current details.</p>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-story">
+  <div class="section">
+    <div class="wrap split">
+      <div class="reveal">
+        <span style="display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:12px">Our story</span>
+        <h2>A neighborhood<br><span style="color:var(--red)">institution.</span></h2>
+        <p>Joe's Barber Shop is the kind of place that feels like stepping back in time. Quaint and cozy, with vintage character, it has become a favorite among locals who appreciate a no-frills, down-to-earth haircut.</p>
+        <p>Joe and his team take real pride in the work. They listen, they pay attention to detail, and they treat every cut like it matters, because to the person in the chair, it does.</p>
+        <p>It is more than a barbershop. It is where neighbors catch up, where regulars are greeted by name, and where a great haircut never breaks the bank.</p>
+      </div>
+      <div class="art-panel reveal">
+        <span class="badge">Photo placeholder</span>
+        <svg viewBox="0 0 200 200" fill="none" aria-hidden="true">
+          <rect x="55" y="60" width="90" height="100" rx="8" stroke="#fff" stroke-width="6"/>
+          <path d="M55 90 h90 M55 120 h90" stroke="#B03A2E" stroke-width="5"/>
+          <circle cx="100" cy="42" r="14" stroke="#C99A3C" stroke-width="6"/>
+          <path d="M70 160 v20 M130 160 v20" stroke="#fff" stroke-width="6" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <div class="section alt">
+    <div class="wrap">
+      <div class="section-head center reveal">
+        <h2>What makes it <span>Joe's</span></h2>
+      </div>
+      <div class="card-wall">
+        <div class="wall-card reveal">
+          <div class="num">01</div>
+          <h3>No-Frills Atmosphere</h3>
+          <p>Down-to-earth and unpretentious. Come as you are and get a cut without the fuss.</p>
+        </div>
+        <div class="wall-card reveal">
+          <div class="num">02</div>
+          <h3>Attention to Detail</h3>
+          <p>Every cut is personalized. The team listens to what you want and makes sure it is just right.</p>
+        </div>
+        <div class="wall-card reveal">
+          <div class="num">03</div>
+          <h3>Fair Prices</h3>
+          <p>An affordable cut that feels anything but cheap. Great value, every single visit.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="section">
+    <div class="wrap">
+      <div class="section-head center reveal">
+        <span style="display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:12px">Gallery</span>
+        <h2>Inside <span>the shop</span></h2>
+        <p>Scroll through for a look at Joe's. Real photos coming soon.</p>
+      </div>
+      <div class="strip reveal">
+        <div class="shot"><span class="badge">Photo placeholder</span><svg viewBox="0 0 200 200" fill="none" aria-hidden="true"><rect x="78" y="30" width="44" height="120" rx="22" stroke="#fff" stroke-width="6"/><path d="M78 58 l44 -16 M78 92 l44 -16 M78 126 l44 -16" stroke="#B03A2E" stroke-width="9"/></svg><span class="cap">The barber pole</span></div>
+        <div class="shot"><span class="badge">Photo placeholder</span><svg viewBox="0 0 200 200" fill="none" aria-hidden="true"><rect x="50" y="80" width="100" height="70" rx="10" stroke="#fff" stroke-width="6"/><path d="M75 80 v-22 a25 25 0 0 1 50 0 v22" stroke="#B03A2E" stroke-width="6"/></svg><span class="cap">The chairs</span></div>
+        <div class="shot"><span class="badge">Photo placeholder</span><svg viewBox="0 0 200 200" fill="none" aria-hidden="true"><path d="M60 140 L140 60" stroke="#fff" stroke-width="7" stroke-linecap="round"/><circle cx="63" cy="140" r="10" stroke="#C99A3C" stroke-width="6"/><circle cx="137" cy="63" r="10" stroke="#C99A3C" stroke-width="6"/></svg><span class="cap">The tools</span></div>
+        <div class="shot"><span class="badge">Photo placeholder</span><svg viewBox="0 0 200 200" fill="none" aria-hidden="true"><circle cx="100" cy="80" r="32" stroke="#fff" stroke-width="6"/><path d="M60 150 q40 -36 80 0" stroke="#B03A2E" stroke-width="6" stroke-linecap="round"/></svg><span class="cap">Fresh cuts</span></div>
+        <div class="shot"><span class="badge">Photo placeholder</span><svg viewBox="0 0 200 200" fill="none" aria-hidden="true"><rect x="60" y="55" width="80" height="95" rx="8" stroke="#fff" stroke-width="6"/><path d="M60 85 h80" stroke="#B03A2E" stroke-width="5"/></svg><span class="cap">Storefront</span></div>
+      </div>
+      <p class="strip-hint">Scroll sideways to see more</p>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="section">
+    <div class="wrap">
+      <div class="section-head center reveal">
+        <span style="display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:12px">Reviews</span>
+        <h2>Word on <span>the street</span></h2>
+      </div>
+      <div class="rev-band reveal">
+        <div class="big">4.5</div>
+        <p class="stars">★★★★½</p>
+        <p>Based on 44 reviews on Birdeye. Sentiments below are paraphrased from public reviews.</p>
+      </div>
+      <div class="rev-grid">
+        <div class="rev reveal"><p>"Excellent place to get your haircut! Joe is always there for a great conversation and a cut!"</p><span class="src">Paraphrased from public reviews</span></div>
+        <div class="rev reveal"><p>"Rock solid, old school, five star barbershop! Been here about four times. Clean, friendly, solid and skilled. Great shop."</p><span class="src">Paraphrased from public reviews</span></div>
+        <div class="rev reveal"><p>"Was so much impressed with the trim."</p><span class="src">Paraphrased from public reviews</span></div>
+        <div class="rev reveal"><p>"Appointment recommended. A classic barbershop experience with friendly service and affordable prices."</p><span class="src">Paraphrased from public reviews</span></div>
+      </div>
+      <div class="source-links reveal">
+        <a class="call-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJe6-hL5QO5IkRVKs4Ww-4d2o" target="_blank" rel="noopener">See reviews on Google</a>
+        <a class="btn-ghost" style="color:var(--navy);border-color:var(--navy)" href="https://reviews.birdeye.com/joes-barber-shop-170256597990440" target="_blank" rel="noopener">See reviews on Birdeye</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="section">
+    <div class="wrap">
+      <div class="section-head center reveal">
+        <span style="display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:12px">Visit us</span>
+        <h2>Find <span>the shop</span></h2>
+        <p>Right on Shrewsbury Street in North Grafton. Street parking nearby.</p>
+      </div>
+      <div class="visit-grid">
+        <div class="visit-card reveal">
+          <h3>Address and contact</h3>
+          <p><strong>Joe's Barber Shop</strong><br>22 Shrewsbury St<br>North Grafton, MA 01536</p>
+          <p>Phone: <a href="tel:+15088395506">(508) 839-5506</a></p>
+          <p>Hours: Call for hours</p>
+          <p>Parking: street parking</p>
+        </div>
+        <a class="dir-card reveal" href="https://www.google.com/maps/place/?q=place_id:ChIJe6-hL5QO5IkRVKs4Ww-4d2o" target="_blank" rel="noopener">
+          <strong>Get directions</strong>
+          <span>Google Maps · 22 Shrewsbury St, North Grafton, MA</span>
+        </a>
+      </div>
+      <div style="text-align:center" class="reveal">
+        <a class="call-btn" href="tel:+15088395506">Call (508) 839-5506 to book</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-big">Joe's <span>Barber Shop</span></div>
+    <div class="foot-row">
+      <span>22 Shrewsbury St, North Grafton, MA 01536</span>
+      <a href="tel:+15088395506">(508) 839-5506</a>
+      <a href="https://www.google.com/maps/place/?q=place_id:ChIJe6-hL5QO5IkRVKs4Ww-4d2o" target="_blank" rel="noopener">Get directions</a>
+      <a href="https://reviews.birdeye.com/joes-barber-shop-170256597990440" target="_blank" rel="noopener">Read reviews</a>
+    </div>
+    <div class="copy">© Joe's Barber Shop</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "story", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
