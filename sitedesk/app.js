@@ -1750,7 +1750,12 @@ var INTAKE_STATUSES = [['open','Open'],['building','Building'],['ready','Ready']
 async function renderIntakesInto(el){
   el.innerHTML = '<div class="card"><div class="empty">Loading intakes...</div></div>';
   let items = [];
-  try{ items = await loadIntakes('all'); }
+  try{
+    /* Always fetch a fresh tree: new intakes submitted while the app sits open
+       must appear without a manual reload. */
+    clearTreeCache();
+    items = await loadIntakes('all');
+  }
   catch(e){
     el.innerHTML = '<div class="card"><div class="empty">' + esc(e.message) +
       '<br/><button class="btn" id="btn-retry-intakes" type="button">Retry</button></div></div>';
