@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Godiva's Salon · Beauty Salon in Syracuse, NY</title>
+<meta name="description" content="Godiva's Salon, a beauty salon at 4121 Genesee St, Syracuse, NY 13219. Haircuts, color, highlights and styling. Call (315) 488-5946.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=Public+Sans:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FBF6EC; --cream-2:#F4EAD3; --paper:#FFFEFA;
+  --ink:#2E2118; --ink-soft:#6B5844;
+  --cocoa:#4A2C1A; --cocoa-deep:#33200F; --cocoa-soft:#EAD9BE;
+  --gold:#C08A2E; --gold-deep:#9A6B1F; --gold-soft:#F5E5C4;
+  --blush:#B4586B; --blush-soft:#F4D8DD;
+  --radius:20px;
+  --shadow:0 20px 44px -18px rgba(46,33,24,.32);
+  --shadow-sm:0 10px 24px -12px rgba(46,33,24,.25);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Public Sans",system-ui,sans-serif;
+  background:var(--cream);color:var(--ink);line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--gold-deep)}
+::selection{background:var(--gold-soft);color:var(--ink)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.hand{font-family:"Caveat",cursive}
+
+/* ---------- pages ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .35s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ---------- slim bar + side drawer ---------- */
+.topbar{
+  position:sticky;top:0;z-index:60;
+  background:var(--cocoa-deep);color:var(--cream);
+  display:flex;align-items:center;gap:14px;padding:12px 20px;
+}
+.topbar .brandline{font-family:"Fraunces",serif;font-weight:700;font-size:1.15rem;text-decoration:none;color:var(--cream)}
+.topbar .brandline small{display:block;font-family:"Public Sans",sans-serif;font-weight:600;font-size:.62rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold-soft)}
+.drawer-btn{background:var(--gold);border:none;color:var(--cocoa-deep);font-weight:700;font-size:1.05rem;border-radius:12px;padding:9px 15px;cursor:pointer}
+.drawer-btn:hover{background:var(--gold-soft)}
+.topbar .spacer{flex:1}
+.topbar .call-mini{color:var(--cream);text-decoration:none;font-weight:700;font-size:.95rem;border:2px solid var(--gold);border-radius:999px;padding:8px 18px}
+.topbar .call-mini:hover{background:var(--gold);color:var(--cocoa-deep)}
+
+.scrim{position:fixed;inset:0;background:rgba(46,33,24,.55);opacity:0;pointer-events:none;transition:opacity .3s;z-index:70}
+.scrim.show{opacity:1;pointer-events:auto}
+.drawer{
+  position:fixed;top:0;left:0;bottom:0;width:300px;max-width:84vw;z-index:80;
+  background:var(--cocoa-deep);color:var(--cream);
+  transform:translateX(-105%);transition:transform .32s ease;
+  display:flex;flex-direction:column;padding:28px 24px;
+}
+.drawer.open{transform:none}
+.drawer .d-close{align-self:flex-end;background:none;border:2px solid var(--gold-soft);color:var(--gold-soft);border-radius:10px;font-size:1.1rem;padding:6px 12px;cursor:pointer;margin-bottom:18px}
+.drawer .d-brand{font-family:"Fraunces",serif;font-weight:900;font-size:1.5rem;margin-bottom:4px}
+.drawer .d-brand small{display:block;font-family:"Public Sans",sans-serif;font-weight:600;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold-soft);margin-top:6px}
+.drawer nav.main{display:flex;flex-direction:column;gap:4px;margin-top:22px}
+.drawer nav.main a{color:var(--cream);text-decoration:none;font-weight:600;font-size:1.08rem;padding:13px 14px;border-radius:12px;transition:background .2s}
+.drawer nav.main a:hover{background:rgba(192,138,46,.22)}
+.drawer nav.main a.active{background:var(--gold);color:var(--cocoa-deep)}
+.drawer .d-foot{margin-top:auto;padding-top:22px;border-top:1px solid rgba(245,229,196,.2);font-size:.9rem;color:rgba(251,246,236,.75)}
+.drawer .d-foot a{color:var(--gold-soft);text-decoration:none;font-weight:700}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:700;padding:13px 28px;border-radius:999px;transition:transform .15s;border:none;cursor:pointer;font-size:1rem}
+.btn-solid{background:var(--gold);color:var(--cocoa-deep);box-shadow:var(--shadow-sm)}
+.btn-solid:hover{background:var(--gold-deep);color:#fff;transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:var(--cream);border:2px solid var(--cream)}
+.btn-ghost:hover{background:rgba(255,255,255,.14)}
+.btn-dark{background:var(--cocoa);color:#fff}
+.btn-dark:hover{background:var(--cocoa-deep);transform:translateY(-2px)}
+.pill{display:inline-block;background:var(--gold-soft);color:var(--cocoa-deep);font-weight:700;font-size:.8rem;letter-spacing:1.6px;text-transform:uppercase;padding:7px 16px;border-radius:999px;margin-bottom:16px}
+
+/* ---------- type ---------- */
+h1,h2,h3{font-family:"Fraunces",serif;line-height:1.12;color:var(--ink)}
+h1{font-size:clamp(2.4rem,6vw,4.2rem);font-weight:900}
+h2{font-size:clamp(1.7rem,3.4vw,2.5rem);font-weight:700}
+h3{font-size:1.22rem;font-weight:700}
+.lede{font-size:1.12rem;max-width:60ch}
+
+/* ---------- hero: full bleed ---------- */
+.hero-bleed{
+  position:relative;overflow:hidden;color:#fff;
+  background:linear-gradient(160deg,#33200F 0%,#4A2C1A 55%,#6B4423 100%);
+}
+.hero-bleed .swirls{position:absolute;inset:0;opacity:.5}
+.hero-inner{position:relative;max-width:1120px;margin:0 auto;padding:110px 24px 120px;text-align:center}
+.hero-inner h1{color:#fff;margin-bottom:18px}
+.hero-inner .lede{color:rgba(255,255,255,.88);margin:0 auto 30px}
+.hero-inner .pill{background:rgba(192,138,46,.25);color:var(--gold-soft)}
+.hero-cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.hero-stats{display:flex;gap:36px;justify-content:center;margin-top:44px;flex-wrap:wrap}
+.hero-stats .stat{text-align:center}
+.hero-stats .stat b{display:block;font-family:"Fraunces",serif;font-size:1.9rem;color:var(--gold-soft)}
+.hero-stats .stat span{font-size:.85rem;color:rgba(255,255,255,.75);letter-spacing:1px;text-transform:uppercase}
+
+/* ---------- card wall rhythm ---------- */
+.band{padding:72px 0}
+.card-wall{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.card-wall .wcard{background:var(--paper);border-radius:var(--radius);padding:30px 26px;box-shadow:var(--shadow-sm);border-top:5px solid var(--gold)}
+.wcard h3{margin-bottom:8px}
+.wcard p{color:var(--ink-soft);font-size:.96rem}
+.wcard .wicon{width:52px;height:52px;margin-bottom:14px}
+.band.tint{background:var(--cream-2)}
+.sec-head{max-width:720px;margin-bottom:36px}
+.sec-head p{color:var(--ink-soft)}
+
+/* ---------- offerings: cards ---------- */
+.offer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.offer{background:var(--paper);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);border:1px solid rgba(74,44,26,.12);display:flex;flex-direction:column}
+.offer .o-top{height:150px;display:flex;align-items:center;justify-content:center}
+.offer .o-top svg{width:64px;height:64px}
+.offer .o-body{padding:24px 24px 28px;display:flex;flex-direction:column;flex:1}
+.offer .o-body p{color:var(--ink-soft);font-size:.95rem;flex:1;margin:8px 0 14px}
+.offer .o-price{font-family:"Fraunces",serif;font-weight:700;color:var(--gold-deep);font-size:1.15rem}
+.sample-note{background:var(--gold-soft);border-radius:12px;padding:12px 18px;font-size:.9rem;margin-top:26px}
+
+/* ---------- gallery: horizontal strip ---------- */
+.strip{display:flex;gap:20px;overflow-x:auto;padding:6px 4px 20px;scroll-snap-type:x mandatory}
+.strip::-webkit-scrollbar{height:10px}
+.strip::-webkit-scrollbar-thumb{background:var(--gold);border-radius:99px}
+.strip::-webkit-scrollbar-track{background:rgba(74,44,26,.12);border-radius:99px}
+.frame{flex:0 0 300px;scroll-snap-align:start;background:var(--paper);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);position:relative}
+.frame svg{display:block;width:100%;height:230px}
+.frame .tag{position:absolute;top:12px;left:12px;background:rgba(46,33,24,.85);color:#fff;font-size:.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:5px 12px;border-radius:999px}
+.frame .cap{padding:12px 16px;font-size:.9rem;font-weight:600;color:var(--ink-soft)}
+.strip-hint{font-size:.88rem;color:var(--ink-soft);margin-top:4px}
+
+/* ---------- reviews ---------- */
+.rev-wall{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.rev-card{background:var(--cocoa-deep);color:var(--cream);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm)}
+.rev-card .stars{color:var(--gold-soft);font-size:1.15rem;letter-spacing:2px;margin-bottom:12px}
+.rev-card blockquote{font-family:"Fraunces",serif;font-size:1.12rem;font-style:italic;margin-bottom:12px}
+.rev-card .who{font-size:.88rem;color:rgba(251,246,236,.7)}
+.src-links{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+.src-links a{display:inline-flex;align-items:center;gap:8px;background:var(--paper);border:2px solid var(--gold-deep);color:var(--gold-deep);font-weight:700;text-decoration:none;padding:11px 20px;border-radius:999px;font-size:.95rem}
+.src-links a:hover{background:var(--gold-deep);color:#fff}
+
+/* ---------- visit ---------- */
+.visit-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.vcard{background:var(--paper);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow-sm);border:1px solid rgba(74,44,26,.12)}
+.vcard h3{margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.vcard h3 svg{width:26px;height:26px}
+.hours-list{list-style:none;display:grid;gap:8px;font-size:.98rem}
+.hours-list li{display:flex;justify-content:space-between;border-bottom:1px dashed rgba(74,44,26,.25);padding-bottom:8px}
+.hours-list li.today{color:var(--gold-deep);font-weight:700}
+
+/* ---------- footer: minimal ---------- */
+footer.site{background:var(--cocoa-deep);color:rgba(251,246,236,.85);text-align:center;padding:52px 24px 0}
+footer.site .f-brand{font-family:"Fraunces",serif;font-weight:900;font-size:1.6rem;color:#fff}
+footer.site .f-brand small{display:block;font-family:"Public Sans",sans-serif;font-weight:600;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold-soft);margin-top:8px}
+footer.site .f-contact{margin:18px 0;font-size:.98rem}
+footer.site .f-contact a{color:var(--gold-soft);text-decoration:none;font-weight:700}
+footer.site .f-nav{margin:6px 0 26px}
+footer.site .f-nav a{color:rgba(251,246,236,.8);text-decoration:none;margin:0 12px;font-weight:600;font-size:.94rem}
+footer.site .f-nav a:hover{color:#fff}
+.foot-bottom{border-top:1px solid rgba(251,246,236,.18);padding:20px 0;font-size:.92rem}
+
+/* ---------- reveal ---------- */
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:900px){
+  .card-wall,.offer-grid,.visit-cards,.rev-wall{grid-template-columns:1fr}
+  .topbar .call-mini{display:none}
+  .hero-inner{padding:80px 24px 90px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <button class="drawer-btn" id="drawerBtn" aria-label="Open navigation menu" aria-expanded="false">☰ Menu</button>
+  <a class="brandline" href="#home" data-page="home">Godiva's Salon<small>Syracuse, NY</small></a>
+  <span class="spacer"></span>
+  <a class="call-mini" href="tel:+13154885946">(315) 488-5946</a>
+</div>
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Site navigation">
+  <button class="d-close" id="drawerClose" aria-label="Close menu">✕</button>
+  <div class="d-brand">Godiva's Salon<small>Syracuse, NY</small></div>
+  <nav class="main" id="mainNav" aria-label="Main">
+    <a href="#home" data-page="home" class="active" aria-current="page">Home</a>
+    <a href="#services" data-page="services">Services</a>
+    <a href="#gallery" data-page="gallery">Gallery</a>
+    <a href="#reviews" data-page="reviews">Reviews</a>
+    <a href="#visit" data-page="visit">Visit Us</a>
+  </nav>
+  <div class="d-foot">
+    Godiva's Salon<br>4121 Genesee St, Syracuse, NY 13219<br>
+    <a href="tel:+13154885946">(315) 488-5946</a>
+  </div>
+</aside>
+
+<main>
+<section class="page" id="page-home">
+  <div class="hero-bleed">
+    <svg class="swirls" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <g fill="none" stroke="#C08A2E" stroke-width="2" opacity=".35">
+        <path d="M-40 500 Q 300 420 600 500 T 1240 480"/>
+        <path d="M-40 540 Q 300 460 600 540 T 1240 520"/>
+        <path d="M-40 100 Q 400 180 760 90 T 1240 120"/>
+        <circle cx="1020" cy="180" r="120"/><circle cx="1020" cy="180" r="80"/>
+        <circle cx="180" cy="420" r="90"/><circle cx="180" cy="420" r="56"/>
+      </g>
+    </svg>
+    <div class="hero-inner">
+      <span class="pill">Beauty salon · Syracuse, NY</span>
+      <h1>Your new beauty home.</h1>
+      <p class="lede">Godiva's Salon on Genesee Street is known for skilled stylists, honest pricing and a warm, welcoming chair. Cuts, color, highlights and styling for all ages.</p>
+      <div class="hero-cta">
+        <a class="btn btn-solid" href="tel:+13154885946">Call (315) 488-5946</a>
+        <a class="btn btn-ghost" href="#services" data-page="services">Explore services</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><b>4.7★</b><span>directory rating</span></div>
+        <div class="stat"><b>30+</b><span>client reviews</span></div>
+        <div class="stat"><b>2008</b><span>serving Syracuse</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="pill">Why Godiva's</span>
+        <h2>High class salon, far from overpriced.</h2>
+        <p>That is how one longtime client put it. Reviewers keep coming back for the same reasons: talented stylists, a well kept salon, and service that feels personal instead of rushed.</p>
+      </div>
+      <div class="card-wall">
+        <div class="wcard reveal">
+          <svg class="wicon" viewBox="0 0 48 48" aria-hidden="true"><circle cx="15" cy="15" r="7" fill="none" stroke="#9A6B1F" stroke-width="3"/><circle cx="33" cy="33" r="7" fill="none" stroke="#9A6B1F" stroke-width="3"/><path d="M20 20 28 28M28 20 20 28" stroke="#9A6B1F" stroke-width="3" stroke-linecap="round"/></svg>
+          <h3>Skilled stylists</h3><p>Clients praise cuts, color and highlights from a team reviewers describe as talented and attentive to detail.</p>
+        </div>
+        <div class="wcard reveal">
+          <svg class="wicon" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 8c6 8 10 13 10 20a10 10 0 0 1-20 0c0-7 4-12 10-20z" fill="none" stroke="#9A6B1F" stroke-width="3"/><path d="M12 40h24" stroke="#9A6B1F" stroke-width="3" stroke-linecap="round"/></svg>
+          <h3>Fair pricing</h3><p>Reviewers call the pricing reasonable and professional, especially compared with other salons in the area.</p>
+        </div>
+        <div class="wcard reveal">
+          <svg class="wicon" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 42s-14-8.5-14-22a8 8 0 0 1 14-5.3A8 8 0 0 1 38 20c0 13.5-14 22-14 22z" fill="none" stroke="#9A6B1F" stroke-width="3"/></svg>
+          <h3>Welcoming for all ages</h3><p>From longtime regulars to first timers, clients describe a comforting salon that is a joy to be in.</p>
+        </div>
+        <div class="wcard reveal">
+          <svg class="wicon" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="16" fill="none" stroke="#9A6B1F" stroke-width="3"/><path d="M24 14v10l7 5" stroke="#9A6B1F" stroke-width="3" stroke-linecap="round" fill="none"/></svg>
+          <h3>Personal attention</h3><p>Stylists are praised for listening, offering good suggestions and keeping each client's best interest at heart.</p>
+        </div>
+        <div class="wcard reveal">
+          <svg class="wicon" viewBox="0 0 48 48" aria-hidden="true"><rect x="8" y="10" width="32" height="24" rx="6" fill="none" stroke="#9A6B1F" stroke-width="3"/><path d="M16 34v6m16-6v6M12 20h24" stroke="#9A6B1F" stroke-width="3" stroke-linecap="round"/></svg>
+          <h3>Well kept space</h3><p>A clean, professional salon with free lot parking right off Genesee Street.</p>
+        </div>
+        <div class="wcard reveal">
+          <svg class="wicon" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 30c6-14 10-20 16-20s10 6 16 20" fill="none" stroke="#9A6B1F" stroke-width="3" stroke-linecap="round"/><circle cx="24" cy="10" r="4" fill="#9A6B1F"/></svg>
+          <h3>Full beauty services</h3><p>Haircuts, styling, color and highlights, plus brow services mentioned by happy clients.</p>
+        </div>
+      </div>
+      <p style="margin-top:32px"><a class="btn btn-dark" href="#reviews" data-page="reviews">Read client reviews</a></p>
+    </div>
+  </div>
+
+  <div class="band tint">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="pill">Popular services</span>
+        <h2>Most requested at the salon</h2>
+        <p>A quick look at what clients book most. Full details and sample pricing live on the Services page.</p>
+      </div>
+      <div class="offer-grid">
+        <div class="offer reveal">
+          <div class="o-top" style="background:linear-gradient(135deg,#4A2C1A,#6B4423)">
+            <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="15" cy="15" r="7" fill="none" stroke="#F5E5C4" stroke-width="3"/><circle cx="33" cy="33" r="7" fill="none" stroke="#F5E5C4" stroke-width="3"/><path d="M20 20 28 28M28 20 20 28" stroke="#F5E5C4" stroke-width="3" stroke-linecap="round"/></svg>
+          </div>
+          <div class="o-body"><h3>Haircut and style</h3><p>Consultation, cut, shampoo and a finished style you can recreate at home.</p><span class="o-price">from $50*</span></div>
+        </div>
+        <div class="offer reveal">
+          <div class="o-top" style="background:linear-gradient(135deg,#9A6B1F,#C08A2E)">
+            <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 6c8 10 12 16 12 24a12 12 0 0 1-24 0c0-8 4-14 12-24z" fill="none" stroke="#33200F" stroke-width="3"/><path d="M18 30a6 6 0 0 0 6 6" stroke="#33200F" stroke-width="3" stroke-linecap="round"/></svg>
+          </div>
+          <div class="o-body"><h3>Color and highlights</h3><p>All over color, root touch ups and foil highlights for brightness and dimension.</p><span class="o-price">from $85*</span></div>
+        </div>
+        <div class="offer reveal">
+          <div class="o-top" style="background:linear-gradient(135deg,#B4586B,#7B2D4B)">
+            <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M10 34c4-2 6-6 6-10V12m28 22c-4-2-6-6-6-10V12" fill="none" stroke="#F5E5C4" stroke-width="3" stroke-linecap="round"/><circle cx="16" cy="36" r="4" fill="#F5E5C4"/><circle cx="32" cy="36" r="4" fill="#F5E5C4"/></svg>
+          </div>
+          <div class="o-body"><h3>Styling and brows</h3><p>Blowouts, special occasion styling and brow shaping clients love.</p><span class="o-price">from $35*</span></div>
+        </div>
+      </div>
+      <div class="sample-note">*Sample prices for planning only, not a quote. Call (315) 488-5946 for current rates.</div>
+      <p style="margin-top:26px"><a class="btn btn-dark" href="#services" data-page="services">All services and pricing</a></p>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="pill">Visit us</span>
+        <h2>On Genesee Street in Syracuse.</h2>
+        <p>Godiva's Salon, 4121 Genesee St, Syracuse, NY 13219. Free lot parking. Call (315) 488-5946 to book your appointment.</p>
+      </div>
+      <div class="visit-cards">
+        <div class="vcard reveal">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="#9A6B1F" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Address</h3>
+          <p>Godiva's Salon<br>4121 Genesee St<br>Syracuse, NY 13219</p>
+          <p style="margin-top:10px"><a href="https://www.google.com/maps/place/?q=place_id:ChIJo38kacbw2YkRfEQftK-MKLM" target="_blank" rel="noopener">Get directions on Google Maps</a></p>
+        </div>
+        <div class="vcard reveal">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="#9A6B1F" stroke-width="2" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.13.96.36 1.9.7 2.8a2 2 0 0 1-.45 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.25a2 2 0 0 1 2.1-.45c.9.34 1.84.57 2.8.7a2 2 0 0 1 1.7 2.05z"/></svg>Phone</h3>
+          <p><a href="tel:+13154885946" style="font-weight:700;font-size:1.2rem">(315) 488-5946</a></p>
+          <p style="margin-top:10px">Call to book. Walk-ins welcome when chairs are open.</p>
+        </div>
+        <div class="vcard reveal">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="#9A6B1F" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Hours</h3>
+          <ul class="hours-list" id="hoursList">
+            <li><span>Monday - Saturday</span><span>8:00 AM - 8:00 PM</span></li>
+            <li><span>Sunday</span><span>Closed</span></li>
+          </ul>
+          <p style="font-size:.85rem;color:var(--ink-soft);margin-top:12px">Hours from directory listings; call to confirm.</p>
+        </div>
+      </div>
+      <p style="margin-top:30px"><a class="btn btn-dark" href="#visit" data-page="visit">Plan your visit</a></p>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="band">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="pill">Services</span>
+        <h2>Services and sample pricing</h2>
+        <p>Typical services at Godiva's Salon, a beauty salon in Syracuse. Prices are samples for planning only. Call (315) 488-5946 for current rates and to book.</p>
+      </div>
+      <div class="offer-grid">
+        <div class="offer reveal">
+          <div class="o-top" style="background:linear-gradient(135deg,#4A2C1A,#6B4423)"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="15" cy="15" r="7" fill="none" stroke="#F5E5C4" stroke-width="3"/><circle cx="33" cy="33" r="7" fill="none" stroke="#F5E5C4" stroke-width="3"/><path d="M20 20 28 28M28 20 20 28" stroke="#F5E5C4" stroke-width="3" stroke-linecap="round"/></svg></div>
+          <div class="o-body"><h3>Women's cut and style</h3><p>Consultation, precision cut, shampoo and finished style.</p><span class="o-price">$50+*</span></div>
+        </div>
+        <div class="offer reveal">
+          <div class="o-top" style="background:linear-gradient(135deg,#33200F,#4A2C1A)"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M10 40 24 8l14 32M15 28h18" fill="none" stroke="#F5E5C4" stroke-width="3" stroke-linecap="round"/></svg></div>
+          <div class="o-body"><h3>Men's cut</h3><p>Sharp, clean cuts with detailed neckline and finish.</p><span class="o-price">$30+*</span></div>
+        </div>
+        <div class="offer reveal">
+          <div class="o-top" style="background:linear-gradient(135deg,#9A6B1F,#C08A2E)"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 6c8 10 12 16 12 24a12 12 0 0 1-24 0c0-8 4-14 12-24z" fill="none" stroke="#33200F" stroke-width="3"/></svg></div>
+          <div class="o-body"><h3>All over color</h3><p>Single process color with shine and even coverage.</p><span class="o-price">$85+*</span></div>
+        </div>
+        <div class="offer reveal">
+          <div class="o-top" style="background:linear-gradient(135deg,#C08A2E,#F5E5C4)"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14 40 24 8l10 32M18 28h12" fill="none" stroke="#4A2C1A" stroke-width="3" stroke-linecap="round"/></svg></div>
+          <div class="o-body"><h3>Partial / full highlights</h3><p>Foil highlights for brightness, dimension and sun kissed color.</p><span class="o-price">$110+*</span></div>
+        </div>
+        <div class="offer reveal">
+          <div class="o-top" style="background:linear-gradient(135deg,#B4586B,#7B2D4B)"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M10 34c4-2 6-6 6-10V12m28 22c-4-2-6-6-6-10V12" fill="none" stroke="#F5E5C4" stroke-width="3" stroke-linecap="round"/></svg></div>
+          <div class="o-body"><h3>Blowout and styling</h3><p>Shampoo, blow dry and polished style for events or evenings out.</p><span class="o-price">$40+*</span></div>
+        </div>
+        <div class="offer reveal">
+          <div class="o-top" style="background:linear-gradient(135deg,#6B5844,#4A2C1A)"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 26c8-8 10-12 16-12s8 4 16 12" fill="none" stroke="#F5E5C4" stroke-width="3" stroke-linecap="round"/><circle cx="24" cy="30" r="4" fill="#F5E5C4"/></svg></div>
+          <div class="o-body"><h3>Brow shaping</h3><p>Shaping and cleanup for polished, natural looking brows.</p><span class="o-price">$18+*</span></div>
+        </div>
+      </div>
+      <div class="sample-note"><strong>Sample pricing.</strong> Prices shown are examples, not a quote. Hair length, thickness and product choice affect the final price. Call (315) 488-5946 for exact pricing.</div>
+      <p style="margin-top:28px"><a class="btn btn-solid" href="tel:+13154885946">Call to book: (315) 488-5946</a></p>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="band">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="pill">Gallery</span>
+        <h2>Work from the chair</h2>
+        <p>Sample imagery showing the kind of work done at Godiva's Salon. Swipe sideways to browse. Real client photos coming soon.</p>
+      </div>
+    </div>
+    <div class="wrap">
+      <div class="strip">
+        <div class="frame reveal"><span class="tag">Sample image</span><svg viewBox="0 0 300 230" role="img" aria-label="Highlight work sample"><defs><linearGradient id="h1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#33200F"/><stop offset=".6" stop-color="#9A6B1F"/><stop offset="1" stop-color="#F5E5C4"/></linearGradient></defs><rect width="300" height="230" fill="url(#h1)"/><path d="M120 40 q-20 120 -40 190 M160 40 q0 120 -10 190 M200 40 q20 120 40 190" stroke="#F5E5C4" stroke-width="8" fill="none" opacity=".85"/></svg><div class="cap">Foil highlights (sample)</div></div>
+        <div class="frame reveal"><span class="tag">Sample image</span><svg viewBox="0 0 300 230" role="img" aria-label="Precision cut sample"><rect width="300" height="230" fill="#F4EAD3"/><circle cx="150" cy="95" r="55" fill="#4A2C1A"/><path d="M95 95 a55 55 0 0 1 110 0 v30 h-110 z" fill="#33200F"/><rect x="100" y="150" width="100" height="50" rx="20" fill="#9A6B1F"/></svg><div class="cap">Precision cut (sample)</div></div>
+        <div class="frame reveal"><span class="tag">Sample image</span><svg viewBox="0 0 300 230" role="img" aria-label="Color service sample"><defs><linearGradient id="h3" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#B4586B"/><stop offset="1" stop-color="#4A2C1A"/></linearGradient></defs><rect width="300" height="230" fill="url(#h3)"/><ellipse cx="150" cy="90" rx="70" ry="60" fill="#33200F"/><path d="M90 100 q60 40 120 0" stroke="#C08A2E" stroke-width="7" fill="none"/></svg><div class="cap">Rich all over color (sample)</div></div>
+        <div class="frame reveal"><span class="tag">Sample image</span><svg viewBox="0 0 300 230" role="img" aria-label="Styling sample"><rect width="300" height="230" fill="#EAD9BE"/><g fill="#4A2C1A"><circle cx="110" cy="80" r="26"/><circle cx="150" cy="66" r="30"/><circle cx="190" cy="80" r="26"/><circle cx="130" cy="112" r="28"/><circle cx="172" cy="112" r="28"/></g><rect x="120" y="140" width="60" height="70" rx="22" fill="#B4586B"/></svg><div class="cap">Curly styling (sample)</div></div>
+        <div class="frame reveal"><span class="tag">Sample image</span><svg viewBox="0 0 300 230" role="img" aria-label="Blowout sample"><rect width="300" height="230" fill="#F5E5C4"/><path d="M110 60 q40 -30 80 0 q-10 120 -40 150 q-30 -30 -40 -150" fill="#33200F"/><circle cx="150" cy="52" r="26" fill="#4A2C1A"/><path d="M60 200 h180" stroke="#9A6B1F" stroke-width="10" stroke-linecap="round"/></svg><div class="cap">Smooth blowout (sample)</div></div>
+        <div class="frame reveal"><span class="tag">Sample image</span><svg viewBox="0 0 300 230" role="img" aria-label="Salon interior sample"><rect width="300" height="230" fill="#33200F"/><rect x="30" y="80" width="90" height="110" rx="40" fill="#F5E5C4"/><rect x="180" y="80" width="90" height="110" rx="40" fill="#F5E5C4"/><circle cx="150" cy="40" r="20" fill="#C08A2E"/><rect x="30" y="192" width="240" height="10" rx="5" fill="#9A6B1F"/></svg><div class="cap">Salon interior (sample)</div></div>
+      </div>
+      <p class="strip-hint">Scroll or swipe sideways to see more.</p>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="band tint">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="pill">Reviews</span>
+        <h2>What clients say</h2>
+        <p>Based on 30+ reviews across Google and directory listings, with a 4.7 out of 5 rating on directory profiles. Summaries below are paraphrased from real client reviews.</p>
+      </div>
+      <div class="rev-wall">
+        <div class="rev-card reveal">
+          <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <blockquote>A client of 15 years called the salon comforting and a joy to be in for all ages, praising consistently great cuts.</blockquote>
+          <div class="who">Paraphrased from a client review, February 2024</div>
+        </div>
+        <div class="rev-card reveal">
+          <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <blockquote>One reviewer called it a very high class salon with skilled, friendly stylists, professional service and fair prices.</blockquote>
+          <div class="who">Paraphrased from a client review, February 2023</div>
+        </div>
+        <div class="rev-card reveal">
+          <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <blockquote>A client praised a stylist for listening, offering good suggestions and doing beautiful brow work with a gentle touch.</blockquote>
+          <div class="who">Paraphrased from a client review, July 2022</div>
+        </div>
+        <div class="rev-card reveal">
+          <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <blockquote>A longtime client praised talented cutting, coloring and highlighting, plus patience and kindness with elderly clients.</blockquote>
+          <div class="who">Paraphrased from a client review, May 2021</div>
+        </div>
+      </div>
+      <div class="src-links">
+        <a href="https://www.google.com/maps/place/?q=place_id:ChIJo38kacbw2YkRfEQftK-MKLM" target="_blank" rel="noopener">See reviews on Google</a>
+        <a href="https://reviews.birdeye.com/godivas-salon-170181252490821" target="_blank" rel="noopener">See reviews on Birdeye</a>
+        <a href="https://www.bestprosintown.com/ny/syracuse/godivas-salon-/" target="_blank" rel="noopener">See reviews on BestProsInTown</a>
+        <a href="https://www.loc8nearme.com/new-york/syracuse/godivas-salon/4101128/" target="_blank" rel="noopener">See reviews on Loc8NearMe</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="band">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="pill">Visit us</span>
+        <h2>Plan your visit</h2>
+        <p>Godiva's Salon, 4121 Genesee St, Syracuse, NY 13219. Free lot parking on site.</p>
+      </div>
+      <div class="visit-cards">
+        <div class="vcard reveal">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="#9A6B1F" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Address</h3>
+          <p>Godiva's Salon<br>4121 Genesee St<br>Syracuse, NY 13219</p>
+          <p style="margin-top:12px"><a class="btn btn-dark" href="https://www.google.com/maps/place/?q=place_id:ChIJo38kacbw2YkRfEQftK-MKLM" target="_blank" rel="noopener">Get directions</a></p>
+        </div>
+        <div class="vcard reveal">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="#9A6B1F" stroke-width="2" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.13.96.36 1.9.7 2.8a2 2 0 0 1-.45 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.25a2 2 0 0 1 2.1-.45c.9.34 1.84.57 2.8.7a2 2 0 0 1 1.7 2.05z"/></svg>Phone</h3>
+          <p><a href="tel:+13154885946" style="font-weight:700;font-size:1.25rem">(315) 488-5946</a></p>
+          <p style="margin-top:10px">Call to book an appointment or ask about services and pricing.</p>
+          <p style="margin-top:14px"><a class="btn btn-solid" href="tel:+13154885946">Call now</a></p>
+        </div>
+        <div class="vcard reveal">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="#9A6B1F" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Hours</h3>
+          <ul class="hours-list" id="hoursList2">
+            <li><span>Monday - Saturday</span><span>8:00 AM - 8:00 PM</span></li>
+            <li><span>Sunday</span><span>Closed</span></li>
+          </ul>
+          <p style="font-size:.85rem;color:var(--ink-soft);margin-top:12px">Hours from directory listings; call to confirm before visiting.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="f-brand">Godiva's Salon<small>Syracuse, NY</small></div>
+    <p class="f-contact">Godiva's Salon · 4121 Genesee St, Syracuse, NY 13219 · <a href="tel:+13154885946">(315) 488-5946</a></p>
+    <nav class="f-nav" aria-label="Footer">
+      <a href="#home" data-page="home">Home</a>
+      <a href="#services" data-page="services">Services</a>
+      <a href="#gallery" data-page="gallery">Gallery</a>
+      <a href="#reviews" data-page="reviews">Reviews</a>
+      <a href="#visit" data-page="visit">Visit Us</a>
+    </nav>
+    <div class="foot-bottom">
+© Godiva's Salon
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("drawerBtn");
+  var drawer = document.getElementById("drawer");
+  var scrim = document.getElementById("scrim");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(drawer){ drawer.classList.remove("open"); }
+    if(scrim){ scrim.classList.remove("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+    if(document.body){ document.body.style.overflow = ""; }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  /* ---------- side drawer open/close ---------- */
+  function openDrawer(){
+    if(drawer){ drawer.classList.add("open"); }
+    if(scrim){ scrim.classList.add("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "true"); }
+    if(document.body){ document.body.style.overflow = "hidden"; }
+  }
+  if(burger){
+    burger.addEventListener("click", function(){
+      if(drawer && drawer.classList.contains("open")){ closeMenu(); }
+      else { openDrawer(); }
+    });
+  }
+  var dClose = document.getElementById("drawerClose");
+  if(dClose){ dClose.addEventListener("click", closeMenu); }
+  if(scrim){ scrim.addEventListener("click", closeMenu); }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
