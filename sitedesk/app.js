@@ -1802,8 +1802,7 @@ function renderProfileInto(el){
     (u.phone ? '<div><dt>Phone</dt><dd>' + esc(u.phone) + '</dd></div>' : '') +
     '</dl>' +
     '<div class="row" style="margin-top:16px">' +
-    '<button class="btn ghost block" id="btn-logout" type="button">Log out</button></div>' +
-    '<p class="muted" style="font-size:11px;margin-top:12px;line-height:1.55">Signed in on this device for 7 days. Your data token is shared by the app and scoped to the data repo only.</p></div>' +
+    '<button class="btn ghost block" id="btn-logout" type="button">Log out</button></div></div>' +
     helpHtml();
   el.querySelector('#btn-logout').addEventListener('click', logout);
 }
