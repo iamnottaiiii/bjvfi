@@ -4,6 +4,7 @@
 // iamnottaiiii/sitedesk-data repo (Contents). It cannot touch bjvfi or anything else.
 // Caller access to the app is still gated by PBKDF2 passwords in users.json.
 // Stored as interleaved chunks so secret scanners don't flag the pattern.
+const VAPID_PUBLIC_KEY="BP2TuPZYSRC9ndo_N-RfV2W_oo_SXAeC2Gn3JOLKmLp8blCpJqyJeWTioMI9YcP-eOYdXb3DeBheiI7QKpMUmDM";
 const SITEDESK_DATA_TOKEN = (function (parts) {
   var tok = "";
   var len = parts[0].length;

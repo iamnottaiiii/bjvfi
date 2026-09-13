@@ -497,8 +497,59 @@ function maybeNotifGate(){
   wrap.querySelector('#notif-yes').addEventListener('click', async function(){
     try{ await Notification.requestPermission(); }catch(e){}
     done();
+    ensurePushSubscribed();
+    renderApp();
   });
   wrap.querySelector('#notif-no').addEventListener('click', done);
+}
+
+/* ================= web push (closed-app notifications) ================= */
+function urlB64ToU8(str){
+  str = String(str || '').replace(/-/g, '+').replace(/_/g, '/');
+  while(str.length % 4) str += '=';
+  const bin = atob(str);
+  const out = new Uint8Array(bin.length);
+  for(let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+
+/* Subscribes this device for push and saves the subscription. Only runs when
+   notification permission is already granted; it never prompts by itself. */
+async function ensurePushSubscribed(){
+  try{
+    if(typeof Notification === 'undefined') return;
+    if(!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+    if(typeof VAPID_PUBLIC_KEY === 'undefined' || !VAPID_PUBLIC_KEY) return;
+    if(!state.user || !state.user.username) return;
+    if(Notification.permission !== 'granted') return;
+    const reg = await navigator.serviceWorker.ready;
+    let sub = await reg.pushManager.getSubscription();
+    if(!sub){
+      sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64ToU8(VAPID_PUBLIC_KEY) });
+    }
+    await savePushSub(sub.toJSON());
+  }catch(e){ /* push is best-effort */ }
+}
+
+async function savePushSub(sj){
+  if(!sj || !sj.endpoint || !state.user) return;
+  const username = state.user.username;
+  for(let attempt = 0; attempt < 2; attempt++){
+    let rec = null;
+    try{ rec = await ghGetJson('push_subs.json'); }catch(e){ rec = null; }
+    const subs = (rec && rec.data && typeof rec.data === 'object') ? rec.data : {};
+    const mine = Array.isArray(subs[username]) ? subs[username] : [];
+    const entry = { endpoint: sj.endpoint, keys: sj.keys || {}, updated_at: nowISO() };
+    const ix = mine.findIndex(function(x){ return x && x.endpoint === entry.endpoint; });
+    if(ix >= 0) mine[ix] = entry; else mine.push(entry);
+    subs[username] = mine.slice(-5);
+    try{
+      await ghPutJson('push_subs.json', subs, rec ? rec.sha : null, 'sitedesk: push subscription ' + username);
+      return;
+    }catch(e){
+      if(!isConflictError(e)) return;
+    }
+  }
 }
 
 /* ================= catalog + claims ================= */
@@ -731,6 +782,7 @@ async function doLogin(){
     state.tab = state.user.role === 'builder' ? 'inbox' : 'queue';
     await bootData(true);
     maybeNotifGate();
+    ensurePushSubscribed();
     renderApp();
     startFeedPoll();
   }catch(e){
@@ -2639,6 +2691,7 @@ function bindApp(app){
   if(bn) bn.addEventListener('click', async function(){
     try{ await Notification.requestPermission(); }catch(e){}
     try{ localStorage.setItem(LS_NOTIF_ASKED, '1'); }catch(e){}
+    ensurePushSubscribed();
     renderApp();
   });
 }
@@ -2767,6 +2820,7 @@ function bootMain(){
     state.tab = s.role === 'builder' ? 'inbox' : 'queue';
     renderApp();
     startFeedPoll();
+    ensurePushSubscribed();
     bootData(false).then(function(){ renderApp(); }).catch(function(e){ toast(e.message); });
   } else {
     if(s && (!SITEDESK_DATA_TOKEN || SITEDESK_DATA_TOKEN === 'PUT_TOKEN_HERE')){

@@ -1,4 +1,4 @@
-var CACHE = 'sitedesk-v2';
+var CACHE = 'sitedesk-v3';
 var CORE = ['index.html', 'styles.css', 'app.js', 'config.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon.svg'];
 
 self.addEventListener('install', function(e){
@@ -23,5 +23,32 @@ self.addEventListener('fetch', function(e){
       caches.open(CACHE).then(function(c){ c.put(e.request, copy); });
       return resp;
     }).catch(function(){ return caches.match(e.request); })
+  );
+});
+
+self.addEventListener('push', function(e){
+  var data = {};
+  try{ data = e.data ? e.data.json() : {}; }catch(_){}
+  var title = String(data.title || 'SiteDesk');
+  var body = String(data.body || '').slice(0, 140);
+  var url = String(data.url || 'index.html');
+  e.waitUntil(
+    self.registration.showNotification(title, {
+      body: body, icon: 'icon-192.png', badge: 'icon-192.png',
+      tag: 'sitedesk-push', renotify: true, data: { url: url }
+    })
+  );
+});
+
+self.addEventListener('notificationclick', function(e){
+  e.notification.close();
+  var url = (e.notification.data && e.notification.data.url) || 'index.html';
+  e.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(list){
+      for(var i = 0; i < list.length; i++){
+        if(list[i].url.indexOf('/sitedesk') >= 0){ list[i].focus(); return; }
+      }
+      return clients.openWindow(url);
+    })
   );
 });
