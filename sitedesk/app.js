@@ -322,6 +322,31 @@ function lastReadAt(){
 }
 function setLastRead(ts){ try{ localStorage.setItem(LS_LASTREAD, String(ts)); }catch(e){} }
 
+var LS_DISMISSED = 'sitedesk_dismissed_v1';
+function getDismissed(){
+  try{
+    var a = JSON.parse(localStorage.getItem(LS_DISMISSED) || '[]');
+    return Array.isArray(a) ? a : [];
+  }catch(e){ return []; }
+}
+function isDismissed(id){
+  if(!id) return false;
+  return getDismissed().indexOf(id) !== -1;
+}
+function dismissNotif(id){
+  if(!id) return;
+  var a = getDismissed();
+  if(a.indexOf(id) === -1) a.push(id);
+  if(a.length > 300) a = a.slice(a.length - 300);
+  try{ localStorage.setItem(LS_DISMISSED, JSON.stringify(a)); }catch(e){}
+}
+function recountUnread(){
+  var lr = lastReadAt();
+  state.unread = state.feed.filter(function(n){
+    return feedItemVisible(n) && !isDismissed(n.id) && (new Date(n.created_at || 0).getTime() || 0) > lr;
+  }).length;
+}
+
 /* ================= ui primitives ================= */
 
 var toastTimer = null;
@@ -402,10 +427,7 @@ async function fetchFeed(announce){
   items.forEach(function(n){ const t = new Date(n.created_at || 0).getTime() || 0; if(t > maxTs) maxTs = t; });
   state.feed = items;
   if(maxTs > state.feedMaxTs) state.feedMaxTs = maxTs;
-  const unreadList = items.filter(function(n){
-    return feedItemVisible(n) && (new Date(n.created_at || 0).getTime() || 0) > lastReadAt();
-  });
-  state.unread = unreadList.length;
+  recountUnread();
   if(announce && prevMax){
     const fresh = items.filter(function(n){
       return feedItemVisible(n) && (new Date(n.created_at || 0).getTime() || 0) > prevMax;
@@ -2359,7 +2381,7 @@ function wireAdminTools(el){
 /* ================= alerts / profile ================= */
 
 function renderAlertsInto(el){
-  const list = state.feed.filter(feedItemVisible);
+  const list = state.feed.filter(feedItemVisible).filter(function(n){ return !isDismissed(n.id); });
   let html = '<div class="card"><div class="row" style="justify-content:space-between;margin-bottom:12px">' +
     '<h2 style="margin:0">Alerts</h2>' +
     '<button class="btn ghost sm" id="btn-feed-refresh" type="button">Refresh</button></div>';
@@ -2376,15 +2398,33 @@ function renderAlertsInto(el){
       const wrap = n.link
         ? '<button type="button" class="alert-item" data-alink="' + esc(n.link) + '">' + inner + '</button>'
         : '<div class="alert-item-static">' + inner + '</div>';
-      return '<div style="background-image:var(--sep);background-size:100% 1px;background-repeat:no-repeat;background-position:bottom">' + wrap + '</div>';
+      return '<div class="alert-row" style="display:flex;gap:8px;align-items:flex-start;background-image:var(--sep);background-size:100% 1px;background-repeat:no-repeat;background-position:bottom">' +
+        '<div style="flex:1;min-width:0">' + wrap + '</div>' +
+        '<button type="button" class="btn ghost sm alert-dismiss" data-dismiss="' + esc(n.id || '') + '" aria-label="Delete notification" style="flex:none;margin-top:6px">\u00D7</button></div>';
     }).join('');
   }
-  html += '<button class="btn ghost block" id="mark-read" style="margin-top:12px" type="button">Mark all read</button></div>';
+  html += '<div class="row" style="margin-top:12px;gap:8px">' +
+    '<button class="btn ghost block" id="mark-read" style="flex:1;margin-top:0" type="button">Mark all read</button>' +
+    '<button class="btn ghost block" id="clear-notifs" style="flex:1;margin-top:0" type="button">Clear all</button></div></div>';
   el.innerHTML = html;
   el.querySelectorAll('[data-alink]').forEach(function(b){
     b.addEventListener('click', function(){ goAlertLink(b.getAttribute('data-alink')); });
   });
+  el.querySelectorAll('[data-dismiss]').forEach(function(b){
+    b.addEventListener('click', function(e){
+      e.stopPropagation();
+      dismissNotif(b.getAttribute('data-dismiss'));
+      recountUnread();
+      renderApp();
+    });
+  });
   el.querySelector('#mark-read').addEventListener('click', function(){
+    setLastRead(Date.now());
+    state.unread = 0;
+    renderApp();
+  });
+  el.querySelector('#clear-notifs').addEventListener('click', function(){
+    list.forEach(function(n){ dismissNotif(n.id); });
     setLastRead(Date.now());
     state.unread = 0;
     renderApp();
