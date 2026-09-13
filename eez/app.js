@@ -385,7 +385,8 @@
   function currentUitheme() {
     return document.documentElement.getAttribute("data-uitheme") || "";
   }
-  function applyUitheme(name, custom) {
+  function applyUitheme(name, custom, opts) {
+    const preview = !!(opts && opts.preview);
     const t = UITHEMES.includes(name) ? name : "";
     const root = document.documentElement;
     clearCustomThemeVars();
@@ -420,6 +421,7 @@
       /* ignore */
     }
     try {
+      if (preview) return; // draft preview: paint only, persist on save
       if (t) localStorage.setItem(UITHEME_KEY, t);
       else localStorage.removeItem(UITHEME_KEY);
       if (custom && (custom.bg || custom.accent || custom.text)) {
@@ -432,13 +434,24 @@
       /* ignore */
     }
   }
-  async function saveUitheme(name, custom) {
-    const t = UITHEMES.includes(name) ? name : "";
-    applyUitheme(t, custom);
-    if (!state.me) return;
+  function themeSavedState(persist) {
+    const u = persist ? state.me : null;
+    return {
+      preset: persist ? (u.theme_preset || "") : storedUitheme(),
+      custom: { ...(persist ? parsePackedCustom(u.theme_custom || "") : storedUithemeCustom()) },
+    };
+  }
+  function themeDraftEqual(a, b) {
+    return (a.preset || "") === (b.preset || "") &&
+      a.custom.bg === b.custom.bg && a.custom.accent === b.custom.accent && a.custom.text === b.custom.text;
+  }
+  async function commitUitheme(persist, draft) {
+    const t = UITHEMES.includes(draft.preset) ? draft.preset : "";
+    applyUitheme(t, draft.custom);
+    if (!persist || !state.me) return;
     try {
       const patch = { theme_preset: t };
-      if (t === "custom" && custom) patch.theme_custom = packCustom({ ...storedUithemeCustom(), ...custom });
+      if (t === "custom") patch.theme_custom = packCustom(draft.custom);
       const data = await api("/api/me", { method: "PATCH", body: JSON.stringify(patch) });
       state.me = data.user;
     } catch {
@@ -454,16 +467,63 @@
       )
       .join("");
   }
-  function markPicks(selector, activeEl) {
-    document.querySelectorAll(selector).forEach((b) => b.classList.toggle("on", b === activeEl));
-  }
-  function clearUitheme(persist) {
-    markPicks("#theme-picks .theme-pick", null);
-    const cust = document.getElementById("theme-custom-on");
-    if (cust) cust.hidden = true;
-    if (persist) return saveUitheme("");
-    applyUitheme("");
-    return Promise.resolve();
+  function bindUithemeControls(persist) {
+    const saved = themeSavedState(persist);
+    const draft = { preset: saved.preset, custom: { ...saved.custom } };
+    const saveBtn = document.getElementById("theme-save");
+    const syncUI = () => {
+      document.querySelectorAll("#theme-picks .theme-pick").forEach((b) =>
+        b.classList.toggle("on", b.getAttribute("data-uitheme") === draft.preset));
+      const cust = document.getElementById("theme-custom-on");
+      if (cust) cust.hidden = draft.preset !== "custom";
+      const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+      setVal("theme-bg-color", draft.custom.bg);
+      setVal("theme-accent-color", draft.custom.accent);
+      setVal("theme-text-color", draft.custom.text);
+      if (saveBtn) saveBtn.disabled = themeDraftEqual(draft, saved);
+    };
+    const previewDraft = () => {
+      applyUitheme(draft.preset, draft.custom, { preview: true });
+      syncUI();
+    };
+    document.querySelectorAll("#theme-picks .theme-pick").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        draft.preset = btn.getAttribute("data-uitheme");
+        previewDraft();
+      });
+    });
+    [["theme-bg-color", "bg"], ["theme-accent-color", "accent"], ["theme-text-color", "text"]].forEach(([id, key]) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener("input", () => {
+        draft.custom[key] = validHex(el.value) || draft.custom[key];
+        draft.preset = "custom";
+        previewDraft();
+      });
+    });
+    const td = document.getElementById("theme-default");
+    if (td) {
+      td.addEventListener("click", () => {
+        draft.preset = "";
+        draft.custom = { ...CUSTOM_DEFAULTS };
+        previewDraft();
+      });
+    }
+    if (saveBtn) {
+      saveBtn.addEventListener("click", async () => {
+        saveBtn.disabled = true;
+        try {
+          await commitUitheme(persist, draft);
+          saved.preset = draft.preset;
+          saved.custom = { ...draft.custom };
+          showToast("theme saved");
+        } catch (err) {
+          showToast("couldn't save");
+        }
+        syncUI();
+      });
+    }
+    syncUI();
   }
   function themeCustomHtml(values) {
     const v = { ...storedUithemeCustom(), ...(values || {}) };
@@ -475,53 +535,6 @@
       <button type="button" class="btn ghost sm" id="theme-default">default</button>
     </div>`;
   }
-  function readCustomInputs() {
-    const g = (id) => {
-      const el = document.getElementById(id);
-      return el ? el.value : "";
-    };
-    return {
-      bg: validHex(g("theme-bg-color")) || CUSTOM_DEFAULTS.bg,
-      accent: validHex(g("theme-accent-color")) || CUSTOM_DEFAULTS.accent,
-      text: validHex(g("theme-text-color")) || CUSTOM_DEFAULTS.text,
-    };
-  }
-  function bindUithemeControls(persist) {
-    document.querySelectorAll("#theme-picks .theme-pick").forEach((btn) => {
-      btn.addEventListener("click", async () => {
-        const t = btn.getAttribute("data-uitheme");
-        markPicks("#theme-picks .theme-pick", btn);
-        if (persist) await saveUitheme(t);
-        else applyUitheme(t);
-        showToast("theme set");
-      });
-    });
-    ["theme-bg-color", "theme-accent-color", "theme-text-color"].forEach((id) => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.addEventListener("input", () => {
-        markPicks("#theme-picks .theme-pick", null);
-        const cust = document.getElementById("theme-custom-on");
-        if (cust) cust.hidden = false;
-        applyUitheme("custom", readCustomInputs());
-      });
-      el.addEventListener("change", async () => {
-        if (persist) await saveUitheme("custom", readCustomInputs());
-      });
-    });
-    const td = document.getElementById("theme-default");
-    if (td) {
-      td.addEventListener("click", async () => {
-        markPicks("#theme-picks .theme-pick", null);
-        const cust = document.getElementById("theme-custom-on");
-        if (cust) cust.hidden = true;
-        if (persist) await saveUitheme("");
-        else applyUitheme("");
-        showToast("default look");
-      });
-    }
-  }
-
   function initTheme() {
     // Base look is always dark now. Whole-UI themes (3 presets + custom) recolor from here.
     applyBaseTheme();
@@ -2832,113 +2845,91 @@ var lastSendAt = 0;
         <a class="btn ghost sm" href="#/you">&larr; back</a>
       </div>
       <h1>settings</h1>
-      <section class="settings-block">
-        <h2>appearance</h2>
-        <p class="settings-note">theme — recolors the whole app${persist ? "" : " (this device until you log in)"}</p>
-        <div class="theme-picks" id="theme-picks">${uithemePicksHtml(currentPreset)}</div>
-        ${themeCustomHtml(customVals)}
-      </section>
-      ${persist ? "" : `<section class="settings-block">
-        <h2>account</h2>
-        <p class="hint">log in to sync your look across devices.</p>
-        <div class="row-btns">
-          <a class="btn primary" href="#/login">log in</a>
-          <a class="btn" href="#/register">create an account</a>
+      <section class="settings-group">
+        <h2>look</h2>
+        <div class="settings-sub">
+          <h3>appearance</h3>
+          <p class="settings-note">theme — recolors the whole app${persist ? "" : " (this device until you log in)"}</p>
+          <div class="theme-picks" id="theme-picks">${uithemePicksHtml(currentPreset)}</div>
+          ${themeCustomHtml(customVals)}
+          <div class="row-btns theme-save-row">
+            <button type="button" class="btn primary sm" id="theme-save" disabled>save theme</button>
+          </div>
         </div>
-      </section>`}
-    </div>`);
-    bindUithemeControls(persist);
-    applyUserAppearance(u);
-  }
-
-  async function renderYou() {
-    setNav("you");
-    if (!state.me) {
-      app.innerHTML = fadeWrap(`<div class="settings">
-        <h1>you</h1>
-        <section class="settings-block">
-          <h2>account</h2>
-          <p class="hint">log in to edit your answers and read messages.</p>
+      </section>
+      ${persist ? `<section class="settings-group">
+        <h2>lists</h2>
+        <div class="settings-sub">
+          <h3>bookmarks</h3>
+          <div id="bookmarks-box" class="bookmark-list"><p class="hint">loading…</p></div>
+        </div>
+        <div class="settings-sub">
+          <h3>blocked</h3>
+          <div id="blocks-box" class="block-list"><p class="hint">loading…</p></div>
+        </div>
+      </section>
+      <section class="settings-group">
+        <h2>activity</h2>
+        <div class="settings-sub">
+          <h3>stack</h3>
+          <div class="settings-card">
+            <label class="toggle">quiet mode (pause the stack)
+              <span class="switch">
+                <input type="checkbox" id="quiet-toggle" ${u.quiet_mode ? "checked" : ""} />
+                <span class="knob"></span>
+              </span>
+            </label>
+          </div>
+          <p class="settings-note">quiet hides you from home. threads you already have stay.</p>
+        </div>
+        <div class="settings-sub">
+          <h3>notifications</h3>
+          <div class="settings-card">
+            <button class="btn" type="button" id="enable-push">enable in-app alerts</button>
+          </div>
+          <p class="settings-note">Replies and answers show up on the bell at the top of the screen.</p>
+        </div>
+      </section>
+      <section class="settings-group">
+        <h2>account</h2>
+        <div class="settings-sub">
+          <p class="settings-email">${escapeHtml(u.email || "")}</p>
+          <div class="row-btns">
+            <button class="btn ghost" type="button" id="logout">log out</button>
+            <button class="btn danger ghost" type="button" id="delete-account">delete account</button>
+          </div>
+          <p class="settings-note">Delete permanently wipes your profile, messages, Q&amp;A, and bookmarks.</p>
+        </div>
+        <div class="settings-sub">
+          <h3>your data</h3>
+          <div class="settings-card">
+            <button class="btn" type="button" id="export-data">export my data (JSON)</button>
+          </div>
+        </div>
+      </section>` : `<section class="settings-group">
+        <h2>account</h2>
+        <div class="settings-sub">
+          <p class="hint">log in to sync your look across devices.</p>
           <div class="row-btns">
             <a class="btn primary" href="#/login">log in</a>
             <a class="btn" href="#/register">create an account</a>
           </div>
-        </section>
-        <section class="settings-block">
-          <h2>more</h2>
-          <div class="row-btns">
-            <a class="btn" href="#/settings">settings</a>
-          </div>
-        </section>
-        <section class="settings-block">
-          <h2>legal</h2>
+        </div>
+      </section>`}
+      <section class="settings-group">
+        <h2>about</h2>
+        <div class="settings-sub">
           <p class="fine"><a href="#/terms">terms</a> · <a href="#/privacy">privacy</a></p>
-        </section>
-      </div>`);
-      applyUserAppearance(null);
-      return;
-    }
-    const u = state.me;
-    app.innerHTML = fadeWrap(`<div class="settings">
-      <h1>you</h1>
-      <div class="row-btns settings-link-row">
-        <a class="btn" href="#/settings">settings</a>
-      </div>
-      <section class="settings-block">
-        <h2>bookmarks</h2>
-        <div id="bookmarks-box" class="bookmark-list"><p class="hint">loading…</p></div>
-      </section>
-      <section class="settings-block">
-        <h2>blocked</h2>
-        <div id="blocks-box" class="block-list"><p class="hint">loading…</p></div>
-      </section>
-      <section class="settings-block">
-        <h2>profile</h2>
-        <form id="you-form" class="form">
-          <label>Why are you here? <textarea name="why_here" required maxlength="500">${escapeHtml(u.why_here)}</textarea></label>
-          <label>What are you into right now? <textarea name="into_now" required maxlength="500">${escapeHtml(u.into_now)}</textarea></label>
-          <label>Ask them something. <textarea name="ask_them" required maxlength="500">${escapeHtml(u.ask_them)}</textarea></label>
-          <p id="you-err" class="error" hidden></p>
-          <button class="btn primary" type="submit">save</button>
-        </form>
-      </section>
-      <section class="settings-block">
-        <h2>stack</h2>
-        <div class="settings-card">
-          <label class="toggle">quiet mode (pause the stack)
-            <span class="switch">
-              <input type="checkbox" id="quiet-toggle" ${u.quiet_mode ? "checked" : ""} />
-              <span class="knob"></span>
-            </span>
-          </label>
         </div>
-        <p class="settings-note">quiet hides you from home. threads you already have stay.</p>
-      </section>
-      <section class="settings-block">
-        <h2>notifications</h2>
-        <div class="settings-card">
-          <button class="btn" type="button" id="enable-push">enable in-app alerts</button>
-        </div>
-        <p class="settings-note">Replies and answers show up on the bell at the top of the screen.</p>
-      </section>
-      <section class="settings-block">
-        <h2>account</h2>
-        <p class="settings-email">${escapeHtml(u.email || "")}</p>
-        <div class="row-btns">
-          <button class="btn ghost" type="button" id="logout">log out</button>
-          <button class="btn danger ghost" type="button" id="delete-account">delete account</button>
-        </div>
-        <p class="settings-note">Delete permanently wipes your profile, messages, Q&amp;A, and bookmarks.</p>
-      </section>
-      <section class="settings-block">
-        <h2>more</h2>
-        <div class="settings-card">
-          <button class="btn" type="button" id="export-data">export my data (JSON)</button>
-        </div>
-        <p class="fine"><a href="#/terms">terms</a> · <a href="#/privacy">privacy</a></p>
       </section>
     </div>`);
+    bindUithemeControls(persist);
+    if (persist) bindSettingsSections();
     applyUserAppearance(u);
+  }
+
+  /* bookmarks, blocks, quiet mode, push, account, and export live in settings now. */
+  function bindSettingsSections() {
     (async () => {
       const box = document.getElementById("bookmarks-box");
       if (box) {
@@ -3076,6 +3067,60 @@ var lastSendAt = 0;
         }
       });
     }
+    const logoutBtn = document.getElementById("logout");
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", async () => {
+        await api("/api/auth/logout", { method: "POST", body: "{}" });
+        state.me = null;
+        closeRealtime("inbox");
+        closeRealtime("thread");
+        updateInboxBadgeFrom([]);
+        location.hash = "#/";
+      });
+    }
+  }
+
+  async function renderYou() {
+    setNav("you");
+    if (!state.me) {
+      app.innerHTML = fadeWrap(`<div class="settings">
+        <h1>you</h1>
+        <section class="settings-block">
+          <h2>account</h2>
+          <p class="hint">log in to edit your answers and read messages.</p>
+          <div class="row-btns">
+            <a class="btn primary" href="#/login">log in</a>
+            <a class="btn" href="#/register">create an account</a>
+          </div>
+        </section>
+        <section class="settings-block">
+          <h2>more</h2>
+          <div class="row-btns">
+            <a class="btn" href="#/settings">settings</a>
+          </div>
+        </section>
+      </div>`);
+      applyUserAppearance(null);
+      return;
+    }
+    const u = state.me;
+    app.innerHTML = fadeWrap(`<div class="settings">
+      <h1>you</h1>
+      <div class="row-btns settings-link-row">
+        <a class="btn" href="#/settings">settings</a>
+      </div>
+      <section class="settings-block">
+        <h2>profile</h2>
+        <form id="you-form" class="form">
+          <label>Why are you here? <textarea name="why_here" required maxlength="500">${escapeHtml(u.why_here)}</textarea></label>
+          <label>What are you into right now? <textarea name="into_now" required maxlength="500">${escapeHtml(u.into_now)}</textarea></label>
+          <label>Ask them something. <textarea name="ask_them" required maxlength="500">${escapeHtml(u.ask_them)}</textarea></label>
+          <p id="you-err" class="error" hidden></p>
+          <button class="btn primary" type="submit">save</button>
+        </form>
+      </section>
+    </div>`);
+    applyUserAppearance(u);
     document.getElementById("you-form").addEventListener("submit", async (e) => {
       e.preventDefault();
       const fd = new FormData(e.target);
@@ -3087,7 +3132,6 @@ var lastSendAt = 0;
             why_here: fd.get("why_here"),
             into_now: fd.get("into_now"),
             ask_them: fd.get("ask_them"),
-            quiet_mode: quiet ? quiet.checked : Boolean(u.quiet_mode),
           }),
         });
         state.me = data.user;
@@ -3097,14 +3141,6 @@ var lastSendAt = 0;
         err.hidden = false;
         err.textContent = ex.message;
       }
-    });
-    document.getElementById("logout").addEventListener("click", async () => {
-      await api("/api/auth/logout", { method: "POST", body: "{}" });
-      state.me = null;
-      closeRealtime("inbox");
-      closeRealtime("thread");
-      updateInboxBadgeFrom([]);
-      location.hash = "#/";
     });
   }
 
