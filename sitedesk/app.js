@@ -947,9 +947,9 @@ function showGrabPreview(slug){
   const bySlug = catalogBySlug();
   const l = bySlug[slug] || normalizeLead({ s: slug, n: slug, p: '' });
   const url = siteUrlFor(l);
-  const WAIT_S = 120;
+  const WAIT_MS = 120000;
   let siteOpened = false;
-  let remaining = WAIT_S;
+  let deadline = 0;
   let iv = null;
   function fmt(s){ return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
   let html = '<h2>Review before you grab</h2>' +
@@ -971,19 +971,18 @@ function showGrabPreview(slug){
   function refresh(){
     if(!document.body.contains(confirmBtn)){ stopTimer(); return; }
     if(!siteOpened){ confirmBtn.disabled = true; confirmBtn.textContent = 'Open the site first'; return; }
-    if(remaining > 0){ confirmBtn.disabled = true; confirmBtn.textContent = 'Grab in ' + fmt(remaining); return; }
+    const left = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+    if(left > 0){ confirmBtn.disabled = true; confirmBtn.textContent = 'Grab in ' + fmt(left); return; }
+    stopTimer();
     confirmBtn.disabled = false; confirmBtn.textContent = 'Grab this lead';
   }
   openBtn.addEventListener('click', function(){
     window.open(url, '_blank', 'noopener');
     if(!siteOpened){
       siteOpened = true;
+      deadline = Date.now() + WAIT_MS;
       openBtn.textContent = 'Site opened \u2713 Reopen';
-      iv = setInterval(function(){
-        remaining--;
-        if(remaining <= 0){ remaining = 0; stopTimer(); }
-        refresh();
-      }, 1000);
+      iv = setInterval(refresh, 1000);
     }
     refresh();
   });
@@ -1502,12 +1501,16 @@ async function submitIntake(claim){
     fail(e.message);
     return;
   }
-  await postEvent('staff', 'Intake: ' + business, state.user.name + ' submitted build details for ' + business + '.', 'intake:' + intake.id);
-  clearTreeCache();
-  delete state.claimsBySlug[claim.slug];
-  await refreshMyClaims();
-  await refreshMyIntakes();
-  toast('Sent to builders');
+  try{
+    await postEvent('staff', 'Intake: ' + business, state.user.name + ' submitted build details for ' + business + '.', 'intake:' + intake.id);
+    clearTreeCache();
+    delete state.claimsBySlug[claim.slug];
+    await refreshMyClaims();
+    await refreshMyIntakes();
+    toast('Sent to builders');
+  }catch(e){
+    /* best-effort refresh: still re-render below so the button never sticks */
+  }
   renderApp();
 }
 
