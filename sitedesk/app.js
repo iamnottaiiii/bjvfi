@@ -377,8 +377,22 @@ function feedItemVisible(item){
   if(a === 'all') return true;
   if(state.user && a === state.user.username) return true;
   if(state.user && (state.user.role === 'admin' || state.user.role === 'head') &&
-     (a === 'admin' || a === 'head')) return true;
+     (a === 'admin' || a === 'head' || a === 'staff')) return true;
+  if(state.user && state.user.role === 'builder' && a === 'staff') return true;
   return false;
+}
+
+/* Poll the feed so alerts pop up on the device even while the app sits idle. */
+function startFeedPoll(){
+  try{ if(state.feedPoll) clearInterval(state.feedPoll); }catch(e){}
+  state.feedPoll = setInterval(function(){
+    if(!state.user) return;
+    fetchFeed(true).catch(function(){});
+  }, 30000);
+}
+function stopFeedPoll(){
+  try{ if(state.feedPoll) clearInterval(state.feedPoll); }catch(e){}
+  state.feedPoll = null;
 }
 
 async function fetchFeed(announce){
@@ -673,6 +687,7 @@ async function doLogin(){
     await bootData(true);
     maybeNotifGate();
     renderApp();
+    startFeedPoll();
   }catch(e){
     err.textContent = e.message;
   }finally{
@@ -683,6 +698,7 @@ async function doLogin(){
 }
 
 function logout(){
+  stopFeedPoll();
   clearSession();
   state.user = null; state.myClaims = []; state.myIntakes = [];
   state.feed = []; state.unread = 0; state.feedMaxTs = 0;
@@ -1333,7 +1349,7 @@ async function submitIntake(claim){
     if(btn){ btn.disabled = false; btn.textContent = 'Submit to builders'; }
     return;
   }
-  await postEvent('admin', 'Intake: ' + business, state.user.name + ' submitted build details for ' + business + '.', '');
+  await postEvent('staff', 'Intake: ' + business, state.user.name + ' submitted build details for ' + business + '.', '');
   clearTreeCache();
   delete state.claimsBySlug[claim.slug];
   await refreshMyClaims();
@@ -2193,6 +2209,7 @@ function bootMain(){
     state.user = { username: s.username, role: s.role, name: s.name };
     state.tab = s.role === 'builder' ? 'inbox' : 'queue';
     renderApp();
+    startFeedPoll();
     bootData(false).then(function(){ renderApp(); }).catch(function(e){ toast(e.message); });
   } else {
     if(s && (!SITEDESK_DATA_TOKEN || SITEDESK_DATA_TOKEN === 'PUT_TOKEN_HERE')){
