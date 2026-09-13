@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Caroline's Hair Salon &amp; Day Spa · Pittsford, NY</title>
+<meta name="description" content="Caroline's Hair Salon & Day Spa at 25 State St, Pittsford, NY. Full-service salon and day spa: hair, color, facials, nails, massage. Call (585) 586-6630.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FDF6F1; --paper:#FFFDFB; --blush:#F7E3E0; --rose:#C05B7C; --rose-deep:#8E2F52;
+  --rose-soft:#F9E9EC; --gold:#C99B3F; --gold-soft:#F6E8C8; --ink:#40222F; --ink-soft:#7A5563;
+  --leaf:#5F7A52; --radius:18px;
+  --shadow:0 18px 44px -18px rgba(142,47,82,.28);
+  --shadow-sm:0 10px 26px -12px rgba(142,47,82,.22);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Jost",system-ui,sans-serif;background:var(--cream);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:var(--rose-deep)}
+::selection{background:var(--gold-soft);color:var(--ink)}
+img{max-width:100%}
+.serif{font-family:"Cormorant Garamond",serif}
+.main{margin-left:300px;min-height:100vh}
+.wrap{max-width:1060px;margin:0 auto;padding:0 26px}
+
+/* ---------- side drawer nav ---------- */
+nav.main{
+  position:fixed;top:0;left:0;bottom:0;width:300px;z-index:70;
+  background:linear-gradient(170deg,#3B1D2B 0%,#57263B 60%,#6E3049 100%);
+  color:#F8E9EE;display:flex;flex-direction:column;padding:34px 30px;
+  transition:transform .32s ease;overflow-y:auto;
+}
+.nav-brand{text-decoration:none;color:#fff;display:block;margin-bottom:8px}
+.nav-brand .mark{width:58px;height:58px;margin-bottom:14px}
+.nav-brand strong{font-family:"Cormorant Garamond",serif;font-size:1.65rem;font-weight:700;line-height:1.08;display:block}
+.nav-brand small{display:block;font-size:.66rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold-soft);margin-top:6px;font-weight:600}
+.nav-rule{height:1px;background:rgba(246,232,200,.25);margin:22px 0}
+nav.main .links{display:flex;flex-direction:column;gap:2px}
+nav.main .links a{
+  text-decoration:none;color:#F3DDE5;font-weight:500;font-size:1.02rem;
+  padding:11px 14px;border-radius:12px;transition:background .2s,color .2s,transform .2s;
+  display:flex;align-items:center;gap:12px;
+}
+nav.main .links a .n{font-family:"Cormorant Garamond",serif;font-style:italic;color:var(--gold-soft);font-size:.95rem;width:26px}
+nav.main .links a:hover{background:rgba(255,255,255,.08);transform:translateX(4px)}
+nav.main .links a.active{background:#FDF6F1;color:var(--rose-deep);font-weight:600}
+nav.main .links a.active .n{color:var(--rose-deep)}
+.nav-foot{margin-top:auto;padding-top:22px}
+.nav-foot .call{
+  display:flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;
+  background:var(--gold);color:#3B1D2B;font-weight:700;padding:13px;border-radius:999px;
+  transition:transform .2s,background .2s;
+}
+.nav-foot .call:hover{background:#DDAF55;transform:translateY(-2px)}
+.nav-foot p{font-size:.8rem;color:#D9AEBE;text-align:center;margin-top:12px;line-height:1.5}
+.scrim{position:fixed;inset:0;background:rgba(43,20,31,.5);z-index:65;opacity:0;pointer-events:none;transition:opacity .3s}
+.scrim.show{opacity:1;pointer-events:auto}
+
+/* ---------- mobile top bar ---------- */
+.topbar{display:none;position:sticky;top:0;z-index:60;background:rgba(253,246,241,.94);backdrop-filter:blur(10px);border-bottom:2px solid rgba(192,91,124,.16)}
+.topbar .bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 18px}
+.topbar .tbrand{text-decoration:none;color:var(--ink);font-family:"Cormorant Garamond",serif;font-weight:700;font-size:1.25rem}
+.burger{background:none;border:0;cursor:pointer;padding:10px}
+.burger span{display:block;width:26px;height:3px;border-radius:3px;background:var(--ink);margin:5px 0;transition:.25s}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .32s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- full-bleed hero ---------- */
+.hero{
+  position:relative;min-height:92vh;display:flex;align-items:center;overflow:hidden;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(201,155,63,.30), transparent 34%),
+    radial-gradient(circle at 88% 82%, rgba(192,91,124,.34), transparent 40%),
+    radial-gradient(circle at 70% 12%, rgba(247,227,224,.9), transparent 46%),
+    linear-gradient(160deg,#FBEFE9 0%,#F6DFD8 45%,#EDCFC9 100%);
+}
+.hero::before{
+  content:"";position:absolute;inset:0;opacity:.5;
+  background-image:radial-gradient(rgba(142,47,82,.10) 1.4px, transparent 1.5px);
+  background-size:30px 30px;
+}
+.hero-inner{position:relative;z-index:2;display:grid;grid-template-columns:1.05fr .95fr;gap:44px;align-items:center;width:100%;padding:64px 0}
+.kicker{
+  display:inline-block;font-size:.78rem;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--rose-deep);
+  background:rgba(255,253,251,.75);border:1px solid rgba(192,91,124,.3);padding:9px 20px;border-radius:999px;margin-bottom:22px;
+}
+.hero h1{font-family:"Cormorant Garamond",serif;font-weight:700;font-size:clamp(3rem,6vw,4.8rem);line-height:1.02;letter-spacing:-.5px;margin-bottom:20px}
+.hero h1 em{font-style:italic;color:var(--rose-deep)}
+.lede{font-size:1.12rem;color:var(--ink-soft);max-width:32rem;margin-bottom:30px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:28px}
+.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:600;padding:14px 28px;border-radius:999px;font-size:1rem;transition:transform .18s,background .18s,box-shadow .18s}
+.btn-solid{background:var(--rose-deep);color:#fff;box-shadow:var(--shadow-sm)}
+.btn-solid:hover{background:#6E223F;transform:translateY(-2px)}
+.btn-ghost{background:rgba(255,253,251,.85);color:var(--ink);border:2px solid rgba(64,34,47,.22)}
+.btn-ghost:hover{border-color:var(--rose-deep);color:var(--rose-deep);transform:translateY(-2px)}
+.hours-pill{display:inline-flex;align-items:center;gap:10px;background:var(--ink);color:var(--cream);padding:11px 22px;border-radius:999px;font-weight:500;font-size:.95rem;box-shadow:var(--shadow-sm)}
+.hours-pill .dot{width:10px;height:10px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px rgba(201,155,63,.25)}
+.hero-art{position:relative}
+.stage{
+  position:relative;background:rgba(255,253,251,.6);border:1px solid rgba(255,255,255,.9);
+  border-radius:200px 200px 28px 28px;padding:44px 34px 30px;box-shadow:var(--shadow);
+  backdrop-filter:blur(4px);overflow:hidden;
+}
+.stage svg{width:100%;height:auto;display:block;animation:floaty 7s ease-in-out infinite}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.stamp{
+  position:absolute;bottom:-16px;left:50%;transform:translateX(-50%) rotate(-3deg);background:var(--rose-deep);color:#fff;
+  font-family:"Cormorant Garamond",serif;font-style:italic;font-size:1.05rem;padding:10px 26px;border-radius:999px;
+  box-shadow:var(--shadow-sm);white-space:nowrap;z-index:2;
+}
+.scroll-hint{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);color:var(--ink-soft);font-size:.78rem;letter-spacing:3px;text-transform:uppercase;z-index:2}
+
+/* ---------- sections ---------- */
+section.block{padding:64px 0}
+.sec-head{max-width:44rem;margin:0 auto 44px;text-align:center}
+.sec-head .hand{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:1.5rem;color:var(--rose-deep)}
+h2{font-family:"Cormorant Garamond",serif;font-weight:700;font-size:clamp(2rem,3.8vw,2.9rem);line-height:1.08;margin:8px 0 14px}
+.sec-head p{color:var(--ink-soft)}
+
+/* card wall */
+.card-wall{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.wcard{
+  background:var(--paper);border-radius:var(--radius);padding:32px 28px;box-shadow:var(--shadow-sm);
+  border:1px solid rgba(192,91,124,.12);position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;
+}
+.wcard::after{content:"";position:absolute;top:0;left:0;right:0;height:6px;background:linear-gradient(90deg,var(--rose),var(--gold))}
+.wcard:hover{transform:translateY(-7px);box-shadow:var(--shadow)}
+.wcard .icon{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--rose-soft);margin-bottom:18px}
+.wcard .icon svg{width:30px;height:30px}
+.wcard h3{font-family:"Cormorant Garamond",serif;font-size:1.5rem;margin-bottom:8px}
+.wcard p{color:var(--ink-soft);font-size:.97rem;margin-bottom:14px}
+.wcard a.more{font-weight:600;font-size:.92rem;color:var(--rose-deep);text-decoration:none}
+.wcard a.more:hover{text-decoration:underline}
+
+/* promise band */
+.band{background:linear-gradient(120deg,var(--rose-deep),#5E1E36);border-radius:26px;color:#fff;padding:52px 48px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 20%, rgba(201,155,63,.4), transparent 52%)}
+.band h2{color:#fff;position:relative}
+.band p{color:#F3D9E2;position:relative;max-width:38rem;margin-bottom:8px}
+.band .stats{position:relative;display:flex;gap:38px;flex-wrap:wrap;margin-top:26px}
+.band .stat strong{font-family:"Cormorant Garamond",serif;font-size:2.2rem;display:block;color:var(--gold-soft)}
+.band .stat span{font-size:.85rem;letter-spacing:1.5px;text-transform:uppercase;color:#EBC9D6}
+
+/* ---------- services tabs ---------- */
+.strip{border-radius:26px;padding:54px 48px;color:#fff;position:relative;overflow:hidden;margin:44px 0;box-shadow:var(--shadow)}
+.strip::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(255,255,255,.22), transparent 50%)}
+.strip h2{color:#fff;font-size:clamp(2rem,4vw,3rem);position:relative;margin:4px 0 10px}
+.strip p{color:rgba(255,255,255,.88);max-width:36rem;position:relative}
+.strip .hand{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:1.6rem;position:relative}
+.strip.s-svc{background:linear-gradient(120deg,#8E2F52,#5E1E36)}
+.strip.s-about{background:linear-gradient(120deg,#7A5A2B,#4A3818)}
+.strip.s-gal{background:linear-gradient(120deg,#C05B7C,#8E2F52)}
+.strip.s-rev{background:linear-gradient(120deg,#4A5A6A,#2B3640)}
+.strip.s-visit{background:linear-gradient(120deg,#5F7A52,#3A4D31)}
+.tabs{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:30px}
+.tab-btn{
+  font-family:"Jost",sans-serif;font-weight:600;font-size:.95rem;cursor:pointer;
+  background:var(--paper);color:var(--ink);border:2px solid rgba(192,91,124,.2);
+  padding:11px 22px;border-radius:999px;transition:all .2s;
+}
+.tab-btn:hover{border-color:var(--rose-deep)}
+.tab-btn.on{background:var(--rose-deep);border-color:var(--rose-deep);color:#fff;box-shadow:var(--shadow-sm)}
+.tab-panel{display:none}
+.tab-panel.on{display:block;animation:fadeIn .3s ease}
+.svc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 44px}
+.svc{padding:16px 4px;border-bottom:1px dashed rgba(142,47,82,.3)}
+.svc-top{display:flex;align-items:baseline;gap:10px}
+.svc-top strong{font-size:1.06rem;font-weight:600}
+.svc-top .dots{flex:1;border-bottom:2px dotted rgba(201,155,63,.7);transform:translateY(-4px)}
+.svc-top .price{font-family:"Cormorant Garamond",serif;font-weight:700;font-size:1.15rem;color:var(--rose-deep);white-space:nowrap}
+.svc small{color:var(--ink-soft)}
+.price-note{background:var(--gold-soft);border:2px dashed rgba(122,90,43,.45);border-radius:var(--radius);padding:18px 24px;margin-top:26px;font-size:.95rem;color:#5F4A1E}
+.price-note strong{color:var(--rose-deep)}
+
+/* ---------- gallery: arch tiles ---------- */
+.arch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.arch{
+  border-radius:150px 150px 22px 22px;overflow:hidden;box-shadow:var(--shadow-sm);background:var(--paper);
+  transition:transform .2s;position:relative;border:1px solid rgba(192,91,124,.12);
+}
+.arch:hover{transform:translateY(-6px)}
+.arch .art{aspect-ratio:4/4.6;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.arch .art svg{width:46%;height:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.18));transition:transform .3s}
+.arch:hover .art svg{transform:scale(1.08)}
+.arch .cap{padding:18px 22px 24px;text-align:center}
+.arch .cap strong{font-family:"Cormorant Garamond",serif;font-size:1.25rem;display:block}
+.arch .cap small{color:var(--ink-soft)}
+.arch .soon{position:absolute;top:16px;left:50%;transform:translateX(-50%);background:rgba(255,253,251,.88);font-size:.66rem;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;padding:5px 14px;border-radius:999px;color:var(--ink-soft);z-index:2}
+
+/* ---------- reviews ---------- */
+.rev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.rev{background:var(--paper);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm);position:relative;border:1px solid rgba(192,91,124,.12)}
+.rev .stars{color:var(--gold);font-size:1.15rem;letter-spacing:3px;margin-bottom:12px}
+.rev p{font-size:1.02rem;margin-bottom:14px}
+.rev cite{font-style:normal;font-weight:600;font-size:.85rem;color:var(--rose-deep);letter-spacing:.5px}
+.rev .sample-badge{display:inline-block;background:var(--gold-soft);color:#6B5320;font-size:.68rem;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;padding:4px 14px;border-radius:999px;margin-bottom:12px}
+.rs-strip{margin:26px auto 34px;max-width:640px;background:var(--paper);border:1px solid rgba(201,155,63,.4);border-radius:14px;padding:20px 24px;text-align:center}
+.rs-note{margin:0 0 14px;font-size:.95rem;color:var(--ink-soft);line-height:1.55}
+.rs-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rs-btn{display:inline-block;background:var(--rose-deep);color:#fff;padding:11px 26px;border-radius:999px;font-weight:600;text-decoration:none;font-size:.95rem}
+.rs-btn:hover{background:#6E223F}
+.cta-band{background:linear-gradient(120deg,var(--rose-deep),#5E1E36);border-radius:26px;color:#fff;padding:50px;text-align:center;margin-top:44px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.cta-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 20%, rgba(201,155,63,.4), transparent 50%)}
+.cta-band h2{color:#fff;position:relative}
+.cta-band p{color:#F3D9E2;position:relative;max-width:36rem;margin:0 auto 24px}
+.cta-band .btn-solid{background:#fff;color:var(--rose-deep);position:relative}
+.cta-band .btn-solid:hover{background:var(--gold-soft)}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-bottom:26px}
+.info-card{background:var(--paper);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm);border:1px solid rgba(192,91,124,.12)}
+.info-card h3{font-family:"Cormorant Garamond",serif;font-size:1.5rem;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.info-card h3 svg{width:28px;height:28px}
+.info-card p{color:var(--ink-soft);margin-bottom:8px}
+.info-card a.big{font-family:"Cormorant Garamond",serif;font-size:1.6rem;font-weight:700;color:var(--rose-deep);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.map-card{
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:340px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 46px, rgba(142,47,82,.14) 46px 48px),
+    repeating-linear-gradient(90deg, transparent 0 46px, rgba(142,47,82,.14) 46px 48px),
+    linear-gradient(140deg,#F6DFD8,#EDCFC9);
+  display:flex;align-items:center;justify-content:center;
+}
+.map-pin{text-align:center;background:var(--paper);padding:26px 34px;border-radius:20px;box-shadow:var(--shadow);max-width:78%;position:relative}
+.map-pin::after{content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);border:14px solid transparent;border-top-color:var(--paper);border-bottom:0}
+.map-pin svg{width:44px;height:44px;margin-bottom:8px}
+.map-pin strong{font-family:"Cormorant Garamond",serif;font-size:1.2rem;display:block}
+.map-pin small{color:var(--ink-soft)}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- multi-column footer ---------- */
+footer{background:#2E1622;color:#E9CBD6;margin-top:20px}
+.foot-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:36px;padding:56px 0 32px}
+.foot-grid h4{font-family:"Cormorant Garamond",serif;color:#fff;font-size:1.25rem;margin-bottom:14px}
+.foot-grid p,.foot-grid a{color:#C79AAB;font-size:.95rem}
+.foot-grid a{text-decoration:none;display:inline-block;padding:3px 0}
+.foot-grid a:hover{color:var(--gold-soft)}
+.foot-brand span{font-family:"Cormorant Garamond",serif;font-weight:700;color:#fff;font-size:1.4rem;display:block;margin-bottom:10px}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.12);padding:20px 0 26px;display:flex;justify-content:center;font-size:.85rem;color:#A97E8E}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:1100px){
+  .card-wall{grid-template-columns:1fr 1fr}
+  .arch-grid{grid-template-columns:1fr 1fr}
+  .foot-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:1023px){
+  .main{margin-left:0}
+  nav.main{transform:translateX(-105%)}
+  nav.main.open{transform:none}
+  .topbar{display:block}
+}
+@media(max-width:760px){
+  .hero-inner{grid-template-columns:1fr;padding:48px 0}
+  .hero{min-height:auto}
+  .card-wall,.svc-grid,.rev-grid,.visit-grid,.arch-grid{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr}
+  .strip{padding:40px 28px}
+  .cta-band,.band{padding:36px 24px}
+}
+</style>
+</head>
+<body>
+
+<nav class="main" id="mainNav" aria-label="Main navigation">
+  <a class="nav-brand" href="#home" data-page="home" aria-label="Caroline's Hair Salon and Day Spa, home">
+    <svg class="mark" viewBox="0 0 64 64" role="img" aria-label="Scissors and flower logo"><circle cx="32" cy="32" r="30" fill="none" stroke="#F6E8C8" stroke-width="2"/><circle cx="24" cy="46" r="5" fill="none" stroke="#F6E8C8" stroke-width="2.6"/><circle cx="40" cy="46" r="5" fill="none" stroke="#F6E8C8" stroke-width="2.6"/><path d="M27 43 L44 22 M37 43 L20 22" stroke="#F6E8C8" stroke-width="2.6" stroke-linecap="round"/><circle cx="32" cy="16" r="6" fill="#C05B7C"/><circle cx="32" cy="16" r="2.4" fill="#F6E8C8"/></svg>
+    <strong>Caroline's</strong>
+    <small>Hair Salon · Day Spa</small>
+  </a>
+  <div class="nav-rule"></div>
+  <div class="links">
+    <a href="#home" data-page="home" class="active" aria-current="page"><span class="n">01</span>Home</a>
+    <a href="#services" data-page="services"><span class="n">02</span>Services</a>
+    <a href="#about" data-page="about"><span class="n">03</span>Our Story</a>
+    <a href="#gallery" data-page="gallery"><span class="n">04</span>Gallery</a>
+    <a href="#reviews" data-page="reviews"><span class="n">05</span>Reviews</a>
+    <a href="#visit" data-page="visit"><span class="n">06</span>Visit Us</a>
+  </div>
+  <div class="nav-foot">
+    <a class="call" href="tel:+15855866630">Call (585) 586-6630</a>
+    <p>25 State St<br>Pittsford, NY 14534</p>
+  </div>
+</nav>
+<div class="scrim" id="scrim"></div>
+
+<header class="topbar">
+  <div class="bar">
+    <button class="burger" id="burger" aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button>
+    <a class="tbrand" href="#home" data-page="home">Caroline's</a>
+    <a class="btn btn-solid" style="padding:10px 18px" href="tel:+15855866630">Call</a>
+  </div>
+</header>
+
+<main class="main">
+
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="wrap hero-inner">
+      <div>
+        <span class="kicker">Pittsford Village · Full Service Salon</span>
+        <h1>Beautiful hair.<br><em>Total relaxation.</em><br>One address.</h1>
+        <p class="lede">Caroline's Hair Salon &amp; Day Spa on State Street is where Pittsford comes to unwind: expert cuts and color upstairs in spirit, and a full menu of facials, nails, and massage waiting down the hall.</p>
+        <div class="cta-row">
+          <a class="btn btn-solid" href="#services" data-page="services">Explore Services</a>
+          <a class="btn btn-ghost" href="tel:+15855866630">Call (585) 586-6630</a>
+        </div>
+        <span class="hours-pill"><span class="dot"></span>Call for hours</span>
+      </div>
+      <div class="hero-art">
+        <div class="stage">
+          <svg viewBox="0 0 320 360" role="img" aria-label="Illustration of a salon styling chair and arched mirror">
+            <ellipse cx="160" cy="330" rx="110" ry="14" fill="#8E2F52" opacity=".12"/>
+            <path d="M60 300 L60 120 Q60 40 160 40 Q260 40 260 120 L260 300" fill="#F6E8C8" stroke="#C05B7C" stroke-width="5"/>
+            <path d="M80 300 L80 130 Q80 60 160 60 Q240 60 240 130 L240 300" fill="#FDF6F1" opacity=".8"/>
+            <circle cx="160" cy="150" r="34" fill="#F7E3E0"/>
+            <path d="M126 150 q34 -46 68 0 q-34 20 -68 0" fill="#8E2F52" opacity=".85"/>
+            <rect x="118" y="196" width="84" height="14" rx="7" fill="#C05B7C"/>
+            <rect x="140" y="210" width="40" height="70" rx="10" fill="#8E2F52"/>
+            <path d="M110 290 h100 l14 26 h-128 z" fill="#C99B3F"/>
+            <rect x="60" y="288" width="200" height="12" rx="6" fill="#40222F"/>
+            <path d="M96 96 q12 -18 24 0 M200 96 q12 -18 24 0" stroke="#C05B7C" stroke-width="4" fill="none" stroke-linecap="round"/>
+            <circle cx="252" cy="70" r="10" fill="#C05B7C" opacity=".55"/>
+            <circle cx="70" cy="230" r="8" fill="#C99B3F" opacity=".6"/>
+            <circle cx="246" cy="210" r="6" fill="#5F7A52" opacity=".55"/>
+            <path d="M40 320 q40 -30 80 0 t80 0 t80 0" stroke="#8E2F52" stroke-width="3" fill="none" opacity=".35" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="stamp">Hair, skin, nails &amp; massage</div>
+      </div>
+    </div>
+    <div class="scroll-hint">scroll</div>
+  </div>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="hand">What we do best</span>
+        <h2>A full menu of<br>head-to-toe care</h2>
+        <p>One appointment or a whole spa day. Every service starts with a consultation so you leave with exactly the look you pictured.</p>
+      </div>
+      <div class="card-wall">
+        <div class="wcard reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#C05B7C" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="7" r="2.6"/><circle cx="6" cy="17" r="2.6"/><path d="M8 8.5L20 19M8 15.5L20 5"/></svg></div>
+          <h3>Cuts &amp; Styling</h3>
+          <p>Precision cuts, blowouts, and special-occasion styling for women, men, and kids.</p>
+          <a class="more" href="#services" data-page="services">See hair services</a>
+        </div>
+        <div class="wcard reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#8E2F52" stroke-width="2" stroke-linecap="round"><path d="M12 3c3 4 6 7 6 11a6 6 0 01-12 0c0-4 3-7 6-11z"/><path d="M9 14a3 3 0 003 3"/></svg></div>
+          <h3>Color &amp; Highlights</h3>
+          <p>Rich single-process color, dimensional highlights, balayage, and glossing treatments.</p>
+          <a class="more" href="#services" data-page="services">See color services</a>
+        </div>
+        <div class="wcard reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#C99B3F" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.5 2.5"/></svg></div>
+          <h3>Facials &amp; Skin</h3>
+          <p>Custom facials, deep cleansing, and glow treatments tailored to your skin.</p>
+          <a class="more" href="#services" data-page="services">See spa services</a>
+        </div>
+        <div class="wcard reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#5F7A52" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21v-4a4 4 0 014-4h2a4 4 0 014 4v4"/><path d="M9 11V6a3 3 0 016 0v5"/></svg></div>
+          <h3>Nails</h3>
+          <p>Manicures, pedicures, and polished finishes in a calm, clean setting.</p>
+          <a class="more" href="#services" data-page="services">See nail services</a>
+        </div>
+        <div class="wcard reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#C05B7C" stroke-width="2" stroke-linecap="round"><path d="M4 14c2-1 4-1 6 0s4 1 6 0 4-1 4 1-2 4-6 4H8c-3 0-5-3-4-5z"/><path d="M12 14V6M9 8l3-2 3 2"/></svg></div>
+          <h3>Massage</h3>
+          <p>Swedish, deep tissue, and hot stone sessions that melt the week away.</p>
+          <a class="more" href="#services" data-page="services">See massage</a>
+        </div>
+        <div class="wcard reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#8E2F52" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M8 8V6a4 4 0 018 0v2M12 12v4M10 14h4"/></svg></div>
+          <h3>Bridal &amp; Packages</h3>
+          <p>Wedding parties, spa-day packages, and gift certificates for someone you love.</p>
+          <a class="more" href="#services" data-page="services">See packages</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" style="padding-top:0">
+    <div class="wrap">
+      <div class="band reveal">
+        <h2>Why Pittsford books with Caroline's</h2>
+        <p>A neighborhood salon with a day-spa heart: the friendliness of a village shop, the service menu of a destination spa, and stylists who listen before they snip.</p>
+        <div class="stats">
+          <div class="stat"><strong>6</strong><span>Service menus</span></div>
+          <div class="stat"><strong>1</strong><span>Village location</span></div>
+          <div class="stat"><strong>0</strong><span>Rushed appointments</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="hand">First visit?</span>
+        <h2>Here's how it works</h2>
+      </div>
+      <div class="card-wall">
+        <div class="wcard reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#C05B7C" stroke-width="2" stroke-linecap="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg></div>
+          <h3>1. Call to book</h3>
+          <p>Reach us at (585) 586-6630. Tell us what you have in mind and we will match you with the right stylist or therapist.</p>
+        </div>
+        <div class="wcard reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#8E2F52" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 01-8 8H5l-2 2V12a8 8 0 018-8h2a8 8 0 018 8z"/></svg></div>
+          <h3>2. Consult first</h3>
+          <p>Every service begins with a real conversation about your hair, skin, and goals. No guesswork, no surprises.</p>
+        </div>
+        <div class="wcard reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#C99B3F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg></div>
+          <h3>3. Leave glowing</h3>
+          <p>Walk out of our State Street door feeling like the best version of yourself. That is the whole point.</p>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:36px" class="reveal">
+        <a class="btn btn-solid" href="#visit" data-page="visit">Plan your visit</a>
+      </div>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div class="strip s-svc">
+      <span class="hand">Our menu</span>
+      <h2>Services &amp; spa rituals</h2>
+      <p>Hair, color, skin, nails, and massage, all under one village roof. Tap a category to browse.</p>
+    </div>
+
+    <div class="tabs reveal" role="tablist" aria-label="Service categories">
+      <button type="button" class="tab-btn on" data-tab="hair" role="tab" aria-selected="true">Hair</button>
+      <button type="button" class="tab-btn" data-tab="color" role="tab" aria-selected="false">Color</button>
+      <button type="button" class="tab-btn" data-tab="skin" role="tab" aria-selected="false">Skin &amp; Facials</button>
+      <button type="button" class="tab-btn" data-tab="nails" role="tab" aria-selected="false">Nails</button>
+      <button type="button" class="tab-btn" data-tab="massage" role="tab" aria-selected="false">Massage</button>
+      <button type="button" class="tab-btn" data-tab="packages" role="tab" aria-selected="false">Packages</button>
+    </div>
+
+    <div class="tab-panel on" id="tab-hair" role="tabpanel">
+      <div class="svc-grid">
+        <div class="svc"><div class="svc-top"><strong>Women's cut &amp; style</strong><span class="dots"></span><span class="price">from $55*</span></div><small>Consultation, precision cut, blowout finish.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Men's cut</strong><span class="dots"></span><span class="price">from $32*</span></div><small>Tailored cut with hot-lather neckline cleanup.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Kids' cut (12 &amp; under)</strong><span class="dots"></span><span class="price">from $28*</span></div><small>Patient, friendly first-chair experience.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Blowout</strong><span class="dots"></span><span class="price">from $40*</span></div><small>Smooth, bouncy, event-ready hair.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Updo / special occasion</strong><span class="dots"></span><span class="price">from $65*</span></div><small>Weddings, proms, and nights that matter.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Deep conditioning treatment</strong><span class="dots"></span><span class="price">from $25*</span></div><small>Restorative mask with scalp massage.</small></div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-color" role="tabpanel">
+      <div class="svc-grid">
+        <div class="svc"><div class="svc-top"><strong>Single-process color</strong><span class="dots"></span><span class="price">from $70*</span></div><small>Rich, even coverage root to tip.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Partial highlights</strong><span class="dots"></span><span class="price">from $95*</span></div><small>Face-framing brightness and dimension.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Full highlights</strong><span class="dots"></span><span class="price">from $130*</span></div><small>All-over multi-dimensional color.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Balayage</strong><span class="dots"></span><span class="price">from $150*</span></div><small>Hand-painted, sun-kissed grow-out.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Gloss / toner</strong><span class="dots"></span><span class="price">from $35*</span></div><small>Shine, tone correction, color refresh.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Color correction</strong><span class="dots"></span><span class="price">by consult*</span></div><small>Bring us your color emergency. We can help.</small></div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-skin" role="tabpanel">
+      <div class="svc-grid">
+        <div class="svc"><div class="svc-top"><strong>Signature facial</strong><span class="dots"></span><span class="price">from $85*</span></div><small>Cleanse, exfoliate, mask, and moisturize, customized.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Deep-cleansing facial</strong><span class="dots"></span><span class="price">from $95*</span></div><small>Extractions and clarity for congested skin.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Anti-aging treatment</strong><span class="dots"></span><span class="price">from $110*</span></div><small>Firming masks and targeted serums.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Back facial</strong><span class="dots"></span><span class="price">from $75*</span></div><small>Deep clean for hard-to-reach skin.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Brow shaping</strong><span class="dots"></span><span class="price">from $18*</span></div><small>Waxing or tweezing, shaped to your face.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Makeup application</strong><span class="dots"></span><span class="price">from $50*</span></div><small>Event makeup with a skin-first approach.</small></div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-nails" role="tabpanel">
+      <div class="svc-grid">
+        <div class="svc"><div class="svc-top"><strong>Classic manicure</strong><span class="dots"></span><span class="price">from $30*</span></div><small>Shape, cuticle care, polish.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Spa manicure</strong><span class="dots"></span><span class="price">from $45*</span></div><small>Exfoliation, masque, and extended massage.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Classic pedicure</strong><span class="dots"></span><span class="price">from $48*</span></div><small>Soak, scrub, shape, and polish.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Spa pedicure</strong><span class="dots"></span><span class="price">from $65*</span></div><small>Hot towels, callus care, and deep hydration.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Gel polish add-on</strong><span class="dots"></span><span class="price">from $20*</span></div><small>Chip-resistant color that lasts for weeks.</small></div>
+        <div class="svc"><div class="svc-top"><strong>French finish</strong><span class="dots"></span><span class="price">from $10*</span></div><small>The timeless white-tip look.</small></div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-massage" role="tabpanel">
+      <div class="svc-grid">
+        <div class="svc"><div class="svc-top"><strong>Swedish massage · 60 min</strong><span class="dots"></span><span class="price">from $90*</span></div><small>Long, flowing strokes for full-body calm.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Deep tissue · 60 min</strong><span class="dots"></span><span class="price">from $105*</span></div><small>Targeted work for stubborn knots.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Hot stone · 75 min</strong><span class="dots"></span><span class="price">from $125*</span></div><small>Warm stones melt tension away.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Couples massage · 60 min</strong><span class="dots"></span><span class="price">from $180*</span></div><small>Side-by-side relaxation for two.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Chair massage · 15 min</strong><span class="dots"></span><span class="price">from $25*</span></div><small>Quick reset for neck, shoulders, and back.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Prenatal massage · 60 min</strong><span class="dots"></span><span class="price">from $100*</span></div><small>Gentle, supportive care for moms-to-be.</small></div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-packages" role="tabpanel">
+      <div class="svc-grid">
+        <div class="svc"><div class="svc-top"><strong>The Caroline's Day</strong><span class="dots"></span><span class="price">from $240*</span></div><small>Cut and style, signature facial, spa mani-pedi, lunch break included.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Bridal party package</strong><span class="dots"></span><span class="price">by consult*</span></div><small>Hair, makeup, and nails for the whole party, on site or in salon.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Mommy &amp; me mani-pedi</strong><span class="dots"></span><span class="price">from $80*</span></div><small>A sweet shared appointment for two.</small></div>
+        <div class="svc"><div class="svc-top"><strong>Gift certificates</strong><span class="dots"></span><span class="price">any amount</span></div><small>Available for every service and package. Call to arrange.</small></div>
+      </div>
+    </div>
+
+    <div class="price-note reveal">
+      <strong>*Sample pricing:</strong> prices above are samples to give you an idea. Final pricing depends on hair length, stylist level, and service details, and is always confirmed before we begin. Call <a href="tel:+15855866630">(585) 586-6630</a> for an exact quote.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-about">
+  <div class="wrap">
+    <div class="strip s-about">
+      <span class="hand">Our story</span>
+      <h2>A village salon<br>with a spa soul</h2>
+      <p>Caroline's brings together two things Pittsford loves: a friendly neighborhood hair salon and a true day spa, in one welcoming space on State Street.</p>
+    </div>
+
+    <div class="card-wall" style="margin-bottom:56px">
+      <div class="wcard reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#C05B7C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div>
+        <h3>People first</h3>
+        <p>Every appointment starts with listening. Your stylist or therapist learns what you want, what you have tried, and what your week looks like before a single snip or stroke.</p>
+      </div>
+      <div class="wcard reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#8E2F52" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg></div>
+        <h3>Real expertise</h3>
+        <p>From precision cutting to advanced color and esthetics, our team trains continuously so the village gets big-city skill without the drive.</p>
+      </div>
+      <div class="wcard reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#C99B3F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21C7 17 3 13.5 3 9.5 3 7 5 5 7.5 5c1.7 0 3.3.9 4.5 2.6C13.2 5.9 14.8 5 16.5 5 19 5 21 7 21 9.5c0 4-4 7.5-9 11.5z"/></svg></div>
+        <h3>A place to exhale</h3>
+        <p>Soft light, calm music, warm towels. Whether you are here for a quick trim or a full spa day, you will feel the day slow down the moment you arrive.</p>
+      </div>
+    </div>
+
+    <div class="band reveal">
+      <h2>Come as you are. Leave glowing.</h2>
+      <p>That is the whole philosophy at Caroline's. No judgment, no rush, no one-size-fits-all. Just skilled hands, honest advice, and a chair that is always warm for you.</p>
+      <div style="margin-top:26px;position:relative">
+        <a class="btn btn-solid" style="background:#fff;color:var(--rose-deep)" href="#visit" data-page="visit">Plan your visit</a>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div class="strip s-gal">
+      <span class="hand">The look book</span>
+      <h2>Styles we love</h2>
+      <p>Artistic previews of the work our chairs see every day. Real photos of our salon and our clients' transformations are on the way.</p>
+    </div>
+
+    <div class="arch-grid">
+      <div class="arch reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(150deg,#F7E3E0,#EDCFC9)">
+          <svg viewBox="0 0 100 120"><path d="M30 110 V55 q0 -35 20 -35 q20 0 20 35 V110" fill="#8E2F52"/><path d="M30 60 q20 -14 40 0" stroke="#C99B3F" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="50" cy="26" r="12" fill="#F6E8C8"/></svg>
+        </div>
+        <div class="cap"><strong>Signature Blowout</strong><small>Smooth, bouncy, polished</small></div>
+      </div>
+      <div class="arch reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(150deg,#F6E8C8,#EAD3AC)">
+          <svg viewBox="0 0 100 120"><path d="M32 110 V50 q18 -30 36 0 V110" fill="#5A3A24"/><path d="M38 70 q12 -10 24 0 M38 88 q12 -10 24 0" stroke="#C99B3F" stroke-width="3.5" fill="none" stroke-linecap="round"/><circle cx="50" cy="24" r="12" fill="#F6E8C8"/></svg>
+        </div>
+        <div class="cap"><strong>Balayage</strong><small>Hand-painted dimension</small></div>
+      </div>
+      <div class="arch reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(150deg,#E9D9F2,#CBB8E0)">
+          <svg viewBox="0 0 100 120"><ellipse cx="50" cy="72" rx="26" ry="34" fill="#3B1D2B"/><path d="M34 50 q16 -16 32 0" stroke="#F6E8C8" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="50" cy="26" r="12" fill="#F6E8C8"/><path d="M44 100 q6 6 12 0" stroke="#C05B7C" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>Bridal Updo</strong><small>Elegant occasion styling</small></div>
+      </div>
+      <div class="arch reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(150deg,#D9EAF6,#B8D2E8)">
+          <svg viewBox="0 0 100 120"><ellipse cx="50" cy="66" rx="24" ry="30" fill="#FDF6F1" stroke="#C05B7C" stroke-width="3"/><circle cx="42" cy="60" r="3" fill="#8E2F52"/><circle cx="58" cy="60" r="3" fill="#8E2F52"/><path d="M42 74 q8 8 16 0" stroke="#8E2F52" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M50 36 q0 -12 10 -14 M50 36 q0 -12 -10 -14" stroke="#5F7A52" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>Signature Facial</strong><small>Customized glow treatment</small></div>
+      </div>
+      <div class="arch reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(150deg,#F9D9E2,#EFB9C9)">
+          <svg viewBox="0 0 100 120"><path d="M30 100 q20 -26 40 0" stroke="#C05B7C" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M34 92 q16 -18 32 0 M38 84 q12 -12 24 0" stroke="#8E2F52" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="50" cy="46" r="10" fill="#F6E8C8"/><path d="M50 56 v14" stroke="#C99B3F" stroke-width="4" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>Spa Pedicure</strong><small>Soak, scrub, and polish</small></div>
+      </div>
+      <div class="arch reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(150deg,#DDE8D4,#BCCDAE)">
+          <svg viewBox="0 0 100 120"><rect x="30" y="52" width="40" height="56" rx="20" fill="#FDF6F1" stroke="#5F7A52" stroke-width="3"/><path d="M40 70 q10 -8 20 0 M40 84 q10 -8 20 0" stroke="#5F7A52" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="50" cy="34" r="9" fill="#C05B7C" opacity=".7"/></svg>
+        </div>
+        <div class="cap"><strong>Hot Stone Massage</strong><small>Warm, deep relaxation</small></div>
+      </div>
+    </div>
+
+    <div class="price-note reveal" style="margin-top:28px">
+      <strong>Coming soon:</strong> real photos of our salon, our team, and client transformations. The illustrations above are artistic previews.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div class="strip s-rev">
+      <span class="hand">Kind words</span>
+      <h2>What guests say</h2>
+      <p>We are building our review collection. The notes below are samples of the experience we aim to deliver at every visit.</p>
+    </div>
+    <div class="rs-strip">
+      <p class="rs-note">Review themes on this page are paraphrased from public feedback. Open the source to read current reviews and ratings.</p>
+      <div class="rs-links"><a class="rs-btn" href="https://www.google.com/maps/search/?api=1&query=Caroline%27s+Hair+Salon+%26+Day+Spa+25+State+St+Pittsford+NY" target="_blank" rel="noopener">See reviews on Google</a></div>
+    </div>
+
+    <div class="rev-grid">
+      <div class="rev reveal">
+        <span class="sample-badge">Sample</span>
+        <div class="stars">★★★★★</div>
+        <p>"My stylist really listened. The cut, the color, the whole experience, I will not trust my hair to anyone else."</p>
+        <cite>Sample guest feedback</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="sample-badge">Sample</span>
+        <div class="stars">★★★★★</div>
+        <p>"The facial was pure bliss. Calm room, warm towels, and my skin glowed for days afterward."</p>
+        <cite>Sample guest feedback</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="sample-badge">Sample</span>
+        <div class="stars">★★★★★</div>
+        <p>"Booked a spa day for my birthday: massage, mani-pedi, and a blowout. Best gift I have given myself in years."</p>
+        <cite>Sample guest feedback</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="sample-badge">Sample</span>
+        <div class="stars">★★★★★</div>
+        <p>"Friendly from the front desk to the shampoo bowl. Fair prices, zero rush, beautiful result."</p>
+        <cite>Sample guest feedback</cite>
+      </div>
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Visited us? Tell Pittsford.</h2>
+      <p>Your review helps a local salon and day spa keep growing. It takes a minute, and it means the world to our team.</p>
+      <a class="btn btn-solid" href="https://www.google.com/maps/search/?api=1&query=Caroline%27s+Hair+Salon+%26+Day+Spa+25+State+St+Pittsford+NY" target="_blank" rel="noopener">Leave us a Google review</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="wrap">
+    <div class="strip s-visit">
+      <span class="hand">Visit us</span>
+      <h2>Find us on<br>State Street</h2>
+      <p>We are in the heart of Pittsford village, an easy stroll from the shops and cafes on Main Street.</p>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#C05B7C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Find us</h3>
+        <p><strong>Caroline's Hair Salon &amp; Day Spa</strong><br>25 State St<br>Pittsford, NY 14534</p>
+        <p>Village parking nearby.<br>Walk-ins welcome when chairs allow.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#C05B7C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg> Call us</h3>
+        <p>Appointments, packages, gift certificates:</p>
+        <a class="big" href="tel:+15855866630">(585) 586-6630</a>
+        <p style="margin-top:10px">Please call ahead for Saturday appointments, they go fast.</p>
+      </div>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#C05B7C" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Hours</h3>
+        <p><strong>Call for hours:</strong> our schedule varies by service and season.</p>
+        <p>Reach us at <a href="tel:+15855866630">(585) 586-6630</a> and we will find a time that fits your week, including early and late appointments when available.</p>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <svg viewBox="0 0 24 24" fill="#8E2F52"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#FDF6F1"/></svg>
+          <strong>25 State St</strong>
+          <small>Pittsford, NY 14534</small><br>
+          <a class="btn btn-solid" href="https://www.google.com/maps/search/?api=1&query=Caroline%27s+Hair+Salon+%26+Day+Spa+25+State+St+Pittsford+NY" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand"><span>Caroline's</span></div>
+        <p>Hair salon and day spa in the village of Pittsford, NY. Cuts, color, facials, nails, and massage, all under one roof on State Street.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <a href="#home" data-page="home">Home</a><br>
+        <a href="#services" data-page="services">Services</a><br>
+        <a href="#about" data-page="about">Our Story</a><br>
+        <a href="#gallery" data-page="gallery">Gallery</a><br>
+        <a href="#reviews" data-page="reviews">Reviews</a>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <p>25 State St<br>Pittsford, NY 14534<br><a href="tel:+15855866630">(585) 586-6630</a></p>
+      </div>
+      <div>
+        <h4>Hours</h4>
+        <p>Call for hours:<br><a href="tel:+15855866630">(585) 586-6630</a></p>
+        <p style="margin-top:10px">Gift certificates available.</p>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© Caroline's Hair Salon & Day Spa</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+  var scrim = document.getElementById("scrim");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+    if(scrim){ scrim.classList.remove("show"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+      if(scrim){ scrim.classList.toggle("show", open); }
+    });
+  }
+  if(scrim){
+    scrim.addEventListener("click", function(){ closeMenu(); });
+  }
+
+  var tabBtns = document.querySelectorAll(".tab-btn");
+  var panels = document.querySelectorAll(".tab-panel");
+  for(var t = 0; t < tabBtns.length; t++){
+    tabBtns[t].addEventListener("click", function(e){
+      e.preventDefault();
+      for(var a = 0; a < tabBtns.length; a++){
+        tabBtns[a].classList.remove("on");
+        tabBtns[a].setAttribute("aria-selected", "false");
+      }
+      for(var b = 0; b < panels.length; b++){
+        panels[b].classList.remove("on");
+      }
+      this.classList.add("on");
+      this.setAttribute("aria-selected", "true");
+      var panel = document.getElementById("tab-" + this.getAttribute("data-tab"));
+      if(panel){ panel.classList.add("on"); }
+    });
+  }
+
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
