@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shampoo · Hair Salon, Staten Island, NY</title>
+<meta name="description" content="Shampoo, a full service hair salon at 660 Bay St, Staten Island, NY. Haircuts, color, highlights, keratin treatments, perms and blowouts. Call (718) 876-7100.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{
+  --plum:#3B1F4E; --plum-deep:#241230; --plum-ink:#170C1F;
+  --aqua:#39C1C1; --aqua-soft:#D9F2F1; --aqua-line:rgba(57,193,193,.35);
+  --blush:#FFE9EC; --cream:#FCFAF7; --paper:#FFFFFF;
+  --ink:#2C2530; --ink-soft:#6E6475;
+  --radius:20px;
+  --shadow:0 24px 60px -24px rgba(59,31,78,.35);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Outfit",system-ui,sans-serif;background:var(--cream);color:var(--ink);line-height:1.7;-webkit-font-smoothing:antialiased}
+a{color:var(--plum)}
+::selection{background:var(--aqua);color:var(--plum-deep)}
+.wrap{max-width:1140px;margin:0 auto;padding:0 28px}
+
+/* ---------- top bar + side drawer nav ---------- */
+header.site{position:sticky;top:0;z-index:60;background:rgba(252,250,247,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--aqua-line)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--plum-deep)}
+.brand svg{width:44px;height:44px;flex:none}
+.brand-name{font-weight:800;font-size:1.3rem;letter-spacing:.5px}
+.brand-name small{display:block;font-weight:600;font-size:.62rem;letter-spacing:3px;text-transform:uppercase;color:var(--aqua)}
+.burger{display:inline-flex;flex-direction:column;justify-content:center;background:var(--plum);border:0;cursor:pointer;padding:12px 14px;border-radius:12px}
+.burger span{display:block;width:24px;height:3px;border-radius:3px;background:#fff;margin:3px 0;transition:.25s}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:320px;max-width:86vw;background:var(--plum-deep);color:#fff;z-index:80;transform:translateX(-105%);transition:transform .32s ease;padding:28px;display:flex;flex-direction:column;gap:6px}
+.drawer.open{transform:translateX(0)}
+.drawer .close-x{align-self:flex-end;background:none;border:0;color:#fff;font-size:1.6rem;cursor:pointer;padding:6px}
+.drawer a.dlink{display:block;text-decoration:none;color:#fff;font-weight:600;font-size:1.15rem;padding:14px 16px;border-radius:12px;transition:background .2s}
+.drawer a.dlink:hover,.drawer a.dlink.active{background:rgba(57,193,193,.22)}
+.drawer .dcall{margin-top:auto;background:var(--aqua);color:var(--plum-deep);text-align:center;font-weight:800;padding:14px;border-radius:14px;text-decoration:none}
+.scrim{position:fixed;inset:0;background:rgba(23,12,31,.5);z-index:70;opacity:0;pointer-events:none;transition:opacity .3s}
+.scrim.show{opacity:1;pointer-events:auto}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .35s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- split hero ---------- */
+.hero-split{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;padding:84px 0 72px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:.74rem;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--plum);background:var(--aqua-soft);padding:8px 18px;border-radius:999px;margin-bottom:22px}
+h1{font-weight:900;font-size:clamp(2.6rem,5.6vw,4.4rem);line-height:1.02;letter-spacing:-1px;color:var(--plum-deep);margin-bottom:18px}
+h1 .serif{font-family:"Instrument Serif",serif;font-weight:400;font-style:italic;color:#2A8E8E}
+.lede{font-size:1.1rem;color:var(--ink-soft);max-width:30rem;margin-bottom:28px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:26px}
+.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;padding:14px 28px;border-radius:999px;font-size:1rem;transition:transform .18s,box-shadow .18s}
+.btn-solid{background:var(--plum);color:#fff;box-shadow:0 14px 30px -12px rgba(59,31,78,.55)}
+.btn-solid:hover{transform:translateY(-2px)}
+.btn-ghost{background:var(--paper);color:var(--plum-deep);border:2px solid var(--aqua-line)}
+.btn-ghost:hover{border-color:var(--aqua);transform:translateY(-2px)}
+.hours-pill{display:inline-flex;align-items:center;gap:10px;background:var(--plum-deep);color:#fff;padding:10px 22px;border-radius:999px;font-weight:600;font-size:.95rem}
+.bubble-art{position:relative}
+.bubble-art .card{background:linear-gradient(150deg,var(--plum),var(--plum-ink));border-radius:32px;padding:44px;box-shadow:var(--shadow);overflow:hidden;position:relative}
+.bubble-art .card::before{content:"";position:absolute;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,rgba(57,193,193,.45),transparent 70%);top:-90px;right:-90px}
+.bubble-art .card::after{content:"";position:absolute;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(255,233,236,.3),transparent 70%);bottom:-60px;left:-50px}
+.bubble-art svg{position:relative;z-index:1;width:100%;height:auto;display:block}
+.float-chip{position:absolute;z-index:2;background:#fff;border-radius:16px;box-shadow:var(--shadow);padding:12px 18px;font-weight:700;font-size:.85rem;color:var(--plum-deep);display:flex;align-items:center;gap:10px}
+.float-chip .dot{width:10px;height:10px;border-radius:50%;background:var(--aqua)}
+.chip-a{top:26px;right:18px;animation:floaty 5s ease-in-out infinite}
+.chip-b{bottom:30px;left:14px;animation:floaty 6s ease-in-out infinite reverse}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+
+/* ---------- alternating bands ---------- */
+.band{padding:64px 0}
+.band.tint{background:var(--paper);border-top:1px solid var(--aqua-line);border-bottom:1px solid var(--aqua-line)}
+.band-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.band.tint .band-grid > *:first-child{order:2}
+h2{font-weight:800;font-size:clamp(1.7rem,3.4vw,2.4rem);line-height:1.15;letter-spacing:-.5px;color:var(--plum-deep);margin-bottom:16px}
+h2 .serif{font-family:"Instrument Serif",serif;font-weight:400;font-style:italic;color:#2A8E8E}
+.band p{color:var(--ink-soft);margin-bottom:14px}
+.check{display:flex;gap:12px;align-items:flex-start;margin:12px 0}
+.check svg{width:22px;height:22px;flex:none;margin-top:3px}
+.check span{color:var(--ink)}
+.mini-art{border-radius:var(--radius);padding:40px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow)}
+.mini-art svg{width:110px;height:110px}
+
+/* ---------- service cards ---------- */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;padding:64px 0}
+.svc{background:var(--paper);border:1px solid var(--aqua-line);border-radius:var(--radius);padding:30px;transition:transform .2s,box-shadow .2s}
+.svc:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+.svc .ico{width:56px;height:56px;border-radius:16px;background:var(--aqua-soft);display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+.svc .ico svg{width:30px;height:30px}
+.svc h3{font-size:1.15rem;color:var(--plum-deep);margin-bottom:8px}
+.svc p{font-size:.92rem;color:var(--ink-soft)}
+.svc .sample{display:inline-block;margin-top:14px;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#2A8E8E;background:var(--aqua-soft);padding:7px 14px;border-radius:999px}
+.note{font-size:.85rem;color:var(--ink-soft);background:var(--paper);border-left:4px solid var(--aqua);padding:14px 18px;border-radius:0 12px 12px 0;margin:0 0 64px}
+
+/* ---------- masonry gallery ---------- */
+.masonry{columns:3;column-gap:20px;padding:56px 0}
+.tile{break-inside:avoid;margin-bottom:20px;border-radius:var(--radius);position:relative;overflow:hidden;border:1px solid var(--aqua-line);display:flex;align-items:center;justify-content:center;padding:34px;text-align:center}
+.tile svg{width:64px;height:64px;opacity:.9}
+.tile .badge{position:absolute;top:12px;left:12px;background:var(--plum-deep);color:#fff;font-size:.66rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:6px 12px;border-radius:999px}
+.tile figcaption{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(23,12,31,.85));color:#fff;padding:36px 16px 14px;font-size:.88rem;font-weight:600}
+.tall{height:340px}
+.med{height:250px}
+.short{height:200px}
+.t1{background:linear-gradient(150deg,#4A2A63,#241230)}
+.t2{background:linear-gradient(150deg,#2A8E8E,#123F3F)}
+.t3{background:linear-gradient(150deg,#6B4A7A,#33203F)}
+.t4{background:linear-gradient(150deg,#3AA5A5,#17494A)}
+.t5{background:linear-gradient(150deg,#5A3A73,#2A1A38)}
+.t6{background:linear-gradient(150deg,#4E7FA0,#1E3547)}
+
+/* ---------- reviews ---------- */
+.rev{background:var(--paper);border:1px solid var(--aqua-line);border-radius:var(--radius);padding:28px;margin-bottom:18px}
+.rev .stars{color:#E8A93D;font-size:1.1rem;letter-spacing:3px;margin-bottom:10px}
+.rev p{color:var(--ink);margin-bottom:10px}
+.rev .meta{font-size:.8rem;color:var(--ink-soft);text-transform:uppercase;letter-spacing:1.5px}
+.src-links{display:flex;flex-wrap:wrap;gap:12px;margin:26px 0}
+.src-links a{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:700;color:var(--plum-deep);background:var(--paper);border:2px solid var(--aqua-line);padding:12px 22px;border-radius:999px;transition:transform .18s,border-color .18s}
+.src-links a:hover{transform:translateY(-2px);border-color:var(--aqua)}
+
+/* ---------- contact ---------- */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;padding:64px 0}
+.info-card{background:var(--plum-deep);color:#fff;border-radius:var(--radius);padding:40px}
+.info-card h2{color:#fff}
+.info-card .row{display:flex;gap:14px;align-items:flex-start;margin:18px 0}
+.info-card .row svg{width:22px;height:22px;flex:none;margin-top:4px}
+.info-card a{color:var(--aqua)}
+.map-link{display:inline-block;margin-top:14px}
+.hours-call{background:var(--aqua-soft);border-radius:var(--radius);padding:40px;display:flex;flex-direction:column;justify-content:center}
+.hours-call h2{margin-bottom:10px}
+.hours-call p{color:var(--ink-soft);margin-bottom:20px}
+
+/* ---------- minimal footer ---------- */
+footer.site{background:var(--plum-ink);color:#C9BCD6;margin-top:64px}
+.foot-min{padding:44px 0 0;text-align:center}
+.foot-min .fbrand{font-weight:800;font-size:1.4rem;color:#fff;margin-bottom:6px}
+.foot-min .finfo{font-size:.92rem;color:#C9BCD6;margin-bottom:18px}
+.foot-min .finfo a{color:var(--aqua);text-decoration:none}
+.foot-min nav{display:flex;justify-content:center;flex-wrap:wrap;gap:6px;margin-bottom:20px}
+.foot-min nav a{color:#C9BCD6;text-decoration:none;font-size:.9rem;font-weight:600;padding:8px 14px;border-radius:999px}
+.foot-min nav a:hover{background:rgba(57,193,193,.18);color:#fff}
+.foot-bottom{border-top:1px solid rgba(57,193,193,.25);padding:20px 0 26px}
+.foot-bottom p{margin:0;font-size:.9rem}
+
+@media(max-width:900px){
+  .hero-split,.band-grid,.contact-grid{grid-template-columns:1fr;gap:32px}
+  .band.tint .band-grid > *:first-child{order:0}
+  .cards{grid-template-columns:1fr}
+  .masonry{columns:2}
+}
+@media(max-width:560px){
+  .masonry{columns:1}
+}
+</style>
+</head>
+<body>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Menu">
+  <button class="close-x" id="drawerClose" aria-label="Close menu">×</button>
+  <nav class="main">
+    <a class="dlink" href="#home" data-page="home">Home</a>
+    <a class="dlink" href="#services" data-page="services">Services</a>
+    <a class="dlink" href="#gallery" data-page="gallery">Gallery</a>
+    <a class="dlink" href="#reviews" data-page="reviews">Reviews</a>
+    <a class="dlink" href="#contact" data-page="contact">Contact</a>
+  </nav>
+  <a class="dcall" href="tel:+17188767100">Call (718) 876-7100</a>
+</aside>
+
+<header class="site">
+  <div class="wrap">
+    <div class="bar">
+      <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+      <a class="brand" href="#home" data-page="home">
+        <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <circle cx="24" cy="24" r="22" stroke="#39C1C1" stroke-width="3"/>
+          <path d="M14 30c3-8 6-12 10-12s7 4 10 12" stroke="#3B1F4E" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="18" cy="12" r="2.4" fill="#39C1C1"/>
+          <circle cx="26" cy="9" r="3" fill="#3B1F4E"/>
+          <circle cx="33" cy="14" r="2" fill="#39C1C1"/>
+        </svg>
+        <span class="brand-name">Shampoo<small>Staten Island, NY</small></span>
+      </a>
+      <a class="btn btn-solid" style="padding:11px 22px" href="tel:+17188767100">Call Now</a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section class="page" id="page-home">
+  <div class="wrap">
+    <div class="hero-split">
+      <div>
+        <span class="eyebrow">Full Service Hair Salon</span>
+        <h1>Great hair starts with a <span class="serif">great wash.</span></h1>
+        <p class="lede">Shampoo is Staten Island&#39;s full service hair salon on Bay Street. Cuts, color, keratin, perms and blowouts, all under one roof with walk-ins welcome.</p>
+        <div class="cta-row">
+          <a class="btn btn-solid" href="tel:+17188767100">Call to Book</a>
+          <a class="btn btn-ghost" href="#services" data-page="services">See Services</a>
+        </div>
+        <div class="hours-pill">Call for hours · (718) 876-7100</div>
+      </div>
+      <div class="bubble-art">
+        <div class="float-chip chip-a"><span class="dot"></span>Walk-ins welcome</div>
+        <div class="float-chip chip-b"><span class="dot"></span>Good for kids</div>
+        <div class="card">
+          <svg viewBox="0 0 300 220" fill="none" aria-hidden="true">
+            <circle cx="150" cy="105" r="78" stroke="#39C1C1" stroke-width="4"/>
+            <circle cx="150" cy="105" r="60" stroke="#FFE9EC" stroke-width="2" stroke-dasharray="6 8"/>
+            <path d="M118 118c6-22 14-32 32-32s26 10 32 32" stroke="#FFE9EC" stroke-width="7" stroke-linecap="round"/>
+            <circle cx="112" cy="52" r="7" fill="#39C1C1" opacity=".85"/>
+            <circle cx="150" cy="36" r="10" fill="#FFE9EC" opacity=".9"/>
+            <circle cx="188" cy="54" r="5" fill="#39C1C1" opacity=".7"/>
+            <circle cx="205" cy="86" r="7" fill="#FFE9EC" opacity=".6"/>
+            <circle cx="96" cy="88" r="5" fill="#FFE9EC" opacity=".6"/>
+            <circle cx="132" cy="160" r="4" fill="#39C1C1" opacity=".7"/>
+            <circle cx="172" cy="164" r="6" fill="#39C1C1" opacity=".5"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap">
+      <div class="band-grid">
+        <div>
+          <h2>A salon that <span class="serif">treats you right</span></h2>
+          <p>Reviewers describe Shampoo as a spacious, well equipped salon where the team is caring and supportive. Customers consistently leave feeling relaxed, satisfied and confident in the staff&#39;s expertise.</p>
+          <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="#39C1C1" stroke-width="3"><path d="M4 12l5 5L20 6"/></svg><span>Walk-ins welcome, so you can stop by whenever the mood strikes</span></div>
+          <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="#39C1C1" stroke-width="3"><path d="M4 12l5 5L20 6"/></svg><span>Good for kids, with children&#39;s haircuts on the menu</span></div>
+          <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="#39C1C1" stroke-width="3"><path d="M4 12l5 5L20 6"/></svg><span>Full service: cut, color, texture and treatments in one visit</span></div>
+        </div>
+        <div class="mini-art" style="background:linear-gradient(150deg,#D9F2F1,#BFE7E5)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#3B1F4E" stroke-width="1.6"><path d="M7 21v-8l5-9 5 9v8"/><path d="M9.5 21v-5h5v5"/><path d="M4 21h16"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="band tint">
+    <div class="wrap">
+      <div class="band-grid">
+        <div>
+          <h2>Everything hair, <span class="serif">one address</span></h2>
+          <p>From a quick blow dry to a full color transformation, Shampoo&#39;s service menu covers women&#39;s and children&#39;s haircuts, highlights, keratin treatments, perms, permanent straightening, extensions and braiding.</p>
+          <p>Early morning hours on the weekend make it easy to fit great hair into a busy week.</p>
+          <a class="btn btn-ghost" href="#services" data-page="services">Browse All Services</a>
+        </div>
+        <div class="mini-art" style="background:linear-gradient(150deg,#3B1F4E,#241230)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#39C1C1" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap">
+      <div class="band-grid">
+        <div>
+          <h2>Loved on <span class="serif">Bay Street</span></h2>
+          <p>With 97 reviews aggregated on BestProsInTown and hundreds more across review platforms, Shampoo is one of Staten Island&#39;s most reviewed neighborhood salons. Read what clients say, then come see for yourself.</p>
+          <a class="btn btn-solid" href="#reviews" data-page="reviews">Read Reviews</a>
+        </div>
+        <div class="mini-art" style="background:linear-gradient(150deg,#FFE9EC,#F6CBD3)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#3B1F4E" stroke-width="1.6"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div style="padding:64px 0 0">
+      <h2>Services at <span class="serif">Shampoo</span></h2>
+      <p style="color:var(--ink-soft);max-width:44rem;margin-bottom:8px">Full service hair care for the whole family. Prices below are typical samples for the area. Call (718) 876-7100 for exact pricing.</p>
+    </div>
+    <div class="cards">
+      <div class="svc"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#2A8E8E" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg></div><h3>Women&#39;s Haircut</h3><p>Precision cuts tailored to your face shape, texture and lifestyle.</p><span class="sample">Sample: from $35</span></div>
+      <div class="svc"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#2A8E8E" stroke-width="1.8"><circle cx="9" cy="9" r="4"/><path d="M3.5 20c.8-3.5 2.8-5 5.5-5s4.7 1.5 5.5 5"/></svg></div><h3>Children&#39;s Haircut</h3><p>Patient, friendly cuts for kids. A good for kids salon, per reviewers.</p><span class="sample">Sample: from $20</span></div>
+      <div class="svc"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#2A8E8E" stroke-width="1.8"><path d="M12 3v10M12 17v4M5 8l7-5 7 5"/></svg></div><h3>Blow Dry</h3><p>Smooth, voluminous blowouts with a polished finish that lasts.</p><span class="sample">Sample: from $30</span></div>
+      <div class="svc"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#2A8E8E" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18" stroke-dasharray="3 3"/></svg></div><h3>Hair Coloring and Highlights</h3><p>Full color and dimensional highlights for a fresh, vibrant look.</p><span class="sample">Sample: from $75</span></div>
+      <div class="svc"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#2A8E8E" stroke-width="1.8"><path d="M4 16c4-1 6-4 6-8M12 16c4-1 6-4 6-8"/><circle cx="10" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/></svg></div><h3>Keratin Treatment</h3><p>Smoothing keratin for frizz free, manageable hair.</p><span class="sample">Sample: from $150</span></div>
+      <div class="svc"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#2A8E8E" stroke-width="1.8"><path d="M6 20c0-6 3-9 6-9s6 3 6 9"/><path d="M12 11V4"/></svg></div><h3>Perm and Straightening</h3><p>Classic perms and permanent hair straightening for lasting texture.</p><span class="sample">Sample: from $90</span></div>
+      <div class="svc"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#2A8E8E" stroke-width="1.8"><path d="M7 4v16M17 4v16M7 12h10"/></svg></div><h3>Hair Extensions</h3><p>Added length and volume, blended to match your natural hair.</p><span class="sample">Call for pricing</span></div>
+      <div class="svc"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#2A8E8E" stroke-width="1.8"><path d="M5 19c2-8 5-12 7-12s5 4 7 12"/><path d="M12 7V4"/></svg></div><h3>Hair Braiding</h3><p>Beautiful braided styles, from everyday looks to special occasions.</p><span class="sample">Call for pricing</span></div>
+      <div class="svc"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#2A8E8E" stroke-width="1.8"><path d="M4 14c3 4 6 4 8 0s5-4 8 0"/><circle cx="12" cy="8" r="3"/></svg></div><h3>Curly Haircut</h3><p>Cuts that work with your curl pattern, not against it.</p><span class="sample">Sample: from $40</span></div>
+    </div>
+    <div class="note">All prices shown are samples only to give a sense of the area. Final pricing depends on hair length and service detail. Call (718) 876-7100 for exact pricing.</div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div style="padding:64px 0 0">
+      <h2>Inside <span class="serif">Shampoo</span></h2>
+      <p style="color:var(--ink-soft);max-width:44rem">A peek at the salon on Bay Street. Tiles shown are placeholders; real photos of the salon are on the way.</p>
+    </div>
+    <div class="masonry">
+      <figure class="tile tall t1"><span class="badge">Placeholder</span><svg viewBox="0 0 24 24" fill="none" stroke="#39C1C1" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg><figcaption>Styling Chairs</figcaption></figure>
+      <figure class="tile med t2"><span class="badge">Placeholder</span><svg viewBox="0 0 24 24" fill="none" stroke="#FFE9EC" stroke-width="1.5"><path d="M4 18c2-1 4-1 6 0s4 1 6 0 4-1 4-1M7 14c3 4 7 4 10 0"/></svg><figcaption>Wash Stations</figcaption></figure>
+      <figure class="tile short t3"><span class="badge">Placeholder</span><svg viewBox="0 0 24 24" fill="none" stroke="#39C1C1" stroke-width="1.5"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 7h6M9 11h6"/></svg><figcaption>Color Bar</figcaption></figure>
+      <figure class="tile med t4"><span class="badge">Placeholder</span><svg viewBox="0 0 24 24" fill="none" stroke="#3B1F4E" stroke-width="1.5"><path d="M6 20V10l6-6 6 6v10"/><path d="M10 20v-6h4v6"/></svg><figcaption>660 Bay St</figcaption></figure>
+      <figure class="tile tall t5"><span class="badge">Placeholder</span><svg viewBox="0 0 24 24" fill="none" stroke="#FFE9EC" stroke-width="1.5"><circle cx="9" cy="8" r="3.5"/><path d="M3.5 20c.8-3.5 2.8-5 5.5-5s4.7 1.5 5.5 5"/></svg><figcaption>Happy Clients</figcaption></figure>
+      <figure class="tile short t6"><span class="badge">Placeholder</span><svg viewBox="0 0 24 24" fill="none" stroke="#FFE9EC" stroke-width="1.5"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg><figcaption>Finishing Touches</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap" style="padding:64px 0">
+    <h2>What <span class="serif">Clients</span> Say</h2>
+    <p style="color:var(--ink-soft);margin-bottom:26px;max-width:44rem">Based on 97 reviews aggregated on BestProsInTown, plus hundreds of reviews on other platforms. See the full set on Google.</p>
+    <div class="src-links">
+      <a href="https://www.google.com/maps/place/?q=place_id:ChIJ79RvkrRPwokR-1zprjf6sh0" target="_blank" rel="noopener">See reviews on Google</a>
+      <a href="https://www.bestprosintown.com/ny/staten-island/shampoo-/" target="_blank" rel="noopener">Read 97 reviews on BestProsInTown</a>
+    </div>
+    <div class="rev">
+      <div class="stars">★★★★★</div>
+      <p>"A spacious and well equipped salon. Customers consistently leave feeling relaxed, satisfied and confident in the staff&#39;s expertise."</p>
+      <div class="meta">BestProsInTown summary of 97 reviews</div>
+    </div>
+    <div class="rev">
+      <div class="stars">★★★★★</div>
+      <p>"The service is caring and supportive, making Shampoo a trusted destination for hair care in Staten Island."</p>
+      <div class="meta">BestProsInTown summary of 97 reviews</div>
+    </div>
+    <div class="rev">
+      <div class="stars">★★★★★</div>
+      <p>"Walk-ins are welcome and the salon is good for kids, easy for the whole family."</p>
+      <div class="meta">BestProsInTown listing highlights</div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-contact">
+  <div class="wrap">
+    <div class="contact-grid">
+      <div class="info-card">
+        <h2>Book Your Visit</h2>
+        <div class="row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#39C1C1" stroke-width="2"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+          <div>660 Bay St<br>Staten Island, NY 10304</div>
+        </div>
+        <div class="row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#39C1C1" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2z"/></svg>
+          <div><a href="tel:+17188767100">(718) 876-7100</a></div>
+        </div>
+        <a class="map-link btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJ79RvkrRPwokR-1zprjf6sh0" target="_blank" rel="noopener">Get Directions</a>
+      </div>
+      <div class="hours-call">
+        <h2>Hours</h2>
+        <p>Hours vary by day and source, so the safest move is a quick call. Ring (718) 876-7100 to confirm today&#39;s hours and book your chair.</p>
+        <a class="btn btn-solid" href="tel:+17188767100">Call for Hours</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-min">
+      <div class="fbrand">Shampoo</div>
+      <div class="finfo">660 Bay St, Staten Island, NY 10304 · <a href="tel:+17188767100">(718) 876-7100</a></div>
+      <nav aria-label="Footer">
+        <a href="#home" data-page="home">Home</a>
+        <a href="#services" data-page="services">Services</a>
+        <a href="#gallery" data-page="gallery">Gallery</a>
+        <a href="#reviews" data-page="reviews">Reviews</a>
+        <a href="#contact" data-page="contact">Contact</a>
+      </nav>
+    </div>
+    <div class="foot-bottom">
+      <p>© Shampoo</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var PAGES = ["home","services","gallery","reviews","contact"];
+
+  var drawer = document.getElementById("drawer");
+  var scrim = document.getElementById("scrim");
+  var burger = document.getElementById("burger");
+  var drawerClose = document.getElementById("drawerClose");
+  var nav = drawer;
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(drawer){ drawer.classList.remove("open"); }
+    if(scrim){ scrim.classList.remove("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  function openDrawer(){
+    if(drawer){ drawer.classList.add("open"); }
+    if(scrim){ scrim.classList.add("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "true"); }
+  }
+
+  if(burger){
+    burger.addEventListener("click", function(e){
+      e.stopPropagation();
+      if(drawer && drawer.classList.contains("open")){ closeMenu(); } else { openDrawer(); }
+    });
+  }
+  if(drawerClose){ drawerClose.addEventListener("click", closeMenu); }
+  if(scrim){ scrim.addEventListener("click", closeMenu); }
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape"){ closeMenu(); }
+  });
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
