@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inkadelphia Tattoo Studio · Custom Tattoos and Piercings, Philadelphia, PA</title>
+<meta name="description" content="Inkadelphia Tattoo Studio, a street level tattoo and piercing studio at 2834 N 5th St, Philadelphia, PA. Custom tattoos, fine line work, cover ups and professional piercings. Walk ins welcome. Call (215) 644-8900.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Work+Sans:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brick:#7A2E22; --brick-deep:#571E15; --brick-dark:#3E130D;
+  --mortar:#C9B29A; --cream:#F7EFE3; --paper:#FFFBF3;
+  --ink:#211712; --ink-soft:#6E5B4D; --gold:#E0A93E; --gold-soft:#F7E4BC;
+  --navy:#233A4D;
+  --shadow:0 20px 44px -20px rgba(33,23,18,.35);
+  --shadow-sm:0 10px 24px -12px rgba(33,23,18,.3);
+  --radius:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Work Sans",system-ui,sans-serif;
+  background:var(--cream);
+  color:var(--ink);
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+a{color:var(--brick)}
+img{max-width:100%}
+::selection{background:var(--gold);color:var(--ink)}
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+
+/* ---------- brick texture ---------- */
+.brickwall{
+  background-color:var(--brick-deep);
+  background-image:
+    linear-gradient(335deg, rgba(0,0,0,.14) 23px, transparent 23px),
+    linear-gradient(155deg, rgba(0,0,0,.14) 23px, transparent 23px),
+    linear-gradient(335deg, rgba(0,0,0,.14) 23px, transparent 23px),
+    linear-gradient(155deg, rgba(0,0,0,.14) 23px, transparent 23px),
+    linear-gradient(90deg, var(--mortar) 4px, transparent 4px),
+    linear-gradient(0deg, var(--mortar) 4px, transparent 4px);
+  background-size:116px 116px,116px 116px,116px 116px,116px 116px,116px 58px,58px 116px;
+  background-position:0 0,0 0,58px 29px,58px 29px,0 0,0 0;
+}
+
+/* ---------- top bar + side drawer ---------- */
+.topbar{
+  position:sticky;top:0;z-index:60;
+  background:rgba(62,19,13,.96);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border-bottom:3px solid var(--gold);
+  color:var(--cream);
+}
+.topbar .bar{display:flex;align-items:center;gap:14px;padding:10px 0}
+.menu-btn{
+  background:none;border:2px solid rgba(247,239,227,.5);color:var(--cream);
+  border-radius:10px;padding:8px 12px;cursor:pointer;font-weight:700;font-size:.9rem;
+  display:inline-flex;align-items:center;gap:8px;letter-spacing:.5px;
+}
+.menu-btn .lines{display:inline-block;width:20px}
+.menu-btn .lines span{display:block;height:3px;border-radius:3px;background:var(--gold);margin:4px 0}
+.bar .brandmark{font-family:"Anton",sans-serif;font-size:1.25rem;letter-spacing:1px;color:var(--cream);text-decoration:none}
+.bar .brandmark .gold{color:var(--gold)}
+.bar .spacer{flex:1}
+.call-pill{
+  display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:var(--ink);
+  text-decoration:none;font-weight:700;padding:9px 18px;border-radius:999px;font-size:.92rem;
+}
+.call-pill:hover{background:#f0bd57}
+.drawer-veil{
+  position:fixed;inset:0;background:rgba(33,23,18,.55);opacity:0;pointer-events:none;
+  transition:opacity .25s;z-index:69;
+}
+.drawer-veil.show{opacity:1;pointer-events:auto}
+.drawer{
+  position:fixed;top:0;left:0;bottom:0;width:min(340px,86vw);z-index:70;
+  background:var(--ink);color:var(--cream);
+  transform:translateX(-105%);transition:transform .3s ease;
+  display:flex;flex-direction:column;padding:26px 26px 32px;
+  border-right:3px solid var(--gold);
+}
+.drawer.open{transform:translateX(0)}
+.drawer .drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px}
+.drawer .drawer-head .brandmark{font-family:"Anton",sans-serif;font-size:1.15rem;letter-spacing:1px;color:var(--cream);text-decoration:none}
+.drawer-close{background:none;border:2px solid rgba(247,239,227,.4);color:var(--cream);border-radius:10px;padding:6px 12px;cursor:pointer;font-weight:700}
+.drawer nav.main{display:flex;flex-direction:column;gap:6px}
+.drawer nav.main a{
+  color:var(--cream);text-decoration:none;font-weight:600;font-size:1.06rem;
+  padding:12px 14px;border-radius:10px;border-left:4px solid transparent;
+}
+.drawer nav.main a:hover{background:rgba(247,239,227,.08)}
+.drawer nav.main a.active{background:var(--brick);border-left-color:var(--gold);color:#fff}
+.drawer .drawer-foot{margin-top:auto;padding-top:22px;border-top:1px solid rgba(247,239,227,.18);font-size:.9rem;color:rgba(247,239,227,.75)}
+.drawer .drawer-foot a{color:var(--gold);text-decoration:none;font-weight:600}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- hero: full bleed brick ---------- */
+.hero{
+  position:relative;overflow:hidden;color:var(--cream);
+  padding:92px 0 90px;
+}
+.hero::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse at 20% 10%, rgba(224,169,62,.16), transparent 55%),
+             linear-gradient(180deg, rgba(33,23,18,.25), rgba(33,23,18,.62));
+}
+.hero-inner{position:relative;z-index:2;max-width:1140px;margin:0 auto;padding:0 24px;text-align:center}
+.hero .kicker{
+  display:inline-block;font-family:"Caveat",cursive;font-size:1.6rem;color:var(--gold);
+  transform:rotate(-2deg);margin-bottom:14px;
+}
+.hero h1{
+  font-family:"Anton",sans-serif;font-weight:400;
+  font-size:clamp(3rem,9vw,6.4rem);line-height:1;letter-spacing:1.5px;
+  text-transform:uppercase;margin-bottom:16px;text-shadow:0 4px 0 rgba(0,0,0,.35);
+}
+.hero h1 .gold{color:var(--gold)}
+.hero .lede{max-width:36rem;margin:0 auto 28px;font-size:1.1rem;color:rgba(247,239,227,.92)}
+.hero .needle{display:block;margin:0 auto 6px;width:min(420px,80vw);height:auto;filter:drop-shadow(0 8px 10px rgba(0,0,0,.4))}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;justify-content:center}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;
+  padding:14px 28px;border-radius:999px;font-size:1rem;transition:transform .18s,background .18s;
+}
+.btn-solid{background:var(--gold);color:var(--ink)}
+.btn-solid:hover{background:#f0bd57;transform:translateY(-2px)}
+.btn-ghost{border:2px solid rgba(247,239,227,.6);color:var(--cream)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-2px)}
+.street-strip{
+  background:var(--ink);color:var(--cream);padding:14px 0;overflow:hidden;
+  border-top:3px solid var(--gold);border-bottom:3px solid var(--gold);
+}
+.street-strip .track{display:flex;gap:44px;white-space:nowrap;animation:slide 28s linear infinite;font-weight:600;letter-spacing:2px;font-size:.85rem;text-transform:uppercase}
+@keyframes slide{to{transform:translateX(-50%)}}
+
+/* ---------- magazine rhythm ---------- */
+.section{padding:72px 0}
+.section.alt{background:var(--paper);border-top:1px solid rgba(33,23,18,.1);border-bottom:1px solid rgba(33,23,18,.1)}
+.eyebrow{font-size:.78rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--brick);margin-bottom:10px}
+h2{
+  font-family:"Anton",sans-serif;font-weight:400;text-transform:uppercase;letter-spacing:1px;
+  font-size:clamp(1.9rem,4vw,2.8rem);line-height:1.05;margin-bottom:16px;
+}
+h2 .gold{color:var(--brick)}
+.sub{color:var(--ink-soft);max-width:44rem;margin-bottom:34px}
+.mag-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:2px solid var(--ink);border-radius:var(--radius);overflow:hidden;background:var(--paper);box-shadow:var(--shadow)}
+.mag-cell{padding:38px;border-bottom:2px solid var(--ink)}
+.mag-cell:nth-child(odd){border-right:2px solid var(--ink)}
+.mag-cell:nth-last-child(-n+2){border-bottom:0}
+.mag-cell .num{font-family:"Anton",sans-serif;font-size:2.6rem;color:var(--gold);text-shadow:2px 2px 0 var(--ink);line-height:1;margin-bottom:10px}
+.mag-cell h3{font-size:1.15rem;margin-bottom:8px}
+.mag-cell p{color:var(--ink-soft);font-size:.96rem}
+.quote-band{background:var(--brick-dark);color:var(--cream);border-radius:var(--radius);padding:44px;margin-top:48px;position:relative;overflow:hidden}
+.quote-band::before{content:"“";position:absolute;top:-30px;left:20px;font-family:"Anton",sans-serif;font-size:9rem;color:rgba(224,169,62,.25)}
+.quote-band p{font-size:1.25rem;font-weight:500;position:relative;max-width:40rem}
+.quote-band .who{margin-top:14px;color:var(--gold);font-weight:600;font-size:.95rem}
+
+/* ---------- accordion (styles page) ---------- */
+.accordion{border:2px solid var(--ink);border-radius:var(--radius);overflow:hidden;background:var(--paper)}
+.acc-item{border-bottom:2px solid var(--ink)}
+.acc-item:last-child{border-bottom:0}
+.acc-head{
+  width:100%;background:none;border:0;cursor:pointer;text-align:left;
+  display:flex;align-items:center;gap:16px;padding:22px 26px;
+  font-family:"Anton",sans-serif;font-size:1.25rem;letter-spacing:.6px;text-transform:uppercase;color:var(--ink);
+}
+.acc-head .tag{flex:none;background:var(--gold);color:var(--ink);font-family:"Work Sans",sans-serif;font-size:.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:5px 12px;border-radius:999px}
+.acc-head .plus{margin-left:auto;font-size:1.6rem;line-height:1;color:var(--brick);font-weight:700}
+.acc-item.open .acc-head .plus{color:var(--ink)}
+.acc-body{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.acc-body .pad{padding:0 26px 26px;color:var(--ink-soft)}
+.acc-body .pad ul{margin:10px 0 0 20px}
+.acc-body .pad li{margin-bottom:6px}
+.acc-note{font-size:.85rem;background:var(--gold-soft);border:1px dashed var(--brick);border-radius:10px;padding:12px 16px;margin-top:16px}
+
+/* ---------- artists ---------- */
+.artist-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:22px}
+.artist-card{
+  background:var(--paper);border:2px solid var(--ink);border-radius:var(--radius);
+  padding:28px;box-shadow:var(--shadow-sm);position:relative;
+}
+.artist-card .avatar{
+  width:84px;height:84px;border-radius:50%;margin-bottom:14px;
+  background:conic-gradient(from 40deg, var(--brick), var(--gold), var(--brick-dark), var(--gold), var(--brick));
+  border:3px solid var(--ink);display:flex;align-items:center;justify-content:center;
+  font-family:"Anton",sans-serif;font-size:2rem;color:#fff;text-shadow:1px 1px 0 rgba(0,0,0,.5);
+}
+.artist-card h3{font-size:1.2rem;margin-bottom:4px}
+.artist-card .role{font-size:.8rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--brick);margin-bottom:10px}
+.artist-card p{font-size:.94rem;color:var(--ink-soft)}
+
+/* ---------- gallery carousel ---------- */
+.carousel{position:relative;max-width:860px;margin:0 auto}
+.car-viewport{overflow:hidden;border:3px solid var(--ink);border-radius:var(--radius);box-shadow:var(--shadow)}
+.car-track{display:flex;transition:transform .45s ease}
+.car-slide{flex:0 0 100%;min-height:380px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:40px;text-align:center;position:relative}
+.car-slide .badge{
+  position:absolute;top:16px;left:16px;background:var(--ink);color:var(--cream);
+  font-size:.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  padding:6px 14px;border-radius:999px;
+}
+.car-slide svg{width:min(220px,50vw);height:auto}
+.car-slide h3{font-family:"Anton",sans-serif;letter-spacing:1px;text-transform:uppercase;font-size:1.4rem}
+.car-slide p{color:var(--ink-soft);max-width:28rem;font-size:.95rem}
+.car-btn{
+  position:absolute;top:50%;transform:translateY(-50%);z-index:2;
+  width:52px;height:52px;border-radius:50%;border:2px solid var(--ink);
+  background:var(--gold);color:var(--ink);font-size:1.5rem;font-weight:700;cursor:pointer;
+}
+.car-btn:hover{background:#f0bd57}
+.car-btn.prev{left:-26px}
+.car-btn.next{right:-26px}
+.car-dots{display:flex;gap:10px;justify-content:center;margin-top:18px}
+.car-dots button{width:14px;height:14px;border-radius:50%;border:2px solid var(--ink);background:transparent;cursor:pointer}
+.car-dots button.on{background:var(--gold)}
+
+/* ---------- reviews ---------- */
+.rev-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px;margin-top:30px}
+.rev-card{background:var(--paper);border:2px solid var(--ink);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow-sm);position:relative}
+.rev-card .stars{color:var(--gold);font-size:1.2rem;letter-spacing:3px;margin-bottom:10px;text-shadow:0 1px 0 var(--ink)}
+.rev-card p{font-size:.95rem;color:var(--ink-soft);margin-bottom:12px}
+.rev-card .who{font-weight:700;font-size:.9rem}
+.rev-card .sample-tag{
+  position:absolute;top:14px;right:14px;background:var(--ink);color:var(--gold);
+  font-size:.68rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  padding:4px 12px;border-radius:999px;
+}
+.src-links{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.src-links a{
+  display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:700;
+  border:2px solid var(--ink);border-radius:999px;padding:10px 20px;background:var(--gold);color:var(--ink);font-size:.92rem;
+}
+.src-links a:hover{background:#f0bd57}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
+.info-card{background:var(--paper);border:2px solid var(--ink);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm)}
+.info-card h3{font-family:"Anton",sans-serif;letter-spacing:1px;text-transform:uppercase;font-size:1.3rem;margin-bottom:14px}
+.info-card p{margin-bottom:10px;color:var(--ink-soft)}
+.info-card p strong{color:var(--ink)}
+.info-card a{font-weight:600}
+.hours-table{width:100%;border-collapse:collapse;margin-top:8px}
+.hours-table td{padding:9px 4px;border-bottom:1px dashed rgba(33,23,18,.25);font-size:.95rem}
+.hours-table tr:last-child td{border-bottom:0}
+.hours-table td:last-child{text-align:right;font-weight:600}
+
+/* ---------- footer (minimal) ---------- */
+footer.site{background:var(--ink);color:var(--cream);padding:44px 0 30px;border-top:3px solid var(--gold)}
+footer.site .foot-row{display:flex;flex-wrap:wrap;gap:18px;align-items:center;justify-content:space-between;margin-bottom:22px}
+footer.site .brandmark{font-family:"Anton",sans-serif;letter-spacing:1px;font-size:1.15rem;color:var(--cream);text-decoration:none}
+footer.site .foot-links{display:flex;flex-wrap:wrap;gap:6px}
+footer.site .foot-links a{color:rgba(247,239,227,.8);text-decoration:none;font-size:.9rem;font-weight:600;padding:8px 12px}
+footer.site .foot-links a:hover{color:var(--gold)}
+footer.site .copy{text-align:center;color:rgba(247,239,227,.7);font-size:.92rem}
+
+/* ---------- reveal ---------- */
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .5s ease,transform .5s ease}
+.reveal.in{opacity:1;transform:none}
+
+@media (max-width:860px){
+  .visit-grid{grid-template-columns:1fr}
+  .mag-grid{grid-template-columns:1fr}
+  .mag-cell:nth-child(odd){border-right:0}
+  .mag-cell:nth-last-child(-n+2){border-bottom:2px solid var(--ink)}
+  .mag-cell:last-child{border-bottom:0}
+  .car-btn.prev{left:8px}
+  .car-btn.next{right:8px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap bar">
+    <button class="menu-btn" id="drawerOpen" aria-label="Open site menu" aria-controls="siteDrawer" aria-expanded="false"><span class="lines"><span></span><span></span><span></span></span>Menu</button>
+    <a class="brandmark" href="#home" data-page="home" aria-label="Inkadelphia Tattoo Studio, home">INKADELPHIA <span class="gold">TATTOO</span></a>
+    <span class="spacer"></span>
+    <a class="call-pill" href="tel:+12156448900">(215) 644-8900</a>
+  </div>
+</div>
+
+<div class="drawer-veil" id="drawerVeil"></div>
+<aside class="drawer" id="siteDrawer" aria-label="Site navigation">
+  <div class="drawer-head">
+    <a class="brandmark" href="#home" data-page="home">INKADELPHIA TATTOO</a>
+    <button class="drawer-close" id="drawerClose" aria-label="Close site menu">Close</button>
+  </div>
+  <nav class="main" id="mainNav">
+    <a href="#home" data-page="home" class="active" aria-current="page">Home</a>
+    <a href="#styles" data-page="styles">Styles and Services</a>
+    <a href="#artists" data-page="artists">Artists and Piercers</a>
+    <a href="#gallery" data-page="gallery">Gallery</a>
+    <a href="#reviews" data-page="reviews">Reviews</a>
+    <a href="#visit" data-page="visit">Visit Us</a>
+  </nav>
+  <div class="drawer-foot">
+    <p>2834 N 5th St<br>Philadelphia, PA 19133</p>
+    <p style="margin-top:10px"><a href="tel:+12156448900">(215) 644-8900</a></p>
+    <p style="margin-top:10px"><a href="http://instagram.com/inkadelphia_tattoos">Follow us on Instagram</a></p>
+  </div>
+</aside>
+
+<section class="page" id="page-home">
+  <div class="hero brickwall">
+    <div class="hero-inner">
+      <span class="kicker">North 5th Street, Philadelphia</span>
+      <svg class="needle" viewBox="0 0 420 120" aria-hidden="true">
+        <g stroke="#E0A93E" stroke-width="10" stroke-linecap="round">
+          <line x1="30" y1="100" x2="240" y2="44"/>
+        </g>
+        <g fill="none" stroke="#F7EFE3" stroke-width="7" stroke-linecap="round">
+          <line x1="262" y1="38" x2="388" y2="38"/>
+          <line x1="262" y1="58" x2="352" y2="58"/>
+        </g>
+        <circle cx="52" cy="92" r="16" fill="none" stroke="#E0A93E" stroke-width="8"/>
+        <path d="M262 20 L390 20 L390 76 L262 76 Z" fill="none" stroke="#F7EFE3" stroke-width="6"/>
+        <g fill="#E0A93E">
+          <circle cx="120" cy="26" r="4"/><circle cx="180" cy="16" r="3"/><circle cx="330" cy="96" r="4"/>
+        </g>
+      </svg>
+      <h1>Ink That <span class="gold">Holds</span></h1>
+      <p class="lede">Inkadelphia Tattoo Studio is a street level shop on North 5th Street where custom tattoos and professional piercings meet real craftsmanship. Walk ins welcome, consultations always free.</p>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="#styles" data-page="styles">Explore Styles</a>
+        <a class="btn btn-ghost" href="tel:+12156448900">Call (215) 644-8900</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="street-strip">
+    <div class="track" id="stripTrack">
+      <span>Walk Ins Welcome</span><span>Custom Tattoos</span><span>Professional Piercings</span><span>Free Consultations</span><span>18 Plus Only, ID Required</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="wrap">
+      <div class="eyebrow">Why Inkadelphia</div>
+      <h2>Built Like a <span class="gold">Rowhouse</span>, Solid and Made to Last</h2>
+      <p class="sub">Clients rate us 4.8 out of 5 across more than 350 Google reviews. They come for the art and come back for the people.</p>
+      <div class="mag-grid reveal">
+        <div class="mag-cell">
+          <div class="num">01</div>
+          <h3>Custom Work, Drawn for You</h3>
+          <p>Bring a sketch, a photo, or just an idea. The artists draw every piece to fit your body, your story, and your skin.</p>
+        </div>
+        <div class="mag-cell">
+          <div class="num">02</div>
+          <h3>Tattoos and Piercings Under One Roof</h3>
+          <p>From fine line tattoos to top grade piercings, the whole studio works as one team, so your visit is smooth start to finish.</p>
+        </div>
+        <div class="mag-cell">
+          <div class="num">03</div>
+          <h3>Walk Ins Welcome</h3>
+          <p>Spontaneous ink happens here. Walk in during open hours and the crew will fit you in whenever the chairs allow.</p>
+        </div>
+        <div class="mag-cell">
+          <div class="num">04</div>
+          <h3>Clean, Calm, and Professional</h3>
+          <p>Reviewers keep using the same words: clean, thorough, and welcoming. First timers are guided through every step.</p>
+        </div>
+      </div>
+      <div class="quote-band reveal">
+        <p>Owner is super thorough and conducts business well. My tattoo healed perfectly. I will not go anywhere else.</p>
+        <div class="who">Theme echoed across Google reviews</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-styles">
+  <div class="section">
+    <div class="wrap">
+      <div class="eyebrow">Styles and Services</div>
+      <h2>What the <span class="gold">Studio</span> Does</h2>
+      <p class="sub">Open an item below to learn what each service covers. Pricing is set per piece, so call the studio for an exact quote.</p>
+      <div class="accordion reveal" id="servicesAcc">
+        <div class="acc-item open">
+          <button class="acc-head" aria-expanded="true"><span class="tag">Core</span>Custom Tattoos<span class="plus">+</span></button>
+          <div class="acc-body"><div class="pad">
+            One of a kind designs drawn for your placement and skin. Black and grey, full color, geometric, dotwork, script, and realism are all on the table. Bring references and the artist builds the final design with you.
+          </div></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-head" aria-expanded="false"><span class="tag">Core</span>Fine Line Tattoos<span class="plus">+</span></button>
+          <div class="acc-body"><div class="pad">
+            Delicate, precise linework that heals clean. Reviewers praise the fine line work here again and again. Ideal for first tattoos, minimalist designs, and script.
+          </div></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-head" aria-expanded="false"><span class="tag">Core</span>Portraits and Realism<span class="plus">+</span></button>
+          <div class="acc-body"><div class="pad">
+            Likeness work with real attention to detail. Clients call out the portrait work as one of a kind. Book a consultation first so the artist can plan the session and sizing.
+          </div></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-head" aria-expanded="false"><span class="tag">Core</span>Cover Ups and Reworks<span class="plus">+</span></button>
+          <div class="acc-body"><div class="pad">
+            Old ink you are done with can become something you love. The team designs around existing tattoos to build bold, lasting cover ups.
+          </div></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-head" aria-expanded="false"><span class="tag">Core</span>Professional Piercings<span class="plus">+</span></button>
+          <div class="acc-body"><div class="pad">
+            Top grade piercings with careful technique and clear aftercare. Popular options include:
+            <ul><li>Ear piercings: lobes, tragus, conch, cartilage</li><li>Nose piercings</li><li>Navel piercings</li><li>Implant grade jewelry options</li></ul>
+          </div></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-head" aria-expanded="false"><span class="tag">House</span>Consultations<span class="plus">+</span></button>
+          <div class="acc-body"><div class="pad">
+            Always free. Talk through your idea, get placement advice, sizing, session planning, and an honest price before you commit to anything.
+          </div></div>
+        </div>
+      </div>
+      <div class="acc-note reveal">Pricing is per piece and varies with size, detail, and placement. Call <a href="tel:+12156448900">(215) 644-8900</a> for a quote. Samples on this site are illustrative only.</div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-artists">
+  <div class="section alt">
+    <div class="wrap">
+      <div class="eyebrow">The Crew</div>
+      <h2>Artists and <span class="gold">Piercers</span></h2>
+      <p class="sub">A small team with a big reputation. Clients name their artists by name in reviews, which says everything about the trust this shop earns.</p>
+      <div class="artist-grid reveal">
+        <div class="artist-card">
+          <div class="avatar">F</div>
+          <h3>Fax</h3>
+          <div class="role">Tattoo Artist</div>
+          <p>Praised in reviews for portraits and one of a kind custom work, with amazing attention to detail. Book ahead when you can.</p>
+        </div>
+        <div class="artist-card">
+          <div class="avatar">TL</div>
+          <h3>Tat2 Lu</h3>
+          <div class="role">Tattoo Artist</div>
+          <p>Known for clean line work and a welcoming chair. Named by clients who walked in late and still got seen with no fuss.</p>
+        </div>
+        <div class="artist-card">
+          <div class="avatar">L</div>
+          <h3>Luis</h3>
+          <div class="role">Tattoo Artist</div>
+          <p>Clients call the work amazing and keep coming back. A steady hand for custom pieces large and small.</p>
+        </div>
+        <div class="artist-card">
+          <div class="avatar">C</div>
+          <h3>Cynthia</h3>
+          <div class="role">Tattoo Artist</div>
+          <p>High praise for incredible work and a warm approach that puts nervous first timers at ease.</p>
+        </div>
+        <div class="artist-card">
+          <div class="avatar">K</div>
+          <h3>Kat</h3>
+          <div class="role">Piercer</div>
+          <p>Described as super sweet and careful. Recent reviews call out comfortable, fast, and clean piercings with a 10 out of 10 experience.</p>
+        </div>
+        <div class="artist-card">
+          <div class="avatar">Q</div>
+          <h3>Queen</h3>
+          <div class="role">Piercer</div>
+          <p>Clients praise extremely professional technique and a calming presence, even for clients who arrive nervous.</p>
+        </div>
+      </div>
+      <p class="sub" style="margin-top:24px;font-size:.88rem">Artist details are based on client reviews and public listings. Ask for your artist by name when you call <a href="tel:+12156448900">(215) 644-8900</a>.</p>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="section">
+    <div class="wrap">
+      <div class="eyebrow">Gallery</div>
+      <h2>Recent <span class="gold">Work</span></h2>
+      <p class="sub">A look at the range the studio covers. These panels are placeholder art standing in for the real portfolio.</p>
+      <div class="carousel reveal" id="galleryCar">
+        <div class="car-viewport">
+          <div class="car-track">
+            <div class="car-slide" style="background:linear-gradient(150deg,#F7EFE3,#EBD9C0)">
+              <span class="badge">Placeholder</span>
+              <svg viewBox="0 0 200 200" aria-hidden="true">
+                <path d="M100 20 C60 20 40 60 40 100 C40 150 70 180 100 180 C130 180 160 150 160 100 C160 60 140 20 100 20 Z" fill="none" stroke="#7A2E22" stroke-width="6"/>
+                <path d="M100 45 C85 45 75 65 75 95 C75 130 85 155 100 155 M100 45 C115 45 125 65 125 95 C125 130 115 155 100 155" fill="none" stroke="#7A2E22" stroke-width="4"/>
+                <circle cx="100" cy="95" r="14" fill="#E0A93E" stroke="#211712" stroke-width="4"/>
+              </svg>
+              <h3>Fine Line Floral</h3>
+              <p>Delicate linework in the studio's signature clean style. Real healed photos from clients keep earning the same compliment: perfect and precise.</p>
+            </div>
+            <div class="car-slide" style="background:linear-gradient(150deg,#233A4D,#16283A)">
+              <span class="badge">Placeholder</span>
+              <svg viewBox="0 0 200 200" aria-hidden="true">
+                <path d="M60 170 L100 40 L140 170 Z" fill="none" stroke="#E0A93E" stroke-width="7"/>
+                <circle cx="100" cy="130" r="18" fill="none" stroke="#F7EFE3" stroke-width="5"/>
+                <g fill="#F7EFE3"><circle cx="100" cy="80" r="4"/><circle cx="88" cy="105" r="4"/><circle cx="112" cy="105" r="4"/></g>
+              </svg>
+              <h3 style="color:#F7EFE3">Geometric Blackwork</h3>
+              <p style="color:rgba(247,239,227,.8)">Bold geometry and dotwork built to sit clean for years. Cover up friendly designs are a studio specialty.</p>
+            </div>
+            <div class="car-slide" style="background:linear-gradient(150deg,#7A2E22,#571E15)">
+              <span class="badge">Placeholder</span>
+              <svg viewBox="0 0 200 200" aria-hidden="true">
+                <circle cx="100" cy="95" r="52" fill="none" stroke="#F7EFE3" stroke-width="6"/>
+                <path d="M70 95 Q100 60 130 95 Q100 130 70 95 Z" fill="#E0A93E"/>
+                <circle cx="100" cy="95" r="10" fill="#211712"/>
+                <path d="M100 43 L100 28 M100 147 L100 162 M48 95 L33 95 M152 95 L167 95" stroke="#F7EFE3" stroke-width="5" stroke-linecap="round"/>
+              </svg>
+              <h3 style="color:#F7EFE3">Color Realism</h3>
+              <p style="color:rgba(247,239,227,.8)">Portraits and color work with deep saturation. The portrait pieces clients brag about in reviews start as consultations like yours.</p>
+            </div>
+            <div class="car-slide" style="background:linear-gradient(150deg,#FFFBF3,#F7E4BC)">
+              <span class="badge">Placeholder</span>
+              <svg viewBox="0 0 200 200" aria-hidden="true">
+                <circle cx="100" cy="80" r="34" fill="none" stroke="#233A4D" stroke-width="6"/>
+                <circle cx="100" cy="80" r="12" fill="#E0A93E"/>
+                <path d="M100 114 L100 168 M88 130 L76 156 M112 130 L124 156" stroke="#233A4D" stroke-width="5" stroke-linecap="round"/>
+                <circle cx="100" cy="172" r="8" fill="none" stroke="#233A4D" stroke-width="5"/>
+              </svg>
+              <h3>Precision Piercings</h3>
+              <p>Top grade jewelry, careful placement, and aftercare you can actually follow. Clients call the piercing work fast, clean, and painless as it gets.</p>
+            </div>
+          </div>
+        </div>
+        <button class="car-btn prev" id="carPrev" aria-label="Previous gallery slide">‹</button>
+        <button class="car-btn next" id="carNext" aria-label="Next gallery slide">›</button>
+        <div class="car-dots" id="carDots" aria-label="Gallery slide selectors"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="section alt">
+    <div class="wrap">
+      <div class="eyebrow">Reviews</div>
+      <h2>What <span class="gold">Philly</span> Says</h2>
+      <p class="sub">Based on 356 Google reviews, Inkadelphia holds a 4.8 out of 5 rating. The cards below are sample reviews reflecting common themes.</p>
+      <div class="rev-grid reveal">
+        <div class="rev-card">
+          <span class="sample-tag">Sample</span>
+          <div class="stars">★★★★★</div>
+          <p>Walked in for a fine line tattoo and it healed perfectly. The owner is thorough and the whole staff is amazing. I will not go anywhere else.</p>
+          <div class="who">Osman C., Google review theme</div>
+        </div>
+        <div class="rev-card">
+          <span class="sample-tag">Sample</span>
+          <div class="stars">★★★★★</div>
+          <p>Fax fit us into a busy schedule for my daughter's 21st birthday tattoo. Clean, welcoming shop and talent beyond what we imagined.</p>
+          <div class="who">Client theme, portrait session</div>
+        </div>
+        <div class="rev-card">
+          <span class="sample-tag">Sample</span>
+          <div class="stars">★★★★★</div>
+          <p>Got a conch and cartilage piercing and could not be happier. Super clean, extremely professional, and made me feel comfortable the whole time.</p>
+          <div class="who">Piercing client theme</div>
+        </div>
+      </div>
+      <div class="src-links reveal">
+        <a href="https://www.google.com/maps/place/?q=place_id:ChIJ69s4lx3IxokRMAT2jtBO9X8">See reviews on Google</a>
+        <a href="https://www.tripadvisor.ca/Attraction_Review-g60795-d26584519-Reviews-Inkadelphia_Tattoo_Studio-Philadelphia_Pennsylvania.html">Read reviews on Tripadvisor</a>
+        <a href="https://www.loc8nearme.com/pennsylvania/philadelphia/inkadelphia-tattoo-studio/3964918/">More reviews and hours</a>
+      </div>
+      <p class="sub" style="margin-top:18px;font-size:.88rem">Review links above point to real listings found during research. Sample cards are illustrative summaries of recurring review themes, not direct quotes.</p>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="section">
+    <div class="wrap">
+      <div class="eyebrow">Visit Us</div>
+      <h2>Find the <span class="gold">Studio</span></h2>
+      <p class="sub">Street level shop on North 5th Street in the Hunting Park area. Walk ins welcome during open hours.</p>
+      <div class="visit-grid reveal">
+        <div class="info-card">
+          <h3>Address and Contact</h3>
+          <p><strong>Inkadelphia Tattoo Studio</strong><br>2834 N 5th St<br>Philadelphia, PA 19133</p>
+          <p><strong>Phone:</strong> <a href="tel:+12156448900">(215) 644-8900</a></p>
+          <p><strong>Instagram:</strong> <a href="http://instagram.com/inkadelphia_tattoos">@inkadelphia_tattoos</a></p>
+          <p style="margin-top:16px"><a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJ69s4lx3IxokRMAT2jtBO9X8">Get Directions</a></p>
+        </div>
+        <div class="info-card">
+          <h3>Shop Hours</h3>
+          <table class="hours-table">
+            <tr><td>Monday</td><td>12:00 PM to 6:00 PM</td></tr>
+            <tr><td>Tuesday</td><td>12:00 PM to 8:00 PM</td></tr>
+            <tr><td>Wednesday</td><td>12:00 PM to 8:00 PM</td></tr>
+            <tr><td>Thursday</td><td>12:00 PM to 8:00 PM</td></tr>
+            <tr><td>Friday</td><td>12:00 PM to 8:00 PM</td></tr>
+            <tr><td>Saturday</td><td>12:00 PM to 8:00 PM</td></tr>
+            <tr><td>Sunday</td><td>Closed</td></tr>
+          </table>
+          <p style="margin-top:12px;font-size:.88rem">Hours from public listings. Call the studio to confirm before a special trip.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-row">
+      <a class="brandmark" href="#home" data-page="home">INKADELPHIA TATTOO</a>
+      <nav class="foot-links" aria-label="Footer">
+        <a href="#styles" data-page="styles">Styles</a>
+        <a href="#artists" data-page="artists">Artists</a>
+        <a href="#gallery" data-page="gallery">Gallery</a>
+        <a href="#reviews" data-page="reviews">Reviews</a>
+        <a href="#visit" data-page="visit">Visit</a>
+      </nav>
+    </div>
+    <p class="copy">© Inkadelphia Tattoo Studio</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "styles", "artists", "gallery", "reviews", "visit"];
+  var drawer = document.getElementById("siteDrawer");
+  var veil = document.getElementById("drawerVeil");
+  var drawerOpen = document.getElementById("drawerOpen");
+  var drawerClose = document.getElementById("drawerClose");
+  var nav = document.getElementById("mainNav");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(drawer){ drawer.classList.remove("open"); }
+    if(veil){ veil.classList.remove("show"); }
+    if(drawerOpen){ drawerOpen.setAttribute("aria-expanded", "false"); }
+  }
+
+  function openMenu(){
+    if(drawer){ drawer.classList.add("open"); }
+    if(veil){ veil.classList.add("show"); }
+    if(drawerOpen){ drawerOpen.setAttribute("aria-expanded", "true"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(drawerOpen){ drawerOpen.addEventListener("click", openMenu); }
+  if(drawerClose){ drawerClose.addEventListener("click", closeMenu); }
+  if(veil){ veil.addEventListener("click", closeMenu); }
+
+  /* ---------- street strip: duplicate for seamless loop ---------- */
+  var track = document.getElementById("stripTrack");
+  if(track){ track.innerHTML += track.innerHTML; }
+
+  /* ---------- accordion ---------- */
+  var acc = document.getElementById("servicesAcc");
+  if(acc){
+    var heads = acc.querySelectorAll(".acc-head");
+    function setBody(item){
+      var body = item.querySelector(".acc-body");
+      if(item.classList.contains("open")){ body.style.maxHeight = body.scrollHeight + "px"; }
+      else { body.style.maxHeight = "0"; }
+    }
+    for(var a = 0; a < heads.length; a++){
+      (function(head){
+        var item = head.parentNode;
+        head.addEventListener("click", function(){
+          var wasOpen = item.classList.contains("open");
+          var items = acc.querySelectorAll(".acc-item");
+          for(var k = 0; k < items.length; k++){
+            items[k].classList.remove("open");
+            items[k].querySelector(".acc-head").setAttribute("aria-expanded", "false");
+            setBody(items[k]);
+          }
+          if(!wasOpen){
+            item.classList.add("open");
+            head.setAttribute("aria-expanded", "true");
+          }
+          setBody(item);
+        });
+        setBody(item);
+      })(heads[a]);
+    }
+    window.addEventListener("resize", function(){
+      var open = acc.querySelector(".acc-item.open .acc-body");
+      if(open){ open.style.maxHeight = open.scrollHeight + "px"; }
+    });
+  }
+
+  /* ---------- carousel ---------- */
+  var car = document.getElementById("galleryCar");
+  if(car){
+    var ctrack = car.querySelector(".car-track");
+    var slides = car.querySelectorAll(".car-slide");
+    var dotsWrap = document.getElementById("carDots");
+    var idx = 0;
+    var dots = [];
+    for(var s = 0; s < slides.length; s++){
+      (function(n){
+        var d = document.createElement("button");
+        d.setAttribute("aria-label", "Go to slide " + (n + 1));
+        d.addEventListener("click", function(){ go(n); });
+        dotsWrap.appendChild(d);
+        dots.push(d);
+      })(s);
+    }
+    function go(n){
+      idx = (n + slides.length) % slides.length;
+      ctrack.style.transform = "translateX(-" + (idx * 100) + "%)";
+      for(var m = 0; m < dots.length; m++){ dots[m].classList.toggle("on", m === idx); }
+    }
+    document.getElementById("carPrev").addEventListener("click", function(){ go(idx - 1); });
+    document.getElementById("carNext").addEventListener("click", function(){ go(idx + 1); });
+    go(0);
+  }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

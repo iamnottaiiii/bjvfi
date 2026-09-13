@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Infinity Salon · Five Star Hair Salon, Liverpool, NY</title>
+<meta name="description" content="Infinity Salon is a five star rated hair salon at 642 Old Liverpool Rd, Liverpool, NY. Precision cuts, dimensional color, styling, bridal hair and makeup. Call (315) 283-8559.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,500&family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#2A1B26; --plum:#4A2545; --plum-deep:#341A31;
+  --rose:#C4838B; --rose-soft:#F6DCDA; --blush:#F9ECE9;
+  --cream:#FDF8F4; --paper:#FFFDFB;
+  --gold:#C99B3F; --gold-soft:#F3E4C2;
+  --radius:18px;
+  --shadow:0 18px 40px -18px rgba(42,27,38,.28);
+  --shadow-sm:0 8px 22px -10px rgba(42,27,38,.22);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Jost",system-ui,sans-serif;background:var(--cream);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased}
+img{max-width:100%}
+a{color:var(--plum)}
+::selection{background:var(--gold-soft);color:var(--ink)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.serif{font-family:"Playfair Display",serif}
+
+/* ---------- top bar + drawer ---------- */
+.topbar{position:sticky;top:0;z-index:60;background:rgba(253,248,244,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:2px solid rgba(74,37,69,.12)}
+.topbar-in{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
+.brand svg{width:44px;height:44px;flex:none}
+.brand-name{font-family:"Playfair Display",serif;font-weight:900;font-size:1.3rem;line-height:1.05}
+.brand-name small{display:block;font-family:"Jost",sans-serif;font-weight:600;font-size:.62rem;letter-spacing:3.5px;text-transform:uppercase;color:var(--rose)}
+.burger{background:var(--plum);border:0;border-radius:12px;cursor:pointer;padding:12px 14px;display:flex;flex-direction:column;gap:5px}
+.burger span{display:block;width:24px;height:2.5px;border-radius:3px;background:#fff;transition:.25s}
+.call-btn{display:inline-flex;align-items:center;gap:8px;background:var(--plum);color:#fff;text-decoration:none;font-weight:600;padding:11px 20px;border-radius:999px;box-shadow:var(--shadow-sm);transition:transform .18s,background .18s;white-space:nowrap}
+.call-btn:hover{background:var(--plum-deep);transform:translateY(-2px)}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:min(340px,84vw);background:var(--plum-deep);color:#F3E4D2;z-index:100;transform:translateX(-102%);transition:transform .32s cubic-bezier(.22,.8,.3,1);display:flex;flex-direction:column;padding:28px;box-shadow:20px 0 60px rgba(0,0,0,.3)}
+.drawer.open{transform:none}
+.drawer .d-brand{font-family:"Playfair Display",serif;font-weight:900;font-size:1.6rem;color:#fff;margin-bottom:6px}
+.drawer .d-sub{font-size:.8rem;letter-spacing:2px;text-transform:uppercase;color:var(--rose);margin-bottom:26px}
+.drawer nav.main{display:flex;flex-direction:column;gap:4px}
+.drawer nav.main a{color:#F3E4D2;text-decoration:none;font-weight:500;font-size:1.15rem;padding:12px 16px;border-radius:12px;transition:background .2s}
+.drawer nav.main a:hover{background:rgba(255,255,255,.08)}
+.drawer nav.main a.active,.drawer nav.main a[aria-current="page"]{background:var(--rose);color:#fff;font-weight:600}
+.drawer .d-foot{margin-top:auto;font-size:.85rem;color:#C9AFA4}
+.drawer .d-foot a{color:#fff;text-decoration:none;font-weight:600}
+.scrim{position:fixed;inset:0;background:rgba(42,27,38,.5);z-index:90;opacity:0;pointer-events:none;transition:opacity .3s}
+.scrim.show{opacity:1;pointer-events:auto}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- hero (split) ---------- */
+.hero{padding:64px 0 56px;position:relative;overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.kicker{display:inline-flex;align-items:center;gap:10px;font-weight:600;font-size:.82rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--plum);background:var(--paper);border:2px solid var(--rose-soft);padding:8px 18px;border-radius:999px;margin-bottom:20px}
+h1{font-family:"Playfair Display",serif;font-weight:900;font-size:clamp(2.6rem,5.2vw,4.2rem);line-height:1.04;letter-spacing:-.5px;margin-bottom:18px}
+h1 .accent{color:var(--rose);font-style:italic}
+.lede{font-size:1.12rem;color:#5A4553;max-width:32rem;margin-bottom:26px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:24px}
+.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:600;padding:14px 26px;border-radius:999px;font-size:1rem;transition:transform .18s,box-shadow .18s,background .18s}
+.btn-solid{background:var(--plum);color:#fff;box-shadow:var(--shadow-sm)}
+.btn-solid:hover{background:var(--plum-deep);transform:translateY(-2px)}
+.btn-ghost{background:var(--paper);color:var(--ink);border:2px solid rgba(74,37,69,.25)}
+.btn-ghost:hover{border-color:var(--rose);color:var(--plum);transform:translateY(-2px)}
+.rating-row{display:flex;flex-wrap:wrap;gap:18px;align-items:center;font-size:.95rem;color:#5A4553}
+.rating-row .stars{color:var(--gold);font-size:1.2rem;letter-spacing:3px}
+.hero-art{position:relative}
+.art-card{background:linear-gradient(150deg,#F9ECE9,#F1D5D1);border-radius:28px;padding:44px;box-shadow:var(--shadow);border:3px solid #fff;position:relative;overflow:hidden}
+.art-card svg{width:100%;height:auto;display:block;animation:floaty 6s ease-in-out infinite}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.stamp{position:absolute;bottom:-16px;left:26px;background:var(--gold);color:#fff;font-family:"Playfair Display",serif;font-weight:700;padding:12px 22px;border-radius:999px;transform:rotate(-3deg);box-shadow:var(--shadow-sm);font-size:.95rem;z-index:2}
+
+/* ---------- sections ---------- */
+section.block{padding:56px 0}
+.sec-head{max-width:44rem;margin:0 auto 40px;text-align:center}
+.sec-head .eyebrow{font-weight:600;font-size:.8rem;letter-spacing:3px;text-transform:uppercase;color:var(--rose)}
+h2{font-family:"Playfair Display",serif;font-weight:900;font-size:clamp(1.9rem,3.6vw,2.7rem);line-height:1.12;margin:8px 0 12px;letter-spacing:-.3px}
+.sec-head p{color:#5A4553}
+
+/* asymmetric grid */
+.asym{display:grid;grid-template-columns:repeat(12,1fr);gap:22px}
+.acard{background:var(--paper);border-radius:var(--radius);padding:32px 28px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;border-top:6px solid var(--rose);transition:transform .2s,box-shadow .2s}
+.acard:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+.acard:nth-child(2){border-top-color:var(--gold)}
+.acard:nth-child(3){border-top-color:var(--plum)}
+.acard .icon{width:54px;height:54px;border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;background:var(--rose-soft)}
+.acard:nth-child(2) .icon{background:var(--gold-soft)}
+.acard:nth-child(3) .icon{background:#E4D3E6}
+.acard .icon svg{width:30px;height:30px}
+.acard h3{font-family:"Playfair Display",serif;font-size:1.35rem;margin-bottom:8px}
+.acard p{color:#5A4553;font-size:.97rem}
+.a1{grid-column:1/6;grid-row:1}
+.a2{grid-column:6/13;grid-row:1;margin-top:44px}
+.a3{grid-column:2/12;grid-row:2}
+.stat-band{background:var(--plum);color:#F3E4D2;border-radius:26px;padding:44px 40px;display:grid;grid-template-columns:repeat(3,1fr);gap:24px;text-align:center;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.stat-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(201,155,63,.35), transparent 50%)}
+.stat{position:relative}
+.stat .num{font-family:"Playfair Display",serif;font-weight:900;font-size:2.6rem;color:var(--gold)}
+.stat .lbl{font-size:.85rem;letter-spacing:2px;text-transform:uppercase;color:#D8BFAE}
+
+/* ---------- services price table ---------- */
+.svc-note{background:var(--gold-soft);border:2px dashed rgba(201,155,63,.6);border-radius:var(--radius);padding:18px 24px;margin-bottom:30px;font-size:.95rem;color:#6B5220}
+.svc-note strong{color:var(--plum)}
+.svc-list{display:grid;grid-template-columns:1fr 1fr;gap:10px 48px}
+.svc{padding:16px 4px;border-bottom:2px dotted rgba(74,37,69,.25)}
+.svc-top{display:flex;align-items:baseline;gap:12px}
+.svc-top strong{font-family:"Playfair Display",serif;font-size:1.12rem}
+.svc-top .dots{flex:1;border-bottom:2px dotted rgba(196,131,139,.55);transform:translateY(-4px)}
+.svc-top .price{font-weight:700;color:var(--plum);white-space:nowrap}
+.svc small{color:#5A4553}
+.svc .flag{display:inline-block;background:var(--rose-soft);color:#8A3E47;font-size:.68rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:999px;margin-left:8px;vertical-align:2px}
+
+/* ---------- gallery horizontal strip ---------- */
+.strip-scroll{display:flex;gap:20px;overflow-x:auto;padding:6px 4px 22px;scroll-snap-type:x mandatory}
+.gtile{flex:0 0 264px;scroll-snap-align:start;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);background:var(--paper);transition:transform .2s;position:relative}
+.gtile:hover{transform:translateY(-6px) rotate(.4deg)}
+.gtile .art{aspect-ratio:1/1.05;display:flex;align-items:center;justify-content:center;position:relative}
+.gtile .art svg{width:42%;height:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.18));transition:transform .3s}
+.gtile:hover .art svg{transform:scale(1.08) rotate(-3deg)}
+.gtile .cap{padding:14px 18px 18px}
+.gtile .cap strong{font-family:"Playfair Display",serif;font-size:1.05rem;display:block}
+.gtile .cap small{color:#5A4553}
+.gtile .soon{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.88);font-size:.66rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 12px;border-radius:999px;color:#5A4553}
+
+/* ---------- reviews ---------- */
+.rev-list{display:grid;gap:22px;max-width:760px;margin:0 auto}
+.rev{background:var(--paper);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow-sm);border-left:6px solid var(--rose)}
+.rev .stars{color:var(--gold);font-size:1.15rem;letter-spacing:3px;margin-bottom:12px}
+.rev p{font-size:1.03rem;margin-bottom:12px}
+.rev cite{font-style:normal;font-weight:600;font-size:.85rem;color:var(--plum);letter-spacing:.5px}
+.rs-strip{margin:0 auto 30px;max-width:640px;background:var(--paper);border:1px solid var(--gold-soft);border-radius:14px;padding:18px 22px;text-align:center}
+.rs-note{margin:0 0 12px;font-size:.95rem;color:#5A4553;line-height:1.55}
+.rs-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rs-btn{display:inline-block;background:var(--plum);color:#fff;padding:10px 24px;border-radius:999px;font-weight:600;text-decoration:none;font-size:.95rem;line-height:1.2}
+.rs-btn:hover{background:var(--plum-deep)}
+.cta-band{background:linear-gradient(120deg,var(--plum),var(--plum-deep));border-radius:26px;color:#fff;padding:48px;text-align:center;margin-top:44px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.cta-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 20%, rgba(201,155,63,.4), transparent 50%)}
+.cta-band h2{color:#fff;position:relative}
+.cta-band p{color:#EAD9CE;position:relative;max-width:36rem;margin:0 auto 24px}
+.cta-band .btn-solid{background:#fff;color:var(--plum-deep);position:relative}
+.cta-band .btn-solid:hover{background:var(--gold-soft)}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-bottom:26px}
+.info-card{background:var(--paper);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm)}
+.info-card h3{font-family:"Playfair Display",serif;font-size:1.4rem;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.info-card h3 svg{width:28px;height:28px}
+.info-card p{color:#5A4553;margin-bottom:8px}
+.info-card a.big{font-family:"Playfair Display",serif;font-size:1.5rem;font-weight:700;color:var(--plum);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.hours-table{width:100%;border-collapse:collapse;font-size:.98rem}
+.hours-table td{padding:10px 6px;border-bottom:1px dashed rgba(42,27,38,.18)}
+.hours-table td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.hours-table tr.closed-row td{color:#8A7581;font-style:italic}
+.map-card{border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:340px;background:linear-gradient(rgba(74,37,69,.07),rgba(74,37,69,.07)),repeating-linear-gradient(0deg,transparent 0 46px,rgba(74,37,69,.16) 46px 48px),repeating-linear-gradient(90deg,transparent 0 46px,rgba(74,37,69,.16) 46px 48px),linear-gradient(140deg,#F3E6DD,#E9D3C8);display:flex;align-items:center;justify-content:center}
+.map-pin{text-align:center;background:var(--paper);padding:26px 34px;border-radius:20px;box-shadow:var(--shadow);max-width:78%;position:relative}
+.map-pin::after{content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);border:14px solid transparent;border-top-color:var(--paper);border-bottom:0}
+.map-pin svg{width:44px;height:44px;margin-bottom:8px}
+.map-pin strong{font-family:"Playfair Display",serif;font-size:1.15rem;display:block}
+.map-pin small{color:#5A4553}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- page strips ---------- */
+.strip{border-radius:26px;padding:56px 48px;color:#fff;position:relative;overflow:hidden;margin-bottom:44px;box-shadow:var(--shadow)}
+.strip::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(255,255,255,.22), transparent 50%)}
+.strip h2{color:#fff;font-size:clamp(2rem,4vw,3rem);position:relative;margin:4px 0 10px}
+.strip p{color:rgba(255,255,255,.9);max-width:36rem;position:relative}
+.strip .eyebrow{font-weight:600;font-size:.8rem;letter-spacing:3px;text-transform:uppercase;color:#F3E4C2;position:relative}
+.strip.s-services{background:linear-gradient(120deg,#4A2545,#2B1628)}
+.strip.s-about{background:linear-gradient(120deg,#8A3E47,#5E2A33)}
+.strip.s-gal{background:linear-gradient(120deg,#A67C2E,#7A5A1D)}
+.strip.s-rev{background:linear-gradient(120deg,#6E3A5E,#43243B)}
+.strip.s-visit{background:linear-gradient(120deg,#3E2B3B,#241722)}
+
+/* ---------- footer (big type) ---------- */
+footer{background:var(--plum-deep);color:#EAD9CE;margin-top:20px;overflow:hidden}
+.foot-big{font-family:"Playfair Display",serif;font-weight:900;font-size:clamp(3rem,10vw,7.5rem);line-height:1;color:#fff;text-align:center;padding:56px 24px 8px;letter-spacing:-1px}
+.foot-big em{color:var(--rose);font-style:italic}
+.foot-contact{display:flex;flex-wrap:wrap;gap:14px 40px;justify-content:center;padding:24px 24px 40px;font-size:1.02rem}
+.foot-contact a{color:#fff;text-decoration:none;font-weight:600}
+.foot-contact a:hover{color:var(--gold)}
+.foot-contact span{color:#C9AFA4}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.12);padding:20px 0 26px;display:flex;justify-content:center;font-size:.85rem;color:#A98F80}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:940px){
+  .hero-grid{grid-template-columns:1fr}
+  .a1{grid-column:1/13;grid-row:auto}
+  .a2{grid-column:1/13;grid-row:auto;margin-top:0}
+  .a3{grid-column:1/13;grid-row:auto}
+  .svc-list{grid-template-columns:1fr}
+  .visit-grid{grid-template-columns:1fr}
+  .stat-band{grid-template-columns:1fr}
+  .strip{padding:40px 28px}
+}
+</style>
+</head>
+<body>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Site menu">
+  <div class="d-brand">Infinity Salon</div>
+  <div class="d-sub">Liverpool · New York</div>
+  <nav class="main" id="mainNav" aria-label="Main navigation">
+    <a href="#home" data-page="home" class="active" aria-current="page">Home</a>
+    <a href="#services" data-page="services">Services</a>
+    <a href="#about" data-page="about">About</a>
+    <a href="#gallery" data-page="gallery">Gallery</a>
+    <a href="#reviews" data-page="reviews">Reviews</a>
+    <a href="#visit" data-page="visit">Visit Us</a>
+  </nav>
+  <div class="d-foot">Call to book:<br><a href="tel:+13152838559">(315) 283-8559</a></div>
+</aside>
+
+<div class="topbar">
+  <div class="wrap topbar-in">
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    <a class="brand" href="#home" data-page="home" aria-label="Infinity Salon, home">
+      <svg viewBox="0 0 64 64" role="img" aria-label="Scissors logo"><circle cx="32" cy="32" r="29" fill="#4A2545"/><circle cx="32" cy="32" r="29" fill="none" stroke="#C99B3F" stroke-width="2.5"/><circle cx="22" cy="44" r="6.5" fill="none" stroke="#F3E4C2" stroke-width="3"/><circle cx="42" cy="44" r="6.5" fill="none" stroke="#F3E4C2" stroke-width="3"/><path d="M25 39 L40 18 M39 39 L24 18" stroke="#F3E4C2" stroke-width="3" stroke-linecap="round"/></svg>
+      <span class="brand-name">Infinity Salon<small>Liverpool · NY</small></span>
+    </a>
+    <a class="call-btn" href="tel:+13152838559">(315) 283-8559</a>
+  </div>
+</div>
+
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="kicker">Five star rated · Liverpool, NY</span>
+        <h1>Great hair,<br><span class="accent">no limits.</span></h1>
+        <p class="lede">Infinity Salon is a five star rated hair salon at 642 Old Liverpool Rd in Liverpool, NY. Stylist Heidi and the team specialize in precision cuts, dimensional color, styling, and bridal hair and makeup, all in a clean, welcoming studio.</p>
+        <div class="cta-row">
+          <a class="btn btn-solid" href="tel:+13152838559">Call to Book →</a>
+          <a class="btn btn-ghost" href="#services" data-page="services">See Services</a>
+        </div>
+        <div class="rating-row">
+          <span class="stars">★★★★★</span>
+          <span><strong>5.0</strong> · Based on 27 Birdeye reviews</span>
+          <span>Tue - Sat · 10 AM - 7 PM</span>
+        </div>
+      </div>
+      <div class="hero-art">
+        <div class="art-card">
+          <svg viewBox="0 0 300 300" role="img" aria-label="Illustration of a salon vanity mirror with scissors">
+            <ellipse cx="150" cy="266" rx="104" ry="14" fill="#4A2545" opacity=".12"/>
+            <rect x="88" y="28" width="124" height="168" rx="62" fill="#FFFDFB" stroke="#4A2545" stroke-width="7"/>
+            <rect x="104" y="44" width="92" height="136" rx="46" fill="#EAF1F5"/>
+            <path d="M118 120 Q150 96 182 120" fill="none" stroke="#C99B3F" stroke-width="6" stroke-linecap="round"/>
+            <path d="M118 146 Q150 122 182 146" fill="none" stroke="#C4838B" stroke-width="6" stroke-linecap="round"/>
+            <circle cx="196" cy="60" r="5" fill="#C4838B"/>
+            <circle cx="112" cy="70" r="4" fill="#C99B3F"/>
+            <rect x="138" y="196" width="24" height="52" rx="10" fill="#4A2545"/>
+            <rect x="112" y="248" width="76" height="12" rx="6" fill="#4A2545"/>
+            <g transform="translate(196,196) rotate(18)">
+              <circle cx="-12" cy="14" r="8" fill="none" stroke="#4A2545" stroke-width="4"/>
+              <circle cx="12" cy="14" r="8" fill="none" stroke="#4A2545" stroke-width="4"/>
+              <path d="M-8 8 L8 -14 M8 8 L-8 -14" stroke="#4A2545" stroke-width="4" stroke-linecap="round"/>
+            </g>
+          </svg>
+        </div>
+        <div class="stamp">Rated 5.0 by clients</div>
+      </div>
+    </div>
+  </div>
+
+  <section class="block" style="padding-top:8px">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow">Why Infinity</span>
+        <h2>A chair where you are<br>the main event</h2>
+        <p>Clients keep coming back for the same reasons: honest advice, careful color, and a stylist who listens.</p>
+      </div>
+      <div class="asym">
+        <div class="acard a1 reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#8A3E47" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="6" r="2.6"/><circle cx="6" cy="18" r="2.6"/><path d="M8 7.5 L20 19 M8 16.5 L20 5"/></svg></div>
+          <h3>Color that gets you</h3>
+          <p>From subtle dimension to full transformations, Heidi is known for intuitive color that flatters your skin tone and fits your vision. Clients say the color comes out exactly as they pictured it.</p>
+        </div>
+        <div class="acard a2 reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#A67C2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21C7 17 3 13.5 3 9.5 3 7 5 5 7.5 5c1.7 0 3.3.9 4.5 2.6C13.2 5.9 14.8 5 16.5 5 19 5 21 7 21 9.5c0 4-4 7.5-9 11.5z"/></svg></div>
+          <h3>Welcoming to everyone</h3>
+          <p>Clean, neat, and friendly, the salon earns praise for making first timers feel at ease and regulars feel remembered. Bridal parties get the whole studio, with patience for every schedule.</p>
+        </div>
+        <div class="acard a3 reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#4A2545" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg></div>
+          <h3>Bridal hair and makeup</h3>
+          <p>Wedding mornings are a specialty: hair and makeup for the whole party, done on site so everyone can get ready together. Brides rave about looks that photograph beautifully and last all night.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" style="padding-top:0">
+    <div class="wrap">
+      <div class="stat-band reveal">
+        <div class="stat"><div class="num">5.0</div><div class="lbl">Average rating</div></div>
+        <div class="stat"><div class="num">27</div><div class="lbl">Birdeye reviews</div></div>
+        <div class="stat"><div class="num">Tue-Sat</div><div class="lbl">10 AM - 7 PM</div></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="cta-band reveal">
+      <h2>Your best hair day is one call away.</h2>
+      <p>642 Old Liverpool Rd, Liverpool, NY 13088 · Open Tue - Sat, 10 AM - 7 PM. Call to book your chair.</p>
+      <a class="btn btn-solid" href="tel:+13152838559">Call (315) 283-8559</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-services">
+      <span class="eyebrow">Services and pricing</span>
+      <h2>Cuts, color, styling,<br>and special occasions</h2>
+      <p>Every appointment starts with a consultation so the result fits your hair, your style, and your life.</p>
+    </div>
+
+    <div class="svc-note reveal">
+      <strong>Sample prices:</strong> listed prices are samples to give you an idea of typical salon pricing. Final pricing is confirmed in person and varies by hair length, stylist, and service. Call <a href="tel:+13152838559">(315) 283-8559</a> for an exact quote.
+    </div>
+
+    <div class="svc-list reveal">
+      <div class="svc"><div class="svc-top"><strong>Women's Cut and Style <span class="flag">Popular</span></strong><span class="dots"></span><span class="price">from $45</span></div><small>Consultation, precision cut, wash, and blowout finish.</small></div>
+      <div class="svc"><div class="svc-top"><strong>Men's Cut</strong><span class="dots"></span><span class="price">from $30</span></div><small>Clean, sharp cuts tailored to your look.</small></div>
+      <div class="svc"><div class="svc-top"><strong>Single Process Color</strong><span class="dots"></span><span class="price">from $65</span></div><small>Rich, even color from roots to ends.</small></div>
+      <div class="svc"><div class="svc-top"><strong>Partial Foil Highlights <span class="flag">Popular</span></strong><span class="dots"></span><span class="price">from $85</span></div><small>Face framing brightness and dimension.</small></div>
+      <div class="svc"><div class="svc-top"><strong>Full Foil Highlights</strong><span class="dots"></span><span class="price">from $120</span></div><small>All over dimension, from natural to bold.</small></div>
+      <div class="svc"><div class="svc-top"><strong>Balayage</strong><span class="dots"></span><span class="price">from $140</span></div><small>Hand painted, sun kissed, low maintenance grow out.</small></div>
+      <div class="svc"><div class="svc-top"><strong>Blowout and Style</strong><span class="dots"></span><span class="price">from $35</span></div><small>Smooth, bouncy, event ready hair.</small></div>
+      <div class="svc"><div class="svc-top"><strong>Updos and Formal Styling</strong><span class="dots"></span><span class="price">from $55</span></div><small>Prom, events, and nights out.</small></div>
+      <div class="svc"><div class="svc-top"><strong>Bridal Hair and Makeup <span class="flag">Specialty</span></strong><span class="dots"></span><span class="price">ask us</span></div><small>On site hair and makeup for the bride and the whole party.</small></div>
+      <div class="svc"><div class="svc-top"><strong>Brow and Lash Services</strong><span class="dots"></span><span class="price">ask us</span></div><small>Shaping, tinting, lashes, and finishing touches.</small></div>
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Not sure what you need? Ask.</h2>
+      <p>Call and describe your hair goals. We will recommend the right service and give you an exact price before you book.</p>
+      <a class="btn btn-solid" href="tel:+13152838559">Call (315) 283-8559</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-about">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-about">
+      <span class="eyebrow">About the salon</span>
+      <h2>A Liverpool studio built<br>on happy clients</h2>
+      <p>Infinity Salon is a boutique hair salon on Old Liverpool Road, known across the area for color expertise and genuine hospitality.</p>
+    </div>
+
+    <div class="asym" style="margin-bottom:56px">
+      <div class="acard a1 reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#8A3E47" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.9 3.1-6.5 7-6.5s7 2.6 7 6.5"/></svg></div>
+        <h3>Led by Heidi</h3>
+        <p>Clients describe Heidi as kind, professional, and intuitive, with a gift for seeing both what suits you and what you are dreaming of. Many have followed her chair for over a year and recommend her to everyone they know.</p>
+      </div>
+      <div class="acard a2 reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#A67C2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div>
+        <h3>A team that shows up</h3>
+        <p>From Robin's makeup artistry to the stylists handling bridal parties of nine, the team is praised for patience, kindness, and making big days run smoothly.</p>
+      </div>
+      <div class="acard a3 reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#4A2545" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18M12 3v18"/><circle cx="12" cy="12" r="9"/></svg></div>
+        <h3>The mission</h3>
+        <p>It is the salon's mission that every client leaves feeling pampered, confident, and beautiful. That promise, kept appointment after appointment, is why the reviews read the way they do.</p>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <div class="cta-band reveal">
+        <h2>Come see what the five stars are about.</h2>
+        <p>642 Old Liverpool Rd, Liverpool, NY 13088 · Tue - Sat, 10 AM - 7 PM.</p>
+        <a class="btn btn-solid" href="#visit" data-page="visit">Plan your visit →</a>
+      </div>
+      <div style="height:56px"></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-gal">
+      <span class="eyebrow">Gallery</span>
+      <h2>The work speaks<br>for itself</h2>
+      <p>Artistic previews of salon favorites. Real photos of client transformations are on the way.</p>
+    </div>
+
+    <div class="strip-scroll reveal">
+      <div class="gtile">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#E8B4B8,#C4838B)">
+          <svg viewBox="0 0 100 100"><path d="M50 12 C38 30 36 52 44 78 M50 12 C62 30 64 52 56 78" stroke="#FFFDFB" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M50 12 C44 34 44 56 50 82" stroke="#8A3E47" stroke-width="2.4" fill="none" opacity=".5"/></svg>
+        </div>
+        <div class="cap"><strong>Dimensional Color</strong><small>Soft, lived in brightness</small></div>
+      </div>
+      <div class="gtile">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#D9B36A,#A67C2E)">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="38" r="22" fill="#FFFDFB"/><path d="M28 38 a22 22 0 0144 0 l-6 0 a16 16 0 00-32 0 Z" fill="#4A2545"/><path d="M50 60 L44 88 M50 60 L56 88" stroke="#4A2545" stroke-width="5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>Precision Cuts</strong><small>Tailored to your features</small></div>
+      </div>
+      <div class="gtile">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#B98BB0,#6E3A5E)">
+          <svg viewBox="0 0 100 100"><path d="M30 78 Q50 20 70 78" stroke="#FFFDFB" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M38 78 Q50 44 62 78" stroke="#F3E4C2" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="50" cy="30" r="6" fill="#C99B3F"/></svg>
+        </div>
+        <div class="cap"><strong>Balayage</strong><small>Hand painted and sun kissed</small></div>
+      </div>
+      <div class="gtile">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#F3D9C8,#D9A06A)">
+          <svg viewBox="0 0 100 100"><ellipse cx="50" cy="52" rx="26" ry="30" fill="#FFFDFB"/><path d="M30 40 Q50 66 70 40" stroke="#C4838B" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="50" cy="52" r="4" fill="#4A2545"/></svg>
+        </div>
+        <div class="cap"><strong>Blowouts</strong><small>Smooth with lasting bounce</small></div>
+      </div>
+      <div class="gtile">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#A8C6CF,#5E8B99)">
+          <svg viewBox="0 0 100 100"><rect x="28" y="18" width="44" height="64" rx="10" fill="#FFFDFB"/><circle cx="50" cy="42" r="12" fill="none" stroke="#4A2545" stroke-width="4"/><path d="M50 54 v16 M42 62 h16" stroke="#4A2545" stroke-width="4" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>Bridal Styling</strong><small>Hair and makeup, on site</small></div>
+      </div>
+      <div class="gtile">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#C9A9C4,#8A5E86)">
+          <svg viewBox="0 0 100 100"><path d="M36 20 L64 20 L58 72 L42 72 Z" fill="#FFFDFB"/><path d="M44 20 L40 8 M56 20 L60 8" stroke="#4A2545" stroke-width="5" stroke-linecap="round"/><rect x="44" y="34" width="12" height="22" rx="6" fill="#C4838B"/></svg>
+        </div>
+        <div class="cap"><strong>Special Occasion</strong><small>Updos and formal looks</small></div>
+      </div>
+    </div>
+
+    <div class="svc-note reveal" style="margin-top:8px">
+      <strong>Coming soon:</strong> real photos of client hair, straight from the salon chair. The illustrations above are artistic previews.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-rev">
+      <span class="eyebrow">Reviews</span>
+      <h2>Five stars,<br>twenty seven times over</h2>
+      <p>Rated 5.0 from 27 reviews on Birdeye. Here is what clients keep saying.</p>
+    </div>
+    <div class="rs-strip">
+      <p class="rs-note">Review themes on this page are paraphrased from public feedback. Open the source to read current reviews and ratings.</p>
+      <div class="rs-links">
+        <a class="rs-btn" href="https://reviews.birdeye.com/infinity-salon-170021732375723" target="_blank" rel="noopener">See reviews on Birdeye</a>
+        <a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJD6PTsmfx2YkRDxd48TJANqY" target="_blank" rel="noopener">See reviews on Google</a>
+        <a class="rs-btn" href="https://salondiscover.com/infinity-salon-13088/" target="_blank" rel="noopener">More reviews</a>
+      </div>
+    </div>
+
+    <div class="rev-list">
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>Clients praise Heidi's color work again and again: intuitive about what suits you, exact about matching your vision, and results that earn compliments for weeks.</p>
+        <cite>Based on 27 Birdeye reviews</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>Brides call out the team's patience on wedding mornings: hair and makeup for the whole party, done in the salon, with looks that photograph beautifully and last all night.</p>
+        <cite>Based on 27 Birdeye reviews</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>Reviewers describe a clean, neat, beautiful salon where they feel welcomed like a friend, not rushed like an appointment.</p>
+        <cite>Based on 27 Birdeye reviews</cite>
+      </div>
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Love your hair? Tell Liverpool.</h2>
+      <p>Your review helps a local salon keep growing. It takes a minute, and it means the world to the team.</p>
+      <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJD6PTsmfx2YkRDxd48TJANqY" target="_blank" rel="noopener">Leave us a Google review</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-visit">
+      <span class="eyebrow">Visit us</span>
+      <h2>Find your chair</h2>
+      <p>We are on Old Liverpool Road, easy to reach from anywhere in the Liverpool area. Walk ins welcome when the schedule allows.</p>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#8A3E47" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Find us</h3>
+        <p><strong>Infinity Salon</strong><br>642 Old Liverpool Rd<br>Liverpool, NY 13088</p>
+        <p>Parking available on site.<br>Look for the Infinity Salon sign.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#8A3E47" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg> Call us</h3>
+        <p>Questions or ready to book:</p>
+        <a class="big" href="tel:+13152838559">(315) 283-8559</a>
+        <p style="margin-top:10px">For bridal parties and large bookings, please call ahead so we can plan your morning.</p>
+      </div>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#8A3E47" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Hours</h3>
+        <table class="hours-table">
+          <tr><td>Tuesday</td><td>10:00 AM - 7:00 PM</td></tr>
+          <tr><td>Wednesday</td><td>10:00 AM - 7:00 PM</td></tr>
+          <tr><td>Thursday</td><td>10:00 AM - 7:00 PM</td></tr>
+          <tr><td>Friday</td><td>10:00 AM - 7:00 PM</td></tr>
+          <tr><td>Saturday</td><td>10:00 AM - 7:00 PM</td></tr>
+          <tr class="closed-row"><td>Sunday</td><td>Closed</td></tr>
+          <tr class="closed-row"><td>Monday</td><td>Closed</td></tr>
+        </table>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <svg viewBox="0 0 24 24" fill="#8A3E47"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#FFFDFB"/></svg>
+          <strong>642 Old Liverpool Rd</strong>
+          <small>Liverpool, NY 13088</small><br>
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJD6PTsmfx2YkRDxd48TJANqY" target="_blank" rel="noopener">Get Directions →</a>
+        </div>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-big">Infinity <em>Salon</em></div>
+  <div class="foot-contact">
+    <span>642 Old Liverpool Rd, Liverpool, NY 13088</span>
+    <a href="tel:+13152838559">(315) 283-8559</a>
+    <span>Tue - Sat · 10 AM - 7 PM</span>
+  </div>
+  <div class="foot-bottom">
+    <span>© Infinity Salon</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+  var drawer = document.getElementById("drawer");
+  var scrim = document.getElementById("scrim");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(drawer){ drawer.classList.remove("open"); }
+    if(scrim){ scrim.classList.remove("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && drawer){
+    burger.addEventListener("click", function(){
+      var open = drawer.classList.toggle("open");
+      if(scrim){ scrim.classList.toggle("show", open); }
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+  if(scrim){
+    scrim.addEventListener("click", closeMenu);
+  }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
