@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studio A barber shop · Barber Shop, Marlborough, MA</title>
+<meta name="description" content="Studio A barber shop, a downtown Marlborough barber shop at 130 Main St. Classic cuts, skin fades and kids cuts from a friendly, experienced team. Call (774) 556-2179.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FAF4E8; --cream-2:#F3EAD8; --paper:#FFFDF7;
+  --ink:#241B13; --ink-soft:#5C4B3A;
+  --red:#8C2F26; --red-deep:#651F18; --red-soft:#F3D9D2;
+  --brass:#C08A2D; --brass-soft:#F5E5C3;
+  --char:#2A2521;
+  --radius:16px;
+  --shadow:0 20px 44px -18px rgba(36,27,19,.35);
+  --shadow-sm:0 10px 26px -12px rgba(36,27,19,.28);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Public Sans",system-ui,sans-serif;background:var(--cream);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased}
+img{max-width:100%}
+a{color:var(--red)}
+::selection{background:var(--brass);color:var(--ink)}
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+.serif{font-family:"Fraunces",serif}
+
+/* ---------- header + side drawer ---------- */
+header.site{position:sticky;top:0;z-index:60;background:rgba(42,37,33,.96);backdrop-filter:blur(8px);border-bottom:3px solid var(--brass)}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--cream)}
+.brand-mark{width:46px;height:46px;flex:none}
+.brand-name{font-family:"Fraunces",serif;font-weight:900;font-size:1.25rem;line-height:1.05}
+.brand-name small{display:block;font-family:"Public Sans",sans-serif;font-weight:700;font-size:.62rem;letter-spacing:3px;text-transform:uppercase;color:var(--brass)}
+.burger{background:var(--red);border:2px solid var(--brass);color:var(--cream);border-radius:12px;padding:10px 16px;font-weight:700;font-size:.95rem;cursor:pointer;display:flex;align-items:center;gap:10px}
+.burger:hover{background:var(--red-deep)}
+.burger .lines{display:inline-block;width:20px;height:14px;position:relative}
+.burger .lines span{position:absolute;left:0;width:100%;height:2px;background:var(--cream)}
+.burger .lines span:nth-child(1){top:0}.burger .lines span:nth-child(2){top:6px}.burger .lines span:nth-child(3){top:12px}
+.scrim{position:fixed;inset:0;background:rgba(20,14,10,.55);opacity:0;pointer-events:none;transition:opacity .3s;z-index:70}
+.scrim.show{opacity:1;pointer-events:auto}
+nav.main{position:fixed;top:0;right:0;height:100dvh;width:min(360px,88vw);background:var(--char);color:var(--cream);z-index:80;transform:translateX(105%);transition:transform .34s cubic-bezier(.2,.8,.25,1);display:flex;flex-direction:column;padding:26px 26px 30px;border-left:3px solid var(--brass)}
+nav.main.open{transform:translateX(0)}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.drawer-head .t{font-family:"Fraunces",serif;font-weight:900;font-size:1.3rem;color:var(--brass)}
+.drawer-close{background:none;border:2px solid rgba(250,244,232,.35);color:var(--cream);border-radius:10px;width:40px;height:40px;font-size:1.2rem;cursor:pointer}
+.drawer-close:hover{border-color:var(--brass);color:var(--brass)}
+nav.main a.dlink{display:block;text-decoration:none;color:var(--cream);font-family:"Fraunces",serif;font-weight:700;font-size:1.35rem;padding:12px 6px;border-bottom:1px solid rgba(250,244,232,.14)}
+nav.main a.dlink:hover{color:var(--brass)}
+nav.main a.dlink.active{color:var(--brass)}
+.drawer-foot{margin-top:auto;padding-top:18px}
+.drawer-call{display:block;text-align:center;background:var(--red);color:#fff;text-decoration:none;font-weight:700;padding:14px;border-radius:12px;margin-bottom:10px}
+.drawer-call:hover{background:var(--red-deep)}
+.drawer-note{font-size:.85rem;color:rgba(250,244,232,.65);text-align:center}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .35s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ---------- hero: card cluster over stripes ---------- */
+.hero{position:relative;overflow:hidden;padding:64px 0 84px;background:repeating-linear-gradient(-45deg,var(--red) 0 26px,var(--cream) 26px 52px)}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(250,244,232,.25),rgba(250,244,232,0) 40%,rgba(36,27,19,.12))}
+.hero-inner{position:relative;z-index:2}
+.cluster{display:grid;grid-template-columns:1.25fr .9fr;gap:0;align-items:stretch}
+.card{background:var(--paper);border-radius:var(--radius);box-shadow:var(--shadow);padding:38px 36px;border:1px solid rgba(36,27,19,.1)}
+.card-main{transform:rotate(-1.2deg);z-index:2;margin-right:-34px}
+.card-side{transform:rotate(1.4deg);background:var(--char);color:var(--cream);display:flex;flex-direction:column;justify-content:center;gap:14px;margin:26px 0 26px 0;padding:34px 30px}
+.eyebrow{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:12px}
+.card-side .eyebrow{color:var(--brass)}
+h1.hero-title{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(2.4rem,5vw,3.6rem);line-height:1.02;letter-spacing:-.5px;margin-bottom:14px}
+.hero-sub{color:var(--ink-soft);font-size:1.08rem;margin-bottom:22px;max-width:34rem}
+.btnrow{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-block;text-decoration:none;font-weight:700;padding:13px 22px;border-radius:999px;border:2px solid var(--red);transition:transform .15s}
+.btn:hover{transform:translateY(-2px)}
+.btn-solid{background:var(--red);color:#fff}
+.btn-solid:hover{background:var(--red-deep)}
+.btn-ghost{color:var(--red);background:transparent}
+.btn-ghost:hover{background:var(--red-soft)}
+.btn-light{background:var(--brass);border-color:var(--brass);color:var(--ink)}
+.btn-light:hover{background:#d39a35}
+.stat-big{font-family:"Fraunces",serif;font-weight:900;font-size:2.6rem;color:var(--brass);line-height:1}
+.stat-cap{font-size:.9rem;color:rgba(250,244,232,.75)}
+.side-row{display:flex;gap:12px;align-items:center}
+.side-row svg{width:34px;height:34px;flex:none}
+.hours-mini{font-size:.92rem;color:rgba(250,244,232,.85)}
+.hours-mini strong{color:#fff}
+
+/* ---------- magazine rhythm ---------- */
+.mag{padding:70px 0}
+.feature{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center;margin-bottom:64px}
+.feature.rev .f-art{order:2}
+.f-art{border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);min-height:300px;display:flex;align-items:center;justify-content:center}
+.f-kicker{font-size:.72rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:10px}
+h2.sec-title{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(1.8rem,3.4vw,2.6rem);line-height:1.08;margin-bottom:16px;letter-spacing:-.3px}
+.dropcap::first-letter{font-family:"Fraunces",serif;font-weight:900;font-size:3.4em;float:left;line-height:.85;padding-right:10px;color:var(--red)}
+.f-copy p{margin-bottom:14px;color:var(--ink-soft)}
+.f-copy p strong{color:var(--ink)}
+.pullband{background:var(--char);color:var(--cream);border-radius:var(--radius);padding:44px 40px;display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-bottom:64px;box-shadow:var(--shadow)}
+.pullband .n{font-family:"Fraunces",serif;font-weight:900;font-size:2.4rem;color:var(--brass)}
+.pullband .c{font-size:.95rem;color:rgba(250,244,232,.8)}
+.teaser-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.teaser{background:var(--paper);border:1px solid rgba(36,27,19,.12);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow-sm)}
+.teaser h3{font-family:"Fraunces",serif;font-size:1.25rem;margin-bottom:8px}
+.teaser p{color:var(--ink-soft);font-size:.96rem;margin-bottom:14px}
+.teaser a{font-weight:700}
+
+/* ---------- editorial leaders (services) ---------- */
+.leader{display:grid;grid-template-columns:110px 1fr;gap:28px;padding:40px 0;border-top:3px solid var(--ink);align-items:start}
+.leader:last-of-type{border-bottom:3px solid var(--ink)}
+.leader .num{font-family:"Fraunces",serif;font-weight:900;font-size:3.2rem;color:var(--red);line-height:1}
+.leader h3{font-family:"Fraunces",serif;font-weight:900;font-size:1.7rem;margin-bottom:8px}
+.leader .tag{display:inline-block;background:var(--brass-soft);color:var(--ink);font-size:.75rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 12px;border-radius:999px;margin-bottom:12px}
+.leader p{color:var(--ink-soft);max-width:46rem}
+.price-card{margin-top:44px;background:var(--paper);border:2px dashed var(--brass);border-radius:var(--radius);padding:30px 32px}
+.price-card h3{font-family:"Fraunces",serif;font-size:1.4rem;margin-bottom:6px}
+.sample-badge{display:inline-block;background:var(--ink);color:var(--brass);font-size:.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:5px 12px;border-radius:999px;margin-bottom:14px}
+.price-rows{display:grid;grid-template-columns:1fr 1fr;gap:10px 30px;margin-top:10px}
+.price-rows .pr{display:flex;justify-content:space-between;border-bottom:1px dotted rgba(36,27,19,.3);padding:8px 0;font-weight:600}
+.price-note{font-size:.85rem;color:var(--ink-soft);margin-top:14px}
+
+/* ---------- carousel ---------- */
+.car-wrap{position:relative;max-width:860px;margin:0 auto}
+.car-viewport{overflow:hidden;border-radius:var(--radius);box-shadow:var(--shadow)}
+.car-track{display:flex;transition:transform .45s cubic-bezier(.2,.8,.25,1)}
+.car-slide{flex:0 0 100%;min-height:420px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;position:relative;padding:40px}
+.car-slide svg{width:130px;height:130px}
+.car-cap{font-family:"Fraunces",serif;font-size:1.3rem;font-weight:700}
+.car-badge{position:absolute;top:16px;left:16px}
+.car-nav{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:20px}
+.car-btn{background:var(--char);color:var(--cream);border:none;width:48px;height:48px;border-radius:50%;font-size:1.3rem;cursor:pointer}
+.car-btn:hover{background:var(--red)}
+.car-dots{display:flex;gap:8px}
+.car-dots button{width:12px;height:12px;border-radius:50%;border:2px solid var(--red);background:transparent;cursor:pointer;padding:0}
+.car-dots button.on{background:var(--red)}
+
+/* ---------- reviews ---------- */
+.rev-summary{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:40px}
+.rev-card{background:var(--paper);border:1px solid rgba(36,27,19,.12);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow-sm)}
+.rev-card .score{font-family:"Fraunces",serif;font-weight:900;font-size:3rem;color:var(--red)}
+.rev-card .stars{color:var(--brass);font-size:1.3rem;letter-spacing:2px}
+.rev-card p{color:var(--ink-soft);font-size:.95rem;margin:10px 0 16px}
+.src-list{display:grid;gap:14px}
+.src-item{display:flex;align-items:center;justify-content:space-between;gap:16px;background:var(--char);color:var(--cream);border-radius:var(--radius);padding:20px 24px;text-decoration:none}
+.src-item:hover{background:#38302a}
+.src-item .t{font-weight:700;font-size:1.05rem}
+.src-item .s{font-size:.88rem;color:rgba(250,244,232,.7)}
+.src-item .go{background:var(--brass);color:var(--ink);font-weight:700;border-radius:999px;padding:9px 18px;white-space:nowrap}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:30px}
+.visit-card{background:var(--paper);border:1px solid rgba(36,27,19,.12);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow-sm)}
+.visit-card h3{font-family:"Fraunces",serif;font-size:1.35rem;margin-bottom:12px}
+.visit-card p{color:var(--ink-soft);margin-bottom:8px}
+.hours-table{width:100%;border-collapse:collapse;margin-top:6px}
+.hours-table td{padding:9px 4px;border-bottom:1px solid rgba(36,27,19,.14);font-size:.96rem}
+.hours-table tr.today td{font-weight:700;color:var(--red)}
+.map-ph{background:var(--char);border-radius:var(--radius);min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--cream);text-align:center;padding:30px}
+
+/* ---------- reveal ---------- */
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* ---------- big-type footer ---------- */
+footer.site{background:var(--ink);color:var(--cream);margin-top:80px;overflow:hidden}
+.bigtype{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(3rem,12vw,9rem);line-height:.95;letter-spacing:-2px;color:var(--cream);padding:56px 0 8px;white-space:nowrap}
+.bigtype span{color:var(--brass)}
+.foot-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:28px;padding:30px 0 40px}
+.foot-grid h4{font-size:.75rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--brass);margin-bottom:12px}
+.foot-grid a{color:var(--cream);text-decoration:none}
+.foot-grid a:hover{color:var(--brass)}
+.foot-grid p{color:rgba(250,244,232,.7);font-size:.95rem}
+.copyline{border-top:1px solid rgba(250,244,232,.18);padding:18px 0 26px;font-size:.92rem;color:rgba(250,244,232,.75)}
+
+.page-head{padding:56px 0 10px}
+.page-head p.lead{color:var(--ink-soft);font-size:1.1rem;max-width:44rem}
+
+@media(max-width:900px){
+  .cluster{grid-template-columns:1fr}
+  .card-main{margin-right:0;transform:rotate(-.6deg)}
+  .card-side{margin:18px 0 0;transform:rotate(.6deg)}
+  .feature{grid-template-columns:1fr}
+  .feature.rev .f-art{order:0}
+  .pullband{grid-template-columns:1fr}
+  .teaser-grid{grid-template-columns:1fr}
+  .rev-summary,.visit-grid{grid-template-columns:1fr}
+  .leader{grid-template-columns:64px 1fr;gap:16px}
+  .leader .num{font-size:2.2rem}
+  .price-rows{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr}
+  .bigtype{white-space:normal}
+}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap topbar">
+    <a class="brand" href="#home" data-page="home" aria-label="Studio A barber shop, home">
+      <svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true"><rect x="6" y="4" width="36" height="40" rx="8" fill="#8C2F26"/><rect x="14" y="10" width="20" height="6" rx="3" fill="#FAF4E8"/><rect x="14" y="20" width="20" height="6" rx="3" fill="#C08A2D"/><rect x="14" y="30" width="20" height="6" rx="3" fill="#FAF4E8"/><circle cx="24" cy="42" r="0" fill="none"/></svg>
+      <span class="brand-name">Studio A<small>barber shop</small></span>
+    </a>
+    <button class="burger" id="burger" aria-expanded="false" aria-controls="mainNav"><span class="lines" aria-hidden="true"><span></span><span></span><span></span></span>Menu</button>
+  </div>
+</header>
+<div class="scrim" id="scrim"></div>
+<nav class="main" id="mainNav" aria-label="Site">
+  <div class="drawer-head"><span class="t">Studio A</span><button class="drawer-close" id="drawerClose" aria-label="Close menu">&times;</button></div>
+  <a class="dlink" href="#home" data-page="home">Home</a>
+  <a class="dlink" href="#services" data-page="services">Services</a>
+  <a class="dlink" href="#gallery" data-page="gallery">Gallery</a>
+  <a class="dlink" href="#reviews" data-page="reviews">Reviews</a>
+  <a class="dlink" href="#visit" data-page="visit">Visit Us</a>
+  <div class="drawer-foot">
+    <a class="drawer-call" href="tel:+17745562179">Call (774) 556-2179</a>
+    <p class="drawer-note">130 Main St, Marlborough, MA 01752</p>
+  </div>
+</nav>
+
+<main>
+<section class="page" id="page-home">
+  <div class="hero">
+    <div class="wrap hero-inner">
+      <div class="cluster">
+        <div class="card card-main">
+          <span class="eyebrow">Downtown Marlborough barber shop</span>
+          <h1 class="hero-title">Sharp cuts.<br>Easy chair.<br>Honest work.</h1>
+          <p class="hero-sub">Studio A barber shop is a neighborhood shop on Main Street known for clean fades, patient kids cuts, and barbers who take their time to get it right.</p>
+          <div class="btnrow">
+            <a class="btn btn-solid" href="#services" data-page="services">See services</a>
+            <a class="btn btn-ghost" href="tel:+17745562179">Call (774) 556-2179</a>
+          </div>
+        </div>
+        <div class="card card-side">
+          <div>
+            <span class="eyebrow">Customer rating</span>
+            <div class="stat-big">4.7 / 5</div>
+            <p class="stat-cap">Based on 98 reviews on Birdeye</p>
+          </div>
+          <div class="side-row">
+            <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="none" stroke="#C08A2D" stroke-width="3"/><path d="M20 11v9l7 5" fill="none" stroke="#C08A2D" stroke-width="3" stroke-linecap="round"/></svg>
+            <p class="hours-mini"><strong>Mon to Sat, mornings to evenings.</strong><br>Closed Sundays. Hours can change, call to confirm.</p>
+          </div>
+          <a class="btn btn-light" href="#visit" data-page="visit">Plan your visit</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap mag">
+    <div class="feature reveal">
+      <div class="f-art" style="background:linear-gradient(135deg,#8C2F26,#651F18)">
+        <svg width="150" height="150" viewBox="0 0 100 100" aria-hidden="true"><rect x="38" y="8" width="24" height="84" rx="12" fill="#FAF4E8"/><rect x="38" y="20" width="24" height="12" fill="#8C2F26" transform="skewY(-12)"/><rect x="38" y="44" width="24" height="12" fill="#8C2F26" transform="skewY(-12)"/><rect x="38" y="68" width="24" height="12" fill="#8C2F26" transform="skewY(-12)"/><rect x="30" y="2" width="40" height="8" rx="4" fill="#C08A2D"/></svg>
+      </div>
+      <div class="f-copy">
+        <p class="f-kicker">The shop</p>
+        <h2 class="sec-title">A Main Street shop with a steady hand</h2>
+        <p class="dropcap">Tucked into downtown Marlborough at 130 Main St, Studio A is the kind of barber shop where the coffee is self-serve, the parking is easy, and nobody rushes your cut. The team, including Agnaldo, Ricardo and Pedro, has been giving excellent haircuts for years.</p>
+        <p>Walk-ins find a friendly chair, and first-timers who feel unsure about barber shops tend to leave as regulars. Reviewers keep coming back to the same words: <strong>kind, professional, and precise</strong>.</p>
+      </div>
+    </div>
+
+    <div class="pullband reveal">
+      <div><div class="n">4.7</div><div class="c">Average rating across 98 Birdeye reviews</div></div>
+      <div><div class="n">8+ yrs</div><div class="c">The crew has been cutting hair in Marlborough for years</div></div>
+      <div><div class="n">Main St</div><div class="c">Right downtown with easy parking nearby</div></div>
+    </div>
+
+    <div class="feature rev reveal">
+      <div class="f-art" style="background:linear-gradient(135deg,#2A2521,#4a3b2c)">
+        <svg width="150" height="150" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="38" r="20" fill="none" stroke="#C08A2D" stroke-width="5"/><path d="M50 18v40M30 38h40" stroke="#C08A2D" stroke-width="4" stroke-linecap="round"/><rect x="34" y="66" width="32" height="10" rx="5" fill="#FAF4E8"/><path d="M20 84c8-6 16-6 24 0s16 6 24 0" stroke="#8C2F26" stroke-width="5" fill="none" stroke-linecap="round"/></svg>
+      </div>
+      <div class="f-copy">
+        <p class="f-kicker">What we do best</p>
+        <h2 class="sec-title">Fades with intent, cuts for the whole family</h2>
+        <p>Skin fades are the house specialty, cut clean and blended with care. Kids get the same patience as adults, which is why families keep the shop on speed dial. Every cut starts with a real conversation about what you want.</p>
+        <div class="btnrow" style="margin-top:18px">
+          <a class="btn btn-solid" href="#services" data-page="services">See services</a>
+          <a class="btn btn-ghost" href="#gallery" data-page="gallery">See the shop</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="teaser-grid">
+      <div class="teaser reveal">
+        <h3>Visit us</h3>
+        <p>130 Main St, Marlborough, MA 01752. Get directions, see hours, and find parking info.</p>
+        <a href="#visit" data-page="visit">Plan your visit</a>
+      </div>
+      <div class="teaser reveal">
+        <h3>Reviews</h3>
+        <p>Based on 98 Birdeye reviews, customers rate Studio A 4.7 out of 5. Read what the neighborhood says.</p>
+        <a href="#reviews" data-page="reviews">Read reviews</a>
+      </div>
+      <div class="teaser reveal">
+        <h3>Book a chair</h3>
+        <p>Prefer to book ahead? Studio A also takes bookings through Fresha.</p>
+        <a href="https://www.fresha.com/lvp/studio-a-barber-shop-main-street-marlborough-BorLLa" target="_blank" rel="noopener">Book on Fresha</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div class="page-head">
+      <span class="eyebrow">Services</span>
+      <h2 class="sec-title">The chair menu</h2>
+      <p class="lead">Every service starts with a consult: what you want, what your hair does, and how much upkeep you want at home.</p>
+    </div>
+    <div class="leader reveal">
+      <div class="num">01</div>
+      <div>
+        <span class="tag">Most requested</span>
+        <h3>Classic Haircuts</h3>
+        <p>Full-service mens cuts, scissor over comb to clipper work, finished with a clean neckline and styling. The team caters to all hair types and takes the time to get the shape right.</p>
+      </div>
+    </div>
+    <div class="leader reveal">
+      <div class="num">02</div>
+      <div>
+        <span class="tag">House specialty</span>
+        <h3>Skin Fades</h3>
+        <p>The cut the shop is known for. Tight, blended fades from low to high, with crisp lines and detail work that holds its shape as it grows out.</p>
+      </div>
+    </div>
+    <div class="leader reveal">
+      <div class="num">03</div>
+      <div>
+        <span class="tag">Family favorite</span>
+        <h3>Kids Cuts</h3>
+        <p>Patient, friendly cuts for young clients. The barbers are known for putting nervous first-timers at ease, and parents appreciate a shop that treats kids like regulars.</p>
+      </div>
+    </div>
+    <div class="leader reveal">
+      <div class="num">04</div>
+      <div>
+        <span class="tag">The experience</span>
+        <h3>Walk In, Settle In</h3>
+        <p>Help yourself to the self-serve coffee station while you wait. No appointment needed for most visits, and the chair is always welcoming, even if barber shops usually intimidate you.</p>
+      </div>
+    </div>
+    <div class="price-card reveal">
+      <span class="sample-badge">Sample pricing</span>
+      <h3>Typical pricing</h3>
+      <p class="price-note" style="margin-top:0">The shop does not publish prices online, so treat these as examples only.</p>
+      <div class="price-rows">
+        <div class="pr"><span>Classic haircut</span><span>$30</span></div>
+        <div class="pr"><span>Skin fade</span><span>$35</span></div>
+        <div class="pr"><span>Kids cut</span><span>$25</span></div>
+        <div class="pr"><span>Cut and beard cleanup</span><span>$40</span></div>
+      </div>
+      <p class="price-note">Sample prices shown for illustration. Call <a href="tel:+17745562179">(774) 556-2179</a> for current pricing.</p>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div class="page-head">
+      <span class="eyebrow">Gallery</span>
+      <h2 class="sec-title">Inside the shop</h2>
+      <p class="lead">A look at the tools of the trade. Photos shown are sample illustrations.</p>
+    </div>
+    <div class="car-wrap">
+      <div class="car-viewport">
+        <div class="car-track" id="carTrack">
+          <div class="car-slide" style="background:linear-gradient(135deg,#8C2F26,#651F18)">
+            <span class="sample-badge car-badge">Sample image</span>
+            <svg viewBox="0 0 100 100" aria-hidden="true"><rect x="38" y="8" width="24" height="84" rx="12" fill="#FAF4E8"/><rect x="38" y="20" width="24" height="12" fill="#8C2F26"/><rect x="38" y="44" width="24" height="12" fill="#8C2F26"/><rect x="38" y="68" width="24" height="12" fill="#8C2F26"/><rect x="30" y="2" width="40" height="8" rx="4" fill="#C08A2D"/></svg>
+            <p class="car-cap" style="color:#FAF4E8">The classic pole</p>
+          </div>
+          <div class="car-slide" style="background:linear-gradient(135deg,#2A2521,#4a3b2c)">
+            <span class="sample-badge car-badge">Sample image</span>
+            <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="32" cy="70" r="10" fill="none" stroke="#C08A2D" stroke-width="5"/><circle cx="68" cy="70" r="10" fill="none" stroke="#C08A2D" stroke-width="5"/><path d="M38 62L62 30M62 62L38 30" stroke="#FAF4E8" stroke-width="6" stroke-linecap="round"/></svg>
+            <p class="car-cap" style="color:#FAF4E8">Shears at work</p>
+          </div>
+          <div class="car-slide" style="background:linear-gradient(135deg,#C08A2D,#8a5f1c)">
+            <span class="sample-badge car-badge">Sample image</span>
+            <svg viewBox="0 0 100 100" aria-hidden="true"><rect x="30" y="30" width="40" height="26" rx="8" fill="#2A2521"/><rect x="38" y="56" width="10" height="22" rx="4" fill="#2A2521"/><path d="M34 38h32M34 46h32" stroke="#FAF4E8" stroke-width="3"/></svg>
+            <p class="car-cap" style="color:#2A2521">Precision clippers</p>
+          </div>
+          <div class="car-slide" style="background:linear-gradient(135deg,#FAF4E8,#F3EAD8)">
+            <span class="sample-badge car-badge">Sample image</span>
+            <svg viewBox="0 0 100 100" aria-hidden="true"><rect x="28" y="34" width="44" height="30" rx="10" fill="#8C2F26"/><rect x="34" y="64" width="8" height="20" fill="#2A2521"/><rect x="58" y="64" width="8" height="20" fill="#2A2521"/><rect x="28" y="28" width="44" height="10" rx="5" fill="#2A2521"/></svg>
+            <p class="car-cap" style="color:#2A2521">Take a seat</p>
+          </div>
+          <div class="car-slide" style="background:linear-gradient(135deg,#651F18,#2A2521)">
+            <span class="sample-badge car-badge">Sample image</span>
+            <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M30 70L70 30" stroke="#C08A2D" stroke-width="7" stroke-linecap="round"/><rect x="60" y="24" width="22" height="10" rx="5" fill="#FAF4E8" transform="rotate(45 71 29)"/></svg>
+            <p class="car-cap" style="color:#FAF4E8">The finishing touch</p>
+          </div>
+        </div>
+      </div>
+      <div class="car-nav">
+        <button class="car-btn" id="carPrev" aria-label="Previous photo">&#8592;</button>
+        <div class="car-dots" id="carDots"></div>
+        <button class="car-btn" id="carNext" aria-label="Next photo">&#8594;</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div class="page-head">
+      <span class="eyebrow">Reviews</span>
+      <h2 class="sec-title">What the neighborhood says</h2>
+      <p class="lead">Real ratings from real review sites. Based on reviews on Birdeye, customers praise the kind, professional service and call it the best barber shop in town.</p>
+    </div>
+    <div class="rev-summary">
+      <div class="rev-card reveal">
+        <div class="score">4.7</div>
+        <div class="stars" aria-label="4.7 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p>Average rating on Birdeye, based on 98 reviews. Reviewers highlight excellent service, a welcoming shop, and barbers they recommend by name.</p>
+        <a class="btn btn-ghost" href="https://reviews.birdeye.com/studio-a-barber-shop-170191664560610" target="_blank" rel="noopener">Read reviews on Birdeye</a>
+      </div>
+      <div class="rev-card reveal">
+        <div class="score">Google</div>
+        <div class="stars" aria-label="Google reviews">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p>See the shop's Google listing for customer reviews, photos, and the latest hours.</p>
+        <a class="btn btn-ghost" href="https://www.google.com/maps/place/?q=place_id:ChIJG2N-nYyL44kR2avmO8Wdg1w" target="_blank" rel="noopener">Read reviews on Google</a>
+      </div>
+    </div>
+    <div class="src-list">
+      <a class="src-item reveal" href="https://www.google.com/maps/place/?q=place_id:ChIJG2N-nYyL44kR2avmO8Wdg1w" target="_blank" rel="noopener">
+        <span><span class="t">Google reviews</span><br><span class="s">Reviews and photos on the Google listing</span></span>
+        <span class="go">Open</span>
+      </a>
+      <a class="src-item reveal" href="https://reviews.birdeye.com/studio-a-barber-shop-170191664560610" target="_blank" rel="noopener">
+        <span><span class="t">Birdeye</span><br><span class="s">4.7 average from 98 reviews</span></span>
+        <span class="go">Open</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="wrap">
+    <div class="page-head">
+      <span class="eyebrow">Visit us</span>
+      <h2 class="sec-title">Find the chair</h2>
+      <p class="lead">Downtown Marlborough, easy to reach and easy to park.</p>
+    </div>
+    <div class="visit-grid">
+      <div class="visit-card reveal">
+        <h3>Address and contact</h3>
+        <p><strong>Studio A barber shop</strong><br>130 Main St<br>Marlborough, MA 01752</p>
+        <p>Phone: <a href="tel:+17745562179">(774) 556-2179</a></p>
+        <div class="btnrow" style="margin-top:14px">
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJG2N-nYyL44kR2avmO8Wdg1w" target="_blank" rel="noopener">Get directions</a>
+          <a class="btn btn-ghost" href="tel:+17745562179">Call now</a>
+        </div>
+      </div>
+      <div class="visit-card reveal">
+        <h3>Hours</h3>
+        <table class="hours-table" id="hoursTable">
+          <tr><td>Monday</td><td>9:00 AM - 7:00 PM</td></tr>
+          <tr><td>Tuesday</td><td>12:00 PM - 7:00 PM</td></tr>
+          <tr><td>Wednesday</td><td>9:00 AM - 7:00 PM</td></tr>
+          <tr><td>Thursday</td><td>9:00 AM - 7:00 PM</td></tr>
+          <tr><td>Friday</td><td>9:00 AM - 7:00 PM</td></tr>
+          <tr><td>Saturday</td><td>9:00 AM - 7:00 PM</td></tr>
+          <tr><td>Sunday</td><td>Closed</td></tr>
+        </table>
+        <p class="price-note">Hours as listed in local directories. Call <a href="tel:+17745562179">(774) 556-2179</a> to confirm before you visit.</p>
+      </div>
+    </div>
+    <div class="map-ph reveal">
+      <svg width="60" height="60" viewBox="0 0 60 60" aria-hidden="true"><path d="M30 6c-10 0-18 8-18 18 0 13 18 30 18 30s18-17 18-30c0-10-8-18-18-18z" fill="#C08A2D"/><circle cx="30" cy="24" r="7" fill="#2A2521"/></svg>
+      <p><strong>130 Main St, Marlborough, MA 01752</strong></p>
+      <a class="btn btn-light" href="https://www.google.com/maps/place/?q=place_id:ChIJG2N-nYyL44kR2avmO8Wdg1w" target="_blank" rel="noopener">Open in Google Maps</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="bigtype">STUDIO <span>A</span></div>
+    <div class="foot-grid">
+      <div>
+        <h4>Shop</h4>
+        <p>Studio A barber shop<br>130 Main St<br>Marlborough, MA 01752</p>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <p><a href="tel:+17745562179">(774) 556-2179</a><br><a href="https://www.google.com/maps/place/?q=place_id:ChIJG2N-nYyL44kR2avmO8Wdg1w" target="_blank" rel="noopener">Get directions</a></p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <p><a href="#services" data-page="services">Services</a><br><a href="#gallery" data-page="gallery">Gallery</a><br><a href="#reviews" data-page="reviews">Reviews</a><br><a href="#visit" data-page="visit">Visit us</a></p>
+      </div>
+    </div>
+    <div class="copyline">&copy; Studio A barber shop</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+    var scrim = document.getElementById("scrim");
+    if(scrim){ scrim.classList.remove("show"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+      var scrim = document.getElementById("scrim");
+      if(scrim){ scrim.classList.toggle("show", open); }
+    });
+  }
+  var dc = document.getElementById("drawerClose");
+  if(dc){ dc.addEventListener("click", closeMenu); }
+  var scrim = document.getElementById("scrim");
+  if(scrim){ scrim.addEventListener("click", closeMenu); }
+
+  /* ---------- gallery carousel ---------- */
+  var track = document.getElementById("carTrack");
+  var dotsBox = document.getElementById("carDots");
+  var idx = 0, total = 0;
+  function renderDots(){
+    dotsBox.innerHTML = "";
+    for(var d = 0; d < total; d++){
+      (function(k){
+        var b = document.createElement("button");
+        b.setAttribute("aria-label", "Go to photo " + (k + 1));
+        if(k === idx){ b.className = "on"; }
+        b.addEventListener("click", function(){ go(k); });
+        dotsBox.appendChild(b);
+      })(d);
+    }
+  }
+  function go(k){
+    idx = (k + total) % total;
+    track.style.transform = "translateX(-" + (idx * 100) + "%)";
+    renderDots();
+  }
+  if(track && dotsBox){
+    total = track.children.length;
+    renderDots();
+    document.getElementById("carPrev").addEventListener("click", function(){ go(idx - 1); });
+    document.getElementById("carNext").addEventListener("click", function(){ go(idx + 1); });
+  }
+
+  /* ---------- highlight today's hours ---------- */
+  var DOWMAP = {"Sun":0,"Mon":1,"Tue":2,"Wed":3,"Thu":4,"Fri":5,"Sat":6};
+  var day = -1;
+  try{
+    var wd = new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",weekday:"short"}).format(new Date());
+    if(DOWMAP[wd] !== undefined){ day = DOWMAP[wd]; }
+  }catch(e){ day = -1; }
+  if(day >= 0){
+    var rows = document.querySelectorAll("#hoursTable tr");
+    var rmap = {1:0, 2:1, 3:2, 4:3, 5:4, 6:5, 0:6};
+    var r = rows[rmap[day]];
+    if(r){ r.classList.add("today"); }
+  }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Class Of Our Own Barbershop | Barber Shop in Worcester, MA</title>
+<meta name="description" content="Class Of Our Own Barbershop, 712b Pleasant St, Worcester, MA. Haircuts, beard trims, and head shaves. Call (508) 239-6598.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#171310;
+  --ink2:#241e18;
+  --paper:#f5efe2;
+  --paper2:#efe6d2;
+  --gold:#c9a227;
+  --gold2:#e4c04a;
+  --red:#a93226;
+  --cream:#fffdf6;
+  --line:rgba(23,19,16,.14);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+img,svg{display:block;max-width:100%}
+a{color:inherit}
+h1,h2,h3,.bebas{font-family:'Bebas Neue',Impact,sans-serif;font-weight:400;letter-spacing:.04em;line-height:1.05}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+.badge{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;background:var(--ink);color:var(--gold2);padding:6px 14px;border-radius:999px}
+.page{display:none}
+.page.active{display:block;animation:fadeIn .45s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* ---------- topbar + drawer ---------- */
+.topbar{position:sticky;top:0;z-index:60;background:var(--ink);color:var(--paper);display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:3px solid var(--gold)}
+.topbar .brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+.topbar .brand .pole{width:30px;height:30px;flex:0 0 30px}
+.topbar .brand b{font-family:'Bebas Neue',sans-serif;font-size:1.35rem;letter-spacing:.08em;color:var(--gold2);font-weight:400}
+#burger{background:none;border:2px solid var(--gold2);color:var(--gold2);width:46px;height:46px;border-radius:10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+#burger span{display:block;width:20px;height:2px;background:var(--gold2)}
+.topbar .call{margin-left:auto;text-decoration:none;font-weight:700;color:var(--paper);border:2px solid var(--gold);padding:9px 16px;border-radius:999px;font-size:.9rem}
+.topbar .call:hover{background:var(--gold);color:var(--ink)}
+#scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:opacity .3s;z-index:70}
+#scrim.show{opacity:1;pointer-events:auto}
+nav.drawer{position:fixed;top:0;left:0;bottom:0;width:min(340px,86vw);background:var(--ink2);color:var(--paper);z-index:80;transform:translateX(-105%);transition:transform .38s cubic-bezier(.2,.8,.2,1);padding:26px 0;display:flex;flex-direction:column;box-shadow:8px 0 40px rgba(0,0,0,.35)}
+nav.drawer.open{transform:translateX(0)}
+nav.drawer .dhead{padding:0 26px 18px;border-bottom:1px solid rgba(233,196,74,.25)}
+nav.drawer .dhead .badge{background:var(--gold);color:var(--ink)}
+nav.drawer a.dlink{display:flex;align-items:center;gap:12px;text-decoration:none;padding:15px 26px;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.08em;color:var(--paper);border-left:5px solid transparent}
+nav.drawer a.dlink:hover{background:rgba(233,196,74,.1)}
+nav.drawer a.dlink.active{color:var(--gold2);border-left-color:var(--gold);background:rgba(233,196,74,.08)}
+nav.drawer .dfoot{margin-top:auto;padding:20px 26px;border-top:1px solid rgba(233,196,74,.25);font-size:.85rem;color:rgba(245,239,226,.75)}
+nav.drawer .dfoot a{color:var(--gold2);font-weight:700}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-block;text-decoration:none;font-weight:700;padding:14px 28px;border-radius:999px;border:2px solid var(--ink);transition:transform .15s,background .15s,color .15s}
+.btn-solid{background:var(--ink);color:var(--paper)}
+.btn-solid:hover{background:var(--gold);border-color:var(--gold);color:var(--ink);transform:translateY(-2px)}
+.btn-gold{background:var(--gold);border-color:var(--gold);color:var(--ink)}
+.btn-gold:hover{background:var(--gold2);transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:var(--paper);border-color:var(--paper)}
+.btn-ghost:hover{background:var(--paper);color:var(--ink)}
+.btn-row{display:flex;gap:12px;flex-wrap:wrap}
+
+/* ---------- hero: full bleed ---------- */
+.hero{position:relative;background:var(--ink);color:var(--paper);overflow:hidden}
+.hero-art{position:absolute;inset:0;opacity:.5}
+.hero-in{position:relative;z-index:2;padding:96px 0 120px;text-align:center}
+.hero-in h1{font-size:clamp(3.2rem,10vw,7.5rem);color:var(--paper);text-transform:uppercase}
+.hero-in h1 em{font-style:normal;color:var(--gold2)}
+.hero-in .sub{max-width:640px;margin:18px auto 30px;font-size:1.08rem;color:rgba(245,239,226,.85)}
+.hero-badge{position:absolute;left:50%;bottom:0;transform:translate(-50%,50%);z-index:3;background:var(--cream);color:var(--ink);border:3px solid var(--gold);border-radius:999px;padding:10px 22px;font-weight:700;font-size:.95rem;display:flex;align-items:center;gap:10px;box-shadow:0 10px 30px rgba(0,0,0,.25);white-space:nowrap}
+.hero-badge .dot{width:11px;height:11px;border-radius:50%;background:#2e9e4f}
+.hero-badge.closed .dot{background:var(--red)}
+.hero-sec{padding-top:60px}
+
+/* ---------- card wall ---------- */
+.section{padding:72px 0}
+.sec-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:34px;flex-wrap:wrap}
+.sec-head h2{font-size:clamp(2.2rem,5vw,3.4rem);text-transform:uppercase}
+.sec-head h2 span{color:var(--red)}
+.card-wall{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:22px}
+.card{background:var(--cream);border:2px solid var(--ink);border-radius:18px;padding:30px 26px;box-shadow:6px 6px 0 var(--ink);transition:transform .2s,box-shadow .2s}
+.card:nth-child(odd){transform:rotate(-.6deg)}
+.card:nth-child(even){transform:rotate(.6deg)}
+.card:hover{transform:rotate(0) translateY(-5px);box-shadow:10px 10px 0 var(--gold)}
+.card .icon{width:52px;height:52px;margin-bottom:16px}
+.card h3{font-size:1.7rem;letter-spacing:.05em;margin-bottom:10px;text-transform:uppercase}
+.card p{font-size:.96rem;color:rgba(23,19,16,.8)}
+.card .clink{display:inline-block;margin-top:14px;font-weight:700;color:var(--red);text-decoration:none}
+
+/* ---------- dark band ---------- */
+.band{background:var(--ink2);color:var(--paper);border-top:4px solid var(--gold);border-bottom:4px solid var(--gold)}
+.band h2{color:var(--gold2)}
+.hours-card{background:var(--cream);color:var(--ink);border-radius:18px;padding:30px;max-width:560px;margin:0 auto;border:2px solid var(--gold)}
+#hoursTable{width:100%;border-collapse:collapse;margin-top:12px}
+#hoursTable td{padding:10px 4px;border-bottom:1px dashed var(--line);font-size:.95rem}
+#hoursTable td:last-child{text-align:right;font-weight:600}
+#hoursTable tr.today td{background:rgba(201,162,39,.18);font-weight:700}
+
+/* ---------- services tabs ---------- */
+.tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px}
+.tab-btn{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.06em;background:var(--cream);border:2px solid var(--ink);color:var(--ink);border-radius:999px;padding:10px 26px;cursor:pointer}
+.tab-btn.active{background:var(--ink);color:var(--gold2);border-color:var(--ink)}
+.tab-panel{display:none;background:var(--cream);border:2px solid var(--ink);border-radius:20px;padding:36px;box-shadow:6px 6px 0 var(--ink)}
+.tab-panel.active{display:block;animation:fadeIn .4s ease}
+.tab-panel h3{font-size:2.2rem;text-transform:uppercase;margin-bottom:10px}
+.tab-panel .price{font-size:1.05rem;font-weight:700;color:var(--red);margin-bottom:14px}
+.tab-panel p{color:rgba(23,19,16,.82);max-width:60ch}
+.sample-note{display:inline-block;margin-top:18px;font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:rgba(169,50,38,.12);color:var(--red);padding:6px 14px;border-radius:999px;border:1px dashed var(--red)}
+
+/* ---------- carousel ---------- */
+.carousel{position:relative;background:var(--ink);border-radius:22px;overflow:hidden;border:3px solid var(--gold)}
+.car-track{display:flex;transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.car-slide{flex:0 0 100%;min-height:380px;display:flex;align-items:center;justify-content:center;position:relative;padding:30px}
+.car-slide .art{max-width:420px;width:100%}
+.car-slide .cap{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.65);color:#fff;font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:7px 16px;border-radius:999px}
+.car-btn{position:absolute;top:50%;transform:translateY(-50%);background:var(--gold);border:none;width:52px;height:52px;border-radius:50%;font-size:1.4rem;font-weight:700;cursor:pointer;color:var(--ink);z-index:2}
+.car-btn:hover{background:var(--gold2)}
+.car-btn.prev{left:16px}
+.car-btn.next{right:16px}
+.car-dots{display:flex;gap:10px;justify-content:center;padding:18px;background:var(--ink)}
+.car-dots button{width:12px;height:12px;border-radius:50%;border:2px solid var(--gold);background:transparent;cursor:pointer}
+.car-dots button.on{background:var(--gold)}
+
+/* ---------- reviews ---------- */
+.rev-summary{background:var(--ink);color:var(--paper);border-radius:20px;padding:36px;text-align:center;border:3px solid var(--gold)}
+.rev-summary .stars{font-size:2rem;color:var(--gold2);letter-spacing:.2em}
+.rev-summary .score{font-family:'Bebas Neue',sans-serif;font-size:4rem;color:var(--gold2);line-height:1}
+.rev-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px;margin:34px 0}
+.rev-card{background:var(--cream);border:2px solid var(--ink);border-radius:16px;padding:26px;box-shadow:5px 5px 0 var(--ink)}
+.rev-card .q{font-size:2.4rem;color:var(--gold);line-height:1;font-family:Georgia,serif}
+.rev-card p{font-size:.95rem;color:rgba(23,19,16,.85);margin:6px 0 12px}
+.rev-card .src{font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--red)}
+.rev-links{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px}
+.visit-card{background:var(--cream);border:2px solid var(--ink);border-radius:18px;padding:30px;box-shadow:6px 6px 0 var(--gold)}
+.visit-card h3{font-size:1.8rem;text-transform:uppercase;margin-bottom:14px;color:var(--red)}
+.visit-card a.tel{font-size:1.4rem;font-weight:800;text-decoration:none;color:var(--ink)}
+.visit-card a.tel:hover{color:var(--red)}
+.mapart{background:var(--ink);border-radius:18px;padding:34px;color:var(--paper);text-align:center;border:2px solid var(--ink)}
+
+/* ---------- footer multi column ---------- */
+footer{background:var(--ink);color:var(--paper);margin-top:70px;border-top:4px solid var(--gold)}
+.foot-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:30px;padding:54px 0 30px}
+.foot-grid h4{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.08em;color:var(--gold2);margin-bottom:14px;font-weight:400}
+.foot-grid a{display:block;color:rgba(245,239,226,.8);text-decoration:none;padding:5px 0;font-size:.94rem}
+.foot-grid a:hover{color:var(--gold2)}
+.foot-grid p{font-size:.94rem;color:rgba(245,239,226,.8)}
+.foot-bottom{border-top:1px solid rgba(233,196,74,.25);padding:20px 0;text-align:center;font-size:.9rem;color:rgba(245,239,226,.75)}
+
+@media(max-width:640px){
+  .hero-in{padding:70px 0 110px}
+  .topbar .call{display:none}
+  .car-btn{width:42px;height:42px}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <button id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <a class="brand" href="#home" data-page="home" aria-label="Class Of Our Own Barbershop, home">
+    <svg class="pole" viewBox="0 0 30 44" aria-hidden="true"><rect x="8" y="2" width="14" height="40" rx="7" fill="#f5efe2" stroke="#c9a227" stroke-width="2"/><clipPath id="pcl"><rect x="8" y="2" width="14" height="40" rx="7"/></clipPath><g clip-path="url(#pcl)"><rect x="8" y="4" width="14" height="7" fill="#a93226" transform="skewY(-18)"/><rect x="8" y="16" width="14" height="7" fill="#a93226"/><rect x="8" y="28" width="14" height="7" fill="#23408f" transform="skewY(18)"/></g></svg>
+    <b>CLASS OF OUR OWN</b>
+  </a>
+  <a class="call" href="tel:+15082396598">(508) 239-6598</a>
+</header>
+<div id="scrim"></div>
+<nav class="drawer main" id="mainNav" aria-label="Site navigation">
+  <div class="dhead"><span class="badge">Worcester, MA</span></div>
+  <a class="dlink" href="#home" data-page="home">Home</a>
+  <a class="dlink" href="#services" data-page="services">Services</a>
+  <a class="dlink" href="#about" data-page="about">Our Story</a>
+  <a class="dlink" href="#gallery" data-page="gallery">Gallery</a>
+  <a class="dlink" href="#reviews" data-page="reviews">Reviews</a>
+  <a class="dlink" href="#visit" data-page="visit">Visit Us</a>
+  <div class="dfoot">
+    712b Pleasant St, Worcester, MA 01602<br>
+    <a href="tel:+15082396598">(508) 239-6598</a>
+  </div>
+</nav>
+
+<main>
+
+<section class="page" id="page-home">
+  <div class="hero">
+    <svg class="hero-art" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs><pattern id="stripes" width="90" height="90" patternTransform="rotate(24)" patternUnits="userSpaceOnUse">
+        <rect width="90" height="90" fill="none"/><rect width="30" height="90" fill="#a93226" opacity=".28"/><rect x="30" width="30" height="90" fill="#f5efe2" opacity=".1"/><rect x="60" width="30" height="90" fill="#23408f" opacity=".28"/>
+      </pattern></defs>
+      <rect width="1200" height="600" fill="url(#stripes)"/>
+      <rect width="1200" height="600" fill="#171310" opacity=".72"/>
+    </svg>
+    <div class="hero-in wrap">
+      <span class="badge reveal">Barber Shop · Pleasant Street</span>
+      <h1 class="reveal">A <em>Class</em> of<br>Our Own</h1>
+      <p class="sub reveal">Sharp cuts, clean lines, and real craftsmanship on Pleasant Street in Worcester. Walk out looking like the best version of yourself.</p>
+      <div class="btn-row reveal" style="justify-content:center">
+        <a class="btn btn-gold" href="tel:+15082396598">Call (508) 239-6598</a>
+        <a class="btn btn-ghost" href="#services" data-page="services">See Services</a>
+      </div>
+    </div>
+    <div class="hero-badge" id="hoursPill"><span class="dot"></span><span id="hoursText">Check hours below</span></div>
+  </div>
+
+  <div class="section hero-sec">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Why the <span>chair</span> matters</h2>
+        <a class="btn btn-solid" href="#about" data-page="about">Our Story</a>
+      </div>
+      <div class="card-wall">
+        <div class="card reveal">
+          <svg class="icon" viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="23" fill="none" stroke="#a93226" stroke-width="3"/><path d="M16 36 L36 16 M16 16 L36 36" stroke="#171310" stroke-width="4" stroke-linecap="round"/><circle cx="13" cy="13" r="4" fill="none" stroke="#171310" stroke-width="3"/><circle cx="39" cy="39" r="4" fill="none" stroke="#171310" stroke-width="3"/></svg>
+          <h3>Precision Cuts</h3>
+          <p>Detailed work built around your head shape, hair texture, and personal style. No rushed chairs.</p>
+          <a class="clink" href="#services" data-page="services">Browse services</a>
+        </div>
+        <div class="card reveal">
+          <svg class="icon" viewBox="0 0 52 52" aria-hidden="true"><rect x="10" y="6" width="12" height="40" rx="6" fill="#f5efe2" stroke="#c9a227" stroke-width="3"/><rect x="30" y="6" width="12" height="40" rx="6" fill="#a93226" opacity=".85"/></svg>
+          <h3>Classic Barbershop</h3>
+          <p>A warm, professional shop on Pleasant Street where you are greeted like a regular from day one.</p>
+          <a class="clink" href="#gallery" data-page="gallery">Peek inside</a>
+        </div>
+        <div class="card reveal">
+          <svg class="icon" viewBox="0 0 52 52" aria-hidden="true"><path d="M26 6l4.7 9.5 10.5 1.5-7.6 7.4 1.8 10.5L26 30.1l-9.4 4.9 1.8-10.5L10.8 17l10.5-1.5z" fill="none" stroke="#c9a227" stroke-width="3" stroke-linejoin="round"/></svg>
+          <h3>Rated 4.8</h3>
+          <p>Reviewers praise the attention to detail and the genuine care that goes into every appointment.</p>
+          <a class="clink" href="#reviews" data-page="reviews">Read reviews</a>
+        </div>
+        <div class="card reveal">
+          <svg class="icon" viewBox="0 0 52 52" aria-hidden="true"><path d="M26 46s-14-8.6-14-20a8 8 0 0116-3 8 8 0 0116 3c0 11.4-14 20-14 20z" fill="none" stroke="#a93226" stroke-width="3"/><circle cx="26" cy="24" r="4" fill="#a93226"/></svg>
+          <h3>Easy to Find</h3>
+          <p>712b Pleasant St, Worcester, MA 01602. Open six days a week with evening hours.</p>
+          <a class="clink" href="#visit" data-page="visit">Plan your visit</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section band">
+    <div class="wrap" style="text-align:center">
+      <h2 class="reveal" style="font-size:clamp(2rem,5vw,3.2rem);text-transform:uppercase;margin-bottom:26px">Hours of <span style="color:var(--red)">operation</span></h2>
+      <div class="hours-card reveal">
+        <table id="hoursTable">
+          <tr><td>Monday</td><td>10:00 AM - 6:00 PM</td></tr>
+          <tr><td>Tuesday</td><td>10:00 AM - 6:00 PM</td></tr>
+          <tr><td>Wednesday</td><td>9:00 AM - 9:00 PM</td></tr>
+          <tr><td>Thursday</td><td>9:00 AM - 9:00 PM</td></tr>
+          <tr><td>Friday</td><td>9:00 AM - 9:00 PM</td></tr>
+          <tr><td>Saturday</td><td>9:00 AM - 9:00 PM</td></tr>
+          <tr><td>Sunday</td><td>Closed</td></tr>
+        </table>
+        <p style="margin-top:14px;font-size:.85rem;color:rgba(23,19,16,.65)">Call ahead to confirm, walk-ins welcome when chairs are open.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-services">
+  <div class="section">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Services <span>&amp;</span> pricing</h2>
+        <span class="badge">Tap a service</span>
+      </div>
+      <div class="tabs" role="tablist">
+        <button class="tab-btn active" data-tab="t-haircut">Haircut</button>
+        <button class="tab-btn" data-tab="t-beard">Beard Trim</button>
+        <button class="tab-btn" data-tab="t-shave">Head Shave</button>
+      </div>
+      <div class="tab-panel active" id="t-haircut" role="tabpanel">
+        <h3>Men's Haircut</h3>
+        <div class="price">From $30 · sample price</div>
+        <p>A full-service cut tailored to you: consultation, precision clipper and scissor work, clean lineup, and a styled finish. The signature service of the shop, built on detail and consistency.</p>
+        <span class="sample-note">Sample prices, call to confirm</span>
+      </div>
+      <div class="tab-panel" id="t-beard" role="tabpanel">
+        <h3>Beard Trim</h3>
+        <div class="price">From $15 · sample price</div>
+        <p>Shape, sculpt, and detail your beard with crisp lines and a conditioned finish. Pairs perfectly with a fresh cut.</p>
+        <span class="sample-note">Sample prices, call to confirm</span>
+      </div>
+      <div class="tab-panel" id="t-shave" role="tabpanel">
+        <h3>Head Shave</h3>
+        <div class="price">From $25 · sample price</div>
+        <p>A smooth, close head shave with hot lather and careful razor work for a clean, polished result.</p>
+        <span class="sample-note">Sample prices, call to confirm</span>
+      </div>
+      <div class="btn-row" style="margin-top:30px">
+        <a class="btn btn-solid" href="tel:+15082396598">Call to Book</a>
+        <a class="btn btn-gold" href="#visit" data-page="visit">Visit the Shop</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-about">
+  <div class="section">
+    <div class="wrap">
+      <div class="sec-head"><h2>Our <span>story</span></h2></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:34px;align-items:start">
+        <div class="reveal">
+          <svg viewBox="0 0 400 300" style="width:100%;border:3px solid var(--ink);border-radius:18px;background:var(--ink)" aria-hidden="true">
+            <rect width="400" height="300" fill="#241e18"/>
+            <rect x="60" y="40" width="280" height="220" rx="12" fill="#f5efe2"/>
+            <rect x="60" y="40" width="280" height="60" rx="12" fill="#a93226"/>
+            <rect x="60" y="88" width="280" height="12" fill="#a93226"/>
+            <text x="200" y="76" text-anchor="middle" font-family="Bebas Neue" font-size="26" fill="#f5efe2" letter-spacing="4">CLASS OF OUR OWN</text>
+            <rect x="90" y="130" width="220" height="12" rx="6" fill="#171310" opacity=".2"/>
+            <rect x="110" y="152" width="180" height="12" rx="6" fill="#171310" opacity=".15"/>
+            <rect x="130" y="174" width="140" height="12" rx="6" fill="#171310" opacity=".1"/>
+            <circle cx="200" cy="222" r="14" fill="none" stroke="#c9a227" stroke-width="4"/>
+          </svg>
+          <p style="text-align:center;font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(23,19,16,.55);margin-top:10px">Sample illustration</p>
+        </div>
+        <div class="reveal">
+          <h3 style="font-size:2rem;text-transform:uppercase;margin-bottom:14px">A shop built on craft</h3>
+          <p style="margin-bottom:14px;color:rgba(23,19,16,.85)">Class Of Our Own Barbershop sits on Pleasant Street in Worcester, a neighborhood shop where the work speaks for itself. The name says it all: this is a place in a class of its own.</p>
+          <p style="margin-bottom:14px;color:rgba(23,19,16,.85)">Reviewers describe a warm, welcoming, and professional atmosphere, and an owner who takes real pride in the craft, combining skill, precision, and artistry in every chair.</p>
+          <p style="color:rgba(23,19,16,.85)">Whether it is your first visit or your fiftieth, you get the same thing: a careful cut, an honest conversation, and a finish you can feel.</p>
+          <div class="btn-row" style="margin-top:24px">
+            <a class="btn btn-solid" href="#reviews" data-page="reviews">What Clients Say</a>
+            <a class="btn btn-gold" href="tel:+15082396598">Call the Shop</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-gallery">
+  <div class="section">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>The <span>gallery</span></h2>
+        <span class="badge">Sample photos</span>
+      </div>
+      <div class="carousel">
+        <div class="car-track" id="carTrack">
+          <div class="car-slide">
+            <svg class="art" viewBox="0 0 400 300" aria-hidden="true"><rect width="400" height="300" rx="14" fill="#241e18"/><rect x="150" y="40" width="100" height="220" rx="50" fill="#f5efe2"/><g opacity=".9"><rect x="150" y="60" width="100" height="26" fill="#a93226"/><rect x="150" y="112" width="100" height="26" fill="#23408f"/><rect x="150" y="164" width="100" height="26" fill="#a93226"/><rect x="150" y="216" width="100" height="26" fill="#23408f"/></g><rect x="150" y="40" width="100" height="220" rx="50" fill="none" stroke="#c9a227" stroke-width="6"/></svg>
+            <span class="cap">Sample photo · the classic pole</span>
+          </div>
+          <div class="car-slide">
+            <svg class="art" viewBox="0 0 400 300" aria-hidden="true"><rect width="400" height="300" rx="14" fill="#f5efe2"/><circle cx="200" cy="130" r="70" fill="#e8dcc2"/><path d="M130 120 Q200 40 270 120" fill="none" stroke="#171310" stroke-width="10" stroke-linecap="round"/><rect x="120" y="210" width="160" height="14" rx="7" fill="#a93226"/><text x="200" y="262" text-anchor="middle" font-family="Bebas Neue" font-size="24" fill="#171310" letter-spacing="3">FRESH FADE</text></svg>
+            <span class="cap">Sample photo · fresh fade</span>
+          </div>
+          <div class="car-slide">
+            <svg class="art" viewBox="0 0 400 300" aria-hidden="true"><rect width="400" height="300" rx="14" fill="#171310"/><g stroke="#c9a227" stroke-width="8" stroke-linecap="round"><line x1="120" y1="90" x2="280" y2="210"/><line x1="280" y1="90" x2="120" y2="210"/></g><circle cx="100" cy="70" r="22" fill="none" stroke="#f5efe2" stroke-width="8"/><circle cx="300" cy="230" r="22" fill="none" stroke="#f5efe2" stroke-width="8"/><text x="200" y="272" text-anchor="middle" font-family="Bebas Neue" font-size="24" fill="#f5efe2" letter-spacing="3">TOOLS OF THE TRADE</text></svg>
+            <span class="cap">Sample photo · tools of the trade</span>
+          </div>
+          <div class="car-slide">
+            <svg class="art" viewBox="0 0 400 300" aria-hidden="true"><rect width="400" height="300" rx="14" fill="#a93226"/><rect x="40" y="40" width="320" height="220" rx="12" fill="#f5efe2"/><text x="200" y="130" text-anchor="middle" font-family="Bebas Neue" font-size="44" fill="#171310" letter-spacing="4">WALK-INS</text><text x="200" y="175" text-anchor="middle" font-family="Bebas Neue" font-size="44" fill="#a93226" letter-spacing="4">WELCOME</text><rect x="120" y="200" width="160" height="10" rx="5" fill="#c9a227"/></svg>
+            <span class="cap">Sample photo · walk-ins welcome</span>
+          </div>
+        </div>
+        <button class="car-btn prev" data-car="prev" aria-label="Previous photo">‹</button>
+        <button class="car-btn next" data-car="next" aria-label="Next photo">›</button>
+        <div class="car-dots" id="carDots"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-reviews">
+  <div class="section">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Client <span>reviews</span></h2>
+        <span class="badge">Real review sources</span>
+      </div>
+      <div class="rev-summary reveal">
+        <div class="stars">★★★★★</div>
+        <div class="score">4.8</div>
+        <p style="color:rgba(245,239,226,.85)">Rated 4.8 based on 33 reviews on Birdeye, and 5.0 based on 24 reviews on Top Rated Online.</p>
+      </div>
+      <div class="rev-cards">
+        <div class="rev-card reveal">
+          <div class="q">&ldquo;</div>
+          <p>Reviewers highlight attention to detail and a barber who takes the time to get the cut right, even helping clients find a new style that suits them.</p>
+          <div class="src">Based on Google reviews · via Birdeye</div>
+        </div>
+        <div class="rev-card reveal">
+          <div class="q">&ldquo;</div>
+          <p>Clients describe a warm, welcoming, professional atmosphere, and an owner who combines skill, precision, and artistry in a class all by himself.</p>
+          <div class="src">Based on Google reviews · via Birdeye</div>
+        </div>
+        <div class="rev-card reveal">
+          <div class="q">&ldquo;</div>
+          <p>A true neighborhood favorite: reviewers call it an excellent spot all around and say they knew from the moment they walked in they were in the right place.</p>
+          <div class="src">Based on Google reviews · via Birdeye</div>
+        </div>
+      </div>
+      <div class="rev-links reveal">
+        <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJTdxuUU4H5IkRQKAR7s4G9-o" target="_blank" rel="noopener">See reviews on Google</a>
+        <a class="btn btn-gold" href="https://reviews.birdeye.com/class-of-our-own-barbershop-170256656190109" target="_blank" rel="noopener">Reviews on Birdeye</a>
+        <a class="btn btn-gold" href="https://www.top-rated.online/cities/Worcester/place/p/14089682/Class+Of+Our+Own+Barbershop" target="_blank" rel="noopener">Top Rated Online</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="page-visit">
+  <div class="section">
+    <div class="wrap">
+      <div class="sec-head"><h2>Visit <span>us</span></h2></div>
+      <div class="visit-grid">
+        <div class="visit-card reveal">
+          <h3>Find Us</h3>
+          <p>Class Of Our Own Barbershop<br>712b Pleasant St<br>Worcester, MA 01602</p>
+          <p style="margin-top:14px"><a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJTdxuUU4H5IkRQKAR7s4G9-o" target="_blank" rel="noopener">Get Directions</a></p>
+        </div>
+        <div class="visit-card reveal">
+          <h3>Call Us</h3>
+          <p><a class="tel" href="tel:+15082396598">(508) 239-6598</a></p>
+          <p style="margin-top:10px;color:rgba(23,19,16,.75)">Call to book your chair or ask about walk-in availability.</p>
+        </div>
+        <div class="visit-card reveal">
+          <h3>Hours</h3>
+          <p>Mon - Tue: 10 AM - 6 PM<br>Wed - Sat: 9 AM - 9 PM<br>Sunday: Closed</p>
+        </div>
+      </div>
+      <div class="mapart reveal" style="margin-top:26px">
+        <svg viewBox="0 0 120 120" style="width:84px;margin:0 auto 14px" aria-hidden="true"><path d="M60 112s-38-24-38-56a38 38 0 0176 0c0 32-38 56-38 56z" fill="none" stroke="#c9a227" stroke-width="7"/><circle cx="60" cy="56" r="14" fill="#a93226"/></svg>
+        <h3 class="bebas" style="font-size:2rem;letter-spacing:.06em;color:var(--gold2)">PLEASANT STREET, WORCESTER</h3>
+        <p style="color:rgba(245,239,226,.8);max-width:52ch;margin:8px auto 20px">Right in the heart of Worcester, easy to reach and easy to love. Tap below for turn-by-turn directions.</p>
+        <a class="btn btn-gold" href="https://www.google.com/maps/place/?q=place_id:ChIJTdxuUU4H5IkRQKAR7s4G9-o" target="_blank" rel="noopener">Open in Google Maps</a>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <h4>Class Of Our Own</h4>
+        <p>A Worcester barbershop in a class of its own. Precision cuts, honest service, and a chair that feels like home.</p>
+      </div>
+      <div>
+        <h4>Pages</h4>
+        <a href="#home" data-page="home">Home</a>
+        <a href="#services" data-page="services">Services</a>
+        <a href="#about" data-page="about">Our Story</a>
+        <a href="#gallery" data-page="gallery">Gallery</a>
+        <a href="#reviews" data-page="reviews">Reviews</a>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <p>712b Pleasant St<br>Worcester, MA 01602</p>
+        <a href="tel:+15082396598">(508) 239-6598</a>
+        <a href="https://www.google.com/maps/place/?q=place_id:ChIJTdxuUU4H5IkRQKAR7s4G9-o" target="_blank" rel="noopener">Get Directions</a>
+      </div>
+      <div>
+        <h4>Hours</h4>
+        <p>Mon - Tue: 10 AM - 6 PM<br>Wed - Sat: 9 AM - 9 PM<br>Sunday: Closed</p>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© Class Of Our Own Barbershop</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+    var scrim = document.getElementById("scrim");
+    if(scrim){ scrim.classList.remove("show"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+      var scrim = document.getElementById("scrim");
+      if(scrim){ scrim.classList.toggle("show", open); }
+    });
+  }
+
+  var scrim = document.getElementById("scrim");
+  if(scrim){ scrim.addEventListener("click", closeMenu); }
+
+  var tabBtns = document.querySelectorAll(".tab-btn");
+  for(var t = 0; t < tabBtns.length; t++){
+    tabBtns[t].addEventListener("click", function(){
+      for(var a = 0; a < tabBtns.length; a++){ tabBtns[a].classList.remove("active"); }
+      this.classList.add("active");
+      var panels = document.querySelectorAll(".tab-panel");
+      for(var b = 0; b < panels.length; b++){
+        panels[b].classList.toggle("active", panels[b].id === this.getAttribute("data-tab"));
+      }
+    });
+  }
+
+  var track = document.getElementById("carTrack");
+  var dotsBox = document.getElementById("carDots");
+  var idx = 0;
+  function slideCount(){ return track ? track.children.length : 0; }
+  function go(n){
+    var c = slideCount();
+    if(!c){ return; }
+    idx = ((n % c) + c) % c;
+    track.style.transform = "translateX(-" + (idx * 100) + "%)";
+    var dots = dotsBox.querySelectorAll("button");
+    for(var d = 0; d < dots.length; d++){
+      dots[d].classList.toggle("on", d === idx);
+    }
+  }
+  if(track && dotsBox){
+    for(var s = 0; s < slideCount(); s++){
+      (function(n){
+        var dot = document.createElement("button");
+        dot.setAttribute("aria-label", "Go to photo " + (n + 1));
+        dot.addEventListener("click", function(){ go(n); });
+        dotsBox.appendChild(dot);
+      })(s);
+    }
+    var carBtns = document.querySelectorAll("[data-car]");
+    for(var cb = 0; cb < carBtns.length; cb++){
+      carBtns[cb].addEventListener("click", function(){
+        go(idx + (this.getAttribute("data-car") === "next" ? 1 : -1));
+      });
+    }
+    go(0);
+  }
+
+  var HOURS = {0:null,1:[10,18],2:[10,18],3:[9,21],4:[9,21],5:[9,21],6:[9,21]};
+  var DOW = {"Sun":0,"Mon":1,"Tue":2,"Wed":3,"Thu":4,"Fri":5,"Sat":6};
+  function fmt(h){
+    var ap = h < 12 ? "AM" : "PM";
+    var hh = h % 12;
+    if(hh === 0){ hh = 12; }
+    return hh + ":00 " + ap;
+  }
+  try{
+    var parts = new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",weekday:"short",hour:"numeric",hour12:false}).formatToParts(new Date());
+    var wd = "Mon", hr = 12;
+    parts.forEach(function(p){
+      if(p.type === "weekday"){ wd = p.value; }
+      if(p.type === "hour"){ hr = parseInt(p.value, 10) % 24; }
+    });
+    var day = DOW[wd] !== undefined ? DOW[wd] : 1;
+    var pill = document.getElementById("hoursPill");
+    var txt = document.getElementById("hoursText");
+    var todayH = HOURS[day];
+    if(pill && txt){
+      if(todayH && hr >= todayH[0] && hr < todayH[1]){
+        txt.textContent = "Open now · until " + fmt(todayH[1]) + " today";
+      } else {
+        pill.classList.add("closed");
+        var nd = day;
+        var found = false;
+        for(var k = 1; k <= 7; k++){
+          var cnd = (day + k) % 7;
+          if(HOURS[cnd]){ nd = cnd; found = true; break; }
+        }
+        var dayName = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][nd];
+        txt.textContent = "Closed · opens " + (k === 1 ? "tomorrow" : dayName) + " at " + fmt(HOURS[nd][0]);
+      }
+    }
+    var rows = document.querySelectorAll("#hoursTable tr");
+    var ridx = (day + 6) % 7;
+    if(rows[ridx]){ rows[ridx].classList.add("today"); }
+  }catch(e){}
+
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

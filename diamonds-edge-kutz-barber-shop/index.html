@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diamonds Edge Kutz Barber Shop | Barber Shop in Worcester, MA</title>
+<meta name="description" content="Diamonds Edge Kutz Barber Shop at 16-18b Millbury St, Worcester, MA. Cuts, fades, beard trims, and hot towel shaves. Call (508) 963-5509.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#111114; --bg2:#18181d; --card:#1e1e24; --ink:#f4efe6; --muted:#b9b2a4;
+  --gold:#d4a94e; --gold2:#b3872f; --line:rgba(212,169,78,.28);
+  --serif:'Playfair Display',Georgia,serif; --sans:'Inter',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;overflow-x:hidden}
+a{color:inherit}
+img,svg{display:block;max-width:100%}
+.page{display:none}
+.page.active{display:block;animation:fadeIn .45s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.wrap{max-width:1100px;margin:0 auto;padding:0 24px}
+
+/* ---------- side drawer ---------- */
+.burger{position:fixed;top:18px;left:18px;z-index:120;width:52px;height:52px;border:1px solid var(--line);border-radius:12px;background:rgba(17,17,20,.9);backdrop-filter:blur(6px);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.burger span{display:block;width:24px;height:2px;background:var(--gold);transition:.3s}
+.burger[aria-expanded="true"] span:nth-child(1){transform:translateY(8px) rotate(45deg)}
+.burger[aria-expanded="true"] span:nth-child(2){opacity:0}
+.burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-8px) rotate(-45deg)}
+nav.main{position:fixed;top:0;left:0;bottom:0;width:min(330px,86vw);background:var(--bg2);border-right:1px solid var(--line);z-index:110;padding:96px 28px 28px;transform:translateX(-105%);transition:transform .35s ease;display:flex;flex-direction:column;gap:6px}
+nav.main.open{transform:none}
+nav.main .brand{font-family:var(--serif);font-weight:900;font-size:1.5rem;color:var(--gold);text-decoration:none;margin-bottom:18px;line-height:1.25}
+nav.main a[data-page]{display:block;text-decoration:none;font-size:1.02rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:12px 14px;border-radius:10px;color:var(--muted)}
+nav.main a[data-page]:hover{background:rgba(212,169,78,.1);color:var(--ink)}
+nav.main a[data-page].active{background:rgba(212,169,78,.16);color:var(--gold)}
+nav.main .drawer-foot{margin-top:auto;display:flex;flex-direction:column;gap:10px}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:opacity .3s;z-index:105}
+.scrim.show{opacity:1;pointer-events:auto}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-block;text-decoration:none;font-weight:700;letter-spacing:.04em;border-radius:999px;padding:13px 30px;transition:.25s;cursor:pointer;border:1px solid transparent}
+.btn-solid{background:var(--gold);color:#17171b}
+.btn-solid:hover{background:var(--gold2);transform:translateY(-2px)}
+.btn-ghost{border-color:var(--line);color:var(--ink)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ---------- hero: editorial type, no image ---------- */
+.hero{padding:130px 0 70px;border-bottom:1px solid var(--line)}
+.kicker{display:inline-block;font-size:.78rem;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);border:1px solid var(--line);border-radius:999px;padding:8px 18px;margin-bottom:26px}
+.hero h1{font-family:var(--serif);font-weight:900;line-height:.98;letter-spacing:-.01em;font-size:clamp(3rem,9.5vw,7.5rem);margin-bottom:24px}
+.hero h1 em{font-style:italic;color:var(--gold)}
+.hero .rule{width:88px;height:4px;background:var(--gold);margin:26px 0}
+.hero p.lede{font-size:1.12rem;color:var(--muted);max-width:640px;margin-bottom:34px}
+.hero-ctas{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:40px}
+.pill{display:inline-flex;align-items:center;gap:10px;font-size:.9rem;font-weight:600;border:1px solid var(--line);border-radius:999px;padding:9px 18px;color:var(--muted)}
+.pill .dot{width:9px;height:9px;border-radius:50%;background:#3ddc84}
+.pill.closed .dot{background:#ff5d5d}
+
+/* ---------- card wall ---------- */
+.section{padding:76px 0}
+.section-head{margin-bottom:38px}
+.section-head .kicker{margin-bottom:16px}
+.section-head h2{font-family:var(--serif);font-weight:700;font-size:clamp(1.9rem,4vw,2.8rem);line-height:1.15}
+.section-head p{color:var(--muted);max-width:620px;margin-top:10px}
+.cardwall{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px}
+.wcard{background:var(--card);border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:28px 24px;position:relative;overflow:hidden;transition:.25s}
+.wcard:hover{transform:translateY(-4px);border-color:var(--line)}
+.wcard .num{font-family:var(--serif);font-style:italic;color:var(--gold);font-size:1rem;margin-bottom:10px;display:block}
+.wcard h3{font-size:1.12rem;margin-bottom:8px}
+.wcard p{font-size:.94rem;color:var(--muted)}
+.wcard svg{margin-bottom:16px}
+
+/* ---------- tabs ---------- */
+.tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:30px}
+.tabbtn{font-family:var(--sans);font-weight:700;font-size:.92rem;letter-spacing:.05em;text-transform:uppercase;background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:11px 24px;cursor:pointer;transition:.25s}
+.tabbtn:hover{color:var(--ink);border-color:var(--gold)}
+.tabbtn.active{background:var(--gold);color:#17171b;border-color:var(--gold)}
+.tabpanel{display:none}
+.tabpanel.active{display:block;animation:fadeIn .35s ease}
+.panelgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+.scard{background:var(--card);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:26px}
+.scard h3{font-family:var(--serif);font-size:1.25rem;margin-bottom:8px}
+.scard p{color:var(--muted);font-size:.95rem;margin-bottom:14px}
+.scard .price{font-weight:700;color:var(--gold);font-size:1.05rem}
+.samplebadge{display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);border:1px dashed var(--gold);border-radius:6px;padding:4px 10px;margin-top:10px}
+.note{margin-top:26px;font-size:.9rem;color:var(--muted)}
+
+/* ---------- carousel ---------- */
+.carousel{position:relative;max-width:760px;margin:0 auto}
+.cwindow{overflow:hidden;border-radius:20px;border:1px solid var(--line)}
+.ctrack{display:flex;transition:transform .5s ease}
+.cslide{min-width:100%;background:var(--bg2);padding:60px 40px;text-align:center}
+.cslide .art{margin:0 auto 26px}
+.cslide h3{font-family:var(--serif);font-size:1.6rem;margin-bottom:10px}
+.cslide p{color:var(--muted);max-width:480px;margin:0 auto 8px}
+.carbtn{position:absolute;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:rgba(17,17,20,.85);color:var(--gold);font-size:1.3rem;cursor:pointer;z-index:2}
+.carbtn:hover{background:var(--gold);color:#17171b}
+.carprev{left:-24px}.carnext{right:-24px}
+.dots{display:flex;gap:10px;justify-content:center;margin-top:22px}
+.dot{width:11px;height:11px;border-radius:50%;border:1px solid var(--gold);background:transparent;cursor:pointer;padding:0}
+.dot.active{background:var(--gold)}
+
+/* ---------- reviews ---------- */
+.revlink{display:block;background:var(--card);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:24px 26px;text-decoration:none;margin-bottom:14px;transition:.25s}
+.revlink:hover{border-color:var(--line);transform:translateY(-2px)}
+.revlink .src{font-weight:700;font-size:1.05rem;color:var(--gold);margin-bottom:6px}
+.revlink p{color:var(--muted);font-size:.95rem}
+.stars{color:var(--gold);letter-spacing:.2em;margin-bottom:16px;font-size:1.2rem}
+.quote{background:var(--bg2);border-left:3px solid var(--gold);border-radius:0 12px 12px 0;padding:18px 22px;margin-bottom:14px;color:var(--muted);font-style:italic}
+
+/* ---------- visit ---------- */
+.visitgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-bottom:30px}
+.vcard{background:var(--card);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:28px}
+.vcard h3{font-family:var(--serif);font-size:1.3rem;margin-bottom:12px;color:var(--gold)}
+.vcard p,.vcard li{color:var(--muted);font-size:.96rem}
+.vcard a{color:var(--ink)}
+.hours{width:100%;border-collapse:collapse;font-size:.95rem}
+.hours td{padding:9px 4px;border-bottom:1px solid rgba(255,255,255,.07);color:var(--muted)}
+.hours tr.today td{color:var(--gold);font-weight:700}
+.hours td:last-child{text-align:right}
+.mapbtn{margin-top:8px}
+
+/* ---------- footer ---------- */
+footer{border-top:1px solid var(--line);padding:44px 0 34px;margin-top:40px}
+footer .frow{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;margin-bottom:22px}
+footer .flinks a{text-decoration:none;color:var(--muted);font-size:.92rem;margin-right:18px}
+footer .flinks a:hover{color:var(--gold)}
+footer .copy{font-size:.92rem;color:var(--muted)}
+
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:none}
+@media (max-width:640px){
+  .carprev{left:8px}.carnext{right:8px}
+  .cslide{padding:44px 24px}
+}
+</style>
+</head>
+<body>
+
+<button class="burger" id="burger" aria-label="Open navigation" aria-expanded="false" aria-controls="mainNav">
+  <span></span><span></span><span></span>
+</button>
+
+<nav class="main" id="mainNav" aria-label="Primary">
+  <a class="brand" href="#home" data-page="home">Diamonds Edge<br>Kutz Barber Shop</a>
+  <a href="#home" data-page="home" class="active" aria-current="page">Home</a>
+  <a href="#services" data-page="services">Services</a>
+  <a href="#gallery" data-page="gallery">Gallery</a>
+  <a href="#reviews" data-page="reviews">Reviews</a>
+  <a href="#visit" data-page="visit">Visit Us</a>
+  <div class="drawer-foot">
+    <a class="btn btn-solid" href="tel:+15089635509">Call (508) 963-5509</a>
+    <p style="font-size:.85rem;color:var(--muted)">16-18b Millbury St<br>Worcester, MA 01610</p>
+  </div>
+</nav>
+<div class="scrim" id="scrim"></div>
+
+<main>
+<section class="page" id="page-home">
+  <header class="hero">
+    <div class="wrap">
+      <span class="kicker">Barber Shop · Worcester, MA</span>
+      <h1>Sharp cuts.<br><em>Diamond edge</em><br>every time.</h1>
+      <div class="rule"></div>
+      <p class="lede">Diamonds Edge Kutz Barber Shop on Millbury Street delivers precise fades, crisp line-ups, and clean shaves in a clean and elegant space. Walk in, sit back, and leave sharper than you came.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-solid" href="#services" data-page="services">See services</a>
+        <a class="btn btn-ghost" href="tel:+15089635509">Call (508) 963-5509</a>
+      </div>
+      <div class="pill" id="hoursPill"><span class="dot"></span><span id="hoursText">Checking hours...</span></div>
+    </div>
+  </header>
+
+  <div class="section">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="kicker">Why Diamonds Edge Kutz</span>
+        <h2>A cut above the rest of Millbury Street</h2>
+        <p>Rated 5.0 stars across 20 Google reviews, this shop is known for good attention, good service, and quality in a clean, elegant space. One reviewer put it simply: the best in Worcester.</p>
+      </div>
+      <div class="cardwall">
+        <div class="wcard reveal">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><circle cx="22" cy="22" r="20" stroke="#d4a94e" stroke-width="2"/><path d="M14 30 L30 14 M14 14 L30 30" stroke="#d4a94e" stroke-width="2" stroke-linecap="round"/></svg>
+          <span class="num">01</span>
+          <h3>Precision Fades</h3>
+          <p>Clean blends from skin to scissor work, finished with a crisp line-up that holds its edge.</p>
+        </div>
+        <div class="wcard reveal">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><circle cx="22" cy="22" r="20" stroke="#d4a94e" stroke-width="2"/><path d="M22 12 v14 M22 26 c0 5-3 7-6 8 M22 26 c0 5 3 7 6 8" stroke="#d4a94e" stroke-width="2" stroke-linecap="round"/></svg>
+          <span class="num">02</span>
+          <h3>Beard Sculpting</h3>
+          <p>Shape-ups, trims, and detail work that frames the jawline and keeps the beard looking intentional.</p>
+        </div>
+        <div class="wcard reveal">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><circle cx="22" cy="22" r="20" stroke="#d4a94e" stroke-width="2"/><path d="M16 20 q6-8 12 0 M16 26 q6-8 12 0" stroke="#d4a94e" stroke-width="2" stroke-linecap="round"/></svg>
+          <span class="num">03</span>
+          <h3>Hot Towel Finish</h3>
+          <p>The classic close. Warm towel prep and a smooth razor finish for skin that feels brand new.</p>
+        </div>
+        <div class="wcard reveal">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true"><circle cx="22" cy="22" r="20" stroke="#d4a94e" stroke-width="2"/><path d="M15 29 l7-14 7 14" stroke="#d4a94e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="num">04</span>
+          <h3>Latino Owned</h3>
+          <p>A proudly Latino-owned neighborhood shop with wheelchair-accessible parking and early morning hours.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="padding-top:0">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="kicker">What clients say</span>
+        <h2>Based on 20 Google reviews</h2>
+      </div>
+      <div class="stars reveal">★★★★★</div>
+      <div class="quote reveal">“Really good at cutting hair.”</div>
+      <div class="quote reveal">“The best in Worcester.”</div>
+      <div class="quote reveal">“Good attention, good service, quality, clean and elegant space.”</div>
+      <p class="reveal" style="margin-top:18px"><a class="btn btn-ghost" href="#reviews" data-page="reviews">Read reviews</a></p>
+    </div>
+  </div>
+
+  <div class="section" style="padding-top:0">
+    <div class="wrap reveal" style="background:var(--card);border:1px solid var(--line);border-radius:22px;padding:48px 40px;text-align:center">
+      <h2 style="font-family:var(--serif);font-size:clamp(1.7rem,4vw,2.4rem);margin-bottom:12px">Walk-ins welcome. Chairs are waiting.</h2>
+      <p style="color:var(--muted);margin-bottom:26px">16-18b Millbury St, Worcester, MA 01610</p>
+      <a class="btn btn-solid" href="tel:+15089635509">Call (508) 963-5509</a>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="kicker">Services</span>
+        <h2>The menu, chair side</h2>
+        <p>Everything a barber shop should do, done with a diamond edge. Call for current pricing and availability.</p>
+      </div>
+      <div class="tabs" role="tablist">
+        <button class="tabbtn active" data-tab="cuts" role="tab">Cuts</button>
+        <button class="tabbtn" data-tab="fades" role="tab">Fades &amp; Designs</button>
+        <button class="tabbtn" data-tab="beard" role="tab">Beard &amp; Detail</button>
+        <button class="tabbtn" data-tab="shave" role="tab">Shave &amp; Finish</button>
+      </div>
+
+      <div class="tabpanel active" data-panel="cuts">
+        <div class="panelgrid">
+          <div class="scard"><h3>Classic Haircut</h3><p>Consultation, precision cut, styled finish, and a clean neckline.</p><div class="price">from $25 <span class="samplebadge">Sample pricing</span></div></div>
+          <div class="scard"><h3>Kids Cut (12 &amp; under)</h3><p>Patient, tidy cuts for young gentlemen. Same sharp standard, scaled down.</p><div class="price">from $20 <span class="samplebadge">Sample pricing</span></div></div>
+          <div class="scard"><h3>Cut &amp; Beard Combo</h3><p>The full reset: haircut plus beard trim and line-up in one chair session.</p><div class="price">from $35 <span class="samplebadge">Sample pricing</span></div></div>
+        </div>
+      </div>
+
+      <div class="tabpanel" data-panel="fades">
+        <div class="panelgrid">
+          <div class="scard"><h3>Skin Fade</h3><p>Seamless blend from skin to length, razor-crisp line-up included.</p><div class="price">from $28 <span class="samplebadge">Sample pricing</span></div></div>
+          <div class="scard"><h3>Drop / Taper Fade</h3><p>Modern taper work with natural edges for a low-maintenance grow-out.</p><div class="price">from $26 <span class="samplebadge">Sample pricing</span></div></div>
+          <div class="scard"><h3>Hair Design</h3><p>Lines, parts, and razor art for a cut that turns heads.</p><div class="price">from $30 <span class="samplebadge">Sample pricing</span></div></div>
+        </div>
+      </div>
+
+      <div class="tabpanel" data-panel="beard">
+        <div class="panelgrid">
+          <div class="scard"><h3>Beard Trim &amp; Line-Up</h3><p>Shape, balance, and detail for a beard that looks deliberately sharp.</p><div class="price">from $15 <span class="samplebadge">Sample pricing</span></div></div>
+          <div class="scard"><h3>Beard Sculpting</h3><p>Full reshaping with razor detail and hot lather edges.</p><div class="price">from $20 <span class="samplebadge">Sample pricing</span></div></div>
+          <div class="scard"><h3>Eyebrow Clean-Up</h3><p>Quick razor detail to frame the face and finish the look.</p><div class="price">from $8 <span class="samplebadge">Sample pricing</span></div></div>
+        </div>
+      </div>
+
+      <div class="tabpanel" data-panel="shave">
+        <div class="panelgrid">
+          <div class="scard"><h3>Hot Towel Shave</h3><p>Warm towel prep, hot lather, straight razor finish, and cool-down.</p><div class="price">from $25 <span class="samplebadge">Sample pricing</span></div></div>
+          <div class="scard"><h3>Head Shave</h3><p>Clean, smooth dome with hot towel and moisturizer finish.</p><div class="price">from $22 <span class="samplebadge">Sample pricing</span></div></div>
+          <div class="scard"><h3>Neckline Clean-Up</h3><p>Between-cut maintenance to keep the edges looking fresh.</p><div class="price">from $10 <span class="samplebadge">Sample pricing</span></div></div>
+        </div>
+      </div>
+
+      <p class="note">Prices shown are sample estimates for illustration. Please call <a href="tel:+15089635509">(508) 963-5509</a> to confirm current pricing.</p>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="kicker">Gallery</span>
+        <h2>The work speaks</h2>
+        <p>Sample gallery placeholders. The real chairs at 16-18b Millbury St speak louder.</p>
+      </div>
+      <div class="carousel">
+        <div class="cwindow">
+          <div class="ctrack" id="ctrack">
+            <div class="cslide">
+              <svg class="art" width="120" height="120" viewBox="0 0 120 120" aria-hidden="true"><rect x="8" y="8" width="104" height="104" rx="18" fill="#1e1e24" stroke="#d4a94e" stroke-width="2"/><path d="M35 80 L85 40 M35 40 L85 80" stroke="#d4a94e" stroke-width="5" stroke-linecap="round"/><circle cx="35" cy="35" r="9" fill="none" stroke="#d4a94e" stroke-width="4"/><circle cx="35" cy="85" r="9" fill="none" stroke="#d4a94e" stroke-width="4"/></svg>
+              <h3>Skin Fades</h3>
+              <p>Seamless blends and razor line-ups. <span class="samplebadge">Sample gallery</span></p>
+            </div>
+            <div class="cslide">
+              <svg class="art" width="120" height="120" viewBox="0 0 120 120" aria-hidden="true"><rect x="8" y="8" width="104" height="104" rx="18" fill="#1e1e24" stroke="#d4a94e" stroke-width="2"/><path d="M40 84 q20-44 40 0" stroke="#d4a94e" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M48 84 q12-26 24 0" stroke="#d4a94e" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+              <h3>Beard Work</h3>
+              <p>Shape-ups and sculpted edges. <span class="samplebadge">Sample gallery</span></p>
+            </div>
+            <div class="cslide">
+              <svg class="art" width="120" height="120" viewBox="0 0 120 120" aria-hidden="true"><rect x="8" y="8" width="104" height="104" rx="18" fill="#1e1e24" stroke="#d4a94e" stroke-width="2"/><rect x="38" y="30" width="44" height="60" rx="10" fill="none" stroke="#d4a94e" stroke-width="4"/><path d="M46 44 h28 M46 54 h28 M46 64 h28" stroke="#d4a94e" stroke-width="3" stroke-linecap="round"/></svg>
+              <h3>The Chair</h3>
+              <p>A clean, elegant space to unwind. <span class="samplebadge">Sample gallery</span></p>
+            </div>
+            <div class="cslide">
+              <svg class="art" width="120" height="120" viewBox="0 0 120 120" aria-hidden="true"><rect x="8" y="8" width="104" height="104" rx="18" fill="#1e1e24" stroke="#d4a94e" stroke-width="2"/><circle cx="60" cy="60" r="26" fill="none" stroke="#d4a94e" stroke-width="5"/><path d="M60 46 v14 l10 8" stroke="#d4a94e" stroke-width="5" fill="none" stroke-linecap="round"/></svg>
+              <h3>Hot Towel Detail</h3>
+              <p>The classic close, done right. <span class="samplebadge">Sample gallery</span></p>
+            </div>
+          </div>
+        </div>
+        <button class="carbtn carprev" id="carPrev" aria-label="Previous slide">&#8249;</button>
+        <button class="carbtn carnext" id="carNext" aria-label="Next slide">&#8250;</button>
+        <div class="dots" id="carDots" role="tablist" aria-label="Gallery slides"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="kicker">Reviews</span>
+        <h2>5.0 stars, based on 20 Google reviews</h2>
+        <p>What reviewers say: good attention, good service, quality, and a clean, elegant space. Read the reviews where they were written.</p>
+      </div>
+      <div class="stars">★★★★★</div>
+      <a class="revlink" href="https://www.google.com/maps/place/?q=place_id:ChIJITm_yVsH5IkROzF3eaunDG0">
+        <div class="src">Google Reviews</div>
+        <p>Read all 20 Google reviews and the 5.0 star rating on the shop's Google Maps listing.</p>
+      </a>
+      <a class="revlink" href="https://reviews.birdeye.com/diamonds-edge-kutz-barber-shop-171604089511293">
+        <div class="src">Birdeye</div>
+        <p>See the 5.0 star rating and 20 reviews collected on Birdeye for Diamonds Edge Kutz Barber Shop.</p>
+      </a>
+      <a class="revlink" href="https://www.top-rated.online/cities/Worcester/place/p/14089691/Diamonds+Edge+Kutz+Barber+Shop">
+        <div class="src">Top Rated Online</div>
+        <p>Find hours, amenities, and the 5.0 star review summary on Top Rated Online.</p>
+      </a>
+      <p class="note">Review counts and ratings come from third-party listings and can change over time.</p>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="kicker">Visit us</span>
+        <h2>Find us on Millbury Street</h2>
+      </div>
+      <div class="visitgrid">
+        <div class="vcard">
+          <h3>Address</h3>
+          <p>Diamonds Edge Kutz Barber Shop<br>16-18b Millbury St<br>Worcester, MA 01610</p>
+          <p class="mapbtn"><a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJITm_yVsH5IkROzF3eaunDG0">Get directions</a></p>
+        </div>
+        <div class="vcard">
+          <h3>Contact</h3>
+          <p>Phone: <a href="tel:+15089635509">(508) 963-5509</a><br><br><a class="btn btn-ghost" href="tel:+15089635509">Call now</a></p>
+        </div>
+        <div class="vcard">
+          <h3>Hours</h3>
+          <table class="hours" id="hoursTable">
+            <tr><td>Monday</td><td>8:00 AM to 5:00 PM</td></tr>
+            <tr><td>Tuesday</td><td>9:00 AM to 5:00 PM</td></tr>
+            <tr><td>Wednesday</td><td>9:00 AM to 7:00 PM</td></tr>
+            <tr><td>Thursday</td><td>8:00 AM to 6:00 PM</td></tr>
+            <tr><td>Friday</td><td>6:30 AM to 7:00 PM</td></tr>
+            <tr><td>Saturday</td><td>4:45 AM to 7:00 PM</td></tr>
+            <tr><td>Sunday</td><td>Closed</td></tr>
+          </table>
+          <p class="note">Hours as listed in online directories. Call to confirm.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="frow">
+      <div class="flinks">
+        <a href="#home" data-page="home">Home</a>
+        <a href="#services" data-page="services">Services</a>
+        <a href="#gallery" data-page="gallery">Gallery</a>
+        <a href="#reviews" data-page="reviews">Reviews</a>
+        <a href="#visit" data-page="visit">Visit Us</a>
+      </div>
+      <a class="btn btn-solid" href="tel:+15089635509">Call (508) 963-5509</a>
+    </div>
+    <p class="copy">&copy; Diamonds Edge Kutz Barber Shop</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+  var scrim = document.getElementById("scrim");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(scrim){ scrim.classList.remove("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+      if(scrim){ scrim.classList.toggle("show", open); }
+    });
+  }
+  if(scrim){ scrim.addEventListener("click", closeMenu); }
+
+  /* ---------- service tabs ---------- */
+  document.addEventListener("click", function(e){
+    var btn = e.target.closest(".tabbtn");
+    if(!btn) return;
+    var tab = btn.getAttribute("data-tab");
+    var btns = document.querySelectorAll(".tabbtn");
+    for(var i = 0; i < btns.length; i++){ btns[i].classList.toggle("active", btns[i] === btn); }
+    var panels = document.querySelectorAll(".tabpanel");
+    for(var j = 0; j < panels.length; j++){
+      panels[j].classList.toggle("active", panels[j].getAttribute("data-panel") === tab);
+    }
+  });
+
+  /* ---------- gallery carousel ---------- */
+  var track = document.getElementById("ctrack");
+  var dotsWrap = document.getElementById("carDots");
+  var slides = track ? track.children.length : 0;
+  var idx = 0;
+  function go(n){
+    if(!track) return;
+    idx = ((n % slides) + slides) % slides;
+    track.style.transform = "translateX(-" + (idx * 100) + "%)";
+    var dots = dotsWrap.children;
+    for(var i = 0; i < dots.length; i++){ dots[i].classList.toggle("active", i === idx); }
+  }
+  if(track && dotsWrap){
+    for(var d = 0; d < slides; d++){
+      var dot = document.createElement("button");
+      dot.className = "dot" + (d === 0 ? " active" : "");
+      dot.setAttribute("aria-label", "Go to slide " + (d + 1));
+      (function(k){ dot.addEventListener("click", function(){ go(k); }); })(d);
+      dotsWrap.appendChild(dot);
+    }
+    document.getElementById("carPrev").addEventListener("click", function(){ go(idx - 1); });
+    document.getElementById("carNext").addEventListener("click", function(){ go(idx + 1); });
+  }
+
+  /* ---------- live hours (America/New_York) ---------- */
+  var HOURS = {0:null, 1:[8,17], 2:[9,17], 3:[9,19], 4:[8,18], 5:[6.5,19], 6:[4.75,19]};
+  var DOW = {"Sun":0,"Mon":1,"Tue":2,"Wed":3,"Thu":4,"Fri":5,"Sat":6};
+  var DAYNAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  function fmt(h){
+    var ap = h < 12 ? "AM" : "PM";
+    var hh = Math.floor(h % 12); if(hh === 0){ hh = 12; }
+    var mm = (h % 1) ? ":30" : ":00";
+    return hh + mm + " " + ap;
+  }
+  try{
+    var parts = new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",weekday:"short",hour:"numeric",hour12:false}).formatToParts(new Date());
+    var wd = "Mon", hr = 12;
+    parts.forEach(function(p){
+      if(p.type === "weekday"){ wd = p.value; }
+      if(p.type === "hour"){ hr = parseInt(p.value, 10) % 24; }
+    });
+    var day = DOW[wd] !== undefined ? DOW[wd] : 1;
+    var pill = document.getElementById("hoursPill");
+    var txt = document.getElementById("hoursText");
+    if(pill && txt){
+      var today = HOURS[day];
+      if(today && hr >= today[0] && hr < today[1]){
+        txt.textContent = "Open now · until " + fmt(today[1]) + " today";
+      } else if(today && hr < today[0]){
+        pill.classList.add("closed");
+        txt.textContent = "Opens today at " + fmt(today[0]);
+      } else {
+        pill.classList.add("closed");
+        var nd = (day + 1) % 7;
+        while(HOURS[nd] === null){ nd = (nd + 1) % 7; }
+        txt.textContent = "Opens " + DAYNAMES[nd] + " at " + fmt(HOURS[nd][0]);
+      }
+    }
+    var rows = document.querySelectorAll("#hoursTable tr");
+    var ridx = (day + 6) % 7;
+    if(rows[ridx]){ rows[ridx].classList.add("today"); }
+  }catch(e){ /* leave default pill text */ }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
