@@ -1148,6 +1148,7 @@ function leadCard(claim){
 
   if(claim.status === 'claimed'){
     html += '<div class="card" style="margin:18px 0"><h2>Log outcome</h2>' +
+      precallNoteHtml() +
       '<p class="muted" style="font-size:12px;margin-bottom:12px;line-height:1.55">When they are <strong>interested</strong>, save that, then you get the <strong>Add build details</strong> form.</p>' +
       '<div class="field"><label>Outcome</label><div class="pick compact" id="outcome-pick">' +
       OUTCOMES.map(function(o, i){
@@ -1158,13 +1159,28 @@ function leadCard(claim){
       '<div class="err" id="outcome-err"></div></div>';
   }
 
+/* Red pre-call checklist: what to ask for on the call, entered after hanging up. */
+function precallNoteHtml(){
+  return '<div class="precall-note"><strong>BEFORE THE CALL, READ THIS.</strong><br/>' +
+    'If they sound interested, ask for all of this while you have them on the phone, then fill in the form after you hang up:' +
+    '<ul><li>Brand colors (main color + accent color)</li>' +
+    '<li>Logo (ask them to text or email it to you)</li>' +
+    '<li>Full list of services</li>' +
+    '<li>Photos: storefront, work, team</li>' +
+    '<li>Which pages and features they want on the site</li>' +
+    '<li>Business hours</li>' +
+    '<li>Best contact info and social media links</li></ul></div>';
+}
+
   if(claim.status === 'interested'){
     html += '<div class="card" id="intake-panel" style="margin:18px 0"><h2>Add build details</h2>' +
+      precallNoteHtml() +
       '<p class="muted" style="font-size:12px;margin-bottom:14px;line-height:1.55">They are interested. Capture everything the builder needs.</p>' +
       '<div class="field"><label>Business *</label><input id="in-business" value="' + esc(lead.name) + '"/></div>' +
       '<div class="grid2"><div class="field"><label>Contact name *</label><input id="in-contact" placeholder="Who you spoke with"/></div>' +
       '<div class="field"><label>Phone *</label><input id="in-phone" type="tel" value="' + esc(lead.phone) + '"/></div></div>' +
       '<div class="field"><label>Email</label><input id="in-email" type="email" inputmode="email" placeholder="owner@business.com"/></div>' +
+      '<div class="field"><label>Brand colors</label><input id="in-colors" placeholder="e.g. navy blue + gold"/></div>' +
       '<div class="field"><label>What they want *</label><textarea id="in-wants" placeholder="Pages, features, vibe, must-haves"></textarea></div>' +
       '<div class="field"><label>Notes</label><textarea id="in-notes" placeholder="Anything else for the builder"></textarea></div>' +
       '<div class="field"><label>Photos & files</label>' +
@@ -1417,6 +1433,7 @@ async function submitIntake(claim){
   const v = function(id){ return (document.getElementById(id).value || '').trim(); };
   const business = v('in-business'), contact = v('in-contact'), phone = v('in-phone');
   const email = v('in-email'), wants = v('in-wants'), notes = v('in-notes');
+  const brandColors = v('in-colors');
   if(!business || !contact || !phone || !wants){ err.textContent = 'Business, contact, phone, and what they want are required.'; return; }
   const btn = document.getElementById('btn-intake');
   if(btn){ btn.disabled = true; btn.textContent = 'Submitting...'; }
@@ -1425,7 +1442,7 @@ async function submitIntake(claim){
   const intakeId = 'intake-' + claim.slug;
   const intake = {
     id: intakeId, slug: claim.slug, business: business, contact_name: contact,
-    phone: phone, email: email, wants: wants, notes: notes,
+    phone: phone, email: email, wants: wants, notes: notes, brand_colors: brandColors,
     claimer: state.user.username, claimer_name: state.user.name,
     status: 'open', created_at: nowISO(), files: []
   };
@@ -1669,7 +1686,8 @@ async function renderIntakesInto(el){
         '<div class="muted" style="font-size:11px">from ' + esc(i.claimer_name || i.claimer || '') +
         ' \xB7 ' + esc(fmtTime(i.created_at)) + '</div></div>' + badge(i.status) + '</div>' +
         '<div class="copybox" style="margin-bottom:10px">' + esc(i.wants || '') +
-        (i.notes ? '\n\nNotes: ' + i.notes : '') + '</div>' +
+        (i.brand_colors ? '\n\nBrand colors: ' + esc(i.brand_colors) : '') +
+        (i.notes ? '\n\nNotes: ' + esc(i.notes) : '') + '</div>' +
         (i.files && i.files.length ?
           '<div class="field" style="margin-bottom:10px"><label>Attached files (' + i.files.length + ')</label><div class="row">' +
           i.files.map(function(f){
@@ -1881,14 +1899,16 @@ function adminUsersHtml(){
       '<div class="row" style="margin-bottom:8px">' + badge(u.role) + '</div>' +
       '<div class="row">' +
       '<button class="btn ghost sm" data-udash="' + esc(r.username) + '" type="button">Dashboard</button>' +
-      (u.status === 'pending' ? '<button class="btn sm" data-uact="approve" data-u="' + esc(r.username) + '" type="button">Approve</button>' +
-        '<button class="btn ghost sm" data-uact="reject" data-u="' + esc(r.username) + '" type="button">Reject</button>' : '') +
-      (u.status !== 'disabled' ? '<button class="btn danger sm" data-uact="disable" data-u="' + esc(r.username) + '" type="button">Disable</button>' :
-        '<button class="btn ghost sm" data-uact="approve" data-u="' + esc(r.username) + '" type="button">Re-enable</button>') +
-      (state.user.role === 'head' ? '<select data-urole="' + esc(r.username) + '" style="min-height:42px;width:auto">' +
-        ['caller','builder','admin','head'].map(function(ro){
-          return '<option value="' + ro + '"' + (u.role === ro ? ' selected' : '') + '>' + ro + '</option>';
-        }).join('') + '</select>' : '') +
+      (u.role === 'head' ? '' :
+        (u.status === 'pending' ? '<button class="btn sm" data-uact="approve" data-u="' + esc(r.username) + '" type="button">Approve</button>' +
+          '<button class="btn ghost sm" data-uact="reject" data-u="' + esc(r.username) + '" type="button">Reject</button>' : '') +
+        (u.status !== 'disabled' ? '<button class="btn danger sm" data-uact="disable" data-u="' + esc(r.username) + '" type="button">Disable</button>' :
+          '<button class="btn ghost sm" data-uact="approve" data-u="' + esc(r.username) + '" type="button">Re-enable</button>') +
+        '<button class="btn ghost sm" data-uact="resetpw" data-u="' + esc(r.username) + '" type="button">Reset password</button>' +
+        (state.user.role === 'head' ? '<select data-urole="' + esc(r.username) + '" style="min-height:42px;width:auto">' +
+          ['caller','builder','admin','head'].map(function(ro){
+            return '<option value="' + ro + '"' + (u.role === ro ? ' selected' : '') + '>' + ro + '</option>';
+          }).join('') + '</select>' : '')) +
       '</div></div>';
   }).join('');
   return html + '</div>';
@@ -2056,6 +2076,13 @@ async function saveUsers(){  const rec = await ghGetJson('users.json');
 async function userAction(username, act, el){
   const u = state.users[username];
   if(!u){ toast('User not found.'); return; }
+  /* The head is untouchable: no one can disable, edit, delete, or change the role of a head account.
+     The head changes their own password from Profile. */
+  if(u.role === 'head'){
+    toast('The head account cannot be changed.');
+    renderAdminInto(el);
+    return;
+  }
   try{
     if(act === 'approve'){
       u.status = 'approved';
@@ -2078,6 +2105,18 @@ async function userAction(username, act, el){
       u.role = act.slice(5);
       await saveUsers();
       toast('Role updated');
+    } else if(act === 'resetpw'){
+      /* Admin/head resets a user's password when the user asks (e.g. by email).
+         The new password is shown once so it can be sent to the user. */
+      const password = genPassword(16);
+      u.pass = await pbkdf2Hash(password);
+      await saveUsers();
+      openModal('<h2>New password for @' + esc(username) + '</h2>' +
+        '<p class="helper-warn">Send this to the user now. It is shown ONCE and cannot be recovered.</p>' +
+        '<div class="copybox mono" id="rp-pass-val">' + esc(password) + '</div>' +
+        '<div class="row" style="margin-top:8px"><button class="btn sm" id="rp-copy" type="button">Copy password</button></div>');
+      document.getElementById('rp-copy').addEventListener('click', function(){ copyText(password, 'Password'); });
+      toast('Password reset for @' + username);
     }
     renderAdminInto(el);
   }catch(e){ toast(e.message); }
@@ -2250,6 +2289,11 @@ function renderProfileInto(el){
     '<div class="field"><input id="pay-method" value="' + esc(u.payment_method || '') + '" placeholder="e.g. Cash App $yourtag" autocapitalize="none"/></div>' +
     '<button class="btn sm" id="btn-save-pay" type="button">Save payment method</button>' +
     '<div class="err" id="pay-err"></div></div>' +
+    '<div class="card" style="margin-top:14px"><h2>Change password</h2>' +
+    '<div class="field"><label>Current password</label><input id="pw-cur" type="password" autocomplete="current-password"/></div>' +
+    '<div class="field"><label>New password <span class="muted">(8+ characters)</span></label><input id="pw-new" type="password" autocomplete="new-password"/></div>' +
+    '<button class="btn sm" id="btn-change-pw" type="button">Change password</button>' +
+    '<div class="err" id="pw-err"></div></div>' +
     '<div class="card" style="margin-top:14px"><h2>Payments received</h2>' +
     '<div id="pay-history">' + payHistoryHtml(u) + '</div></div>' +
     '<div class="card" style="margin-top:14px">' +
@@ -2259,6 +2303,7 @@ function renderProfileInto(el){
     '<div class="card" style="margin-top:14px"><button class="btn ghost block" id="btn-delete-acct" type="button" style="color:#ff7b7b">Delete my account</button></div>';
   el.querySelector('#btn-logout').addEventListener('click', logout);
   el.querySelector('#btn-save-pay').addEventListener('click', saveOwnPaymentMethod);
+  el.querySelector('#btn-change-pw').addEventListener('click', changeOwnPassword);
   el.querySelector('#btn-howto').addEventListener('click', function(){
     state.tab = 'help';
     renderApp();
@@ -2399,6 +2444,32 @@ function renderLegalPublic(){
   document.getElementById('legal-home').addEventListener('click', renderHome);
 }
 
+/* Profile: change your own password (head included). */
+async function changeOwnPassword(){
+  const err = document.getElementById('pw-err');
+  err.textContent = '';
+  const cur = document.getElementById('pw-cur').value || '';
+  const nw = document.getElementById('pw-new').value || '';
+  if(nw.length < 8){ err.textContent = 'New password must be at least 8 characters.'; return; }
+  const btn = document.getElementById('btn-change-pw');
+  btn.disabled = true;
+  try{
+    const rec = await ghGetJson('users.json');
+    const users = rec && rec.data ? rec.data : {};
+    const u = users[state.user.username];
+    if(!u) throw new Error('User not found.');
+    const ok = await pbkdf2Verify(cur, u.pass);
+    if(!ok) throw new Error('Current password is wrong.');
+    const hash = await pbkdf2Hash(nw);
+    await updateUserRecord(state.user.username, function(x){ x.pass = hash; },
+      'sitedesk: password change @' + state.user.username);
+    document.getElementById('pw-cur').value = '';
+    document.getElementById('pw-new').value = '';
+    toast('Password changed');
+  }catch(e){ err.textContent = e.message; }
+  btn.disabled = false;
+}
+
 /* How-to-use guide: how the app works, by role. */
 function deleteOwnAccount(){
   const btn = document.getElementById('btn-delete-acct');
@@ -2418,6 +2489,14 @@ function deleteOwnAccount(){
     try{
       const me = state.user.username;
       await loadUsers();
+      /* The head can never be deleted, by anyone, including the head. */
+      if(state.users[me] && state.users[me].role === 'head'){
+        toast('The head account cannot be deleted.');
+        btn.disabled = false;
+        btn.textContent = 'Delete my account';
+        btn.removeAttribute('data-confirm');
+        return;
+      }
       if(state.user.role === 'head'){
         const otherHeads = Object.keys(state.users).filter(function(k){
           const u = state.users[k];
