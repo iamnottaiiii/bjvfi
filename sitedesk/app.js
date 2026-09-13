@@ -605,7 +605,7 @@ function renderHome(){
     '<p class="muted" style="font-size:13px;margin-bottom:28px">The calling floor for the website crew.<br/>Grab leads, log outcomes, get paid.</p>' +
     '<button class="btn block" id="home-login" type="button" style="margin-bottom:10px">Login</button>' +
     '<button class="btn ghost block" id="home-signup" type="button">Create account</button>' +
-    '<p class="muted" style="margin-top:18px;font-size:11px"><a href="#" id="home-legal" style="color:var(--amber)">Terms of Service &amp; Privacy Policy</a></p>' +
+    '<p class="muted" style="margin-top:18px;font-size:11px"><a href="#" id="home-legal" style="color:var(--amber)">Terms &amp; Policy</a></p>' +
     '</div></div>';
   document.getElementById('home-login').addEventListener('click', renderLogin);
   document.getElementById('home-signup').addEventListener('click', renderSignup);
@@ -649,7 +649,8 @@ function renderSignup(){
     '<div class="field"><label>Confirm password *</label><input id="su-pass2" type="password" autocomplete="new-password"/></div>' +
     '<button class="btn block" id="su-go" type="button">Create account</button>' +
     '<div class="err" id="su-err"></div>' +
-    '<p class="muted" style="margin-top:12px;font-size:11px;line-height:1.5">By creating an account you agree to the <a href="#" id="su-legal" style="color:var(--amber)">Terms of Service and Privacy Policy</a>.</p>' +
+    '<div class="field" style="margin-top:12px"><label class="checkrow"><input type="checkbox" id="su-agree-terms"/> <span>I agree to the <a href="#" id="su-terms" style="color:var(--amber)">Terms</a></span></label></div>' +
+    '<div class="field"><label class="checkrow"><input type="checkbox" id="su-agree-policy"/> <span>I agree to the <a href="#" id="su-policy" style="color:var(--amber)">Policy</a></span></label></div>' +
     '<p class="muted" style="margin-top:14px;font-size:12px">Already have an account? <a href="#" id="su-login" style="color:var(--amber)">Log in</a> &middot; <a href="#" id="su-home" style="color:var(--amber)">Home</a></p>' +
     '</div></div>';
   document.getElementById('su-go').addEventListener('click', doSignup);
@@ -659,8 +660,11 @@ function renderSignup(){
   document.getElementById('su-login').addEventListener('click', function(e){
     e.preventDefault(); renderLogin();
   });
-  document.getElementById('su-legal').addEventListener('click', function(e){
-    e.preventDefault(); renderLegalPublic();
+  document.getElementById('su-terms').addEventListener('click', function(e){
+    e.preventDefault(); e.stopPropagation(); renderLegalPublic();
+  });
+  document.getElementById('su-policy').addEventListener('click', function(e){
+    e.preventDefault(); e.stopPropagation(); renderLegalPublic();
   });
   document.getElementById('su-home').addEventListener('click', function(e){
     e.preventDefault(); renderHome();
@@ -679,6 +683,9 @@ async function doSignup(){
   if(username.length < 3){ err.textContent = 'Username must be at least 3 characters.'; return; }
   if(pw1.length < 8){ err.textContent = 'Password must be at least 8 characters.'; return; }
   if(pw1 !== pw2){ err.textContent = 'Passwords do not match.'; return; }
+  const agreeT = document.getElementById('su-agree-terms').checked;
+  const agreeP = document.getElementById('su-agree-policy').checked;
+  if(!agreeT || !agreeP){ err.textContent = 'You must agree to the Terms and the Policy to create an account.'; return; }
   const btn = document.getElementById('su-go');
   btn.disabled = true; btn.textContent = 'Creating...';
   try{
@@ -2254,17 +2261,26 @@ function renderProfileInto(el){
     '<div id="pay-history">' + payHistoryHtml(u) + '</div></div>' +
     '<div class="card" style="margin-top:14px">' +
     '<button class="btn ghost block" id="btn-howto" type="button">How to use SiteDesk</button>' +
-    '<button class="btn ghost block" id="btn-legal" type="button" style="margin-top:10px">Terms &amp; privacy</button></div>';
+    '<button class="btn ghost block" id="btn-terms" type="button" style="margin-top:10px">Terms</button>' +
+    '<button class="btn ghost block" id="btn-policy" type="button" style="margin-top:10px">Policy</button></div>' +
+    '<div class="card" style="margin-top:14px"><button class="btn ghost block" id="btn-delete-acct" type="button" style="color:#ff7b7b">Delete my account</button></div>';
   el.querySelector('#btn-logout').addEventListener('click', logout);
   el.querySelector('#btn-save-pay').addEventListener('click', saveOwnPaymentMethod);
   el.querySelector('#btn-howto').addEventListener('click', function(){
     state.tab = 'help';
     renderApp();
   });
-  el.querySelector('#btn-legal').addEventListener('click', function(){
+  el.querySelector('#btn-terms').addEventListener('click', function(){
+    state.legalSection = 'terms';
     state.tab = 'legal';
     renderApp();
   });
+  el.querySelector('#btn-policy').addEventListener('click', function(){
+    state.legalSection = 'policy';
+    state.tab = 'legal';
+    renderApp();
+  });
+  el.querySelector('#btn-delete-acct').addEventListener('click', deleteOwnAccount);
 }
 
 function payHistoryHtml(u){
@@ -2309,69 +2325,140 @@ async function saveOwnPaymentMethod(){
 }
 
 /* Terms of Service + Privacy Policy. */
-function legalHtml(){
-  let h = '<h2>Terms of Service</h2>' +
+function legalSec(t, b){
+  return '<h3 style="margin:14px 0 8px">' + t + '</h3>' +
+    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">' + b + '</p>';
+}
+
+function termsHtml(){
+  let h = '<h2>Terms</h2>' +
     '<p class="muted" style="font-size:11px;margin-bottom:10px">Effective September 13, 2026</p>';
-  h += '<h3 style="margin:14px 0 8px">1. What SiteDesk is</h3>' +
-    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">SiteDesk is BJVFI\'s internal tool for the website crew. Callers claim business leads and log call outcomes, builders receive build details and deliver finished sites, and staff coordinate payments and approvals.</p>';
-  h += '<h3 style="margin:14px 0 8px">2. Accounts</h3>' +
-    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">New accounts must be approved by an admin before login. Keep your password private and do not share your account. One account per person. Admins may disable accounts that break these terms.</p>';
-  h += '<h3 style="margin:14px 0 8px">3. Using the app fairly</h3>' +
-    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">Claim only leads you intend to work. Log outcomes honestly: do not mark interested or sold unless it really happened. The 45-minute claim timer and the 5-lead limit keep the queue fair for everyone, so do not try to get around them.</p>';
-  h += '<h3 style="margin:14px 0 8px">4. Calling businesses</h3>' +
-    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">On every call you represent BJVFI. Be polite, honest, and clear: the site build is free, and management plus hosting is $27/month. Never pretend to be someone you are not, never pressure or harass anyone, and honor do-not-call requests immediately.</p>';
-  h += '<h3 style="margin:14px 0 8px">5. Builders</h3>' +
-    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">Build what the caller documented, including customer notes and attached files. Keep your build status honest so callers stay informed, and deliver the finished site URL and the client payment link through the app.</p>';
-  h += '<h3 style="margin:14px 0 8px">6. Payments</h3>' +
-    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">Worker payouts go to the payment handle you save in your profile. Client hosting payments are collected through BJVFI\'s payment links. A lead can only be marked sold after the build is submitted with a client payment link.</p>';
-  h += '<h3 style="margin:14px 0 8px">7. Content</h3>' +
-    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">Photos and files attached to build records must be ones you have the right to use, such as customer-provided materials or public business information.</p>';
-  h += '<h3 style="margin:14px 0 8px">8. Termination</h3>' +
-    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">Admins may suspend or remove accounts for abuse, dishonest logging, harassment, or misuse of business data. You can ask to have your account removed at any time.</p>';
-  h += '<h3 style="margin:14px 0 8px">9. Changes</h3>' +
-    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">We may update these terms as the app changes. Continued use of SiteDesk means you accept the current version.</p>';
-  h += '<h3 style="margin:14px 0 8px">10. Contact</h3>' +
-    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">Questions about these terms: ask your admin.</p>';
-  h += '<h2 style="margin-top:26px">Privacy Policy</h2>' +
+  h += legalSec('1. What this is',
+    'SiteDesk is a project of BJVFI for the website crew. Callers claim business leads and log call outcomes, builders receive build details and deliver finished sites, and staff coordinate payments and approvals.');
+  h += legalSec('2. Who these Terms cover',
+    'Everyone using the app: callers, builders, staff, and admins. By creating an account or logging in, you agree to these Terms.');
+  h += legalSec('3. Accounts',
+    'You must be 18 or older to use SiteDesk. New accounts must be approved by an admin before login. Keep your password private and do not share your account. One account per person. You can delete your account at any time from your profile.');
+  h += legalSec('4. Fair use',
+    'Claim only leads you intend to work. Log outcomes honestly: do not mark interested or sold unless it really happened. The 45-minute claim timer and the 5-lead limit keep the queue fair for everyone, so do not try to get around them.');
+  h += legalSec('5. Calling businesses',
+    'On every call you represent BJVFI. Use your common sense: be polite, honest, and clear. Never pretend to be someone you are not, never pressure or harass anyone, and honor do-not-call requests immediately.');
+  h += legalSec('6. What you must tell every client',
+    'After a build, tell the client plainly: the site build is free. Hosting and management is $27/month. By accepting the site, the client agrees to a subscription of at least one year, paid monthly or in full for the year. Payments are non-refundable. The website is owned by BJVFI, and by accepting it the client gives BJVFI the authority to manage it. Extra updates or edits to the site cost $20 each.');
+  h += legalSec('7. Builders',
+    'Build what the caller documented, including customer notes and attached files. Keep your build status honest so callers stay informed, and deliver the finished site URL and the client payment link through the app.');
+  h += legalSec('8. Crew payments',
+    'Worker payouts go to the payment handle you save in your profile. Client hosting payments are collected through BJVFI\'s payment links. A lead can only be marked sold after the build is submitted with a client payment link.');
+  h += legalSec('9. Content',
+    'Photos and files attached to build records must be ones you have the right to use, such as customer-provided materials or public business information.');
+  h += legalSec('10. Breaking the rules',
+    'If you break these Terms you will get a warning first. If it continues, your account will be removed. This has to be here: someone harassing businesses or misusing lead data puts BJVFI at risk, and we need to be able to cut that off.');
+  h += legalSec('11. Changes',
+    'We may update these Terms as the project changes. Continued use of SiteDesk means you accept the current version.');
+  h += legalSec('12. Contact',
+    'Questions about these Terms: email contact@bjvfi.com.');
+  h += legalSec('13. Governing',
+    'These Terms govern themselves. They are not tied to the laws of any state or country.');
+  return h;
+}
+
+function policyHtml(){
+  let h = '<h2>Policy</h2>' +
     '<p class="muted" style="font-size:11px;margin-bottom:10px">Effective September 13, 2026</p>';
-  h += '<h3 style="margin:14px 0 8px">1. What we collect</h3>' +
-    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">Account info you give us: name, username, phone number, password (stored as a secure one-way hash, never plain text), and your payment handle. Activity: leads you claim, call outcomes you log, build details you submit, and files you attach. If you enable notifications, your browser\'s push subscription so we can send you alerts.</p>';
-  h += '<h3 style="margin:14px 0 8px">2. How we use it</h3>' +
-    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">To run the app: sign you in, show your leads, coordinate builds between callers and builders, send you alerts, and pay you.</p>';
-  h += '<h3 style="margin:14px 0 8px">3. Who sees it</h3>' +
-    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">Builders see the caller contact info and build details for builds assigned to them. Staff and admins see the activity they need to run the operation, such as approvals, outcomes, and payments. We do not sell your personal information to anyone.</p>';
-  h += '<h3 style="margin:14px 0 8px">4. Business data</h3>' +
-    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">Business leads come from public listings. Your call notes and outcomes are visible to the staff running the operation.</p>';
-  h += '<h3 style="margin:14px 0 8px">5. Storage and security</h3>' +
-    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">Data is stored in BJVFI\'s private data store and transmitted over HTTPS. No system is perfect, so keep your password private and tell your admin if you suspect misuse.</p>';
-  h += '<h3 style="margin:14px 0 8px">6. Notifications</h3>' +
-    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">You can turn device notifications on or off in the Alerts tab. Turning them off does not delete your account data.</p>';
-  h += '<h3 style="margin:14px 0 8px">7. Retention and deletion</h3>' +
-    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">We keep account and activity records while you work with us and as needed to run the business. Ask your admin to correct or delete your personal info.</p>';
-  h += '<h3 style="margin:14px 0 8px">8. Changes</h3>' +
-    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">We may update this policy as the app changes. Continued use of SiteDesk means you accept the current version.</p>';
-  h += '<h3 style="margin:14px 0 8px">9. Contact</h3>' +
-    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:4px">Privacy questions: ask your admin.</p>';
+  h += legalSec('1. What we collect',
+    'Your name, username, password (stored as a secure one-way hash, never plain text), phone number, and payment handle. Your activity in the app: leads you claim, call outcomes you log, build details you submit, and files you attach. If you enable notifications, your browser\'s push subscription so we can send you alerts. We do not collect your location.');
+  h += legalSec('2. How we use it',
+    'To run the app: sign you in, show your leads, coordinate builds between callers and builders, send you alerts, and pay you.');
+  h += legalSec('3. Who sees it',
+    'Builders see the caller contact info and build details for builds assigned to them. Staff and admins see the activity they need to run the operation, such as approvals, outcomes, and payments. We do not share your data with anyone outside the project, and we do not sell it to anyone.');
+  h += legalSec('4. Business data',
+    'Business leads come from public listings. Your call notes and outcomes are visible to the staff running the operation.');
+  h += legalSec('5. Storage and security',
+    'Data is stored in BJVFI\'s private data store and transmitted over HTTPS. No system is perfect, so keep your password private and email contact@bjvfi.com if you suspect misuse.');
+  h += legalSec('6. Your control',
+    'You can delete your account at any time from your profile. Deleting removes your account and your active lead claims.');
+  h += legalSec('7. Changes',
+    'We may update this Policy as the project changes. Continued use of SiteDesk means you accept the current version.');
+  h += legalSec('8. Contact',
+    'Questions about this Policy: email contact@bjvfi.com.');
   return h;
 }
 
 function renderLegalInto(el){
+  const section = state.legalSection === 'policy' ? 'policy' : 'terms';
+  const body = section === 'policy' ? policyHtml() : termsHtml();
   el.innerHTML = '<div class="row" style="margin-bottom:12px">' +
     '<button class="btn ghost sm" id="legal-back" type="button">&lsaquo; Back to profile</button></div>' +
-    '<div class="card" style="padding:18px">' + legalHtml() + '</div>';
+    '<div class="card" style="padding:18px">' + body + '</div>';
   el.querySelector('#legal-back').addEventListener('click', function(){
     state.tab = 'profile';
     renderApp();
   });
 }
 
-/* Legal page before login (welcome / signup screens). */
+/* Terms + Policy before login (welcome / signup screens). */
 function renderLegalPublic(){
   document.getElementById('app').innerHTML =
     '<header class="top"><div class="brand">sitedesk<div class="brand-sub">bjvfi</div></div></header>' +
-    '<div class="main auth-main"><div class="card" style="padding:18px;text-align:left">' + legalHtml() +
+    '<div class="main auth-main"><div class="card" style="padding:18px;text-align:left">' + termsHtml() +
+    '<div style="margin-top:8px">' + policyHtml() + '</div>' +
     '<button class="btn ghost block" id="legal-home" type="button" style="margin-top:16px">Back</button></div></div>';
   document.getElementById('legal-home').addEventListener('click', renderHome);
+}
+
+/* How-to-use guide: how the app works, by role. */
+function deleteOwnAccount(){
+  const btn = document.getElementById('btn-delete-acct');
+  if(!btn || !state.user) return;
+  if(btn.getAttribute('data-confirm') !== '1'){
+    btn.setAttribute('data-confirm', '1');
+    btn.textContent = 'Tap again to delete my account forever';
+    setTimeout(function(){
+      const b = document.getElementById('btn-delete-acct');
+      if(b){ b.removeAttribute('data-confirm'); b.textContent = 'Delete my account'; }
+    }, 6000);
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = 'Deleting...';
+  (async function(){
+    try{
+      const me = state.user.username;
+      await loadUsers();
+      if(state.user.role === 'head'){
+        const otherHeads = Object.keys(state.users).filter(function(k){
+          const u = state.users[k];
+          return u && u.role === 'head' && u.status === 'approved' && k !== me;
+        });
+        if(!otherHeads.length){
+          toast('You are the last admin, so this account cannot be deleted.');
+          btn.disabled = false;
+          btn.textContent = 'Delete my account';
+          btn.removeAttribute('data-confirm');
+          return;
+        }
+      }
+      const claims = state.myClaims || [];
+      for(const c of claims){
+        if(c.status === 'claimed' || c.status === 'interested'){
+          try{
+            const rec = await ghGetJson('claims/' + c.slug + '.json');
+            if(rec) await ghDeleteFile('claims/' + c.slug + '.json', rec.sha);
+          }catch(e){}
+        }
+      }
+      await loadUsers();
+      delete state.users[me];
+      await ghPutJson('users.json', state.users, state.usersSha, 'sitedesk: delete account @' + me);
+      logout();
+      toast('Account deleted');
+    }catch(e){
+      toast(e.message);
+      btn.disabled = false;
+      btn.textContent = 'Delete my account';
+      btn.removeAttribute('data-confirm');
+    }
+  })();
 }
 
 /* How-to-use guide: how the app works, by role. */
