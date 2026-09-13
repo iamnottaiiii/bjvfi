@@ -64,6 +64,8 @@ function directionsHref(address){
 var CLAIM_TTL_MS = 45 * 60 * 1000;
 function claimExpired(claim, nowMs){
   if(!claim || !claim.claim_expires_at) return false;
+  /* In-build and sold leads never expire back to the queue. */
+  if(claim.status === 'build' || claim.status === 'sold') return false;
   return (nowMs == null ? Date.now() : nowMs) >= Number(claim.claim_expires_at);
 }
 
@@ -1035,7 +1037,42 @@ function leadCard(claim){
 
   let html = '<div class="lead-title">' + esc(lead.name) + '</div>' +
     '<div class="row" style="margin:8px 0 10px">' + badge(claim.status) + '</div>' +
-    claimTimerHtml(claim);
+    ((claim.status === 'claimed' || claim.status === 'interested') ? claimTimerHtml(claim) : '');
+
+  if(claim.status === 'build'){
+    const intake = ((state.myIntakes || []).filter(function(x){ return x.slug === claim.slug; })[0]) || null;
+    html += '<div class="card" style="margin:14px 0"><h2>Build status</h2>';
+    if(intake){
+      html += '<div class="row" style="margin:8px 0 10px">' + badge(intake.status) + '</div>';
+      if(intake.builder_name){
+        html += '<div style="font-size:13px;margin-bottom:6px"><strong>Builder:</strong> ' + esc(intake.builder_name) + '</div>';
+        if(intake.builder_phone){
+          const bt = 'Hi ' + intake.builder_name + ', checking on the ' + (intake.business || lead.name) + ' site build.';
+          html += '<div class="phone-line"><span class="num">' + esc(intake.builder_phone) + '</span>' +
+            '<a class="btn call sm" href="' + esc(telHref(intake.builder_phone)) + '">Call</a>' +
+            '<a class="btn sms sm" href="' + esc(smsHref(intake.builder_phone, bt)) + '">Text</a></div>';
+        }
+      } else {
+        html += '<p class="muted" style="font-size:12px;line-height:1.55">Sent to builders. A builder will pick it up soon.</p>';
+      }
+      if(intake.site_url){
+        html += '<div class="row" style="margin:10px 0"><a class="btn sm" href="' + esc(intake.site_url) + '" target="_blank" rel="noopener">View built site</a></div>';
+      }
+      if(intake.status === 'ready' && intake.pay_link){
+        html += '<div class="field"><label>Client payment link</label>' +
+          '<div class="copybox" id="pay-link-text">' + esc(intake.pay_link) + '</div>' +
+          '<div class="row" style="margin-top:8px"><button class="btn ghost sm" id="btn-copy-paylink" type="button">Copy link</button></div></div>' +
+          '<p class="muted" style="font-size:12px;line-height:1.55">The site is built and the payment link is ready. Send it to the client, then mark this sold once they pay.</p>' +
+          '<button class="btn block" id="btn-mark-sold" type="button">Mark sold</button>' +
+          '<div class="err" id="sold-err"></div>';
+      } else {
+        html += '<p class="muted" style="font-size:12px;line-height:1.55">You can mark this sold once the builder submits the finished site and the client payment link.</p>';
+      }
+    } else {
+      html += '<p class="muted" style="font-size:12px;line-height:1.55">Build details sent to builders.</p>';
+    }
+    html += '</div>';
+  }
 
   if(claim.status === 'claimed'){
     html += '<p class="review-note"><strong>Know them first.</strong> Open their site and learn who they are before you call or text.</p>';
@@ -1137,6 +1174,11 @@ function wireLeadCard(claim){
   on('btn-outcome', function(){ saveOutcome(claim); });
   on('btn-release', function(){ releaseLead(claim); });
   on('btn-intake', function(){ submitIntake(claim); });
+  on('btn-copy-paylink', function(){
+    const t = document.getElementById('pay-link-text');
+    if(t) copyText(t.textContent, 'Payment link');
+  });
+  on('btn-mark-sold', function(){ markSold(claim); });
   const fi = document.getElementById('in-files');
   if(fi) fi.addEventListener('change', function(){ previewIntakeFiles(fi); });
 }
@@ -1339,11 +1381,12 @@ async function submitIntake(claim){
       if(btn){ btn.disabled = false; btn.textContent = 'Submit to builders'; }
     }
     await ghPutJson('intakes/' + intake.id + '.json', intake, null, 'sitedesk: intake ' + intake.id);
-    claim.status = 'sold';
+    claim.status = 'build';
+    claim.intake_id = intake.id;
     claim.timeline = claim.timeline || [];
     claim.timeline.push({ t: nowISO(), k: 'intake submitted', note: 'Build details sent to builders' });
     const rec = await ghGetJson('claims/' + claim.slug + '.json');
-    if(rec) await ghPutJson('claims/' + claim.slug + '.json', claim, rec.sha, 'sitedesk: sold ' + claim.slug);
+    if(rec) await ghPutJson('claims/' + claim.slug + '.json', claim, rec.sha, 'sitedesk: build ' + claim.slug);
   }catch(e){
     err.textContent = e.message;
     if(btn){ btn.disabled = false; btn.textContent = 'Submit to builders'; }
@@ -1356,6 +1399,48 @@ async function submitIntake(claim){
   await refreshMyIntakes();
   toast('Sent to builders');
   renderApp();
+}
+
+/* Caller marks a lead sold. Only allowed once the builder submitted the
+   finished site and the client payment link (intake is Ready). */
+async function markSold(claim){
+  const err = document.getElementById('sold-err');
+  if(err) err.textContent = '';
+  try{
+    let intakeId = claim.intake_id;
+    if(!intakeId){
+      const found = ((state.myIntakes || []).filter(function(x){ return x.slug === claim.slug; })[0]) || null;
+      if(found) intakeId = found.id;
+    }
+    if(!intakeId){ if(err) err.textContent = 'Build record not found.'; return; }
+    const rec = await ghGetJson('intakes/' + intakeId + '.json');
+    if(!rec){ if(err) err.textContent = 'Build record not found.'; return; }
+    const intake = rec.data;
+    if(intake.status !== 'ready' || !intake.pay_link){
+      if(err) err.textContent = 'Not ready yet. The builder still needs to submit the finished site and the client payment link.';
+      return;
+    }
+    intake.status = 'done';
+    intake.sold_at = nowISO();
+    intake.sold_by = state.user.username;
+    await ghPutJson('intakes/' + intakeId + '.json', intake, rec.sha, 'sitedesk: intake ' + intakeId + ' sold');
+    const crec = await ghGetJson('claims/' + claim.slug + '.json');
+    if(crec){
+      const c = crec.data;
+      c.status = 'sold';
+      c.timeline = c.timeline || [];
+      c.timeline.push({ t: nowISO(), k: 'sold', note: 'Marked sold by ' + state.user.name });
+      await ghPutJson('claims/' + claim.slug + '.json', c, crec.sha, 'sitedesk: sold ' + claim.slug);
+    }
+    await postEvent('staff', 'Sold: ' + (claim.business_name || claim.slug),
+      state.user.name + ' marked ' + (claim.business_name || claim.slug) + ' sold.', '');
+    clearTreeCache();
+    delete state.claimsBySlug[claim.slug];
+    await refreshMyClaims();
+    await refreshMyIntakes();
+    toast('Marked sold');
+    renderApp();
+  }catch(e){ if(err) err.textContent = e.message; else toast(e.message); }
 }
 
 async function renderMineInto(el){
@@ -1381,7 +1466,7 @@ async function renderMineInto(el){
   html += '<div class="card"><h2>My leads' + (list.length ? ' \xB7 ' + list.length : '') + '</h2>' +
     '<div class="filters"><input id="mine-q" value="' + esc(state.mineQ) + '" placeholder="Search business or phone"/>' +
     '<div class="chiprow">' +
-    [['all','All'],['claimed','Claimed'],['interested','Interested'],['sold','Sold']].map(function(p){
+    [['all','All'],['claimed','Claimed'],['interested','Interested'],['build','In build'],['sold','Sold']].map(function(p){
       return '<button type="button" class="chip' + (state.mineStatus === p[0] ? ' on' : '') + '" data-mine-status="' + p[0] + '">' + p[1] + '</button>';
     }).join('') + '</div></div>';
   if(!list.length){
@@ -1439,7 +1524,7 @@ async function loadIntakes(scope){
   return items;
 }
 
-var INTAKE_STATUSES = [['open','Open'],['building','Building'],['done','Done']];
+var INTAKE_STATUSES = [['open','Open'],['building','Building'],['ready','Ready'],['done','Done']];
 
 async function renderIntakesInto(el){
   el.innerHTML = '<div class="card"><div class="empty">Loading intakes...</div></div>';
@@ -1456,7 +1541,7 @@ async function renderIntakesInto(el){
   let html = '<div class="card"><h2>' + (state.user.role === 'builder' ? 'Builds' : 'Intakes') +
     (items.length ? ' \xB7 ' + items.length : '') + '</h2>' +
     '<div class="chiprow" style="margin-bottom:12px">' +
-    [['all','All'],['open','Open'],['building','Building'],['done','Done']].map(function(p){
+    [['all','All'],['open','Open'],['building','Building'],['ready','Ready'],['done','Done']].map(function(p){
       return '<button type="button" class="chip' + (state.intakeStatusFilter === p[0] ? ' on' : '') + '" data-istatus="' + p[0] + '">' + p[1] + '</button>';
     }).join('') + '</div>';
   if(!items.length){
@@ -1481,7 +1566,19 @@ async function renderIntakesInto(el){
         INTAKE_STATUSES.map(function(p){
           return '<button type="button" class="chip' + (i.status === p[0] ? ' on' : '') +
             '" data-intake="' + esc(i.id) + '" data-inewstatus="' + p[0] + '">' + p[1] + '</button>';
-        }).join('') + '</div></div></div>';
+        }).join('') + '</div></div>' +
+        (i.site_url ? '<div style="margin-top:8px;font-size:13px"><strong>Built site:</strong> <a href="' + esc(i.site_url) + '" target="_blank" rel="noopener">Open</a></div>' : '') +
+        (i.pay_link ? '<div style="margin-top:4px;font-size:13px"><strong>Payment link:</strong> <a href="' + esc(i.pay_link) + '" target="_blank" rel="noopener">Open</a></div>' : '') +
+        (canInbox() ?
+          '<div class="field" style="margin-top:10px"><label>Built site URL</label>' +
+          '<input id="bs-site-' + esc(i.id) + '" placeholder="https://..." value="' + esc(i.site_url || '') + '"/>' +
+          '<label style="margin-top:8px">Client payment link</label>' +
+          '<input id="bs-pay-' + esc(i.id) + '" placeholder="https://..." value="' + esc(i.pay_link || '') + '"/>' +
+          '<div class="row" style="margin-top:8px"><button type="button" class="btn sm" data-submit-build="' + esc(i.id) + '">Submit built site</button></div>' +
+          '<div class="err" id="bs-err-' + esc(i.id) + '"></div></div>' +
+          (i.builder_name ? '<div class="muted" style="font-size:11px">Builder: ' + esc(i.builder_name) + '</div>' : '')
+          : '') +
+        '</div>';
     }).join('');
   }
   html += '</div>';
@@ -1494,6 +1591,9 @@ async function renderIntakesInto(el){
   });
   el.querySelectorAll('[data-intake]').forEach(function(chip){
     chip.addEventListener('click', function(){ setIntakeStatus(chip, el); });
+  });
+  el.querySelectorAll('[data-submit-build]').forEach(function(b){
+    b.addEventListener('click', function(){ submitBuiltSite(b.getAttribute('data-submit-build'), el); });
   });
   el.querySelectorAll('[data-intake-file]').forEach(function(b){
     b.addEventListener('click', function(){
@@ -1512,6 +1612,12 @@ async function setIntakeStatus(chip, el){
     const intake = rec.data;
     const old = intake.status;
     intake.status = ns;
+    if(ns === 'building'){
+      intake.builder = state.user.username;
+      intake.builder_name = state.user.name;
+      const u = (state.users || {})[state.user.username];
+      if(u && u.phone) intake.builder_phone = u.phone;
+    }
     await ghPutJson('intakes/' + id + '.json', intake, rec.sha, 'sitedesk: intake ' + id + ' -> ' + ns);
     if(intake.claimer && old !== ns){
       await postEvent(intake.claimer, 'Intake update: ' + (intake.business || intake.slug),
@@ -1520,6 +1626,42 @@ async function setIntakeStatus(chip, el){
     toast('Status: ' + ns);
     renderIntakesInto(el);
   }catch(e){ toast(e.message); chip.disabled = false; }
+}
+
+/* Builder/admin/head submits the finished site plus the client payment link.
+   The intake becomes Ready and the caller is notified so they can mark it sold. */
+async function submitBuiltSite(id, el){
+  const siteEl = document.getElementById('bs-site-' + id);
+  const payEl = document.getElementById('bs-pay-' + id);
+  const err = document.getElementById('bs-err-' + id);
+  const siteUrl = siteEl ? (siteEl.value || '').trim() : '';
+  const payLink = payEl ? (payEl.value || '').trim() : '';
+  if(err) err.textContent = '';
+  if(!siteUrl || !payLink){
+    if(err) err.textContent = 'Add the built site URL and the client payment link.';
+    return;
+  }
+  try{
+    const rec = await ghGetJson('intakes/' + id + '.json');
+    if(!rec){ if(err) err.textContent = 'Intake not found.'; return; }
+    const intake = rec.data;
+    intake.site_url = siteUrl;
+    intake.pay_link = payLink;
+    intake.status = 'ready';
+    intake.ready_at = nowISO();
+    intake.ready_by = state.user.username;
+    intake.builder = intake.builder || state.user.username;
+    intake.builder_name = intake.builder_name || state.user.name;
+    const u = (state.users || {})[state.user.username];
+    if(u && u.phone && !intake.builder_phone) intake.builder_phone = u.phone;
+    await ghPutJson('intakes/' + id + '.json', intake, rec.sha, 'sitedesk: intake ' + id + ' ready');
+    if(intake.claimer){
+      await postEvent(intake.claimer, 'Site ready: ' + (intake.business || intake.slug),
+        state.user.name + ' finished the site. The client payment link is ready. Open the lead and mark it sold.', '');
+    }
+    toast('Submitted. The caller was notified.');
+    renderIntakesInto(el);
+  }catch(e){ if(err) err.textContent = e.message; else toast(e.message); }
 }
 
 /* ================= admin ================= */
@@ -2015,11 +2157,11 @@ function helpHtml(){
     '<h3 style="margin:14px 0 8px">No number on a lead?</h3>' +
     '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">Open their site from the lead details, the number is usually listed there.</p>' +
     '<h3 style="margin:14px 0 8px">After the call</h3>' +
-    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">Log what happened. <strong>No answer</strong> or <strong>sent message</strong> resets your 45-minute timer so you can follow up. <strong>Interested</strong> opens the build-details form: write down what they want and <strong>attach photos and files</strong> (logo, menus, site pictures), the builder sees all of it. <strong>Release</strong> gives a lead back to the queue.</p>';
+    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">Log what happened. <strong>No answer</strong> or <strong>sent message</strong> resets your 45-minute timer so you can follow up. <strong>Interested</strong> opens the build-details form: write down what they want and <strong>attach photos and files</strong> (logo, menus, site pictures), the builder sees all of it. After you submit, the lead shows as <strong>In build</strong>: you can see the builder and call or text them from the lead. When the builder submits the finished site and the client payment link, you get notified, send the link to the client, and hit <strong>Mark sold</strong> once they pay. <strong>Release</strong> gives a lead back to the queue.</p>';
   }
   if(builder){
     h += '<h3 style="margin:14px 0 8px">Builds</h3>' +
-    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">New intakes from callers land in <strong>' + (u.role === 'builder' ? 'Builds' : 'Intakes') + '</strong> with the customer details, what they want, and attached photos and files. Tap a file to view it. Update the build status (Open, Building, Done) so the caller stays in the loop.</p>';
+    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">New intakes from callers land in <strong>' + (u.role === 'builder' ? 'Builds' : 'Intakes') + '</strong> with the customer details, what they want, and attached photos and files. Tap a file to view it. Set the build status (Open, Building) so the caller stays in the loop. When the site is finished, enter the <strong>built site URL</strong> and the <strong>client payment link</strong>, then hit <strong>Submit built site</strong>: the caller gets notified and can mark it sold.</p>';
   }
   if(admin){
     h += '<h3 style="margin:14px 0 8px">Admin</h3>' +
