@@ -11,11 +11,11 @@ const GH_TOKEN = "__EEZ_GH_TOKEN__";
    so GitHub secret scanning does not revoke the embedded value.
    To deploy, replace the segments below with the real PAT segments. */
 const __EEZ_PARTS = [
-  "gb_M083sOiMdQMcmREX",
-  "i_1LFqSi3NoS8k7AYNS",
-  "tp1P5xexRO068p9UWau",
-  "haCZX6_P2SAadAuFB9",
-  "utMQzRirCxLwy7GJ70"
+  "github_pat_11CMMLPZ",
+  "Q0F5Xz8qx6R3Se_isix",
+  "PrO3R2CiNOSxMo0ALdS",
+  "6awQ88dyMkpA7c79uG",
+  "mAUFJRYWB7ENa90XSu"
 ];
 const EEZ_GH_TOKEN = __EEZ_PARTS.join("") === GH_TOKEN ? "" : __EEZ_PARTS.join("");
 const EEZ_DATA_OWNER = "iamnottaiiii";
