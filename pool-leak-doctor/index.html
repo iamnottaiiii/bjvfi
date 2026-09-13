@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pool Leak Doctor | Pool Leak Detection and Repair, Fleming Island, FL</title>
+<meta name="description" content="Pool Leak Doctor of Fleming Island, FL finds and fixes swimming pool leaks: leak detection, structural leak repair, plumbing pressure testing and dye testing. Call (904) 616-1828.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --deep:#0B3C5D; --deep-2:#062A44;
+  --aqua:#1FA8CC; --aqua-deep:#0E7C9B; --aqua-soft:#DFF2F9;
+  --foam:#F2FAFD;
+  --ink:#12242E; --ink-soft:#4E6B7A;
+  --coral:#F2674B; --coral-soft:#FDE6DE;
+  --lime:#6FBF73;
+  --radius:16px;
+  --shadow:0 18px 38px -18px rgba(11,60,93,.32);
+  --shadow-sm:0 8px 20px -10px rgba(11,60,93,.26);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:"Inter",system-ui,sans-serif;
+  background:var(--foam);
+  background-image:radial-gradient(rgba(31,168,204,.10) 1.3px, transparent 1.4px);
+  background-size:26px 26px;
+  color:var(--ink);
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--aqua-deep)}
+::selection{background:var(--aqua);color:#fff}
+img{max-width:100%}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+
+/* ---------- topbar (mobile / tablet) ---------- */
+.topbar{
+  position:sticky;top:0;z-index:80;
+  background:rgba(6,42,68,.96);color:#EAF4F8;
+  backdrop-filter:blur(8px);
+  display:none;align-items:center;justify-content:space-between;
+  padding:12px 20px;
+}
+.topbar .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff}
+.topbar .brand svg{width:38px;height:38px}
+.topbar .brand-name{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:1.05rem;line-height:1.05}
+.topbar .brand-name small{display:block;font-family:"Inter",sans-serif;font-weight:600;font-size:.6rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--aqua)}
+.burger{background:none;border:0;cursor:pointer;padding:10px}
+.burger span{display:block;width:26px;height:3px;border-radius:3px;background:#fff;margin:5px 0;transition:.25s}
+
+/* ---------- side drawer nav ---------- */
+.drawer{
+  position:fixed;top:0;left:0;bottom:0;width:268px;z-index:90;
+  background:linear-gradient(175deg,var(--deep-2),#041E33);
+  color:#EAF4F8;display:flex;flex-direction:column;
+  padding:30px 24px 26px;
+  transform:translateX(-105%);transition:transform .32s ease;
+}
+.drawer.open{transform:none}
+.drawer .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:#fff;margin-bottom:34px}
+.drawer .brand svg{width:52px;height:52px;flex:none}
+.drawer .brand-name{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:1.22rem;line-height:1.08}
+.drawer .brand-name small{display:block;font-family:"Inter",sans-serif;font-weight:600;font-size:.6rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--aqua);margin-top:4px}
+nav.main{display:flex;flex-direction:column;gap:4px}
+nav.main a{
+  text-decoration:none;color:#D4E6F0;font-weight:600;font-size:1rem;
+  padding:12px 16px;border-radius:12px;transition:background .2s,color .2s;
+}
+nav.main a:hover{background:rgba(31,168,204,.18);color:#fff}
+nav.main a[aria-current="page"],nav.main a.active{background:var(--aqua);color:#04222F}
+.drawer .call-block{margin-top:auto;padding-top:24px;border-top:1px solid rgba(255,255,255,.14)}
+.drawer .call-block p{font-size:.82rem;color:#9FC2D4;margin-bottom:10px}
+.call-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--coral);color:#fff;text-decoration:none;font-weight:700;
+  padding:12px 20px;border-radius:999px;box-shadow:var(--shadow-sm);
+  transition:transform .18s,background .18s;white-space:nowrap;
+}
+.call-btn:hover{background:#D95134;transform:translateY(-2px)}
+.scrim{position:fixed;inset:0;background:rgba(4,20,32,.55);z-index:85;opacity:0;pointer-events:none;transition:opacity .3s}
+.scrim.show{opacity:1;pointer-events:auto}
+
+main{min-height:100vh}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- home intro (no hero banner) ---------- */
+.intro{padding:64px 0 8px}
+.kicker{
+  display:inline-flex;align-items:center;gap:10px;
+  background:#fff;border:2px solid var(--aqua-soft);
+  color:var(--aqua-deep);font-weight:700;font-size:.78rem;letter-spacing:2.5px;text-transform:uppercase;
+  padding:8px 18px;border-radius:999px;margin-bottom:20px;box-shadow:var(--shadow-sm);
+}
+h1{
+  font-family:"Space Grotesk",sans-serif;font-weight:700;
+  font-size:clamp(2.5rem,5.2vw,4.1rem);line-height:1.04;letter-spacing:-.5px;margin-bottom:18px;color:var(--deep-2);
+}
+h1 .accent{color:var(--aqua-deep)}
+.lede{font-size:1.12rem;color:var(--ink-soft);max-width:38rem;margin-bottom:26px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:24px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;
+  padding:14px 26px;border-radius:999px;font-size:1rem;transition:transform .18s,box-shadow .18s,background .18s;
+}
+.btn-solid{background:var(--coral);color:#fff;box-shadow:var(--shadow-sm)}
+.btn-solid:hover{background:#D95134;transform:translateY(-2px)}
+.btn-ghost{background:#fff;color:var(--deep-2);border:2px solid rgba(11,60,93,.2)}
+.btn-ghost:hover{border-color:var(--aqua-deep);color:var(--aqua-deep);transform:translateY(-2px)}
+.hours-pill{
+  display:inline-flex;align-items:center;gap:10px;background:var(--deep-2);color:#EAF4F8;
+  padding:10px 20px;border-radius:999px;font-weight:600;font-size:.95rem;box-shadow:var(--shadow-sm);
+}
+.hours-pill .dot{width:10px;height:10px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 4px rgba(111,191,115,.25);animation:pulse 2s infinite}
+.hours-pill.closed .dot{background:var(--coral);box-shadow:0 0 0 4px rgba(242,103,75,.25)}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+
+/* ---------- trust strip ---------- */
+.trust{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;padding:40px 0 8px}
+.trust .t{background:#fff;border-radius:var(--radius);padding:22px;box-shadow:var(--shadow-sm);display:flex;gap:14px;align-items:flex-start}
+.trust .t svg{width:34px;height:34px;flex:none}
+.trust .t strong{font-family:"Space Grotesk",sans-serif;display:block;margin-bottom:2px}
+.trust .t span{color:var(--ink-soft);font-size:.93rem}
+
+/* ---------- sections ---------- */
+section.block{padding:56px 0}
+.sec-head{max-width:46rem;margin-bottom:34px}
+.sec-head.center{margin-left:auto;margin-right:auto;text-align:center}
+.sec-head .hand{font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:.85rem;letter-spacing:3px;text-transform:uppercase;color:var(--aqua-deep)}
+h2{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:clamp(1.9rem,3.6vw,2.7rem);line-height:1.12;margin:8px 0 12px;color:var(--deep-2);letter-spacing:-.3px}
+.sec-head p{color:var(--ink-soft)}
+
+/* ---------- card wall (services) ---------- */
+.wall{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.card{
+  background:#fff;border-radius:var(--radius);padding:28px 24px;box-shadow:var(--shadow-sm);
+  border-bottom:5px solid var(--aqua);transition:transform .2s,box-shadow .2s;
+}
+.card:nth-child(3n+2){border-bottom-color:var(--coral)}
+.card:nth-child(3n){border-bottom-color:var(--deep)}
+.card:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+.card .icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;background:var(--aqua-soft)}
+.card .icon svg{width:28px;height:28px}
+.card h3{font-family:"Space Grotesk",sans-serif;font-size:1.22rem;margin-bottom:8px;color:var(--deep-2)}
+.card p{color:var(--ink-soft);font-size:.95rem}
+.card ul{list-style:none;margin-top:14px;display:grid;gap:8px}
+.card ul li{display:flex;gap:10px;align-items:flex-start;color:var(--ink-soft);font-size:.92rem}
+.card ul svg{flex:none;width:20px;height:20px;margin-top:2px}
+.card .note{margin-top:14px;background:var(--foam);border:1px dashed rgba(11,60,93,.3);border-radius:10px;padding:10px 14px;font-size:.85rem;color:var(--ink-soft)}
+
+/* ---------- rhythm: magazine ---------- */
+.mag{display:grid;grid-template-columns:1fr 1fr;gap:6px 48px}
+.mag-item{border-top:3px solid var(--aqua);padding:26px 0 32px}
+.mag-item:nth-child(3n+2){border-top-color:var(--coral)}
+.mag-item:nth-child(3n){border-top-color:var(--deep)}
+.mag-item:first-child{grid-column:1/-1;display:grid;grid-template-columns:72px 1fr;gap:24px;align-items:start}
+.mag-item .icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:var(--aqua-soft);flex:none}
+.mag-item .icon svg{width:28px;height:28px}
+.mag-item h3{font-family:"Space Grotesk",sans-serif;font-size:1.4rem;color:var(--deep-2);margin-bottom:10px;border-left:4px solid var(--coral);padding-left:14px}
+.mag-item:first-child h3{font-size:1.9rem}
+.mag-item p{color:var(--ink-soft);font-size:.97rem}
+.mag-item:first-child p::first-letter{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:3.1em;float:left;line-height:.85;padding:4px 10px 0 0;color:var(--aqua-deep)}
+
+/* ---------- steps ---------- */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.step{background:var(--deep-2);color:#EAF4F8;border-radius:var(--radius);padding:26px 22px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden}
+.step::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 10%, rgba(31,168,204,.28), transparent 55%)}
+.step .num{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:2.4rem;color:var(--aqua);position:relative}
+.step h3{font-family:"Space Grotesk",sans-serif;font-size:1.15rem;margin:8px 0 6px;position:relative}
+.step p{font-size:.9rem;color:#B9D2DE;position:relative}
+
+/* ---------- reviews ---------- */
+.rev-wall{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.rev{background:#fff;border-radius:var(--radius);padding:26px;box-shadow:var(--shadow-sm)}
+.rev .stars{color:#E8A93D;font-size:1.15rem;letter-spacing:3px;margin-bottom:12px}
+.rev p{font-size:.98rem;margin-bottom:14px}
+.rev cite{font-style:normal;font-weight:700;font-size:.82rem;color:var(--aqua-deep);letter-spacing:.5px}
+.rev .sample-tag{display:inline-block;background:var(--coral-soft);color:#B23A1F;font-size:.68rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 12px;border-radius:999px;margin-bottom:12px}
+.src-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:34px 0 10px}
+.src-btn{display:inline-flex;align-items:center;gap:8px;background:var(--deep);color:#fff;text-decoration:none;font-weight:700;padding:12px 24px;border-radius:999px;transition:transform .18s,background .18s}
+.src-btn:hover{background:var(--aqua-deep);transform:translateY(-2px)}
+.src-btn.alt{background:#fff;color:var(--deep-2);border:2px solid rgba(11,60,93,.2)}
+.src-btn.alt:hover{border-color:var(--aqua-deep);color:var(--aqua-deep)}
+.disclaimer{background:#fff;border:1px solid var(--aqua-soft);border-radius:12px;padding:16px 20px;font-size:.88rem;color:var(--ink-soft);max-width:640px;margin:0 auto;text-align:center}
+
+/* ---------- gallery carousel ---------- */
+.carousel{position:relative}
+.car-track{display:flex;gap:16px;overflow:hidden;padding:6px 4px 18px;scroll-behavior:smooth}
+.car-btn{position:absolute;top:38%;z-index:3;width:52px;height:52px;border-radius:50%;border:0;background:var(--deep-2);color:#fff;font-size:1.6rem;line-height:1;cursor:pointer;box-shadow:var(--shadow-sm);transition:transform .18s,background .18s;display:flex;align-items:center;justify-content:center}
+.car-btn:hover{background:var(--aqua-deep);transform:scale(1.06)}
+.car-btn.prev{left:-8px}
+.car-btn.next{right:-8px}
+.car-dots{display:flex;gap:8px;justify-content:center;margin-top:2px}
+.tile{
+  flex:0 0 250px;scroll-snap-align:start;background:#fff;border-radius:var(--radius);
+  overflow:hidden;box-shadow:var(--shadow-sm);transition:transform .2s;position:relative;
+}
+.tile:hover{transform:translateY(-5px)}
+.tile .art{aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.tile .art svg{width:46%;height:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.2))}
+.tile .cap{padding:14px 18px 16px}
+.tile .cap strong{font-family:"Space Grotesk",sans-serif;font-size:1.05rem;display:block;color:var(--deep-2)}
+.tile .cap small{color:var(--ink-soft)}
+.tile .soon{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.88);font-size:.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 12px;border-radius:999px;color:var(--ink-soft)}
+
+/* ---------- cta band ---------- */
+.cta-band{background:linear-gradient(120deg,var(--deep),var(--aqua-deep));border-radius:26px;color:#fff;padding:48px;text-align:center;margin-top:12px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.cta-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 20%, rgba(255,255,255,.18), transparent 50%)}
+.cta-band h2{color:#fff;position:relative}
+.cta-band p{color:#DFF2F9;position:relative;max-width:36rem;margin:0 auto 24px}
+.cta-band .btn-solid{background:#fff;color:var(--deep-2);position:relative}
+.cta-band .btn-solid:hover{background:var(--foam)}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
+.info-card{background:#fff;border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm)}
+.info-card h3{font-family:"Space Grotesk",sans-serif;font-size:1.35rem;margin-bottom:14px;display:flex;align-items:center;gap:12px;color:var(--deep-2)}
+.info-card h3 svg{width:28px;height:28px}
+.info-card p{color:var(--ink-soft);margin-bottom:8px}
+.info-card a.big{font-family:"Space Grotesk",sans-serif;font-size:1.5rem;font-weight:700;color:var(--aqua-deep);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.hours-table{width:100%;border-collapse:collapse;font-size:.98rem}
+.hours-table td{padding:10px 6px;border-bottom:1px dashed rgba(11,60,93,.18)}
+.hours-table tr.today td{font-weight:800;color:var(--aqua-deep)}
+.hours-table tr.today td:first-child::after{content:"\00B7 today";font-size:.85rem;color:var(--coral);margin-left:6px}
+.hours-table td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.map-card{
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:320px;
+  background:
+    linear-gradient(rgba(31,168,204,.08), rgba(31,168,204,.08)),
+    repeating-linear-gradient(0deg, transparent 0 46px, rgba(11,60,93,.14) 46px 48px),
+    repeating-linear-gradient(90deg, transparent 0 46px, rgba(11,60,93,.14) 46px 48px),
+    linear-gradient(140deg,#DFF2F9,#BFE3F0);
+  display:flex;align-items:center;justify-content:center;
+}
+.map-pin{
+  text-align:center;background:#fff;padding:26px 34px;border-radius:20px;box-shadow:var(--shadow);
+  max-width:80%;position:relative;
+}
+.map-pin::after{content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);border:14px solid transparent;border-top-color:#fff;border-bottom:0}
+.map-pin svg{width:44px;height:44px;margin-bottom:8px}
+.map-pin strong{font-family:"Space Grotesk",sans-serif;font-size:1.15rem;display:block;color:var(--deep-2)}
+.map-pin small{color:var(--ink-soft)}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- story ---------- */
+.story-split{display:grid;grid-template-columns:1.05fr .95fr;gap:44px;align-items:start;margin-bottom:52px}
+.story-split p{color:var(--ink-soft);margin-bottom:14px}
+.side-card{background:var(--deep-2);color:#EAF4F8;border-radius:24px;padding:38px 34px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.side-card::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 12%, rgba(31,168,204,.3), transparent 55%)}
+.side-card h3{font-family:"Space Grotesk",sans-serif;font-size:1.5rem;margin-bottom:14px;position:relative;color:#fff}
+.side-card p{color:#B9D2DE;position:relative;margin-bottom:10px}
+.side-card .big-num{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:3rem;color:var(--aqua);position:relative}
+
+/* ---------- footer bigtype ---------- */
+footer{background:var(--deep-2);color:#B9D2DE;margin-top:24px}
+.foot-big{padding:60px 0 10px;text-align:center}
+.foot-big .big-name{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:clamp(3rem,10vw,7rem);line-height:1;color:#fff;letter-spacing:-1px}
+.foot-big .big-name .a{color:var(--aqua)}
+.foot-meta{display:flex;justify-content:center;gap:26px;flex-wrap:wrap;margin:26px 0 8px;font-size:.95rem}
+.foot-meta a{color:#9FD8E8;text-decoration:none}
+.foot-meta a:hover{color:#fff}
+.foot-links{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:18px 0}
+.foot-links a{color:#D4E6F0;text-decoration:none;font-weight:600;font-size:.92rem;padding:8px 14px;border-radius:999px}
+.foot-links a:hover{background:rgba(31,168,204,.2);color:#fff}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.12);padding:18px 0 24px;text-align:center;font-size:.88rem;color:#8FB2C2}
+
+/* ---------- page strips ---------- */
+.strip{border-radius:22px;padding:48px 44px;color:#fff;position:relative;overflow:hidden;margin-bottom:40px;box-shadow:var(--shadow)}
+.strip::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(255,255,255,.2), transparent 50%)}
+.strip h2{color:#fff;font-size:clamp(2rem,4vw,2.9rem);position:relative;margin:4px 0 10px}
+.strip p{color:rgba(255,255,255,.88);max-width:36rem;position:relative}
+.strip .k{font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:.82rem;letter-spacing:3px;text-transform:uppercase;position:relative}
+.strip.s-serv{background:linear-gradient(120deg,#0E7C9B,#062A44)}
+.strip.s-story{background:linear-gradient(120deg,#0B3C5D,#0E7C9B)}
+.strip.s-gal{background:linear-gradient(120deg,#1FA8CC,#0B3C5D)}
+.strip.s-rev{background:linear-gradient(120deg,#D95134,#8C2F1D)}
+.strip.s-visit{background:linear-gradient(120deg,#062A44,#1FA8CC)}
+
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(min-width:1024px){
+  .drawer{transform:none}
+  .topbar{display:none!important}
+  .scrim{display:none!important}
+  main{margin-left:268px}
+}
+@media(max-width:1023px){
+  .topbar{display:flex}
+}
+@media(max-width:940px){
+  .wall{grid-template-columns:1fr 1fr}
+  .rev-wall{grid-template-columns:1fr 1fr}
+  .steps{grid-template-columns:1fr 1fr}
+  .trust{grid-template-columns:1fr}
+  .visit-grid{grid-template-columns:1fr}
+  .story-split{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .wall,.rev-wall,.steps,.mag{grid-template-columns:1fr}
+  .mag-item:first-child{grid-template-columns:1fr}
+  .intro{padding:44px 0 4px}
+  .cta-band{padding:36px 24px}
+  .strip{padding:36px 26px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="brand" href="#home" data-page="home" aria-label="Pool Leak Doctor, home">
+    <svg viewBox="0 0 64 64" role="img" aria-label="Water drop logo"><path d="M32 6C20 22 12 33 12 44a20 20 0 0040 0C52 33 44 22 32 6z" fill="#1FA8CC"/><path d="M22 44a10 10 0 007 9.6" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg>
+    <span class="brand-name">Pool Leak Doctor<small>Fleming Island, FL</small></span>
+  </a>
+  <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+</div>
+
+<nav class="drawer main" id="mainNav" aria-label="Main navigation">
+  <a class="brand" href="#home" data-page="home" aria-label="Pool Leak Doctor, home">
+    <svg viewBox="0 0 64 64" role="img" aria-label="Water drop logo"><path d="M32 6C20 22 12 33 12 44a20 20 0 0040 0C52 33 44 22 32 6z" fill="#1FA8CC"/><path d="M22 44a10 10 0 007 9.6" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg>
+    <span class="brand-name">Pool Leak Doctor<small>Fleming Island, FL</small></span>
+  </a>
+  <a href="#home" data-page="home" class="active" aria-current="page">Home</a>
+  <a href="#services" data-page="services">Services</a>
+  <a href="#story" data-page="story">Our Story</a>
+  <a href="#gallery" data-page="gallery">Gallery</a>
+  <a href="#reviews" data-page="reviews">Reviews</a>
+  <a href="#visit" data-page="visit">Visit / Contact</a>
+  <div class="call-block">
+    <p>Losing water? Talk to the Doctor.</p>
+    <a class="call-btn" href="tel:+19046161828">(904) 616-1828</a>
+  </div>
+</nav>
+<div class="scrim" id="scrim"></div>
+
+<main>
+<section class="page active" id="page-home">
+  <div class="wrap">
+    <div class="intro">
+      <span class="kicker">Pool leak specialists</span>
+      <h1>Stop the leak.<br><span class="accent">Start swimming.</span></h1>
+      <p class="lede">Pool Leak Doctor is a Fleming Island pool leak detection and repair specialist serving Clay County. We find structural and plumbing leaks fast, then fix them, so your water bill and your pool stay where they belong.</p>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="tel:+19046161828">Call (904) 616-1828</a>
+        <a class="btn btn-ghost" href="#services" data-page="services">See services</a>
+      </div>
+      <span class="hours-pill" id="hoursPill"><span class="dot"></span><span id="hoursText">Checking today's hours...</span></span>
+    </div>
+
+    <div class="trust">
+      <div class="t reveal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1FA8CC" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+        <div><strong>Mon to Fri, 9 AM to 6 PM</strong><span>Evenings and weekends by appointment.</span></div>
+      </div>
+      <div class="t reveal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1FA8CC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <div><strong>Fleming Island and Clay County</strong><span>We come to your pool, no shop visit needed.</span></div>
+      </div>
+      <div class="t reveal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1FA8CC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg>
+        <div><strong>Direct line, no runaround</strong><span>One call, one specialist, straight answers.</span></div>
+      </div>
+    </div>
+
+    <section class="block">
+      <div class="sec-head reveal">
+        <span class="hand">What we do</span>
+        <h2>Leak detection is all we do, and we do it well</h2>
+        <p>A focused specialty beats a generalist guessing game. Here is how we track down your water loss.</p>
+      </div>
+      <div class="mag">
+        <div class="mag-item reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0E7C9B" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
+          <h3>Leak Detection</h3>
+          <p>Full-system investigation of your pool and spa: structure, fittings, and underground plumbing, until the source is found.</p>
+        </div>
+        <div class="mag-item reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#D95134" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6M12 16v6M2 12h6M16 12h6"/><circle cx="12" cy="12" r="3.5"/></svg></div>
+          <h3>Structural Leak Repair</h3>
+          <p>Cracks, skimmers, lights, tile lines and returns: located by dive inspection and dye testing, then sealed properly.</p>
+        </div>
+        <div class="mag-item reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0B3C5D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17c2-6 5-9 8-9s6 3 8 9"/><path d="M2 20h20"/></svg></div>
+          <h3>Plumbing Pressure Testing</h3>
+          <p>We pressure-test underground lines to find the breaks you cannot see, no digging up the whole yard to find them.</p>
+        </div>
+        <div class="mag-item reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0E7C9B" stroke-width="2" stroke-linecap="round"><path d="M12 3C8 9 6 12.5 6 16a6 6 0 0012 0c0-3.5-2-7-6-13z"/></svg></div>
+          <h3>Dye Testing</h3>
+          <p>A careful dye test shows exactly where water is escaping, so repairs target the leak, not the whole pool.</p>
+        </div>
+        <div class="mag-item reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#D95134" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg></div>
+          <h3>Equipment Area Checks</h3>
+          <p>Pump, filter, heater and valves: we inspect the equipment pad for the slow drips that add up to real water loss.</p>
+        </div>
+        <div class="mag-item reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0B3C5D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <h3>Water Audits</h3>
+          <p>Evaporation or leak? We walk you through the bucket test and measure real loss, so you know what you are dealing with.</p>
+        </div>
+      </div>
+      <div style="margin-top:28px" class="reveal">
+        <a class="btn btn-ghost" href="#services" data-page="services">Full service details</a>
+      </div>
+    </section>
+
+    <section class="block" style="padding-top:0">
+      <div class="sec-head reveal">
+        <span class="hand">How it works</span>
+        <h2>From first call to fixed pool</h2>
+      </div>
+      <div class="steps">
+        <div class="step reveal"><span class="num">01</span><h3>You call</h3><p>Tell us what you are seeing: dropping water level, soggy spots, rising bills.</p></div>
+        <div class="step reveal"><span class="num">02</span><h3>We inspect</h3><p>On-site visit with dive inspection, dye test and pressure checks as needed.</p></div>
+        <div class="step reveal"><span class="num">03</span><h3>We pinpoint</h3><p>You get a clear diagnosis: where the leak is and what it takes to fix it.</p></div>
+        <div class="step reveal"><span class="num">04</span><h3>We repair</h3><p>Leak sealed, water holding, pool back in service. Done right, done once.</p></div>
+      </div>
+    </section>
+
+    <section class="block" style="padding-top:0">
+      <div class="sec-head reveal">
+        <span class="hand">What neighbors say</span>
+        <h2>Reviews from around Fleming Island</h2>
+        <p>Based on 6 reviews listed on Birdeye for Pool Leak Doctor.</p>
+      </div>
+      <div class="rev-wall">
+        <div class="rev reveal">
+          <div class="stars">★★★★★</div>
+          <p>"Extremely thorough and professional, willing to answer all my questions. He knows the business well."</p>
+          <cite>via BestProsInTown</cite>
+        </div>
+        <div class="rev reveal">
+          <div class="stars">★★★★★</div>
+          <p>"Found and repaired two small cuts in my pool. Took the time to patch and make sure it would not leak afterwards. Would definitely use again."</p>
+          <cite>via BestProsInTown</cite>
+        </div>
+        <div class="rev reveal">
+          <div class="stars">★★★★☆</div>
+          <p>"Booked in advance and confirmed the appointment. Thorough work once on site."</p>
+          <cite><span class="sample-tag">Sample</span> typical customer feedback</cite>
+        </div>
+      </div>
+      <div class="src-row reveal">
+        <a class="src-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJo3lFTknF5YgRQFpOCJpGxbw" target="_blank" rel="noopener">See reviews on Google</a>
+        <a class="src-btn alt" href="https://reviews.birdeye.com/pool-leak-doctor-170429875097966" target="_blank" rel="noopener">Birdeye profile</a>
+      </div>
+    </section>
+
+    <div class="cta-band reveal">
+      <h2>Losing water? Call the Doctor.</h2>
+      <p>A small leak today is a big repair tomorrow. Call (904) 616-1828 and get a straight answer about your pool.</p>
+      <a class="btn btn-solid" href="tel:+19046161828">Call (904) 616-1828</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-serv">
+      <span class="k">Services</span>
+      <h2>Every way we hunt down leaks</h2>
+      <p>One specialty, done completely: find the leak, fix the leak, prove it is fixed. Here is the full menu of what we do.</p>
+    </div>
+    <div class="wall">
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0E7C9B" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
+        <h3>Full Leak Detection</h3>
+        <p>A complete investigation of pool and spa water loss, structure to plumbing.</p>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#6FBF73" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Dive inspection of every fitting</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#6FBF73" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Written findings and repair plan</li>
+        </ul>
+        <div class="note">Call for a quote: (904) 616-1828</div>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#D95134" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6M12 16v6M2 12h6M16 12h6"/><circle cx="12" cy="12" r="3.5"/></svg></div>
+        <h3>Structural Leak Repair</h3>
+        <p>Cracks, skimmers, lights, returns and tile lines, sealed and verified.</p>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#6FBF73" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Underwater-capable repairs</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#6FBF73" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Post-repair water level check</li>
+        </ul>
+        <div class="note">Call for a quote: (904) 616-1828</div>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0B3C5D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17c2-6 5-9 8-9s6 3 8 9"/><path d="M2 20h20"/></svg></div>
+        <h3>Plumbing Pressure Testing</h3>
+        <p>We isolate and pressure-test underground lines to find hidden breaks.</p>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#6FBF73" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Pinpoints the failing section</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#6FBF73" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Minimal digging, targeted repair</li>
+        </ul>
+        <div class="note">Call for a quote: (904) 616-1828</div>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0E7C9B" stroke-width="2" stroke-linecap="round"><path d="M12 3C8 9 6 12.5 6 16a6 6 0 0012 0c0-3.5-2-7-6-13z"/></svg></div>
+        <h3>Dye Testing</h3>
+        <p>Precision dye testing shows exactly where water is escaping.</p>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#6FBF73" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Skimmer, drain, light and return checks</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#6FBF73" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>No guesswork, no overselling</li>
+        </ul>
+        <div class="note">Call for a quote: (904) 616-1828</div>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#D95134" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg></div>
+        <h3>Equipment Area Checks</h3>
+        <p>Pump, filter, heater, valves and seals: the slow drips that add up.</p>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#6FBF73" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Full equipment pad inspection</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#6FBF73" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Seal and gasket replacement</li>
+        </ul>
+        <div class="note">Call for a quote: (904) 616-1828</div>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0B3C5D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+        <h3>Water Loss Audits</h3>
+        <p>Evaporation or leak? We measure and give you a straight answer.</p>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#6FBF73" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Bucket test walkthrough</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#6FBF73" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Honest go/no-go on further testing</li>
+        </ul>
+        <div class="note">Call for a quote: (904) 616-1828</div>
+      </div>
+    </div>
+    <div class="cta-band reveal">
+      <h2>Not sure where to start?</h2>
+      <p>Describe the symptoms and we will tell you what test makes sense. No pressure, no upsell.</p>
+      <a class="btn btn-solid" href="tel:+19046161828">Call (904) 616-1828</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-story">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-story">
+      <span class="k">Our story</span>
+      <h2>One doctor. One specialty.<br>Zero guesswork.</h2>
+      <p>Pool Leak Doctor is a Fleming Island pool leak specialist serving Clay County and nearby Northeast Florida.</p>
+    </div>
+    <div class="story-split">
+      <div class="reveal">
+        <h2 style="font-size:clamp(1.6rem,3vw,2.2rem)">Why a leak specialist, not a pool company</h2>
+        <p>Most pool companies do a little of everything: cleanings, chemicals, repairs. Leak detection is a different discipline. It takes patience, methodical testing, and the willingness to prove the answer before billing for it.</p>
+        <p>Pool Leak Doctor focuses on that one hard problem. When your water level keeps dropping and nobody can tell you why, that is exactly the call we want.</p>
+        <p>We work directly with homeowners across Fleming Island, Orange Park, Green Cove Springs and the surrounding Clay County area. You talk to the person who will actually be in your pool.</p>
+      </div>
+      <div class="side-card reveal">
+        <h3>The house call, done right</h3>
+        <div class="big-num">Mon to Fri</div>
+        <p>On-site appointments 9 AM to 6 PM, Monday through Friday. Evenings and weekends by arrangement.</p>
+        <p>Based in Fleming Island, FL 32006. We come to you, there is no shop to visit and no waiting room.</p>
+      </div>
+    </div>
+    <div class="mag" style="margin-bottom:56px">
+      <div class="mag-item reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0E7C9B" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
+        <h3>Find it first</h3>
+        <p>We diagnose before we quote. You will know exactly what is wrong and what it takes to fix before any work starts.</p>
+      </div>
+      <div class="mag-item reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#D95134" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+        <h3>Fix it right</h3>
+        <p>Targeted repairs, sealed and verified with a water level check, not a patch and a prayer.</p>
+      </div>
+      <div class="mag-item reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0B3C5D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 10h8M8 14h5"/><path d="M21 12a9 9 0 11-4-7.5"/></svg></div>
+        <h3>Straight talk</h3>
+        <p>If it is evaporation, we will tell you. If it is a leak, we will show you. Honest answers keep customers coming back.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-gal">
+      <span class="k">Gallery</span>
+      <h2>The tools of the trade</h2>
+      <p>Artistic previews of leak detection work. Real photos from the field are on the way. Use the arrows to browse.</p>
+    </div>
+    <div class="carousel">
+      <button class="car-btn prev" aria-label="Previous photos">&#8249;</button>
+      <div class="car-track">
+      <div class="tile reveal"><span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#1FA8CC,#0B3C5D)"><svg viewBox="0 0 100 100"><path d="M50 10C36 28 28 40 28 54a22 22 0 0044 0C72 40 64 28 50 10z" fill="#fff" opacity=".92"/></svg></div>
+        <div class="cap"><strong>Dye testing</strong><small>Pinpointing the exact escape point</small></div>
+      </div>
+      <div class="tile reveal"><span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#0B3C5D,#062A44)"><svg viewBox="0 0 100 100"><circle cx="50" cy="46" r="26" fill="none" stroke="#fff" stroke-width="6"/><path d="M50 20v-8M50 80v-8M24 46h-8M84 46h-8" stroke="#1FA8CC" stroke-width="6" stroke-linecap="round"/></svg></div>
+        <div class="cap"><strong>Dive inspection</strong><small>Every fitting, up close</small></div>
+      </div>
+      <div class="tile reveal"><span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#F2674B,#B23A1F)"><svg viewBox="0 0 100 100"><path d="M20 70h60M30 70V40h40v30" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"/><circle cx="50" cy="28" r="8" fill="#fff"/></svg></div>
+        <div class="cap"><strong>Pressure testing</strong><small>Finding underground breaks</small></div>
+      </div>
+      <div class="tile reveal"><span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#0E7C9B,#0B3C5D)"><svg viewBox="0 0 100 100"><rect x="24" y="30" width="52" height="40" rx="8" fill="none" stroke="#fff" stroke-width="6"/><path d="M32 52h36" stroke="#1FA8CC" stroke-width="6" stroke-linecap="round"/></svg></div>
+        <div class="cap"><strong>Skimmer repairs</strong><small>The most common culprit</small></div>
+      </div>
+      <div class="tile reveal"><span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#1FA8CC,#0E7C9B)"><svg viewBox="0 0 100 100"><path d="M30 78V34a20 20 0 0140 0v44" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"/><path d="M22 78h56" stroke="#062A44" stroke-width="6" stroke-linecap="round"/></svg></div>
+        <div class="cap"><strong>Pipe locating</strong><small>Tracing the underground runs</small></div>
+      </div>
+      <div class="tile reveal"><span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#0B3C5D,#1FA8CC)"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="28" fill="none" stroke="#fff" stroke-width="6"/><circle cx="50" cy="50" r="10" fill="#fff"/></svg></div>
+        <div class="cap"><strong>Main drain checks</strong><small>Deep water, clear answers</small></div>
+      </div>
+      <div class="tile reveal"><span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#F2A0B5,#D95134)"><svg viewBox="0 0 100 100"><path d="M28 30h44v40H28z" fill="none" stroke="#fff" stroke-width="6"/><path d="M28 44l22 14 22-14" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"/></svg></div>
+        <div class="cap"><strong>Equipment pad</strong><small>Pumps, filters and valves</small></div>
+      </div>
+      <div class="tile reveal"><span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#062A44,#0E7C9B)"><svg viewBox="0 0 100 100"><path d="M20 60c8-14 16-20 30-20s22 6 30 20" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"/><path d="M14 72h72" stroke="#1FA8CC" stroke-width="6" stroke-linecap="round"/></svg></div>
+        <div class="cap"><strong>Water level checks</strong><small>Proof the leak is gone</small></div>
+      </div>
+      </div>
+      <button class="car-btn next" aria-label="Next photos">&#8250;</button>
+    </div>
+    <div class="disclaimer reveal style="margin-top:20px;margin-bottom:56px">
+      <strong>Coming soon:</strong> real photos from actual leak detection jobs. The illustrations above are artistic previews.
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-rev">
+      <span class="k">Reviews</span>
+      <h2>What customers say</h2>
+      <p>Real feedback from public review profiles. Read the sources yourself, then decide.</p>
+    </div>
+    <div class="disclaimer reveal">
+      Review themes below are paraphrased from public feedback. Open a source to read current reviews and ratings.
+    </div>
+    <div class="src-row reveal">
+      <a class="src-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJo3lFTknF5YgRQFpOCJpGxbw" target="_blank" rel="noopener">See reviews on Google</a>
+      <a class="src-btn alt" href="https://reviews.birdeye.com/pool-leak-doctor-170429875097966" target="_blank" rel="noopener">Birdeye: 6 reviews</a>
+      <a class="src-btn alt" href="https://www.bestprosintown.com/fl/fleming-island/pool-leak-doctor-/" target="_blank" rel="noopener">BestProsInTown: 5 reviews</a>
+    </div>
+    <div class="rev-wall" style="margin-top:28px">
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>"Extremely thorough and professional, willing to answer all my questions and address every concern about my pool. He clearly knows the business well. I recommend him to anybody."</p>
+        <cite>Paraphrased · via BestProsInTown, Jun 2026</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>"Found and repaired two small cuts in my pool, no bigger than a quarter. Took the time to patch properly and make sure it would not leak afterwards. Would definitely use again."</p>
+        <cite>Paraphrased · via BestProsInTown, May 2025</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★☆☆</div>
+        <p>"Mixed experiences reported across review sites: praise for thorough on-site work, with a few reviewers noting slow callbacks. Booking ahead and confirming the appointment is recommended."</p>
+        <cite>Summary of themes · Birdeye, 3 of 5 stars across 6 reviews</cite>
+      </div>
+    </div>
+    <div class="cta-band reveal">
+      <h2>Had a visit from the Doctor?</h2>
+      <p>Your review helps neighbors with mystery leaks find the right specialist. It takes a minute.</p>
+      <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJo3lFTknF5YgRQFpOCJpGxbw" target="_blank" rel="noopener">Leave a Google review</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-visit">
+      <span class="k">Visit / Contact</span>
+      <h2>We come to you</h2>
+      <p>Pool Leak Doctor is a mobile service based in Fleming Island. Call to book your on-site leak inspection.</p>
+    </div>
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#1FA8CC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg> Call us</h3>
+        <p>Leak questions, booking, quotes:</p>
+        <a class="big" href="tel:+19046161828">(904) 616-1828</a>
+        <p style="margin-top:10px">Mon to Fri, 9 AM to 6 PM.<br>Describe the symptoms and we will tell you what test makes sense.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#1FA8CC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Service area</h3>
+        <p><strong>Pool Leak Doctor</strong><br>PO Box 8030<br>Fleming Island, FL 32006</p>
+        <p>Mobile service: Fleming Island, Orange Park, Green Cove Springs and surrounding Clay County. There is no shop to visit, we come to your pool.</p>
+      </div>
+    </div>
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#1FA8CC" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Hours</h3>
+        <table class="hours-table" id="hoursTable">
+          <tr><td>Monday</td><td>9:00 AM - 6:00 PM</td></tr>
+          <tr><td>Tuesday</td><td>9:00 AM - 6:00 PM</td></tr>
+          <tr><td>Wednesday</td><td>9:00 AM - 6:00 PM</td></tr>
+          <tr><td>Thursday</td><td>9:00 AM - 6:00 PM</td></tr>
+          <tr><td>Friday</td><td>9:00 AM - 6:00 PM</td></tr>
+          <tr><td>Saturday</td><td>Closed</td></tr>
+          <tr><td>Sunday</td><td>Closed</td></tr>
+        </table>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <svg viewBox="0 0 24 24" fill="#1FA8CC"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#fff"/></svg>
+          <strong>Fleming Island, FL 32006</strong>
+          <small>Mobile service · we come to you</small><br>
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJo3lFTknF5YgRQFpOCJpGxbw" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap foot-big">
+    <div class="big-name">Pool Leak <span class="a">Doctor</span></div>
+    <div class="foot-meta">
+      <span>PO Box 8030, Fleming Island, FL 32006</span>
+      <a href="tel:+19046161828">(904) 616-1828</a>
+    </div>
+    <div class="foot-links">
+      <a href="#home" data-page="home">Home</a>
+      <a href="#services" data-page="services">Services</a>
+      <a href="#story" data-page="story">Our Story</a>
+      <a href="#gallery" data-page="gallery">Gallery</a>
+      <a href="#reviews" data-page="reviews">Reviews</a>
+      <a href="#visit" data-page="visit">Visit / Contact</a>
+    </div>
+    <div class="foot-bottom">
+      <span>© Pool Leak Doctor</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "story", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+    var scrim = document.getElementById("scrim");
+    if(scrim){ scrim.classList.remove("show"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+      var scrim = document.getElementById("scrim");
+      if(scrim){ scrim.classList.toggle("show", open); }
+    });
+  }
+  var scrimEl = document.getElementById("scrim");
+  if(scrimEl){ scrimEl.addEventListener("click", closeMenu); }
+
+  /* ---------- live hours (America/New_York) ---------- */
+  var HOURS = {0:null,1:[9,18],2:[9,18],3:[9,18],4:[9,18],5:[9,18],6:null};
+  var DOW = {"Sun":0,"Mon":1,"Tue":2,"Wed":3,"Thu":4,"Fri":5,"Sat":6};
+  var DAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  function fmt(h){
+    var ap = h < 12 ? "AM" : "PM";
+    var hh = h % 12;
+    if(hh === 0){ hh = 12; }
+    return hh + ":00 " + ap;
+  }
+  try{
+    var parts = new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",weekday:"short",hour:"numeric",hour12:false}).formatToParts(new Date());
+    var wd = "Mon", hr = 12;
+    parts.forEach(function(p){
+      if(p.type === "weekday"){ wd = p.value; }
+      if(p.type === "hour"){ hr = parseInt(p.value, 10) % 24; }
+    });
+    var day = DOW[wd] !== undefined ? DOW[wd] : 1;
+    var pill = document.getElementById("hoursPill");
+    var txt = document.getElementById("hoursText");
+    if(pill && txt){
+      var today = HOURS[day];
+      if(today && hr >= today[0] && hr < today[1]){
+        txt.textContent = "Open now · until " + fmt(today[1]) + " today";
+      } else {
+        pill.classList.add("closed");
+        var found = -1, nd = day;
+        for(var k = 0; k < 7; k++){
+          nd = (day + k) % 7;
+          var hh2 = HOURS[nd];
+          if(hh2 && (k > 0 || hr < hh2[0])){ found = nd; break; }
+        }
+        if(found >= 0){
+          var label = (found === day) ? "today" : (((day + 1) % 7 === found) ? "tomorrow" : DAYS[found]);
+          txt.textContent = "Opens " + label + " at " + fmt(HOURS[found][0]);
+        } else {
+          txt.textContent = "Call for current hours";
+        }
+      }
+    }
+    var rows = document.querySelectorAll("#hoursTable tr");
+    var idx = (day + 6) % 7;
+    if(rows[idx]){ rows[idx].classList.add("today"); }
+  }catch(e){ /* leave default pill text */ }
+
+  /* ---------- gallery carousel ---------- */
+  var carTrack = document.querySelector(".car-track");
+  var carPrev = document.querySelector(".car-btn.prev");
+  var carNext = document.querySelector(".car-btn.next");
+  function carStep(dir){
+    if(!carTrack){ return; }
+    var tile = carTrack.querySelector(".tile");
+    var w = tile ? tile.offsetWidth + 16 : 300;
+    carTrack.scrollBy({left: dir * w * 2, behavior: "smooth"});
+  }
+  if(carPrev){ carPrev.addEventListener("click", function(){ carStep(-1); }); }
+  if(carNext){ carNext.addEventListener("click", function(){ carStep(1); }); }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
