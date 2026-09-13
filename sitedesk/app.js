@@ -877,6 +877,7 @@ async function grabLead(slug){
   }
   clearTreeCache();
   state.claimsBySlug[slug] = claim;
+  if(state.treeSlugs && state.treeSlugs.indexOf(slug) === -1) state.treeSlugs.push(slug);
   toast('Claimed: ' + lead.name);
   state.boardOrder = [];
   await refreshMyClaims();
