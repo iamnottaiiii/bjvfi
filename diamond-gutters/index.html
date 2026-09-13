@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diamond Gutters · Gutter Cleaning Service, Staten Island, NY</title>
+<meta name="description" content="Diamond Gutters at 431 Maine Ave, Staten Island, NY 10314. Gutter cleaning, downspout flushing, and minor gutter repairs. Call (347) 573-9308.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#191919; --ink-2:#232323; --ink-3:#2E2E2E;
+  --paper:#FAF8F4; --line:rgba(25,25,25,.14);
+  --gold:#FFC400; --gold-deep:#D9A400; --gold-soft:#FFF3C4;
+  --steel:#5C6B73; --steel-soft:#E9EDEF;
+  --ok:#2E9E5B;
+  --radius:14px;
+  --shadow:0 18px 40px -18px rgba(25,25,25,.35);
+  --shadow-sm:0 8px 22px -12px rgba(25,25,25,.3);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Barlow",system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased}
+img{max-width:100%}
+a{color:#8A6D00}
+::selection{background:var(--gold);color:var(--ink)}
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+h1,h2,h3{font-family:"Barlow Condensed",sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.5px;line-height:1.05}
+
+/* ---------- top strip + drawer nav ---------- */
+.topstrip{background:var(--ink);color:#fff}
+.topstrip .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 24px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:#fff}
+.brand-mark{width:44px;height:44px;flex:none;border-radius:10px;background:var(--gold);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm)}
+.brand-mark svg{width:28px;height:28px}
+.brand-name{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:1.35rem;line-height:1;letter-spacing:1px;text-transform:uppercase}
+.brand-name small{display:block;font-family:"Barlow",sans-serif;font-weight:600;font-size:.62rem;letter-spacing:2.8px;color:var(--gold)}
+.top-actions{display:flex;align-items:center;gap:12px}
+.top-actions .call-link{display:inline-flex;align-items:center;gap:8px;color:var(--gold);font-weight:700;text-decoration:none;font-size:1.02rem;white-space:nowrap}
+.top-actions .call-link:hover{color:#fff}
+.menu-btn{display:inline-flex;align-items:center;gap:10px;background:var(--gold);color:var(--ink);border:0;cursor:pointer;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:1rem;letter-spacing:1px;text-transform:uppercase;padding:11px 20px;border-radius:8px;transition:transform .18s,background .18s}
+.menu-btn:hover{background:#fff;transform:translateY(-2px)}
+.menu-btn span.lines{display:block;width:22px;height:2.5px;background:var(--ink);box-shadow:0 7px 0 var(--ink),0 -7px 0 var(--ink)}
+
+.drawer{position:fixed;top:0;left:0;bottom:0;width:min(360px,88vw);background:var(--ink);color:#fff;z-index:100;transform:translateX(-102%);transition:transform .32s cubic-bezier(.22,.8,.3,1);display:flex;flex-direction:column;box-shadow:var(--shadow)}
+.drawer.open{transform:none}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid rgba(255,255,255,.12)}
+.drawer-head strong{font-family:"Barlow Condensed",sans-serif;font-size:1.25rem;letter-spacing:1px;text-transform:uppercase;color:var(--gold)}
+.drawer-close{background:none;border:0;color:#fff;font-size:1.6rem;cursor:pointer;line-height:1;padding:6px}
+.drawer nav{display:flex;flex-direction:column;padding:14px}
+.drawer nav a{display:flex;align-items:center;justify-content:space-between;color:#fff;text-decoration:none;font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:1.45rem;letter-spacing:1px;text-transform:uppercase;padding:14px 14px;border-radius:8px;transition:background .2s,color .2s}
+.drawer nav a small{font-family:"Barlow",sans-serif;font-size:.7rem;color:#8f8f8f;letter-spacing:2px}
+.drawer nav a:hover{background:var(--ink-3)}
+.drawer nav a.active{background:var(--gold);color:var(--ink)}
+.drawer nav a.active small{color:var(--ink)}
+.drawer-foot{margin-top:auto;padding:22px 24px;border-top:1px solid rgba(255,255,255,.12)}
+.drawer-foot p{font-size:.92rem;color:#B9B9B9;margin-bottom:10px}
+.drawer-foot a.big{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:1.6rem;color:var(--gold);text-decoration:none;letter-spacing:1px}
+.backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:99;opacity:0;pointer-events:none;transition:opacity .3s}
+.backdrop.show{opacity:1;pointer-events:auto}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- full-bleed hero ---------- */
+.hero{position:relative;background:linear-gradient(160deg,#242424 0%,#101010 100%);color:#fff;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;background:
+  linear-gradient(180deg, rgba(255,196,0,.10) 0%, transparent 40%),
+  repeating-linear-gradient(90deg, transparent 0 90px, rgba(255,255,255,.03) 90px 92px);pointer-events:none}
+.hero-roof{position:absolute;left:0;right:0;top:0;height:120px;background:
+  linear-gradient(180deg,#2E2E2E,#232323);clip-path:polygon(0 100%, 8% 30%, 50% 0, 92% 30%, 100% 100%);opacity:.85;pointer-events:none}
+.hero .wrap{position:relative;padding-top:110px;padding-bottom:90px;display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
+.kicker{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:var(--ink);font-family:"Barlow Condensed",sans-serif;font-weight:700;letter-spacing:2px;text-transform:uppercase;font-size:.9rem;padding:8px 18px;border-radius:6px;margin-bottom:20px}
+h1{font-size:clamp(3rem,7vw,5.2rem);font-weight:800;color:#fff;margin-bottom:16px}
+h1 .gold{color:var(--gold)}
+.lede{font-size:1.15rem;color:#D8D8D8;max-width:34rem;margin-bottom:28px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:26px}
+.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;padding:15px 30px;border-radius:8px;font-size:1.02rem;font-family:"Barlow Condensed",sans-serif;letter-spacing:1px;text-transform:uppercase;transition:transform .18s,background .18s,color .18s;border:0;cursor:pointer}
+.btn-solid{background:var(--gold);color:var(--ink)}
+.btn-solid:hover{background:#fff;transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.35)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-2px)}
+.hours-pill{display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);padding:10px 20px;border-radius:999px;font-weight:600;font-size:.95rem;color:#fff}
+.hours-pill .dot{width:10px;height:10px;border-radius:50%;background:#57C46B;box-shadow:0 0 0 4px rgba(87,196,107,.25);animation:pulse 2s infinite}
+.hours-pill.closed .dot{background:#E4658F;box-shadow:0 0 0 4px rgba(228,101,143,.25)}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+.hero-art{position:relative}
+.gutter-stage{background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.14);border-radius:20px;padding:34px;box-shadow:var(--shadow)}
+.gutter-stage svg{width:100%;height:auto;display:block}
+.hero-stats{display:flex;gap:0;margin-top:26px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:12px;overflow:hidden}
+.hero-stats div{flex:1;padding:16px 18px;text-align:center;border-left:1px solid rgba(255,255,255,.12)}
+.hero-stats div:first-child{border-left:0}
+.hero-stats strong{display:block;font-family:"Barlow Condensed",sans-serif;font-size:1.7rem;color:var(--gold);letter-spacing:1px}
+.hero-stats small{color:#B9B9B9;font-size:.8rem;letter-spacing:1px;text-transform:uppercase}
+
+/* ---------- sections ---------- */
+section.band{padding:72px 0}
+.band.alt{background:var(--ink);color:#fff}
+.band.light{background:var(--steel-soft)}
+.sec-head{max-width:46rem;margin:0 auto 44px;text-align:left}
+.sec-head.center{text-align:center}
+.eyebrow{display:inline-block;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:.85rem;letter-spacing:3px;text-transform:uppercase;color:#8A6D00;background:var(--gold-soft);padding:7px 16px;border-radius:6px;margin-bottom:14px}
+.band.alt .eyebrow{color:var(--gold);background:rgba(255,196,0,.12)}
+h2{font-size:clamp(2.2rem,4.4vw,3.4rem);font-weight:800;margin-bottom:12px}
+.band.alt h2{color:#fff}
+.sec-head p{color:var(--steel);font-size:1.05rem}
+.band.alt .sec-head p{color:#C9C9C9}
+
+/* alternating rows */
+.row{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;margin-bottom:64px}
+.row:last-child{margin-bottom:0}
+.row.flip .row-copy{order:2}
+.row-copy h2{margin-bottom:14px}
+.row-copy p{color:var(--steel);margin-bottom:14px}
+.band.alt .row-copy p{color:#C9C9C9}
+.row-art{background:#fff;border-radius:var(--radius);padding:38px;box-shadow:var(--shadow-sm);border:1px solid var(--line)}
+.band.alt .row-art{background:var(--ink-2);border-color:rgba(255,255,255,.1)}
+.row-art svg{width:100%;height:auto;display:block}
+.check-list{list-style:none;margin:20px 0;display:grid;gap:11px}
+.check-list li{display:flex;gap:12px;align-items:flex-start;font-weight:500}
+.band.alt .check-list li{color:#E3E3E3}
+.check-list .tick{flex:none;width:26px;height:26px;border-radius:50%;background:var(--gold);color:var(--ink);font-weight:800;display:flex;align-items:center;justify-content:center;font-size:.85rem;margin-top:1px}
+
+/* leaders list (offerings) */
+.leaders{list-style:none;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;border:1px solid var(--line)}
+.leaders li{display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;padding:24px 30px;border-bottom:1px solid var(--line)}
+.leaders li:last-child{border-bottom:0}
+.leaders li:hover{background:var(--gold-soft)}
+.leaders .li-num{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:1.9rem;color:var(--gold-deep);min-width:52px}
+.leaders h3{font-size:1.5rem;margin-bottom:4px}
+.leaders p{color:var(--steel);font-size:.95rem;margin:0}
+.leaders .li-cta{font-family:"Barlow Condensed",sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ink);background:var(--gold);text-decoration:none;padding:10px 20px;border-radius:8px;white-space:nowrap;font-size:.95rem}
+.leaders .li-cta:hover{background:var(--ink);color:#fff}
+.price-note{background:var(--ink);color:#fff;border-radius:var(--radius);padding:22px 30px;margin-top:22px;font-size:.97rem}
+.price-note .tag{display:inline-block;background:var(--gold);color:var(--ink);font-family:"Barlow Condensed",sans-serif;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;font-size:.78rem;padding:5px 14px;border-radius:6px;margin-right:12px;vertical-align:2px}
+.price-note a{color:var(--gold);font-weight:700}
+
+/* carousel gallery */
+.carousel{position:relative;background:var(--ink);border-radius:20px;overflow:hidden;box-shadow:var(--shadow)}
+.car-track{display:flex;transition:transform .45s cubic-bezier(.22,.8,.3,1)}
+.car-slide{flex:0 0 100%;display:grid;grid-template-columns:1fr 1fr;min-height:380px}
+.car-slide .art{display:flex;align-items:center;justify-content:center;padding:44px}
+.car-slide .art svg{width:64%;max-width:230px;height:auto;filter:drop-shadow(0 14px 18px rgba(0,0,0,.3))}
+.car-slide .copy{padding:52px 48px 52px 0;color:#fff;display:flex;flex-direction:column;justify-content:center}
+.car-slide .copy .soon{display:inline-block;align-self:flex-start;background:rgba(255,196,0,.14);color:var(--gold);font-size:.72rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;padding:5px 14px;border-radius:999px;margin-bottom:14px}
+.car-slide h3{font-size:2rem;color:var(--gold);margin-bottom:10px}
+.car-slide p{color:#C9C9C9}
+.car-btn{position:absolute;top:50%;transform:translateY(-50%);background:var(--gold);color:var(--ink);border:0;width:52px;height:52px;border-radius:50%;font-size:1.4rem;font-weight:800;cursor:pointer;box-shadow:var(--shadow-sm);transition:transform .18s,background .18s;z-index:2}
+.car-btn:hover{background:#fff;transform:translateY(-50%) scale(1.08)}
+.car-btn.prev{left:18px}
+.car-btn.next{right:18px}
+.car-dots{position:absolute;bottom:18px;left:0;right:0;display:flex;justify-content:center;gap:10px}
+.car-dots button{width:12px;height:12px;border-radius:50%;border:0;background:rgba(255,255,255,.3);cursor:pointer;padding:0}
+.car-dots button.on{background:var(--gold)}
+
+/* reviews */
+.rev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.rev{background:#fff;border-radius:var(--radius);padding:30px;box-shadow:var(--shadow-sm);border:1px solid var(--line);border-top:6px solid var(--gold)}
+.rev .stars{color:var(--gold-deep);font-size:1.15rem;letter-spacing:3px;margin-bottom:12px}
+.rev p{font-size:1.02rem;margin-bottom:14px}
+.rev cite{font-style:normal;font-weight:700;font-size:.85rem;color:#8A6D00;letter-spacing:.5px;text-transform:uppercase}
+.cta-band{background:linear-gradient(120deg,var(--gold),var(--gold-deep));border-radius:20px;color:var(--ink);padding:52px;text-align:center;margin-top:44px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.cta-band h2{color:var(--ink);font-size:clamp(2rem,4vw,3rem)}
+.cta-band p{color:#4d3d00;max-width:36rem;margin:0 auto 24px;font-weight:500}
+.cta-band .btn{background:var(--ink);color:#fff}
+.cta-band .btn:hover{background:#000}
+.rs-strip{margin:26px auto 10px;max-width:660px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px 22px;text-align:center}
+.rs-note{margin:0 0 12px;font-size:.95rem;color:var(--steel);line-height:1.55}
+.rs-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rs-btn{display:inline-block;background:var(--ink);color:var(--gold);padding:10px 24px;border-radius:8px;font-weight:700;text-decoration:none;font-size:.95rem;font-family:"Barlow Condensed",sans-serif;letter-spacing:1px;text-transform:uppercase}
+.rs-btn:hover{background:#000}
+
+/* contact */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
+.info-card{background:#fff;border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm);border:1px solid var(--line);border-left:8px solid var(--gold)}
+.info-card h3{font-size:1.6rem;margin-bottom:14px}
+.info-card p{color:var(--steel);margin-bottom:8px}
+.info-card a.big{font-family:"Barlow Condensed",sans-serif;font-size:1.7rem;font-weight:800;color:var(--ink);text-decoration:none;letter-spacing:1px}
+.info-card a.big:hover{color:#8A6D00}
+.hours-table{width:100%;border-collapse:collapse;font-size:.98rem}
+.hours-table td{padding:10px 6px;border-bottom:1px dashed var(--line)}
+.hours-table tr.today td{font-weight:800;color:#8A6D00}
+.hours-table td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.map-card{border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:340px;background:repeating-linear-gradient(0deg,transparent 0 46px,rgba(25,25,25,.1) 46px 48px),repeating-linear-gradient(90deg,transparent 0 46px,rgba(25,25,25,.1) 46px 48px),linear-gradient(140deg,#EFE8D8,#DED2B8);display:flex;align-items:center;justify-content:center}
+.map-pin{text-align:center;background:#fff;padding:26px 34px;border-radius:14px;box-shadow:var(--shadow);max-width:78%;position:relative}
+.map-pin::after{content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);border:14px solid transparent;border-top-color:#fff;border-bottom:0}
+.map-pin svg{width:44px;height:44px;margin-bottom:8px}
+.map-pin strong{font-family:"Barlow Condensed",sans-serif;font-size:1.3rem;display:block;letter-spacing:1px;text-transform:uppercase}
+.map-pin small{color:var(--steel)}
+.map-pin .btn{margin-top:14px}
+
+/* strip heads */
+.strip{border-radius:20px;padding:56px 48px;color:#fff;position:relative;overflow:hidden;margin-bottom:40px;box-shadow:var(--shadow)}
+.strip::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(255,255,255,.14), transparent 50%)}
+.strip h2{color:#fff;font-size:clamp(2.2rem,4.4vw,3.2rem);position:relative;margin:6px 0 10px}
+.strip p{color:rgba(255,255,255,.85);max-width:36rem;position:relative;font-size:1.05rem}
+.strip .eyebrow{background:rgba(255,255,255,.16);color:#fff;position:relative}
+.strip.s-services{background:linear-gradient(120deg,#3A3A3A,#191919)}
+.strip.s-about{background:linear-gradient(120deg,#2B3B42,#16232A)}
+.strip.s-gal{background:linear-gradient(120deg,#6B5A00,#403500)}
+.strip.s-rev{background:linear-gradient(120deg,#4A4A4A,#242424)}
+.strip.s-contact{background:linear-gradient(120deg,#242424,#0F0F0F)}
+
+/* ---------- big-type footer ---------- */
+footer{background:var(--ink);color:#C9C9C9}
+.foot-big{padding:64px 0 24px}
+.foot-big h2{font-size:clamp(3rem,9vw,6.5rem);font-weight:800;color:#fff;margin-bottom:6px}
+.foot-big h2 .gold{color:var(--gold)}
+.foot-big p.tagline{font-size:1.1rem;color:#9A9A9A;max-width:40rem;margin-bottom:36px}
+.foot-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:36px;padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,.12)}
+.foot-cols h4{font-family:"Barlow Condensed",sans-serif;color:var(--gold);font-size:1.05rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px}
+.foot-cols p,.foot-cols a{color:#A8A8A8;font-size:.95rem;text-decoration:none}
+.foot-cols a:hover{color:var(--gold)}
+.foot-cols .foot-links{list-style:none;display:grid;gap:8px}
+.foot-bottom{padding:22px 0 28px;display:flex;justify-content:center;font-size:.85rem;color:#7A7A7A}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:940px){
+  .hero .wrap{grid-template-columns:1fr;padding-top:80px}
+  .row{grid-template-columns:1fr;gap:32px}
+  .row.flip .row-copy{order:0}
+  .car-slide{grid-template-columns:1fr;min-height:0}
+  .car-slide .copy{padding:8px 32px 56px}
+  .contact-grid{grid-template-columns:1fr}
+  .rev-grid{grid-template-columns:1fr}
+  .top-actions .call-link{display:none}
+  .foot-cols{grid-template-columns:1fr}
+  .strip{padding:40px 28px}
+}
+</style>
+</head>
+<body>
+
+<header class="topstrip">
+  <div class="wrap">
+    <a class="brand" href="#home" data-page="home" aria-label="Diamond Gutters, home">
+      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h18l-2 12H5z"/><path d="M3 8c0-2 1.5-3.5 3.5-3.5S10 6 10 8"/><path d="M14 12h4"/></svg></span>
+      <span class="brand-name">Diamond<small>Gutters · Staten Island</small></span>
+    </a>
+    <div class="top-actions">
+      <a class="call-link" href="tel:+13475739308">&#9742; (347) 573-9308</a>
+      <button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false"><span class="lines"></span>Menu</button>
+    </div>
+  </div>
+</header>
+
+<aside class="drawer" id="drawer" aria-label="Site menu">
+  <div class="drawer-head">
+    <strong>Menu</strong>
+    <button class="drawer-close" id="drawerClose" aria-label="Close menu">&times;</button>
+  </div>
+  <nav class="main" id="mainNav" aria-label="Main navigation">
+    <a href="#home" data-page="home" class="active">Home<small>Start</small></a>
+    <a href="#services" data-page="services">Services<small>What we do</small></a>
+    <a href="#about" data-page="about">About<small>Who we are</small></a>
+    <a href="#gallery" data-page="gallery">Gallery<small>Our work</small></a>
+    <a href="#reviews" data-page="reviews">Reviews<small>5 star rated</small></a>
+    <a href="#contact" data-page="contact">Contact<small>Get in touch</small></a>
+  </nav>
+  <div class="drawer-foot">
+    <p>Mon - Fri · 9:00 AM - 6:00 PM<br>431 Maine Ave, Staten Island, NY 10314</p>
+    <a class="big" href="tel:+13475739308">(347) 573-9308</a>
+  </div>
+</aside>
+<div class="backdrop" id="backdrop"></div>
+
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-roof" aria-hidden="true"></div>
+    <div class="wrap">
+      <div>
+        <span class="kicker">Gutter Cleaning Service</span>
+        <h1>Clean gutters.<br><span class="gold">Solid roofline.</span></h1>
+        <p class="lede">Diamond Gutters keeps Staten Island rain gutters clear, flowing, and firmly attached. Professional gutter cleaning and downspout service for homes across the Island.</p>
+        <div class="cta-row">
+          <a class="btn btn-solid" href="#services" data-page="services">See Services</a>
+          <a class="btn btn-ghost" href="tel:+13475739308">&#9742; (347) 573-9308</a>
+        </div>
+        <span class="hours-pill" id="hoursPill"><span class="dot"></span><span id="hoursText">Checking today's hours...</span></span>
+      </div>
+      <div class="hero-art">
+        <div class="gutter-stage">
+          <svg viewBox="0 0 320 240" role="img" aria-label="Illustration of a clean house roofline with gutters">
+            <ellipse cx="160" cy="222" rx="120" ry="12" fill="#000" opacity=".35"/>
+            <path d="M50 120 L160 40 L270 120 Z" fill="#2E2E2E"/>
+            <path d="M50 120 L160 40 L270 120" fill="none" stroke="#FFC400" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="70" y="120" width="180" height="80" fill="#3A3A3A"/>
+            <rect x="70" y="120" width="180" height="80" fill="none" stroke="#FFC400" stroke-width="4"/>
+            <path d="M60 108 h200" stroke="#FFC400" stroke-width="10" stroke-linecap="round"/>
+            <path d="M60 108 h200" stroke="#191919" stroke-width="4" stroke-linecap="round" opacity=".5"/>
+            <rect x="228" y="112" width="16" height="88" fill="#FFC400"/>
+            <rect x="228" y="112" width="16" height="88" fill="none" stroke="#191919" stroke-width="3"/>
+            <rect x="140" y="140" width="40" height="60" rx="3" fill="#FFC400"/>
+            <circle cx="176" cy="172" r="3" fill="#191919"/>
+            <rect x="92" y="140" width="28" height="28" rx="3" fill="#5C6B73"/>
+            <rect x="200" y="140" width="28" height="28" rx="3" fill="#5C6B73"/>
+            <g fill="#57C46B" opacity=".9">
+              <circle cx="52" cy="60" r="5"/><circle cx="268" cy="60" r="5"/><circle cx="160" cy="20" r="5"/>
+            </g>
+            <path d="M90 200 l-14 14 M230 200 l14 14" stroke="#FFC400" stroke-width="6" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="hero-stats">
+          <div><strong>5.0</strong><small>Star rating</small></div>
+          <div><strong>Mon-Fri</strong><small>9 AM - 6 PM</small></div>
+          <div><strong>SI, NY</strong><small>Local crew</small></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="band">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow">Why it matters</span>
+        <h2>Clogged gutters cost more than a cleaning</h2>
+        <p>When gutters back up, water goes where it should not: behind siding, into basements, and over the foundation. A routine clean keeps the whole system working.</p>
+      </div>
+      <div class="row">
+        <div class="row-copy reveal">
+          <h2>What we do on every visit</h2>
+          <p>We show up with ladders, tools, and a straightforward process. No upsells, no surprises, just clear gutters.</p>
+          <ul class="check-list">
+            <li><span class="tick">&#10003;</span>Remove leaves, sticks, and built-up debris from gutters</li>
+            <li><span class="tick">&#10003;</span>Flush gutters and downspouts so water flows freely</li>
+            <li><span class="tick">&#10003;</span>Check for sagging, loose hangers, and visible damage</li>
+            <li><span class="tick">&#10003;</span>Clean up all debris from your yard before we leave</li>
+          </ul>
+          <a class="btn btn-solid" href="#services" data-page="services">See all services</a>
+        </div>
+        <div class="row-art reveal">
+          <svg viewBox="0 0 320 220" role="img" aria-label="Illustration of a gutter being cleaned">
+            <rect x="40" y="60" width="240" height="34" rx="8" fill="#5C6B73"/>
+            <rect x="40" y="60" width="240" height="34" rx="8" fill="none" stroke="#191919" stroke-width="4"/>
+            <g fill="#2E9E5B"><ellipse cx="110" cy="52" rx="16" ry="10"/><ellipse cx="150" cy="48" rx="13" ry="9"/><ellipse cx="190" cy="52" rx="15" ry="10"/></g>
+            <g stroke="#191919" stroke-width="5" stroke-linecap="round"><path d="M40 160 L120 160 M40 160 L70 60 M90 160 L120 60"/></g>
+            <rect x="108" y="148" width="24" height="12" rx="4" fill="#FFC400"/>
+            <circle cx="230" cy="150" r="22" fill="#FFC400" stroke="#191919" stroke-width="4"/>
+            <path d="M222 150 l6 6 11 -12" stroke="#191919" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M250 190 q20 -14 34 0" stroke="#57C46B" stroke-width="6" fill="none" stroke-linecap="round"/>
+            <path d="M258 182 q14 -10 24 0" stroke="#57C46B" stroke-width="5" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band alt">
+    <div class="wrap">
+      <div class="row flip">
+        <div class="row-copy reveal">
+          <span class="eyebrow">Staten Island local</span>
+          <h2>Your neighbors' gutters, our business</h2>
+          <p>Diamond Gutters is based at 431 Maine Ave in Staten Island. We work homes across the Island, and our customers rate us 5 stars for professional, careful work.</p>
+          <p>Fall leaves, spring storms, summer downpours: whatever the season drops in your gutters, we get it out and make sure water goes where it belongs.</p>
+          <a class="btn btn-ghost" href="#about" data-page="about">More about us</a>
+        </div>
+        <div class="row-art reveal">
+          <svg viewBox="0 0 320 220" role="img" aria-label="Illustration of a Staten Island home">
+            <ellipse cx="160" cy="200" rx="130" ry="12" fill="#000" opacity=".4"/>
+            <path d="M60 130 L160 60 L260 130 Z" fill="#2E2E2E" stroke="#FFC400" stroke-width="5" stroke-linejoin="round"/>
+            <rect x="80" y="130" width="160" height="70" fill="#3A3A3A" stroke="#FFC400" stroke-width="4"/>
+            <path d="M70 122 h180" stroke="#FFC400" stroke-width="9" stroke-linecap="round"/>
+            <rect x="216" y="124" width="14" height="76" fill="#FFC400"/>
+            <rect x="145" y="150" width="30" height="50" rx="3" fill="#FFC400"/>
+            <g fill="#57C46B"><ellipse cx="52" cy="180" rx="22" ry="14"/><ellipse cx="268" cy="180" rx="22" ry="14"/></g>
+            <circle cx="160" cy="40" r="12" fill="#FFC400" opacity=".9"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band light">
+    <div class="wrap">
+      <div class="sec-head center reveal">
+        <span class="eyebrow">Ready when you are</span>
+        <h2>Get a free estimate today</h2>
+        <p>Call or message us with your address and we will give you a straightforward price. Most jobs are scheduled within days.</p>
+      </div>
+      <div style="text-align:center" class="reveal">
+        <div class="cta-row" style="justify-content:center;margin-bottom:0">
+          <a class="btn btn-solid" href="tel:+13475739308">&#9742; Call (347) 573-9308</a>
+          <a class="btn" style="background:var(--ink);color:#fff" href="#contact" data-page="contact">Contact us</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-services">
+      <span class="eyebrow">Services</span>
+      <h2>Gutter work,<br>done right</h2>
+      <p>Cleaning, flushing, and light repairs for residential gutters across Staten Island.</p>
+    </div>
+
+    <div class="sec-head reveal">
+      <span class="eyebrow">What we offer</span>
+      <h2>Pick your service</h2>
+      <p>Prices below are samples. Every roofline is different, so call for an exact quote.</p>
+    </div>
+
+    <ul class="leaders reveal">
+      <li>
+        <span class="li-num">01</span>
+        <div><h3>Full Gutter Cleaning</h3><p>Debris removal from all gutters, scooped and bagged, with a full visual check of hangers and seams.</p></div>
+        <a class="li-cta" href="tel:+13475739308">Call</a>
+      </li>
+      <li>
+        <span class="li-num">02</span>
+        <div><h3>Downspout Flushing</h3><p>Water-flush every downspout to clear blockages and confirm water flows freely away from the foundation.</p></div>
+        <a class="li-cta" href="tel:+13475739308">Call</a>
+      </li>
+      <li>
+        <span class="li-num">03</span>
+        <div><h3>Gutter and Downspout Inspection</h3><p>A full walk of the roofline: sagging, leaks, loose spikes, and drainage direction, with straight talk on what needs attention.</p></div>
+        <a class="li-cta" href="tel:+13475739308">Call</a>
+      </li>
+      <li>
+        <span class="li-num">04</span>
+        <div><h3>Minor Gutter Repairs</h3><p>Re-securing loose hangers, resealing small leaks, and straightening minor bends during your cleaning visit.</p></div>
+        <a class="li-cta" href="tel:+13475739308">Call</a>
+      </li>
+      <li>
+        <span class="li-num">05</span>
+        <div><h3>Seasonal Maintenance Plan</h3><p>Twice-a-year cleanings, spring and fall, so your gutters never get a chance to clog.</p></div>
+        <a class="li-cta" href="tel:+13475739308">Call</a>
+      </li>
+    </ul>
+
+    <div class="price-note reveal"><span class="tag">Sample pricing</span>Most single-home gutter cleanings land in a typical range for the area. Call <a href="tel:+13475739308">(347) 573-9308</a> with your address for an exact, free estimate.</div>
+
+    <div class="cta-band reveal">
+      <h2>Water belongs in the downspout, not your basement.</h2>
+      <p>One call gets your gutters cleared and flowing. Free estimates, scheduled fast.</p>
+      <a class="btn" href="tel:+13475739308">&#9742; Call (347) 573-9308</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-about">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-about">
+      <span class="eyebrow">About us</span>
+      <h2>Staten Island's<br>gutter crew</h2>
+      <p>Diamond Gutters is a gutter cleaning service based at 431 Maine Ave, Staten Island, NY.</p>
+    </div>
+
+    <section class="band" style="padding-top:8px">
+      <div class="wrap" style="padding:0">
+        <div class="row">
+          <div class="row-copy reveal">
+            <span class="eyebrow">Who we are</span>
+            <h2>Local, professional,<br>thorough</h2>
+            <p>We are a Staten Island gutter cleaning service. Our customers give us 5 stars for being professional through the whole process and for fixing gutters others thought could not be salvaged.</p>
+            <p>We bring our own ladders and equipment, clean up every bit of debris before we leave, and tell you straight what your roofline needs.</p>
+            <ul class="check-list">
+              <li><span class="tick">&#10003;</span>Based at 431 Maine Ave, Staten Island</li>
+              <li><span class="tick">&#10003;</span>Residential gutter cleaning and downspout service</li>
+              <li><span class="tick">&#10003;</span>Free estimates by phone</li>
+            </ul>
+            <a class="btn btn-solid" href="#contact" data-page="contact">Get in touch</a>
+          </div>
+          <div class="row-art reveal">
+            <svg viewBox="0 0 320 220" role="img" aria-label="Illustration of tools of the trade">
+              <g stroke="#191919" stroke-width="6" stroke-linecap="round"><path d="M80 180 L130 60 M110 180 L160 60 M88 150 h44 M98 118 h44 M108 86 h44"/></g>
+              <rect x="60" y="172" width="120" height="12" rx="6" fill="#FFC400" stroke="#191919" stroke-width="4"/>
+              <rect x="200" y="60" width="70" height="26" rx="8" fill="#5C6B73" stroke="#191919" stroke-width="4"/>
+              <path d="M235 86 v60" stroke="#191919" stroke-width="6" stroke-linecap="round"/>
+              <circle cx="235" cy="160" r="14" fill="#FFC400" stroke="#191919" stroke-width="4"/>
+              <path d="M60 40 h40" stroke="#FFC400" stroke-width="10" stroke-linecap="round"/>
+              <path d="M60 40 h40" stroke="#191919" stroke-width="3" stroke-linecap="round" opacity=".4"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div style="height:20px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-gal">
+      <span class="eyebrow">Gallery</span>
+      <h2>The work<br>speaks</h2>
+      <p>Artistic previews of gutter work. Real job photos from Staten Island homes are on the way.</p>
+    </div>
+
+    <div class="carousel reveal" id="carousel">
+      <div class="car-track" id="carTrack">
+        <div class="car-slide">
+          <div class="art" style="background:linear-gradient(140deg,#2E2E2E,#191919)">
+            <svg viewBox="0 0 100 100"><path d="M15 30 h70" stroke="#FFC400" stroke-width="9" stroke-linecap="round"/><path d="M15 30 h70" stroke="#191919" stroke-width="3" stroke-linecap="round" opacity=".4"/><g fill="#2E9E5B"><ellipse cx="40" cy="22" rx="12" ry="7"/><ellipse cx="60" cy="20" rx="10" ry="6"/></g><rect x="68" y="32" width="9" height="40" fill="#FFC400" stroke="#191919" stroke-width="2.5"/><circle cx="30" cy="66" r="10" fill="#FFC400" stroke="#191919" stroke-width="3"/><path d="M26 66 l3 3 5 -6" stroke="#191919" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>
+          </div>
+          <div class="copy"><span class="soon">Photo soon</span><h3>Debris removal</h3><p>Leaves, sticks, and buildup scooped out and bagged, gutters left clear.</p></div>
+        </div>
+        <div class="car-slide">
+          <div class="art" style="background:linear-gradient(140deg,#3A3A3A,#222)">
+            <svg viewBox="0 0 100 100"><path d="M15 30 h70" stroke="#FFC400" stroke-width="9" stroke-linecap="round"/><path d="M50 36 v34" stroke="#57C46B" stroke-width="6" stroke-linecap="round"/><g fill="#57C46B" opacity=".85"><circle cx="42" cy="78" r="4"/><circle cx="58" cy="78" r="4"/><circle cx="50" cy="70" r="4"/></g><rect x="68" y="32" width="9" height="40" fill="#5C6B73" stroke="#191919" stroke-width="2.5"/></svg>
+          </div>
+          <div class="copy"><span class="soon">Photo soon</span><h3>Downspout flushing</h3><p>Water-flushed downspouts, flowing freely away from the foundation.</p></div>
+        </div>
+        <div class="car-slide">
+          <div class="art" style="background:linear-gradient(140deg,#2E2E2E,#191919)">
+            <svg viewBox="0 0 100 100"><path d="M20 70 L50 25 L80 70" fill="none" stroke="#FFC400" stroke-width="6" stroke-linejoin="round"/><rect x="28" y="70" width="44" height="6" fill="#FFC400"/><circle cx="50" cy="52" r="12" fill="#fff" stroke="#191919" stroke-width="3"/><path d="M44 52 l4 4 8 -9" stroke="#2E9E5B" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg>
+          </div>
+          <div class="copy"><span class="soon">Photo soon</span><h3>Roofline inspection</h3><p>Every visit includes a check of hangers, seams, and drainage direction.</p></div>
+        </div>
+        <div class="car-slide">
+          <div class="art" style="background:linear-gradient(140deg,#3A3A3A,#222)">
+            <svg viewBox="0 0 100 100"><path d="M25 45 h50" stroke="#FFC400" stroke-width="9" stroke-linecap="round"/><path d="M35 50 v-14 M50 50 v-14 M65 50 v-14" stroke="#191919" stroke-width="4" stroke-linecap="round"/><rect x="60" y="60" width="26" height="18" rx="4" fill="#5C6B73" stroke="#191919" stroke-width="3"/><path d="M66 69 h14" stroke="#FFC400" stroke-width="3" stroke-linecap="round"/></svg>
+          </div>
+          <div class="copy"><span class="soon">Photo soon</span><h3>Minor repairs</h3><p>Loose hangers re-secured and small leaks resealed on the spot.</p></div>
+        </div>
+      </div>
+      <button class="car-btn prev" id="carPrev" aria-label="Previous slide">&#8592;</button>
+      <button class="car-btn next" id="carNext" aria-label="Next slide">&#8594;</button>
+      <div class="car-dots" id="carDots"></div>
+    </div>
+
+    <div class="price-note reveal" style="margin-top:28px;background:#fff;border:2px dashed var(--line);color:var(--ink)">
+      <span class="tag">Artistic previews</span>The illustrations above are placeholders. Real photos of finished gutter work are coming soon.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-rev">
+      <span class="eyebrow">Reviews</span>
+      <h2>Rated 5 stars<br>by Staten Island</h2>
+      <p>Based on 4 reviews across Google and Birdeye. Read the real feedback at the sources below.</p>
+    </div>
+    <div class="rs-strip">
+      <p class="rs-note">Review themes on this page are paraphrased from public feedback. Open a source below to read current reviews and ratings.</p>
+      <div class="rs-links">
+        <a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJLXRKttZNwokRJPvaeGIC2cM" target="_blank" rel="noopener">See reviews on Google</a>
+        <a class="rs-btn" href="https://reviews.birdeye.com/diamond-gutters-166704464115808" target="_blank" rel="noopener">See reviews on Birdeye</a>
+      </div>
+    </div>
+
+    <div class="rev-grid">
+      <div class="rev reveal">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p>Customers describe the crew as very professional through the whole process, and praise work on gutters they thought could no longer be salvaged.</p>
+        <cite>Paraphrased from public reviews</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p>Reviewers highlight careful, thorough gutter work and a clean job site when the crew leaves.</p>
+        <cite>Paraphrased from public reviews</cite>
+      </div>
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Had great gutter work? Say so.</h2>
+      <p>Your review helps a local Staten Island business keep growing. It takes a minute, and it matters.</p>
+      <a class="btn" href="https://www.google.com/maps/place/?q=place_id:ChIJLXRKttZNwokRJPvaeGIC2cM" target="_blank" rel="noopener">&#9733; Leave us a Google review</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-contact">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-contact">
+      <span class="eyebrow">Contact</span>
+      <h2>Get your free<br>estimate</h2>
+      <p>Call with your address and we will give you a straightforward price. Most jobs are scheduled within days.</p>
+    </div>
+
+    <div class="contact-grid">
+      <div class="info-card reveal">
+        <h3>Call us</h3>
+        <p>Estimates, scheduling, and questions:</p>
+        <a class="big" href="tel:+13475739308">(347) 573-9308</a>
+        <p style="margin-top:10px">Mon - Fri · 9:00 AM - 6:00 PM</p>
+      </div>
+      <div class="info-card reveal">
+        <h3>Find us</h3>
+        <p><strong>Diamond Gutters</strong><br>431 Maine Ave<br>Staten Island, NY 10314</p>
+        <p>Serving homes across Staten Island.</p>
+      </div>
+    </div>
+
+    <div class="contact-grid">
+      <div class="info-card reveal">
+        <h3>Hours</h3>
+        <table class="hours-table" id="hoursTable">
+          <tr><td>Monday</td><td>9:00 AM - 6:00 PM</td></tr>
+          <tr><td>Tuesday</td><td>9:00 AM - 6:00 PM</td></tr>
+          <tr><td>Wednesday</td><td>9:00 AM - 6:00 PM</td></tr>
+          <tr><td>Thursday</td><td>9:00 AM - 6:00 PM</td></tr>
+          <tr><td>Friday</td><td>9:00 AM - 6:00 PM</td></tr>
+          <tr><td>Saturday</td><td>Closed</td></tr>
+          <tr><td>Sunday</td><td>Closed</td></tr>
+        </table>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <svg viewBox="0 0 24 24" fill="#D9A400"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#fff"/></svg>
+          <strong>431 Maine Ave</strong>
+          <small>Staten Island, NY 10314</small><br>
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJLXRKttZNwokRJPvaeGIC2cM" target="_blank" rel="noopener">Get Directions &#8594;</a>
+        </div>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-big">
+      <h2>Diamond <span class="gold">Gutters</span></h2>
+      <p class="tagline">Gutter cleaning, downspout flushing, and minor repairs for Staten Island homes. Based at 431 Maine Ave.</p>
+      <div class="foot-cols">
+        <div>
+          <h4>Contact</h4>
+          <p>431 Maine Ave<br>Staten Island, NY 10314<br><a href="tel:+13475739308">(347) 573-9308</a></p>
+        </div>
+        <div>
+          <h4>Hours</h4>
+          <p>Mon - Fri · 9:00 AM - 6:00 PM<br>Sat - Sun · Closed</p>
+        </div>
+        <div>
+          <h4>Explore</h4>
+          <ul class="foot-links">
+            <li><a href="#home" data-page="home">Home</a></li>
+            <li><a href="#services" data-page="services">Services</a></li>
+            <li><a href="#gallery" data-page="gallery">Gallery</a></li>
+            <li><a href="#reviews" data-page="reviews">Reviews</a></li>
+            <li><a href="#contact" data-page="contact">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="foot-bottom">
+        <span>© Diamond Gutters</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "contact"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("menuBtn");
+  var drawer = document.getElementById("drawer");
+  var backdrop = document.getElementById("backdrop");
+  var drawerClose = document.getElementById("drawerClose");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function openDrawer(){
+    if(drawer){ drawer.classList.add("open"); }
+    if(backdrop){ backdrop.classList.add("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "true"); }
+  }
+
+  function closeMenu(){
+    if(drawer){ drawer.classList.remove("open"); }
+    if(backdrop){ backdrop.classList.remove("show"); }
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger){
+    burger.addEventListener("click", function(){
+      if(drawer && drawer.classList.contains("open")){ closeMenu(); }
+      else { openDrawer(); }
+    });
+  }
+  if(drawerClose){ drawerClose.addEventListener("click", closeMenu); }
+  if(backdrop){ backdrop.addEventListener("click", closeMenu); }
+
+  var HOURS = {0:null,1:[9,18],2:[9,18],3:[9,18],4:[9,18],5:[9,18],6:null};
+  var DOW = {"Sun":0,"Mon":1,"Tue":2,"Wed":3,"Thu":4,"Fri":5,"Sat":6};
+  function fmt(h){
+    var ap = h < 12 ? "AM" : "PM";
+    var hh = h % 12;
+    if(hh === 0){ hh = 12; }
+    return hh + ":00 " + ap;
+  }
+  try{
+    var parts = new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",weekday:"short",hour:"numeric",hour12:false}).formatToParts(new Date());
+    var wd = "Mon", hr = 12;
+    parts.forEach(function(p){
+      if(p.type === "weekday"){ wd = p.value; }
+      if(p.type === "hour"){ hr = parseInt(p.value, 10) % 24; }
+    });
+    var day = DOW[wd] !== undefined ? DOW[wd] : 1;
+    var today = HOURS[day];
+    var pill = document.getElementById("hoursPill");
+    var txt = document.getElementById("hoursText");
+    if(pill && txt){
+      if(today && hr >= today[0] && hr < today[1]){
+        txt.textContent = "Open now · until " + fmt(today[1]) + " today";
+      } else {
+        pill.classList.add("closed");
+        txt.textContent = today && hr < today[0] ? "Opens today at " + fmt(today[0]) : "Opens Monday at 9:00 AM";
+      }
+    }
+    var rows = document.querySelectorAll("#hoursTable tr");
+    var idx = (day + 6) % 7;
+    if(rows[idx]){ rows[idx].classList.add("today"); }
+  }catch(e){ /* leave default pill text */ }
+
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  var carTrack = document.getElementById("carTrack");
+  var carDots = document.getElementById("carDots");
+  var carIdx = 0;
+  var carCount = carTrack ? carTrack.children.length : 0;
+  function carGo(i){
+    if(!carTrack || !carCount){ return; }
+    carIdx = (i + carCount) % carCount;
+    carTrack.style.transform = "translateX(-" + (carIdx * 100) + "%)";
+    if(carDots){
+      var ds = carDots.children;
+      for(var d = 0; d < ds.length; d++){ ds[d].classList.toggle("on", d === carIdx); }
+    }
+  }
+  if(carTrack && carDots){
+    for(var s = 0; s < carCount; s++){
+      (function(k){
+        var b = document.createElement("button");
+        b.setAttribute("aria-label", "Go to slide " + (k + 1));
+        b.addEventListener("click", function(){ carGo(k); });
+        carDots.appendChild(b);
+      })(s);
+    }
+    var prev = document.getElementById("carPrev");
+    var next = document.getElementById("carNext");
+    if(prev){ prev.addEventListener("click", function(){ carGo(carIdx - 1); }); }
+    if(next){ next.addEventListener("click", function(){ carGo(carIdx + 1); }); }
+    carGo(0);
+  }
+
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

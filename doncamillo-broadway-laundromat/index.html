@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DonCamillo Broadway Laundromat · Self-Service Laundry in Everett, MA</title>
+<meta name="description" content="DonCamillo Broadway Laundromat is a self-service laundromat at 1833 Revere Beach Pkwy, Everett, MA 02149. Washers, dryers, folding stations, free lot parking, card and cash accepted. Call (617) 944-9004.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FFFFFF; --mist:#EFF7FA; --mist-2:#E2F0F4;
+  --ink:#10333C; --ink-soft:#4E6E77;
+  --teal:#0E7C8C; --teal-deep:#0A5B66; --teal-soft:#D7EEF3;
+  --sun:#F5B942; --sun-soft:#FCECC6; --sun-deep:#9A6B14;
+  --mint:#2FA37E;
+  --radius:22px;
+  --shadow:0 22px 48px -22px rgba(16,51,60,.28);
+  --shadow-sm:0 10px 26px -12px rgba(16,51,60,.24);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Public Sans",system-ui,sans-serif;
+  background:var(--paper);color:var(--ink);line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--teal-deep)}
+::selection{background:var(--sun);color:var(--ink)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+
+/* ---------- header: centered logo ---------- */
+header.site{
+  position:sticky;top:0;z-index:50;background:rgba(255,255,255,.94);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-bottom:2px solid var(--mist-2);
+}
+.top{display:flex;flex-direction:column;align-items:center;padding:14px 0 0;position:relative}
+.brand-center{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  text-decoration:none;color:var(--ink);text-align:center;
+}
+.brand-center svg{width:52px;height:52px;filter:drop-shadow(0 5px 8px rgba(14,124,140,.28))}
+.brand-name{font-family:"Fraunces",serif;font-weight:900;font-size:1.5rem;line-height:1.05;letter-spacing:.2px}
+.brand-name small{
+  display:block;font-family:"Public Sans",sans-serif;font-weight:800;font-size:.64rem;
+  letter-spacing:4px;text-transform:uppercase;color:var(--teal);margin-top:4px;
+}
+nav.main{display:flex;align-items:center;justify-content:center;gap:2px;padding:12px 0 14px;flex-wrap:wrap}
+nav.main a{
+  text-decoration:none;color:var(--ink);font-weight:600;font-size:.95rem;
+  padding:9px 15px;border-radius:999px;transition:background .2s,color .2s;white-space:nowrap;
+}
+nav.main a:hover{background:var(--teal-soft)}
+nav.main a.active{background:var(--ink);color:#fff}
+.call-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--teal);color:#fff;text-decoration:none;font-weight:700;
+  padding:10px 20px;border-radius:999px;box-shadow:var(--shadow-sm);
+  transition:transform .18s,background .18s;white-space:nowrap;margin-left:6px;
+}
+.call-btn:hover{background:var(--teal-deep);transform:translateY(-2px)}
+.burger{display:none;background:none;border:0;cursor:pointer;padding:10px;position:absolute;right:12px;top:18px}
+.burger span{display:block;width:26px;height:3px;border-radius:3px;background:var(--ink);margin:5px 0}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- hero: rounded card ---------- */
+.hero-card{
+  margin:36px 0 8px;background:linear-gradient(135deg,var(--teal) 0%,var(--teal-deep) 78%);
+  border-radius:44px;color:#fff;display:grid;grid-template-columns:1.05fr .95fr;gap:40px;
+  padding:64px 56px;align-items:center;box-shadow:var(--shadow);position:relative;overflow:hidden;
+}
+.hero-card::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(circle at 12% 88%, rgba(245,185,66,.35), transparent 42%),
+    radial-gradient(circle at 88% 8%, rgba(255,255,255,.16), transparent 40%);
+}
+.hero-card::after{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.14;
+  background-image:radial-gradient(#fff 1.4px, transparent 1.5px);background-size:30px 30px;
+}
+.hero-copy{position:relative;z-index:1}
+.kicker{
+  display:inline-block;background:var(--sun);color:var(--ink);font-weight:800;font-size:.78rem;
+  letter-spacing:2.2px;text-transform:uppercase;padding:8px 18px;border-radius:999px;margin-bottom:18px;
+}
+.hero-copy h1{
+  font-family:"Fraunces",serif;font-weight:900;
+  font-size:clamp(2.6rem,5.2vw,4.2rem);line-height:1.03;letter-spacing:-.5px;margin-bottom:18px;
+}
+.hero-copy h1 .line-accent{color:var(--sun)}
+.lede{font-size:1.12rem;color:#E4F2F6;max-width:33rem;margin-bottom:26px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:24px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;
+  padding:14px 26px;border-radius:999px;font-size:1rem;transition:transform .18s,box-shadow .18s,background .18s;
+}
+.btn-solid{background:var(--sun);color:var(--ink);box-shadow:var(--shadow-sm)}
+.btn-solid:hover{transform:translateY(-2px);background:#FFCB6B}
+.btn-ghost{background:rgba(255,255,255,.12);color:#fff;border:2px solid rgba(255,255,255,.55)}
+.btn-ghost:hover{background:rgba(255,255,255,.24);transform:translateY(-2px)}
+.hours-pill{
+  display:inline-flex;align-items:center;gap:10px;background:#fff;color:var(--ink);
+  padding:10px 20px;border-radius:999px;font-weight:700;font-size:.94rem;box-shadow:var(--shadow-sm);
+}
+.hours-pill .dot{width:10px;height:10px;border-radius:50%;background:var(--mint);box-shadow:0 0 0 4px rgba(47,163,126,.22);animation:pulse 2s infinite}
+.hours-pill.closed .dot{background:#D95B5B;box-shadow:0 0 0 4px rgba(217,91,91,.22)}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+.hero-art{position:relative;z-index:1;display:flex;justify-content:center}
+.hero-art svg{width:min(340px,80%);height:auto;filter:drop-shadow(0 24px 30px rgba(0,0,0,.28))}
+
+/* ---------- sections ---------- */
+section.block{padding:60px 0}
+.sec-head{max-width:46rem;margin:0 auto 40px;text-align:center}
+.sec-head .eyebrow{font-weight:800;font-size:.78rem;letter-spacing:3px;text-transform:uppercase;color:var(--teal)}
+h2{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(1.9rem,3.6vw,2.7rem);line-height:1.1;margin:8px 0 12px;letter-spacing:-.3px}
+.sec-head p{color:var(--ink-soft)}
+
+/* ---------- asymmetric rhythm ---------- */
+.asym{display:grid;grid-template-columns:1.05fr .95fr;grid-template-rows:auto auto;gap:22px}
+.asym .tall{grid-row:1 / span 2}
+.a-card{
+  border-radius:var(--radius);padding:34px 30px;box-shadow:var(--shadow-sm);
+  position:relative;overflow:hidden;
+}
+.a-card h3{font-family:"Fraunces",serif;font-size:1.45rem;margin-bottom:10px}
+.a-card p{font-size:.98rem}
+.a-card.tall{background:linear-gradient(150deg,var(--ink),var(--teal-deep));color:#fff}
+.a-card.tall p{color:#D9ECF0}
+.a-card.plain{background:var(--mist)}
+.a-card.sun{background:var(--sun-soft)}
+.a-card.sun h3{color:var(--sun-deep)}
+.a-card .big-num{
+  font-family:"Fraunces",serif;font-weight:900;font-size:3.4rem;line-height:1;color:var(--teal);display:block;margin-bottom:6px;
+}
+.a-card.tall .big-num{color:var(--sun)}
+
+/* ---------- number leaders ---------- */
+.leaders{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.leader{
+  background:var(--paper);border:2px solid var(--mist-2);border-radius:var(--radius);
+  padding:30px 28px;transition:transform .2s,box-shadow .2s,border-color .2s;
+}
+.leader:hover{transform:translateY(-6px);box-shadow:var(--shadow-sm);border-color:var(--teal)}
+.leader .num{
+  font-family:"Fraunces",serif;font-weight:900;font-size:2.6rem;color:var(--mist-2);
+  -webkit-text-stroke:2px var(--teal);display:block;line-height:1;margin-bottom:10px;
+}
+.leader h3{font-family:"Fraunces",serif;font-size:1.3rem;margin-bottom:8px}
+.leader p{color:var(--ink-soft);font-size:.97rem}
+
+/* ---------- split ---------- */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.split p{color:var(--ink-soft);margin-bottom:14px}
+.check-list{list-style:none;margin:20px 0;display:grid;gap:12px}
+.check-list li{display:flex;gap:12px;align-items:flex-start;font-weight:500}
+.check-list svg{flex:none;width:24px;height:24px;margin-top:2px}
+.stat-band{
+  background:var(--mist);border-radius:var(--radius);padding:36px 32px;box-shadow:var(--shadow-sm);
+}
+.stat-band .row{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.stat-band .stat b{font-family:"Fraunces",serif;font-size:1.9rem;display:block;color:var(--teal-deep)}
+.stat-band .stat span{font-size:.9rem;color:var(--ink-soft)}
+
+/* ---------- price table ---------- */
+.ptable{width:100%;border-collapse:separate;border-spacing:0;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);margin-bottom:34px}
+.ptable caption{
+  font-family:"Fraunces",serif;font-weight:900;font-size:1.5rem;text-align:left;
+  background:var(--ink);color:#fff;padding:18px 26px;
+}
+.ptable th,.ptable td{padding:15px 26px;text-align:left;font-size:.99rem}
+.ptable thead th{background:var(--teal);color:#fff;font-size:.82rem;letter-spacing:1.6px;text-transform:uppercase}
+.ptable tbody tr:nth-child(even){background:var(--mist)}
+.ptable tbody tr:nth-child(odd){background:#fff}
+.ptable tbody tr:hover{background:var(--teal-soft)}
+.ptable td.price{font-weight:800;font-family:"Fraunces",serif;color:var(--teal-deep);white-space:nowrap}
+.badge-sample{
+  display:inline-block;background:var(--sun-soft);color:var(--sun-deep);font-size:.68rem;font-weight:800;
+  letter-spacing:1.4px;text-transform:uppercase;padding:3px 12px;border-radius:999px;margin-left:10px;vertical-align:2px;
+}
+.note{
+  background:#FFFDF6;border:2px dashed var(--sun);border-radius:var(--radius);
+  padding:18px 24px;font-size:.95rem;color:#6B5B2E;margin-bottom:34px;
+}
+.note strong{color:var(--sun-deep)}
+
+/* ---------- horizontal strip gallery ---------- */
+.strip-gallery{display:flex;gap:20px;overflow-x:auto;padding:6px 4px 18px;scroll-snap-type:x mandatory}
+.gtile{
+  flex:0 0 280px;scroll-snap-align:start;border-radius:var(--radius);overflow:hidden;
+  background:#fff;box-shadow:var(--shadow-sm);transition:transform .2s;position:relative;
+}
+.gtile:hover{transform:translateY(-6px)}
+.gtile .gart{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;position:relative}
+.gtile .gart svg{width:52%;height:auto;filter:drop-shadow(0 12px 14px rgba(0,0,0,.2))}
+.gtile .cap{padding:16px 20px}
+.gtile .cap strong{font-family:"Fraunces",serif;font-size:1.08rem;display:block}
+.gtile .cap small{color:var(--ink-soft)}
+.gtile .soon{
+  position:absolute;top:12px;left:12px;background:rgba(255,255,255,.92);font-size:.68rem;font-weight:800;
+  letter-spacing:1.4px;text-transform:uppercase;padding:5px 13px;border-radius:999px;color:var(--ink-soft);
+}
+
+/* ---------- reviews ---------- */
+.rs-strip{margin:0 auto 34px;max-width:680px;background:var(--mist);border:1px solid var(--mist-2);border-radius:16px;padding:20px 24px;text-align:center}
+.rs-note{margin:0 0 14px;font-size:.95rem;color:var(--ink-soft);line-height:1.6}
+.rs-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rs-btn{
+  display:inline-block;background:var(--teal);color:#fff;padding:11px 24px;border-radius:999px;
+  font-weight:700;text-decoration:none;font-size:.95rem;transition:background .18s,transform .18s;
+}
+.rs-btn:hover{background:var(--teal-deep);transform:translateY(-2px)}
+.rs-btn.alt{background:#fff;color:var(--teal-deep);border:2px solid var(--teal)}
+.rs-btn.alt:hover{background:var(--teal-soft)}
+.rev-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.rev{background:#fff;border:2px solid var(--mist-2);border-radius:var(--radius);padding:30px;position:relative}
+.rev .stars{color:var(--sun-deep);font-size:1.15rem;letter-spacing:3px;margin-bottom:12px}
+.rev.rev-bad .stars{color:#D95B5B}
+.rev p{font-size:1.02rem;margin-bottom:14px}
+.rev cite{font-style:normal;font-weight:700;font-size:.85rem;color:var(--teal-deep);letter-spacing:.5px}
+.score-card{
+  background:var(--ink);color:#fff;border-radius:var(--radius);padding:34px 30px;text-align:center;margin-bottom:26px;
+}
+.score-card b{font-family:"Fraunces",serif;font-size:2.8rem;display:block;color:var(--sun)}
+.score-card span{color:#C6DCE1;font-size:.95rem}
+.cta-band{background:linear-gradient(120deg,var(--teal),var(--teal-deep));border-radius:26px;color:#fff;padding:48px;text-align:center;margin-top:44px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.cta-band h2{color:#fff}
+.cta-band p{color:#D9ECF0;max-width:36rem;margin:0 auto 24px}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-bottom:26px}
+.info-card{background:var(--mist);border-radius:var(--radius);padding:32px}
+.info-card h3{font-family:"Fraunces",serif;font-size:1.4rem;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.info-card h3 svg{width:28px;height:28px;flex:none}
+.info-card p{color:var(--ink-soft);margin-bottom:8px}
+.info-card a.big{font-family:"Fraunces",serif;font-size:1.5rem;font-weight:700;color:var(--teal-deep);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.hours-table{width:100%;border-collapse:collapse;font-size:.98rem}
+.hours-table td{padding:10px 6px;border-bottom:1px dashed rgba(16,51,60,.2)}
+.hours-table tr.today td{font-weight:800;color:var(--teal-deep)}
+.hours-table tr.today td:first-child::after{content:" · today";font-weight:700;color:var(--teal);margin-left:6px}
+.hours-table td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.map-card{
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:340px;
+  background:
+    linear-gradient(rgba(14,124,140,.07), rgba(14,124,140,.07)),
+    repeating-linear-gradient(0deg, transparent 0 46px, rgba(14,124,140,.16) 46px 48px),
+    repeating-linear-gradient(90deg, transparent 0 46px, rgba(14,124,140,.16) 46px 48px),
+    linear-gradient(140deg,#F3E4C8,#EAD3AC);
+  display:flex;align-items:center;justify-content:center;
+}
+.map-pin{
+  text-align:center;background:#fff;padding:26px 34px;border-radius:20px;box-shadow:var(--shadow);
+  max-width:78%;position:relative;
+}
+.map-pin::after{content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);border:14px solid transparent;border-top-color:#fff;border-bottom:0}
+.map-pin svg{width:44px;height:44px;margin-bottom:8px}
+.map-pin strong{font-family:"Fraunces",serif;font-size:1.15rem;display:block}
+.map-pin small{color:var(--ink-soft)}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- footer: 3 columns ---------- */
+footer{background:var(--ink);color:#D9E6E9;margin-top:20px}
+.foot-grid{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:36px;padding:56px 0 32px}
+.foot-grid h4{font-family:"Fraunces",serif;color:#fff;font-size:1.15rem;margin-bottom:14px}
+.foot-grid p,.foot-grid a{color:#AFC6CC;font-size:.95rem}
+.foot-grid a{text-decoration:none}.foot-grid a:hover{color:var(--sun)}
+.foot-brand{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.foot-brand svg{width:44px;height:44px}
+.foot-brand span{font-family:"Fraunces",serif;font-weight:900;color:#fff;font-size:1.25rem}
+.foot-links{list-style:none;display:grid;gap:8px}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.12);padding:20px 0 26px;display:flex;justify-content:center;font-size:.88rem;color:#8FA9AF}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+/* page-specific strips */
+.strip{border-radius:26px;padding:52px 44px;color:#fff;position:relative;overflow:hidden;margin-bottom:40px;box-shadow:var(--shadow)}
+.strip::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(255,255,255,.2), transparent 50%)}
+.strip h2{color:#fff;font-size:clamp(2rem,4vw,3rem);position:relative;margin:4px 0 10px}
+.strip p{color:rgba(255,255,255,.9);max-width:38rem;position:relative}
+.strip .eyebrow{font-weight:800;font-size:.78rem;letter-spacing:3px;text-transform:uppercase;position:relative;color:var(--sun)}
+.strip.s-services{background:linear-gradient(120deg,#0E7C8C,#08434C)}
+.strip.s-story{background:linear-gradient(120deg,#10333C,#061A1F)}
+.strip.s-gal{background:linear-gradient(120deg,#2FA37E,#1C6B51)}
+.strip.s-rev{background:linear-gradient(120deg,#B07A17,#7A5410)}
+.strip.s-visit{background:linear-gradient(120deg,#0A5B66,#083F48)}
+
+@media(max-width:940px){
+  .hero-card{grid-template-columns:1fr;padding:44px 32px}
+  .split,.visit-grid,.rev-grid{grid-template-columns:1fr}
+  .asym{grid-template-columns:1fr;grid-template-rows:auto}
+  .asym .tall{grid-row:auto}
+  .leaders{grid-template-columns:1fr 1fr}
+  nav.main{
+    display:none;position:absolute;top:100%;left:0;right:0;background:#fff;
+    flex-direction:column;align-items:stretch;padding:12px 20px 20px;gap:2px;
+    border-bottom:2px solid var(--mist-2);box-shadow:var(--shadow);
+  }
+  nav.main.open{display:flex}
+  nav.main .call-btn{justify-content:center;margin:8px 0 0}
+  .burger{display:block}
+  .top .call-btn-top{display:none}
+  .foot-grid{grid-template-columns:1fr}
+  .strip{padding:40px 28px}
+}
+@media(max-width:600px){
+  .leaders{grid-template-columns:1fr}
+  .hero-card{border-radius:30px}
+  .cta-band{padding:36px 24px}
+  .gtile{flex-basis:240px}
+}
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="wrap top">
+    <a class="brand-center" href="#home" data-page="home" aria-label="DonCamillo Broadway Laundromat home">
+      <svg viewBox="0 0 64 64" role="img" aria-label="Washing machine logo"><circle cx="32" cy="32" r="29" fill="#0E7C8C"/><circle cx="32" cy="32" r="29" fill="none" stroke="#10333C" stroke-width="3"/><rect x="16" y="8" width="32" height="6" rx="3" fill="#fff" opacity=".85"/><circle cx="32" cy="36" r="15" fill="#fff"/><circle cx="32" cy="36" r="15" fill="none" stroke="#10333C" stroke-width="3"/><path d="M22 32 q5 -8 10 0 q5 8 10 0 q5 -8 10 0" fill="none" stroke="#0E7C8C" stroke-width="3.5" stroke-linecap="round"/><circle cx="37" cy="30" r="4" fill="#D7EEF3"/></svg>
+      <span class="brand-name">DonCamillo<small>Broadway Laundromat · Everett</small></span>
+    </a>
+    <nav class="main" id="mainNav" aria-label="Main navigation">
+      <a href="#home" data-page="home" class="active" aria-current="page">Home</a>
+      <a href="#services" data-page="services">Services</a>
+      <a href="#story" data-page="story">Our Story</a>
+      <a href="#gallery" data-page="gallery">Gallery</a>
+      <a href="#reviews" data-page="reviews">Reviews</a>
+      <a href="#visit" data-page="visit">Visit Us</a>
+      <a class="call-btn" href="tel:+16179449004">Call (617) 944-9004</a>
+    </nav>
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<section class="page active" id="page-home">
+  <div class="wrap">
+    <div class="hero-card reveal">
+      <div class="hero-copy">
+        <span class="kicker">Self-service laundry · Everett, MA</span>
+        <h1>Wash, dry, fold,<br><span class="line-accent">get on with your day.</span></h1>
+        <p class="lede">DonCamillo Broadway Laundromat is a self-service laundry on Revere Beach Pkwy in Everett, with coin and card operated machines, large-capacity washers for comforters, folding stations, and a free lot out front.</p>
+        <div class="cta-row">
+          <a class="btn btn-solid" href="#services" data-page="services">See Services</a>
+          <a class="btn btn-ghost" href="https://www.google.com/maps/place/?q=place_id:ChIJT4YrM6dx44kRYbjsSrkpRT8" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+        <span class="hours-pill" id="hoursPill"><span class="dot"></span><span id="hoursText">Checking today hours</span></span>
+      </div>
+      <div class="hero-art">
+        <svg viewBox="0 0 300 300" role="img" aria-label="Illustration of a front load washing machine">
+          <rect x="60" y="30" width="180" height="240" rx="24" fill="#FFFFFF"/>
+          <rect x="60" y="30" width="180" height="240" rx="24" fill="none" stroke="#10333C" stroke-width="6"/>
+          <rect x="86" y="48" width="128" height="22" rx="11" fill="#D7EEF3"/>
+          <rect x="92" y="54" width="30" height="10" rx="5" fill="#0E7C8C"/>
+          <circle cx="150" cy="165" r="62" fill="#EFF7FA"/>
+          <circle cx="150" cy="165" r="62" fill="none" stroke="#10333C" stroke-width="6"/>
+          <circle cx="150" cy="165" r="46" fill="#0E7C8C"/>
+          <path d="M108 148 q14 -22 28 0 q14 22 28 0 q14 -22 28 0" fill="none" stroke="#D7EEF3" stroke-width="7" stroke-linecap="round"/>
+          <path d="M108 176 q14 -22 28 0 q14 22 28 0 q14 -22 28 0" fill="none" stroke="#D7EEF3" stroke-width="7" stroke-linecap="round" opacity=".7"/>
+          <circle cx="128" cy="150" r="9" fill="#F5B942" opacity=".85"/>
+          <circle cx="172" cy="186" r="7" fill="#F5B942" opacity=".6"/>
+          <rect x="120" y="252" width="60" height="10" rx="5" fill="#0E7C8C" opacity=".25"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow">Why DonCamillo</span>
+        <h2>Laundry day,<br>without the headache</h2>
+        <p>Everything here is set up so you can get in, get clean clothes, and get back to your day. Cash and cards both work, the lot is free, and the space is wheelchair accessible.</p>
+      </div>
+      <div class="asym">
+        <div class="a-card tall reveal">
+          <span class="big-num">14</span>
+          <h3>Years in Everett</h3>
+          <p>Serving the Revere Beach Pkwy corridor since 2012, per the Better Business Bureau business profile. A neighborhood stop for weekly wash days, comforter season, and everything in between.</p>
+          <p style="margin-top:12px">Coin and card operated machines. Folding stations on site. Free lot parking so you can pull right up with your baskets.</p>
+        </div>
+        <div class="a-card plain reveal">
+          <span class="big-num">6-11</span>
+          <h3>Open daily</h3>
+          <p>Google listing hours are 6:00 AM to 11:00 PM, seven days a week. Call to confirm before you head over.</p>
+        </div>
+        <div class="a-card sun reveal">
+          <span class="big-num">$</span>
+          <h3>Cash or card</h3>
+          <p>Pay your way: cash, credit cards, and mobile wallets. No quarters scavenger hunt required.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow">How it works</span>
+        <h2>Three steps,<br>fresh clothes</h2>
+      </div>
+      <div class="leaders">
+        <div class="leader reveal">
+          <span class="num">01</span>
+          <h3>Wash</h3>
+          <p>Self-service washers in a range of sizes, including large-capacity machines that handle comforters and bulky items with room to spare.</p>
+        </div>
+        <div class="leader reveal">
+          <span class="num">02</span>
+          <h3>Dry</h3>
+          <p>High-capacity dryers that get loads dry in fewer cycles. Card payment keeps it moving so nobody is waiting on a coin slot.</p>
+        </div>
+        <div class="leader reveal">
+          <span class="num">03</span>
+          <h3>Fold and go</h3>
+          <p>Folding stations on site give you room to sort and stack before you head to the free lot. Wash-and-fold drop-off is also listed as a service.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" style="padding-top:0">
+    <div class="wrap split">
+      <div class="reveal">
+        <span class="eyebrow">The practical stuff</span>
+        <h2>What to know<br>before you come</h2>
+        <p>DonCamillo is a straightforward self-service laundromat: bring your laundry, your detergent (or grab supplies from the vending machines), and pay by cash or card.</p>
+        <ul class="check-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#2FA37E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Free lot parking right out front</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#2FA37E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Wheelchair accessible, per business directories</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#2FA37E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Dry cleaning drop-off listed as a service</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#2FA37E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Vending machines for laundry supplies</li>
+        </ul>
+        <a class="btn btn-solid" href="#visit" data-page="visit">Plan your visit</a>
+      </div>
+      <div class="stat-band reveal">
+        <div class="row">
+          <div class="stat"><b>6 AM - 11 PM</b><span>Daily hours per Google</span></div>
+          <div class="stat"><b>Free lot</b><span>On-site parking</span></div>
+          <div class="stat"><b>Cards OK</b><span>Visa, MC, Amex, Discover</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="cta-band reveal">
+      <h2>Ready for clean clothes?</h2>
+      <p>1833 Revere Beach Pkwy, Everett, MA 02149. Open daily. Call (617) 944-9004 for current hours and pricing.</p>
+      <a class="btn btn-solid" href="tel:+16179449004">Call (617) 944-9004</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-services">
+      <span class="eyebrow">Services and pricing</span>
+      <h2>What you can get done here</h2>
+      <p>Self-service machines, bulky-item capacity, and drop-off options. Services below reflect public directory listings for this location.</p>
+    </div>
+
+    <div class="note reveal">
+      <strong>Pricing note:</strong> prices below are samples for planning your trip. The store does not publish a price list online, so call <strong>(617) 944-9004</strong> to confirm current pricing before you visit.
+    </div>
+
+    <table class="ptable reveal">
+      <caption>Self-Service Wash</caption>
+      <thead><tr><th>Service</th><th>Details</th><th>Price</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Top-load washers</strong></td><td>Standard loads, coin or card</td><td class="price">from $3.50<span class="badge-sample">Sample</span></td></tr>
+        <tr><td><strong>Front-load washers</strong></td><td>Bigger loads, higher efficiency</td><td class="price">from $4.75<span class="badge-sample">Sample</span></td></tr>
+        <tr><td><strong>Large-capacity washers</strong></td><td>Comforters, blankets, and bulky items</td><td class="price">from $7.50<span class="badge-sample">Sample</span></td></tr>
+        <tr><td><strong>Extra wash options</strong></td><td>Extra rinse and hot water cycles</td><td class="price">ask in store<span class="badge-sample">Sample</span></td></tr>
+      </tbody>
+    </table>
+
+    <table class="ptable reveal">
+      <caption>Dryers and Finishing</caption>
+      <thead><tr><th>Service</th><th>Details</th><th>Price</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Standard dryers</strong></td><td>High heat, timed cycles</td><td class="price">per 10 min, from $1.00<span class="badge-sample">Sample</span></td></tr>
+        <tr><td><strong>Large dryers</strong></td><td>Comforters and heavy loads</td><td class="price">per 10 min, from $1.50<span class="badge-sample">Sample</span></td></tr>
+        <tr><td><strong>Folding stations</strong></td><td>On-site tables to sort and fold</td><td class="price">free to use</td></tr>
+        <tr><td><strong>Laundry supplies</strong></td><td>Detergent, softener, and dryer sheets in vending machines</td><td class="price">vending prices</td></tr>
+      </tbody>
+    </table>
+
+    <table class="ptable reveal">
+      <caption>Drop-Off Services</caption>
+      <thead><tr><th>Service</th><th>Details</th><th>Price</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Wash-and-fold</strong></td><td>Drop off your laundry, pick it up clean and folded</td><td class="price">ask for rates<span class="badge-sample">Sample</span></td></tr>
+        <tr><td><strong>Dry cleaning drop-off</strong></td><td>Listed as a service at this location</td><td class="price">ask for rates<span class="badge-sample">Sample</span></td></tr>
+      </tbody>
+    </table>
+
+    <div class="note reveal">
+      <strong>Good to know:</strong> drop-off services are listed on public directory pages for this address, but details are thin. Call <strong>(617) 944-9004</strong> to confirm wash-and-fold and dry cleaning availability, turnaround time, and pricing.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-story">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-story">
+      <span class="eyebrow">Our story</span>
+      <h2>14 years of laundry<br>on Revere Beach Pkwy</h2>
+      <p>A neighborhood laundromat in Everett, in business since 2012 according to its Better Business Bureau profile.</p>
+    </div>
+
+    <div class="split" style="margin-bottom:56px">
+      <div class="reveal">
+        <span class="eyebrow">The basics</span>
+        <h2>A working laundromat,<br>nothing fancy</h2>
+        <p>DonCamillo Broadway Laundromat is a self-service laundry at 1833 Revere Beach Pkwy in Everett, Massachusetts. Public business records show it started in 2012, and it has been a regular stop on the Pkwy ever since.</p>
+        <p>The setup is the classic one: rows of washers and dryers, folding tables, and supplies from the vending machines. Payment is flexible, with cash, major credit cards, and mobile wallets all accepted. There is a free parking lot and the space is listed as wheelchair accessible.</p>
+        <p>It is the kind of place built for weekly wash days: pull up to the free lot, run your loads through the big machines, fold, and go.</p>
+      </div>
+      <div class="stat-band reveal">
+        <div class="row">
+          <div class="stat"><b>2012</b><span>In business since, per BBB</span></div>
+          <div class="stat"><b>7 days</b><span>Open every day</span></div>
+          <div class="stat"><b>2</b><span>Employees listed, per BBB</span></div>
+        </div>
+        <p style="margin-top:18px;color:var(--ink-soft);font-size:.95rem">Business facts on this page come from public directory profiles (Google business listing, Better Business Bureau, Superpages). This is a demo website draft; the business can confirm or correct any detail.</p>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <div class="cta-band reveal">
+        <h2>Stop by and see for yourself.</h2>
+        <p>1833 Revere Beach Pkwy, Everett, MA 02149. Open daily. Call ahead for hours and pricing.</p>
+        <a class="btn btn-solid" href="#visit" data-page="visit">Plan your visit</a>
+      </div>
+      <div style="height:56px"></div>
+    </div>
+  </div>
+</section>
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-gal">
+      <span class="eyebrow">Gallery</span>
+      <h2>Inside the laundromat</h2>
+      <p>Artistic previews of the space and equipment. Real photos of this location are on the way.</p>
+    </div>
+
+    <div class="strip-gallery">
+      <div class="gtile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="gart" style="background:linear-gradient(140deg,#D7EEF3,#9CCFD9)">
+          <svg viewBox="0 0 100 100"><rect x="22" y="10" width="56" height="80" rx="10" fill="#fff"/><circle cx="50" cy="52" r="21" fill="none" stroke="#0E7C8C" stroke-width="5"/><circle cx="50" cy="52" r="12" fill="#0E7C8C" opacity=".3"/><rect x="30" y="16" width="40" height="6" rx="3" fill="#0E7C8C" opacity=".4"/></svg>
+        </div>
+        <div class="cap"><strong>Front-load washers</strong><small>Range of sizes, card and coin</small></div>
+      </div>
+      <div class="gtile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="gart" style="background:linear-gradient(140deg,#FCECC6,#F5B942)">
+          <svg viewBox="0 0 100 100"><rect x="22" y="10" width="56" height="80" rx="10" fill="#fff"/><circle cx="50" cy="52" r="21" fill="none" stroke="#9A6B14" stroke-width="5"/><path d="M38 52 h24" stroke="#F5B942" stroke-width="6" stroke-linecap="round"/><path d="M42 44 q8 10 16 0" stroke="#9A6B14" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>High-capacity dryers</strong><small>Comforters and bulky loads</small></div>
+      </div>
+      <div class="gtile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="gart" style="background:linear-gradient(140deg,#DFF0E9,#9AD3BC)">
+          <svg viewBox="0 0 100 100"><rect x="14" y="60" width="72" height="10" rx="5" fill="#2FA37E"/><rect x="24" y="34" width="52" height="26" rx="4" fill="#fff"/><path d="M24 40 h52 M24 48 h52 M24 56 h52" stroke="#2FA37E" stroke-width="3" opacity=".6"/><rect x="40" y="22" width="20" height="12" rx="3" fill="#F5B942"/></svg>
+        </div>
+        <div class="cap"><strong>Folding stations</strong><small>Room to sort and stack</small></div>
+      </div>
+      <div class="gtile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="gart" style="background:linear-gradient(140deg,#E2F0F4,#0E7C8C)">
+          <svg viewBox="0 0 100 100"><rect x="30" y="20" width="40" height="60" rx="8" fill="#fff"/><rect x="36" y="28" width="28" height="14" rx="3" fill="#0E7C8C"/><circle cx="42" cy="52" r="4" fill="#F5B942"/><circle cx="58" cy="52" r="4" fill="#F5B942"/><rect x="36" y="62" width="28" height="10" rx="5" fill="#0E7C8C" opacity=".4"/></svg>
+        </div>
+        <div class="cap"><strong>Supply vending</strong><small>Detergent and dryer sheets</small></div>
+      </div>
+      <div class="gtile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="gart" style="background:linear-gradient(140deg,#F0DCE0,#C98AA0)">
+          <svg viewBox="0 0 100 100"><path d="M30 78 q20 -12 40 0 l0 -30 q-20 12 -40 0 z" fill="#fff"/><path d="M50 66 v-22" stroke="#B23A63" stroke-width="4" stroke-linecap="round"/><rect x="20" y="78" width="60" height="8" rx="4" fill="#B23A63" opacity=".35"/></svg>
+        </div>
+        <div class="cap"><strong>Wash-and-fold drop-off</strong><small>Listed service, call to confirm</small></div>
+      </div>
+      <div class="gtile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="gart" style="background:linear-gradient(140deg,#D7EEF3,#10333C)">
+          <svg viewBox="0 0 100 100"><rect x="14" y="56" width="72" height="30" rx="8" fill="#10333C"/><rect x="20" y="62" width="60" height="6" rx="3" fill="#F5B942"/><circle cx="32" cy="80" r="6" fill="#fff" opacity=".85"/><circle cx="68" cy="80" r="6" fill="#fff" opacity=".85"/><path d="M40 40 h20 v16 h-20 z" fill="#fff" opacity=".9"/></svg>
+        </div>
+        <div class="cap"><strong>Free lot parking</strong><small>Pull up with your baskets</small></div>
+      </div>
+    </div>
+
+    <div class="note reveal" style="margin-top:18px">
+      <strong>Coming soon:</strong> real photos of the machines and the space at 1833 Revere Beach Pkwy. The illustrations above are artistic previews.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-rev">
+      <span class="eyebrow">Reviews</span>
+      <h2>What customers<br>are saying</h2>
+      <p>Honest themes from public directory reviews. Read the sources before you decide.</p>
+    </div>
+
+    <div class="score-card reveal">
+      <b>1.0 out of 5</b>
+      <span>Rating on Superpages for this location. Reviews are few and run critical, which makes your visit worth a call first.</span>
+    </div>
+
+    <div class="rs-strip reveal">
+      <p class="rs-note">Review themes on this page are paraphrased from public reviews on Superpages and the Better Business Bureau. Open the sources to read the full, current reviews and ratings.</p>
+      <div class="rs-links">
+        <a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJT4YrM6dx44kRYbjsSrkpRT8" target="_blank" rel="noopener">See reviews on Google</a>
+        <a class="rs-btn alt" href="https://www.superpages.com/everett-ma/bpp/don-camilla-laundromat-472477119" target="_blank" rel="noopener">Superpages</a>
+        <a class="rs-btn alt" href="https://www.bbb.org/us/ma/everett/profile/dry-cleaners/don-camilla-laundromat-0021-468290" target="_blank" rel="noopener">BBB Profile</a>
+      </div>
+    </div>
+
+    <div class="rev-grid">
+      <div class="rev rev-bad reveal">
+        <div class="stars">★</div>
+        <p>"One reviewer on Superpages gave the store a single star, crediting it for cleanliness and order, but describing a heated run-in with the owner over clothing handling."</p>
+        <cite>Paraphrased from a Superpages review</cite>
+      </div>
+      <div class="rev rev-bad reveal">
+        <div class="stars">★</div>
+        <p>"A BBB review described the place as dirty, reported machines that failed or took money without a wash, and said staff were unhelpful when asked for assistance."</p>
+        <cite>Paraphrased from a BBB review by Moris A</cite>
+      </div>
+    </div>
+
+    <div class="note reveal" style="margin-top:28px">
+      <strong>Fair warning, fairly stated:</strong> public reviews for this location are critical. That said, review counts are low and listings sometimes mix up this Everett location with a similarly named one in Revere. Calling ahead at <strong>(617) 944-9004</strong> and visiting during staffed hours is the best way to judge for yourself.
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Been here? Tell the neighborhood.</h2>
+      <p>Your honest review helps the next person decide, and helps the business know what to fix. It takes a minute.</p>
+      <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJT4YrM6dx44kRYbjsSrkpRT8" target="_blank" rel="noopener">Leave a Google review</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+<section class="page" id="page-visit">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-visit">
+      <span class="eyebrow">Visit us</span>
+      <h2>On Revere Beach Pkwy,<br>easy to reach</h2>
+      <p>A free parking lot out front and bus routes nearby. Come do your weekly wash.</p>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#0E7C8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Find us</h3>
+        <p><strong>DonCamillo Broadway Laundromat</strong><br>1833 Revere Beach Pkwy<br>Everett, MA 02149</p>
+        <p>Free lot parking on site.<br>Wheelchair accessible, per business directories.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#0E7C8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg> Call us</h3>
+        <p>Hours, pricing, and drop-off questions:</p>
+        <a class="big" href="tel:+16179449004">(617) 944-9004</a>
+        <p style="margin-top:10px">Call before you visit to confirm hours and current machine pricing.</p>
+      </div>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#0E7C8C" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Hours</h3>
+        <table class="hours-table" id="hoursTable">
+          <tr><td>Monday</td><td>6:00 AM - 11:00 PM</td></tr>
+          <tr><td>Tuesday</td><td>6:00 AM - 11:00 PM</td></tr>
+          <tr><td>Wednesday</td><td>6:00 AM - 11:00 PM</td></tr>
+          <tr><td>Thursday</td><td>6:00 AM - 11:00 PM</td></tr>
+          <tr><td>Friday</td><td>6:00 AM - 11:00 PM</td></tr>
+          <tr><td>Saturday</td><td>6:00 AM - 11:00 PM</td></tr>
+          <tr><td>Sunday</td><td>6:00 AM - 11:00 PM</td></tr>
+        </table>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <svg viewBox="0 0 24 24" fill="#0E7C8C"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#FFFFFF"/></svg>
+          <strong>1833 Revere Beach Pkwy</strong>
+          <small>Everett, MA 02149</small><br>
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJT4YrM6dx44kRYbjsSrkpRT8" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="note reveal" style="margin-bottom:56px">
+      <strong>Hours check:</strong> the Google business listing shows 6:00 AM - 11:00 PM daily, but some directories list 8:00 AM - 9:00 PM. Hours may change, so please call <strong>(617) 944-9004</strong> to confirm before heading over.
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand">
+          <svg viewBox="0 0 64 64" role="img" aria-label="Washing machine logo"><circle cx="32" cy="32" r="29" fill="#0E7C8C"/><rect x="16" y="8" width="32" height="6" rx="3" fill="#fff" opacity=".85"/><circle cx="32" cy="36" r="15" fill="#fff"/><path d="M22 32 q5 -8 10 0 q5 8 10 0 q5 -8 10 0" fill="none" stroke="#0E7C8C" stroke-width="3.5" stroke-linecap="round"/></svg>
+          <span>DonCamillo</span>
+        </div>
+        <p>Self-service laundromat at 1833 Revere Beach Pkwy, Everett, MA. Washers, dryers, folding stations, and free lot parking, open daily.</p>
+      </div>
+      <div>
+        <h4>Visit</h4>
+        <p>1833 Revere Beach Pkwy<br>Everett, MA 02149<br><a href="tel:+16179449004">(617) 944-9004</a></p>
+        <p style="margin-top:10px"><a href="https://www.google.com/maps/place/?q=place_id:ChIJT4YrM6dx44kRYbjsSrkpRT8" target="_blank" rel="noopener">Get Directions</a></p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <ul class="foot-links">
+          <li><a href="#home" data-page="home">Home</a></li>
+          <li><a href="#services" data-page="services">Services and Pricing</a></li>
+          <li><a href="#story" data-page="story">Our Story</a></li>
+          <li><a href="#gallery" data-page="gallery">Gallery</a></li>
+          <li><a href="#reviews" data-page="reviews">Reviews</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© DonCamillo Broadway Laundromat</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "story", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+
+  /* ---------- live hours (America/New_York): 6 AM - 11 PM daily per Google listing ---------- */
+  var HOURS = {0:[6,23],1:[6,23],2:[6,23],3:[6,23],4:[6,23],5:[6,23],6:[6,23]};
+  var DOW = {"Sun":0,"Mon":1,"Tue":2,"Wed":3,"Thu":4,"Fri":5,"Sat":6};
+  function fmt(h){
+    var ap = h < 12 ? "AM" : "PM";
+    var hh = h % 12;
+    if(hh === 0){ hh = 12; }
+    return hh + ":00 " + ap;
+  }
+  try{
+    var parts = new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",weekday:"short",hour:"numeric",hour12:false}).formatToParts(new Date());
+    var wd = "Mon", hr = 12;
+    parts.forEach(function(p){
+      if(p.type === "weekday"){ wd = p.value; }
+      if(p.type === "hour"){ hr = parseInt(p.value, 10) % 24; }
+    });
+    var day = DOW[wd] !== undefined ? DOW[wd] : 1;
+    var openH = HOURS[day][0], closeH = HOURS[day][1];
+    var pill = document.getElementById("hoursPill");
+    var txt = document.getElementById("hoursText");
+    if(pill && txt){
+      if(hr >= openH && hr < closeH){
+        txt.textContent = "Open now - until " + fmt(closeH) + " today";
+      } else if(hr < openH){
+        pill.classList.add("closed");
+        txt.textContent = "Opens today at " + fmt(openH);
+      } else {
+        pill.classList.add("closed");
+        var nd = (day + 1) % 7;
+        var dayName = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][nd];
+        txt.textContent = "Opens " + (nd === day + 1 && nd !== 0 ? "tomorrow" : dayName) + " at " + fmt(HOURS[nd][0]);
+      }
+    }
+    var rows = document.querySelectorAll("#hoursTable tr");
+    var idx = (day + 6) % 7;
+    if(rows[idx]){ rows[idx].classList.add("today"); }
+  }catch(e){ /* leave default pill text */ }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
