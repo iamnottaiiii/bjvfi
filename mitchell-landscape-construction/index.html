@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mitchell landscape &amp; Construction</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{--moss:#5c6b3c;--moss2:#3f4a28;--stone:#8b8d89;--paper:#fbfaf7;--ink:#2c2e2a;--mut:#6f7268;--sand:#e8e2d2}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Source Sans 3',sans-serif;background:var(--paper);color:var(--ink);line-height:1.7}
+header.top{position:sticky;top:0;z-index:60;background:#fff;border-bottom:1px solid #e0ded4}
+.hd-in{max-width:1180px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.4rem}
+.brand{font-family:'Libre Baskerville',serif;font-size:1.35rem;color:var(--moss2)}
+.brand em{font-style:normal;color:var(--stone)}
+#menuBtn{display:none;background:var(--moss);border:0;color:#fff;font-size:1.15rem;padding:.55rem .85rem;cursor:pointer;border-radius:4px}
+ul#navList{list-style:none;display:flex;gap:.2rem}
+ul#navList a{color:var(--ink);text-decoration:none;font-weight:600;font-size:.92rem;padding:.65rem 1.05rem;position:relative}
+ul#navList a.active{color:var(--moss2)}
+ul#navList a.active::after{content:'';position:absolute;left:1.05rem;right:1.05rem;bottom:.3rem;height:2px;background:var(--moss)}
+ul#navList a:hover{color:var(--moss)}
+.page{display:none}
+.page.active{display:block;animation:fade .35s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.hero{display:grid;grid-template-columns:1fr 1fr;min-height:480px}
+@media(max-width:800px){.hero{grid-template-columns:1fr}}
+.hero .left{background:var(--moss2);color:#f4f2ea;padding:4rem 3rem;display:flex;flex-direction:column;justify-content:center}
+.hero .left .rule{width:60px;height:3px;background:var(--sand);margin-bottom:1.4rem}
+.hero .left h1{font-family:'Libre Baskerville',serif;font-size:clamp(2rem,4.5vw,3rem);line-height:1.15;margin-bottom:1rem}
+.hero .left p{color:#d8d4c2;margin-bottom:1.8rem;max-width:440px}
+.hero .right{background:linear-gradient(140deg,var(--sand),#d5cdb4);display:flex;align-items:center;justify-content:center;padding:3rem}
+.hero .right .motif{width:220px;height:220px;border:2px solid var(--moss);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:4rem;color:var(--moss);position:relative}
+.hero .right .motif::after{content:'';position:absolute;inset:18px;border:1px solid var(--moss);border-radius:50%;opacity:.5}
+.btn{display:inline-block;background:var(--sand);color:var(--moss2);font-weight:700;padding:.9rem 2.1rem;text-decoration:none;border:0;cursor:pointer;border-radius:2px}
+.btn:hover{background:#fff}
+.btn.moss{background:var(--moss);color:#fff;margin-left:.6rem}
+.btn.moss:hover{background:var(--moss2)}
+.wrap{max-width:1180px;margin:0 auto;padding:3.2rem 1.4rem}
+.ed{display:grid;grid-template-columns:1fr 2fr;gap:2.6rem;align-items:start}
+@media(max-width:800px){.ed{grid-template-columns:1fr}}
+.ed h2{font-family:'Libre Baskerville',serif;font-size:1.9rem;color:var(--moss2);line-height:1.25}
+.ed .lede{font-size:1.05rem;color:var(--mut);margin-top:.6rem}
+.work-list{border-top:2px solid var(--moss2)}
+.work{display:grid;grid-template-columns:60px 1fr;gap:1.2rem;padding:1.5rem 0;border-bottom:1px solid #e0ded4}
+.work .n{font-family:'Libre Baskerville',serif;font-size:1.6rem;color:var(--stone)}
+.work h3{font-size:1.12rem;margin-bottom:.25rem}
+.work p{font-size:.93rem;color:var(--mut)}
+.work .s{font-size:.68rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--moss);border:1px solid var(--moss);border-radius:3px;padding:.15rem .6rem;display:inline-block;margin-top:.5rem}
+.band{background:var(--moss2);color:#f4f2ea;padding:2.8rem 1.4rem;text-align:center}
+.band h2{font-family:'Libre Baskerville',serif;font-size:2rem;margin-bottom:.6rem}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:2.6rem;align-items:start}
+@media(max-width:840px){.split{grid-template-columns:1fr}}
+form label{display:block;font-weight:700;font-size:.88rem;margin:1rem 0 .35rem;color:var(--moss2)}
+form input,form textarea{width:100%;padding:.85rem;border:1px solid #cfccbd;border-radius:2px;font-family:inherit;font-size:1rem;background:#fff}
+form input.invalid,form textarea.invalid{border-color:#c0392b}
+.err{color:#c0392b;font-size:.85rem;display:none;margin-top:.25rem}
+#formDone{display:none;background:#eef3e2;border:1px solid var(--moss);color:var(--moss2);padding:1.4rem;font-weight:700}
+.info li{list-style:none;margin:1rem 0}
+.info i{color:var(--moss);width:1.6rem}
+.info a{color:var(--moss2);font-weight:700}
+footer{background:var(--moss2);color:#d8d4c2;text-align:center;padding:1.6rem 1rem;font-family:'Libre Baskerville',serif;font-style:italic}
+@media(max-width:720px){
+#menuBtn{display:block}
+.hd-in{flex-wrap:wrap}
+ul#navList{display:none;width:100%;flex-direction:column;margin-top:.8rem}
+ul#navList.open{display:flex}
+ul#navList a{padding:.85rem .4rem;border-top:1px solid #e0ded4}
+ul#navList a.active::after{display:none}
+.hero .left{padding:3rem 1.6rem}
+}
+</style>
+</head>
+<body>
+<header class="top">
+<div class="hd-in">
+<div class="brand">Mitchell <em>landscape &amp; Construction</em></div>
+<button id="menuBtn" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
+<ul id="navList">
+<li><a href="?p=home" data-nav="home" class="active">Home</a></li>
+<li><a href="?p=services" data-nav="services">Services</a></li>
+<li><a href="?p=about" data-nav="about">About</a></li>
+<li><a href="?p=reviews" data-nav="reviews">Reviews</a></li>
+<li><a href="?p=contact" data-nav="contact">Contact</a></li>
+</ul>
+</div>
+</header>
+
+<section class="page active" id="page-home" data-page="home">
+<div class="hero">
+<div class="left">
+<div class="rule"></div>
+<h1>Landscapes built to be lived in</h1>
+<p>Mitchell landscape &amp; Construction serves Essex, Ontario with landscape and construction work. Outdoor spaces designed and built with care.</p>
+<div><a class="btn" data-nav="services">Our Work</a><a class="btn moss" data-nav="contact">Get an Estimate</a></div>
+</div>
+<div class="right"><div class="motif"><i class="fa-solid fa-tree"></i></div></div>
+</div>
+<div class="wrap">
+<div class="ed">
+<div>
+<h2>What we do</h2>
+<p class="lede">Landscape and construction services. Call +1 226-350-3145 to confirm the current list.</p>
+</div>
+<div class="work-list">
+<div class="work"><div class="n">01</div><div><h3>Landscape Installation</h3><p>Plantings, beds, and finished landscapes.</p><span class="s">Sample &middot; call to confirm</span></div></div>
+<div class="work"><div class="n">02</div><div><h3>Hardscape Construction</h3><p>Stone and structural landscape features.</p><span class="s">Sample &middot; call to confirm</span></div></div>
+<div class="work"><div class="n">03</div><div><h3>Lawn and Bed Care</h3><p>Ongoing care for established landscapes.</p><span class="s">Sample &middot; call to confirm</span></div></div>
+<div class="work"><div class="n">04</div><div><h3>Property Cleanup</h3><p>Clearing and resetting overgrown properties.</p><span class="s">Sample &middot; call to confirm</span></div></div>
+</div>
+</div>
+</div>
+</section>
+
+<section class="page" id="page-services" data-page="services">
+<div class="wrap">
+<div class="ed">
+<div>
+<h2>Services</h2>
+<p class="lede">Call to confirm availability and pricing.</p>
+</div>
+<div class="work-list">
+<div class="work"><div class="n">01</div><div><h3>Garden Design</h3><p>Layouts planned around your property.</p><span class="s">Sample &middot; call to confirm</span></div></div>
+<div class="work"><div class="n">02</div><div><h3>Retaining Walls</h3><p>Structural walls for slopes and grade changes.</p><span class="s">Sample &middot; call to confirm</span></div></div>
+<div class="work"><div class="n">03</div><div><h3>Patios and Walkways</h3><p>Stone surfaces for outdoor living.</p><span class="s">Sample &middot; call to confirm</span></div></div>
+<div class="work"><div class="n">04</div><div><h3>Sod and Grading</h3><p>Lawn establishment and drainage grading.</p><span class="s">Sample &middot; call to confirm</span></div></div>
+</div>
+</div>
+</div>
+</section>
+
+<section class="page" id="page-about" data-page="about">
+<div class="wrap">
+<div class="ed">
+<div>
+<h2>About Mitchell</h2>
+<p class="lede">A landscaper and builder in Essex, Ontario.</p>
+</div>
+<div class="work-list">
+<div class="work"><div class="n"><i class="fa-solid fa-location-dot"></i></div><div><h3>Location</h3><p>Mitchell landscape &amp; Construction, 3629 N Malden Rd, Essex, ON N8M 2X6, Canada.</p></div></div>
+<div class="work"><div class="n"><i class="fa-solid fa-phone"></i></div><div><h3>Phone</h3><p><a href="tel:+12263503145" style="color:var(--moss2);font-weight:700">+1 226-350-3145</a>. Call to confirm hours.</p></div></div>
+<div class="work"><div class="n"><i class="fa-solid fa-leaf"></i></div><div><h3>Craft</h3><p>Landscape and construction work for residential properties.</p></div></div>
+</div>
+</div>
+</div>
+</section>
+
+<section class="page" id="page-reviews" data-page="reviews">
+<div class="wrap" style="text-align:center;max-width:640px">
+<h2 style="font-family:'Libre Baskerville',serif;font-size:1.9rem;color:var(--moss2);margin-bottom:.4rem">Reviews</h2>
+<p class="lede" style="margin-bottom:1.6rem">Verified reviews live on Google.</p>
+<div class="work" style="text-align:left;background:#fff;border:1px solid #e0ded4;padding:1.8rem">
+<div class="n"><i class="fa-brands fa-google"></i></div>
+<div><h3>Read real reviews</h3><p style="margin-bottom:1rem">We do not reprint review text here. Read verified reviews for Mitchell landscape &amp; Construction at the source.</p><a class="btn moss" href="https://www.google.com/maps/place/?q=place_id:ChIJ68GmyvjZOogROitxWeIvQlQ" target="_blank" rel="noopener" style="margin-left:0">Read Reviews on Google</a></div>
+</div>
+</div>
+</section>
+
+<section class="page" id="page-contact" data-page="contact">
+<div class="wrap">
+<div class="ed">
+<div>
+<h2>Contact</h2>
+<p class="lede">Call or send the form for an estimate.</p>
+<ul class="info" style="margin-top:1.2rem">
+<li><i class="fa-solid fa-phone"></i> <a href="tel:+12263503145">+1 226-350-3145</a></li>
+<li><i class="fa-solid fa-location-dot"></i> Mitchell landscape &amp; Construction, 3629 N Malden Rd, Essex, ON N8M 2X6, Canada<br><a href="https://www.google.com/maps/search/?api=1&amp;query=Mitchell%20landscape%20%26%20Construction%2C%203629%20N%20Malden%20Rd%2C%20Essex%2C%20ON%20N8M%202X6%2C%20Canada" target="_blank" rel="noopener">Get Directions</a></li>
+<li><i class="fa-solid fa-clock"></i> Hours: call to confirm</li>
+</ul>
+</div>
+<div>
+<form id="contactForm" novalidate>
+<label for="cname">Name</label>
+<input id="cname" type="text" autocomplete="name">
+<div class="err" id="cnameErr">Please enter your name.</div>
+<label for="cphone">Phone</label>
+<input id="cphone" type="tel" autocomplete="tel">
+<div class="err" id="cphoneErr">Please enter a valid phone number.</div>
+<label for="cmsg">Project details</label>
+<textarea id="cmsg" rows="5"></textarea>
+<div class="err" id="cmsgErr">Please enter your message.</div>
+<br><button class="btn moss" type="submit" style="margin-top:1.1rem;margin-left:0">Send Message</button>
+</form>
+<div id="formDone">Message received. Mitchell landscape &amp; Construction will call you back.</div>
+</div>
+</div>
+</div>
+</section>
+
+<div class="band">
+<h2>Let's talk about your property.</h2>
+<p style="margin-bottom:1.2rem;color:#d8d4c2">Call +1 226-350-3145 for landscape and construction work in Essex.</p>
+<a class="btn" href="tel:+12263503145"><i class="fa-solid fa-phone"></i> Call Now</a>
+</div>
+
+<footer>© Mitchell landscape & Construction</footer>
+
+<script>
+function navigateTo(page){
+var pages=document.querySelectorAll('.page');
+for(var i=0;i<pages.length;i++){pages[i].classList.toggle('active',pages[i].getAttribute('data-page')===page);}
+var links=document.querySelectorAll('[data-nav]');
+for(var j=0;j<links.length;j++){links[j].classList.toggle('active',links[j].getAttribute('data-nav')===page);}
+var titles={home:'Home',services:'Services',about:'About',reviews:'Reviews',contact:'Contact'};
+document.title=(titles[page]||'Home')+' | Mitchell landscape & Construction';
+if(window.history&&history.pushState){history.pushState({page:page},'',window.location.pathname+(page==='home'?'':'?p='+page));}
+window.scrollTo(0,0);
+var nav=document.getElementById('navList');if(nav){nav.classList.remove('open');}
+var btn=document.getElementById('menuBtn');if(btn){btn.classList.remove('open');}
+}
+document.addEventListener('DOMContentLoaded',function(){
+var links=document.querySelectorAll('[data-nav]');
+for(var i=0;i<links.length;i++){links[i].addEventListener('click',function(e){e.preventDefault();navigateTo(this.getAttribute('data-nav'));});}
+var btn=document.getElementById('menuBtn');var nav=document.getElementById('navList');
+if(btn&&nav){btn.addEventListener('click',function(){nav.classList.toggle('open');btn.classList.toggle('open');});}
+var params=new URLSearchParams(window.location.search);var start=params.get('p')||'home';
+var valid=['home','services','about','reviews','contact'];if(valid.indexOf(start)<0){start='home';}
+navigateTo(start);
+if(window.history&&history.replaceState){history.replaceState({page:start},'',window.location.pathname+(start==='home'?'':'?p='+start));}
+var form=document.getElementById('contactForm');
+if(form){form.addEventListener('submit',function(e){
+e.preventDefault();var ok=true;
+var fields=['cname','cphone','cmsg'];
+for(var k=0;k<fields.length;k++){
+var f=document.getElementById(fields[k]);var err=document.getElementById(fields[k]+'Err');
+var v=f.value.trim();var bad=(v==='')||(fields[k]==='cphone'&&v.replace(/\D/g,'').length<7);
+if(err){err.style.display=bad?'block':'none';}
+if(bad){ok=false;f.classList.add('invalid');}else{f.classList.remove('invalid');}
+}
+var done=document.getElementById('formDone');
+if(ok){form.style.display='none';if(done){done.style.display='block';}}
+});}
+});
+window.addEventListener('popstate',function(e){
+var p=(e.state&&e.state.page)||'home';
+var pages=document.querySelectorAll('.page');
+for(var i=0;i<pages.length;i++){pages[i].classList.toggle('active',pages[i].getAttribute('data-page')===p);}
+var links=document.querySelectorAll('[data-nav]');
+for(var j=0;j<links.length;j++){links[j].classList.toggle('active',links[j].getAttribute('data-nav')===p);}
+});
+</script>
+</body>
+</html>

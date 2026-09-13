@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hang It Right</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{--ink:#1c1e22;--mut:#6d7278;--line:#e2e4e8;--bg:#ffffff;--wash:#f5f6f8;--acc:#2f6fed}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);line-height:1.7}
+header.top{border-bottom:1px solid var(--line);position:sticky;top:0;z-index:60;background:rgba(255,255,255,.96)}
+.hd-in{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:1rem 1.4rem}
+.brand{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.45rem;letter-spacing:-.01em}
+.brand span{color:var(--acc)}
+#menuBtn{display:none;background:none;border:1px solid var(--line);font-size:1.15rem;padding:.5rem .8rem;cursor:pointer;border-radius:8px;color:var(--ink)}
+ul#navList{list-style:none;display:flex;gap:.2rem}
+ul#navList a{color:var(--ink);text-decoration:none;font-weight:500;font-size:.92rem;padding:.6rem 1rem;border-radius:8px}
+ul#navList a.active{background:var(--ink);color:#fff}
+ul#navList a:hover:not(.active){background:var(--wash)}
+.page{display:none}
+.page.active{display:block;animation:fade .3s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.hero{max-width:1100px;margin:0 auto;padding:5rem 1.4rem 4rem;display:grid;grid-template-columns:1.1fr .9fr;gap:3rem;align-items:center}
+@media(max-width:800px){.hero{grid-template-columns:1fr}}
+.hero h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(2.4rem,6.5vw,3.8rem);line-height:1.05;letter-spacing:-.02em;margin-bottom:1rem}
+.hero h1 span{color:var(--acc)}
+.hero p{color:var(--mut);font-size:1.05rem;margin-bottom:1.8rem;max-width:480px}
+.btn{display:inline-block;background:var(--ink);color:#fff;font-weight:600;padding:.9rem 2rem;border-radius:10px;text-decoration:none;border:0;cursor:pointer;font-size:1rem}
+.btn:hover{background:#000}
+.btn.blue{background:var(--acc);margin-left:.6rem}
+.frame{border:1px solid var(--line);border-radius:16px;padding:2.2rem;background:var(--wash);position:relative}
+.frame::before{content:'';position:absolute;top:14px;left:14px;right:14px;bottom:14px;border:1px dashed #c9ccd2;border-radius:10px;pointer-events:none}
+.frame .big{font-family:'Space Grotesk',sans-serif;font-size:3.4rem;color:var(--acc);text-align:center}
+.frame p{text-align:center;color:var(--mut);font-size:.9rem;margin-top:.6rem}
+.wrap{max-width:1100px;margin:0 auto;padding:3rem 1.4rem}
+.kicker{font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;color:var(--acc);font-weight:600;margin-bottom:.5rem}
+h2.sg{font-family:'Space Grotesk',sans-serif;font-size:2rem;letter-spacing:-.01em;margin-bottom:.4rem}
+.sub{color:var(--mut);margin-bottom:2rem}
+.rows{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+@media(max-width:700px){.rows{grid-template-columns:1fr}}
+.row{background:#fff;padding:1.8rem 1.6rem}
+.row h3{font-family:'Space Grotesk',sans-serif;font-size:1.2rem;margin-bottom:.4rem}
+.row p{color:var(--mut);font-size:.94rem}
+.row .tag{display:inline-block;font-size:.68rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;background:var(--wash);border:1px solid var(--line);border-radius:20px;padding:.2rem .7rem;margin-top:.7rem;color:var(--mut)}
+.note{background:var(--wash);border:1px solid var(--line);border-radius:12px;padding:1.3rem 1.5rem;margin-top:1.8rem;font-size:.92rem;color:var(--mut)}
+.band{background:var(--ink);color:#fff;border-radius:16px;padding:2.8rem 2rem;text-align:center;margin:0 1.4rem 3rem;max-width:1072px;margin-left:auto;margin-right:auto}
+.band h2{font-family:'Space Grotesk',sans-serif;font-size:1.9rem;margin-bottom:.6rem}
+.band p{color:#b9bec6;margin-bottom:1.4rem}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:2.4rem;align-items:start}
+@media(max-width:840px){.split{grid-template-columns:1fr}}
+form label{display:block;font-weight:600;font-size:.88rem;margin:1rem 0 .35rem}
+form input,form textarea{width:100%;padding:.85rem;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:1rem;background:#fff}
+form input:focus,form textarea:focus{outline:2px solid var(--acc);border-color:var(--acc)}
+form input.invalid,form textarea.invalid{border-color:#d33}
+.err{color:#d33;font-size:.85rem;display:none;margin-top:.25rem}
+#formDone{display:none;background:#e9f7ec;border:1px solid #2f7d44;color:#205c30;padding:1.4rem;border-radius:10px;font-weight:600}
+.info li{list-style:none;margin:1rem 0}
+.info i{color:var(--acc);width:1.6rem}
+.info a{color:var(--ink);font-weight:600}
+footer{border-top:1px solid var(--line);text-align:center;padding:1.6rem 1rem;color:var(--mut);font-size:.92rem}
+@media(max-width:720px){
+#menuBtn{display:block}
+.hd-in{flex-wrap:wrap}
+ul#navList{display:none;width:100%;flex-direction:column;margin-top:.8rem}
+ul#navList.open{display:flex}
+ul#navList a{padding:.85rem .6rem;border-top:1px solid var(--line)}
+ul#navList a.active{border-top:0}
+}
+</style>
+</head>
+<body>
+<header class="top">
+<div class="hd-in">
+<div class="brand">Hang It <span>Right</span></div>
+<button id="menuBtn" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
+<ul id="navList">
+<li><a href="?p=home" data-nav="home" class="active">Home</a></li>
+<li><a href="?p=services" data-nav="services">Services</a></li>
+<li><a href="?p=about" data-nav="about">About</a></li>
+<li><a href="?p=reviews" data-nav="reviews">Reviews</a></li>
+<li><a href="?p=contact" data-nav="contact">Contact</a></li>
+</ul>
+</div>
+</header>
+
+<section class="page active" id="page-home" data-page="home">
+<div class="hero">
+<div>
+<div class="kicker">Drywall Contractor &middot; McGregor, ON</div>
+<h1>Straight walls.<br>Clean lines.<br><span>Done right.</span></h1>
+<p>Hang It Right handles drywall installation and finishing in the McGregor, Ontario area. Flat seams, sharp corners, ready for paint.</p>
+<a class="btn" data-nav="services">Services</a>
+<a class="btn blue" data-nav="contact">Get a Quote</a>
+</div>
+<div class="frame">
+<div class="big"><i class="fa-solid fa-border-all"></i></div>
+<p>Drywall hung, taped, and finished to a paint-ready surface.</p>
+</div>
+</div>
+<div class="wrap">
+<div class="kicker">What we do</div>
+<h2 class="sg">Drywall, start to finish</h2>
+<p class="sub">Call +1 519-984-3428 to confirm the current service list.</p>
+<div class="rows">
+<div class="row"><h3>Drywall Installation</h3><p>Hanging drywall for new builds and renovations.</p><span class="tag">Sample &middot; call to confirm</span></div>
+<div class="row"><h3>Taping and Finishing</h3><p>Seams taped and finished smooth, ready for paint.</p><span class="tag">Sample &middot; call to confirm</span></div>
+<div class="row"><h3>Drywall Repair</h3><p>Patching holes and fixing damaged sections.</p><span class="tag">Sample &middot; call to confirm</span></div>
+<div class="row"><h3>Texture Matching</h3><p>Blending repairs into existing wall texture.</p><span class="tag">Sample &middot; call to confirm</span></div>
+</div>
+<div class="note">Service details are samples. For an accurate scope and quote, call <a href="tel:+15199843428" style="color:var(--acc);font-weight:600">+1 519-984-3428</a>.</div>
+</div>
+</section>
+
+<section class="page" id="page-services" data-page="services">
+<div class="wrap">
+<div class="kicker">Services</div>
+<h2 class="sg">The full list</h2>
+<p class="sub">Call to confirm availability and pricing.</p>
+<div class="rows">
+<div class="row"><h3>New Drywall Hang</h3><p>Full installation for additions and new construction.</p><span class="tag">Sample &middot; call to confirm</span></div>
+<div class="row"><h3>Finish Levels 1 to 5</h3><p>The right finish level for your lighting and paint.</p><span class="tag">Sample &middot; call to confirm</span></div>
+<div class="row"><h3>Ceiling Work</h3><p>Drywall ceilings hung flat and finished clean.</p><span class="tag">Sample &middot; call to confirm</span></div>
+<div class="row"><h3>Small Repairs</h3><p>From doorknob holes to water damage patches.</p><span class="tag">Sample &middot; call to confirm</span></div>
+</div>
+</div>
+</section>
+
+<section class="page" id="page-about" data-page="about">
+<div class="wrap">
+<div class="kicker">About</div>
+<h2 class="sg">Hang It Right</h2>
+<p class="sub">A drywall contractor based in McGregor, Ontario.</p>
+<div class="rows">
+<div class="row"><h3>Location</h3><p>Hang It Right, 9548 Walker Rd, McGregor, ON N0R 1J0, Canada.</p></div>
+<div class="row"><h3>Contact</h3><p><a href="tel:+15199843428" style="color:var(--acc);font-weight:600">+1 519-984-3428</a>. Call to confirm hours.</p></div>
+</div>
+</div>
+</section>
+
+<section class="page" id="page-reviews" data-page="reviews">
+<div class="wrap" style="text-align:center">
+<div class="kicker">Reviews</div>
+<h2 class="sg">What customers say</h2>
+<p class="sub">Verified reviews live on Google.</p>
+<div class="note" style="max-width:620px;margin:0 auto">
+<p style="margin-bottom:1.1rem">We do not reprint review text here. Read verified reviews for Hang It Right at the source.</p>
+<a class="btn" href="https://www.google.com/maps/place/?q=place_id:ChIJfTusR7ptvCkRt76PT3k6jj8" target="_blank" rel="noopener"><i class="fa-brands fa-google"></i> Read Reviews on Google</a>
+</div>
+</div>
+</section>
+
+<section class="page" id="page-contact" data-page="contact">
+<div class="wrap">
+<div class="kicker">Contact</div>
+<h2 class="sg">Get a quote</h2>
+<p class="sub">Call, or send the form and we will call you back.</p>
+<div class="split">
+<div>
+<ul class="info">
+<li><i class="fa-solid fa-phone"></i> <a href="tel:+15199843428">+1 519-984-3428</a></li>
+<li><i class="fa-solid fa-location-dot"></i> Hang It Right, 9548 Walker Rd, McGregor, ON N0R 1J0, Canada<br><a href="https://www.google.com/maps/search/?api=1&amp;query=Hang%20It%20Right%2C%209548%20Walker%20Rd%2C%20McGregor%2C%20ON%20N0R%201J0%2C%20Canada" target="_blank" rel="noopener">Get Directions</a></li>
+<li><i class="fa-solid fa-clock"></i> Hours: call to confirm</li>
+</ul>
+</div>
+<div>
+<form id="contactForm" novalidate>
+<label for="cname">Name</label>
+<input id="cname" type="text" autocomplete="name">
+<div class="err" id="cnameErr">Please enter your name.</div>
+<label for="cphone">Phone</label>
+<input id="cphone" type="tel" autocomplete="tel">
+<div class="err" id="cphoneErr">Please enter a valid phone number.</div>
+<label for="cmsg">Project details</label>
+<textarea id="cmsg" rows="5"></textarea>
+<div class="err" id="cmsgErr">Please enter your message.</div>
+<br><button class="btn" type="submit" style="margin-top:1.1rem">Send Message</button>
+</form>
+<div id="formDone">Message sent. Hang It Right will call you back shortly.</div>
+</div>
+</div>
+</div>
+</section>
+
+<div class="band">
+<h2>Walls that are ready for paint.</h2>
+<p>Call +1 519-984-3428 for drywall work in the McGregor area.</p>
+<a class="btn blue" href="tel:+15199843428" style="margin-left:0"><i class="fa-solid fa-phone"></i> Call Now</a>
+</div>
+
+<footer>© Hang It Right</footer>
+
+<script>
+function navigateTo(page){
+var pages=document.querySelectorAll('.page');
+for(var i=0;i<pages.length;i++){pages[i].classList.toggle('active',pages[i].getAttribute('data-page')===page);}
+var links=document.querySelectorAll('[data-nav]');
+for(var j=0;j<links.length;j++){links[j].classList.toggle('active',links[j].getAttribute('data-nav')===page);}
+var titles={home:'Home',services:'Services',about:'About',reviews:'Reviews',contact:'Contact'};
+document.title=(titles[page]||'Home')+' | Hang It Right';
+if(window.history&&history.pushState){history.pushState({page:page},'',window.location.pathname+(page==='home'?'':'?p='+page));}
+window.scrollTo(0,0);
+var nav=document.getElementById('navList');if(nav){nav.classList.remove('open');}
+var btn=document.getElementById('menuBtn');if(btn){btn.classList.remove('open');}
+}
+document.addEventListener('DOMContentLoaded',function(){
+var links=document.querySelectorAll('[data-nav]');
+for(var i=0;i<links.length;i++){links[i].addEventListener('click',function(e){e.preventDefault();navigateTo(this.getAttribute('data-nav'));});}
+var btn=document.getElementById('menuBtn');var nav=document.getElementById('navList');
+if(btn&&nav){btn.addEventListener('click',function(){nav.classList.toggle('open');btn.classList.toggle('open');});}
+var params=new URLSearchParams(window.location.search);var start=params.get('p')||'home';
+var valid=['home','services','about','reviews','contact'];if(valid.indexOf(start)<0){start='home';}
+navigateTo(start);
+if(window.history&&history.replaceState){history.replaceState({page:start},'',window.location.pathname+(start==='home'?'':'?p='+start));}
+var form=document.getElementById('contactForm');
+if(form){form.addEventListener('submit',function(e){
+e.preventDefault();var ok=true;
+var fields=['cname','cphone','cmsg'];
+for(var k=0;k<fields.length;k++){
+var f=document.getElementById(fields[k]);var err=document.getElementById(fields[k]+'Err');
+var v=f.value.trim();var bad=(v==='')||(fields[k]==='cphone'&&v.replace(/\D/g,'').length<7);
+if(err){err.style.display=bad?'block':'none';}
+if(bad){ok=false;f.classList.add('invalid');}else{f.classList.remove('invalid');}
+}
+var done=document.getElementById('formDone');
+if(ok){form.style.display='none';if(done){done.style.display='block';}}
+});}
+});
+window.addEventListener('popstate',function(e){
+var p=(e.state&&e.state.page)||'home';
+var pages=document.querySelectorAll('.page');
+for(var i=0;i<pages.length;i++){pages[i].classList.toggle('active',pages[i].getAttribute('data-page')===p);}
+var links=document.querySelectorAll('[data-nav]');
+for(var j=0;j<links.length;j++){links[j].classList.toggle('active',links[j].getAttribute('data-nav')===p);}
+});
+</script>
+</body>
+</html>

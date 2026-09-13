@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cooperative Mc Gregor Elevator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{--wheat:#d9a441;--wheat2:#f2d98c;--barn:#a83a2c;--barn2:#7e2a20;--field:#f8f3e6;--ink:#3d3225;--mut:#7c6f58}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Work Sans',sans-serif;background:var(--field);color:var(--ink);line-height:1.65}
+.skybar{background:linear-gradient(180deg,#7fb069,#a9cf8f);height:8px}
+header.top{background:#fff;border-bottom:3px solid var(--wheat);position:sticky;top:0;z-index:60}
+.hd-in{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.4rem}
+.brand{display:flex;align-items:center;gap:.8rem}
+.silo{width:46px;height:46px;background:var(--barn);border-radius:8px 8px 4px 4px;position:relative;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.3rem}
+.silo::before{content:'';position:absolute;top:-9px;left:4px;right:4px;height:12px;background:var(--barn2);border-radius:50% 50% 0 0}
+.brand b{font-family:'Fraunces',serif;font-size:1.3rem;line-height:1.15;display:block}
+.brand small{font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--mut)}
+#menuBtn{display:none;background:var(--barn);border:0;color:#fff;font-size:1.15rem;padding:.55rem .85rem;border-radius:8px;cursor:pointer}
+ul#navList{list-style:none;display:flex;gap:.2rem}
+ul#navList a{color:var(--ink);text-decoration:none;font-weight:600;font-size:.92rem;padding:.65rem 1.05rem;border-radius:20px}
+ul#navList a.active{background:var(--barn);color:#fff}
+ul#navList a:hover:not(.active){background:#f0e4c8}
+.page{display:none}
+.page.active{display:block;animation:fade .35s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.hero{background:linear-gradient(180deg,#fdf8ea 0%,var(--field) 100%);padding:4rem 1.2rem 3.4rem;text-align:center;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;left:0;right:0;bottom:0;height:70px;background:repeating-linear-gradient(90deg,var(--wheat) 0 60px,#c08f2e 60px 120px);opacity:.25;clip-path:polygon(0 60%,100% 20%,100% 100%,0 100%)}
+.hero h1{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(2rem,6vw,3.6rem);color:var(--barn2);line-height:1.05;margin-bottom:.9rem;position:relative;z-index:2}
+.hero p{max-width:620px;margin:0 auto 1.8rem;color:var(--mut);position:relative;z-index:2}
+.btn{display:inline-block;background:var(--barn);color:#fff;font-weight:700;padding:.9rem 2.1rem;border-radius:30px;text-decoration:none;border:0;cursor:pointer;font-size:1rem;position:relative;z-index:2}
+.btn:hover{background:var(--barn2)}
+.btn.wheat{background:var(--wheat);color:var(--barn2);margin-left:.6rem}
+.wrap{max-width:1100px;margin:0 auto;padding:3rem 1.4rem}
+h2.fr{font-family:'Fraunces',serif;font-size:2.1rem;color:var(--barn2);text-align:center;margin-bottom:.3rem}
+.fr-sub{text-align:center;color:var(--mut);margin-bottom:2.2rem}
+.bins{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.3rem}
+.bin{background:#fff;border-radius:16px;padding:1.8rem 1.5rem;box-shadow:0 8px 20px rgba(168,58,44,.1);text-align:center;border-bottom:5px solid var(--wheat)}
+.bin .grain-ic{width:62px;height:62px;margin:0 auto 1rem;border-radius:50%;background:#f7e9c4;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:var(--barn)}
+.bin h3{font-family:'Fraunces',serif;font-size:1.25rem;margin-bottom:.4rem}
+.bin p{font-size:.93rem;color:var(--mut)}
+.bin .tag{display:inline-block;font-size:.66rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;background:#f7e9c4;color:var(--barn2);border-radius:20px;padding:.2rem .75rem;margin-top:.7rem}
+.harvest{background:var(--barn);color:#ffe9c9;border-radius:18px;padding:2.2rem;margin-top:2.4rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.4rem}
+.harvest h3{font-family:'Fraunces',serif;font-size:1.3rem;margin-bottom:.3rem}
+.harvest p{font-size:.93rem;color:#f2d8b0}
+.band{background:var(--wheat);text-align:center;padding:2.6rem 1.2rem}
+.band h2{font-family:'Fraunces',serif;font-size:2rem;color:var(--barn2);margin-bottom:.5rem}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:2.4rem;align-items:start}
+@media(max-width:840px){.split{grid-template-columns:1fr}}
+form label{display:block;font-weight:700;font-size:.88rem;margin:1rem 0 .35rem;color:var(--barn2)}
+form input,form textarea{width:100%;padding:.85rem;border:2px solid #e5d5ae;border-radius:10px;font-family:inherit;font-size:1rem;background:#fff}
+form input.invalid,form textarea.invalid{border-color:#c0392b}
+.err{color:#c0392b;font-size:.85rem;display:none;margin-top:.25rem}
+#formDone{display:none;background:#eef5e6;border:2px solid var(--barn);color:var(--barn2);padding:1.4rem;border-radius:10px;font-weight:700}
+.info li{list-style:none;margin:1rem 0}
+.info i{color:var(--barn);width:1.6rem}
+.info a{color:var(--barn2);font-weight:700}
+footer{background:var(--barn2);color:#f2d8b0;text-align:center;padding:1.6rem 1rem;font-family:'Fraunces',serif}
+@media(max-width:720px){
+#menuBtn{display:block}
+.hd-in{flex-wrap:wrap}
+ul#navList{display:none;width:100%;flex-direction:column;margin-top:.8rem}
+ul#navList.open{display:flex}
+ul#navList a{border-radius:10px;padding:.85rem .8rem}
+}
+</style>
+</head>
+<body>
+<div class="skybar"></div>
+<header class="top">
+<div class="hd-in">
+<div class="brand">
+<div class="silo"><i class="fa-solid fa-warehouse"></i></div>
+<div><b>Cooperative Mc Gregor Elevator</b><small>McGregor, Ontario</small></div>
+</div>
+<button id="menuBtn" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
+<ul id="navList">
+<li><a href="?p=home" data-nav="home" class="active">Home</a></li>
+<li><a href="?p=services" data-nav="services">Services</a></li>
+<li><a href="?p=about" data-nav="about">About</a></li>
+<li><a href="?p=reviews" data-nav="reviews">Reviews</a></li>
+<li><a href="?p=contact" data-nav="contact">Contact</a></li>
+</ul>
+</div>
+</header>
+
+<section class="page active" id="page-home" data-page="home">
+<div class="hero">
+<h1>The Co-op Elevator<br>Serving Local Farms</h1>
+<p>Cooperative Mc Gregor Elevator on Mill Street in McGregor, Ontario. Grain handling for the farms of Essex County. Call +1 519-726-6151.</p>
+<a class="btn" data-nav="services">Our Services</a>
+<a class="btn wheat" data-nav="contact">Contact Us</a>
+</div>
+<div class="wrap">
+<h2 class="fr">Elevator Services</h2>
+<p class="fr-sub">Call +1 519-726-6151 to confirm current services and hours.</p>
+<div class="bins">
+<div class="bin"><div class="grain-ic"><i class="fa-solid fa-wheat-awn"></i></div><h3>Grain Receiving</h3><p>Harvest intake at the Mill Street elevator.</p><span class="tag">Sample &middot; call to confirm</span></div>
+<div class="bin"><div class="grain-ic"><i class="fa-solid fa-warehouse"></i></div><h3>Grain Storage</h3><p>Secure storage for member grain.</p><span class="tag">Sample &middot; call to confirm</span></div>
+<div class="bin"><div class="grain-ic"><i class="fa-solid fa-truck"></i></div><h3>Load Out</h3><p>Scheduled loading for transport.</p><span class="tag">Sample &middot; call to confirm</span></div>
+<div class="bin"><div class="grain-ic"><i class="fa-solid fa-scale-balanced"></i></div><h3>Weighing</h3><p>Certified scale services.</p><span class="tag">Sample &middot; call to confirm</span></div>
+</div>
+<div class="harvest">
+<div><h3>Location</h3><p>Cooperative Mc Gregor Elevator, Mill St, McGregor, ON N0R 1J0, Canada.</p></div>
+<div><h3>Phone</h3><p>+1 519-726-6151. Call to confirm services, hours, and harvest schedules.</p></div>
+<div><h3>Co-op Values</h3><p>Member-focused grain handling for the local farming community.</p></div>
+</div>
+</div>
+</section>
+
+<section class="page" id="page-services" data-page="services">
+<div class="wrap">
+<h2 class="fr">Services</h2>
+<p class="fr-sub">Call +1 519-726-6151 to confirm.</p>
+<div class="bins">
+<div class="bin"><div class="grain-ic"><i class="fa-solid fa-wheat-awn"></i></div><h3>Harvest Intake</h3><p>Receiving grain during harvest season.</p><span class="tag">Sample &middot; call to confirm</span></div>
+<div class="bin"><div class="grain-ic"><i class="fa-solid fa-temperature-half"></i></div><h3>Grain Drying</h3><p>Drying services for high-moisture grain.</p><span class="tag">Sample &middot; call to confirm</span></div>
+<div class="bin"><div class="grain-ic"><i class="fa-solid fa-flask"></i></div><h3>Grain Testing</h3><p>Moisture and quality testing.</p><span class="tag">Sample &middot; call to confirm</span></div>
+<div class="bin"><div class="grain-ic"><i class="fa-solid fa-bag-shopping"></i></div><h3>Feed and Supplies</h3><p>Farm supplies for members.</p><span class="tag">Sample &middot; call to confirm</span></div>
+</div>
+</div>
+</section>
+
+<section class="page" id="page-about" data-page="about">
+<div class="wrap">
+<h2 class="fr">About the Co-op</h2>
+<p class="fr-sub">A grain elevator serving McGregor, Ontario.</p>
+<div class="bins">
+<div class="bin"><div class="grain-ic"><i class="fa-solid fa-location-dot"></i></div><h3>Find Us</h3><p>Mill St, McGregor, ON N0R 1J0, Canada.</p></div>
+<div class="bin"><div class="grain-ic"><i class="fa-solid fa-phone"></i></div><h3>Call Us</h3><p><a href="tel:+15197266151" style="color:var(--barn2);font-weight:700">+1 519-726-6151</a></p></div>
+<div class="bin"><div class="grain-ic"><i class="fa-solid fa-people-group"></i></div><h3>Cooperative</h3><p>Built to serve local growers, season after season.</p></div>
+</div>
+</div>
+</section>
+
+<section class="page" id="page-reviews" data-page="reviews">
+<div class="wrap" style="text-align:center">
+<h2 class="fr">Reviews</h2>
+<p class="fr-sub">Verified reviews live on Google.</p>
+<div class="bin" style="max-width:620px;margin:0 auto">
+<p style="margin-bottom:1.1rem">We do not reprint review text here. Read verified reviews for Cooperative Mc Gregor Elevator at the source.</p>
+<a class="btn" href="https://www.google.com/maps/place/?q=place_id:ChIJPRgITF4mO4gRKB0XHTnGNEI" target="_blank" rel="noopener"><i class="fa-brands fa-google"></i> Read Reviews on Google</a>
+</div>
+</div>
+</section>
+
+<section class="page" id="page-contact" data-page="contact">
+<div class="wrap">
+<h2 class="fr">Contact</h2>
+<p class="fr-sub">Call or send a message.</p>
+<div class="split">
+<div>
+<ul class="info">
+<li><i class="fa-solid fa-phone"></i> <a href="tel:+15197266151">+1 519-726-6151</a></li>
+<li><i class="fa-solid fa-location-dot"></i> Cooperative Mc Gregor Elevator, Mill St, McGregor, ON N0R 1J0, Canada<br><a href="https://www.google.com/maps/search/?api=1&amp;query=Cooperative%20Mc%20Gregor%20Elevator%2C%20Mill%20St%2C%20McGregor%2C%20ON%20N0R%201J0%2C%20Canada" target="_blank" rel="noopener">Get Directions</a></li>
+<li><i class="fa-solid fa-clock"></i> Hours: call to confirm</li>
+</ul>
+</div>
+<div>
+<form id="contactForm" novalidate>
+<label for="cname">Name</label>
+<input id="cname" type="text" autocomplete="name">
+<div class="err" id="cnameErr">Please enter your name.</div>
+<label for="cphone">Phone</label>
+<input id="cphone" type="tel" autocomplete="tel">
+<div class="err" id="cphoneErr">Please enter a valid phone number.</div>
+<label for="cmsg">Message</label>
+<textarea id="cmsg" rows="5"></textarea>
+<div class="err" id="cmsgErr">Please enter your message.</div>
+<br><button class="btn" type="submit" style="margin-top:1.1rem">Send Message</button>
+</form>
+<div id="formDone">Message received. The elevator office will get back to you.</div>
+</div>
+</div>
+</div>
+</section>
+
+<div class="band">
+<h2>Harvest season is our busy season.</h2>
+<p style="margin-bottom:1.2rem;font-weight:600;color:var(--barn2)">Call +1 519-726-6151 to plan your deliveries.</p>
+<a class="btn" href="tel:+15197266151"><i class="fa-solid fa-phone"></i> Call Now</a>
+</div>
+
+<footer>© Cooperative Mc Gregor Elevator</footer>
+
+<script>
+function navigateTo(page){
+var pages=document.querySelectorAll('.page');
+for(var i=0;i<pages.length;i++){pages[i].classList.toggle('active',pages[i].getAttribute('data-page')===page);}
+var links=document.querySelectorAll('[data-nav]');
+for(var j=0;j<links.length;j++){links[j].classList.toggle('active',links[j].getAttribute('data-nav')===page);}
+var titles={home:'Home',services:'Services',about:'About',reviews:'Reviews',contact:'Contact'};
+document.title=(titles[page]||'Home')+' | Cooperative Mc Gregor Elevator';
+if(window.history&&history.pushState){history.pushState({page:page},'',window.location.pathname+(page==='home'?'':'?p='+page));}
+window.scrollTo(0,0);
+var nav=document.getElementById('navList');if(nav){nav.classList.remove('open');}
+var btn=document.getElementById('menuBtn');if(btn){btn.classList.remove('open');}
+}
+document.addEventListener('DOMContentLoaded',function(){
+var links=document.querySelectorAll('[data-nav]');
+for(var i=0;i<links.length;i++){links[i].addEventListener('click',function(e){e.preventDefault();navigateTo(this.getAttribute('data-nav'));});}
+var btn=document.getElementById('menuBtn');var nav=document.getElementById('navList');
+if(btn&&nav){btn.addEventListener('click',function(){nav.classList.toggle('open');btn.classList.toggle('open');});}
+var params=new URLSearchParams(window.location.search);var start=params.get('p')||'home';
+var valid=['home','services','about','reviews','contact'];if(valid.indexOf(start)<0){start='home';}
+navigateTo(start);
+if(window.history&&history.replaceState){history.replaceState({page:start},'',window.location.pathname+(start==='home'?'':'?p='+start));}
+var form=document.getElementById('contactForm');
+if(form){form.addEventListener('submit',function(e){
+e.preventDefault();var ok=true;
+var fields=['cname','cphone','cmsg'];
+for(var k=0;k<fields.length;k++){
+var f=document.getElementById(fields[k]);var err=document.getElementById(fields[k]+'Err');
+var v=f.value.trim();var bad=(v==='')||(fields[k]==='cphone'&&v.replace(/\D/g,'').length<7);
+if(err){err.style.display=bad?'block':'none';}
+if(bad){ok=false;f.classList.add('invalid');}else{f.classList.remove('invalid');}
+}
+var done=document.getElementById('formDone');
+if(ok){form.style.display='none';if(done){done.style.display='block';}}
+});}
+});
+window.addEventListener('popstate',function(e){
+var p=(e.state&&e.state.page)||'home';
+var pages=document.querySelectorAll('.page');
+for(var i=0;i<pages.length;i++){pages[i].classList.toggle('active',pages[i].getAttribute('data-page')===p);}
+var links=document.querySelectorAll('[data-nav]');
+for(var j=0;j<links.length;j++){links[j].classList.toggle('active',links[j].getAttribute('data-nav')===p);}
+});
+</script>
+</body>
+</html>
