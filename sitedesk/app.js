@@ -323,9 +323,18 @@ function lastReadAt(){
 function setLastRead(ts){ try{ localStorage.setItem(LS_LASTREAD, String(ts)); }catch(e){} }
 
 var LS_DISMISSED = 'sitedesk_dismissed_v1';
+function dismissedKey(){
+  return LS_DISMISSED + '_' + (state.user && state.user.username ? state.user.username : 'anon');
+}
 function getDismissed(){
   try{
-    var a = JSON.parse(localStorage.getItem(LS_DISMISSED) || '[]');
+    var k = dismissedKey();
+    var a = JSON.parse(localStorage.getItem(k) || 'null');
+    if(!Array.isArray(a)){
+      /* One-time migration from the old device-global key. */
+      a = JSON.parse(localStorage.getItem(LS_DISMISSED) || '[]');
+      if(Array.isArray(a) && a.length) localStorage.setItem(k, JSON.stringify(a));
+    }
     return Array.isArray(a) ? a : [];
   }catch(e){ return []; }
 }
@@ -338,7 +347,35 @@ function dismissNotif(id){
   var a = getDismissed();
   if(a.indexOf(id) === -1) a.push(id);
   if(a.length > 300) a = a.slice(a.length - 300);
-  try{ localStorage.setItem(LS_DISMISSED, JSON.stringify(a)); }catch(e){}
+  try{ localStorage.setItem(dismissedKey(), JSON.stringify(a)); }catch(e){}
+  saveDismissedServer();
+}
+/* Server-side dismissed list, so dismissals follow the account across devices. */
+async function loadDismissedServer(){
+  if(!state.user || !state.user.username) return;
+  if(state.dismissedLoaded) return;
+  state.dismissedLoaded = true;
+  try{
+    const rec = await ghGetJson('dismissed/' + state.user.username + '.json');
+    if(rec && Array.isArray(rec.data)){
+      const merged = getDismissed();
+      rec.data.forEach(function(id){ if(id && merged.indexOf(id) === -1) merged.push(id); });
+      try{ localStorage.setItem(dismissedKey(), JSON.stringify(merged.slice(-300))); }catch(e){}
+    }
+  }catch(e){}
+}
+async function saveDismissedServer(){
+  if(!state.user || !state.user.username) return;
+  try{
+    const rec = await ghGetJson('dismissed/' + state.user.username + '.json');
+    const serverIds = rec && Array.isArray(rec.data) ? rec.data : [];
+    const merged = getDismissed();
+    serverIds.forEach(function(id){ if(id && merged.indexOf(id) === -1) merged.push(id); });
+    const trimmed = merged.slice(-300);
+    try{ localStorage.setItem(dismissedKey(), JSON.stringify(trimmed)); }catch(e){}
+    await ghPutJson('dismissed/' + state.user.username + '.json', trimmed, rec ? rec.sha : null,
+      'sitedesk: dismissed notifications @' + state.user.username);
+  }catch(e){ /* local dismissal stands; sync is best-effort */ }
 }
 function recountUnread(){
   var lr = lastReadAt();
@@ -805,6 +842,7 @@ async function doLogin(){
     state.user = { username: username, name: u.name || username, role: u.role || 'caller', phone: u.phone || '' };
     saveSession(state.user);
     state.tab = state.user.role === 'builder' ? 'inbox' : 'queue';
+    state.dismissedLoaded = false;
     await bootData(true);
     maybeNotifGate();
     ensurePushSubscribed();
@@ -827,6 +865,7 @@ function logout(){
   state.user = null; state.myClaims = []; state.myIntakes = [];
   state.feed = []; state.unread = 0; state.feedMaxTs = 0;
   state.claimsBySlug = {}; state.treeSlugs = null;
+  state.dismissedLoaded = false;
   renderHome();
 }
 
@@ -2040,8 +2079,9 @@ function adminUsersHtml(){
         (u.status !== 'disabled' ? '<button class="btn danger sm" data-uact="disable" data-u="' + esc(r.username) + '" type="button">Disable</button>' :
           '<button class="btn ghost sm" data-uact="approve" data-u="' + esc(r.username) + '" type="button">Re-enable</button>') +
         '<button class="btn ghost sm" data-uact="resetpw" data-u="' + esc(r.username) + '" type="button">Reset password</button>' +
+        (r.username !== state.user.username ? '<button class="btn danger sm" data-uact="delete" data-u="' + esc(r.username) + '" type="button">Delete</button>' : '') +
         (state.user.role === 'head' ? '<select data-urole="' + esc(r.username) + '" style="min-height:42px;width:auto">' +
-          ['caller','builder','admin','head'].map(function(ro){
+          ['caller','builder','admin'].map(function(ro){
             return '<option value="' + ro + '"' + (u.role === ro ? ' selected' : '') + '>' + ro + '</option>';
           }).join('') + '</select>' : '')) +
       '</div></div>';
@@ -2246,9 +2286,65 @@ async function userAction(username, act, el){
     } else if(act.indexOf('role:') === 0){
       if(state.user.role !== 'head'){ toast('Only the head can change roles.'); return; }
       if(username === state.user.username){ toast('You cannot change your own role.'); return; }
-      u.role = act.slice(5);
+      const newRole = act.slice(5);
+      /* There can only ever be one head. The role picker no longer offers
+         'head', and this guard blocks any forged request too. */
+      if(newRole === 'head'){ toast('There can only be one head.'); renderAdminInto(el); return; }
+      u.role = newRole;
       await saveUsers();
       toast('Role updated');
+    } else if(act === 'delete'){
+      if(username === state.user.username){ toast('Delete your own account from Profile.'); return; }
+      /* Two-tap confirm, same pattern as Profile self-delete. */
+      let btn = null;
+      el.querySelectorAll('[data-uact="delete"]').forEach(function(x){
+        if(x.getAttribute('data-u') === username) btn = x;
+      });
+      if(btn && !btn.getAttribute('data-confirm')){
+        btn.setAttribute('data-confirm', '1');
+        btn.textContent = 'Tap again to delete @' + username;
+        setTimeout(function(){
+          try{ btn.removeAttribute('data-confirm'); btn.textContent = 'Delete'; }catch(e){}
+        }, 6000);
+        return;
+      }
+      if(btn){ btn.disabled = true; btn.textContent = 'Deleting...'; }
+      await loadUsers();
+      const target = state.users[username];
+      if(!target){ toast('User not found.'); renderAdminInto(el); return; }
+      if(target.role === 'head'){ toast('The head account cannot be deleted.'); renderAdminInto(el); return; }
+      /* Release their active claims so the leads go back to the queue. */
+      try{
+        const all = await loadAllClaims();
+        const mine = all.filter(function(c){
+          return c && c.claimer === username && (c.status === 'claimed' || c.status === 'interested');
+        });
+        for(const c of mine){
+          try{
+            const rec = await ghGetJson('claims/' + c.slug + '.json');
+            if(rec) await ghDeleteFile('claims/' + c.slug + '.json', rec.sha);
+          }catch(e){}
+        }
+      }catch(e){}
+      /* Drop their push subscriptions so no pushes go to a deleted account. */
+      try{
+        const prec = await ghGetJson('push_subs.json').catch(function(){ return null; });
+        if(prec && prec.data && prec.data[username]){
+          delete prec.data[username];
+          await ghPutJson('push_subs.json', prec.data, prec.sha, 'sitedesk: drop push subs @' + username);
+        }
+      }catch(e){}
+      /* Drop their server-side dismissed notifications too. */
+      try{
+        const drec = await ghGetJson('dismissed/' + username + '.json').catch(function(){ return null; });
+        if(drec) await ghDeleteFile('dismissed/' + username + '.json', drec.sha);
+      }catch(e){}
+      await loadUsers();
+      delete state.users[username];
+      await saveUsers();
+      toast('Deleted @' + username);
+      renderAdminInto(el);
+      return;
     } else if(act === 'resetpw'){
       /* Admin/head resets a user's password when the user asks (e.g. by email).
          The new password is shown once so it can be sent to the user. */
@@ -2817,6 +2913,7 @@ function bindGlobal(){
 }
 
 async function bootData(announce){
+  await loadDismissedServer();
   await refreshTree();
   await fetchFeed(announce);
   if(canClaim()){
