@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mika &amp; Kam’s Barbershop LLC | Barber Shop, 4785 Union Rd, Buffalo, NY</title>
+<meta name="description" content="Mika & Kam’s Barbershop LLC is a barber shop at 4785 Union Rd, Buffalo, NY 14225. Haircuts, fades, beard trims and kids cuts. Call (716) 276-3090.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --coal:#16120D; --coal-2:#1F1912; --coal-3:#2A2218;
+  --cream:#F7F1E3; --paper:#FFFDF6;
+  --ink:#241C11; --ink-soft:#6E5F49;
+  --brass:#C9A227; --brass-deep:#9C7E18; --brass-soft:#F3E7BC;
+  --red:#B33A2B; --blue:#274C77;
+  --radius:16px;
+  --shadow:0 22px 44px -20px rgba(0,0,0,.5);
+  --shadow-sm:0 10px 24px -12px rgba(0,0,0,.35);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Inter",system-ui,sans-serif;
+  background:var(--coal);color:var(--cream);line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%}
+a{color:var(--brass)}
+::selection{background:var(--brass);color:var(--coal)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.display{font-family:"Bebas Neue",sans-serif;letter-spacing:1px;line-height:.95}
+
+/* ---------- header ---------- */
+header.site{
+  position:sticky;top:0;z-index:60;
+  background:rgba(22,18,13,.94);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-bottom:3px solid var(--brass);
+}
+.bar{display:flex;align-items:center;gap:14px;padding:12px 0}
+.burger{
+  background:var(--coal-3);border:2px solid var(--brass);border-radius:10px;cursor:pointer;
+  padding:9px 11px;display:flex;flex-direction:column;gap:5px;
+}
+.burger span{display:block;width:24px;height:3px;border-radius:3px;background:var(--brass);transition:.25s}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--cream)}
+.brand .pole{width:40px;height:40px;flex:none;border-radius:10px;overflow:hidden;box-shadow:var(--shadow-sm);border:2px solid var(--brass)}
+.brand-name{font-family:"Bebas Neue",sans-serif;font-size:1.5rem;letter-spacing:1.5px;line-height:1}
+.brand-name small{display:block;font-family:"Inter",sans-serif;font-weight:700;font-size:.6rem;letter-spacing:3.5px;text-transform:uppercase;color:var(--brass)}
+.head-spacer{flex:1}
+.call-btn{
+  display:inline-flex;align-items:center;gap:8px;background:var(--brass);color:var(--coal);
+  text-decoration:none;font-weight:800;padding:11px 20px;border-radius:999px;font-size:.92rem;
+  transition:transform .18s,background .18s;white-space:nowrap;
+}
+.call-btn:hover{background:var(--brass-soft);transform:translateY(-2px)}
+
+/* ---------- side drawer ---------- */
+.scrim{
+  position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:70;
+  opacity:0;pointer-events:none;transition:opacity .28s;
+}
+.scrim.open{opacity:1;pointer-events:auto}
+nav.drawer{
+  position:fixed;top:0;left:0;bottom:0;width:min(340px,86vw);z-index:71;
+  background:var(--coal-2);border-right:3px solid var(--brass);
+  transform:translateX(-105%);transition:transform .32s cubic-bezier(.22,.8,.3,1);
+  display:flex;flex-direction:column;padding:26px 0;overflow-y:auto;
+}
+nav.drawer.open{transform:translateX(0)}
+.drawer-head{padding:0 28px 20px;border-bottom:1px solid rgba(201,162,39,.25);margin-bottom:14px}
+.drawer-head .display{font-size:1.9rem;color:var(--cream)}
+.drawer-head small{display:block;font-weight:700;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--brass);margin-top:4px}
+nav.drawer a.drawer-link{
+  display:flex;align-items:center;gap:14px;text-decoration:none;color:var(--cream);
+  font-weight:700;font-size:1.05rem;padding:14px 28px;border-left:5px solid transparent;
+  transition:background .2s,border-color .2s;
+}
+nav.drawer a.drawer-link:hover{background:rgba(201,162,39,.1)}
+nav.drawer a.drawer-link.active{background:rgba(201,162,39,.16);border-left-color:var(--brass);color:var(--brass)}
+nav.drawer a.drawer-link .num{font-family:"Bebas Neue",sans-serif;color:var(--brass);font-size:1.2rem;min-width:30px}
+.drawer-foot{margin-top:auto;padding:20px 28px 0;border-top:1px solid rgba(201,162,39,.25)}
+.drawer-foot .call-btn{width:100%;justify-content:center}
+.drawer-foot p{font-size:.85rem;color:#A89678;margin-top:12px;text-align:center}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .32s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- hero card ---------- */
+.hero{position:relative;padding:64px 0 52px;overflow:hidden}
+.hero::before{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(201,162,39,.16), transparent 34%),
+    radial-gradient(circle at 88% 82%, rgba(179,58,43,.14), transparent 36%);
+}
+.hero-card{
+  position:relative;background:var(--paper);color:var(--ink);border-radius:26px;
+  box-shadow:var(--shadow);padding:56px 52px;overflow:hidden;
+  border-top:10px solid var(--brass);
+}
+.hero-card::after{
+  content:"";position:absolute;top:0;right:0;width:120px;height:100%;
+  background:repeating-linear-gradient(-45deg,var(--red) 0 14px,#fff 14px 28px,var(--blue) 28px 42px,#fff 42px 56px);
+  opacity:.9;
+}
+.hero-inner{max-width:38rem;position:relative;z-index:2}
+.kicker{
+  display:inline-block;font-weight:800;font-size:.72rem;letter-spacing:3px;text-transform:uppercase;
+  color:var(--brass-deep);background:var(--brass-soft);padding:7px 16px;border-radius:999px;margin-bottom:18px;
+}
+h1.display{font-size:clamp(3rem,7vw,5.2rem);color:var(--coal);margin-bottom:14px}
+h1.display .accent{color:var(--brass-deep)}
+.lede{font-size:1.1rem;color:var(--ink-soft);margin-bottom:26px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:24px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:800;
+  padding:14px 28px;border-radius:999px;font-size:1rem;transition:transform .18s,box-shadow .18s,background .18s;
+}
+.btn-solid{background:var(--coal);color:var(--cream);box-shadow:var(--shadow-sm)}
+.btn-solid:hover{background:var(--coal-3);transform:translateY(-2px)}
+.btn-brass{background:var(--brass);color:var(--coal);box-shadow:var(--shadow-sm)}
+.btn-brass:hover{background:var(--brass-deep);color:#fff;transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:var(--ink);border:2px solid rgba(36,28,17,.3)}
+.btn-ghost:hover{border-color:var(--brass-deep);color:var(--brass-deep);transform:translateY(-2px)}
+.hours-pill{
+  display:inline-flex;align-items:center;gap:10px;background:var(--coal);color:var(--cream);
+  padding:10px 20px;border-radius:999px;font-weight:600;font-size:.92rem;
+}
+.hours-pill svg{width:18px;height:18px}
+
+/* ---------- alternating bands ---------- */
+section.block{padding:56px 0}
+.band{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;padding:44px 0}
+.band.flip .band-media{order:2}
+.band-media{
+  border-radius:22px;min-height:300px;display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;box-shadow:var(--shadow);
+}
+.band-media svg{width:34%;height:auto;filter:drop-shadow(0 14px 18px rgba(0,0,0,.4))}
+.band-media .badge{
+  position:absolute;top:14px;left:14px;background:rgba(0,0,0,.6);color:#fff;
+  font-size:.68rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  padding:6px 14px;border-radius:999px;
+}
+.band-copy .step{display:block;font-family:"Bebas Neue",sans-serif;font-size:1.4rem;color:var(--brass);letter-spacing:2px;margin-bottom:8px}
+h2.display{font-size:clamp(2.2rem,4.4vw,3.4rem);color:var(--cream);margin-bottom:14px}
+h2.display .accent{color:var(--brass)}
+.band-copy p{color:#CBBFA4;margin-bottom:14px}
+.check-list{list-style:none;margin:18px 0;display:grid;gap:10px}
+.check-list li{display:flex;gap:12px;align-items:flex-start;color:var(--cream);font-weight:500}
+.check-list svg{flex:none;width:22px;height:22px;margin-top:3px}
+
+/* ---------- price table ---------- */
+.price-wrap{background:var(--paper);color:var(--ink);border-radius:22px;box-shadow:var(--shadow);overflow:hidden;border-top:8px solid var(--brass)}
+.price-head{padding:34px 36px 10px}
+.price-head h2{color:var(--coal)}
+.price-head p{color:var(--ink-soft)}
+table.prices{width:100%;border-collapse:collapse}
+table.prices th{
+  text-align:left;font-size:.72rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--brass-deep);
+  padding:16px 36px 10px;border-bottom:2px solid var(--brass);
+}
+table.prices td{padding:18px 36px;border-bottom:1px dashed rgba(36,28,17,.2);vertical-align:top}
+table.prices tr:last-child td{border-bottom:0}
+table.prices td.svc strong{font-size:1.08rem;display:block}
+table.prices td.svc small{color:var(--ink-soft)}
+table.prices td.amt{font-family:"Bebas Neue",sans-serif;font-size:1.7rem;color:var(--brass-deep);text-align:right;white-space:nowrap}
+.price-note{margin:22px auto 0;max-width:44rem;background:rgba(201,162,39,.12);border:2px dashed rgba(201,162,39,.6);border-radius:var(--radius);padding:18px 24px;color:#D8C99F;font-size:.95rem}
+.price-note strong{color:var(--brass)}
+
+/* ---------- gallery strip ---------- */
+.strip-scroll{
+  display:flex;gap:20px;overflow-x:auto;padding:8px 4px 20px;
+  scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
+}
+.strip-card{
+  flex:0 0 300px;scroll-snap-align:start;background:var(--coal-2);
+  border:2px solid rgba(201,162,39,.3);border-radius:var(--radius);overflow:hidden;
+  transition:transform .2s,border-color .2s;
+}
+.strip-card:hover{transform:translateY(-6px);border-color:var(--brass)}
+.strip-card .art{height:230px;display:flex;align-items:center;justify-content:center;position:relative}
+.strip-card .art svg{width:38%;height:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.4))}
+.strip-card .badge{
+  position:absolute;top:12px;left:12px;background:rgba(0,0,0,.62);color:#fff;
+  font-size:.66rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;
+  padding:5px 12px;border-radius:999px;
+}
+.strip-card .cap{padding:16px 20px}
+.strip-card .cap strong{display:block;font-family:"Bebas Neue",sans-serif;font-size:1.3rem;letter-spacing:1px;color:var(--cream)}
+.strip-card .cap small{color:#A89678}
+.scroll-hint{color:#A89678;font-size:.88rem;margin-top:6px;text-align:center}
+
+/* ---------- reviews ---------- */
+.rev-summary{background:var(--coal-2);border:2px solid rgba(201,162,39,.4);border-radius:var(--radius);padding:26px 30px;margin-bottom:30px;display:flex;flex-wrap:wrap;gap:18px;align-items:center;justify-content:space-between}
+.rev-summary p{color:#D8C99F;max-width:36rem;font-size:.98rem}
+.rev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.rev{background:var(--paper);color:var(--ink);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow-sm);position:relative}
+.rev .stars{color:var(--brass-deep);font-size:1.15rem;letter-spacing:3px;margin-bottom:12px}
+.rev p{font-size:1rem;margin-bottom:14px}
+.rev cite{font-style:normal;font-weight:700;font-size:.82rem;color:var(--brass-deep);letter-spacing:1px;text-transform:uppercase}
+.rev .sample-tag{
+  position:absolute;top:16px;right:16px;background:var(--brass-soft);color:var(--brass-deep);
+  font-size:.66rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:4px 12px;border-radius:999px;
+}
+.cta-band{
+  background:linear-gradient(120deg,#3A2F1A,#241C11);border:2px solid var(--brass);
+  border-radius:26px;color:var(--cream);padding:48px;text-align:center;margin-top:44px;box-shadow:var(--shadow);
+}
+.cta-band h2{color:var(--cream)}
+.cta-band p{color:#CBBFA4;max-width:36rem;margin:0 auto 24px}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
+.info-card{background:var(--coal-2);border:2px solid rgba(201,162,39,.3);border-radius:var(--radius);padding:32px}
+.info-card h3{font-family:"Bebas Neue",sans-serif;font-size:1.7rem;letter-spacing:1px;color:var(--brass);margin-bottom:14px}
+.info-card p{color:#CBBFA4;margin-bottom:8px}
+.info-card a.big{font-family:"Bebas Neue",sans-serif;font-size:1.9rem;letter-spacing:1px;color:var(--cream);text-decoration:none}
+.info-card a.big:hover{color:var(--brass)}
+.map-card{
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:320px;
+  background:
+    linear-gradient(rgba(201,162,39,.06), rgba(201,162,39,.06)),
+    repeating-linear-gradient(0deg, transparent 0 44px, rgba(201,162,39,.22) 44px 46px),
+    repeating-linear-gradient(90deg, transparent 0 44px, rgba(201,162,39,.22) 44px 46px),
+    linear-gradient(140deg,#3A2F1A,#241C11);
+  display:flex;align-items:center;justify-content:center;border:2px solid rgba(201,162,39,.35);
+}
+.map-pin{text-align:center;background:var(--paper);color:var(--ink);padding:26px 34px;border-radius:18px;box-shadow:var(--shadow);max-width:80%}
+.map-pin strong{font-family:"Bebas Neue",sans-serif;font-size:1.4rem;letter-spacing:1px;display:block;color:var(--coal)}
+.map-pin small{color:var(--ink-soft)}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- page strip headers ---------- */
+.strip{
+  border-radius:22px;padding:52px 44px;position:relative;overflow:hidden;margin-bottom:40px;
+  background:linear-gradient(120deg,#3A2F1A,#1F1912);border:2px solid rgba(201,162,39,.45);box-shadow:var(--shadow);
+}
+.strip h2{color:var(--cream)}
+.strip p{color:#CBBFA4;max-width:36rem}
+.strip .hand-tag{display:block;font-weight:800;font-size:.72rem;letter-spacing:3px;text-transform:uppercase;color:var(--brass);margin-bottom:10px}
+
+/* ---------- footer big type ---------- */
+footer{background:#0E0B07;border-top:4px solid var(--brass);margin-top:20px}
+.foot-big{padding:56px 0 10px}
+.foot-big .display{font-size:clamp(2.6rem,8vw,6rem);color:var(--cream);line-height:1}
+.foot-big .display .accent{color:var(--brass)}
+.foot-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:30px;padding:30px 0 36px}
+.foot-cols h4{font-family:"Bebas Neue",sans-serif;color:var(--brass);font-size:1.3rem;letter-spacing:2px;margin-bottom:10px}
+.foot-cols p,.foot-cols a{color:#A89678;font-size:.95rem;text-decoration:none}
+.foot-cols a:hover{color:var(--brass)}
+.foot-bottom{border-top:1px solid rgba(201,162,39,.25);padding:20px 0 26px;text-align:center;font-size:.9rem;color:#A89678}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:940px){
+  .band{grid-template-columns:1fr}
+  .band.flip .band-media{order:0}
+  .rev-grid,.visit-grid,.foot-cols{grid-template-columns:1fr}
+  .hero-card{padding:40px 28px}
+  .hero-card::after{display:none}
+  .strip{padding:40px 28px}
+  table.prices th,table.prices td{padding-left:20px;padding-right:20px}
+  .bar .call-btn{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="scrim" id="scrim"></div>
+
+<header class="site">
+  <div class="wrap bar">
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    <a class="brand" href="#home" data-page="home" aria-label="Mika and Kam’s Barbershop, home">
+      <span class="pole" aria-hidden="true">
+        <svg viewBox="0 0 40 40"><rect width="40" height="40" fill="#FFFDF6"/><rect x="0" y="0" width="40" height="40" fill="url(#poleg)"/><defs><pattern id="poleg" width="20" height="20" patternUnits="userSpaceOnUse" patternTransform="rotate(25)"><rect width="20" height="20" fill="#FFFDF6"/><rect width="10" height="20" fill="#B33A2B"/><rect x="10" width="5" height="20" fill="#274C77"/></pattern></defs></svg>
+      </span>
+      <span class="brand-name">MIKA &amp; KAM’S<small>Barbershop · Buffalo</small></span>
+    </a>
+    <span class="head-spacer"></span>
+    <a class="call-btn" href="tel:+17162763090">(716) 276-3090</a>
+  </div>
+</header>
+
+<nav class="drawer main" id="mainNav" aria-label="Main navigation">
+  <div class="drawer-head">
+    <span class="display">MIKA &amp; KAM’S</span>
+    <small>Barbershop · Buffalo, NY</small>
+  </div>
+  <a class="drawer-link active" href="#home" data-page="home"><span class="num">01</span>Home</a>
+  <a class="drawer-link" href="#services" data-page="services"><span class="num">02</span>Services &amp; Prices</a>
+  <a class="drawer-link" href="#about" data-page="about"><span class="num">03</span>Our Shop</a>
+  <a class="drawer-link" href="#gallery" data-page="gallery"><span class="num">04</span>Gallery</a>
+  <a class="drawer-link" href="#reviews" data-page="reviews"><span class="num">05</span>Reviews</a>
+  <a class="drawer-link" href="#visit" data-page="visit"><span class="num">06</span>Visit Us</a>
+  <div class="drawer-foot">
+    <a class="call-btn" href="tel:+17162763090">Call (716) 276-3090</a>
+    <p>4785 Union Rd, Buffalo, NY 14225</p>
+  </div>
+</nav>
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="wrap">
+      <div class="hero-card reveal in">
+        <div class="hero-inner">
+          <span class="kicker">Buffalo, NY · Walk-ins welcome</span>
+          <h1 class="display">Sharp cuts.<br><span class="accent">Zero attitude.</span></h1>
+          <p class="lede">Mika &amp; Kam’s Barbershop LLC is your neighborhood barber shop on Union Rd. Clean fades, crisp lineups, honest prices, and a chair that always feels like yours.</p>
+          <div class="cta-row">
+            <a class="btn btn-brass" href="tel:+17162763090">Call (716) 276-3090</a>
+            <a class="btn btn-ghost" href="#services" data-page="services">See services</a>
+          </div>
+          <span class="hours-pill">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#C9A227" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+            Call for hours
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="band">
+        <div class="band-media reveal" style="background:linear-gradient(140deg,#3A2F1A,#1F1912)">
+          <span class="badge">Sample photo - owner to replace</span>
+          <svg viewBox="0 0 100 100" aria-label="Barber chair illustration"><rect x="28" y="18" width="44" height="34" rx="8" fill="#C9A227"/><rect x="32" y="22" width="36" height="26" rx="6" fill="#9C7E18"/><rect x="20" y="52" width="60" height="10" rx="5" fill="#2A2218"/><rect x="44" y="62" width="12" height="22" fill="#2A2218"/><rect x="32" y="84" width="36" height="6" rx="3" fill="#C9A227"/><rect x="62" y="30" width="18" height="8" rx="4" fill="#2A2218" transform="rotate(-18 62 30)"/></svg>
+        </div>
+        <div class="band-copy reveal">
+          <span class="step">01 · The cut</span>
+          <h2 class="display">Fades that <span class="accent">stay sharp</span> for weeks</h2>
+          <p>Skin fades, tapers, classic scissor cuts. Whatever your look, it leaves the chair clean and stays clean long after.</p>
+          <ul class="check-list">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#C9A227" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Skin fades, low and high tapers</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#C9A227" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Crisp lineups and edge work</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#C9A227" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Kids cuts with patience</li>
+          </ul>
+          <a class="btn btn-brass" href="#services" data-page="services">See the price list</a>
+        </div>
+      </div>
+
+      <div class="band flip">
+        <div class="band-media reveal" style="background:linear-gradient(140deg,#274C77,#16283F)">
+          <span class="badge">Sample photo - owner to replace</span>
+          <svg viewBox="0 0 100 100" aria-label="Straight razor illustration"><rect x="14" y="44" width="46" height="12" rx="6" fill="#C9A227"/><rect x="60" y="46" width="28" height="8" rx="4" fill="#FFFDF6"/><circle cx="20" cy="50" r="4" fill="#9C7E18"/><path d="M14 38 L20 30 L26 38" stroke="#B33A2B" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+        </div>
+        <div class="band-copy reveal">
+          <span class="step">02 · The detail</span>
+          <h2 class="display">Beard work <span class="accent">done right</span></h2>
+          <p>Beard trims, shaping and hot-lather lineups. Walk out looking like the best version of yourself, not someone else.</p>
+          <ul class="check-list">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#C9A227" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Beard sculpting and shaping</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#C9A227" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Neck cleanups between cuts</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#C9A227" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Hot towel finish on request</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="band">
+        <div class="band-media reveal" style="background:linear-gradient(140deg,#B33A2B,#6E2318)">
+          <span class="badge">Sample photo - owner to replace</span>
+          <svg viewBox="0 0 100 100" aria-label="Barbershop storefront illustration"><rect x="16" y="36" width="68" height="48" rx="4" fill="#FFFDF6"/><rect x="24" y="44" width="52" height="20" fill="#274C77"/><rect x="24" y="68" width="20" height="16" fill="#C9A227"/><rect x="56" y="68" width="20" height="16" fill="#C9A227"/><rect x="10" y="28" width="80" height="10" rx="5" fill="#B33A2B"/><rect x="10" y="28" width="80" height="10" rx="5" fill="url(#awning)" opacity=".5"/><defs><pattern id="awning" width="16" height="10" patternUnits="userSpaceOnUse"><rect width="8" height="10" fill="#FFFDF6"/></pattern></defs></svg>
+        </div>
+        <div class="band-copy reveal">
+          <span class="step">03 · The shop</span>
+          <h2 class="display">A neighborhood <span class="accent">chair of your own</span></h2>
+          <p>Find us at 4785 Union Rd in Buffalo. Easy to reach, easy to park, and easy to become a regular. Call ahead or walk in.</p>
+          <div class="cta-row" style="margin-top:20px">
+            <a class="btn btn-brass" href="#visit" data-page="visit">Plan your visit</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip">
+      <span class="hand-tag">Services &amp; prices</span>
+      <h2 class="display">The <span class="accent" style="color:var(--brass)">price list</span></h2>
+      <p>Straightforward services, straightforward pricing. No upsells, no surprises. Final pricing is confirmed in the chair.</p>
+    </div>
+    <div class="price-wrap reveal">
+      <div class="price-head">
+        <h2 class="display">Cuts</h2>
+        <p>Every cut includes a consultation, a clean finish, and styling.</p>
+      </div>
+      <table class="prices">
+        <thead><tr><th>Service</th><th style="text-align:right">Sample price</th></tr></thead>
+        <tbody>
+          <tr><td class="svc"><strong>Classic Haircut</strong><small>Scissor work, wash, style. The timeless standard.</small></td><td class="amt">$25</td></tr>
+          <tr><td class="svc"><strong>Skin Fade</strong><small>Zero-blend fade, foil finish, crisp lineup.</small></td><td class="amt">$28</td></tr>
+          <tr><td class="svc"><strong>Taper / Lineup</strong><small>Neckline cleanup and sharp edges between full cuts.</small></td><td class="amt">$15</td></tr>
+          <tr><td class="svc"><strong>Kids Cut (12 &amp; under)</strong><small>Patient, friendly first-chair experience.</small></td><td class="amt">$20</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="height:28px"></div>
+    <div class="price-wrap reveal">
+      <div class="price-head">
+        <h2 class="display">Beard &amp; detail</h2>
+        <p>Add-ons and standalone grooming.</p>
+      </div>
+      <table class="prices">
+        <thead><tr><th>Service</th><th style="text-align:right">Sample price</th></tr></thead>
+        <tbody>
+          <tr><td class="svc"><strong>Beard Trim &amp; Shape</strong><small>Sculpted, lined, conditioned.</small></td><td class="amt">$15</td></tr>
+          <tr><td class="svc"><strong>Cut + Beard Combo</strong><small>The full reset, hair and beard in one visit.</small></td><td class="amt">$38</td></tr>
+          <tr><td class="svc"><strong>Hot Towel Shave</strong><small>Classic straight-razor finish with hot lather.</small></td><td class="amt">$30</td></tr>
+          <tr><td class="svc"><strong>Gray Blending</strong><small>Subtle camouflage color, natural result.</small></td><td class="amt">$20</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="price-note reveal">
+      <strong>Good to know:</strong> prices shown are samples to give you an idea. Final pricing is confirmed in the chair before any work begins. Call <a href="tel:+17162763090" style="color:var(--brass);font-weight:700">(716) 276-3090</a> with questions.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-about">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip">
+      <span class="hand-tag">Our shop</span>
+      <h2 class="display">Mika &amp; Kam’s,<br><span class="accent" style="color:var(--brass)">on Union Rd</span></h2>
+      <p>A barber shop built on steady hands and honest work, serving Buffalo from 4785 Union Rd.</p>
+    </div>
+    <div class="band">
+      <div class="band-media reveal" style="background:linear-gradient(140deg,#3A2F1A,#1F1912)">
+        <span class="badge">Sample photo - owner to replace</span>
+        <svg viewBox="0 0 100 100" aria-label="Clippers illustration"><rect x="30" y="14" width="24" height="44" rx="8" fill="#C9A227"/><rect x="34" y="8" width="16" height="10" rx="3" fill="#9C7E18"/><rect x="30" y="58" width="24" height="28" rx="8" fill="#2A2218"/><circle cx="42" cy="70" r="4" fill="#B33A2B"/><path d="M36 88 h12" stroke="#FFFDF6" stroke-width="3" stroke-linecap="round"/></svg>
+      </div>
+      <div class="band-copy reveal">
+        <span class="step">The shop</span>
+        <h2 class="display">Two names on the door, <span class="accent">one standard</span> in the chair</h2>
+        <p>Mika &amp; Kam’s Barbershop LLC is a Buffalo barber shop at 4785 Union Rd. The promise is simple: show up, sit down, leave sharper than you came in.</p>
+        <p>Whether it is your first visit or your fiftieth, the chair is yours and the cut gets the same care every time.</p>
+      </div>
+    </div>
+    <div class="band flip">
+      <div class="band-media reveal" style="background:linear-gradient(140deg,#274C77,#16283F)">
+        <span class="badge">Sample photo - owner to replace</span>
+        <svg viewBox="0 0 100 100" aria-label="Handshake illustration"><rect x="18" y="40" width="30" height="14" rx="7" fill="#C9A227" transform="rotate(-20 33 47)"/><rect x="52" y="40" width="30" height="14" rx="7" fill="#FFFDF6" transform="rotate(20 67 47)"/><circle cx="50" cy="47" r="8" fill="#B33A2B"/></svg>
+      </div>
+      <div class="band-copy reveal">
+        <span class="step">The way we work</span>
+        <h2 class="display">Walk-ins welcome, <span class="accent">regulars remembered</span></h2>
+        <p>Call ahead at (716) 276-3090 or just walk in. Bring a photo of the cut you want, or trust the chair. Either way, you will be heard before the first snip.</p>
+        <ul class="check-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#C9A227" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Consultation before every cut</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#C9A227" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Clean tools, clean shop, every client</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#C9A227" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Honest pricing, confirmed up front</li>
+        </ul>
+      </div>
+    </div>
+    <div style="height:40px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip">
+      <span class="hand-tag">Gallery</span>
+      <h2 class="display">The <span class="accent" style="color:var(--brass)">work</span></h2>
+      <p>Artistic previews of the craft. Real photos of actual cuts are on the way. Swipe through.</p>
+    </div>
+    <div class="strip-scroll">
+      <div class="strip-card reveal"><div class="art" style="background:linear-gradient(140deg,#3A2F1A,#1F1912)"><span class="badge">Sample photo - owner to replace</span><svg viewBox="0 0 100 100"><circle cx="50" cy="38" r="20" fill="#C9A227"/><path d="M32 34 q8 -14 18 -6 q10 -8 18 6 q4 12 -6 16 l-12 4 l-12 -4 q-10 -4 -6 -16" fill="#2A2218"/><rect x="30" y="62" width="40" height="26" rx="8" fill="#274C77"/></svg></div><div class="cap"><strong>Skin Fade</strong><small>Zero blend, foil finish</small></div></div>
+      <div class="strip-card reveal"><div class="art" style="background:linear-gradient(140deg,#274C77,#16283F)"><span class="badge">Sample photo - owner to replace</span><svg viewBox="0 0 100 100"><circle cx="50" cy="38" r="20" fill="#C9A227"/><path d="M30 30 q20 -18 40 0 l-4 18 q-16 -8 -32 0 Z" fill="#2A2218"/><rect x="30" y="62" width="40" height="26" rx="8" fill="#B33A2B"/></svg></div><div class="cap"><strong>Classic Taper</strong><small>Clean and professional</small></div></div>
+      <div class="strip-card reveal"><div class="art" style="background:linear-gradient(140deg,#B33A2B,#6E2318)"><span class="badge">Sample photo - owner to replace</span><svg viewBox="0 0 100 100"><circle cx="50" cy="38" r="20" fill="#C9A227"/><path d="M34 52 q16 14 32 0 l-4 12 q-12 8 -24 0 Z" fill="#6E4A2B"/><rect x="30" y="62" width="40" height="26" rx="8" fill="#3A2F1A"/></svg></div><div class="cap"><strong>Beard Sculpt</strong><small>Shaped and lined</small></div></div>
+      <div class="strip-card reveal"><div class="art" style="background:linear-gradient(140deg,#3A2F1A,#1F1912)"><span class="badge">Sample photo - owner to replace</span><svg viewBox="0 0 100 100"><circle cx="50" cy="38" r="20" fill="#C9A227"/><path d="M30 36 q10 -16 20 -8 q10 -8 20 8 q2 14 -8 16 l-12 6 l-12 -6 q-10 -2 -8 -16" fill="#1F1912"/><rect x="30" y="62" width="40" height="26" rx="8" fill="#9C7E18"/></svg></div><div class="cap"><strong>Curly Top Fade</strong><small>Texture kept, sides tight</small></div></div>
+      <div class="strip-card reveal"><div class="art" style="background:linear-gradient(140deg,#274C77,#16283F)"><span class="badge">Sample photo - owner to replace</span><svg viewBox="0 0 100 100"><circle cx="50" cy="38" r="20" fill="#C9A227"/><path d="M32 30 h36 v10 h-36 Z" fill="#2A2218"/><rect x="30" y="62" width="40" height="26" rx="8" fill="#274C77"/></svg></div><div class="cap"><strong>Kids Cut</strong><small>Patient first-chair cuts</small></div></div>
+      <div class="strip-card reveal"><div class="art" style="background:linear-gradient(140deg,#1F1912,#0E0B07)"><span class="badge">Sample photo - owner to replace</span><svg viewBox="0 0 100 100"><rect x="28" y="18" width="44" height="34" rx="8" fill="#C9A227"/><rect x="32" y="22" width="36" height="26" rx="6" fill="#9C7E18"/><rect x="20" y="52" width="60" height="10" rx="5" fill="#2A2218"/><rect x="44" y="62" width="12" height="22" fill="#2A2218"/></svg></div><div class="cap"><strong>The Chair</strong><small>Your seat is waiting</small></div></div>
+    </div>
+    <p class="scroll-hint">Swipe or scroll sideways to see more</p>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip">
+      <span class="hand-tag">Reviews</span>
+      <h2 class="display">What the <span class="accent" style="color:var(--brass)">chair says</span></h2>
+      <p>Real feedback lives on Google. Read what clients are saying, or be the first to leave a review.</p>
+    </div>
+    <div class="rev-summary reveal">
+      <p><strong style="color:var(--brass)">Based on 0 Google reviews.</strong> No public Google reviews were found for this listing yet. Be the first to share your experience after your visit.</p>
+      <a class="btn btn-brass" href="https://www.google.com/maps/place/?q=place_id:ChIJaYCKbzdz04kR76yME1-EUKs" target="_blank" rel="noopener">See reviews on Google</a>
+    </div>
+    <div class="rev-grid">
+      <div class="rev reveal">
+        <span class="sample-tag">Sample</span>
+        <div class="stars">★★★★★</div>
+        <p>Clean fade, fair price, and I was in and out without a long wait. This is my new spot on Union Rd.</p>
+        <cite>Sample review</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="sample-tag">Sample</span>
+        <div class="stars">★★★★★</div>
+        <p>Took my son for his first real haircut. They were patient with him and he walked out proud of it.</p>
+        <cite>Sample review</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="sample-tag">Sample</span>
+        <div class="stars">★★★★★</div>
+        <p>Best beard trim I have had in Buffalo. Sharp lines, no rush, honest price.</p>
+        <cite>Sample review</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="sample-tag">Sample</span>
+        <div class="stars">★★★★★</div>
+        <p>Walked in on a Saturday and they fit me right in. Great conversation, better cut.</p>
+        <cite>Sample review</cite>
+      </div>
+    </div>
+    <div class="cta-band reveal">
+      <h2 class="display">Sat in the chair? <span class="accent" style="color:var(--brass)">Tell Buffalo.</span></h2>
+      <p>Your review helps a local shop grow. It takes a minute, and it means everything to a neighborhood business.</p>
+      <a class="btn btn-brass" href="https://www.google.com/maps/place/?q=place_id:ChIJaYCKbzdz04kR76yME1-EUKs" target="_blank" rel="noopener">Leave a Google review</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip">
+      <span class="hand-tag">Visit us</span>
+      <h2 class="display">Pull up a <span class="accent" style="color:var(--brass)">chair</span></h2>
+      <p>Find us on Union Rd in Buffalo. Call ahead or walk in, either way you are welcome.</p>
+    </div>
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3>Find us</h3>
+        <p><strong style="color:var(--cream)">Mika &amp; Kam’s Barbershop LLC</strong><br>4785 Union Rd<br>Buffalo, NY 14225</p>
+        <p>On Union Rd, easy to reach from anywhere in Buffalo.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3>Call us</h3>
+        <p>Questions, bookings, or just checking the wait:</p>
+        <a class="big" href="tel:+17162763090">(716) 276-3090</a>
+        <p style="margin-top:10px">Walk-ins welcome. Call ahead on Saturdays.</p>
+      </div>
+    </div>
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3>Hours</h3>
+        <p><strong style="color:var(--cream)">Call for hours.</strong></p>
+        <p>Hours change with the season. Call <a href="tel:+17162763090" style="color:var(--brass);font-weight:700">(716) 276-3090</a> to confirm before you head over.</p>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <strong>4785 Union Rd</strong>
+          <small>Buffalo, NY 14225</small><br>
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJaYCKbzdz04kR76yME1-EUKs" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-big">
+      <div class="display">MIKA &amp; KAM’S<br><span class="accent">BARBERSHOP</span></div>
+    </div>
+    <div class="foot-cols">
+      <div>
+        <h4>Visit</h4>
+        <p>4785 Union Rd<br>Buffalo, NY 14225<br><a href="tel:+17162763090">(716) 276-3090</a></p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <p><a href="#services" data-page="services">Services &amp; Prices</a><br><a href="#gallery" data-page="gallery">Gallery</a><br><a href="#reviews" data-page="reviews">Reviews</a><br><a href="#visit" data-page="visit">Visit Us</a></p>
+      </div>
+      <div>
+        <h4>Hours</h4>
+        <p>Call for hours<br><a href="https://www.google.com/maps/place/?q=place_id:ChIJaYCKbzdz04kR76yME1-EUKs" target="_blank" rel="noopener">Get directions</a></p>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© Mika &amp; Kam’s Barbershop LLC</span>
+    </div>
+  </div>
+</footer>
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+  var scrim = document.getElementById("scrim");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(scrim){ scrim.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  function toggleMenu(force){
+    var open = force !== undefined ? force : !nav.classList.contains("open");
+    nav.classList.toggle("open", open);
+    if(scrim){ scrim.classList.toggle("open", open); }
+    if(burger){ burger.setAttribute("aria-expanded", open ? "true" : "false"); }
+  }
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      toggleMenu();
+    });
+  }
+  if(scrim){
+    scrim.addEventListener("click", function(){
+      toggleMenu(false);
+    });
+  }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mike Conway Paperhanging &amp; Painting · Springfield, PA</title>
+<meta name="description" content="Mike Conway Paperhanging & Painting, Springfield PA. Interior and exterior painting, wallpaper hanging, drywall repair, staining and power washing. Established 1981. Call (610) 544-7671 for a free estimate.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=Public+Sans:wght@400;500;600;700;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FBF6EA; --paper-2:#F4EBD6; --card:#FFFDF7;
+  --ink:#22313F; --ink-soft:#5A6B7A;
+  --teal:#0F5D5D; --teal-deep:#0A4040; --teal-soft:#DCEBE6;
+  --gold:#C9A227; --gold-soft:#F6ECCB;
+  --clay:#B4532A; --clay-soft:#F5DDCC;
+  --line:#E4D8BE;
+  --radius:16px;
+  --shadow:0 18px 40px -18px rgba(34,49,63,.28);
+  --shadow-sm:0 8px 22px -10px rgba(34,49,63,.20);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Public Sans",system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.7;-webkit-font-smoothing:antialiased}
+a{color:var(--teal)}
+::selection{background:var(--gold);color:var(--ink)}
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+.serif{font-family:"Fraunces",serif}
+.hand{font-family:"Caveat",cursive}
+
+/* ---------- centered logo header ---------- */
+header.site{position:sticky;top:0;z-index:60;background:rgba(251,246,234,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:2px solid var(--line)}
+.navgrid{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding:10px 0}
+.navside{display:flex;align-items:center;gap:2px}
+.navside.right{justify-content:flex-end}
+nav.main a{text-decoration:none;color:var(--ink);font-weight:600;font-size:.92rem;padding:9px 13px;border-radius:999px;white-space:nowrap;transition:background .2s}
+nav.main a:hover{background:var(--teal-soft)}
+nav.main a.active{background:var(--ink);color:var(--paper)}
+.brand{display:flex;flex-direction:column;align-items:center;text-decoration:none;color:var(--ink);text-align:center;line-height:1.1}
+.brand .mark{width:44px;height:44px}
+.brand-name{font-family:"Fraunces",serif;font-weight:900;font-size:1.06rem;letter-spacing:.2px;margin-top:6px}
+.brand-name small{display:block;font-family:"Public Sans",sans-serif;font-weight:700;font-size:.58rem;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-top:3px}
+.call-btn{display:inline-flex;align-items:center;gap:8px;background:var(--teal);color:#fff;text-decoration:none;font-weight:700;padding:10px 18px;border-radius:999px;box-shadow:var(--shadow-sm);white-space:nowrap;transition:transform .18s,background .18s}
+.call-btn:hover{background:var(--teal-deep);transform:translateY(-2px)}
+.burger{display:none;background:none;border:0;cursor:pointer;padding:10px}
+.burger span{display:block;width:26px;height:3px;border-radius:3px;background:var(--ink);margin:5px 0}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- split hero ---------- */
+.hero{padding:64px 0 56px;position:relative;overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+.kicker{display:inline-block;font-family:"Caveat",cursive;font-size:1.45rem;color:var(--clay);margin-bottom:10px}
+h1.display{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(2.6rem,5.4vw,4.3rem);line-height:1.02;letter-spacing:-.5px;margin-bottom:18px}
+h1.display em{font-style:italic;color:var(--teal)}
+.lede{font-size:1.12rem;color:var(--ink-soft);max-width:34rem;margin-bottom:26px}
+.cta-row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:26px}
+.btn{display:inline-block;text-decoration:none;font-weight:700;padding:14px 28px;border-radius:999px;transition:transform .18s,box-shadow .18s}
+.btn.solid{background:var(--ink);color:var(--paper);box-shadow:var(--shadow-sm)}
+.btn.solid:hover{transform:translateY(-2px)}
+.btn.line{border:2px solid var(--ink);color:var(--ink)}
+.btn.line:hover{background:var(--ink);color:var(--paper)}
+.trust-row{display:flex;gap:26px;flex-wrap:wrap}
+.trust{font-size:.88rem;color:var(--ink-soft)}
+.trust strong{display:block;font-family:"Fraunces",serif;font-size:1.25rem;color:var(--ink)}
+.art-card{background:var(--card);border:2px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:26px;position:relative;overflow:hidden}
+.art-card svg{width:100%;height:auto;display:block;border-radius:12px}
+.art-cap{font-family:"Caveat",cursive;font-size:1.2rem;color:var(--ink-soft);text-align:center;margin-top:10px}
+
+/* ---------- magazine rhythm ---------- */
+.section{padding:56px 0}
+.rule{display:flex;align-items:center;gap:16px;margin-bottom:30px}
+.rule .no{font-family:"Fraunces",serif;font-weight:900;font-size:1rem;background:var(--ink);color:var(--paper);width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none}
+.rule h2{font-family:"Fraunces",serif;font-weight:700;font-size:clamp(1.7rem,3.4vw,2.4rem);letter-spacing:-.3px}
+.rule .barline{flex:1;height:2px;background:var(--line)}
+.dropcap::first-letter{font-family:"Fraunces",serif;font-weight:900;font-size:3.6em;float:left;line-height:.82;padding:6px 12px 0 0;color:var(--teal)}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:36px}
+.pull{border-left:5px solid var(--gold);background:var(--gold-soft);border-radius:0 var(--radius) var(--radius) 0;padding:24px 28px;margin:30px 0;font-family:"Fraunces",serif;font-size:1.35rem;line-height:1.5;font-style:italic}
+.pull cite{display:block;font-family:"Public Sans",sans-serif;font-style:normal;font-size:.85rem;font-weight:700;color:var(--ink-soft);margin-top:12px}
+.pull cite a{color:var(--teal)}
+.numlist{list-style:none;counter-reset:svc;margin-top:8px}
+.numlist li{counter-increment:svc;display:grid;grid-template-columns:84px 1fr;gap:18px;padding:22px 0;border-bottom:2px solid var(--line)}
+.numlist li::before{content:"0" counter(svc);font-family:"Fraunces",serif;font-weight:900;font-size:2.4rem;color:var(--gold);line-height:1}
+.numlist h3{font-family:"Fraunces",serif;font-size:1.35rem;margin-bottom:6px}
+.numlist p{color:var(--ink-soft);font-size:.98rem}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.card{background:var(--card);border:2px solid var(--line);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow-sm)}
+.card h3{font-family:"Fraunces",serif;font-size:1.25rem;margin:12px 0 8px}
+.card p{color:var(--ink-soft);font-size:.96rem}
+.card .tag{display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--teal);background:var(--teal-soft);padding:5px 12px;border-radius:999px}
+.factband{background:var(--ink);color:var(--paper);border-radius:24px;padding:44px;display:grid;grid-template-columns:repeat(4,1fr);gap:28px;margin:40px 0}
+.factband .f{text-align:center}
+.factband .f strong{display:block;font-family:"Fraunces",serif;font-size:2.2rem;color:var(--gold)}
+.factband .f span{font-size:.88rem;color:#CBD6DE}
+
+/* ---------- gallery ---------- */
+.gal{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.tile{background:var(--card);border:2px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm)}
+.tile .ph{aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;position:relative}
+.tile .ph span.badge{position:absolute;top:10px;left:10px;background:rgba(34,49,63,.85);color:#fff;font-size:.68rem;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;padding:5px 11px;border-radius:999px}
+.tile p{padding:14px 18px;font-size:.92rem;color:var(--ink-soft)}
+.tile p strong{color:var(--ink)}
+
+/* ---------- reviews ---------- */
+.rev-head{display:flex;gap:18px;flex-wrap:wrap;margin:26px 0}
+.rev-src{background:var(--card);border:2px solid var(--line);border-radius:var(--radius);padding:20px 24px;flex:1;min-width:230px;box-shadow:var(--shadow-sm)}
+.rev-src .stars{color:var(--gold);font-size:1.3rem;letter-spacing:2px}
+.rev-src strong{font-family:"Fraunces",serif;font-size:1.5rem;display:block;margin:4px 0}
+.rev-src a{font-weight:700;font-size:.92rem}
+.rev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:8px}
+.rev-card{background:var(--card);border:2px solid var(--line);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;gap:12px}
+.rev-card .stars{color:var(--gold);letter-spacing:2px}
+.rev-card blockquote{font-family:"Fraunces",serif;font-style:italic;font-size:1.08rem;line-height:1.55}
+.rev-card .who{font-size:.85rem;font-weight:700;color:var(--ink-soft);margin-top:auto}
+.rev-card .who a{color:var(--teal)}
+.badge-sample{display:inline-block;font-size:.68rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;background:var(--clay);color:#fff;padding:5px 12px;border-radius:999px;align-self:flex-start}
+
+/* ---------- contact ---------- */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:8px}
+.panel{background:var(--card);border:2px solid var(--line);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow-sm)}
+.panel h3{font-family:"Fraunces",serif;font-size:1.4rem;margin-bottom:14px}
+.bigphone{font-family:"Fraunces",serif;font-weight:900;font-size:2rem;color:var(--ink);text-decoration:none;display:block;margin:8px 0 16px}
+.bigphone:hover{color:var(--teal)}
+.hours{width:100%;border-collapse:collapse;font-size:.95rem}
+.hours td{padding:9px 4px;border-bottom:1px dashed var(--line)}
+.hours tr td:last-child{text-align:right;font-weight:600}
+.note{font-size:.85rem;color:var(--ink-soft);margin-top:12px}
+
+/* ---------- big type footer ---------- */
+footer.site{background:var(--ink);color:var(--paper);margin-top:70px;padding:56px 0 0;overflow:hidden}
+.foot-giant{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(3rem,10vw,8.5rem);line-height:.95;letter-spacing:-1px;color:var(--paper);opacity:.96;white-space:nowrap}
+.foot-giant .amp{color:var(--gold);font-style:italic}
+.foot-cols{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:32px;padding:36px 0}
+.foot-cols h4{font-size:.75rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+.foot-cols a{color:#DDE5EA;text-decoration:none;display:block;margin-bottom:8px;font-size:.95rem}
+.foot-cols a:hover{color:var(--gold)}
+.foot-cols p{color:#AEBCC7;font-size:.95rem}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.14);padding:18px 0;text-align:center;color:#DDE5EA;font-size:.92rem}
+
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .5s ease,transform .5s ease}
+.reveal.in{opacity:1;transform:none}
+
+@media (max-width:900px){
+  .navgrid{grid-template-columns:auto 1fr auto}
+  .navside{display:none}
+  .navgrid .call-btn{display:none}
+  .burger{display:block;grid-column:1}
+  .brand{grid-column:2}
+  nav.main{position:absolute;top:100%;left:0;right:0;background:var(--paper);flex-direction:column;align-items:stretch;padding:10px 20px 20px;display:none;border-bottom:2px solid var(--line)}
+  nav.main.open{display:flex}
+  header.site{position:sticky}
+  .navwrap{position:relative}
+  .hero-grid,.cols2,.contact-grid{grid-template-columns:1fr}
+  .cards,.rev-grid,.gal{grid-template-columns:1fr 1fr}
+  .factband{grid-template-columns:1fr 1fr;padding:30px}
+  .foot-cols{grid-template-columns:1fr}
+}
+@media (max-width:560px){.cards,.rev-grid,.gal{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="wrap navwrap">
+    <div class="navgrid">
+      <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+      <nav class="main navside left" id="mainNav" aria-label="Primary">
+        <a href="#home" data-page="home">Home</a>
+        <a href="#services" data-page="services">Services</a>
+        <a href="#about" data-page="about">About</a>
+        <a href="#gallery" data-page="gallery">Gallery</a>
+        <a href="#reviews" data-page="reviews">Reviews</a>
+        <a href="#contact" data-page="contact">Contact</a>
+      </nav>
+      <a class="brand" href="#home" data-page="home" aria-label="Mike Conway Paperhanging and Painting, home">
+        <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" fill="#0F5D5D"/><rect x="14" y="12" width="20" height="5" rx="2.5" fill="#C9A227"/><rect x="14" y="20" width="20" height="16" rx="2" fill="#FBF6EA"/><path d="M14 24h20M14 28h20M14 32h20" stroke="#C9A227" stroke-width="1.4"/></svg>
+        <span class="brand-name">Mike Conway<small>Paperhanging &amp; Painting</small></span>
+      </a>
+      <div class="navside right">
+        <a class="call-btn" href="tel:+16105447671">(610) 544-7671</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+<section class="page" id="page-home">
+  <div class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="kicker">Springfield, PA · Delaware County</span>
+        <h1 class="display">Walls with <em>staying power.</em></h1>
+        <p class="lede">Mike Conway Paperhanging &amp; Painting is a locally owned family business painting and papering homes across the tri-state area since 1981. Honest work, meticulous prep, and finishes that hold up. Call today for a free estimate.</p>
+        <div class="cta-row">
+          <a class="btn solid" href="tel:+16105447671">Call (610) 544-7671</a>
+          <a class="btn line" href="#services" data-page="services">See services</a>
+        </div>
+        <div class="trust-row">
+          <div class="trust"><strong>Est. 1981</strong>45 years of experience</div>
+          <div class="trust"><strong>5.0 / 5</strong>on Angi, 6 reviews</div>
+          <div class="trust"><strong>Free</strong>estimates</div>
+        </div>
+      </div>
+      <div class="art-card">
+        <svg viewBox="0 0 420 380" role="img" aria-label="Illustration of a wallpaper roll unrolling beside a paint roller">
+          <defs>
+            <pattern id="dampat" width="42" height="42" patternUnits="userSpaceOnUse">
+              <rect width="42" height="42" fill="#F4EBD6"/>
+              <path d="M21 6c7 8 7 18 0 24c-7-6-7-16 0-24z" fill="#0F5D5D" opacity=".75"/>
+              <circle cx="21" cy="36" r="3" fill="#C9A227"/>
+              <path d="M4 21c5-3 10-3 13 0c-3 3-8 3-13 0zM38 21c-5-3-10-3-13 0c3 3 8 3 13 0z" fill="#B4532A" opacity=".55"/>
+            </pattern>
+            <linearGradient id="rollg" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#0A4040"/><stop offset=".55" stop-color="#0F5D5D"/><stop offset="1" stop-color="#0A4040"/>
+            </linearGradient>
+          </defs>
+          <rect x="0" y="0" width="420" height="380" rx="14" fill="#DCEBE6"/>
+          <rect x="96" y="118" width="150" height="212" fill="url(#dampat)" stroke="#22313F" stroke-width="3"/>
+          <rect x="96" y="118" width="150" height="212" fill="none" stroke="#C9A227" stroke-width="1.5" stroke-dasharray="6 6" opacity=".6"/>
+          <rect x="88" y="60" width="166" height="64" rx="10" fill="url(#rollg)" stroke="#22313F" stroke-width="3"/>
+          <ellipse cx="254" cy="92" rx="14" ry="30" fill="#F4EBD6" stroke="#22313F" stroke-width="3"/>
+          <ellipse cx="254" cy="92" rx="6" ry="17" fill="#C9A227"/>
+          <rect x="318" y="150" width="14" height="120" rx="7" fill="#C9A227" stroke="#22313F" stroke-width="3"/>
+          <rect x="300" y="120" width="50" height="42" rx="8" fill="#0F5D5D" stroke="#22313F" stroke-width="3"/>
+          <rect x="300" y="120" width="50" height="14" rx="7" fill="#B4532A"/>
+          <path d="M288 285c14-10 34-10 48 0l-8 34h-32z" fill="#22313F"/>
+          <rect x="300" y="265" width="24" height="22" rx="4" fill="#22313F"/>
+          <rect x="40" y="60" width="14" height="120" rx="7" fill="#C9A227" stroke="#22313F" stroke-width="3" transform="rotate(18 47 120)"/>
+          <rect x="22" y="40" width="52" height="16" rx="8" fill="#B4532A" stroke="#22313F" stroke-width="3" transform="rotate(18 47 120)"/>
+        </svg>
+        <p class="art-cap">wallpaper rolls, rollers and brushes, ready to go</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="wrap">
+      <div class="rule reveal"><span class="no">01</span><h2>The craft first</h2><span class="barline"></span></div>
+      <div class="cols2">
+        <p class="dropcap reveal">Paperhanging is a trade of millimeters. Paste the wrong weight, miss a seam by a hair, and the whole wall tells on you. Mike Conway has been hanging paper and brushing paint in Delaware County homes for more than four decades, and the work shows it: crisp seams, smooth walls, and rooms that look finished instead of just painted.</p>
+        <p class="reveal">Conway Paperhanging and Painting was established in 1981 and is run and owned by Mike Conway, a home improvement contractor. The business is built on honesty, courtesy, reliability and hard work, and on the simple promise of stress free, positive results. Fully insured, professional and licensed, serving the tri state area.</p>
+      </div>
+      <blockquote class="pull reveal">My wife and I have used Mike Conway several times over the years and we are never disappointed. He is very professional and meticulous with his craft.<cite>Kurt Perkins · <a href="https://reviews.birdeye.com/mike-conway-paperhanging-painting-167019932576279">via Birdeye</a></cite></blockquote>
+      <div class="rule reveal"><span class="no">02</span><h2>What we do</h2><span class="barline"></span></div>
+      <div class="cards">
+        <div class="card reveal"><span class="tag">Signature</span><h3>Paperhanging</h3><p>Common wallpaper, borders, decals, murals, vinyl and pre pasted high end papers, hung seam to seam.</p></div>
+        <div class="card reveal"><span class="tag">Interior</span><h3>Painting &amp; priming</h3><p>Interior and exterior painting with careful prep, spackling and caulking before a single coat goes on.</p></div>
+        <div class="card reveal"><span class="tag">Prep</span><h3>Drywall &amp; repairs</h3><p>Wall scraping, drywall and sheetrock repairs and installation, wall prep and staining for floors, decks and fences.</p></div>
+      </div>
+      <p class="reveal" style="margin-top:26px"><a class="btn line" href="#services" data-page="services">Full service list</a></p>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="factband reveal">
+      <div class="f"><strong>1981</strong><span>established</span></div>
+      <div class="f"><strong>45</strong><span>years of experience</span></div>
+      <div class="f"><strong>5.0</strong><span>star rating on Angi</span></div>
+      <div class="f"><strong>Free</strong><span>estimates</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="section">
+    <div class="wrap">
+      <span class="kicker">Services</span>
+      <h1 class="display">One call. <em>Every surface.</em></h1>
+      <p class="lede">From a single accent wall to a full exterior repaint, every job starts with prep and ends with a walkthrough. Estimates are always free.</p>
+      <ol class="numlist">
+        <li class="reveal"><div><h3>Paperhanging</h3><p>Common wallpaper, borders, decals, murals, vinyl wallpaper and pre pasted high end papers. Pattern matched, seams invisible.</p></div></li>
+        <li class="reveal"><div><h3>Interior painting &amp; priming</h3><p>Walls, ceilings and trim painted with premium products chosen for your room, with Mike's expert opinion on products and design included.</p></div></li>
+        <li class="reveal"><div><h3>Exterior painting &amp; priming</h3><p>Siding, trim, doors and fences, prepped with scraping, caulking and power washing for a finish that lasts.</p></div></li>
+        <li class="reveal"><div><h3>Drywall &amp; sheetrock</h3><p>Wall scraping, drywall and sheetrock repairs and installation, spackling and full wall prep before paint or paper.</p></div></li>
+        <li class="reveal"><div><h3>Staining</h3><p>Staining for floors, decks and fences that protects the wood and brings out the grain.</p></div></li>
+        <li class="reveal"><div><h3>Power washing</h3><p>Exterior surfaces washed clean so paint and stain bond properly and look sharp.</p></div></li>
+      </ol>
+      <blockquote class="pull reveal">What a great experience. I was impressed by the professionalism and how quickly the job was completed. Meticulous attention to detail.<cite>christina Littlewood · <a href="https://reviews.birdeye.com/mike-conway-paperhanging-painting-167019932576279">via Birdeye</a></cite></blockquote>
+      <div class="cta-row reveal">
+        <a class="btn solid" href="tel:+16105447671">Call (610) 544-7671</a>
+        <a class="btn line" href="#contact" data-page="contact">Request an estimate</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-about">
+  <div class="section">
+    <div class="wrap">
+      <span class="kicker">Our story</span>
+      <h1 class="display">A family trade, <em>done right.</em></h1>
+      <div class="cols2" style="margin-top:28px">
+        <p class="dropcap reveal">In 1981 Mike Conway picked up the trade and never put it down. More than forty years later, Mike Conway Paperhanging &amp; Painting is still run and owned by Mike himself, a home improvement contractor based in Springfield, PA, in Delaware County.</p>
+        <p class="reveal">It is a locally owned family business that stakes its name on honesty, courtesy, reliability and hard work. For more than 25 years Mike has served the tri state area, dedicated to client satisfaction and superb work. Fully insured, professional and licensed, the promise is simple: stress free, positive and timely results.</p>
+      </div>
+      <blockquote class="pull reveal">Best painter and paper hanger around.<cite>Terry Doyle · <a href="https://reviews.birdeye.com/mike-conway-paperhanging-painting-167019932576279">via Birdeye</a></cite></blockquote>
+      <div class="rule reveal"><span class="no">A</span><h2>How every job runs</h2><span class="barline"></span></div>
+      <ol class="numlist">
+        <li class="reveal"><div><h3>Free estimate</h3><p>Call (610) 544-7671. Mike walks the space, talks products and design, and prices the job plainly.</p></div></li>
+        <li class="reveal"><div><h3>Prep like it matters</h3><p>Scraping, spackling, caulking, masking and wall prep, because the finish is only as good as what is underneath.</p></div></li>
+        <li class="reveal"><div><h3>Craft and cleanup</h3><p>Paint or paper applied meticulously, then a walkthrough and a clean site left behind.</p></div></li>
+      </ol>
+    </div>
+  </div>
+</section>
+<section class="page" id="page-gallery">
+  <div class="section">
+    <div class="wrap">
+      <span class="kicker">Gallery</span>
+      <h1 class="display">Recent <em>work.</em></h1>
+      <p class="lede">Sample photo placeholders showing the kinds of projects Mike takes on. Real project photos will be added here.</p>
+      <div class="gal">
+        <div class="tile reveal"><div class="ph" style="background:linear-gradient(135deg,#0F5D5D,#0A4040)"><span class="badge">Sample</span><svg width="120" height="90" viewBox="0 0 120 90"><rect x="10" y="10" width="100" height="70" rx="6" fill="#F4EBD6"/><path d="M10 30h100M10 50h100M10 70h100" stroke="#C9A227" stroke-width="2"/><circle cx="95" cy="22" r="6" fill="#B4532A"/></svg></div><p><strong>Wallpapered dining room.</strong> Pattern matched across four walls.</p></div>
+        <div class="tile reveal"><div class="ph" style="background:linear-gradient(135deg,#C9A227,#B4532A)"><span class="badge">Sample</span><svg width="120" height="90" viewBox="0 0 120 90"><rect x="15" y="15" width="90" height="60" rx="6" fill="#FBF6EA"/><rect x="15" y="15" width="90" height="18" rx="6" fill="#0F5D5D"/><rect x="52" y="55" width="16" height="20" fill="#22313F"/></svg></div><p><strong>Exterior repaint.</strong> Scraped, caulked, primed and coated.</p></div>
+        <div class="tile reveal"><div class="ph" style="background:linear-gradient(135deg,#B4532A,#7A3418)"><span class="badge">Sample</span><svg width="120" height="90" viewBox="0 0 120 90"><rect x="20" y="20" width="80" height="50" rx="6" fill="#F4EBD6"/><path d="M20 45h80" stroke="#22313F" stroke-width="3"/><circle cx="35" cy="32" r="5" fill="#C9A227"/><circle cx="85" cy="58" r="5" fill="#0F5D5D"/></svg></div><p><strong>Stained deck.</strong> Protected and rich in color.</p></div>
+        <div class="tile reveal"><div class="ph" style="background:linear-gradient(135deg,#22313F,#0F5D5D)"><span class="badge">Sample</span><svg width="120" height="90" viewBox="0 0 120 90"><rect x="25" y="10" width="70" height="70" rx="6" fill="#FBF6EA"/><path d="M25 35h70M25 55h70" stroke="#C9A227" stroke-width="2"/><rect x="50" y="10" width="20" height="12" fill="#B4532A"/></svg></div><p><strong>Accent wall mural.</strong> Hung seam to seam.</p></div>
+        <div class="tile reveal"><div class="ph" style="background:linear-gradient(135deg,#0F5D5D,#C9A227)"><span class="badge">Sample</span><svg width="120" height="90" viewBox="0 0 120 90"><rect x="10" y="25" width="100" height="40" rx="6" fill="#FBF6EA"/><path d="M10 40h100" stroke="#22313F" stroke-width="2"/><circle cx="30" cy="55" r="6" fill="#B4532A"/><circle cx="60" cy="55" r="6" fill="#0F5D5D"/><circle cx="90" cy="55" r="6" fill="#C9A227"/></svg></div><p><strong>Interior repaint.</strong> Clean lines, fresh color.</p></div>
+        <div class="tile reveal"><div class="ph" style="background:linear-gradient(135deg,#5A6B7A,#22313F)"><span class="badge">Sample</span><svg width="120" height="90" viewBox="0 0 120 90"><rect x="30" y="15" width="60" height="60" rx="6" fill="#DCEBE6"/><path d="M30 45h60" stroke="#22313F" stroke-width="3"/><rect x="52" y="25" width="16" height="50" fill="#C9A227" opacity=".7"/></svg></div><p><strong>Drywall repair.</strong> Smooth, invisible patches.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="section">
+    <div class="wrap">
+      <span class="kicker">Reviews</span>
+      <h1 class="display">Neighbors <em>approve.</em></h1>
+      <p class="lede">Real reviews from real customers, shown with their source. Ratings below are live on the review sites linked.</p>
+      <div class="rev-head">
+        <div class="rev-src reveal"><div class="stars">★★★★★</div><strong>5.0 / 5</strong><p style="color:var(--ink-soft);font-size:.92rem">6 reviews on Angi</p><a href="https://www.angi.com/companylist/us/pa/springfield/mike-conway-paperhanging-and-painting-reviews-8164981.htm">Read on Angi</a></div>
+        <div class="rev-src reveal"><div class="stars">★★★★★</div><strong>5.0 / 5</strong><p style="color:var(--ink-soft);font-size:.92rem">3 reviews on Birdeye</p><a href="https://reviews.birdeye.com/mike-conway-paperhanging-painting-167019932576279">Read on Birdeye</a></div>
+        <div class="rev-src reveal"><div class="stars">★★★★★</div><strong>Google</strong><p style="color:var(--ink-soft);font-size:.92rem">See the Maps listing</p><a href="https://www.google.com/maps/place/?q=place_id:ChIJ0QWTTRnCxokRHCVBGtMCJ7Q">See reviews on Google</a></div>
+      </div>
+      <div class="rule reveal"><span class="no">R</span><h2>What customers say</h2><span class="barline"></span></div>
+      <div class="rev-grid">
+        <div class="rev-card reveal"><div class="stars">★★★★★</div><blockquote>Best painter and paper hanger around.</blockquote><p class="who">Terry Doyle · <a href="https://reviews.birdeye.com/mike-conway-paperhanging-painting-167019932576279">via Birdeye</a></p></div>
+        <div class="rev-card reveal"><div class="stars">★★★★★</div><blockquote>What a great experience. I was impressed by the professionalism and how quickly the job was completed. Meticulous attention to detail as well. I highly recommend.</blockquote><p class="who">christina Littlewood · <a href="https://reviews.birdeye.com/mike-conway-paperhanging-painting-167019932576279">via Birdeye</a></p></div>
+        <div class="rev-card reveal"><div class="stars">★★★★★</div><blockquote>My wife and I have used Mike Conway several times over the years and we are never disappointed. He is very professional, does an excellent job, and is very meticulous with his craft.</blockquote><p class="who">Kurt Perkins · <a href="https://reviews.birdeye.com/mike-conway-paperhanging-painting-167019932576279">via Birdeye</a></p></div>
+      </div>
+      <div class="cta-row reveal" style="margin-top:34px">
+        <a class="btn solid" href="https://www.google.com/maps/place/?q=place_id:ChIJ0QWTTRnCxokRHCVBGtMCJ7Q">See reviews on Google</a>
+        <a class="btn line" href="#contact" data-page="contact">Get a free estimate</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-contact">
+  <div class="section">
+    <div class="wrap">
+      <span class="kicker">Contact</span>
+      <h1 class="display">Get your <em>free estimate.</em></h1>
+      <p class="lede">Call or stop by. Mike walks every job personally and prices it plainly.</p>
+      <div class="contact-grid">
+        <div class="panel reveal">
+          <h3>Call or visit</h3>
+          <a class="bigphone" href="tel:+16105447671">(610) 544-7671</a>
+          <p><strong>Mike Conway Paperhanging &amp; Painting</strong><br>108 Hillview Dr #2608<br>Springfield, PA 19064</p>
+          <div class="cta-row" style="margin:20px 0 0">
+            <a class="btn solid" href="https://www.google.com/maps/place/?q=place_id:ChIJ0QWTTRnCxokRHCVBGtMCJ7Q">Get directions</a>
+          </div>
+          <p class="note">Payment by check. No credit cards.</p>
+        </div>
+        <div class="panel reveal">
+          <h3>Hours</h3>
+          <table class="hours">
+            <tr><td>Monday</td><td>9:00 AM - 9:00 PM</td></tr>
+            <tr><td>Tuesday</td><td>9:00 AM - 9:00 PM</td></tr>
+            <tr><td>Wednesday</td><td>9:00 AM - 9:00 PM</td></tr>
+            <tr><td>Thursday</td><td>9:00 AM - 9:00 PM</td></tr>
+            <tr><td>Friday</td><td>9:00 AM - 9:00 PM</td></tr>
+            <tr><td>Saturday</td><td>9:00 AM - 9:00 PM</td></tr>
+            <tr><td>Sunday</td><td>Closed</td></tr>
+          </table>
+          <p class="note">Hours as listed in online directories. Call for hours to confirm before visiting.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-giant">MIKE CONWAY <span class="amp">&amp;</span> PAINTING</div>
+    <div class="foot-cols">
+      <div>
+        <h4>Visit</h4>
+        <p>Mike Conway Paperhanging &amp; Painting<br>108 Hillview Dr #2608<br>Springfield, PA 19064<br><a href="tel:+16105447671" style="color:var(--gold);font-weight:700">(610) 544-7671</a></p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <a href="#home" data-page="home">Home</a>
+        <a href="#services" data-page="services">Services</a>
+        <a href="#about" data-page="about">About</a>
+        <a href="#gallery" data-page="gallery">Gallery</a>
+        <a href="#reviews" data-page="reviews">Reviews</a>
+        <a href="#contact" data-page="contact">Contact</a>
+      </div>
+      <div>
+        <h4>Reviews</h4>
+        <a href="https://www.angi.com/companylist/us/pa/springfield/mike-conway-paperhanging-and-painting-reviews-8164981.htm">Angi reviews</a>
+        <a href="https://reviews.birdeye.com/mike-conway-paperhanging-painting-167019932576279">Birdeye reviews</a>
+        <a href="https://www.google.com/maps/place/?q=place_id:ChIJ0QWTTRnCxokRHCVBGtMCJ7Q">See reviews on Google</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© Mike Conway Paperhanging & Painting</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "contact"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
