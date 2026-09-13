@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EST&Eacute;T beauty salon &middot; Hair Salon, Brooklyn, NY</title>
+<meta name="description" content="EST&Eacute;T beauty salon, a hair salon at 802 Avenue U, Brooklyn, NY 11223. Haircuts, color, balayage, keratin smoothing, blowouts and beauty services. Call (646) 469-2471.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#221419; --ink-soft:#6E5A61;
+  --cream:#FBF6F1; --paper:#FFFEFB;
+  --plum:#5A2A3A; --plum-deep:#3C1B27;
+  --rose:#C4708A; --rose-soft:#F6DEE6;
+  --gold:#B98A2E; --gold-soft:#F4E8CE;
+  --radius:14px;
+  --shadow:0 18px 42px -18px rgba(60,27,39,.28);
+  --shadow-sm:0 8px 22px -10px rgba(60,27,39,.2);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Jost",system-ui,sans-serif;background:var(--cream);color:var(--ink);line-height:1.7;-webkit-font-smoothing:antialiased;font-weight:400}
+img{max-width:100%}
+a{color:var(--plum)}
+::selection{background:var(--rose-soft);color:var(--plum-deep)}
+.wrap{max-width:1160px;margin:0 auto;padding:0 26px}
+.serif{font-family:"Playfair Display",serif}
+
+/* ---------- header / drawer ---------- */
+header.site{position:sticky;top:0;z-index:60;background:rgba(251,246,241,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid rgba(90,42,58,.15)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
+.brand svg{width:44px;height:44px;flex:none}
+.brand-name{font-family:"Playfair Display",serif;font-weight:900;font-size:1.45rem;letter-spacing:.12em;line-height:1}
+.brand-name small{display:block;font-family:"Jost",sans-serif;font-weight:500;font-size:.6rem;letter-spacing:4px;text-transform:uppercase;color:var(--rose);margin-top:4px}
+.burger{background:none;border:1px solid rgba(90,42,58,.35);border-radius:999px;cursor:pointer;padding:11px 18px;display:inline-flex;align-items:center;gap:10px;font-family:"Jost",sans-serif;font-weight:600;font-size:.85rem;letter-spacing:2px;text-transform:uppercase;color:var(--plum)}
+.burger span{display:block;width:22px;height:2px;background:var(--plum);position:relative}
+.burger span::before,.burger span::after{content:"";position:absolute;left:0;width:22px;height:2px;background:var(--plum)}
+.burger span::before{top:-7px}.burger span::after{top:7px}
+.overlay{position:fixed;inset:0;background:rgba(34,20,25,.5);opacity:0;pointer-events:none;transition:opacity .3s;z-index:70}
+.overlay.show{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(400px,88vw);background:var(--plum-deep);color:#F3E4E9;z-index:71;transform:translateX(102%);transition:transform .38s cubic-bezier(.22,.8,.3,1);display:flex;flex-direction:column;padding:34px 36px;box-shadow:-20px 0 60px rgba(0,0,0,.35)}
+.drawer.open{transform:none}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:30px}
+.drawer-head .brand-name{color:#fff}
+.drawer-head .brand-name small{color:var(--gold)}
+.drawer-close{background:none;border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:999px;width:42px;height:42px;font-size:1.1rem;cursor:pointer;line-height:1}
+nav.main{display:flex;flex-direction:column;gap:4px}
+nav.main a{text-decoration:none;color:#EBD7DE;font-family:"Playfair Display",serif;font-size:1.55rem;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.1);transition:color .2s,padding-left .2s;display:flex;justify-content:space-between;align-items:center}
+nav.main a small{font-family:"Jost",sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.45)}
+nav.main a:hover{color:var(--gold);padding-left:8px}
+nav.main a.active,nav.main a[aria-current="page"]{color:var(--gold)}
+.drawer-foot{margin-top:auto;padding-top:26px;border-top:1px solid rgba(255,255,255,.12)}
+.drawer-foot p{font-size:.9rem;color:#D8BFC8;margin-bottom:12px}
+.drawer-foot a.tel{font-family:"Playfair Display",serif;font-size:1.4rem;color:#fff;text-decoration:none}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- split hero ---------- */
+.hero{padding:70px 0 64px;position:relative;overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:1.02fr .98fr;gap:56px;align-items:center}
+.kicker{display:inline-block;font-size:.75rem;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--rose);border-bottom:2px solid var(--gold);padding-bottom:8px;margin-bottom:20px}
+h1{font-family:"Playfair Display",serif;font-weight:900;font-size:clamp(2.7rem,5.6vw,4.5rem);line-height:1.04;letter-spacing:-.5px;margin-bottom:20px}
+h1 em{font-style:italic;color:var(--plum)}
+.lede{font-size:1.14rem;color:var(--ink-soft);max-width:33rem;margin-bottom:28px;font-weight:300}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:28px}
+.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:600;padding:14px 28px;border-radius:999px;font-size:1rem;transition:transform .18s,background .18s,border-color .18s;letter-spacing:.5px}
+.btn-solid{background:var(--plum);color:#fff}
+.btn-solid:hover{background:var(--plum-deep);transform:translateY(-2px)}
+.btn-ghost{background:var(--paper);color:var(--plum);border:2px solid rgba(90,42,58,.3)}
+.btn-ghost:hover{border-color:var(--plum);transform:translateY(-2px)}
+.hours-pill{display:inline-flex;align-items:center;gap:10px;background:var(--ink);color:var(--cream);padding:10px 20px;border-radius:999px;font-weight:500;font-size:.95rem}
+.hours-pill .dot{width:10px;height:10px;border-radius:50%;background:#7BC47F;box-shadow:0 0 0 4px rgba(123,196,127,.25);animation:pulse 2s infinite}
+.hours-pill.closed .dot{background:#C4708A;box-shadow:0 0 0 4px rgba(196,112,138,.25)}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+.hero-art{position:relative}
+.vanity{position:relative;background:linear-gradient(150deg,#FFF6EE,#F6DEE6);border-radius:220px 220px 22px 22px;padding:54px 40px 44px;box-shadow:var(--shadow);border:3px solid #fff;overflow:hidden;text-align:center}
+.vanity::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 82% 10%, rgba(185,138,46,.35), transparent 45%)}
+.vanity svg{width:min(78%,280px);height:auto;display:block;margin:0 auto;animation:floaty 6s ease-in-out infinite}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.stamp{position:absolute;bottom:-16px;left:26px;background:var(--gold);color:#fff;font-family:"Playfair Display",serif;font-weight:700;padding:12px 24px;border-radius:999px;transform:rotate(-4deg);box-shadow:var(--shadow-sm);font-size:.95rem;z-index:2;letter-spacing:.5px}
+
+/* ---------- magazine rhythm ---------- */
+section.block{padding:58px 0}
+.sec-head{max-width:44rem;margin:0 auto 42px;text-align:center}
+h2{font-family:"Playfair Display",serif;font-weight:900;font-size:clamp(1.9rem,3.6vw,2.8rem);line-height:1.12;margin:8px 0 14px;letter-spacing:-.3px}
+.sec-head p{color:var(--ink-soft);font-weight:300}
+.eyebrow{font-size:.72rem;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--rose)}
+.mag{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid rgba(90,42,58,.16);border-radius:var(--radius);overflow:hidden;background:var(--paper);box-shadow:var(--shadow-sm)}
+.mag .col{padding:46px 44px}
+.mag .col.dark{background:var(--plum);color:#F3E4E9}
+.mag .col.dark p{color:#E3CBD4}
+.mag h3{font-family:"Playfair Display",serif;font-size:1.6rem;margin-bottom:14px}
+.mag p{color:var(--ink-soft);margin-bottom:14px;font-weight:300}
+.mag p.dropcap::first-letter{font-family:"Playfair Display",serif;font-size:3.4rem;font-weight:900;float:left;line-height:.85;padding-right:10px;color:var(--plum)}
+.mag .col.dark p.dropcap::first-letter{color:var(--gold)}
+.pull{font-family:"Playfair Display",serif;font-style:italic;font-size:1.5rem;line-height:1.45;color:var(--plum);border-left:3px solid var(--gold);padding-left:22px;margin:22px 0}
+.pull cite{display:block;font-family:"Jost",sans-serif;font-style:normal;font-size:.78rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--ink-soft);margin-top:10px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:44px}
+.stat{background:var(--paper);border:1px solid rgba(90,42,58,.14);border-radius:var(--radius);padding:26px 20px;text-align:center;box-shadow:var(--shadow-sm)}
+.stat b{display:block;font-family:"Playfair Display",serif;font-size:2rem;color:var(--plum)}
+.stat span{font-size:.78rem;letter-spacing:2px;text-transform:uppercase;color:var(--ink-soft)}
+
+/* ---------- leaders offerings ---------- */
+.svc-note{background:var(--gold-soft);border:1px dashed rgba(185,138,46,.55);border-radius:var(--radius);padding:16px 24px;font-size:.95rem;color:#6B5320;margin-bottom:34px}
+.svc-cat{margin-bottom:44px}
+.svc-cat-head{display:flex;align-items:baseline;gap:16px;margin-bottom:10px}
+.svc-cat-head h3{font-family:"Playfair Display",serif;font-size:1.7rem;font-weight:700}
+.svc-cat-head .line{flex:1;border-bottom:2px dotted rgba(90,42,58,.35);transform:translateY(-6px)}
+.svc-cat-head .fr{font-family:"Playfair Display",serif;font-style:italic;color:var(--rose);font-size:1.15rem}
+.svc{display:flex;align-items:baseline;gap:12px;padding:15px 4px;border-bottom:1px dashed rgba(34,20,25,.16)}
+.svc .nm{font-weight:600;font-size:1.06rem}
+.svc .nm small{display:block;font-weight:300;color:var(--ink-soft);font-size:.88rem}
+.svc .leader{flex:1;border-bottom:2px dotted rgba(185,138,46,.6);transform:translateY(-5px);min-width:24px}
+.svc .pr{font-family:"Playfair Display",serif;font-weight:700;color:var(--plum);white-space:nowrap}
+.svc .flag{display:inline-block;background:var(--rose-soft);color:var(--plum);font-size:.68rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;padding:3px 12px;border-radius:999px;margin-left:10px;vertical-align:2px}
+
+/* ---------- masonry gallery ---------- */
+.masonry{columns:3;column-gap:20px}
+.tile{break-inside:avoid;margin-bottom:20px;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);background:var(--paper);transition:transform .2s;position:relative}
+.tile:hover{transform:translateY(-5px)}
+.tile .art{display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.tile .art svg{width:42%;height:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.18));transition:transform .3s;margin:9% 0}
+.tile:hover .art svg{transform:scale(1.08) rotate(-3deg)}
+.tile .cap{padding:14px 18px}
+.tile .cap strong{font-family:"Playfair Display",serif;font-size:1.05rem;display:block}
+.tile .cap small{color:var(--ink-soft)}
+.tile .soon{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.88);font-size:.66rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;padding:4px 12px;border-radius:999px;color:var(--ink-soft)}
+
+/* ---------- reviews ---------- */
+.rs-strip{margin:0 auto 34px;max-width:660px;background:var(--paper);border:1px solid var(--rose-soft);border-radius:14px;padding:20px 24px;text-align:center}
+.rs-note{margin:0 0 14px;font-size:.95rem;color:var(--ink-soft);line-height:1.55;font-weight:300}
+.rs-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rs-btn{display:inline-block;background:var(--plum);color:#fff;padding:11px 26px;border-radius:999px;font-weight:600;text-decoration:none;font-size:.95rem}
+.rs-btn:hover{background:var(--plum-deep)}
+.rev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.rev{background:var(--paper);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm);position:relative;border:1px solid rgba(90,42,58,.1)}
+.rev .stars{color:var(--gold);font-size:1.15rem;letter-spacing:3px;margin-bottom:12px}
+.rev p{font-size:1.02rem;margin-bottom:14px;font-weight:300}
+.rev cite{font-style:normal;font-weight:600;font-size:.82rem;color:var(--plum);letter-spacing:1px;text-transform:uppercase}
+.rev .sample-badge{position:absolute;top:16px;right:18px;background:var(--rose-soft);color:var(--plum);font-size:.64rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:4px 12px;border-radius:999px}
+.rev.featured{background:var(--plum);color:#F3E4E9;border:0}
+.rev.featured cite{color:var(--gold)}
+.rev.featured p{color:#EBD7DE}
+.cta-band{background:linear-gradient(120deg,var(--plum),var(--plum-deep));border-radius:22px;color:#fff;padding:50px;text-align:center;margin-top:46px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.cta-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 20%, rgba(185,138,46,.4), transparent 50%)}
+.cta-band h2{color:#fff;position:relative}
+.cta-band p{color:#E3CBD4;position:relative;max-width:36rem;margin:0 auto 26px;font-weight:300}
+.cta-band .btn-solid{background:#fff;color:var(--plum-deep);position:relative}
+.cta-band .btn-solid:hover{background:var(--gold-soft)}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-bottom:26px}
+.info-card{background:var(--paper);border-radius:var(--radius);padding:34px;box-shadow:var(--shadow-sm);border:1px solid rgba(90,42,58,.1)}
+.info-card h3{font-family:"Playfair Display",serif;font-size:1.45rem;margin-bottom:14px}
+.info-card p{color:var(--ink-soft);margin-bottom:8px;font-weight:300}
+.info-card a.big{font-family:"Playfair Display",serif;font-size:1.55rem;font-weight:700;color:var(--plum);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.hours-table{width:100%;border-collapse:collapse;font-size:.98rem}
+.hours-table td{padding:10px 6px;border-bottom:1px dashed rgba(34,20,25,.18)}
+.hours-table tr.today td{font-weight:700;color:var(--plum)}
+.hours-table tr.today td:first-child::after{content:" \00B7 today";font-family:"Playfair Display",serif;font-style:italic;font-size:1rem;color:var(--rose);margin-left:6px}
+.hours-table td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.map-card{border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:340px;background:linear-gradient(rgba(90,42,58,.06), rgba(90,42,58,.06)),repeating-linear-gradient(0deg, transparent 0 46px, rgba(90,42,58,.14) 46px 48px),repeating-linear-gradient(90deg, transparent 0 46px, rgba(90,42,58,.14) 46px 48px),linear-gradient(140deg,#F6DEE6,#EBD7DE);display:flex;align-items:center;justify-content:center}
+.map-pin{text-align:center;background:var(--paper);padding:28px 36px;border-radius:18px;box-shadow:var(--shadow);max-width:78%;position:relative}
+.map-pin::after{content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);border:14px solid transparent;border-top-color:var(--paper);border-bottom:0}
+.map-pin svg{width:44px;height:44px;margin-bottom:8px}
+.map-pin strong{font-family:"Playfair Display",serif;font-size:1.15rem;display:block}
+.map-pin small{color:var(--ink-soft)}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- strips ---------- */
+.strip{border-radius:22px;padding:58px 50px;color:#fff;position:relative;overflow:hidden;margin-bottom:46px;box-shadow:var(--shadow)}
+.strip::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(255,255,255,.2), transparent 50%)}
+.strip h2{color:#fff;font-size:clamp(2rem,4vw,3rem);position:relative;margin:6px 0 10px}
+.strip p{color:rgba(255,255,255,.88);max-width:36rem;position:relative;font-weight:300}
+.strip .eyebrow{color:var(--gold-soft);position:relative}
+.strip.s-services{background:linear-gradient(120deg,#5A2A3A,#2E1420)}
+.strip.s-story{background:linear-gradient(120deg,#7A3B52,#3C1B27)}
+.strip.s-gal{background:linear-gradient(120deg,#B98A2E,#7A5A16)}
+.strip.s-rev{background:linear-gradient(120deg,#C4708A,#7E3A52)}
+.strip.s-visit{background:linear-gradient(120deg,#3C4A2E,#1E2415)}
+
+/* ---------- big-type footer ---------- */
+footer{background:var(--plum-deep);color:#E3CBD4;margin-top:20px}
+.foot-big{font-family:"Playfair Display",serif;font-weight:900;font-size:clamp(3.2rem,11vw,9rem);line-height:.95;letter-spacing:.04em;color:#fff;padding:60px 0 10px;text-align:center;white-space:nowrap}
+.foot-big em{font-style:italic;color:var(--gold)}
+.foot-grid{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:36px;padding:44px 0 30px}
+.foot-grid h4{font-family:"Playfair Display",serif;color:#fff;font-size:1.15rem;margin-bottom:14px}
+.foot-grid p,.foot-grid a{color:#C9A9B4;font-size:.95rem;font-weight:300}
+.foot-grid a{text-decoration:none}.foot-grid a:hover{color:var(--gold)}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.12);padding:20px 0 26px;text-align:center;font-size:.85rem;color:#A9828F}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:940px){
+  .hero-grid,.mag,.visit-grid{grid-template-columns:1fr}
+  .rev-grid{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr}
+  .masonry{columns:2}
+  .strip{padding:42px 28px}
+  .mag .col{padding:34px 28px}
+}
+@media(max-width:600px){
+  .masonry{columns:1}
+  .hero{padding:50px 0 44px}
+  .cta-band{padding:36px 24px}
+  .stats{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="overlay" id="overlay"></div>
+<aside class="drawer" id="drawer" aria-label="Site menu">
+  <div class="drawer-head">
+    <span class="brand-name">EST&Eacute;T<small>beauty salon</small></span>
+    <button class="drawer-close" id="drawerClose" aria-label="Close menu">&times;</button>
+  </div>
+  <nav class="main" id="mainNav" aria-label="Main navigation">
+    <a href="#home" data-page="home" class="active" aria-current="page">Home <small>01</small></a>
+    <a href="#services" data-page="services">Services <small>02</small></a>
+    <a href="#story" data-page="story">Our Story <small>03</small></a>
+    <a href="#gallery" data-page="gallery">Gallery <small>04</small></a>
+    <a href="#reviews" data-page="reviews">Reviews <small>05</small></a>
+    <a href="#visit" data-page="visit">Visit Us <small>06</small></a>
+  </nav>
+  <div class="drawer-foot">
+    <p>802 Avenue U, Brooklyn, NY 11223</p>
+    <a class="tel" href="tel:+16464692471">(646) 469-2471</a>
+  </div>
+</aside>
+
+<header class="site">
+  <div class="wrap bar">
+    <a class="brand" href="#home" data-page="home" aria-label="ESTET beauty salon, home">
+      <svg viewBox="0 0 64 64" role="img" aria-label="ESTET monogram"><circle cx="32" cy="32" r="29" fill="none" stroke="#5A2A3A" stroke-width="3"/><text x="32" y="42" text-anchor="middle" font-family="Playfair Display, serif" font-weight="900" font-size="30" fill="#5A2A3A">&Eacute;</text><circle cx="50" cy="16" r="5" fill="#B98A2E"/></svg>
+      <span class="brand-name">EST&Eacute;T<small>beauty salon &middot; Brooklyn</small></span>
+    </a>
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span>Menu</button>
+  </div>
+</header>
+
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="kicker">Hair salon &middot; Avenue U, Brooklyn</span>
+        <h1>Good hair days,<br><em>made to order.</em></h1>
+        <p class="lede">EST&Eacute;T beauty salon on Avenue U is a neighborhood salon for precision cuts, rich color, smooth blowouts and the kind of personal attention that keeps clients coming back.</p>
+        <div class="cta-row">
+          <a class="btn btn-solid" href="#services" data-page="services">Explore Services &rarr;</a>
+          <a class="btn btn-ghost" href="tel:+16464692471">Call to Book</a>
+        </div>
+        <span class="hours-pill" id="hoursPill"><span class="dot"></span><span id="hoursText">Checking today&rsquo;s hours&hellip;</span></span>
+      </div>
+      <div class="hero-art">
+        <div class="vanity">
+          <svg viewBox="0 0 200 240" role="img" aria-label="Illustration of a vanity mirror with scissors">
+            <ellipse cx="100" cy="222" rx="70" ry="10" fill="#3C1B27" opacity=".12"/>
+            <rect x="52" y="18" width="96" height="150" rx="48" fill="#FFF6EE" stroke="#5A2A3A" stroke-width="5"/>
+            <rect x="64" y="30" width="72" height="126" rx="36" fill="#F6DEE6"/>
+            <path d="M70 70 q15 -18 30 0 q15 18 30 0" fill="none" stroke="#C4708A" stroke-width="5" stroke-linecap="round"/>
+            <path d="M72 100 q14 14 28 0 q14 -14 28 0" fill="none" stroke="#C4708A" stroke-width="5" stroke-linecap="round" opacity=".6"/>
+            <circle cx="128" cy="44" r="6" fill="#fff" opacity=".8"/>
+            <rect x="94" y="168" width="12" height="42" fill="#5A2A3A"/>
+            <rect x="78" y="206" width="44" height="10" rx="5" fill="#5A2A3A"/>
+            <circle cx="56" cy="120" r="16" fill="none" stroke="#B98A2E" stroke-width="5"/>
+            <circle cx="144" cy="150" r="16" fill="none" stroke="#B98A2E" stroke-width="5"/>
+            <path d="M64 132 L136 142 M64 142 L136 132" stroke="#B98A2E" stroke-width="5" stroke-linecap="round"/>
+            <circle cx="162" cy="60" r="7" fill="#B98A2E"/><circle cx="38" cy="180" r="5" fill="#C4708A"/><circle cx="168" cy="190" r="6" fill="#C4708A" opacity=".6"/>
+          </svg>
+        </div>
+        <div class="stamp">Walk-ins welcome &middot; call first</div>
+      </div>
+    </div>
+  </div>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow">The salon</span>
+        <h2>A quiet chair on<br>a busy avenue</h2>
+        <p>Avenue U moves fast. Inside EST&Eacute;T, the pace slows down: one client at a time, one great head of hair at a time.</p>
+      </div>
+      <div class="mag reveal">
+        <div class="col">
+          <span class="eyebrow">Our approach</span>
+          <h3>Consultation first, scissors second</h3>
+          <p class="dropcap">Every appointment at EST&Eacute;T starts with a real conversation. Bring a photo, bring an idea, or bring nothing at all: your stylist will talk through what suits your hair, your face and your routine before a single strand is cut.</p>
+          <p>It is the neighborhood-salon way: honest advice, careful work, and a finish that still looks good when you style it yourself on Tuesday morning.</p>
+          <div class="pull">The best haircut is the one you love<br>on day one <em>and</em> on day thirty.<cite>The EST&Eacute;T philosophy</cite></div>
+        </div>
+        <div class="col dark">
+          <span class="eyebrow" style="color:var(--gold-soft)">Why clients stay</span>
+          <h3>Small salon, serious craft</h3>
+          <p>EST&Eacute;T keeps things personal. You see the same stylist, they remember your color formula, and they notice when your ends need attention before you do.</p>
+          <ul style="list-style:none;display:grid;gap:12px;margin:20px 0">
+            <li>&#10003; &nbsp;Precision cuts for women and men</li>
+            <li>&#10003; &nbsp;Full color, highlights and balayage</li>
+            <li>&#10003; &nbsp;Keratin smoothing and blowouts</li>
+            <li>&#10003; &nbsp;Occasion styling and updos</li>
+          </ul>
+          <a class="btn btn-ghost" href="#services" data-page="services" style="border-color:rgba(255,255,255,.4);color:#fff">See the service list &rarr;</a>
+        </div>
+      </div>
+      <div class="stats reveal">
+        <div class="stat"><b>Ave U</b><span>Gravesend, Brooklyn</span></div>
+        <div class="stat"><b>6</b><span>days a week</span></div>
+        <div class="stat"><b>1:1</b><span>personal attention</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" style="padding-top:0">
+    <div class="wrap">
+      <div class="cta-band reveal">
+        <h2>Your chair is waiting.</h2>
+        <p>802 Avenue U, Brooklyn, NY 11223. Call (646) 469-2471 to book, or just stop by.</p>
+        <a class="btn btn-solid" href="tel:+16464692471">Call (646) 469-2471</a>
+      </div>
+      <div style="height:56px"></div>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-services">
+      <span class="eyebrow">Services</span>
+      <h2>What we do best</h2>
+      <p>Cuts, color and smoothing, done with care. Prices below are samples to give you an idea: call for an exact quote for your hair.</p>
+    </div>
+
+    <div class="svc-note reveal"><strong>Please note:</strong> prices shown are samples and can vary with hair length, thickness and technique. Call <a href="tel:+16464692471">(646) 469-2471</a> for an exact quote before you book.</div>
+
+    <div class="svc-cat reveal">
+      <div class="svc-cat-head"><h3>Cuts &amp; Styling</h3><span class="line"></span><span class="fr">la coupe</span></div>
+      <div class="svc"><div class="nm">Women&rsquo;s Cut &amp; Finish<small>Consultation, precision cut, blowout finish</small></div><span class="leader"></span><span class="pr">sample from $55</span></div>
+      <div class="svc"><div class="nm">Men&rsquo;s Cut<small>Tailored cut with clean edges and styling</small></div><span class="leader"></span><span class="pr">sample from $30</span></div>
+      <div class="svc"><div class="nm">Blowout <span class="flag">Popular</span><small>Smooth, bouncy finish that lasts for days</small></div><span class="leader"></span><span class="pr">sample from $35</span></div>
+      <div class="svc"><div class="nm">Updo &amp; Occasion Styling<small>Weddings, proms and nights out</small></div><span class="leader"></span><span class="pr">sample from $65</span></div>
+      <div class="svc"><div class="nm">Kids&rsquo; Cut <span class="flag">Gentle</span><small>Patient first haircuts and trims</small></div><span class="leader"></span><span class="pr">sample from $25</span></div>
+    </div>
+
+    <div class="svc-cat reveal">
+      <div class="svc-cat-head"><h3>Color</h3><span class="line"></span><span class="fr">la couleur</span></div>
+      <div class="svc"><div class="nm">Single Process Color<small>Rich, even color from roots to ends</small></div><span class="leader"></span><span class="pr">sample from $75</span></div>
+      <div class="svc"><div class="nm">Partial Highlights <span class="flag">Popular</span><small>Face-framing brightness, natural grow-out</small></div><span class="leader"></span><span class="pr">sample from $110</span></div>
+      <div class="svc"><div class="nm">Full Highlights / Balayage<small>Hand-painted dimension, low maintenance</small></div><span class="leader"></span><span class="pr">sample from $160</span></div>
+      <div class="svc"><div class="nm">Root Touch-Up<small>Keep your color seamless between visits</small></div><span class="leader"></span><span class="pr">sample from $60</span></div>
+      <div class="svc"><div class="nm">Gloss &amp; Toner<small>Shine, refresh and perfect your tone</small></div><span class="leader"></span><span class="pr">sample from $40</span></div>
+    </div>
+
+    <div class="svc-cat reveal">
+      <div class="svc-cat-head"><h3>Smoothing &amp; Treatments</h3><span class="line"></span><span class="fr">le soin</span></div>
+      <div class="svc"><div class="nm">Keratin Smoothing Treatment <span class="flag">Signature</span><small>Frizz-free, silkier hair for months</small></div><span class="leader"></span><span class="pr">sample from $180</span></div>
+      <div class="svc"><div class="nm">Deep Conditioning Ritual<small>Restorative mask with steam and massage</small></div><span class="leader"></span><span class="pr">sample from $35</span></div>
+      <div class="svc"><div class="nm">Scalp Treatment<small>Exfoliate and rebalance for healthy growth</small></div><span class="leader"></span><span class="pr">sample from $30</span></div>
+    </div>
+
+    <div class="svc-note reveal"><strong>Not sure what you need?</strong> Book a free consultation: we will look at your hair, talk goals, and quote you exactly before anything begins. <a href="tel:+16464692471">Call (646) 469-2471</a>.</div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-story">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-story">
+      <span class="eyebrow">Our story</span>
+      <h2>Est&eacute;tica,<br>every day</h2>
+      <p>EST&Eacute;T takes its name from the idea of beauty as a daily practice. On Avenue U, that means showing up, chair by chair, client by client.</p>
+    </div>
+    <div class="mag reveal" style="margin-bottom:46px">
+      <div class="col">
+        <span class="eyebrow">The name</span>
+        <h3>EST&Eacute;T, a promise in five letters</h3>
+        <p class="dropcap">Short for est&eacute;tica, the art of looking and feeling beautiful, EST&Eacute;T is a salon built on the belief that great hair is not a luxury reserved for special occasions. It is a Tuesday. It is a job interview. It is the everyday version of you, at your best.</p>
+        <p>Tucked into the Gravesend stretch of Avenue U, the salon serves the neighborhood it sits in: regulars who pop in for a trim, brides getting ready down the block, and anyone who has ever walked out of a salon thinking, this is exactly what I asked for.</p>
+      </div>
+      <div class="col dark">
+        <span class="eyebrow" style="color:var(--gold-soft)">How we work</span>
+        <h3>Slow down, look closely</h3>
+        <p>Hair is personal, so we treat it that way. Appointments are never rushed through an assembly line. Your stylist takes the time to understand your hair&rsquo;s texture, history and habits, then builds the cut or color around you, not a template.</p>
+        <div class="pull" style="color:#fff;border-color:var(--gold)">Listen first.<br>Cut second.<br>Everyone leaves happy.<cite>The EST&Eacute;T way</cite></div>
+      </div>
+    </div>
+    <div class="wrap">
+      <div class="cta-band reveal">
+        <h2>Come as you are.</h2>
+        <p>Leave a little more polished. 802 Avenue U, Brooklyn, open Tuesday through Sunday.</p>
+        <a class="btn btn-solid" href="#visit" data-page="visit">Plan your visit &rarr;</a>
+      </div>
+      <div style="height:56px"></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-gal">
+      <span class="eyebrow">Gallery</span>
+      <h2>The look book</h2>
+      <p>Artistic previews of our craft. Real photos of client transformations are on the way.</p>
+    </div>
+    <div class="masonry">
+      <div class="tile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#F6DEE6,#E8B7C6)">
+          <svg viewBox="0 0 100 100"><circle cx="36" cy="42" r="11" fill="none" stroke="#5A2A3A" stroke-width="4"/><circle cx="64" cy="58" r="11" fill="none" stroke="#5A2A3A" stroke-width="4"/><path d="M43 50 L57 50 M43 50 L20 78 M57 50 L80 78" stroke="#5A2A3A" stroke-width="4" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>Precision Cuts</strong><small>Shaped to your face, your texture</small></div>
+      </div>
+      <div class="tile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#5A2A3A,#2E1420);min-height:230px">
+          <svg viewBox="0 0 100 100"><path d="M50 8 C30 8 26 34 30 55 C33 72 40 88 50 92 C60 88 67 72 70 55 C74 34 70 8 50 8Z" fill="#B98A2E"/><path d="M42 30 q8 24 0 44 M58 30 q-8 24 0 44" stroke="#5A2A3A" stroke-width="3" fill="none" opacity=".6"/><circle cx="50" cy="52" r="4" fill="#FFF6EE"/></svg>
+        </div>
+        <div class="cap"><strong>Balayage</strong><small>Hand-painted, sun-kissed dimension</small></div>
+      </div>
+      <div class="tile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#F4E8CE,#E3C77E)">
+          <svg viewBox="0 0 100 100"><rect x="30" y="12" width="40" height="30" rx="8" fill="#5A2A3A"/><rect x="38" y="42" width="24" height="34" rx="6" fill="#5A2A3A"/><path d="M62 20 q22 4 20 26 q-2 18 -18 20" fill="none" stroke="#B98A2E" stroke-width="6" stroke-linecap="round"/><circle cx="84" cy="60" r="5" fill="#C4708A"/><circle cx="78" cy="74" r="4" fill="#C4708A" opacity=".6"/></svg>
+        </div>
+        <div class="cap"><strong>Blowouts</strong><small>Smooth, bouncy, photo-ready</small></div>
+      </div>
+      <div class="tile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#C4708A,#8A3B56)">
+          <svg viewBox="0 0 100 100"><ellipse cx="50" cy="52" rx="30" ry="36" fill="#FFF6EE"/><path d="M28 40 q22 -14 44 0" stroke="#C4708A" stroke-width="4" fill="none"/><circle cx="40" cy="56" r="4" fill="#5A2A3A"/><circle cx="60" cy="56" r="4" fill="#5A2A3A"/><path d="M42 68 q8 6 16 0" stroke="#5A2A3A" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>Bridal &amp; Occasion</strong><small>Updos that last all night</small></div>
+      </div>
+      <div class="tile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#2E1420,#5A2A3A);min-height:200px">
+          <svg viewBox="0 0 100 100"><path d="M50 12 C28 12 22 40 28 62 C33 80 42 90 50 92 C58 90 67 80 72 62 C78 40 72 12 50 12Z" fill="#F6DEE6" opacity=".9"/><path d="M40 34 q10 30 0 50 M60 34 q-10 30 0 50" stroke="#C4708A" stroke-width="4" fill="none" opacity=".7"/></svg>
+        </div>
+        <div class="cap"><strong>Keratin Smoothing</strong><small>Silk, not frizz</small></div>
+      </div>
+      <div class="tile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#EBD7DE,#D3A9B8)">
+          <svg viewBox="0 0 100 100"><rect x="20" y="30" width="60" height="44" rx="10" fill="#5A2A3A"/><circle cx="50" cy="52" r="14" fill="#F4E8CE"/><circle cx="50" cy="52" r="6" fill="#5A2A3A"/><rect x="42" y="74" width="16" height="10" rx="3" fill="#5A2A3A"/></svg>
+        </div>
+        <div class="cap"><strong>The Chair</strong><small>Your hour, your stylist</small></div>
+      </div>
+      <div class="tile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#FFF6EE,#F4E8CE)">
+          <svg viewBox="0 0 100 100"><path d="M30 78 q-6 -34 12 -48 q6 14 2 26 q14 -6 18 -20 q10 16 2 34 q-4 8 -14 8 Z" fill="#B98A2E"/><circle cx="50" cy="80" r="4" fill="#5A2A3A"/><path d="M68 30 q10 -8 18 -4 q-6 10 -16 8" fill="#C4708A"/></svg>
+        </div>
+        <div class="cap"><strong>Color &amp; Gloss</strong><small>Rich tone, mirror shine</small></div>
+      </div>
+      <div class="tile reveal">
+        <span class="soon">Photo soon</span>
+        <div class="art" style="background:linear-gradient(140deg,#8A3B56,#3C1B27);min-height:210px">
+          <svg viewBox="0 0 100 100"><path d="M28 20 h44 M30 34 h40 M32 48 h36 M34 62 h32" stroke="#F4E8CE" stroke-width="5" stroke-linecap="round"/><circle cx="50" cy="80" r="10" fill="#B98A2E"/></svg>
+        </div>
+        <div class="cap"><strong>Men&rsquo;s Cuts</strong><small>Sharp lines, clean finish</small></div>
+      </div>
+    </div>
+    <div class="svc-note reveal" style="margin-top:28px"><strong>Coming soon:</strong> real photos of our work and our salon. The illustrations above are artistic previews, easy for the owner to swap with actual photos.</div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-rev">
+      <span class="eyebrow">Reviews</span>
+      <h2>Word on<br>Avenue U</h2>
+      <p>Real ratings and reviews live on our Google listing. Read what clients are saying right now.</p>
+    </div>
+    <div class="rs-strip">
+      <p class="rs-note">Review themes on this page are illustrative samples. For current ratings and real client reviews, open our Google listing.</p>
+      <div class="rs-links"><a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJdfrosGRFwokR662xhxdPRro" target="_blank" rel="noopener">See reviews on Google</a></div>
+    </div>
+    <div class="rev-grid">
+      <div class="rev featured reveal">
+        <span class="sample-badge">Sample</span>
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p>&ldquo;Finally, a salon that listens. I showed a photo, we talked it through, and the cut came out exactly right.&rdquo;</p>
+        <cite>Sample review</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="sample-badge">Sample</span>
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p>&ldquo;My balayage looks natural and expensive. The grow-out has been so easy, I keep getting compliments.&rdquo;</p>
+        <cite>Sample review</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="sample-badge">Sample</span>
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p>&ldquo;Quick blowout before an event and it held all night. Friendly, no rushing, fair price.&rdquo;</p>
+        <cite>Sample review</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="sample-badge">Sample</span>
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p>&ldquo;Been coming for trims for a year. They remember my hair and always get the length right.&rdquo;</p>
+        <cite>Sample review</cite>
+      </div>
+    </div>
+    <div class="cta-band reveal">
+      <h2>Love your hair? Tell the neighborhood.</h2>
+      <p>A Google review takes a minute and keeps a neighborhood salon thriving.</p>
+      <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJdfrosGRFwokR662xhxdPRro" target="_blank" rel="noopener">&#9733; Review us on Google</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-visit">
+      <span class="eyebrow">Visit us</span>
+      <h2>Find your chair</h2>
+      <p>We are on Avenue U in Gravesend, Brooklyn, easy to reach, with street parking nearby.</p>
+    </div>
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3>Find us</h3>
+        <p><strong>EST&Eacute;T beauty salon</strong><br>802 Avenue U<br>Brooklyn, NY 11223</p>
+        <p>On Avenue U in Gravesend, between the neighborhood shops. Street parking nearby.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3>Book now</h3>
+        <p>Call for appointments, quotes and consultations:</p>
+        <a class="big" href="tel:+16464692471">(646) 469-2471</a>
+        <p style="margin-top:10px">For color and keratin services, we recommend booking a few days ahead.</p>
+      </div>
+    </div>
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3>Hours</h3>
+        <table class="hours-table" id="hoursTable">
+          <tr><td>Monday</td><td>Closed</td></tr>
+          <tr><td>Tuesday</td><td>9:00 AM - 7:00 PM</td></tr>
+          <tr><td>Wednesday</td><td>9:00 AM - 7:00 PM</td></tr>
+          <tr><td>Thursday</td><td>9:00 AM - 7:00 PM</td></tr>
+          <tr><td>Friday</td><td>9:00 AM - 7:00 PM</td></tr>
+          <tr><td>Saturday</td><td>9:00 AM - 7:00 PM</td></tr>
+          <tr><td>Sunday</td><td>10:00 AM - 5:00 PM</td></tr>
+        </table>
+        <p style="margin-top:12px;font-size:.88rem">Hours from public listings; call to confirm before visiting.</p>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <svg viewBox="0 0 24 24" fill="#5A2A3A"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#FBF6F1"/></svg>
+          <strong>802 Avenue U</strong>
+          <small>Brooklyn, NY 11223</small><br>
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJdfrosGRFwokR662xhxdPRro" target="_blank" rel="noopener">Get Directions &rarr;</a>
+        </div>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-big">EST&Eacute;T <em>salon</em></div>
+    <div class="foot-grid">
+      <div>
+        <h4>EST&Eacute;T beauty salon</h4>
+        <p>A neighborhood hair salon on Avenue U, Brooklyn. Precision cuts, rich color, smooth blowouts, personal attention.</p>
+      </div>
+      <div>
+        <h4>Visit</h4>
+        <p>802 Avenue U<br>Brooklyn, NY 11223<br><a href="tel:+16464692471">(646) 469-2471</a></p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <p><a href="#services" data-page="services">Services</a><br><a href="#gallery" data-page="gallery">Gallery</a><br><a href="#reviews" data-page="reviews">Reviews</a><br><a href="#visit" data-page="visit">Visit Us</a></p>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© ESTÉT beauty salon</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "story", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    var drawer = document.getElementById("drawer");
+    var overlay = document.getElementById("overlay");
+    if(drawer){ drawer.classList.remove("open"); }
+    if(overlay){ overlay.classList.remove("show"); }
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger){
+    burger.addEventListener("click", function(){
+      var drawer = document.getElementById("drawer");
+      var overlay = document.getElementById("overlay");
+      var open = false;
+      if(drawer){ open = drawer.classList.toggle("open"); }
+      if(overlay){ overlay.classList.toggle("show", open); }
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+  var drawerClose = document.getElementById("drawerClose");
+  if(drawerClose){ drawerClose.addEventListener("click", closeMenu); }
+  var overlayEl = document.getElementById("overlay");
+  if(overlayEl){ overlayEl.addEventListener("click", closeMenu); }
+
+  /* ---------- live hours (America/New_York) ---------- */
+  var HOURS = {0:[10,17],1:null,2:[9,19],3:[9,19],4:[9,19],5:[9,19],6:[9,19]};
+  var DOW = {"Sun":0,"Mon":1,"Tue":2,"Wed":3,"Thu":4,"Fri":5,"Sat":6};
+  var DAYNAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  function fmt(h){
+    var ap = h < 12 ? "AM" : "PM";
+    var hh = h % 12;
+    if(hh === 0){ hh = 12; }
+    return hh + ":00 " + ap;
+  }
+  function nextOpen(day){
+    for(var k = 1; k <= 7; k++){
+      var d = (day + k) % 7;
+      if(HOURS[d]){ return {day:d, h:HOURS[d][0]}; }
+    }
+    return null;
+  }
+  try{
+    var parts = new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",weekday:"short",hour:"numeric",hour12:false}).formatToParts(new Date());
+    var wd = "Sat", hr = 12;
+    parts.forEach(function(p){
+      if(p.type === "weekday"){ wd = p.value; }
+      if(p.type === "hour"){ hr = parseInt(p.value, 10) % 24; }
+    });
+    var day = DOW[wd] !== undefined ? DOW[wd] : 6;
+    var today = HOURS[day];
+    var pill = document.getElementById("hoursPill");
+    var txt = document.getElementById("hoursText");
+    if(pill && txt){
+      if(today && hr >= today[0] && hr < today[1]){
+        txt.textContent = "Open now \u00B7 until " + fmt(today[1]) + " today";
+      } else {
+        pill.classList.add("closed");
+        var nx = nextOpen(day);
+        if(nx){
+          var label = ((day + 1) % 7 === nx.day) ? "tomorrow" : DAYNAMES[nx.day];
+          txt.textContent = "Opens " + label + " at " + fmt(nx.h) + " \u00B7 call to confirm";
+        } else {
+          txt.textContent = "Call for hours";
+        }
+      }
+    }
+    var rows = document.querySelectorAll("#hoursTable tr");
+    var idx = (day + 6) % 7; /* rows run Mon..Sun */
+    if(rows[idx]){ rows[idx].classList.add("today"); }
+  }catch(e){ /* leave default pill text */ }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
