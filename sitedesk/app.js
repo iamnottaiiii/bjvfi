@@ -1169,6 +1169,7 @@ function precallNoteHtml(){
     '<li>Photos: storefront, work, team</li>' +
     '<li>Which pages and features they want on the site</li>' +
     '<li>Business hours</li>' +
+    '<li>Email address</li>' +
     '<li>Best contact info and social media links</li></ul></div>';
 }
 
