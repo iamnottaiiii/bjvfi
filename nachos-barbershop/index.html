@@ -1,0 +1,148 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Nachos Barbershop. Appointment and Walk - Ins | Walk-ins Welcome</title><meta name="description" content="Appointments and walk-ins, always. Visit us at 3518 Firestone Blvd, South Gate, CA 90280 or call (323) 456-2753."><link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;800&family=Inter:wght@400;600&display=swap" rel="stylesheet"><style>:root{--bg:#f6f1e7;--ink:#22252a;--acc:#d1495b;--acc2:#30638e;--card:#ffffff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+h1,h2,h3,.brand,.bigname{font-family:'Barlow Condensed',serif;line-height:1.15}
+.wrap{max-width:1080px;margin:0 auto;padding:0 1.2rem}
+a{color:inherit;text-decoration:none}
+.brand{font-weight:700;font-size:1.25rem}
+.page{display:none;animation:fadeIn .35s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.minimal{position:sticky;top:0;z-index:50;background:var(--bg)}.bar{display:flex;align-items:center;justify-content:space-between;padding:1rem 0}.main.pop{display:none;position:absolute;top:100%;left:0;right:0;background:var(--card);flex-direction:column;padding:1rem;gap:.9rem;border-bottom:2px solid var(--acc);z-index:60}.minimal{position:relative}.main.pop.open{display:flex}.main a{font-size:1rem;font-weight:600}.main a.active{color:var(--acc)}#burger{background:none;border:0;cursor:pointer}#burger span{display:block;width:26px;height:3px;background:var(--ink);margin:5px 0}
+.kicker{text-transform:uppercase;letter-spacing:.2em;font-size:.75rem;color:var(--acc);font-weight:700}
+.hero{padding:3.5rem 0}
+.hero h1{font-size:clamp(2.2rem,6vw,4rem);margin:.4rem 0}
+.tag{font-size:1.15rem;opacity:.85;max-width:34rem}
+.tag.big{font-size:1.5rem}
+.cta{display:flex;gap:.8rem;margin-top:1.4rem;flex-wrap:wrap}
+.btn{display:inline-block;background:var(--acc);color:#fff;padding:.75rem 1.5rem;border-radius:8px;font-weight:700;border:2px solid var(--acc)}
+.btn.ghost{background:transparent;color:var(--ink)}
+.hero.fullbleed{position:relative;background:linear-gradient(135deg,var(--acc),var(--ink));color:#fff;padding:5rem 0;overflow:hidden}
+.hero.fullbleed .kicker{color:var(--acc2)}
+.hero.fullbleed .hero-art{position:absolute;right:4%;top:50%;transform:translateY(-50%);opacity:.25;width:220px}
+.hero.split{display:grid;grid-template-columns:1.1fr .9fr;gap:2rem;align-items:center}
+.hero.card{background:var(--card);border:2px solid var(--acc);border-radius:20px;padding:2.5rem;display:grid;grid-template-columns:1.1fr .9fr;gap:2rem;align-items:center;margin:2rem 0}
+.hero.editorial{text-align:left;padding:4rem 0;border-bottom:3px solid var(--acc)}
+.hero.editorial h1{font-size:clamp(3rem,9vw,6rem)}
+.hero.stack{text-align:center}.hero.stack .tag{margin:0 auto}.hero.stack .cta{justify-content:center}
+.artbox{background:var(--card);border:2px dashed var(--acc);border-radius:16px;min-height:220px;display:flex;align-items:center;justify-content:center;padding:1rem}
+.artbox.wide{max-width:560px;margin:1.5rem auto}
+.art{width:150px;height:auto}
+section.blk{padding:2.5rem 0}
+.band{background:var(--card);border-top:2px solid var(--acc);border-bottom:2px solid var(--acc);padding:2.5rem 0;margin:2rem 0}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.2rem;margin-top:1.2rem}
+.hcard{background:var(--card);border:1px solid var(--acc2);border-radius:12px;padding:1.4rem}
+.hcard h3{margin-bottom:.4rem;color:var(--acc)}
+.leaders{list-style:none;margin-top:1rem}
+.leaders li{display:flex;align-items:baseline;gap:.6rem;padding:.7rem 0;border-bottom:1px dotted var(--acc2)}
+.sv-name{font-weight:700;white-space:nowrap}
+.dots{flex:1;border-bottom:2px dotted var(--acc2);transform:translateY(-4px)}
+.sv-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-top:1rem}
+.sv-card{background:var(--card);border:1px solid var(--acc);border-radius:12px;padding:1.3rem}
+.sv-card h3{color:var(--acc);margin-bottom:.4rem}
+.tabrow{display:flex;gap:.5rem;flex-wrap:wrap;margin:1rem 0}
+.tab{background:var(--card);border:2px solid var(--acc2);border-radius:999px;padding:.5rem 1.1rem;cursor:pointer;font-weight:600;color:var(--ink)}
+.tab.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.pane{display:none;background:var(--card);border:1px solid var(--acc2);border-radius:12px;padding:1.5rem}
+.pane.on{display:block}
+.prices{width:100%;border-collapse:collapse;margin-top:1rem}
+.prices th,.prices td{padding:.7rem;border-bottom:1px solid var(--acc2);text-align:left}
+.prices th{color:var(--acc)}
+.note{font-size:.85rem;opacity:.75;margin-top:1rem}
+.ed-row{display:flex;gap:1.2rem;padding:1.1rem 0;border-bottom:2px solid var(--acc2);align-items:flex-start}
+.num{font-size:2.2rem;font-weight:800;color:var(--acc);min-width:3.2rem}
+.masonry{columns:3;column-gap:1rem;margin-top:1rem}
+.masonry .ph{break-inside:avoid;margin-bottom:1rem;min-height:180px}
+.strip{display:flex;gap:1rem;overflow-x:auto;padding:1rem 0;margin-top:1rem}
+.strip .ph{min-width:240px;min-height:200px}
+.car{overflow:hidden;margin-top:1rem}
+.car .track{display:flex;gap:1rem;transition:transform .35s}
+.car .ph{min-width:280px;min-height:220px}
+.car-nav{display:flex;gap:.6rem;margin-top:.8rem}
+.car-nav button{background:var(--acc);color:#fff;border:0;border-radius:50%;width:44px;height:44px;font-size:1.4rem;cursor:pointer}
+.arches{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.2rem;margin-top:1rem}
+.arches .ph{border-radius:120px 120px 16px 16px;min-height:260px}
+.ph{background:var(--card);border:2px dashed var(--acc);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--acc);font-weight:700;text-align:center;padding:1rem}
+.hours{width:100%;border-collapse:collapse;margin-top:1rem;max-width:480px}
+.hours td,.hours th{padding:.6rem;border-bottom:1px solid var(--acc2);text-align:left}
+.stars{font-size:1.15rem;font-weight:700;margin:1rem 0}
+.rev-card{background:var(--card);border:1px solid var(--acc2);border-radius:12px;padding:1.2rem;margin-top:1rem}
+.sample-badge{display:inline-block;background:var(--acc2);color:var(--ink);font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.2rem .6rem;border-radius:999px;margin-bottom:.5rem}
+footer{margin-top:3rem;border-top:3px solid var(--acc);background:var(--card)}
+footer .wrap{padding-top:1.5rem;padding-bottom:1rem}
+.f-big .bigname{font-size:clamp(2.4rem,7vw,4.5rem);color:var(--acc)}
+.f-cols .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.5rem}
+.copy{margin-top:1.2rem;padding-top:.8rem;border-top:1px solid var(--acc2);font-size:.9rem}
+.call{font-weight:700;color:var(--acc)}
+@media(max-width:760px){
+.hero.split,.hero.card{grid-template-columns:1fr}
+.masonry{columns:2}
+.topbar .main,.splitnav .main{display:none;position:absolute;top:100%;left:0;right:0;background:var(--card);flex-direction:column;padding:1rem;gap:.9rem;border-bottom:2px solid var(--acc);z-index:60}
+.topbar{position:relative}.splitnav{position:relative}
+.topbar .main.open,.splitnav .main.open{display:flex}
+#burger{display:block}
+.center .main{display:none;flex-direction:column;background:var(--card);padding:1rem;gap:.8rem;border-top:1px solid var(--acc2)}
+.center .main.open{display:flex}
+.center #burger{display:block;margin:0 auto}
+.hero.fullbleed .hero-art{display:none}
+}</style></head><body><header class="minimal"><div class="wrap bar"><a class="brand" data-page="home" href="#home">Nachos Barbershop. Appointment and Walk - Ins</a><button id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button></div></header><nav class="main pop" id="mainNav"><a data-page="home" href="#home">Home</a><a data-page="services" href="#services">Services</a><a data-page="about" href="#about">About</a><a data-page="gallery" href="#gallery">Gallery</a><a data-page="reviews" href="#reviews">Reviews</a><a data-page="visit" href="#visit">Visit</a></nav><main><section class="page" id="page-home"><div class="wrap hero split"><div><p class="kicker">Walk-ins Welcome</p><h1>Nachos Barbershop. Appointment and Walk - Ins</h1><p class="tag">Appointments and walk-ins, always.</p><div class="cta"><a class="btn" data-page="visit" href="#visit">Book a Chair</a><a class="btn ghost" href="tel:+13234562753">Call (323) 456-2753</a></div></div><div class="artbox"><svg viewBox="0 0 120 120" class="art" aria-hidden="true"><rect x="30" y="30" width="60" height="44" rx="10" fill="#d1495b"/><rect x="42" y="74" width="36" height="10" fill="#d1495b"/><rect x="56" y="84" width="8" height="24" fill="#22252a"/><rect x="40" y="104" width="40" height="6" rx="3" fill="#22252a"/></svg></div></div><div class="wrap blk"><h2>Welcome in</h2><p>Nachos Barbershop on Firestone Boulevard in South Gate welcomes both appointments and walk-ins.</p></div><div class="wrap"><h2>Popular services</h2><div class="cards"><div class="hcard"><h3>Haircut</h3><p>A clean cut shaped to your style.</p></div><div class="hcard"><h3>Skin Fade</h3><p>Smooth, detailed blending.</p></div><div class="hcard"><h3>Beard Trim</h3><p>Shaping and detailing.</p></div></div><p style="margin-top:1rem"><a class="btn" data-page="services" href="#services">See all services</a></p></div><div class="band"><div class="wrap"><h2>Loved locally</h2><p>4.6 from 70 Google reviews</p><p><a class="call" data-page="reviews" href="#reviews">Read what clients say</a></p></div></div><div class="wrap blk"><h2>Visit us</h2><p>3518 Firestone Blvd, South Gate, CA 90280</p><p><a class="call" href="tel:+13234562753">(323) 456-2753</a> · <a class="call" href="https://www.google.com/maps/place/?q=place_id:ChIJGV-qBQDMwoARrs94HtqwbQo">Get directions</a></p></div></section><section class="page" id="page-services"><div class="wrap blk"><p class="kicker">Services</p><h2>What we do best</h2><div class="ed-list"><div class="ed-row"><span class="num">01</span><div><h3>Haircut</h3><p>A clean cut shaped to your style.</p></div></div><div class="ed-row"><span class="num">02</span><div><h3>Skin Fade</h3><p>Smooth, detailed blending.</p></div></div><div class="ed-row"><span class="num">03</span><div><h3>Beard Trim</h3><p>Shaping and detailing.</p></div></div><div class="ed-row"><span class="num">04</span><div><h3>Lineup</h3><p>Crisp edges and sharp detail.</p></div></div><div class="ed-row"><span class="num">05</span><div><h3>Kids Cuts</h3><p>Friendly cuts for young clients.</p></div></div></div><p style="margin-top:1.4rem"><a class="btn" data-page="visit" href="#visit">Book a chair</a></p></div></section><section class="page" id="page-about"><div class="wrap blk"><p class="kicker">Our story</p><h2>About Nachos Barbershop. Appointment and Walk - Ins</h2><p>Nachos Barbershop on Firestone Boulevard in South Gate welcomes both appointments and walk-ins.</p><p style="margin-top:1rem">Book ahead or just walk in for a clean cut, a fade, or a beard trim. Either way, you leave sharp.</p></div></section><section class="page" id="page-gallery"><div class="wrap blk"><p class="kicker">Gallery</p><h2>Inside the shop</h2><p>Real photos are on the way. Placeholders below show where they will live.</p><div class="car"><div class="track"><div class="ph"><span>Photo coming soon</span></div><div class="ph"><span>Photo coming soon</span></div><div class="ph"><span>Photo coming soon</span></div><div class="ph"><span>Photo coming soon</span></div><div class="ph"><span>Photo coming soon</span></div><div class="ph"><span>Photo coming soon</span></div></div><div class="car-nav"><button id="prev" aria-label="Previous">‹</button><button id="next" aria-label="Next">›</button></div></div></div></section><section class="page" id="page-reviews"><div class="wrap blk"><p class="kicker">Reviews</p><h2>What clients say</h2><p class="stars">4.6 from 70 Google reviews</p><p><a class="btn" href="https://www.google.com/maps/place/?q=place_id:ChIJGV-qBQDMwoARrs94HtqwbQo">Read reviews</a> <a class="btn ghost" href="https://www.google.com/maps/place/?q=place_id:ChIJGV-qBQDMwoARrs94HtqwbQo">See reviews on Google</a></p><div class="rev-card"><span class="sample-badge">Sample</span><p>"Sample review shown for layout. Real client words will appear here once connected."</p></div></div></section><section class="page" id="page-visit"><div class="wrap blk"><p class="kicker">Visit</p><h2>Find us</h2><p>3518 Firestone Blvd, South Gate, CA 90280</p><p style="margin-top:.8rem"><a class="btn" href="tel:+13234562753">Call (323) 456-2753</a> <a class="btn ghost" href="https://www.google.com/maps/place/?q=place_id:ChIJGV-qBQDMwoARrs94HtqwbQo">Get directions</a></p><h3 style="margin-top:1.6rem">Hours</h3><p class="hours-call">Call for hours: <a href="tel:+13234562753">(323) 456-2753</a></p></div></section></main><footer class="f-min"><div class="wrap"><p><a href="tel:+13234562753">(323) 456-2753</a><br><a href="https://www.google.com/maps/place/?q=place_id:ChIJGV-qBQDMwoARrs94HtqwbQo">Get directions</a></p><p class="copy">© Nachos Barbershop. Appointment and Walk - Ins</p></div></footer>
+<script>
+(function(){
+  "use strict";
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+    closeMenu();
+    window.scrollTo(0, 0);
+  }
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+<script>
+(function(){
+  var track = document.querySelector(".car .track");
+  if(!track) return;
+  var x = 0;
+  function step(){ var w = track.children[0] ? track.children[0].offsetWidth + 16 : 320; return w; }
+  document.getElementById("next").addEventListener("click", function(){ x -= step(); track.style.transform = "translateX(" + x + "px)"; });
+  document.getElementById("prev").addEventListener("click", function(){ x += step(); if(x > 0){ x = 0; } track.style.transform = "translateX(" + x + "px)"; });
+})();
+</script></body></html>

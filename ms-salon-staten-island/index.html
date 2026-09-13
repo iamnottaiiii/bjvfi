@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MS Salon · Barber Shop, Staten Island, NY</title>
+<meta name="description" content="MS Salon, a barber shop on Richmond Rd in Staten Island, NY 10304. Sharp cuts, fades and beard trims. Call (347) 369-2811.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#171310; --char:#241D17; --paper:#F7F1E4; --cream:#FFFDF6;
+  --gold:#C99A3C; --gold-soft:#F0DFAE; --rust:#A34A24; --rust-soft:#F1D3BD;
+  --mut:#8A7B66; --line:rgba(23,19,16,.16);
+  --radius:14px; --shadow:0 18px 42px -18px rgba(23,19,16,.35);
+  --shadow-sm:0 8px 22px -10px rgba(23,19,16,.28);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Public Sans",system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:var(--rust)}
+::selection{background:var(--gold);color:var(--ink)}
+.wrap{max-width:1160px;margin:0 auto;padding:0 24px}
+
+header.site{position:sticky;top:0;z-index:60;background:var(--ink);color:var(--cream)}
+.bar{display:flex;align-items:center;gap:14px;padding:12px 0}
+.burger{background:none;border:2px solid var(--gold);border-radius:10px;cursor:pointer;padding:9px 11px;display:flex;flex-direction:column;gap:5px}
+.burger span{display:block;width:24px;height:2px;background:var(--gold)}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--cream);margin-right:auto}
+.brand-name{font-family:"Fraunces",serif;font-weight:900;font-size:1.35rem;line-height:1;letter-spacing:.5px}
+.brand-name small{display:block;font-family:"Public Sans",sans-serif;font-weight:700;font-size:.6rem;letter-spacing:3.5px;text-transform:uppercase;color:var(--gold);margin-top:4px}
+.bar .call-btn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:var(--ink);text-decoration:none;font-weight:700;padding:10px 20px;border-radius:999px;white-space:nowrap}
+.bar .call-btn:hover{background:var(--gold-soft)}
+
+.drawer{position:fixed;top:0;left:0;bottom:0;width:min(360px,86vw);background:var(--char);color:var(--cream);z-index:70;transform:translateX(-105%);transition:transform .32s cubic-bezier(.22,.8,.3,1);display:flex;flex-direction:column;padding:22px 26px 30px;box-shadow:20px 0 60px rgba(0,0,0,.4)}
+.drawer.open{transform:none}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px}
+.drawer-head strong{font-family:"Fraunces",serif;font-size:1.3rem}
+.drawer-close{background:none;border:2px solid var(--gold);color:var(--gold);border-radius:10px;font-size:1.1rem;line-height:1;cursor:pointer;padding:7px 12px}
+.drawer nav{display:flex;flex-direction:column;gap:4px}
+.drawer nav a{display:flex;align-items:baseline;gap:14px;text-decoration:none;color:var(--cream);font-family:"Fraunces",serif;font-weight:700;font-size:1.5rem;padding:12px 6px;border-bottom:1px solid rgba(201,154,60,.22)}
+.drawer nav a .num{font-family:"Public Sans",sans-serif;font-size:.75rem;color:var(--gold);font-weight:700;letter-spacing:2px}
+.drawer nav a.active,.drawer nav a:hover{color:var(--gold)}
+.drawer-foot{margin-top:auto;color:var(--mut);font-size:.9rem}
+.drawer-foot a{color:var(--gold);text-decoration:none;font-weight:700}
+.scrim{position:fixed;inset:0;background:rgba(23,19,16,.55);z-index:65;opacity:0;pointer-events:none;transition:opacity .3s}
+.scrim.open{opacity:1;pointer-events:auto}
+
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+.hero-full{position:relative;overflow:hidden;background:var(--ink);color:var(--cream)}
+.hero-full::before{content:"";position:absolute;inset:0;background:
+  radial-gradient(circle at 82% 18%, rgba(201,154,60,.35), transparent 45%),
+  repeating-linear-gradient(115deg, transparent 0 46px, rgba(201,154,60,.07) 46px 48px)}
+.hero-full .wrap{position:relative;padding:96px 24px 84px;max-width:900px}
+.kicker{display:inline-block;font-weight:700;font-size:.75rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);border:2px solid var(--gold);border-radius:999px;padding:7px 18px;margin-bottom:20px}
+h1{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(2.7rem,6vw,4.6rem);line-height:1.02;letter-spacing:-.5px;margin-bottom:18px}
+h1 .gold{color:var(--gold)}
+.lede{font-size:1.12rem;color:#D9CBB2;max-width:36rem;margin-bottom:30px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px}
+.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;padding:14px 28px;border-radius:999px;font-size:1rem;transition:transform .18s,background .18s}
+.btn-solid{background:var(--gold);color:var(--ink)}
+.btn-solid:hover{background:var(--gold-soft);transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:var(--cream);border:2px solid rgba(255,253,246,.4)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-2px)}
+
+.strip-rule{height:10px;background:repeating-linear-gradient(90deg,var(--gold) 0 60px,var(--rust) 60px 120px,var(--ink) 120px 180px)}
+
+section.block{padding:64px 0}
+h2{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(1.9rem,3.6vw,2.7rem);line-height:1.1;letter-spacing:-.3px;margin-bottom:12px}
+.sec-sub{color:#5C5142;max-width:40rem;margin-bottom:34px}
+
+.asym{display:grid;grid-template-columns:repeat(12,1fr);gap:20px}
+.a-card{background:var(--cream);border-radius:var(--radius);padding:30px 28px;box-shadow:var(--shadow-sm);border:1px solid var(--line)}
+.a-card h3{font-family:"Fraunces",serif;font-size:1.35rem;margin:14px 0 8px}
+.a-card p{color:#5C5142;font-size:.98rem}
+.a1{grid-column:span 5}.a2{grid-column:span 7}.a3{grid-column:4/span 6}.a4{grid-column:2/span 4}.a5{grid-column:6/span 6}
+.chip{display:inline-block;background:var(--ink);color:var(--gold);font-size:.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:5px 14px;border-radius:999px}
+.a-card .num{font-family:"Fraunces",serif;font-weight:900;font-size:2.6rem;color:var(--gold);line-height:1}
+
+.why{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:8px}
+.why div{background:var(--ink);color:var(--cream);border-radius:var(--radius);padding:28px 24px;box-shadow:var(--shadow-sm)}
+.why h3{font-family:"Fraunces",serif;color:var(--gold);font-size:1.2rem;margin-bottom:8px}
+.why p{color:#D9CBB2;font-size:.95rem}
+
+.cta-band{background:linear-gradient(120deg,var(--rust),#7E3418);border-radius:24px;color:#fff;padding:52px 40px;text-align:center;margin-top:56px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.cta-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(201,154,60,.4), transparent 50%)}
+.cta-band h2{color:#fff;position:relative}
+.cta-band p{color:#F1D3BD;position:relative;max-width:36rem;margin:0 auto 24px}
+.cta-band .btn-solid{position:relative}
+
+.strip{border-radius:24px;padding:56px 48px;color:var(--cream);position:relative;overflow:hidden;margin-bottom:44px;box-shadow:var(--shadow)}
+.strip::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(255,255,255,.14), transparent 50%)}
+.strip h2{color:#fff;font-size:clamp(2rem,4vw,3rem);position:relative;margin:4px 0 10px}
+.strip p{color:rgba(255,253,246,.85);max-width:38rem;position:relative}
+.strip .kick{font-weight:700;font-size:.75rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);position:relative}
+.strip.s-svc{background:linear-gradient(120deg,#241D17,#4A3520)}
+.strip.s-story{background:linear-gradient(120deg,var(--rust),#7E3418)}
+.strip.s-gal{background:linear-gradient(120deg,#6B5A24,#3E3413)}
+.strip.s-rev{background:linear-gradient(120deg,#7A4A1E,#4A2C0E)}
+.strip.s-visit{background:linear-gradient(120deg,#1F1A15,#3A2F23)}
+
+.ed-list{border-top:3px solid var(--ink)}
+.ed-row{display:grid;grid-template-columns:90px 1fr auto;gap:22px;align-items:baseline;padding:26px 8px;border-bottom:1px solid var(--line)}
+.ed-row .n{font-family:"Fraunces",serif;font-weight:900;font-size:2.2rem;color:var(--gold)}
+.ed-row h3{font-family:"Fraunces",serif;font-size:1.45rem;margin-bottom:6px}
+.ed-row p{color:#5C5142;max-width:34rem}
+.ed-row .price{font-family:"Fraunces",serif;font-weight:700;font-size:1.15rem;background:var(--cream);border:1px solid var(--line);border-radius:999px;padding:8px 20px;white-space:nowrap}
+.price-note{background:#FBF4DF;border:2px dashed rgba(163,74,36,.5);border-radius:var(--radius);padding:18px 24px;margin-top:26px;font-size:.95rem;color:#6B4423}
+.price-note strong{color:var(--rust)}
+
+.car{position:relative;overflow:hidden;border-radius:20px;box-shadow:var(--shadow);background:var(--ink)}
+.car-track{display:flex;transition:transform .45s cubic-bezier(.22,.8,.3,1)}
+.slide{min-width:100%;display:grid;grid-template-columns:1fr 1fr;align-items:stretch}
+.slide .art{min-height:340px;display:flex;align-items:center;justify-content:center;position:relative}
+.slide .art svg{width:46%;height:auto;filter:drop-shadow(0 12px 16px rgba(0,0,0,.3))}
+.slide .cap{background:var(--cream);padding:44px 42px;display:flex;flex-direction:column;justify-content:center}
+.slide .cap strong{font-family:"Fraunces",serif;font-size:1.6rem;display:block;margin-bottom:8px}
+.slide .cap p{color:#5C5142}
+.slide .soon{position:absolute;top:16px;left:16px;background:rgba(255,253,246,.9);font-size:.68rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 14px;border-radius:999px;color:#5C5142}
+.car-btn{position:absolute;top:50%;transform:translateY(-50%);background:var(--gold);border:0;width:52px;height:52px;border-radius:50%;cursor:pointer;font-size:1.4rem;font-weight:700;color:var(--ink);box-shadow:var(--shadow-sm)}
+.car-btn:hover{background:var(--gold-soft)}
+.car-prev{left:18px}.car-next{right:18px}
+.car-dots{display:flex;gap:10px;justify-content:center;padding:18px 0 0}
+.car-dots button{width:12px;height:12px;border-radius:50%;border:0;background:rgba(23,19,16,.2);cursor:pointer}
+.car-dots button.on{background:var(--rust)}
+
+.rev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.rev{background:var(--cream);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow-sm);position:relative;border:1px solid var(--line)}
+.rev .stars{color:var(--gold);font-size:1.15rem;letter-spacing:3px;margin-bottom:12px}
+.rev p{font-size:1.02rem;margin-bottom:14px}
+.rev cite{font-style:normal;font-weight:700;font-size:.85rem;color:var(--rust);letter-spacing:.5px}
+.rev .badge{position:absolute;top:16px;right:16px;background:var(--ink);color:var(--gold);font-size:.66rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 12px;border-radius:999px}
+.rs-strip{margin:0 auto 30px;max-width:640px;background:var(--cream);border:1px solid var(--gold-soft);border-radius:14px;padding:18px 22px;text-align:center}
+.rs-note{margin:0 0 12px;font-size:.95rem;color:#5C5142;line-height:1.55}
+.rs-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rs-btn{display:inline-block;background:var(--ink);color:var(--gold);padding:10px 24px;border-radius:999px;font-weight:700;text-decoration:none;font-size:.95rem}
+.rs-btn:hover{background:var(--char)}
+
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
+.info-card{background:var(--cream);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm);border:1px solid var(--line)}
+.info-card h3{font-family:"Fraunces",serif;font-size:1.4rem;margin-bottom:14px}
+.info-card p{color:#5C5142;margin-bottom:8px}
+.info-card a.big{font-family:"Fraunces",serif;font-size:1.5rem;font-weight:700;color:var(--rust);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.map-card{border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);min-height:340px;background:repeating-linear-gradient(0deg, transparent 0 46px, rgba(201,154,60,.22) 46px 48px),repeating-linear-gradient(90deg, transparent 0 46px, rgba(201,154,60,.22) 46px 48px),linear-gradient(140deg,#EFE3C8,#E0CD9F);display:flex;align-items:center;justify-content:center}
+.map-pin{text-align:center;background:var(--cream);padding:26px 34px;border-radius:18px;box-shadow:var(--shadow);max-width:78%;position:relative}
+.map-pin::after{content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);border:14px solid transparent;border-top-color:var(--cream);border-bottom:0}
+.map-pin strong{font-family:"Fraunces",serif;font-size:1.15rem;display:block}
+.map-pin small{color:#5C5142}
+.map-pin .btn{margin-top:14px}
+
+footer{background:var(--ink);color:#CBBFA9;margin-top:20px}
+.foot-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:32px;padding:56px 0 32px}
+.foot-grid h4{font-family:"Fraunces",serif;color:#fff;font-size:1.05rem;margin-bottom:14px;letter-spacing:.5px}
+.foot-grid p,.foot-grid a{color:#A7977E;font-size:.94rem}
+.foot-grid a{text-decoration:none}
+.foot-grid a:hover{color:var(--gold)}
+.foot-brand span{font-family:"Fraunces",serif;font-weight:900;color:#fff;font-size:1.25rem}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.12);padding:20px 0 26px;text-align:center;font-size:.85rem;color:#8A7B66}
+
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:940px){
+  .a1,.a2,.a3,.a4,.a5{grid-column:span 12}
+  .a4{grid-column:span 6}.a5{grid-column:span 6}
+  .why{grid-template-columns:1fr 1fr}
+  .rev-grid,.visit-grid{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr 1fr}
+  .strip{padding:40px 28px}
+  .slide{grid-template-columns:1fr}
+  .slide .art{min-height:260px}
+  .bar .call-btn{display:none}
+}
+@media(max-width:600px){
+  .a4,.a5{grid-column:span 12}
+  .why{grid-template-columns:1fr}
+  .ed-row{grid-template-columns:56px 1fr}
+  .ed-row .price{grid-column:2;justify-self:start}
+  .foot-grid{grid-template-columns:1fr}
+  .cta-band{padding:36px 24px}
+}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap bar">
+    <button class="burger" id="burger" aria-label="Open navigation menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    <a class="brand" href="#home" data-page="home" aria-label="MS Salon, home">
+      <svg viewBox="0 0 64 64" width="44" height="44" role="img" aria-label="Barber pole logo"><rect x="22" y="6" width="20" height="44" rx="10" fill="#F7F1E4"/><clipPath id="bp"><rect x="22" y="6" width="20" height="44" rx="10"/></clipPath><g clip-path="url(#bp)"><rect x="14" y="12" width="36" height="8" fill="#A34A24" transform="rotate(24 32 16)"/><rect x="14" y="30" width="36" height="8" fill="#C99A3C" transform="rotate(24 32 34)"/><rect x="14" y="48" width="36" height="8" fill="#A34A24" transform="rotate(24 32 52)"/></g><rect x="22" y="6" width="20" height="44" rx="10" fill="none" stroke="#C99A3C" stroke-width="2.5"/><rect x="28" y="50" width="8" height="10" fill="#C99A3C"/></svg>
+      <span class="brand-name">MS Salon<small>Barber Shop · Staten Island</small></span>
+    </a>
+    <a class="call-btn" href="tel:+13473692811">(347) 369-2811</a>
+  </div>
+</header>
+
+<div class="drawer" id="drawer" aria-label="Site navigation">
+  <div class="drawer-head"><strong>Menu</strong><button class="drawer-close" id="drawerClose" aria-label="Close navigation menu">✕</button></div>
+  <nav class="main" id="mainNav">
+    <a href="#home" data-page="home" class="active" aria-current="page"><span class="num">01</span>Home</a>
+    <a href="#services" data-page="services"><span class="num">02</span>Services</a>
+    <a href="#story" data-page="story"><span class="num">03</span>Our Story</a>
+    <a href="#gallery" data-page="gallery"><span class="num">04</span>Gallery</a>
+    <a href="#reviews" data-page="reviews"><span class="num">05</span>Reviews</a>
+    <a href="#visit" data-page="visit"><span class="num">06</span>Visit Us</a>
+  </nav>
+  <div class="drawer-foot">
+    <p>Richmond Rd, Staten Island, NY 10304</p>
+    <p style="margin-top:8px"><a href="tel:+13473692811">(347) 369-2811</a></p>
+  </div>
+</div>
+<div class="scrim" id="scrim"></div>
+
+<section class="page active" id="page-home">
+  <div class="hero-full">
+    <div class="wrap">
+      <span class="kicker">Barber shop · Richmond Rd</span>
+      <h1>Look sharp.<br>Walk in <span class="gold">confident.</span></h1>
+      <p class="lede">MS Salon is your neighborhood barber shop on Richmond Rd in Staten Island. Clean fades, classic cuts and beard trims, done right, every chair, every time.</p>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="#services" data-page="services">See Services →</a>
+        <a class="btn btn-ghost" href="https://www.google.com/maps/place/?q=place_id:ChIJMa-IAABPwokRrpo8XZ_gn-g" target="_blank" rel="noopener">Get Directions</a>
+      </div>
+    </div>
+  </div>
+  <div class="strip-rule"></div>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="reveal">
+        <h2>The neighborhood chair,<br>without the wait</h2>
+        <p class="sec-sub">A barber shop built on the simple stuff: steady hands, sharp tools and a cut that looks like you meant it.</p>
+      </div>
+      <div class="asym">
+        <div class="a-card a1 reveal"><span class="chip">01</span><h3>Classic cuts</h3><p>Taper, scissor work and tidy finishes for every hair type. Walk in, sit down, walk out sharper.</p></div>
+        <div class="a-card a2 reveal"><span class="chip">02</span><h3>Fades and designs</h3><p>Skin fades, hard parts and crisp lineups with a finish so clean it turns heads on Richmond Rd.</p></div>
+        <div class="a-card a3 reveal"><span class="chip">03</span><h3>Beard trims</h3><p>Shape, line and detail work that makes the beard match the haircut. Hot towel finish when you want it.</p></div>
+        <div class="a-card a4 reveal"><span class="chip">04</span><h3>Kids cuts</h3><p>Patient chairs for young gentlemen. First cuts welcome, parents approve.</p></div>
+        <div class="a-card a5 reveal"><span class="chip">05</span><h3>Walk-ins</h3><p>No fuss, no overthinking. Call ahead or just stop in and take the next open chair.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" style="padding-top:0">
+    <div class="wrap">
+      <div class="why">
+        <div class="reveal"><h3>Detail first</h3><p>Neckline, sideburns, edges. The small stuff is the whole job, and we treat it that way.</p></div>
+        <div class="reveal"><h3>Honest chairs</h3><p>Tell us what you want, or trust the chair. Either way, you leave with a cut you asked for.</p></div>
+        <div class="reveal"><h3>Easy to reach</h3><p>Right on Richmond Rd in Staten Island, with a direct line to book or ask anything.</p></div>
+      </div>
+      <div class="cta-band reveal">
+        <h2>Ready for a fresh cut?</h2>
+        <p>MS Salon · Richmond Rd, Staten Island, NY 10304. Call (347) 369-2811 to book your chair.</p>
+        <a class="btn btn-solid" href="tel:+13473692811">Call (347) 369-2811</a>
+      </div>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-svc">
+      <span class="kick">Services</span>
+      <h2>The chair menu</h2>
+      <p>Straightforward barbering, priced to be fair. Below are sample prices to give you an idea. Final prices are set in the shop, call to confirm.</p>
+    </div>
+    <div class="ed-list">
+      <div class="ed-row reveal"><span class="n">01</span><div><h3>Classic Haircut</h3><p>Consultation, precision cut and styled finish. Works for every hair type and every age.</p></div><span class="price">from $30</span></div>
+      <div class="ed-row reveal"><span class="n">02</span><div><h3>Skin Fade</h3><p>Seamless blend from skin to length, with a razor-sharp lineup and neckline detail.</p></div><span class="price">from $35</span></div>
+      <div class="ed-row reveal"><span class="n">03</span><div><h3>Beard Trim and Shape</h3><p>Outline, shape and detail, with a hot towel finish to seal it in.</p></div><span class="price">from $20</span></div>
+      <div class="ed-row reveal"><span class="n">04</span><div><h3>Cut Plus Beard</h3><p>The full reset. Haircut and beard service together so everything matches.</p></div><span class="price">from $45</span></div>
+      <div class="ed-row reveal"><span class="n">05</span><div><h3>Kids Cut</h3><p>Patient, gentle cuts for young gentlemen, including first haircuts.</p></div><span class="price">from $25</span></div>
+      <div class="ed-row reveal"><span class="n">06</span><div><h3>Lineup and Edge Up</h3><p>Crisp edges between full cuts to keep you sharp all month.</p></div><span class="price">from $15</span></div>
+    </div>
+    <div class="price-note reveal">
+      <strong>Good to know:</strong> prices above are samples only and are not confirmed by the shop. Real prices are posted in store and confirmed when you call. <strong>Call (347) 369-2811</strong> for today's chair availability.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-story">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-story">
+      <span class="kick">Our story</span>
+      <h2>A barber shop that treats<br>the chair like a promise</h2>
+      <p>MS Salon opened on Richmond Rd to be the kind of shop Staten Island deserves: honest work, fair chairs, and cuts worth coming back for.</p>
+    </div>
+    <div class="asym" style="margin-bottom:8px">
+      <div class="a-card a2 reveal"><span class="chip">The shop</span><h3>Built for the neighborhood</h3><p>Situated on Richmond Rd, MS Salon keeps barbering simple: clippers, shears and attention to detail. No gimmicks, no upsell games, just the craft done right. Every visit starts with a conversation about what you want and ends with a cut you will want to show off.</p></div>
+      <div class="a-card a1 reveal"><span class="num">10304</span><h3>Staten Island proud</h3><p>Serving Richmond Rd and the surrounding blocks, one chair at a time.</p></div>
+      <div class="a-card a4 reveal"><span class="chip">The craft</span><h3>Old school, new edge</h3><p>Classic techniques meet modern fades and designs. Ask for anything, from a boardroom taper to a weekend lineup.</p></div>
+      <div class="a-card a5 reveal"><span class="chip">The promise</span><h3>If it is not right, we fix it</h3><p>A haircut is a promise. If your cut is not sitting right, come back and we will make it right. That is how a neighborhood shop earns its regulars.</p></div>
+    </div>
+    <div class="wrap">
+      <div class="cta-band reveal">
+        <h2>Take the chair.</h2>
+        <p>MS Salon · Richmond Rd, Staten Island, NY 10304. Call ahead or walk in.</p>
+        <a class="btn btn-solid" href="#visit" data-page="visit">Plan your visit →</a>
+      </div>
+      <div style="height:56px"></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-gal">
+      <span class="kick">Gallery</span>
+      <h2>From the chair</h2>
+      <p>Artistic previews of the craft. Real photos from the shop are on the way.</p>
+    </div>
+
+    <div class="car reveal" id="car">
+      <div class="car-track" id="carTrack">
+        <div class="slide">
+          <div class="art" style="background:linear-gradient(140deg,#2A231B,#14100C)"><span class="soon">Photo soon</span>
+            <svg viewBox="0 0 100 100" role="img" aria-label="Illustration of a fade haircut"><circle cx="50" cy="42" r="30" fill="#C99A3C"/><path d="M20 40 q30 -34 60 0 q4 24 -8 38 q-22 6 -44 0 q-12 -14 -8 -38Z" fill="#171310"/><path d="M32 74 q18 -6 36 0" stroke="#A34A24" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M30 88 h40" stroke="#C99A3C" stroke-width="4" stroke-linecap="round"/></svg>
+          </div>
+          <div class="cap"><strong>The Fade</strong><p>Seamless blends and razor lines, built to last between visits.</p></div>
+        </div>
+        <div class="slide">
+          <div class="art" style="background:linear-gradient(140deg,#4A2C14,#241708)"><span class="soon">Photo soon</span>
+            <svg viewBox="0 0 100 100" role="img" aria-label="Illustration of a beard trim"><rect x="26" y="18" width="48" height="64" rx="24" fill="#C99A3C"/><path d="M34 52 q16 30 32 0 q-2 22 -16 24 q-14 -2 -16 -24Z" fill="#171310"/><path d="M34 52 q16 12 32 0" stroke="#A34A24" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="42" cy="42" r="3" fill="#171310"/><circle cx="58" cy="42" r="3" fill="#171310"/></svg>
+          </div>
+          <div class="cap"><strong>The Beard</strong><p>Shape, detail and hot towel finish for a beard that matches the cut.</p></div>
+        </div>
+        <div class="slide">
+          <div class="art" style="background:linear-gradient(140deg,#3A332A,#181410)"><span class="soon">Photo soon</span>
+            <svg viewBox="0 0 100 100" role="img" aria-label="Illustration of clippers and comb"><rect x="38" y="14" width="24" height="46" rx="10" fill="#C99A3C"/><rect x="38" y="14" width="24" height="12" rx="6" fill="#A34A24"/><path d="M50 60 v20 M44 60 v16 M56 60 v16" stroke="#C99A3C" stroke-width="4" stroke-linecap="round"/><rect x="64" y="40" width="8" height="42" rx="4" fill="#F7F1E4" transform="rotate(-18 68 60)"/><path d="M66 46 l8 20" stroke="#171310" stroke-width="2"/></svg>
+          </div>
+          <div class="cap"><strong>The Tools</strong><p>Clean, sharp and sterilized. The craft starts before the first cut.</p></div>
+        </div>
+        <div class="slide">
+          <div class="art" style="background:linear-gradient(140deg,#241D17,#0F0C08)"><span class="soon">Photo soon</span>
+            <svg viewBox="0 0 100 100" role="img" aria-label="Illustration of a barber chair"><rect x="30" y="56" width="40" height="10" rx="5" fill="#A34A24"/><rect x="46" y="66" width="8" height="20" fill="#C99A3C"/><path d="M30 56 q-6 -24 8 -30 q10 -4 14 6 q4 -10 14 -6 q14 6 8 30Z" fill="#3A2E20"/><rect x="24" y="52" width="52" height="8" rx="4" fill="#C99A3C"/></svg>
+          </div>
+          <div class="cap"><strong>The Chair</strong><p>Take a seat on Richmond Rd. Your cut is waiting.</p></div>
+        </div>
+      </div>
+      <button class="car-btn car-prev" id="carPrev" aria-label="Previous gallery slide">‹</button>
+      <button class="car-btn car-next" id="carNext" aria-label="Next gallery slide">›</button>
+    </div>
+    <div class="car-dots" id="carDots"></div>
+
+    <div class="price-note reveal" style="margin-top:28px">
+      <strong>Coming soon:</strong> real photos from inside the shop. The illustrations above are artistic placeholders the owner can swap for actual photos.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-rev">
+      <span class="kick">Reviews</span>
+      <h2>What the chair<br>has to say</h2>
+      <p>We are collecting public feedback for MS Salon. Check the live Google listing for the latest reviews.</p>
+    </div>
+    <div class="rs-strip">
+      <p class="rs-note">Review themes on this page are illustrative samples while public reviews are collected. Open the source to read current reviews and ratings.</p>
+      <div class="rs-links"><a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJMa-IAABPwokRrpo8XZ_gn-g" target="_blank" rel="noopener">See reviews on Google</a></div>
+    </div>
+
+    <div class="rev-grid">
+      <div class="rev reveal"><span class="badge">Sample</span><div class="stars">★★★★★</div><p>"Clean fade, sharp lineup, in and out on time. My new regular spot on Richmond Rd."</p><cite>Illustrative sample review</cite></div>
+      <div class="rev reveal"><span class="badge">Sample</span><div class="stars">★★★★★</div><p>"Took my time explaining what I wanted and they nailed it. Beard trim was a nice touch too."</p><cite>Illustrative sample review</cite></div>
+      <div class="rev reveal"><span class="badge">Sample</span><div class="stars">★★★★★</div><p>"Great with my son's first haircut. Patient, friendly, and the cut came out perfect."</p><cite>Illustrative sample review</cite></div>
+      <div class="rev reveal"><span class="badge">Sample</span><div class="stars">★★★★☆</div><p>"Solid shop, fair prices. Gets busy on Saturdays, so call ahead if you can."</p><cite>Illustrative sample review</cite></div>
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Sat in our chair? Tell the block.</h2>
+      <p>Your review helps a neighborhood barber shop keep growing. It takes a minute, and it means everything to a local shop.</p>
+      <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJMa-IAABPwokRrpo8XZ_gn-g" target="_blank" rel="noopener">★ Leave us a Google review</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-visit">
+      <span class="kick">Visit us</span>
+      <h2>Find the shop</h2>
+      <p>MS Salon sits on Richmond Rd in Staten Island. Call ahead for hours and chair availability.</p>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3>Find us</h3>
+        <p><strong>MS Salon</strong><br>Richmond Rd<br>Staten Island, NY 10304</p>
+        <p>Street parking nearby.<br>Look for the barber pole.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3>Call us</h3>
+        <p>Bookings, hours and questions:</p>
+        <a class="big" href="tel:+13473692811">(347) 369-2811</a>
+        <p style="margin-top:10px">Call for hours. We will confirm your chair and the day's availability.</p>
+      </div>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3>Hours</h3>
+        <p><strong>Call for hours.</strong> Hours are not published online, so give us a ring and we will tell you when the chairs are open today.</p>
+        <p style="margin-top:10px"><a href="tel:+13473692811" style="font-weight:700">(347) 369-2811</a></p>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <strong>Richmond Rd</strong>
+          <small>Staten Island, NY 10304</small><br>
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJMa-IAABPwokRrpo8XZ_gn-g" target="_blank" rel="noopener">Get Directions →</a>
+        </div>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand"><span>MS Salon</span></div>
+        <p>Neighborhood barber shop on Richmond Rd, Staten Island, NY. Sharp cuts, fair chairs, no fuss.</p>
+      </div>
+      <div>
+        <h4>Visit</h4>
+        <p>Richmond Rd<br>Staten Island, NY 10304<br><a href="tel:+13473692811">(347) 369-2811</a></p>
+      </div>
+      <div>
+        <h4>Services</h4>
+        <p><a href="#services" data-page="services">Classic cuts</a><br><a href="#services" data-page="services">Fades</a><br><a href="#services" data-page="services">Beard trims</a><br><a href="#services" data-page="services">Kids cuts</a></p>
+      </div>
+      <div>
+        <h4>More</h4>
+        <p><a href="#story" data-page="story">Our story</a><br><a href="#gallery" data-page="gallery">Gallery</a><br><a href="#reviews" data-page="reviews">Reviews</a><br><a href="#visit" data-page="visit">Visit us</a></p>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© MS Salon</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "story", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+  var drawer = document.getElementById("drawer");
+  var scrim = document.getElementById("scrim");
+  var drawerClose = document.getElementById("drawerClose");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(drawer){ drawer.classList.remove("open"); }
+    if(scrim){ scrim.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function openMenu(){
+    if(drawer){ drawer.classList.add("open"); }
+    if(scrim){ scrim.classList.add("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "true"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger){ burger.addEventListener("click", function(){ openMenu(); }); }
+  if(drawerClose){ drawerClose.addEventListener("click", function(){ closeMenu(); }); }
+  if(scrim){ scrim.addEventListener("click", function(){ closeMenu(); }); }
+
+  var track = document.getElementById("carTrack");
+  var dotsBox = document.getElementById("carDots");
+  var slides = track ? track.querySelectorAll(".slide") : [];
+  var idx = 0;
+  function paintDots(){
+    if(!dotsBox) return;
+    dotsBox.innerHTML = "";
+    for(var d = 0; d < slides.length; d++){
+      (function(n){
+        var b = document.createElement("button");
+        b.setAttribute("aria-label", "Go to gallery slide " + (n + 1));
+        if(n === idx){ b.className = "on"; }
+        b.addEventListener("click", function(){ go(n); });
+        dotsBox.appendChild(b);
+      })(d);
+    }
+  }
+  function go(n){
+    idx = (n + slides.length) % slides.length;
+    track.style.transform = "translateX(-" + (idx * 100) + "%)";
+    paintDots();
+  }
+  var prev = document.getElementById("carPrev");
+  var next = document.getElementById("carNext");
+  if(prev){ prev.addEventListener("click", function(){ go(idx - 1); }); }
+  if(next){ next.addEventListener("click", function(){ go(idx + 1); }); }
+  if(slides.length){ paintDots(); }
+
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

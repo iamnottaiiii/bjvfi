@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>National Plumbing and Heating Inc | Plumber in Newark, NJ</title>
+<meta name="description" content="National Plumbing and Heating Inc, a full-service plumber at 236 S 11th St, Newark, NJ 07107. Plumbing, heating, sewer jet cleaning, sump pumps, boilers and water heaters. Call (973) 424-9341.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FAF4E8; --cream-2:#F3E8D3; --paper:#FFFDF6;
+  --ink:#2B1B17; --ink-soft:#6E5348;
+  --crim:#A31621; --crim-deep:#7C0E17; --crim-soft:#F7DCD9;
+  --gold:#C99A2C; --gold-soft:#F6EAC9;
+  --line:rgba(163,22,33,.16);
+  --radius:14px;
+  --shadow:0 18px 40px -18px rgba(44,27,23,.28);
+  --shadow-sm:0 8px 22px -10px rgba(44,27,23,.22);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Public Sans",system-ui,sans-serif;
+  background:var(--cream);
+  background-image:
+    linear-gradient(rgba(163,22,33,.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(163,22,33,.045) 1px, transparent 1px);
+  background-size:34px 34px;
+  color:var(--ink);
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%}
+a{color:var(--crim)}
+::selection{background:var(--gold);color:var(--ink)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+
+/* ---------- side drawer nav ---------- */
+.drawer-btn{
+  position:fixed;top:18px;left:18px;z-index:120;
+  width:52px;height:52px;border-radius:50%;
+  background:var(--crim);border:none;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+  box-shadow:var(--shadow-sm);
+}
+.drawer-btn span{display:block;width:22px;height:2.5px;background:#FFF;border-radius:2px;transition:transform .3s,opacity .3s}
+.drawer-btn[aria-expanded="true"] span:nth-child(1){transform:translateY(7.5px) rotate(45deg)}
+.drawer-btn[aria-expanded="true"] span:nth-child(2){opacity:0}
+.drawer-btn[aria-expanded="true"] span:nth-child(3){transform:translateY(-7.5px) rotate(-45deg)}
+.scrim{
+  position:fixed;inset:0;background:rgba(43,27,23,.45);z-index:110;
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+body.nav-open .scrim{opacity:1;pointer-events:auto}
+nav.main{
+  position:fixed;top:0;left:0;bottom:0;width:min(340px,84vw);z-index:115;
+  background:var(--crim-deep);color:#FFF;
+  transform:translateX(-105%);transition:transform .35s cubic-bezier(.2,.8,.2,1);
+  display:flex;flex-direction:column;padding:28px 30px;overflow-y:auto;
+}
+nav.main.open{transform:translateX(0)}
+nav.main .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:#FFF;margin-bottom:8px}
+nav.main .brand-name{font-family:"Fraunces",serif;font-weight:700;font-size:1.25rem;line-height:1.2}
+nav.main .brand-sub{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:#F0CFCB}
+nav.main ul{list-style:none;margin:26px 0;display:flex;flex-direction:column;gap:2px}
+nav.main li a{
+  display:flex;align-items:center;justify-content:space-between;
+  color:#F8E9E4;text-decoration:none;font-weight:600;font-size:1.05rem;
+  padding:13px 10px;border-bottom:1px solid rgba(255,255,255,.14);border-radius:8px;
+}
+nav.main li a:hover{background:rgba(255,255,255,.08)}
+nav.main li a.active{background:rgba(255,255,255,.14);color:#FFF}
+nav.main .drawer-foot{margin-top:auto;font-size:.85rem;color:#E9C7C1;line-height:1.7}
+nav.main .drawer-foot a{color:#FFF;font-weight:700;text-decoration:none}
+.call-banner{
+  background:var(--crim-deep);color:#FFF;text-align:center;
+  padding:11px 70px;font-size:.9rem;font-weight:600;letter-spacing:.02em;
+}
+.call-banner a{color:#FFF;text-decoration:underline;font-weight:800}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .45s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ---------- shared bits ---------- */
+section.block{padding:64px 0}
+.kicker{
+  font-size:.78rem;font-weight:800;letter-spacing:.28em;text-transform:uppercase;color:var(--crim);
+  display:flex;align-items:center;gap:12px;margin-bottom:14px;
+}
+.kicker::after{content:"";height:2px;width:64px;background:var(--crim);opacity:.5}
+h1,h2,h3{font-family:"Fraunces",serif;color:var(--ink);line-height:1.15}
+h2{font-size:clamp(1.8rem,4vw,2.6rem);margin-bottom:10px}
+.lead{color:var(--ink-soft);font-size:1.06rem;max-width:640px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  font-weight:800;text-decoration:none;border-radius:999px;padding:14px 28px;font-size:1rem;
+  transition:transform .2s, box-shadow .2s;cursor:pointer;border:none;
+}
+.btn-solid{background:var(--crim);color:#FFF;box-shadow:var(--shadow-sm)}
+.btn-solid:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.btn-ghost{background:transparent;color:var(--crim);border:2px solid var(--crim)}
+.btn-ghost:hover{background:var(--crim);color:#FFF}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-sm)}
+.badge{
+  display:inline-block;font-size:.7rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+  background:var(--gold-soft);color:#8A6A1A;border:1px dashed #B8912E;border-radius:999px;padding:6px 14px;
+}
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* ---------- hero (split) ---------- */
+.hero{padding:70px 0 60px}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center}
+.hero h1{font-size:clamp(2.6rem,5.6vw,4.2rem);font-weight:900;margin:12px 0 16px}
+.hero h1 .red{color:var(--crim)}
+.hero p.sub{color:var(--ink-soft);font-size:1.1rem;margin-bottom:26px;max-width:520px}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:26px}
+.hero-facts{display:flex;gap:26px;flex-wrap:wrap}
+.hero-facts div{font-size:.86rem;color:var(--ink-soft)}
+.hero-facts strong{display:block;font-family:"Fraunces",serif;font-size:1.5rem;color:var(--crim)}
+.hero-art{
+  position:relative;background:var(--crim);border-radius:26px;min-height:460px;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);
+}
+.hero-art .pipes{position:absolute;inset:0;opacity:.28}
+.hero-art .seal{
+  position:relative;z-index:2;text-align:center;color:#FFF;padding:30px;
+}
+.hero-art .seal-ring{
+  width:190px;height:190px;border-radius:50%;border:3px solid rgba(255,255,255,.7);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 18px;
+  font-family:"Fraunces",serif;
+}
+.hero-art .seal-ring .big{font-size:2rem;font-weight:900;line-height:1}
+.hero-art .seal-ring .small{font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;margin-top:6px;color:#F3D7D2}
+.hero-art .seal p{max-width:280px;margin:0 auto;font-size:.95rem;color:#F6E4E0}
+
+/* ---------- marquee ---------- */
+.marquee{background:var(--ink);color:var(--cream);overflow:hidden;padding:14px 0;border-top:3px solid var(--crim);border-bottom:3px solid var(--crim)}
+.marquee .track{display:flex;gap:44px;white-space:nowrap;font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:.85rem;width:max-content;animation:scroll 26s linear infinite}
+@keyframes scroll{to{transform:translateX(-50%)}}
+
+/* ---------- dotted leader service list ---------- */
+.service-list{list-style:none;margin-top:30px}
+.service-list li{
+  display:flex;align-items:baseline;gap:14px;padding:18px 4px;border-bottom:1px solid var(--line);
+}
+.service-list .svc{font-weight:800;font-size:1.08rem;font-family:"Fraunces",serif}
+.service-list .dots{flex:1;border-bottom:3px dotted rgba(163,22,33,.4);transform:translateY(-5px)}
+.service-list .tag{font-size:.8rem;font-weight:700;color:var(--ink-soft);white-space:nowrap}
+.service-list .num{
+  font-family:"Fraunces",serif;font-weight:900;color:var(--crim);opacity:.5;font-size:1.3rem;min-width:44px;
+}
+.note-box{margin-top:28px;background:var(--crim-soft);border:1px solid var(--line);border-radius:var(--radius);padding:20px 24px;font-size:.95rem;color:#6B2A22}
+
+/* ---------- cards ---------- */
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:30px}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:22px;margin-top:30px}
+.tcard{padding:28px;transition:transform .25s}
+.tcard:hover{transform:translateY(-5px)}
+.tcard .ic{
+  width:52px;height:52px;border-radius:14px;background:var(--crim);color:#FFF;
+  display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:1.4rem;
+}
+.tcard h3{font-size:1.25rem;margin-bottom:8px}
+.tcard p{color:var(--ink-soft);font-size:.96rem}
+
+/* ---------- gallery (square grid) ---------- */
+.gal{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:30px}
+.tile{
+  aspect-ratio:1/1;border-radius:var(--radius);overflow:hidden;position:relative;
+  border:1px solid var(--line);box-shadow:var(--shadow-sm);
+}
+.tile .art{position:absolute;inset:0}
+.tile .cap{
+  position:absolute;left:12px;bottom:12px;right:12px;
+  background:rgba(255,253,246,.94);border-radius:10px;padding:8px 12px;font-size:.8rem;font-weight:700;
+  display:flex;justify-content:space-between;align-items:center;gap:8px;
+}
+.tile .cap .badge{font-size:.58rem;padding:4px 10px}
+
+/* ---------- reviews ---------- */
+.rev-head{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin:18px 0 8px}
+.stars{color:var(--gold);font-size:1.5rem;letter-spacing:2px}
+.rev-head .score{font-family:"Fraunces",serif;font-size:2.2rem;font-weight:900;color:var(--crim)}
+.src-links{display:flex;gap:14px;flex-wrap:wrap;margin:16px 0 30px}
+.src-links a.btn{padding:12px 22px;font-size:.95rem}
+.rev-card{padding:26px;position:relative}
+.rev-card .who{font-weight:800;margin-top:14px}
+.rev-card .meta{font-size:.82rem;color:var(--ink-soft)}
+.rev-card .badge{margin-top:12px}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:30px}
+.visit-card{padding:32px}
+.visit-card h3{margin-bottom:14px;font-size:1.4rem}
+.big-phone{display:block;font-family:"Fraunces",serif;font-size:clamp(1.6rem,4vw,2.4rem);font-weight:900;color:var(--crim);text-decoration:none;margin:10px 0 18px}
+.hours-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px dashed var(--line);font-size:.95rem}
+
+/* ---------- footer (big type) ---------- */
+footer.site{background:var(--ink);color:var(--cream);padding:70px 0 34px;margin-top:20px}
+footer.site .big{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(2.4rem,7vw,5rem);line-height:1.05;margin-bottom:8px}
+footer.site .big a{color:var(--cream);text-decoration:none}
+footer.site .big a:hover{color:var(--gold)}
+footer.site .cols{display:flex;gap:40px;flex-wrap:wrap;margin:26px 0;font-size:.95rem;color:#D8CBBF}
+footer.site .cols a{color:var(--cream)}
+footer.site .copy{border-top:1px solid rgba(250,244,232,.18);padding-top:22px;margin-top:30px;font-size:.9rem;color:#CBBFAF}
+
+/* ---------- responsive ---------- */
+@media(max-width:900px){
+  .hero-grid{grid-template-columns:1fr}
+  .hero-art{min-height:340px}
+  .grid-3,.grid-2,.gal{grid-template-columns:repeat(2,1fr)}
+  .visit-grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .grid-3,.grid-2,.gal{grid-template-columns:1fr}
+  .call-banner{padding:10px 60px 10px 20px;text-align:left;font-size:.82rem}
+}
+</style>
+</head>
+<body>
+
+<button class="drawer-btn" id="burger" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mainNav">
+  <span></span><span></span><span></span>
+</button>
+<div class="scrim" id="scrim" aria-hidden="true"></div>
+
+<nav class="main drawer" id="mainNav" aria-label="Site">
+  <a class="brand" href="#home" data-page="home" aria-label="National Plumbing and Heating Inc, home">
+    <svg width="44" height="44" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" fill="#A31621"/><path d="M14 30c4-9 8 3 12-6s8 2 8 2" stroke="#FAF4E8" stroke-width="3.4" fill="none" stroke-linecap="round"/><circle cx="24" cy="24" r="22" fill="none" stroke="#F3E8D3" stroke-width="2" opacity=".5"/></svg>
+    <span><span class="brand-name">National Plumbing<br>and Heating Inc</span><br><span class="brand-sub">Newark NJ</span></span>
+  </a>
+  <ul>
+    <li><a href="#home" data-page="home" class="active" aria-current="page">Home <span>&rarr;</span></a></li>
+    <li><a href="#services" data-page="services">Services <span>&rarr;</span></a></li>
+    <li><a href="#about" data-page="about">About Us <span>&rarr;</span></a></li>
+    <li><a href="#gallery" data-page="gallery">Gallery <span>&rarr;</span></a></li>
+    <li><a href="#reviews" data-page="reviews">Reviews <span>&rarr;</span></a></li>
+    <li><a href="#visit" data-page="visit">Visit and Contact <span>&rarr;</span></a></li>
+  </ul>
+  <div class="drawer-foot">
+    <a href="tel:+19734249341">(973) 424-9341</a><br>
+    236 S 11th St<br>Newark, NJ 07107
+  </div>
+</nav>
+
+<div class="call-banner">Need a plumber now? Call <a href="tel:+19734249341">(973) 424-9341</a></div>
+
+
+<section class="page" id="page-home">
+  <div class="wrap hero">
+    <div class="hero-grid">
+      <div>
+        <p class="kicker">Plumber in Newark, NJ</p>
+        <h1>Plumbing and heating work, done <span class="red">right the first time.</span></h1>
+        <p class="sub">National Plumbing and Heating Inc is a full-service plumbing and heating contractor at 236 S 11th St in Newark. From water heaters and boilers to sewer jet cleaning and drain work, one call covers the whole system.</p>
+        <div class="hero-cta">
+          <a class="btn btn-solid" href="tel:+19734249341">Call (973) 424-9341</a>
+          <a class="btn btn-ghost" href="#services" data-page="services">See services &rarr;</a>
+        </div>
+        <div class="hero-facts">
+          <div><strong>4.5</strong>star rating, 19 reviews</div>
+          <div><strong>Tri-State</strong>service area</div>
+          <div><strong>100%</strong>satisfaction guarantee</div>
+        </div>
+      </div>
+      <div class="hero-art" role="img" aria-label="Illustrated badge for National Plumbing and Heating Inc">
+        <svg class="pipes" viewBox="0 0 400 460" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <path d="M-20 120 H140 V220 H420" stroke="#FAF4E8" stroke-width="26" fill="none"/>
+          <path d="M-20 300 H260 V420 H420" stroke="#F3E8D3" stroke-width="18" fill="none"/>
+          <circle cx="140" cy="170" r="16" fill="#C99A2C"/>
+          <circle cx="260" cy="360" r="12" fill="#C99A2C"/>
+        </svg>
+        <div class="seal">
+          <div class="seal-ring">
+            <span class="big">NPH</span>
+            <span class="small">Newark NJ</span>
+          </div>
+          <p>Complete plumbing and heating services for homes and businesses across the Tri-State area.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="track" id="marqueeTrack">
+      <span>Plumbing</span><span>&bull;</span><span>Heating</span><span>&bull;</span><span>Water Heaters</span><span>&bull;</span><span>Boilers</span><span>&bull;</span><span>Sewer Jet Cleaning</span><span>&bull;</span><span>Drain Cleaning</span><span>&bull;</span><span>Sump Pumps</span><span>&bull;</span>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <section class="block">
+      <p class="kicker">What we do</p>
+      <h2>One shop for pipes, drains, and heat</h2>
+      <p class="lead">Licensed technicians handle repairs, replacements, and new installs across plumbing, heating, and sewer lines, residential and commercial.</p>
+      <div class="grid-3">
+        <div class="card tcard reveal">
+          <div class="ic" aria-hidden="true">&#128167;</div>
+          <h3>Plumbing Repairs and Installs</h3>
+          <p>Pipe leak repair, fixture repair and replacement for toilets, tubs, and sinks, plus video pipe inspections.</p>
+        </div>
+        <div class="card tcard reveal">
+          <div class="ic" aria-hidden="true">&#128293;</div>
+          <h3>Water Heaters and Boilers</h3>
+          <p>Water heater installation and service, tankless water heaters, and commercial boiler work.</p>
+        </div>
+        <div class="card tcard reveal">
+          <div class="ic" aria-hidden="true">&#128300;</div>
+          <h3>Sewer and Drain Services</h3>
+          <p>Sewer and drain cleaning, high-pressure jetting service, and sewer and gas line replacement and repair.</p>
+        </div>
+      </div>
+      <p style="margin-top:28px"><a class="btn btn-ghost" href="#services" data-page="services">Full service list &rarr;</a></p>
+    </section>
+
+    <section class="block" style="padding-top:0">
+      <p class="kicker">Why call us</p>
+      <h2>A contractor, not a call center</h2>
+      <p class="lead">Approved vendor status with the NJ Schools Development Authority and a 4.5 star rating across 19 reviews.</p>
+      <div class="grid-2">
+        <div class="card tcard reveal">
+          <div class="ic" aria-hidden="true">&#10003;</div>
+          <h3>Satisfaction guaranteed</h3>
+          <p>All work is backed by a 100% satisfaction guarantee, and the team stands behind every repair.</p>
+        </div>
+        <div class="card tcard reveal">
+          <div class="ic" aria-hidden="true">&#127970;</div>
+          <h3>Residential and commercial</h3>
+          <p>From a dripping faucet to full building systems, no job is too small or too big in the Tri-State area.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</section>
+
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <section class="block">
+      <p class="kicker">Services</p>
+      <h2>The complete service list</h2>
+      <p class="lead">Everything below is handled in house by licensed plumbing and heating technicians.</p>
+      <ul class="service-list">
+        <li><span class="num">01</span><span class="svc">Water heater installation and service</span><span class="dots" aria-hidden="true"></span><span class="tag">Plumbing</span></li>
+        <li><span class="num">02</span><span class="svc">Tankless water heater installation</span><span class="dots" aria-hidden="true"></span><span class="tag">Plumbing</span></li>
+        <li><span class="num">03</span><span class="svc">Sewer and drain cleaning</span><span class="dots" aria-hidden="true"></span><span class="tag">Drains</span></li>
+        <li><span class="num">04</span><span class="svc">High-pressure sewer jet cleaning</span><span class="dots" aria-hidden="true"></span><span class="tag">Drains</span></li>
+        <li><span class="num">05</span><span class="svc">Sewer and gas line replacement and repair</span><span class="dots" aria-hidden="true"></span><span class="tag">Lines</span></li>
+        <li><span class="num">06</span><span class="svc">Full video pipe inspections</span><span class="dots" aria-hidden="true"></span><span class="tag">Diagnostics</span></li>
+        <li><span class="num">07</span><span class="svc">Pipe leak repair</span><span class="dots" aria-hidden="true"></span><span class="tag">Plumbing</span></li>
+        <li><span class="num">08</span><span class="svc">Fixture repair and replacement</span><span class="dots" aria-hidden="true"></span><span class="tag">Plumbing</span></li>
+        <li><span class="num">09</span><span class="svc">Boiler installation and service</span><span class="dots" aria-hidden="true"></span><span class="tag">Heating</span></li>
+        <li><span class="num">10</span><span class="svc">Sump pump installation and service</span><span class="dots" aria-hidden="true"></span><span class="tag">Plumbing</span></li>
+        <li><span class="num">11</span><span class="svc">HVAC and heating service</span><span class="dots" aria-hidden="true"></span><span class="tag">Heating</span></li>
+        <li><span class="num">12</span><span class="svc">Whole-house plumbing inspections</span><span class="dots" aria-hidden="true"></span><span class="tag">Preventative</span></li>
+      </ul>
+      <div class="note-box">
+        <strong>Free whole-house inspection.</strong> When a licensed plumber is at your home, they will also check the rest of the plumbing so small problems are found early.
+      </div>
+      <p style="margin-top:30px"><a class="btn btn-solid" href="tel:+19734249341">Call (973) 424-9341 to book</a></p>
+    </section>
+  </div>
+</section>
+
+
+<section class="page" id="page-about">
+  <div class="wrap">
+    <section class="block">
+      <p class="kicker">About us</p>
+      <h2>A Newark shop with a Tri-State footprint</h2>
+      <div class="grid-2" style="margin-top:26px">
+        <div>
+          <p class="lead" style="margin-bottom:16px">National Plumbing and Heating Inc is based at 236 S 11th St in Newark, NJ, serving residential and commercial customers across the Tri-State area. The company is an approved vendor with the New Jersey Schools Development Authority, a credential that holds the team to rigorous public-project standards on every job.</p>
+          <p class="lead">Technicians are licensed, trained, and industry certified, and every job is backed by a 100% satisfaction guarantee.</p>
+          <p style="margin-top:22px"><a class="btn btn-ghost" href="#reviews" data-page="reviews">Read customer reviews &rarr;</a></p>
+        </div>
+        <div class="card visit-card">
+          <h3>At a glance</h3>
+          <div class="hours-row"><span>Rating</span><strong>4.5 stars, 19 reviews</strong></div>
+          <div class="hours-row"><span>Headquarters</span><strong>Newark, NJ 07107</strong></div>
+          <div class="hours-row"><span>Service area</span><strong>Tri-State region</strong></div>
+          <div class="hours-row"><span>Customers</span><strong>Residential and commercial</strong></div>
+          <div class="hours-row"><span>Guarantee</span><strong>100% satisfaction</strong></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</section>
+
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <section class="block">
+      <p class="kicker">Gallery</p>
+      <h2>On the job</h2>
+      <p class="lead">Project photos are being added. Placeholders below mark where real job photos will appear.</p>
+      <div class="gal">
+        <div class="tile reveal"><div class="art" style="background:linear-gradient(135deg,var(--crim) 0%,var(--crim-deep) 100%)"></div><div class="cap"><span>Water heater installs</span><span class="badge">Photo soon</span></div></div>
+        <div class="tile reveal"><div class="art" style="background:linear-gradient(135deg,#C99A2C 0%,#8A6A1A 100%)"></div><div class="cap"><span>Boiler service</span><span class="badge">Photo soon</span></div></div>
+        <div class="tile reveal"><div class="art" style="background:linear-gradient(135deg,#5A3A33 0%,var(--ink) 100%)"></div><div class="cap"><span>Sewer jet cleaning</span><span class="badge">Photo soon</span></div></div>
+        <div class="tile reveal"><div class="art" style="background:linear-gradient(135deg,var(--crim-deep) 0%,#4A1A12 100%)"></div><div class="cap"><span>Fixture replacements</span><span class="badge">Photo soon</span></div></div>
+        <div class="tile reveal"><div class="art" style="background:linear-gradient(135deg,#8A6A1A 0%,#C99A2C 100%)"></div><div class="cap"><span>Pipe repairs</span><span class="badge">Photo soon</span></div></div>
+        <div class="tile reveal"><div class="art" style="background:linear-gradient(135deg,#6E5348 0%,#2B1B17 100%)"></div><div class="cap"><span>Video inspections</span><span class="badge">Photo soon</span></div></div>
+      </div>
+    </section>
+  </div>
+</section>
+
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <section class="block">
+      <p class="kicker">Reviews</p>
+      <h2>What customers say</h2>
+      <div class="rev-head">
+        <span class="stars" aria-label="4.5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span>
+        <span class="score">4.5</span>
+        <span class="lead">Based on 19 Google reviews</span>
+      </div>
+      <div class="src-links">
+        <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJ_9hDB-RVwokRgqYWE2ATHJU">See reviews on Google</a>
+        <a class="btn btn-ghost" href="https://reviews.birdeye.com/national-plumbing-heating-inc-166651975550827">See reviews on Birdeye</a>
+      </div>
+      <div class="grid-2">
+        <div class="card rev-card reveal">
+          <span class="stars" style="font-size:1.1rem">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+          <p style="margin-top:10px">Fast water heater replacement. The tech arrived quickly, swapped out the old tank, and left everything clean.</p>
+          <p class="who">Verified customer theme</p>
+          <p class="meta">Theme from recent customer feedback</p>
+          <span class="badge">Sample</span>
+        </div>
+        <div class="card rev-card reveal">
+          <span class="stars" style="font-size:1.1rem">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+          <p style="margin-top:10px">Professional crew on a full-house repipe. Competitive pricing, owned their hiccups, and made everything right.</p>
+          <p class="who">Verified customer theme</p>
+          <p class="meta">Theme from recent customer feedback</p>
+          <span class="badge">Sample</span>
+        </div>
+        <div class="card rev-card reveal">
+          <span class="stars" style="font-size:1.1rem">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+          <p style="margin-top:10px">Great experience from start to finish. Responsive, courteous, and thorough on the whole plumbing check.</p>
+          <p class="who">Verified customer theme</p>
+          <p class="meta">Theme from recent customer feedback</p>
+          <span class="badge">Sample</span>
+        </div>
+        <div class="card rev-card reveal">
+          <span class="stars" style="font-size:1.1rem">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+          <p style="margin-top:10px">Highly recommended by neighbors for drain and sewer work. Fair, honest communication throughout.</p>
+          <p class="who">Verified customer theme</p>
+          <p class="meta">Theme from recent customer feedback</p>
+          <span class="badge">Sample</span>
+        </div>
+      </div>
+      <div class="note-box" style="margin-top:30px">Customer themes above are samples based on public review highlights. Read the full verified reviews on Google and Birdeye using the links above.</div>
+    </section>
+  </div>
+</section>
+
+
+<section class="page" id="page-visit">
+  <div class="wrap">
+    <section class="block">
+      <p class="kicker">Visit and contact</p>
+      <h2>Get in touch</h2>
+      <p class="lead">Call for service, a quote, or scheduling across the Tri-State area.</p>
+      <div class="visit-grid">
+        <div class="card visit-card reveal">
+          <h3>Call us</h3>
+          <a class="big-phone" href="tel:+19734249341">(973) 424-9341</a>
+          <p class="lead" style="font-size:.95rem">Call for hours</p>
+          <p style="margin-top:18px;display:flex;gap:12px;flex-wrap:wrap">
+            <a class="btn btn-solid" href="tel:+19734249341">Call now</a>
+            <a class="btn btn-ghost" href="https://www.google.com/maps/place/?q=place_id:ChIJ_9hDB-RVwokRgqYWE2ATHJU">Get directions</a>
+          </p>
+        </div>
+        <div class="card visit-card reveal">
+          <h3>Find us</h3>
+          <p><strong>National Plumbing and Heating Inc</strong><br>236 S 11th St<br>Newark, NJ 07107</p>
+          <p style="margin-top:14px;color:var(--ink-soft);font-size:.95rem">Serving residential and commercial customers across the Tri-State area.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap">
+    <p class="big"><a href="tel:+19734249341">Need a plumber?<br>Call us today.</a></p>
+    <div class="cols">
+      <span><strong>National Plumbing and Heating Inc</strong><br>236 S 11th St, Newark, NJ 07107</span>
+      <span><a href="tel:+19734249341">(973) 424-9341</a><br><a href="https://www.google.com/maps/place/?q=place_id:ChIJ_9hDB-RVwokRgqYWE2ATHJU">Get directions</a></span>
+      <span>
+        <a href="#home" data-page="home">Home</a><br>
+        <a href="#services" data-page="services">Services</a><br>
+        <a href="#reviews" data-page="reviews">Reviews</a>
+      </span>
+    </div>
+    <p class="copy">© National Plumbing & Heating Inc</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+  var scrim = document.getElementById("scrim");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+    document.body.classList.remove("nav-open");
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+      document.body.classList.toggle("nav-open", open);
+    });
+  }
+  if(scrim){
+    scrim.addEventListener("click", closeMenu);
+  }
+
+  /* ---------- marquee: duplicate for seamless loop ---------- */
+  var track = document.getElementById("marqueeTrack");
+  if(track){ track.innerHTML += track.innerHTML; }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
