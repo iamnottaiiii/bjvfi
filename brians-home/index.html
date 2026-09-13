@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brian's Home · Custom Home Builder, Rex, GA</title>
+<meta name="description" content="Brian's Home is a custom home builder and remodeling contractor at 3010 Deerfield Way, Rex, GA. New construction, additions, remodeling and repairs. Call (770) 960-2631.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F4F1E9; --paper:#FFFEFA; --ink:#1F2733; --ink-soft:#5B6675;
+  --amber:#E07B16; --amber-deep:#B35F0B; --amber-soft:#FCEFD9;
+  --steel:#2C4A63; --steel-deep:#1D3346; --steel-soft:#E2EAF1;
+  --slate:#8A94A3;
+  --radius:20px;
+  --shadow:0 24px 50px -22px rgba(31,39,51,.28);
+  --shadow-sm:0 10px 26px -12px rgba(31,39,51,.22);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Inter",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:var(--amber-deep)}
+::selection{background:var(--amber);color:#fff}
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+h1,h2,h3{font-family:"Archivo",sans-serif;line-height:1.08;letter-spacing:-.5px}
+
+/* ---------- top bar ---------- */
+header.site{position:sticky;top:0;z-index:60;background:rgba(244,241,233,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:3px solid var(--ink)}
+.bar{display:flex;align-items:center;gap:16px;padding:12px 0}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);margin-right:auto}
+.brand svg{width:48px;height:48px;flex:none}
+.brand-name{font-family:"Archivo",sans-serif;font-weight:900;font-size:1.3rem;line-height:1}
+.brand-name small{display:block;font-family:"Inter",sans-serif;font-weight:600;font-size:.62rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--amber-deep);margin-top:4px}
+.call-btn{display:inline-flex;align-items:center;gap:8px;background:var(--amber);color:#fff;text-decoration:none;font-weight:700;padding:11px 20px;border-radius:12px;box-shadow:var(--shadow-sm);transition:transform .18s,background .18s;white-space:nowrap}
+.call-btn:hover{background:var(--amber-deep);transform:translateY(-2px)}
+.burger{background:var(--ink);border:0;cursor:pointer;padding:12px 13px;border-radius:12px;display:flex;flex-direction:column;gap:5px}
+.burger span{display:block;width:24px;height:3px;border-radius:3px;background:#fff;transition:.25s}
+
+/* ---------- side drawer nav ---------- */
+nav.main{position:fixed;top:0;left:0;bottom:0;width:min(360px,86vw);background:var(--ink);z-index:200;transform:translateX(-104%);transition:transform .32s cubic-bezier(.22,.8,.3,1);display:flex;flex-direction:column;padding:0 0 28px;box-shadow:30px 0 60px -20px rgba(0,0,0,.4)}
+nav.main.open{transform:translateX(0)}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:22px 24px;border-bottom:1px solid rgba(255,255,255,.12)}
+.drawer-head .brand-name{color:#fff}
+.drawer-close{background:rgba(255,255,255,.1);border:0;color:#fff;font-size:1.4rem;line-height:1;cursor:pointer;width:40px;height:40px;border-radius:10px}
+.drawer-close:hover{background:rgba(255,255,255,.2)}
+.drawer-links{padding:18px 14px;display:flex;flex-direction:column;gap:4px;overflow-y:auto}
+.drawer-links a{display:flex;align-items:center;gap:14px;text-decoration:none;color:#DCE3EC;font-weight:600;font-size:1.05rem;padding:14px 16px;border-radius:12px;transition:background .2s,color .2s}
+.drawer-links a .n{font-family:"Archivo",sans-serif;font-size:.75rem;color:var(--amber);font-weight:800;width:26px}
+.drawer-links a:hover{background:rgba(255,255,255,.08);color:#fff}
+.drawer-links a.active{background:var(--amber);color:#fff}
+.drawer-links a.active .n{color:#fff}
+.drawer-foot{margin-top:auto;padding:0 24px}
+.drawer-foot .call-btn{width:100%;justify-content:center;margin-bottom:12px}
+.drawer-foot p{color:#8A94A3;font-size:.82rem;text-align:center}
+.scrim{position:fixed;inset:0;background:rgba(20,26,35,.55);z-index:150;opacity:0;pointer-events:none;transition:opacity .3s}
+nav.main.open ~ .scrim{opacity:1;pointer-events:auto}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- hero card ---------- */
+.hero-band{background:linear-gradient(140deg,var(--steel-deep),var(--steel) 60%,#3A5A78);background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 1px,transparent 1px 44px),repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 1px,transparent 1px 44px),linear-gradient(140deg,var(--steel-deep),var(--steel) 60%,#3A5A78);padding:56px 0 72px;position:relative;overflow:hidden}
+.hero-band::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 82% 18%,rgba(224,123,22,.35),transparent 45%);pointer-events:none}
+.hero-card{position:relative;z-index:1;background:var(--paper);border-radius:26px;box-shadow:var(--shadow);padding:48px;display:grid;grid-template-columns:1.05fr .95fr;gap:44px;align-items:center;border-top:10px solid var(--amber)}
+.kicker{display:inline-block;background:var(--amber-soft);color:var(--amber-deep);font-weight:700;font-size:.78rem;letter-spacing:2.2px;text-transform:uppercase;padding:8px 16px;border-radius:999px;margin-bottom:18px}
+.hero-card h1{font-size:clamp(2.4rem,5vw,3.9rem);font-weight:900;margin-bottom:16px}
+.hero-card h1 .hl{color:var(--amber-deep);position:relative;white-space:nowrap}
+.lede{color:var(--ink-soft);font-size:1.1rem;margin-bottom:26px;max-width:32rem}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:26px}
+.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;padding:14px 26px;border-radius:12px;font-size:1rem;transition:transform .18s,box-shadow .18s,background .18s}
+.btn-solid{background:var(--ink);color:#fff;box-shadow:var(--shadow-sm)}
+.btn-solid:hover{background:var(--steel-deep);transform:translateY(-2px)}
+.btn-amber{background:var(--amber);color:#fff;box-shadow:var(--shadow-sm)}
+.btn-amber:hover{background:var(--amber-deep);transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:var(--ink);border:2px solid rgba(31,39,51,.25)}
+.btn-ghost:hover{border-color:var(--amber);color:var(--amber-deep)}
+.hours-pill{display:inline-flex;align-items:center;gap:10px;background:var(--ink);color:#fff;padding:10px 20px;border-radius:999px;font-weight:600;font-size:.92rem}
+.hours-pill .dot{width:10px;height:10px;border-radius:50%;background:#7BC47F;box-shadow:0 0 0 4px rgba(123,196,127,.25);animation:pulse 2s infinite}
+.hours-pill.closed .dot{background:#E4658F;box-shadow:0 0 0 4px rgba(228,101,143,.25)}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+.hero-art{background:linear-gradient(150deg,var(--steel-soft),#CBD9E6);border-radius:18px;padding:28px;border:2px solid rgba(44,74,99,.15)}
+.hero-art svg{width:100%;height:auto;display:block}
+.stats-row{position:relative;z-index:1;display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:-34px}
+.stat{background:var(--paper);border-radius:16px;box-shadow:var(--shadow-sm);padding:20px 24px;border-left:6px solid var(--amber)}
+.stat strong{font-family:"Archivo",sans-serif;font-size:1.7rem;font-weight:900;display:block}
+.stat small{color:var(--ink-soft);font-weight:600;text-transform:uppercase;letter-spacing:1px;font-size:.72rem}
+
+/* ---------- marquee ---------- */
+.marquee{background:var(--ink);color:#fff;overflow:hidden;padding:14px 0;margin:44px 0 0}
+.marquee-track{display:flex;width:max-content;animation:scroll 26s linear infinite}
+.marquee-track span{font-family:"Archivo",sans-serif;font-weight:700;font-size:1rem;padding:0 24px;white-space:nowrap}
+.marquee-track span i{font-style:normal;color:var(--amber);padding-right:24px}
+@keyframes scroll{to{transform:translateX(-50%)}}
+
+/* ---------- card wall ---------- */
+section.block{padding:64px 0}
+.sec-head{max-width:46rem;margin:0 auto 42px;text-align:center}
+.sec-head .eyebrow{font-weight:700;font-size:.78rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--amber-deep)}
+.sec-head h2{font-size:clamp(1.9rem,3.6vw,2.8rem);font-weight:900;margin:10px 0 12px}
+.sec-head p{color:var(--ink-soft)}
+.wall{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.wcard{background:var(--paper);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden;transition:transform .2s,box-shadow .2s;display:flex;flex-direction:column}
+.wcard:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+.wcard .art{height:170px;display:flex;align-items:center;justify-content:center;position:relative}
+.wcard .art svg{width:76px;height:76px}
+.wcard .body{padding:26px 26px 30px;flex:1}
+.wcard h3{font-size:1.25rem;font-weight:800;margin-bottom:8px}
+.wcard p{color:var(--ink-soft);font-size:.96rem;margin-bottom:16px}
+.wcard .more{font-weight:700;color:var(--amber-deep);text-decoration:none;font-size:.95rem}
+.wcard .more:hover{text-decoration:underline}
+.cta-band{background:linear-gradient(120deg,var(--amber),var(--amber-deep));border-radius:26px;color:#fff;padding:52px;text-align:center;margin-top:52px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.cta-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 20%,rgba(255,255,255,.25),transparent 50%)}
+.cta-band h2{color:#fff;position:relative;font-size:clamp(1.7rem,3.4vw,2.5rem);margin-bottom:12px}
+.cta-band p{color:#FFEED6;position:relative;max-width:36rem;margin:0 auto 26px}
+.cta-band .btn-amber{background:#fff;color:var(--amber-deep);position:relative}
+.cta-band .btn-amber:hover{background:var(--ink);color:#fff}
+
+/* ---------- editorial offers ---------- */
+.strip{border-radius:26px;padding:54px 48px;color:#fff;position:relative;overflow:hidden;margin:44px 0;box-shadow:var(--shadow)}
+.strip::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%,rgba(255,255,255,.2),transparent 50%)}
+.strip h2{color:#fff;font-size:clamp(2rem,4vw,3rem);position:relative;margin:4px 0 10px;font-weight:900}
+.strip p{color:rgba(255,255,255,.9);max-width:38rem;position:relative}
+.strip .eyebrow{font-weight:700;font-size:.78rem;letter-spacing:2.5px;text-transform:uppercase;color:#fff;position:relative;opacity:.85}
+.strip.s-blue{background:linear-gradient(120deg,var(--steel-deep),var(--steel))}
+.strip.s-amber{background:linear-gradient(120deg,var(--amber),var(--amber-deep))}
+.strip.s-ink{background:linear-gradient(120deg,#141B25,#2A3546)}
+.ed-row{display:grid;grid-template-columns:90px 1fr;gap:26px;padding:36px 8px;border-bottom:3px solid rgba(31,39,51,.12)}
+.ed-row:last-of-type{border-bottom:0}
+.ed-row .num{font-family:"Archivo",sans-serif;font-weight:900;font-size:3rem;color:transparent;-webkit-text-stroke:2px var(--amber-deep);line-height:1}
+.ed-row h3{font-size:1.5rem;font-weight:800;margin-bottom:8px}
+.ed-row p{color:var(--ink-soft);max-width:44rem;margin-bottom:14px}
+.tag-row{display:flex;flex-wrap:wrap;gap:8px}
+.tag-row span{background:var(--steel-soft);color:var(--steel-deep);font-size:.8rem;font-weight:600;padding:6px 14px;border-radius:999px}
+.ed-note{background:var(--amber-soft);border:2px dashed rgba(179,95,11,.5);border-radius:var(--radius);padding:20px 26px;margin-top:26px;font-size:.95rem;color:#7A4d12}
+.ed-note strong{color:var(--amber-deep)}
+
+/* ---------- gallery strip ---------- */
+.gstrip{display:flex;gap:20px;overflow-x:auto;padding:6px 6px 26px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+.gtile{flex:0 0 320px;scroll-snap-align:start;background:var(--paper);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);transition:transform .2s;position:relative}
+.gtile:hover{transform:translateY(-5px)}
+.gtile .art{height:230px;display:flex;align-items:center;justify-content:center;position:relative}
+.gtile .art svg{width:44%;height:auto;filter:drop-shadow(0 12px 14px rgba(0,0,0,.18))}
+.gtile .soon{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.9);font-size:.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:5px 12px;border-radius:999px;color:var(--ink-soft)}
+.gtile .cap{padding:18px 22px 22px}
+.gtile .cap strong{font-family:"Archivo",sans-serif;font-size:1.1rem;display:block}
+.gtile .cap small{color:var(--ink-soft)}
+.strip-hint{font-size:.9rem;color:var(--ink-soft);margin-top:4px}
+
+/* ---------- reviews ---------- */
+.rev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.rev{background:var(--paper);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow-sm);position:relative}
+.rev .stars{color:var(--amber);font-size:1.15rem;letter-spacing:3px;margin-bottom:12px}
+.rev p{font-size:1.02rem;margin-bottom:14px}
+.rev cite{font-style:normal;font-weight:700;font-size:.85rem;color:var(--amber-deep);letter-spacing:.5px}
+.rev.featured{background:var(--ink);color:#fff}
+.rev.featured cite{color:var(--amber)}
+.rev.featured p{color:#DCE3EC}
+.rev .sample-badge{display:inline-block;background:var(--amber-soft);color:var(--amber-deep);font-size:.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 12px;border-radius:999px;margin-bottom:10px}
+.rs-strip{margin:0 auto 40px;max-width:680px;background:var(--paper);border:1px solid rgba(224,123,22,.35);border-radius:16px;padding:22px 26px;text-align:center;box-shadow:var(--shadow-sm)}
+.rs-note{margin:0 0 14px;font-size:.95rem;color:var(--ink-soft);line-height:1.55}
+.rs-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rs-btn{display:inline-block;background:var(--amber);color:#fff;padding:11px 26px;border-radius:12px;font-weight:700;text-decoration:none;font-size:.95rem}
+.rs-btn:hover{background:var(--amber-deep)}
+.rs-btn.alt{background:var(--ink)}
+.rs-btn.alt:hover{background:var(--steel-deep)}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-bottom:26px}
+.info-card{background:var(--paper);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm)}
+.info-card h3{font-size:1.4rem;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.info-card h3 svg{width:28px;height:28px}
+.info-card p{color:var(--ink-soft);margin-bottom:8px}
+.info-card a.big{font-family:"Archivo",sans-serif;font-size:1.5rem;font-weight:800;color:var(--amber-deep);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.hours-table{width:100%;border-collapse:collapse;font-size:.98rem}
+.hours-table td{padding:10px 6px;border-bottom:1px dashed rgba(31,39,51,.2)}
+.hours-table tr.today td{font-weight:800;color:var(--amber-deep)}
+.hours-table tr.today td:first-child::after{content:" · today";font-weight:700;color:var(--amber);margin-left:6px}
+.hours-table td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.map-card{border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:340px;background:repeating-linear-gradient(0deg,transparent 0 46px,rgba(44,74,99,.16) 46px 48px),repeating-linear-gradient(90deg,transparent 0 46px,rgba(44,74,99,.16) 46px 48px),linear-gradient(140deg,#F0E7D2,#E4D5B4);display:flex;align-items:center;justify-content:center}
+.map-pin{text-align:center;background:var(--paper);padding:26px 34px;border-radius:18px;box-shadow:var(--shadow);max-width:78%;position:relative}
+.map-pin::after{content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);border:14px solid transparent;border-top-color:var(--paper);border-bottom:0}
+.map-pin svg{width:44px;height:44px;margin-bottom:8px}
+.map-pin strong{font-family:"Archivo",sans-serif;font-size:1.15rem;display:block}
+.map-pin small{color:var(--ink-soft)}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- minimal footer ---------- */
+footer.site{background:var(--ink);color:#C6CFDB;margin-top:20px;padding:34px 0 0}
+.foot-min{display:flex;flex-wrap:wrap;gap:14px 34px;align-items:center;justify-content:space-between;padding-bottom:26px}
+.foot-min .fbrand{font-family:"Archivo",sans-serif;font-weight:800;color:#fff;font-size:1.1rem}
+.foot-min a{color:#E8A04C;text-decoration:none}
+.foot-min a:hover{text-decoration:underline}
+.foot-copy{border-top:1px solid rgba(255,255,255,.12);padding:18px 0 22px;text-align:center;font-size:.9rem;color:#8A94A3}
+
+/* ---------- about split ---------- */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;margin-bottom:56px}
+.split h2{font-size:clamp(1.8rem,3.4vw,2.6rem);font-weight:900;margin:8px 0 14px}
+.split p{color:var(--ink-soft);margin-bottom:14px}
+.split p strong{color:var(--ink)}
+.check-list{list-style:none;margin:20px 0;display:grid;gap:12px}
+.check-list li{display:flex;gap:12px;align-items:flex-start;font-weight:500}
+.check-list svg{flex:none;width:24px;height:24px;margin-top:2px}
+.quote-card{background:var(--ink);color:#fff;border-radius:24px;padding:40px 36px;position:relative;box-shadow:var(--shadow)}
+.quote-card::before{content:"\201C";position:absolute;top:6px;left:26px;font-family:"Archivo",sans-serif;font-size:5rem;color:var(--amber);opacity:.6}
+.quote-card p{font-family:"Archivo",sans-serif;font-size:1.3rem;line-height:1.5;margin-bottom:14px;position:relative}
+.quote-card cite{font-style:normal;font-weight:600;color:var(--amber);font-size:.85rem;letter-spacing:1.5px;text-transform:uppercase}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:940px){
+  .hero-card{grid-template-columns:1fr;padding:36px 28px}
+  .split,.visit-grid{grid-template-columns:1fr}
+  .wall{grid-template-columns:1fr 1fr}
+  .rev-grid{grid-template-columns:1fr}
+  .stats-row{grid-template-columns:1fr 1fr}
+  .strip{padding:40px 28px}
+  .cta-band{padding:40px 26px}
+  .bar .call-btn{display:none}
+}
+@media(max-width:600px){
+  .wall{grid-template-columns:1fr}
+  .stats-row{grid-template-columns:1fr}
+  .ed-row{grid-template-columns:1fr;gap:10px}
+  .foot-min{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap bar">
+    <button class="burger" id="burger" aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button>
+    <a class="brand" href="#home" data-page="home" aria-label="Brian's Home, home">
+      <svg viewBox="0 0 64 64" role="img" aria-label="House logo"><rect x="8" y="28" width="48" height="28" rx="3" fill="#2C4A63"/><path d="M6 30 L32 8 L58 30" fill="none" stroke="#E07B16" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><rect x="27" y="40" width="10" height="16" fill="#E07B16"/><rect x="15" y="36" width="8" height="8" fill="#F4F1E9"/><rect x="41" y="36" width="8" height="8" fill="#F4F1E9"/></svg>
+      <span class="brand-name">Brian's Home<small>Custom Builder · Rex, GA</small></span>
+    </a>
+    <a class="call-btn" href="tel:+17709602631">Call (770) 960-2631</a>
+  </div>
+</header>
+
+<nav class="main" id="mainNav" aria-label="Main navigation">
+  <div class="drawer-head">
+    <span class="brand-name">Brian's Home</span>
+    <button class="drawer-close" id="drawerClose" aria-label="Close navigation">&times;</button>
+  </div>
+  <div class="drawer-links">
+    <a href="#home" data-page="home" class="active" aria-current="page"><span class="n">01</span>Home</a>
+    <a href="#services" data-page="services"><span class="n">02</span>Services</a>
+    <a href="#about" data-page="about"><span class="n">03</span>Our Story</a>
+    <a href="#gallery" data-page="gallery"><span class="n">04</span>Gallery</a>
+    <a href="#reviews" data-page="reviews"><span class="n">05</span>Reviews</a>
+    <a href="#visit" data-page="visit"><span class="n">06</span>Visit Us</a>
+  </div>
+  <div class="drawer-foot">
+    <a class="call-btn" href="tel:+17709602631">Call (770) 960-2631</a>
+    <p>Mon - Fri · 9:00 AM - 6:00 PM<br>3010 Deerfield Way, Rex, GA</p>
+  </div>
+</nav>
+<div class="scrim" id="scrim" aria-hidden="true"></div>
+
+<section class="page active" id="page-home">
+  <div class="hero-band">
+    <div class="wrap">
+      <div class="hero-card">
+        <div>
+          <span class="kicker">Custom Home Builder · Rex, Georgia</span>
+          <h1>Built for how <span class="hl">your family</span> lives.</h1>
+          <p class="lede">Brian's Home is a construction company and custom home builder on Deerfield Way in Rex, Georgia. New builds, remodeling, additions and repairs, one name on the project from first sketch to final walkthrough.</p>
+          <div class="cta-row">
+            <a class="btn btn-amber" href="#services" data-page="services">Explore Services</a>
+            <a class="btn btn-ghost" href="tel:+17709602631">Call (770) 960-2631</a>
+          </div>
+          <span class="hours-pill" id="hoursPill"><span class="dot"></span><span id="hoursText">Checking today's hours…</span></span>
+        </div>
+        <div class="hero-art">
+          <svg viewBox="0 0 320 260" role="img" aria-label="Blueprint drawing of a custom home">
+            <rect x="8" y="8" width="304" height="244" rx="10" fill="none" stroke="#2C4A63" stroke-width="2" stroke-dasharray="10 8" opacity=".4"/>
+            <g fill="none" stroke="#1F2733" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="70" y="130" width="180" height="90"/>
+              <path d="M50 134 L160 60 L270 134"/>
+              <rect x="145" y="175" width="30" height="45"/>
+              <rect x="95" y="150" width="28" height="24"/>
+              <rect x="197" y="150" width="28" height="24"/>
+            </g>
+            <g stroke="#B35F0B" stroke-width="2" stroke-dasharray="6 5" fill="none">
+              <line x1="70" y1="240" x2="250" y2="240"/>
+              <line x1="50" y1="40" x2="50" y2="150"/>
+            </g>
+            <g fill="#B35F0B" font-family="monospace" font-size="13">
+              <text x="150" y="252" text-anchor="middle">60'-0"</text>
+              <text x="34" y="100" transform="rotate(-90 34 100)">28'-0"</text>
+            </g>
+            <circle cx="270" cy="60" r="18" fill="#E07B16"/>
+            <path d="M262 60 h16 M270 52 v16" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat reveal"><strong>4.5 / 5</strong><small>Public review average</small></div>
+        <div class="stat reveal"><strong>Mon - Fri</strong><small>9:00 AM - 6:00 PM office hours</small></div>
+        <div class="stat reveal"><strong>Rex, GA</strong><small>Based in Clayton County</small></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track" id="marqueeTrack">
+      <span><i>✦</i>Custom Home Construction</span><span><i>✦</i>Whole-Home Remodeling</span><span><i>✦</i>Home Additions</span><span><i>✦</i>Kitchen &amp; Bath Remodels</span><span><i>✦</i>Repairs &amp; Improvement</span><span><i>✦</i>Rex · Clayton County</span>
+    </div>
+  </div>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow">What we do</span>
+        <h2>One builder, start to finish</h2>
+        <p>New construction, remodeling and repairs, handled by the same local team that answers your call.</p>
+      </div>
+      <div class="wall">
+        <div class="wcard reveal">
+          <div class="art" style="background:linear-gradient(140deg,#2C4A63,#1D3346)">
+            <svg viewBox="0 0 76 76" fill="none" stroke="#E07B16" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="30" width="48" height="32" rx="2"/><path d="M10 32 L38 12 L66 32"/><rect x="33" y="46" width="10" height="16"/></svg>
+          </div>
+          <div class="body">
+            <h3>Custom new builds</h3>
+            <p>Ground-up home construction planned around your lot, your budget and the way your family lives.</p>
+            <a class="more" href="#services" data-page="services">See services →</a>
+          </div>
+        </div>
+        <div class="wcard reveal">
+          <div class="art" style="background:linear-gradient(140deg,#E07B16,#B35F0B)">
+            <svg viewBox="0 0 76 76" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M50 12 L64 26 L32 58 L14 60 L16 42 Z"/><path d="M46 20 L56 30"/></svg>
+          </div>
+          <div class="body">
+            <h3>Remodeling &amp; repairs</h3>
+            <p>Whole-home renovations, kitchen and bath updates, and the repairs that keep a house feeling solid.</p>
+            <a class="more" href="#services" data-page="services">See services →</a>
+          </div>
+        </div>
+        <div class="wcard reveal">
+          <div class="art" style="background:linear-gradient(140deg,#8A94A3,#5B6675)">
+            <svg viewBox="0 0 76 76" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M38 8 C24 22 18 32 18 44 a20 20 0 0 0 40 0 C58 32 52 22 38 8 Z"/><circle cx="38" cy="44" r="7"/></svg>
+          </div>
+          <div class="body">
+            <h3>Local to Rex</h3>
+            <p>Based at 3010 Deerfield Way in Rex, serving homeowners across Clayton County and the south metro.</p>
+            <a class="more" href="#visit" data-page="visit">Visit us →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="cta-band reveal">
+        <h2>Thinking about a build or a remodel?</h2>
+        <p>Call Brian's Home at (770) 960-2631, Monday through Friday, 9 AM to 6 PM. Tell us about your project and get an honest take on next steps.</p>
+        <a class="btn btn-amber" href="tel:+17709602631">Call (770) 960-2631</a>
+      </div>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div class="strip s-blue">
+      <span class="eyebrow">Services</span>
+      <h2>The build, from foundation to finish</h2>
+      <p>Brian's Home is listed as a custom home building contractor and a building remodeling and repair contractor. These are the kinds of projects we take on.</p>
+    </div>
+
+    <div class="ed-row reveal">
+      <div class="num">01</div>
+      <div>
+        <h3>Custom Home Construction</h3>
+        <p>Ground-up builds tailored to your lot and your household. Layout, structure, finishes and fixtures, coordinated by one builder who answers the phone.</p>
+        <div class="tag-row"><span>New construction</span><span>Floor plans</span><span>Framing to finish</span></div>
+      </div>
+    </div>
+
+    <div class="ed-row reveal">
+      <div class="num">02</div>
+      <div>
+        <h3>Whole-Home Remodeling</h3>
+        <p>Make the house you have feel like the home you want. Room-by-room updates or full renovations that modernize layout, flow and finishes.</p>
+        <div class="tag-row"><span>Kitchen &amp; bath</span><span>Flooring</span><span>Interior updates</span></div>
+      </div>
+    </div>
+
+    <div class="ed-row reveal">
+      <div class="num">03</div>
+      <div>
+        <h3>Home Additions</h3>
+        <p>When the family outgrows the floor plan. Extra bedrooms, expanded living space and garages, tied into your existing home so it looks original.</p>
+        <div class="tag-row"><span>Bedroom additions</span><span>Living space</span><span>Garages</span></div>
+      </div>
+    </div>
+
+    <div class="ed-row reveal">
+      <div class="num">04</div>
+      <div>
+        <h3>Repairs &amp; Home Improvement</h3>
+        <p>The unglamorous work that keeps a house standing strong. Structural fixes, exterior repairs and general improvement projects, done right the first time.</p>
+        <div class="tag-row"><span>Structural repair</span><span>Exterior work</span><span>General improvement</span></div>
+      </div>
+    </div>
+
+    <div class="ed-row reveal">
+      <div class="num">05</div>
+      <div>
+        <h3>Pre-Construction Planning</h3>
+        <p>Permits, timelines and realistic budgeting before a single wall comes down. Know what your project will cost and how long it will take, up front.</p>
+        <div class="tag-row"><span>Estimates</span><span>Permits</span><span>Project timelines</span></div>
+      </div>
+    </div>
+
+    <div class="ed-note reveal">
+      <strong>Pricing:</strong> every project is different, so pricing is always by written estimate. Call <strong>(770) 960-2631</strong> and describe your project, we will tell you straight what it takes.
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Get a straight answer on your project.</h2>
+      <p>Call Monday through Friday, 9 AM to 6 PM. We will talk through what you need, what it costs, and whether we are the right fit.</p>
+      <a class="btn btn-amber" href="tel:+17709602631">Call (770) 960-2631</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-about">
+  <div class="wrap">
+    <div class="strip s-amber">
+      <span class="eyebrow">Our Story</span>
+      <h2>A builder's name<br>on every project</h2>
+      <p>Brian's Home is a construction company and custom home builder based at 3010 Deerfield Way in Rex, Georgia, serving homeowners across Clayton County.</p>
+    </div>
+
+    <div class="split">
+      <div class="reveal">
+        <span class="eyebrow" style="font-weight:700;font-size:.78rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--amber-deep)">Who we are</span>
+        <h2>The kind of builder who picks up the phone</h2>
+        <p>Brian's Home is a <strong>local construction company in Rex, Georgia</strong>, working in custom home building as well as remodeling and repair. When you call, you talk to the builder, not a call center.</p>
+        <p>The business holds a <strong>4.5 out of 5 star average across 4 public reviews</strong>, with neighbors and passersby noting the quality of the homes. It is the sort of reputation a local builder earns one project at a time.</p>
+        <ul class="check-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#B35F0B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Custom home construction in Rex and Clayton County</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#B35F0B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Remodeling, additions and home repairs</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#B35F0B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Office hours Mon - Fri, 9:00 AM - 6:00 PM</li>
+        </ul>
+        <a class="btn btn-ghost" href="#reviews" data-page="reviews">Read reviews →</a>
+      </div>
+      <div class="quote-card reveal">
+        <p>A home is the biggest project most families ever take on. It deserves a builder who treats it that way.</p>
+        <cite>The Brian's Home team</cite>
+      </div>
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Meet us at the job site.</h2>
+      <p>3010 Deerfield Way, Rex, GA 30273. Call (770) 960-2631 during office hours and we will talk through your plans.</p>
+      <a class="btn btn-amber" href="#visit" data-page="visit">Plan your visit →</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div class="strip s-ink">
+      <span class="eyebrow">Gallery</span>
+      <h2>What a Brian's Home<br>project looks like</h2>
+      <p>Artistic previews of typical project types. Real project photos are on the way.</p>
+    </div>
+
+    <div class="gstrip">
+      <div class="gtile reveal">
+        <span class="soon">Sample art</span>
+        <div class="art" style="background:linear-gradient(140deg,#2C4A63,#1D3346)">
+          <svg viewBox="0 0 100 100" fill="none" stroke="#E07B16" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><rect x="18" y="44" width="64" height="38"/><path d="M12 46 L50 18 L88 46"/><rect x="44" y="62" width="12" height="20"/></svg>
+        </div>
+        <div class="cap"><strong>Custom new builds</strong><small>Ground-up homes, planned around you</small></div>
+      </div>
+      <div class="gtile reveal">
+        <span class="soon">Sample art</span>
+        <div class="art" style="background:linear-gradient(140deg,#E07B16,#B35F0B)">
+          <svg viewBox="0 0 100 100" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><rect x="20" y="30" width="60" height="44"/><path d="M20 52 h60 M50 30 v44"/></svg>
+        </div>
+        <div class="cap"><strong>Framing &amp; structure</strong><small>The bones of the build</small></div>
+      </div>
+      <div class="gtile reveal">
+        <span class="soon">Sample art</span>
+        <div class="art" style="background:linear-gradient(140deg,#8A94A3,#5B6675)">
+          <svg viewBox="0 0 100 100" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><rect x="24" y="40" width="52" height="34"/><circle cx="50" cy="30" r="8"/><path d="M40 74 v-14 h20 v14"/></svg>
+        </div>
+        <div class="cap"><strong>Kitchen &amp; bath remodels</strong><small>Rooms that work harder</small></div>
+      </div>
+      <div class="gtile reveal">
+        <span class="soon">Sample art</span>
+        <div class="art" style="background:linear-gradient(140deg,#1D3346,#0F1D2A)">
+          <svg viewBox="0 0 100 100" fill="none" stroke="#E8A04C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 70 h72 M22 70 V44 h30 v26 M52 70 V52 h26 v18"/><path d="M60 40 h10 M65 35 v10"/></svg>
+        </div>
+        <div class="cap"><strong>Home additions</strong><small>Room to grow</small></div>
+      </div>
+      <div class="gtile reveal">
+        <span class="soon">Sample art</span>
+        <div class="art" style="background:linear-gradient(140deg,#E8A04C,#E07B16)">
+          <svg viewBox="0 0 100 100" fill="none" stroke="#1F2733" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M62 18 L80 36 L44 72 L26 74 L28 56 Z"/><path d="M58 26 L70 38"/></svg>
+        </div>
+        <div class="cap"><strong>Repairs &amp; finishing</strong><small>Done right the first time</small></div>
+      </div>
+      <div class="gtile reveal">
+        <span class="soon">Sample art</span>
+        <div class="art" style="background:linear-gradient(140deg,#2C4A63,#5B7A96)">
+          <svg viewBox="0 0 100 100" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 66 h60 M28 66 V48 a22 22 0 0 1 44 0 v18"/><circle cx="50" cy="40" r="6"/></svg>
+        </div>
+        <div class="cap"><strong>Exteriors &amp; porches</strong><small>Curb appeal that lasts</small></div>
+      </div>
+    </div>
+    <p class="strip-hint reveal">Scroll sideways to browse. These are artistic previews, ask us about real projects when you call.</p>
+
+    <div class="ed-note reveal" style="margin-top:26px">
+      <strong>Real photos coming soon:</strong> the illustrations above are artistic previews of typical project types. Ask to see finished work in person when you call <strong>(770) 960-2631</strong>.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div class="strip s-blue">
+      <span class="eyebrow">Reviews</span>
+      <h2>Rated 4.5 out of 5<br>by the public</h2>
+      <p>Based on 4 public Birdeye reviews for Brian's Home in Rex, GA. Here is what people are saying.</p>
+    </div>
+
+    <div class="rs-strip">
+      <p class="rs-note">Review themes on this page are paraphrased from public feedback. Open the source to read current reviews and ratings.</p>
+      <div class="rs-links">
+        <a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJ6Zozn8f49IgRYkkYs8bbJB4" target="_blank" rel="noopener">See reviews on Google</a>
+        <a class="rs-btn alt" href="https://reviews.birdeye.com/brians-home-166752080954683" target="_blank" rel="noopener">Read reviews on Birdeye</a>
+      </div>
+    </div>
+
+    <div class="rev-grid">
+      <div class="rev featured reveal">
+        <div class="stars">★★★★★</div>
+        <p>Based on 4 Birdeye reviews, Brian's Home holds a 4.5-star average. Reviewers call out the quality of the homes, with neighbors stopping by just to say so.</p>
+        <cite>via Birdeye · 4 public reviews</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="sample-badge">Sample</span>
+        <div class="stars">★★★★★</div>
+        <p>"Great house. The workmanship shows, and the neighbors notice."</p>
+        <cite>paraphrased from public feedback</cite>
+      </div>
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Worked with us? Leave a review.</h2>
+      <p>Your review helps a local Rex builder keep growing. It takes a minute, and it means a lot.</p>
+      <a class="btn btn-amber" href="https://www.google.com/maps/place/?q=place_id:ChIJ6Zozn8f49IgRYkkYs8bbJB4" target="_blank" rel="noopener">★ Leave us a Google review</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="wrap">
+    <div class="strip s-amber">
+      <span class="eyebrow">Visit Us</span>
+      <h2>Come talk<br>about your project</h2>
+      <p>We are on Deerfield Way in Rex, Georgia. Call ahead during office hours and we will make time for you.</p>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#B35F0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Find us</h3>
+        <p><strong>Brian's Home</strong><br>3010 Deerfield Way<br>Rex, GA 30273</p>
+        <p>Serving Rex and Clayton County, plus the south metro Atlanta area.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#B35F0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg> Call us</h3>
+        <p>Estimates, timelines and project questions:</p>
+        <a class="big" href="tel:+17709602631">(770) 960-2631</a>
+        <p style="margin-top:10px">Office hours are Monday through Friday, 9:00 AM to 6:00 PM.</p>
+      </div>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#B35F0B" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Hours</h3>
+        <table class="hours-table" id="hoursTable">
+          <tr><td>Monday</td><td>9:00 AM - 6:00 PM</td></tr>
+          <tr><td>Tuesday</td><td>9:00 AM - 6:00 PM</td></tr>
+          <tr><td>Wednesday</td><td>9:00 AM - 6:00 PM</td></tr>
+          <tr><td>Thursday</td><td>9:00 AM - 6:00 PM</td></tr>
+          <tr><td>Friday</td><td>9:00 AM - 6:00 PM</td></tr>
+          <tr><td>Saturday</td><td>Closed</td></tr>
+          <tr><td>Sunday</td><td>Closed</td></tr>
+        </table>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <svg viewBox="0 0 24 24" fill="#B35F0B"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#FFFEFA"/></svg>
+          <strong>3010 Deerfield Way</strong>
+          <small>Rex, GA 30273</small><br>
+          <a class="btn btn-amber" href="https://www.google.com/maps/place/?q=place_id:ChIJ6Zozn8f49IgRYkkYs8bbJB4" target="_blank" rel="noopener">Get Directions →</a>
+        </div>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-min">
+      <span class="fbrand">Brian's Home · Custom Builder, Rex GA</span>
+      <span><a href="tel:+17709602631">(770) 960-2631</a> · 3010 Deerfield Way, Rex, GA 30273</span>
+    </div>
+    <div class="foot-copy">
+      <span>© Brian's Home</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+
+  var drawerClose = document.getElementById("drawerClose");
+  if(drawerClose){
+    drawerClose.addEventListener("click", function(){ closeMenu(); });
+  }
+
+  var scrim = document.getElementById("scrim");
+  if(scrim){
+    scrim.addEventListener("click", function(){ closeMenu(); });
+  }
+
+  var track = document.getElementById("marqueeTrack");
+  if(track){ track.innerHTML += track.innerHTML; }
+
+  var HOURS = {0:null,1:[9,18],2:[9,18],3:[9,18],4:[9,18],5:[9,18],6:null};
+  var DOW = {"Sun":0,"Mon":1,"Tue":2,"Wed":3,"Thu":4,"Fri":5,"Sat":6};
+  function fmt(h){
+    var ap = h < 12 ? "AM" : "PM";
+    var hh = h % 12;
+    if(hh === 0){ hh = 12; }
+    return hh + ":00 " + ap;
+  }
+  try{
+    var parts = new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",weekday:"short",hour:"numeric",hour12:false}).formatToParts(new Date());
+    var wd = "Mon", hr = 12;
+    parts.forEach(function(p){
+      if(p.type === "weekday"){ wd = p.value; }
+      if(p.type === "hour"){ hr = parseInt(p.value, 10) % 24; }
+    });
+    var day = DOW[wd] !== undefined ? DOW[wd] : 1;
+    var todayH = HOURS[day];
+    var pill = document.getElementById("hoursPill");
+    var txt = document.getElementById("hoursText");
+    if(pill && txt){
+      if(todayH && hr >= todayH[0] && hr < todayH[1]){
+        txt.textContent = "Open now · until " + fmt(todayH[1]) + " today";
+      } else {
+        pill.classList.add("closed");
+        var next = day, hops = 0, nh = null;
+        while(hops < 7){
+          next = (next + 1) % 7; hops++;
+          if(HOURS[next]){ nh = HOURS[next]; break; }
+        }
+        var dayName = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][next];
+        txt.textContent = "Opens " + (hops === 1 ? "tomorrow" : dayName) + " at " + fmt(nh[0]);
+      }
+    }
+    var rows = document.querySelectorAll("#hoursTable tr");
+    var idx = (day + 6) % 7;
+    if(rows[idx]){ rows[idx].classList.add("today"); }
+  }catch(e){ }
+
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

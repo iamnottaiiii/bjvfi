@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brooklyn Cuts Barbershop | Emmaus, PA</title>
+<meta name="description" content="Brooklyn Cuts Barbershop, 1245 Chestnut St, Emmaus, PA 18049. Fades, beard trims, and hot towel shaves. Call (610) 421-8070.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#171310; --paper:#f7f1e6; --card:#ffffff; --amber:#e8a33d; --ember:#c63f22;
+  --line:#e3d7c1; --muted:#6f6455; --drawer:#1d1712;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Space Grotesk",system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.6}
+h1,h2,h3,.display{font-family:"Archivo",sans-serif;letter-spacing:-.01em}
+a{color:inherit}
+img{max-width:100%}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+
+/* ---------- top bar ---------- */
+.topbar{position:sticky;top:0;z-index:60;background:var(--ink);color:var(--paper);display:flex;align-items:center;gap:14px;padding:12px 18px}
+.burger{background:none;border:2px solid var(--amber);border-radius:8px;color:var(--paper);width:44px;height:44px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;cursor:pointer}
+.burger span{display:block;width:20px;height:2px;background:var(--paper)}
+.brand-mini{font-family:"Archivo";font-weight:900;text-transform:uppercase;font-size:1rem;letter-spacing:.06em}
+.brand-mini em{font-style:normal;color:var(--amber)}
+.topbar .call{margin-left:auto;background:var(--amber);color:var(--ink);font-weight:700;text-decoration:none;padding:9px 16px;border-radius:999px;font-size:.9rem}
+
+/* ---------- side drawer ---------- */
+.drawer{position:fixed;top:0;left:0;bottom:0;width:320px;max-width:86vw;background:var(--drawer);color:var(--paper);z-index:80;transform:translateX(-105%);transition:transform .32s ease;display:flex;flex-direction:column;padding:26px 24px}
+.drawer.open{transform:translateX(0)}
+.drawer .dhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px}
+.drawer .dbrand{font-family:"Archivo";font-weight:900;text-transform:uppercase;font-size:1.15rem;line-height:1.2}
+.drawer .dbrand em{font-style:normal;color:var(--amber)}
+.dclose{background:none;border:2px solid #4a4137;color:var(--paper);border-radius:8px;width:40px;height:40px;font-size:1.1rem;cursor:pointer}
+nav.main{display:flex;flex-direction:column;gap:6px}
+nav.main a[data-page]{text-decoration:none;color:var(--paper);font-family:"Archivo";font-weight:800;text-transform:uppercase;font-size:1.5rem;padding:10px 12px;border-radius:10px;border-left:4px solid transparent}
+nav.main a[data-page]:hover{background:#2a211a}
+nav.main a[data-page].active{border-left-color:var(--amber);background:#2a211a}
+.dfoot{margin-top:auto;color:#a99c86;font-size:.85rem;border-top:1px solid #3a3128;padding-top:16px}
+.dfoot a{color:var(--amber);text-decoration:none}
+.overlay{position:fixed;inset:0;background:rgba(20,14,8,.55);z-index:70;opacity:0;pointer-events:none;transition:opacity .3s}
+.overlay.show{opacity:1;pointer-events:auto}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ---------- card hero ---------- */
+.hero{padding:38px 0 26px}
+.hero-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:20px}
+.hero-card{background:var(--ink);color:var(--paper);border-radius:22px;padding:44px 40px;position:relative;overflow:hidden}
+.hero-card::after{content:"";position:absolute;right:-70px;top:-70px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,var(--ember),transparent 70%);opacity:.5}
+.kicker{display:inline-block;background:var(--amber);color:var(--ink);font-weight:700;font-size:.75rem;text-transform:uppercase;letter-spacing:.14em;padding:6px 14px;border-radius:999px;margin-bottom:18px}
+.hero-card h1{font-size:clamp(2.4rem,5.2vw,3.9rem);font-weight:900;line-height:1.02;text-transform:uppercase}
+.hero-card h1 em{font-style:normal;color:var(--amber)}
+.hero-card p{color:#d8cdbb;margin:18px 0 26px;max-width:44ch}
+.btnrow{display:flex;gap:12px;flex-wrap:wrap}
+.btn{display:inline-block;text-decoration:none;font-weight:700;padding:13px 26px;border-radius:12px;font-size:1rem}
+.btn.primary{background:var(--amber);color:var(--ink)}
+.btn.ghost{border:2px solid #5c5145;color:var(--paper)}
+.hero-side{display:grid;gap:20px}
+.info-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px}
+.info-card h3{font-size:.8rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:8px}
+.info-card .big{font-family:"Archivo";font-weight:800;font-size:1.35rem}
+.info-card p{font-size:.95rem;color:var(--muted)}
+.info-card a.tel{color:var(--ink);font-weight:700;text-decoration:none}
+
+/* ---------- section titles ---------- */
+.sect{padding:34px 0}
+.sect-title{font-size:clamp(1.7rem,3.4vw,2.4rem);font-weight:900;text-transform:uppercase;margin-bottom:6px}
+.sect-sub{color:var(--muted);margin-bottom:24px;max-width:60ch}
+
+/* ---------- card wall ---------- */
+.card-wall{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.wcard{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px;display:flex;flex-direction:column;gap:10px}
+.wcard .icon{width:52px;height:52px;border-radius:14px;background:var(--ink);color:var(--amber);display:flex;align-items:center;justify-content:center}
+.wcard h3{font-size:1.15rem;font-weight:800}
+.wcard p{color:var(--muted);font-size:.95rem}
+.wcard .tag{margin-top:auto;align-self:flex-start;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;background:#f1e7d2;border-radius:999px;padding:5px 12px;color:var(--muted)}
+
+/* ---------- leaders offerings ---------- */
+.leader-list{background:var(--ink);color:var(--paper);border-radius:22px;padding:40px 38px}
+.leader-list h2{font-size:1.9rem;font-weight:900;text-transform:uppercase;margin-bottom:6px}
+.leader-list .note{color:#b7a88f;font-size:.9rem;margin-bottom:26px}
+.leader{display:flex;align-items:baseline;gap:10px;padding:16px 0;border-bottom:1px dashed #453b2d}
+.leader:last-child{border-bottom:none}
+.leader .nm{font-family:"Archivo";font-weight:700;font-size:1.08rem}
+.leader .dots{flex:1;border-bottom:3px dotted #5c4f3c;transform:translateY(-4px)}
+.leader .pr{font-weight:700;color:var(--amber);white-space:nowrap}
+.sample-badge{display:inline-block;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;background:#3a2f22;color:var(--amber);border-radius:6px;padding:3px 8px;margin-left:8px;vertical-align:middle}
+.cta-band{margin-top:26px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;background:var(--amber);border-radius:16px;padding:22px 26px;color:var(--ink)}
+.cta-band strong{font-family:"Archivo";font-weight:900;font-size:1.25rem;text-transform:uppercase}
+.cta-band .btn.primary{background:var(--ink);color:var(--paper)}
+
+/* ---------- horizontal strip gallery ---------- */
+.strip{display:flex;gap:16px;overflow-x:auto;padding:6px 2px 18px;scroll-snap-type:x mandatory}
+.tile{flex:0 0 300px;scroll-snap-align:start;border-radius:18px;overflow:hidden;background:var(--card);border:1px solid var(--line)}
+.tile .art{height:210px;display:flex;align-items:center;justify-content:center;position:relative}
+.tile .cap{padding:14px 16px;font-size:.9rem}
+.tile .cap strong{display:block;font-family:"Archivo"}
+.tile .cap span{color:var(--muted);font-size:.8rem}
+.ph-badge{position:absolute;top:10px;left:10px;background:rgba(23,19,16,.85);color:var(--amber);font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;padding:5px 10px;border-radius:6px}
+.a1{background:linear-gradient(135deg,#2a2119,#171310)}
+.a1::before{content:"";width:110px;height:110px;border-radius:50%;background:radial-gradient(circle,var(--amber),transparent 72%)}
+.a2{background:linear-gradient(135deg,#c63f22,#7e2413)}
+.a2::before{content:"";width:0;height:0;border-left:60px solid transparent;border-right:60px solid transparent;border-bottom:104px solid rgba(247,241,230,.28)}
+.a3{background:linear-gradient(135deg,#e8a33d,#b26f14)}
+.a3::before{content:"";width:120px;height:120px;border:14px solid rgba(23,19,16,.35);border-radius:50%}
+.a4{background:linear-gradient(135deg,#3d4a5c,#1d242e)}
+.a4::before{content:"";width:100px;height:140px;background:rgba(232,163,61,.5);clip-path:polygon(50% 0,100% 100%,0 100%)}
+.a5{background:linear-gradient(135deg,#171310,#3a2c1c)}
+.a5::before{content:"";width:130px;height:60px;background:rgba(198,63,34,.55);border-radius:60px}
+
+/* ---------- about ---------- */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.about-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:30px}
+.about-card h3{font-family:"Archivo";font-weight:800;font-size:1.3rem;margin-bottom:10px;text-transform:uppercase}
+.about-card p{color:var(--muted)}
+.about-card ul{list-style:none;margin-top:12px;display:grid;gap:8px}
+.about-card li::before{content:"\2713  ";color:var(--ember);font-weight:700}
+
+/* ---------- reviews ---------- */
+.rev-links{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px}
+.rev-links a{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:600;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 20px}
+.rev-links a:hover{border-color:var(--amber)}
+.rev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.rev{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px}
+.rev .stars{color:var(--amber);font-size:1.1rem;letter-spacing:.15em;margin-bottom:10px}
+.rev p{font-size:.95rem}
+.rev .who{margin-top:14px;font-size:.85rem;color:var(--muted)}
+.rev .who strong{color:var(--ink)}
+
+/* ---------- contact ---------- */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.c-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:30px}
+.c-card h3{font-family:"Archivo";font-weight:800;text-transform:uppercase;margin-bottom:14px;font-size:1.15rem}
+.c-card p{margin-bottom:10px;color:var(--muted)}
+.c-card a{color:var(--ink);font-weight:700;text-decoration:none}
+.hours-table{width:100%;border-collapse:collapse;font-size:.95rem}
+.hours-table td{padding:9px 0;border-bottom:1px dashed var(--line)}
+.hours-table tr:last-child td{border-bottom:none}
+.hours-table td:last-child{text-align:right;font-weight:600}
+.maplink{display:inline-block;margin-top:16px;background:var(--ink);color:var(--paper);text-decoration:none;font-weight:700;padding:13px 26px;border-radius:12px}
+
+/* ---------- big type footer ---------- */
+footer{margin-top:50px;background:var(--ink);color:var(--paper)}
+.foot-big{padding:54px 0 10px;text-align:center}
+.foot-big .giant{font-family:"Archivo";font-weight:900;text-transform:uppercase;font-size:clamp(2.6rem,9vw,6.5rem);line-height:.95;color:var(--paper)}
+.foot-big .giant em{font-style:normal;color:var(--amber)}
+.foot-nav{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;padding:22px 0}
+.foot-nav a[data-page]{color:#cfc3ab;text-decoration:none;font-weight:600;font-size:.95rem;padding:8px 14px;border:1px solid #3c332a;border-radius:999px}
+.foot-nav a[data-page]:hover{border-color:var(--amber);color:var(--paper)}
+.copy{border-top:1px solid #332b21;text-align:center;padding:20px;color:#a99c86;font-size:.85rem}
+
+@media(max-width:860px){
+  .hero-grid,.about-grid,.contact-grid{grid-template-columns:1fr}
+  .card-wall,.rev-grid{grid-template-columns:1fr}
+  .tile{flex-basis:250px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <div class="brand-mini">Brooklyn <em>Cuts</em></div>
+  <a class="call" href="tel:+16104218070">(610) 421-8070</a>
+</div>
+
+<aside class="drawer" id="mainNav" aria-label="Site navigation">
+  <div class="dhead">
+    <div class="dbrand">Brooklyn<br><em>Cuts</em> Barbershop</div>
+    <button class="dclose" id="drawerClose" aria-label="Close menu">&#10005;</button>
+  </div>
+  <nav class="main">
+    <a data-page="home" href="#home">Home</a>
+    <a data-page="services" href="#services">Services</a>
+    <a data-page="about" href="#about">About</a>
+    <a data-page="reviews" href="#reviews">Reviews</a>
+    <a data-page="contact" href="#contact">Contact</a>
+  </nav>
+  <div class="dfoot">
+    <div>1245 Chestnut St, Emmaus, PA 18049</div>
+    <div><a href="tel:+16104218070">(610) 421-8070</a></div>
+    <div>Sun 9AM-3PM, Mon-Sat 9AM-6PM</div>
+  </div>
+</aside>
+<div class="overlay" id="drawerOverlay"></div>
+
+<section class="page" id="page-home">
+  <div class="wrap">
+    <div class="hero">
+      <div class="hero-grid">
+        <div class="hero-card">
+          <span class="kicker">Emmaus, PA Barbershop</span>
+          <h1>Sharp Cuts.<br><em>Brooklyn</em> Attitude.</h1>
+          <p>Brooklyn Cuts Barbershop brings a classic city barbershop feel to Chestnut Street in Emmaus. Fades, beard work, and straight razor finishes, done with precision and pride.</p>
+          <div class="btnrow">
+            <a class="btn primary" data-page="contact" href="#contact">Book Your Chair</a>
+            <a class="btn ghost" data-page="services" href="#services">See Services</a>
+          </div>
+        </div>
+        <div class="hero-side">
+          <div class="info-card">
+            <h3>Walk-Ins Welcome</h3>
+            <div class="big">No appointment? No problem.</div>
+            <p>Come by the shop on Chestnut Street and grab the next open chair.</p>
+          </div>
+          <div class="info-card">
+            <h3>Call the Shop</h3>
+            <div class="big"><a class="tel" href="tel:+16104218070">(610) 421-8070</a></div>
+            <p>Sun 9AM-3PM, Mon-Sat 9AM-6PM</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sect">
+      <h2 class="sect-title">Why Brooklyn Cuts</h2>
+      <p class="sect-sub">A neighborhood shop with a big-city edge, serving Emmaus and the Lehigh Valley.</p>
+      <div class="card-wall">
+        <div class="wcard">
+          <div class="icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.5 8.5 20 20M8.5 15.5 20 4"/></svg></div>
+          <h3>Precision Fades</h3>
+          <p>Skin fades, tapers, and blends cut clean, with crisp lineups that hold their shape.</p>
+          <span class="tag">Signature Service</span>
+        </div>
+        <div class="wcard">
+          <div class="icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17c4 0 4-10 8-10s4 10 8 10"/><path d="M3 21h18"/></svg></div>
+          <h3>Beard Sculpting</h3>
+          <p>Shape-ups, beard trims, and hot towel finishes that leave the beard sharp and even.</p>
+          <span class="tag">Detail Work</span>
+        </div>
+        <div class="wcard">
+          <div class="icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="9"/></svg></div>
+          <h3>All Ages Welcome</h3>
+          <p>From first haircuts to classic gentleman cuts, every client gets the same careful service.</p>
+          <span class="tag">Family Friendly</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sect">
+      <h2 class="sect-title">Shop Gallery</h2>
+      <p class="sect-sub">A look inside the shop. Swipe through the strip.</p>
+      <div class="strip">
+        <div class="tile"><div class="art a1"><span class="ph-badge">Placeholder</span></div><div class="cap"><strong>The Chair</strong><span>Photo placeholder, owner can swap in a real shop photo.</span></div></div>
+        <div class="tile"><div class="art a2"><span class="ph-badge">Placeholder</span></div><div class="cap"><strong>Fade Work</strong><span>Photo placeholder, owner can swap in a real cut photo.</span></div></div>
+        <div class="tile"><div class="art a3"><span class="ph-badge">Placeholder</span></div><div class="cap"><strong>Tools of the Trade</strong><span>Photo placeholder, owner can swap in a real tools photo.</span></div></div>
+        <div class="tile"><div class="art a4"><span class="ph-badge">Placeholder</span></div><div class="cap"><strong>Shop Vibe</strong><span>Photo placeholder, owner can swap in a real interior photo.</span></div></div>
+        <div class="tile"><div class="art a5"><span class="ph-badge">Placeholder</span></div><div class="cap"><strong>Finished Cut</strong><span>Photo placeholder, owner can swap in a real result photo.</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div class="sect">
+      <h2 class="sect-title">Services</h2>
+      <p class="sect-sub">Classic barbershop services with a Brooklyn edge. Prices below are samples, call the shop for current pricing.</p>
+      <div class="leader-list">
+        <h2>The Cut Menu</h2>
+        <p class="note">All prices marked sample. Call <a href="tel:+16104218070" style="color:var(--amber)">(610) 421-8070</a> to confirm.</p>
+        <div class="leader"><span class="nm">Signature Haircut</span><span class="dots"></span><span class="pr">$35<span class="sample-badge">Sample</span></span></div>
+        <div class="leader"><span class="nm">Skin Fade</span><span class="dots"></span><span class="pr">$35<span class="sample-badge">Sample</span></span></div>
+        <div class="leader"><span class="nm">Cut and Beard Combo</span><span class="dots"></span><span class="pr">$50<span class="sample-badge">Sample</span></span></div>
+        <div class="leader"><span class="nm">Beard Trim and Shape</span><span class="dots"></span><span class="pr">$20<span class="sample-badge">Sample</span></span></div>
+        <div class="leader"><span class="nm">Hot Towel Shave</span><span class="dots"></span><span class="pr">$30<span class="sample-badge">Sample</span></span></div>
+        <div class="leader"><span class="nm">Kids Cut (12 and under)</span><span class="dots"></span><span class="pr">$28<span class="sample-badge">Sample</span></span></div>
+        <div class="leader"><span class="nm">Lineup and Edge Up</span><span class="dots"></span><span class="pr">$15<span class="sample-badge">Sample</span></span></div>
+      </div>
+      <div class="cta-band">
+        <strong>Ready for a fresh cut?</strong>
+        <a class="btn primary" data-page="contact" href="#contact">Get In Touch</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-about">
+  <div class="wrap">
+    <div class="sect">
+      <h2 class="sect-title">About the Shop</h2>
+      <p class="sect-sub">Brooklyn Cuts Barbershop sits on Chestnut Street in Emmaus, PA, bringing old-school barbershop craft to the Lehigh Valley.</p>
+      <div class="about-grid">
+        <div class="about-card">
+          <h3>The Shop</h3>
+          <p>Brooklyn Cuts is a full-service barbershop built around the classics: sharp fades, careful scissor work, and straight razor finishes. The shop keeps the atmosphere relaxed and the standards high, so every client leaves looking sharp.</p>
+        </div>
+        <div class="about-card">
+          <h3>What to Expect</h3>
+          <ul>
+            <li>Walk-ins welcome during shop hours</li>
+            <li>Clean, comfortable shop on Chestnut Street</li>
+            <li>Fades, tapers, and classic cuts</li>
+            <li>Beard trims and hot towel shaves</li>
+            <li>Service for men and boys of all ages</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div class="sect">
+      <h2 class="sect-title">Reviews</h2>
+      <p class="sect-sub">See what clients are saying about Brooklyn Cuts Barbershop on Google.</p>
+      <div class="rev-links">
+        <a href="https://www.google.com/maps/place/?q=place_id:ChIJ7ZNmE7Q6xIkR4tj9rQ1SnEE" target="_blank" rel="noopener">See reviews on Google</a>
+        <a href="https://www.google.com/maps/place/?q=place_id:ChIJ7ZNmE7Q6xIkR4tj9rQ1SnEE" target="_blank" rel="noopener">Leave a Google review</a>
+      </div>
+      <div class="rev-grid">
+        <div class="rev">
+          <div class="stars">★★★★★</div>
+          <p>"Clean shop, great fade, and the lineup was crisp. Best cut I have had in Emmaus."</p>
+          <div class="who"><strong>Sample review</strong> · placeholder, replace with a real client review</div>
+        </div>
+        <div class="rev">
+          <div class="stars">★★★★★</div>
+          <p>"Walked in without an appointment and was in the chair fast. Took his time and got every detail right."</p>
+          <div class="who"><strong>Sample review</strong> · placeholder, replace with a real client review</div>
+        </div>
+        <div class="rev">
+          <div class="stars">★★★★★</div>
+          <p>"My son loves his haircut and I love the price. We will be back every few weeks."</p>
+          <div class="who"><strong>Sample review</strong> · placeholder, replace with a real client review</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-contact">
+  <div class="wrap">
+    <div class="sect">
+      <h2 class="sect-title">Visit Us</h2>
+      <p class="sect-sub">Find us on Chestnut Street in Emmaus, or call ahead to check the wait.</p>
+      <div class="contact-grid">
+        <div class="c-card">
+          <h3>Brooklyn Cuts Barbershop</h3>
+          <p><strong>Address</strong><br>Brooklyn Cuts Barbershop, 1245 Chestnut St, Emmaus, PA 18049</p>
+          <p><strong>Phone</strong><br><a href="tel:+16104218070">(610) 421-8070</a></p>
+          <a class="maplink" href="https://www.google.com/maps/place/?q=place_id:ChIJ7ZNmE7Q6xIkR4tj9rQ1SnEE" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+        <div class="c-card">
+          <h3>Shop Hours</h3>
+          <table class="hours-table">
+            <tr><td>Monday</td><td>9:00 AM - 6:00 PM</td></tr>
+            <tr><td>Tuesday</td><td>9:00 AM - 6:00 PM</td></tr>
+            <tr><td>Wednesday</td><td>9:00 AM - 6:00 PM</td></tr>
+            <tr><td>Thursday</td><td>9:00 AM - 6:00 PM</td></tr>
+            <tr><td>Friday</td><td>9:00 AM - 6:00 PM</td></tr>
+            <tr><td>Saturday</td><td>9:00 AM - 6:00 PM</td></tr>
+            <tr><td>Sunday</td><td>9:00 AM - 3:00 PM</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-big">
+      <div class="giant">Brooklyn <em>Cuts</em></div>
+    </div>
+    <div class="foot-nav">
+      <a data-page="home" href="#home">Home</a>
+      <a data-page="services" href="#services">Services</a>
+      <a data-page="about" href="#about">About</a>
+      <a data-page="reviews" href="#reviews">Reviews</a>
+      <a data-page="contact" href="#contact">Contact</a>
+    </div>
+  </div>
+  <div class="copy">© Brooklyn Cuts Barbershop</div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var PAGES = ["home","services","about","reviews","contact"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+  var overlay = document.getElementById("drawerOverlay");
+  var drawerClose = document.getElementById("drawerClose");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+    if(overlay){ overlay.classList.remove("show"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+      if(overlay){ overlay.classList.toggle("show", open); }
+    });
+  }
+  if(drawerClose){ drawerClose.addEventListener("click", closeMenu); }
+  if(overlay){ overlay.addEventListener("click", closeMenu); }
+
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
