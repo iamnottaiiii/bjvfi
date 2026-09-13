@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>East End Hair Co · Beauty Salon, East Syracuse, NY</title>
+<meta name="description" content="East End Hair Co at 716 W Manlius St, East Syracuse, NY. Cuts, color, styling and DevaCurl certified curl services for men and women. Call (315) 437-4077.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FAF7F0; --paper:#FFFFFF; --tint:#F0E9DA;
+  --ink:#1E2A28; --ink-soft:#5A6B67;
+  --teal:#14504D; --teal-deep:#0C3836; --teal-soft:#DDEDEA;
+  --copper:#C4703B; --copper-deep:#9A5226; --copper-soft:#F6E3CE;
+  --radius:14px;
+  --shadow:0 18px 40px -18px rgba(30,42,40,.26);
+  --shadow-sm:0 8px 22px -10px rgba(30,42,40,.2);
+  --drawer:270px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Inter",system-ui,sans-serif;background:var(--cream);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased}
+img{max-width:100%}
+a{color:var(--teal)}
+::selection{background:var(--copper-soft);color:var(--ink)}
+.serif{font-family:"DM Serif Display",Georgia,serif}
+
+/* ---------- side drawer nav ---------- */
+.drawer{position:fixed;top:0;left:0;bottom:0;width:var(--drawer);background:var(--teal-deep);color:#EDEAE0;z-index:60;display:flex;flex-direction:column;padding:28px 26px;overflow-y:auto}
+.drawer .brand{display:flex;flex-direction:column;gap:12px;text-decoration:none;color:#fff;margin-bottom:30px}
+.drawer .brand svg{width:54px;height:54px}
+.brand-name{font-family:"DM Serif Display",serif;font-size:1.55rem;line-height:1.1}
+.brand-name small{display:block;font-family:"Inter",sans-serif;font-weight:600;font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--copper-soft);margin-top:4px}
+nav.main{display:flex;flex-direction:column;gap:4px}
+nav.main a{text-decoration:none;color:#D9D4C4;font-weight:500;font-size:1rem;padding:12px 16px;border-radius:10px;transition:background .2s,color .2s;display:flex;align-items:center;gap:12px}
+nav.main a:hover{background:rgba(255,255,255,.08);color:#fff}
+nav.main a.active{background:var(--copper);color:#fff;font-weight:600}
+.drawer .call-box{margin-top:auto;padding-top:26px;border-top:1px solid rgba(255,255,255,.14)}
+.drawer .call-box p{font-size:.85rem;color:#B9B4A2;margin-bottom:10px}
+.call-btn{display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--teal-deep);text-decoration:none;font-weight:700;padding:12px 20px;border-radius:999px;box-shadow:var(--shadow-sm);transition:transform .18s;white-space:nowrap}
+.call-btn:hover{transform:translateY(-2px)}
+.page-wrap{margin-left:var(--drawer);min-height:100vh;display:flex;flex-direction:column}
+.burger{display:none;position:fixed;top:16px;left:16px;z-index:70;background:var(--teal-deep);color:#fff;border:0;border-radius:12px;cursor:pointer;padding:12px 14px;box-shadow:var(--shadow-sm)}
+.burger span{display:block;width:24px;height:3px;border-radius:3px;background:#fff;margin:5px 0}
+.scrim{display:none;position:fixed;inset:0;background:rgba(12,56,54,.5);z-index:55}
+
+/* ---------- pages / router ---------- */
+.page{display:none;flex:1}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- split hero ---------- */
+.hero{padding:72px 0 64px}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:52px;align-items:center;max-width:1060px;margin:0 auto;padding:0 32px}
+.kicker{display:inline-block;font-weight:700;font-size:.76rem;letter-spacing:3.5px;text-transform:uppercase;color:var(--copper-deep);background:var(--copper-soft);padding:8px 20px;border-radius:999px;margin-bottom:20px}
+h1{font-family:"DM Serif Display",serif;font-weight:400;font-size:clamp(2.6rem,5vw,4.2rem);line-height:1.04;letter-spacing:-.3px;margin-bottom:18px}
+h1 em{font-style:italic;color:var(--teal)}
+.lede{font-size:1.1rem;color:var(--ink-soft);max-width:32rem;margin-bottom:28px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:26px}
+.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:600;padding:14px 28px;border-radius:999px;font-size:1rem;transition:transform .18s,box-shadow .18s,background .18s}
+.btn-solid{background:var(--teal);color:#fff;box-shadow:var(--shadow-sm)}
+.btn-solid:hover{background:var(--teal-deep);transform:translateY(-2px)}
+.btn-ghost{background:var(--paper);color:var(--ink);border:2px solid rgba(30,42,40,.2)}
+.btn-ghost:hover{border-color:var(--teal);color:var(--teal);transform:translateY(-2px)}
+.hours-pill{display:inline-flex;align-items:center;gap:10px;background:var(--ink);color:var(--cream);padding:10px 20px;border-radius:999px;font-weight:500;font-size:.94rem;box-shadow:var(--shadow-sm)}
+.hours-pill .dot{width:10px;height:10px;border-radius:50%;background:#8FD694;box-shadow:0 0 0 4px rgba(143,214,148,.25);animation:pulse 2s infinite}
+.hours-pill.closed .dot{background:#F2A0B5;box-shadow:0 0 0 4px rgba(242,160,181,.25)}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+.hero-art{position:relative}
+.art-card{position:relative;background:linear-gradient(150deg,#EAF4F1,#D5E8E2);border-radius:28px;padding:44px;box-shadow:var(--shadow);border:3px solid #fff;overflow:hidden}
+.art-card::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 85% 12%, rgba(196,112,59,.35), transparent 42%)}
+.art-card svg{width:100%;height:auto;display:block}
+.stamp{position:absolute;bottom:-18px;left:26px;background:var(--copper);color:#fff;font-weight:700;padding:12px 22px;border-radius:999px;transform:rotate(-3deg);box-shadow:var(--shadow-sm);font-size:.92rem;z-index:2}
+
+/* ---------- alternating bands ---------- */
+.band{padding:60px 0}
+.band.tint{background:var(--tint)}
+.band-inner{max-width:1060px;margin:0 auto;padding:0 32px}
+.sec-head{max-width:42rem;margin:0 auto 38px;text-align:center}
+.eyebrow{font-size:.76rem;font-weight:700;letter-spacing:3.5px;text-transform:uppercase;color:var(--copper-deep)}
+h2{font-family:"DM Serif Display",serif;font-weight:400;font-size:clamp(1.9rem,3.6vw,2.7rem);line-height:1.1;margin:8px 0 12px;letter-spacing:-.3px}
+.sec-head p{color:var(--ink-soft)}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.split.rev .txt{order:2}
+.split p{color:var(--ink-soft);margin-bottom:14px}
+.split-img{border-radius:22px;box-shadow:var(--shadow);min-height:300px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.split-img svg{width:46%;height:auto;filter:drop-shadow(0 14px 18px rgba(0,0,0,.18))}
+.check-list{list-style:none;margin:20px 0;display:grid;gap:12px}
+.check-list li{display:flex;gap:12px;align-items:flex-start;font-weight:500}
+.check-list svg{flex:none;width:24px;height:24px;margin-top:2px}
+.feat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.feat{background:var(--paper);border-radius:var(--radius);padding:28px 24px;box-shadow:var(--shadow-sm)}
+.feat h3{font-family:"DM Serif Display",serif;font-size:1.35rem;margin-bottom:8px}
+.feat p{color:var(--ink-soft);font-size:.96rem}
+.feat .n{font-family:"DM Serif Display",serif;font-size:2rem;color:var(--copper);display:block;margin-bottom:6px}
+
+/* ---------- leaders offerings ---------- */
+.leaders{list-style:none;background:var(--paper);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:12px 34px}
+.leaders li{padding:20px 0;border-bottom:1px dashed rgba(30,42,40,.18)}
+.leaders li:last-child{border-bottom:0}
+.l-row{display:flex;align-items:baseline;gap:14px}
+.l-row .name{font-weight:600;font-size:1.1rem}
+.l-row .dots{flex:1;border-bottom:2px dotted rgba(20,80,77,.4);transform:translateY(-4px)}
+.l-row .price{font-family:"DM Serif Display",serif;font-size:1.3rem;color:var(--teal);white-space:nowrap}
+.l-desc{color:var(--ink-soft);font-size:.94rem;margin-top:4px;max-width:36rem}
+.l-tag{display:inline-block;background:var(--teal-soft);color:var(--teal-deep);font-size:.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 12px;border-radius:999px;margin-left:10px;vertical-align:2px}
+.price-note{background:var(--copper-soft);border:2px dashed rgba(196,112,59,.5);border-radius:var(--radius);padding:18px 24px;margin-top:16px;font-size:.95rem;color:#6B3F18}
+.price-note strong{color:var(--copper-deep)}
+
+/* ---------- horizontal strip gallery ---------- */
+.hstrip{display:flex;gap:20px;overflow-x:auto;padding:6px 32px 26px;scroll-snap-type:x mandatory;max-width:1120px;margin:0 auto}
+.hstrip::-webkit-scrollbar{height:10px}
+.hstrip::-webkit-scrollbar-thumb{background:var(--copper);border-radius:999px}
+.hstrip::-webkit-scrollbar-track{background:var(--tint);border-radius:999px}
+.tile{flex:0 0 300px;scroll-snap-align:start;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);background:var(--paper)}
+.tile .art{height:230px;display:flex;align-items:center;justify-content:center;position:relative}
+.tile .art svg{width:44%;height:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.18))}
+.tile .cap{padding:16px 20px}
+.tile .cap strong{font-family:"DM Serif Display",serif;font-size:1.15rem;display:block}
+.tile .cap small{color:var(--ink-soft)}
+.tile .soon{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.9);font-size:.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 12px;border-radius:999px;color:var(--ink-soft)}
+
+/* ---------- reviews ---------- */
+.rev-stack{display:grid;gap:20px;max-width:760px;margin:0 auto}
+.rev{background:var(--paper);border-radius:var(--radius);padding:30px 32px;box-shadow:var(--shadow-sm)}
+.rev .stars{color:var(--copper);font-size:1.15rem;letter-spacing:3px;margin-bottom:12px}
+.rev p{font-size:1.05rem;margin-bottom:12px}
+.rev cite{font-style:normal;font-weight:600;font-size:.85rem;color:var(--teal);letter-spacing:.5px}
+.rs-strip{margin:0 auto 40px;max-width:640px;background:var(--paper);border:1px solid rgba(196,112,59,.4);border-radius:14px;padding:20px 24px;text-align:center;box-shadow:var(--shadow-sm)}
+.rs-note{margin:0 0 14px;font-size:.95rem;color:var(--ink-soft);line-height:1.55}
+.rs-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rs-btn{display:inline-block;background:var(--teal);color:#fff;padding:11px 26px;border-radius:999px;font-weight:600;text-decoration:none;font-size:.95rem}
+.rs-btn:hover{background:var(--teal-deep)}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-bottom:26px}
+.info-card{background:var(--paper);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm)}
+.info-card h3{font-family:"DM Serif Display",serif;font-size:1.45rem;margin-bottom:14px}
+.info-card p{color:var(--ink-soft);margin-bottom:8px}
+.info-card a.big{font-family:"DM Serif Display",serif;font-size:1.5rem;color:var(--teal);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.hours-table{width:100%;border-collapse:collapse;font-size:.98rem}
+.hours-table td{padding:10px 6px;border-bottom:1px dashed rgba(30,42,40,.18)}
+.hours-table tr.today td{font-weight:700;color:var(--teal)}
+.hours-table tr.today td:first-child::after{content:" · today";font-size:.9rem;color:var(--copper-deep);margin-left:6px}
+.hours-table td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.map-card{border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:340px;background:repeating-linear-gradient(0deg,transparent 0 46px,rgba(20,80,77,.14) 46px 48px),repeating-linear-gradient(90deg,transparent 0 46px,rgba(20,80,77,.14) 46px 48px),linear-gradient(140deg,#F0E9DA,#E2D5BC);display:flex;align-items:center;justify-content:center}
+.map-pin{text-align:center;background:var(--paper);padding:26px 34px;border-radius:20px;box-shadow:var(--shadow);max-width:78%;position:relative}
+.map-pin::after{content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);border:14px solid transparent;border-top-color:var(--paper);border-bottom:0}
+.map-pin svg{width:44px;height:44px;margin-bottom:8px}
+.map-pin strong{font-family:"DM Serif Display",serif;font-size:1.15rem;display:block}
+.map-pin small{color:var(--ink-soft)}
+.map-pin .btn{margin-top:14px}
+
+/* page strips */
+.strip{border-radius:22px;padding:52px 44px;color:#fff;position:relative;overflow:hidden;margin-bottom:40px;box-shadow:var(--shadow)}
+.strip::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(255,255,255,.2), transparent 50%)}
+.strip h2{color:#fff;font-size:clamp(1.9rem,3.6vw,2.8rem);position:relative;margin:4px 0 10px}
+.strip p{color:rgba(255,255,255,.9);max-width:36rem;position:relative}
+.strip .eyebrow{color:var(--copper-soft);position:relative}
+.strip.s-svc{background:linear-gradient(120deg,#14504D,#0C3836)}
+.strip.s-about{background:linear-gradient(120deg,#C4703B,#8A4A20)}
+.strip.s-gal{background:linear-gradient(120deg,#1E2A28,#0F1514)}
+.strip.s-rev{background:linear-gradient(120deg,#9A5226,#5F3215)}
+.strip.s-visit{background:linear-gradient(120deg,#14504D,#081F1E)}
+
+/* minimal footer */
+footer{background:var(--teal-deep);color:#CFC9B8;margin-top:auto}
+.foot-inner{max-width:1060px;margin:0 auto;padding:44px 32px 0;text-align:center}
+.foot-inner .fname{font-family:"DM Serif Display",serif;font-size:1.6rem;color:#fff;margin-bottom:8px}
+.foot-inner p{font-size:.92rem;color:#A9A294}
+.foot-inner nav{margin:18px 0 6px}
+.foot-inner nav a{color:#D9D4C4;text-decoration:none;font-size:.9rem;margin:0 10px}
+.foot-inner nav a:hover{color:#fff}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.12);margin-top:26px;padding:18px 0 24px;display:flex;justify-content:center;font-size:.85rem;color:#8E887A}
+
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:940px){
+  .drawer{transform:translateX(-100%);transition:transform .3s ease;box-shadow:var(--shadow)}
+  .drawer.open{transform:none}
+  .scrim.on{display:block}
+  .page-wrap{margin-left:0}
+  .burger{display:block}
+  .hero-grid,.split,.visit-grid{grid-template-columns:1fr}
+  .split.rev .txt{order:0}
+  .feat-row{grid-template-columns:1fr}
+  .strip{padding:38px 26px}
+}
+</style>
+</head>
+<body>
+
+<aside class="drawer" id="drawer">
+  <a class="brand" href="#home" data-page="home" aria-label="East End Hair Co, home">
+    <svg viewBox="0 0 64 64" role="img" aria-label="Hair strand logo"><circle cx="32" cy="32" r="29" fill="#14504D"/><circle cx="32" cy="32" r="29" fill="none" stroke="#F6E3CE" stroke-width="2.5"/><path d="M32 8 q-14 24 0 48" fill="none" stroke="#F6E3CE" stroke-width="3.5" stroke-linecap="round"/><path d="M40 12 q-10 20 0 40 M24 12 q-10 20 0 40" fill="none" stroke="#C4703B" stroke-width="2.5" stroke-linecap="round"/></svg>
+    <span class="brand-name">East End Hair Co<small>East Syracuse, NY</small></span>
+  </a>
+  <nav class="main" id="mainNav" aria-label="Main navigation">
+    <a href="#home" data-page="home" class="active" aria-current="page">Home</a>
+    <a href="#services" data-page="services">Services</a>
+    <a href="#about" data-page="about">About</a>
+    <a href="#gallery" data-page="gallery">Gallery</a>
+    <a href="#reviews" data-page="reviews">Reviews</a>
+    <a href="#visit" data-page="visit">Visit</a>
+  </nav>
+  <div class="call-box">
+    <p>Book by phone, Tue to Sat</p>
+    <a class="call-btn" href="tel:+13154374077">(315) 437-4077</a>
+  </div>
+</aside>
+<div class="scrim" id="scrim"></div>
+<button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+
+<div class="page-wrap">
+
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-grid">
+      <div>
+        <span class="kicker">East Syracuse, NY</span>
+        <h1>Great hair days,<br><em>every</em> day.</h1>
+        <p class="lede">East End Hair Co is a full-service beauty salon on West Manlius Street, with an experienced team of stylists, color services, and DevaCurl certified curl care for men and women.</p>
+        <div class="cta-row">
+          <a class="btn btn-solid" href="#services" data-page="services">See Services</a>
+          <a class="btn btn-ghost" href="https://www.google.com/maps/place/?q=place_id:ChIJx3MIkTSN2YkRaFagPHFa72Y" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+        <span class="hours-pill" id="hoursPill"><span class="dot"></span><span id="hoursText">Checking today's hours…</span></span>
+      </div>
+      <div class="hero-art">
+        <div class="art-card">
+          <svg viewBox="0 0 300 300" role="img" aria-label="Illustration of flowing hair and styling tools">
+            <ellipse cx="150" cy="268" rx="105" ry="14" fill="#0C3836" opacity=".15"/>
+            <circle cx="150" cy="130" r="80" fill="#F6E3CE"/>
+            <path d="M96 110 q-8 60 20 110 M204 110 q8 60 -20 110 M150 50 q-52 8 -56 62 M150 50 q52 8 56 62" stroke="#C4703B" stroke-width="9" fill="none" stroke-linecap="round"/>
+            <path d="M122 84 q-4 44 14 82 M178 84 q4 44 -14 82" stroke="#9A5226" stroke-width="5" fill="none" stroke-linecap="round"/>
+            <circle cx="60" cy="220" r="26" fill="#14504D"/>
+            <circle cx="53" cy="233" r="7" fill="none" stroke="#F6E3CE" stroke-width="4"/>
+            <circle cx="67" cy="233" r="7" fill="none" stroke="#F6E3CE" stroke-width="4"/>
+            <path d="M57 227 L74 206 M63 227 L46 206" stroke="#F6E3CE" stroke-width="4" stroke-linecap="round"/>
+            <circle cx="242" cy="60" r="8" fill="#C4703B" opacity=".8"/>
+            <circle cx="262" cy="88" r="6" fill="#14504D" opacity=".7"/>
+            <circle cx="52" cy="70" r="6" fill="#14504D" opacity=".6"/>
+          </svg>
+        </div>
+        <div class="stamp">DevaCurl certified curl care</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="band tint">
+    <div class="band-inner">
+      <div class="sec-head reveal">
+        <span class="eyebrow">Why East End</span>
+        <h2>A salon team that<br>knows your hair</h2>
+        <p>Clients stay for years because the stylists listen first, then cut, color, and style with care.</p>
+      </div>
+      <div class="feat-row">
+        <div class="feat reveal"><span class="n">01</span><h3>Experienced stylists</h3><p>A team of qualified stylists, so you can find the right chair for your hair, your style, and your schedule.</p></div>
+        <div class="feat reveal"><span class="n">02</span><h3>Curl expertise</h3><p>A DevaCurl certified salon, offering the DevaCut and DevaCurl Transformation for wavy to super-curly hair.</p></div>
+        <div class="feat reveal"><span class="n">03</span><h3>For men and women</h3><p>Sharp cuts, full color, and styling for everyone. Walk out feeling like yourself, only better.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="band-inner split">
+      <div class="txt reveal">
+        <span class="eyebrow">Curl care</span>
+        <h2>Curls cut the way<br>they actually live</h2>
+        <p>The DevaCut sculpts curls one by one, dry, in their natural state, so the shape holds when you style at home. It is paired with a transformation service: botanical cleanse, condition, styling, and coaching for at-home curl care.</p>
+        <ul class="check-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#14504D" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>DevaCurl certified stylist on the team</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#14504D" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Cut and color for all natural textures</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#14504D" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Coaching so the style lasts at home</li>
+        </ul>
+        <a class="btn btn-solid" href="#services" data-page="services">Explore services</a>
+      </div>
+      <div class="split-img reveal" style="background:linear-gradient(140deg,#DDEDEA,#B9D8D1)">
+        <svg viewBox="0 0 100 100"><circle cx="50" cy="36" r="19" fill="#9A5226"/><path d="M31 36 q-6 8 -4 18 q-6 6 -2 16 q-5 8 2 14 M69 36 q6 8 4 18 q6 6 2 16 q5 8 -2 14 M50 17 q-20 2 -21 20 M50 17 q20 2 21 20" stroke="#5F3215" stroke-width="5" fill="none" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="band tint">
+    <div class="band-inner split rev">
+      <div class="txt reveal">
+        <span class="eyebrow">Color and cuts</span>
+        <h2>Color that gets<br>compliments</h2>
+        <p>Clients report getting regular remarks on how good their hair looks after a color, cut, and treatment visit. From subtle dimension to a full refresh, the team builds color around your life, not the other way around.</p>
+        <p>Prefer a classic cut? The salon is a longtime favorite for straightforward, great haircuts for both men and women.</p>
+        <a class="btn btn-ghost" href="#reviews" data-page="reviews">Read client reviews</a>
+      </div>
+      <div class="split-img reveal" style="background:linear-gradient(140deg,#F6E3CE,#E8C896)">
+        <svg viewBox="0 0 100 100"><circle cx="50" cy="42" r="18" fill="#C4703B"/><path d="M32 42 q-2 26 4 40 M68 42 q2 26 -4 40 M50 24 q-18 0 -20 18 M50 24 q18 0 20 18" stroke="#8A4A20" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M36 30 l8 24 M64 30 l-8 24" stroke="#F6E3CE" stroke-width="3" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="band-inner" style="text-align:center">
+      <div class="sec-head reveal">
+        <span class="eyebrow">Visit</span>
+        <h2>Your chair is waiting</h2>
+        <p>716 W Manlius St, East Syracuse, NY 13057. Open Tue to Sat. Call to book.</p>
+      </div>
+      <a class="btn btn-solid reveal" href="tel:+13154374077">Call (315) 437-4077</a>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="band" style="padding-top:56px">
+    <div class="band-inner">
+      <div class="strip s-svc">
+        <span class="eyebrow">Services</span>
+        <h2>Everything your hair needs,<br>under one roof</h2>
+        <p>Cuts, color, styling, treatments, and certified curl care. Prices below are samples; your stylist confirms the exact price before starting.</p>
+      </div>
+      <ul class="leaders reveal">
+        <li>
+          <div class="l-row"><span class="name">Haircut <span class="l-tag">Men and women</span></span><span class="dots"></span><span class="price">from $25</span></div>
+          <p class="l-desc">Consult, precision cut, and style finish, tailored to your hair type and how you actually wear it.</p>
+        </li>
+        <li>
+          <div class="l-row"><span class="name">DevaCut <span class="l-tag">Curl certified</span></span><span class="dots"></span><span class="price">from $65</span></div>
+          <p class="l-desc">Curls sculpted curl by curl, dry, in their natural state. Includes the DevaCurl Transformation: botanical cleanse, condition, styling, and at-home coaching.</p>
+        </li>
+        <li>
+          <div class="l-row"><span class="name">Single-process color</span><span class="dots"></span><span class="price">from $60</span></div>
+          <p class="l-desc">Root touch-up or all-over color with a rich, even finish.</p>
+        </li>
+        <li>
+          <div class="l-row"><span class="name">Highlights and dimension</span><span class="dots"></span><span class="price">from $85</span></div>
+          <p class="l-desc">Partial or full highlights for brightness and movement that grows out softly.</p>
+        </li>
+        <li>
+          <div class="l-row"><span class="name">Color, cut and treatment</span><span class="dots"></span><span class="price">from $110</span></div>
+          <p class="l-desc">The full refresh clients book every few weeks: color, precision cut, and a conditioning treatment.</p>
+        </li>
+        <li>
+          <div class="l-row"><span class="name">Blowout and style</span><span class="dots"></span><span class="price">from $30</span></div>
+          <p class="l-desc">Smooth, polished styling for events, photos, or just because.</p>
+        </li>
+        <li>
+          <div class="l-row"><span class="name">Deep conditioning treatment</span><span class="dots"></span><span class="price">from $20</span></div>
+          <p class="l-desc">Restorative treatment for dry or stressed hair, a favorite add-on to any cut or color.</p>
+        </li>
+      </ul>
+      <div class="price-note reveal"><strong>Please note:</strong> prices above are samples to help you plan. Final pricing depends on hair length, density, and the service chosen. <strong>Call (315) 437-4077 for an exact quote.</strong></div>
+      <div style="height:56px"></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-about">
+  <div class="band" style="padding-top:56px">
+    <div class="band-inner">
+      <div class="strip s-about">
+        <span class="eyebrow">About</span>
+        <h2>A team salon<br>East Syracuse trusts</h2>
+        <p>East End Hair Co brings together experienced stylists under one roof on West Manlius Street.</p>
+      </div>
+      <div class="split">
+        <div class="txt reveal">
+          <span class="eyebrow">Our story</span>
+          <h2>Many chairs,<br>one standard</h2>
+          <p>East End Hair Co is a team salon: a group of qualified stylists sharing one shop, so clients can find the right fit for their hair and their schedule. Many clients have been coming for years, and some travel a long way to keep their appointments.</p>
+          <p>The salon is a licensed New York State appearance enhancement business, and it is listed as a DevaCurl certified salon for curl-specific cutting and color.</p>
+          <ul class="check-list">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#14504D" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Licensed NY appearance enhancement business</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#14504D" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>DevaCurl certified curl services</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#14504D" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Cuts, color and styling for men and women</li>
+          </ul>
+          <a class="btn btn-solid" href="#visit" data-page="visit">Plan your visit</a>
+        </div>
+        <div class="split-img reveal" style="background:linear-gradient(140deg,#DDEDEA,#B9D8D1)">
+          <svg viewBox="0 0 100 100"><circle cx="36" cy="40" r="16" fill="#C4703B"/><circle cx="64" cy="40" r="16" fill="#14504D"/><path d="M20 40 q-2 22 4 36 M52 40 q-2 22 4 36 M48 40 q-2 22 4 36 M80 40 q-2 22 4 36" stroke="#5F3215" stroke-width="4" fill="none" stroke-linecap="round" opacity=".7"/><path d="M36 24 q-16 0 -17 16 M64 24 q-16 0 -17 16 M36 24 q16 0 17 16 M64 24 q16 0 17 16" stroke="#5F3215" stroke-width="3.5" fill="none" stroke-linecap="round" opacity=".7"/></svg>
+        </div>
+      </div>
+      <div style="height:56px"></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="band" style="padding-top:56px">
+    <div class="band-inner">
+      <div class="strip s-gal">
+        <span class="eyebrow">Gallery</span>
+        <h2>Fresh from<br>the styling chair</h2>
+        <p>Artistic previews of the looks we love. Real salon photos are on the way.</p>
+      </div>
+    </div>
+    <div class="hstrip">
+      <div class="tile reveal"><div class="art" style="background:linear-gradient(140deg,#DDEDEA,#B9D8D1)"><span class="soon">Photo soon</span><svg viewBox="0 0 100 100"><circle cx="50" cy="36" r="19" fill="#9A5226"/><path d="M31 36 q-6 8 -4 18 q-6 6 -2 16 q-5 8 2 14 M69 36 q6 8 4 18 q6 6 2 16 q5 8 -2 14 M50 17 q-20 2 -21 20 M50 17 q20 2 21 20" stroke="#5F3215" stroke-width="5" fill="none" stroke-linecap="round"/></svg></div><div class="cap"><strong>DevaCut curls</strong><small>Sculpted curl by curl</small></div></div>
+      <div class="tile reveal"><div class="art" style="background:linear-gradient(140deg,#F6E3CE,#E8C896)"><span class="soon">Photo soon</span><svg viewBox="0 0 100 100"><circle cx="50" cy="42" r="18" fill="#C4703B"/><path d="M32 42 q-2 26 4 40 M68 42 q2 26 -4 40 M50 24 q-18 0 -20 18 M50 24 q18 0 20 18" stroke="#8A4A20" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M36 30 l8 24 M64 30 l-8 24" stroke="#F6E3CE" stroke-width="3" stroke-linecap="round"/></svg></div><div class="cap"><strong>Dimensional color</strong><small>Brightness that grows out softly</small></div></div>
+      <div class="tile reveal"><div class="art" style="background:linear-gradient(140deg,#E4D9C8,#C9B795)"><span class="soon">Photo soon</span><svg viewBox="0 0 100 100"><ellipse cx="50" cy="44" rx="19" ry="23" fill="#1E2A28"/><path d="M31 44 q0 -22 19 -22 q19 0 19 22 q0 9 -3 14" fill="none" stroke="#C4703B" stroke-width="4" stroke-linecap="round"/><path d="M39 66 q11 7 22 0" stroke="#F6E3CE" stroke-width="4" fill="none" stroke-linecap="round"/></svg></div><div class="cap"><strong>Classic cut</strong><small>Sharp, clean, low maintenance</small></div></div>
+      <div class="tile reveal"><div class="art" style="background:linear-gradient(140deg,#D9E2E0,#B4C6C2)"><span class="soon">Photo soon</span><svg viewBox="0 0 100 100"><circle cx="50" cy="38" r="20" fill="#0C3836"/><path d="M30 38 q-4 34 6 52 M70 38 q4 34 -6 52 M50 18 q-22 0 -24 22 M50 18 q22 0 24 22" stroke="#14504D" stroke-width="5" fill="none" stroke-linecap="round"/></svg></div><div class="cap"><strong>Layered style</strong><small>Movement and shape</small></div></div>
+      <div class="tile reveal"><div class="art" style="background:linear-gradient(140deg,#F0DCD2,#DDB9A4)"><span class="soon">Photo soon</span><svg viewBox="0 0 100 100"><circle cx="50" cy="40" r="19" fill="#9A5226"/><path d="M31 40 q-3 30 5 48 M69 40 q3 30 -5 48 M50 21 q-19 0 -21 19 M50 21 q19 0 21 19" stroke="#5F3215" stroke-width="4.5" fill="none" stroke-linecap="round"/><circle cx="42" cy="32" r="3" fill="#F6E3CE"/><circle cx="58" cy="30" r="3" fill="#F6E3CE"/></svg></div><div class="cap"><strong>Rich all-over color</strong><small>Even tone, healthy shine</small></div></div>
+      <div class="tile reveal"><div class="art" style="background:linear-gradient(140deg,#E8E2D4,#CFC4A8)"><span class="soon">Photo soon</span><svg viewBox="0 0 100 100"><circle cx="50" cy="42" r="17" fill="#5F3215"/><path d="M33 42 q-1 24 5 38 M67 42 q1 24 -5 38 M50 25 q-17 0 -18 17 M50 25 q17 0 18 17" stroke="#3A1F0D" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M42 58 q8 5 16 0" stroke="#C4703B" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg></div><div class="cap"><strong>Smooth blowout</strong><small>Polished for the week</small></div></div>
+    </div>
+    <div class="band-inner">
+      <div class="price-note reveal" style="margin-top:10px;margin-bottom:56px"><strong>Coming soon:</strong> real photos from inside the salon. The illustrations above are artistic previews. Swipe sideways to browse.</div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="band" style="padding-top:56px">
+    <div class="band-inner">
+      <div class="strip s-rev">
+        <span class="eyebrow">Reviews</span>
+        <h2>Clients keep<br>coming back</h2>
+        <p>Rated 5 out of 5 stars in public reviews. Here is what clients keep saying.</p>
+      </div>
+      <div class="rs-strip">
+        <p class="rs-note">Review themes on this page are paraphrased from public feedback. Open the source to read current reviews and ratings.</p>
+        <div class="rs-links"><a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJx3MIkTSN2YkRaFagPHFa72Y" target="_blank" rel="noopener">See reviews on Google</a></div>
+      </div>
+      <div class="rev-stack">
+        <div class="rev reveal">
+          <div class="stars">★★★★★</div>
+          <p>"My stylist does a wonderful job consistently. I get a color, cut and hair treatment every five weeks. Thanks to her talent, I get regular remarks about how good my hair looks."</p>
+          <cite>Paraphrased, based on 19 public reviews</cite>
+        </div>
+        <div class="rev reveal">
+          <div class="stars">★★★★★</div>
+          <p>"Great place to get a haircut for both men and women. Been going for years. They have a lot of qualified stylists in the other chairs."</p>
+          <cite>Paraphrased, based on 19 public reviews</cite>
+        </div>
+        <div class="rev reveal">
+          <div class="stars">★★★★★</div>
+          <p>"Warm and friendly, very welcoming. My hair turned out great, better than either of us anticipated, and I feel like I left with a new friend."</p>
+          <cite>Paraphrased, based on 19 public reviews</cite>
+        </div>
+        <div class="rev reveal">
+          <div class="stars">★★★★★</div>
+          <p>"I love this salon. Great cut, always friendly service."</p>
+          <cite>Paraphrased, based on 19 public reviews</cite>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:40px;margin-bottom:56px">
+        <a class="btn btn-solid reveal" href="https://www.google.com/maps/place/?q=place_id:ChIJx3MIkTSN2YkRaFagPHFa72Y" target="_blank" rel="noopener">Leave a Google review</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="band" style="padding-top:56px">
+    <div class="band-inner">
+      <div class="strip s-visit">
+        <span class="eyebrow">Visit</span>
+        <h2>Find us on<br>West Manlius Street</h2>
+        <p>Easy to reach in East Syracuse, with parking nearby. Call ahead to book your chair.</p>
+      </div>
+      <div class="visit-grid">
+        <div class="info-card reveal">
+          <h3>Find us</h3>
+          <p><strong>East End Hair Co</strong><br>716 W Manlius St<br>East Syracuse, NY 13057</p>
+          <p>Parking nearby.<br>Call ahead to reserve your appointment.</p>
+        </div>
+        <div class="info-card reveal">
+          <h3>Call us</h3>
+          <p>To book or ask about services:</p>
+          <a class="big" href="tel:+13154374077">(315) 437-4077</a>
+          <p style="margin-top:10px">The salon is a licensed New York State appearance enhancement business, in good standing.</p>
+        </div>
+      </div>
+      <div class="visit-grid">
+        <div class="info-card reveal">
+          <h3>Hours</h3>
+          <table class="hours-table" id="hoursTable">
+            <tr><td>Monday</td><td>Closed</td></tr>
+            <tr><td>Tuesday</td><td>9:00 AM - 5:00 PM</td></tr>
+            <tr><td>Wednesday</td><td>10:00 AM - 7:00 PM</td></tr>
+            <tr><td>Thursday</td><td>10:00 AM - 7:00 PM</td></tr>
+            <tr><td>Friday</td><td>9:00 AM - 5:00 PM</td></tr>
+            <tr><td>Saturday</td><td>8:00 AM - 4:00 PM</td></tr>
+            <tr><td>Sunday</td><td>Closed</td></tr>
+          </table>
+        </div>
+        <div class="map-card reveal">
+          <div class="map-pin">
+            <svg viewBox="0 0 24 24" fill="#14504D"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#FAF7F0"/></svg>
+            <strong>716 W Manlius St</strong>
+            <small>East Syracuse, NY 13057</small><br>
+            <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJx3MIkTSN2YkRaFagPHFa72Y" target="_blank" rel="noopener">Get Directions</a>
+          </div>
+        </div>
+      </div>
+      <div style="height:56px"></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-inner">
+    <div class="fname">East End Hair Co</div>
+    <p>716 W Manlius St, East Syracuse, NY 13057 · <a href="tel:+13154374077" style="color:#D9D4C4">(315) 437-4077</a></p>
+    <nav>
+      <a href="#home" data-page="home">Home</a>
+      <a href="#services" data-page="services">Services</a>
+      <a href="#about" data-page="about">About</a>
+      <a href="#gallery" data-page="gallery">Gallery</a>
+      <a href="#reviews" data-page="reviews">Reviews</a>
+      <a href="#visit" data-page="visit">Visit</a>
+    </nav>
+    <div class="foot-bottom">
+      <span>© East End Hair Co</span>
+    </div>
+  </div>
+</footer>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+  var drawer = document.getElementById("drawer");
+  var scrim = document.getElementById("scrim");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(drawer){ drawer.classList.remove("open"); }
+    if(scrim){ scrim.classList.remove("on"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && drawer){
+    burger.addEventListener("click", function(){
+      var open = drawer.classList.toggle("open");
+      if(scrim){ scrim.classList.toggle("on", open); }
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+  if(scrim){
+    scrim.addEventListener("click", closeMenu);
+  }
+
+  /* ---------- live hours (America/New_York) ---------- */
+  var HOURS = {0:null,1:null,2:[9,17],3:[10,19],4:[10,19],5:[9,17],6:[8,16]};
+  var DOW = {"Sun":0,"Mon":1,"Tue":2,"Wed":3,"Thu":4,"Fri":5,"Sat":6};
+  function fmt(h){
+    var ap = h < 12 ? "AM" : "PM";
+    var hh = h % 12;
+    if(hh === 0){ hh = 12; }
+    return hh + ":00 " + ap;
+  }
+  try{
+    var parts = new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",weekday:"short",hour:"numeric",hour12:false}).formatToParts(new Date());
+    var wd = "Mon", hr = 12;
+    parts.forEach(function(p){
+      if(p.type === "weekday"){ wd = p.value; }
+      if(p.type === "hour"){ hr = parseInt(p.value, 10) % 24; }
+    });
+    var day = DOW[wd] !== undefined ? DOW[wd] : 1;
+    var pill = document.getElementById("hoursPill");
+    var txt = document.getElementById("hoursText");
+    var today = HOURS[day];
+    if(pill && txt){
+      if(today && hr >= today[0] && hr < today[1]){
+        txt.textContent = "Open now, until " + fmt(today[1]) + " today";
+      } else {
+        pill.classList.add("closed");
+        var nd = day, found = false;
+        for(var k = 1; k <= 7; k++){
+          nd = (day + k) % 7;
+          if(HOURS[nd]){ found = true; break; }
+        }
+        if(found){
+          var dayName = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][nd];
+          txt.textContent = "Opens " + (k === 1 ? "tomorrow" : dayName) + " at " + fmt(HOURS[nd][0]);
+        } else {
+          txt.textContent = "Call for hours";
+        }
+      }
+    }
+    var rows = document.querySelectorAll("#hoursTable tr");
+    var idx = (day + 6) % 7; /* rows run Mon..Sun */
+    if(rows[idx]){ rows[idx].classList.add("today"); }
+  }catch(e){ /* leave default pill text */ }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

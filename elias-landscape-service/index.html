@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elias landscape Service · Gardener in Pittsburgh, PA</title>
+<meta name="description" content="Elias landscape Service is a Pittsburgh gardener at 1407 Fallowfield Ave, Pittsburgh, PA 15216. Lawn care, garden beds, planting, mulching and cleanups. Call (412) 224-7857.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,600;0,800;1,400&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F7F4EC; --paper-2:#EFEAE0; --card:#FFFEFA;
+  --ink:#23301F; --ink-soft:#55624F;
+  --green:#2F6B34; --green-deep:#1F4A24; --green-soft:#DDEBD3;
+  --moss:#7C8B3F; --moss-soft:#E8EBD2;
+  --clay:#C25E2E; --clay-deep:#97451F; --clay-soft:#F7E2D2;
+  --radius:16px;
+  --shadow:0 20px 44px -20px rgba(35,48,31,.28);
+  --shadow-sm:0 10px 24px -12px rgba(35,48,31,.22);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Work Sans",system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:var(--green)}
+::selection{background:var(--green-soft);color:var(--green-deep)}
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+h1,h2,h3{font-family:"Bitter",serif;letter-spacing:-.3px}
+
+/* ---------- side drawer nav ---------- */
+.side{position:fixed;top:0;left:0;bottom:0;width:300px;background:var(--green-deep);color:#fff;z-index:100;display:flex;flex-direction:column;padding:28px 26px;transform:translateX(-105%);transition:transform .35s cubic-bezier(.22,.8,.3,1)}
+.side.open{transform:translateX(0)}
+.side .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:#fff;margin-bottom:30px}
+.side .brand svg{width:46px;height:46px;flex:none}
+.side .brand span{font-family:"Bitter",serif;font-weight:800;font-size:1.12rem;line-height:1.15}
+.side .brand small{display:block;font-family:"Work Sans",sans-serif;font-weight:600;font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:#BFD6B8}
+.side nav{display:flex;flex-direction:column;gap:4px}
+.side nav a{color:#E4EBDD;text-decoration:none;font-weight:600;font-size:1.05rem;padding:11px 14px;border-radius:12px;transition:background .2s,color .2s}
+.side nav a:hover{background:rgba(255,255,255,.1)}
+.side nav a.active{background:var(--clay);color:#fff}
+.side .drawer-call{margin-top:auto;display:flex;flex-direction:column;gap:12px}
+.side .drawer-call .btn-cream{background:#fff;color:var(--green-deep);text-decoration:none;font-weight:700;text-align:center;padding:13px;border-radius:999px}
+.side .drawer-call small{color:#BFD6B8;text-align:center;font-size:.82rem}
+.scrim{position:fixed;inset:0;background:rgba(35,48,31,.5);z-index:90;opacity:0;pointer-events:none;transition:opacity .3s}
+.scrim.on{opacity:1;pointer-events:auto}
+.topbar{position:sticky;top:0;z-index:80;background:rgba(247,244,236,.94);backdrop-filter:blur(10px);border-bottom:2px solid rgba(47,107,52,.16)}
+.topbar .row{display:flex;align-items:center;gap:16px;padding:12px 0}
+.open-btn{background:var(--green);border:0;cursor:pointer;border-radius:12px;padding:11px 13px;display:flex;flex-direction:column;gap:5px}
+.open-btn span{display:block;width:24px;height:3px;border-radius:3px;background:#fff}
+.topbar .mini{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1rem}
+.topbar .mini svg{width:34px;height:34px}
+.topbar .phone{margin-left:auto;font-weight:700;color:var(--green-deep);text-decoration:none;background:var(--green-soft);padding:10px 20px;border-radius:999px;white-space:nowrap}
+.topbar .phone:hover{background:var(--green);color:#fff}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- editorial hero ---------- */
+.hero-ed{padding:90px 0 70px;position:relative;overflow:hidden}
+.hero-ed::before{content:"";position:absolute;top:-120px;right:-120px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,var(--green-soft),transparent 70%)}
+.hero-ed .eyebrow{display:inline-block;font-weight:700;font-size:.78rem;letter-spacing:4px;text-transform:uppercase;color:var(--clay);margin-bottom:22px;border-bottom:3px solid var(--clay-soft);padding-bottom:8px}
+.hero-ed h1{font-size:clamp(3rem,7.5vw,5.6rem);line-height:1.02;font-weight:800;margin-bottom:24px}
+.hero-ed h1 em{font-style:italic;color:var(--green)}
+.hero-ed .rule{width:96px;height:6px;background:var(--clay);border-radius:99px;margin:0 0 24px}
+.hero-ed .lede{font-size:1.2rem;color:var(--ink-soft);max-width:38rem;margin-bottom:32px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:28px}
+.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;padding:14px 28px;border-radius:999px;font-size:1rem;transition:transform .18s,background .18s,box-shadow .18s}
+.btn-solid{background:var(--green);color:#fff;box-shadow:var(--shadow-sm)}
+.btn-solid:hover{background:var(--green-deep);transform:translateY(-2px)}
+.btn-line{border:2px solid var(--green);color:var(--green-deep);background:transparent}
+.btn-line:hover{background:var(--green-soft);transform:translateY(-2px)}
+.hours-pill{display:inline-flex;align-items:center;gap:10px;background:var(--ink);color:#fff;padding:10px 22px;border-radius:999px;font-weight:600;font-size:.95rem}
+.hours-pill .dot{width:10px;height:10px;border-radius:50%;background:#7BC47F;box-shadow:0 0 0 4px rgba(123,196,127,.25);animation:pulse 2s infinite}
+.hours-pill.closed .dot{background:#E4658F;box-shadow:0 0 0 4px rgba(228,101,143,.25)}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+.hero-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:52px}
+.hstat{background:var(--card);border-radius:var(--radius);padding:22px 24px;box-shadow:var(--shadow-sm);border-left:6px solid var(--green)}
+.hstat:nth-child(2){border-left-color:var(--clay)}
+.hstat:nth-child(3){border-left-color:var(--moss)}
+.hstat strong{font-family:"Bitter",serif;font-size:1.5rem;display:block;color:var(--green-deep)}
+.hstat:nth-child(2) strong{color:var(--clay-deep)}
+.hstat:nth-child(3) strong{color:var(--moss)}
+.hstat span{color:var(--ink-soft);font-size:.95rem}
+
+/* ---------- alternating bands ---------- */
+.band{padding:70px 0}
+.band.alt{background:var(--paper-2)}
+.band .row{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.band .row.flip .copy{order:2}
+.band .eyebrow{display:inline-block;font-weight:700;font-size:.75rem;letter-spacing:3.5px;text-transform:uppercase;color:var(--clay);margin-bottom:14px}
+.band h2{font-size:clamp(1.9rem,3.4vw,2.6rem);line-height:1.12;margin-bottom:16px}
+.band .copy p{color:var(--ink-soft);margin-bottom:14px}
+.band .visual{border-radius:22px;min-height:320px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.band .visual svg{width:42%;height:auto;filter:drop-shadow(0 14px 18px rgba(0,0,0,.2))}
+.band .visual .vtag{position:absolute;bottom:16px;left:16px;background:rgba(255,255,255,.9);font-size:.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:6px 14px;border-radius:999px;color:var(--ink-soft)}
+.checks{list-style:none;display:grid;gap:10px;margin:18px 0 22px}
+.checks li{display:flex;gap:12px;align-items:flex-start;font-weight:500}
+.checks svg{flex:none;width:24px;height:24px;margin-top:2px}
+
+/* ---------- service cards ---------- */
+section.block{padding:70px 0}
+.sec-head{text-align:center;max-width:46rem;margin:0 auto 44px}
+.sec-head .eyebrow{display:inline-block;font-weight:700;font-size:.75rem;letter-spacing:3.5px;text-transform:uppercase;color:var(--clay);margin-bottom:12px}
+.sec-head h2{font-size:clamp(1.9rem,3.6vw,2.7rem);line-height:1.1;margin-bottom:12px}
+.sec-head p{color:var(--ink-soft)}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.card{background:var(--card);border-radius:var(--radius);padding:32px 28px;box-shadow:var(--shadow-sm);transition:transform .2s,box-shadow .2s;border-bottom:6px solid var(--green)}
+.card:nth-child(2){border-bottom-color:var(--clay)}
+.card:nth-child(3){border-bottom-color:var(--moss)}
+.card:nth-child(4){border-bottom-color:var(--green)}
+.card:nth-child(5){border-bottom-color:var(--clay)}
+.card:nth-child(6){border-bottom-color:var(--moss)}
+.card:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+.card .icon{width:56px;height:56px;border-radius:16px;background:var(--green-soft);display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+.card:nth-child(2) .icon{background:var(--clay-soft)}
+.card:nth-child(3) .icon{background:var(--moss-soft)}
+.card:nth-child(4) .icon{background:var(--green-soft)}
+.card:nth-child(5) .icon{background:var(--clay-soft)}
+.card:nth-child(6) .icon{background:var(--moss-soft)}
+.card .icon svg{width:30px;height:30px}
+.card h3{font-size:1.32rem;margin-bottom:10px}
+.card p{color:var(--ink-soft);font-size:.96rem}
+
+/* ---------- masonry gallery ---------- */
+.masonry{columns:3 280px;column-gap:20px}
+.mtile{break-inside:avoid;margin-bottom:20px;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);background:var(--card)}
+.mtile .art{display:flex;align-items:center;justify-content:center;position:relative}
+.mtile .art svg{width:40%;height:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.18));padding:34px 0}
+.mtile .cap{padding:14px 18px}
+.mtile .cap strong{font-family:"Bitter",serif;display:block}
+.mtile .cap small{color:var(--ink-soft)}
+.mtile .badge{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.88);font-size:.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 12px;border-radius:999px;color:var(--ink-soft)}
+
+/* ---------- reviews ---------- */
+.rev-stack{display:grid;gap:22px;max-width:860px;margin:0 auto}
+.rev{background:var(--card);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm);border-left:8px solid var(--green)}
+.rev:nth-child(2){border-left-color:var(--clay)}
+.rev .stars{color:#C8862E;font-size:1.2rem;letter-spacing:3px;margin-bottom:10px}
+.rev p{font-size:1.05rem;margin-bottom:12px}
+.rev cite{font-style:normal;font-weight:700;font-size:.85rem;color:var(--green-deep);letter-spacing:.5px}
+
+/* ---------- big-type footer ---------- */
+footer{background:var(--green-deep);color:#fff;margin-top:40px}
+.foot-cta{padding:70px 0 50px;text-align:center;border-bottom:1px solid rgba(255,255,255,.14)}
+.foot-cta h2{font-size:clamp(2.2rem,5.5vw,4rem);font-weight:800;line-height:1.05;margin-bottom:16px}
+.foot-cta h2 em{color:var(--clay-soft);font-style:italic}
+.foot-cta p{color:#C9D6C2;max-width:34rem;margin:0 auto 26px}
+.foot-cta .btn-solid{background:var(--clay)}
+.foot-cta .btn-solid:hover{background:var(--clay-deep)}
+.foot-cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px;padding:44px 0 34px;color:#C9D6C2}
+.foot-cols h4{font-family:"Bitter",serif;color:#fff;font-size:1.1rem;margin-bottom:12px}
+.foot-cols a{color:#E4EBDD;text-decoration:none}
+.foot-cols a:hover{color:#fff;text-decoration:underline}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.14);padding:20px 0 26px;text-align:center;font-size:.85rem;color:#9FB39A}
+
+/* ---------- page hero strips ---------- */
+.strip{border-radius:22px;padding:56px 48px;color:#fff;position:relative;overflow:hidden;margin-bottom:44px;box-shadow:var(--shadow)}
+.strip::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(255,255,255,.2), transparent 52%)}
+.strip h2{font-size:clamp(2rem,4.2vw,3rem);position:relative;margin-bottom:10px}
+.strip p{color:rgba(255,255,255,.9);max-width:38rem;position:relative}
+.strip .eyebrow{position:relative;display:inline-block;font-weight:700;font-size:.75rem;letter-spacing:3.5px;text-transform:uppercase;margin-bottom:12px;color:#fff}
+.strip.s-svc{background:linear-gradient(120deg,#2F6B34,#1F4A24)}
+.strip.s-about{background:linear-gradient(120deg,#7C8B3F,#55612B)}
+.strip.s-gal{background:linear-gradient(120deg,#C25E2E,#97451F)}
+.strip.s-rev{background:linear-gradient(120deg,#2F6B34,#243318)}
+.strip.s-contact{background:linear-gradient(120deg,#1F4A24,#101f12)}
+
+/* ---------- contact page ---------- */
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:22px}
+.info{background:var(--card);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm)}
+.info h3{font-size:1.35rem;margin-bottom:12px;display:flex;align-items:center;gap:12px}
+.info h3 svg{width:28px;height:28px}
+.info p{color:var(--ink-soft);margin-bottom:8px}
+.info a.big{font-family:"Bitter",serif;font-size:1.5rem;font-weight:800;color:var(--green-deep);text-decoration:none}
+.info a.big:hover{text-decoration:underline}
+.hours-table{width:100%;border-collapse:collapse;font-size:.98rem}
+.hours-table td{padding:10px 6px;border-bottom:1px dashed rgba(35,48,31,.2)}
+.hours-table tr.today td{font-weight:800;color:var(--green-deep)}
+.hours-table tr.today td:first-child::after{content:" · today";font-size:.85rem;color:var(--clay)}
+.hours-table td:last-child{text-align:right}
+.mapbox{border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);min-height:300px;background:repeating-linear-gradient(0deg,transparent 0 44px,rgba(47,107,52,.16) 44px 46px),repeating-linear-gradient(90deg,transparent 0 44px,rgba(47,107,52,.16) 44px 46px),linear-gradient(140deg,#E7EFE0,#D6E3C9);display:flex;align-items:center;justify-content:center;margin-bottom:56px}
+.map-pin{background:var(--card);padding:26px 34px;border-radius:18px;box-shadow:var(--shadow);text-align:center;max-width:80%}
+.map-pin strong{font-family:"Bitter",serif;font-size:1.15rem;display:block}
+.map-pin small{color:var(--ink-soft)}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- review source strip ---------- */
+.rs-strip{margin:26px auto 34px;max-width:640px;background:#FFFEFA;border:2px solid var(--green-soft);border-radius:14px;padding:20px 22px;text-align:center}
+.rs-note{margin:0 0 14px;font-size:.95rem;color:var(--ink-soft);line-height:1.55}
+.rs-btn{display:inline-block;background:var(--green);color:#fff;padding:11px 26px;border-radius:999px;font-weight:700;text-decoration:none;font-size:.95rem}
+.rs-btn:hover{background:var(--green-deep)}
+
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:940px){
+  .band .row{grid-template-columns:1fr}
+  .band .row.flip .copy{order:0}
+  .cards{grid-template-columns:1fr 1fr}
+  .hero-meta{grid-template-columns:1fr 1fr}
+  .info-grid{grid-template-columns:1fr}
+  .foot-cols{grid-template-columns:1fr}
+  .strip{padding:40px 28px}
+}
+@media(max-width:600px){
+  .cards{grid-template-columns:1fr}
+  .hero-meta{grid-template-columns:1fr}
+  .side{width:86vw}
+  .topbar .phone{font-size:.85rem;padding:9px 14px}
+}
+</style>
+</head>
+<body>
+
+<aside class="side" id="sideDrawer" aria-label="Site menu">
+  <a class="brand" href="#home" data-page="home" aria-label="Elias landscape Service, home">
+    <svg viewBox="0 0 64 64" role="img" aria-label="Leaf logo"><circle cx="32" cy="32" r="28" fill="#7C8B3F"/><path d="M32 12 C46 22 48 38 32 52 C16 38 18 22 32 12 Z" fill="#DDEBD3"/><path d="M32 16 V48" stroke="#1F4A24" stroke-width="3" stroke-linecap="round"/><path d="M32 26 l8 -6 M32 34 l-8 -6 M32 42 l8 -6" stroke="#1F4A24" stroke-width="2.5" stroke-linecap="round"/></svg>
+    <span>Elias landscape<small>Service · Pittsburgh</small></span>
+  </a>
+  <nav class="main" id="mainNav" aria-label="Main navigation">
+    <a href="#home" data-page="home" class="active" aria-current="page">Home</a>
+    <a href="#services" data-page="services">Services</a>
+    <a href="#about" data-page="about">About</a>
+    <a href="#gallery" data-page="gallery">Gallery</a>
+    <a href="#reviews" data-page="reviews">Reviews</a>
+    <a href="#contact" data-page="contact">Contact</a>
+  </nav>
+  <div class="drawer-call">
+    <a class="btn-cream" href="tel:+14122247857">(412) 224-7857</a>
+    <small>Mon - Sat · 7 AM - 6 PM<br>1407 Fallowfield Ave, Pittsburgh</small>
+  </div>
+</aside>
+<div class="scrim" id="scrim"></div>
+
+<div class="topbar">
+  <div class="wrap row">
+    <button class="open-btn" id="drawerOpen" aria-label="Open menu"><span></span><span></span><span></span></button>
+    <span class="mini">
+      <svg viewBox="0 0 64 64" role="img" aria-label="Leaf logo"><circle cx="32" cy="32" r="28" fill="#2F6B34"/><path d="M32 12 C46 22 48 38 32 52 C16 38 18 22 32 12 Z" fill="#DDEBD3"/><path d="M32 16 V48" stroke="#FFFEFA" stroke-width="3" stroke-linecap="round"/></svg>
+      Elias landscape Service
+    </span>
+    <a class="phone" href="tel:+14122247857">(412) 224-7857</a>
+  </div>
+</div>
+
+<section class="page active" id="page-home">
+  <div class="hero-ed">
+    <div class="wrap">
+      <span class="eyebrow">Gardener · Pittsburgh, PA</span>
+      <h1>Your yard,<br><em>loved</em> back to life.</h1>
+      <div class="rule"></div>
+      <p class="lede">Elias landscape Service is a Pittsburgh gardener serving Brookline, Beechview and the South Hills. Mowing, garden beds, planting, mulching and seasonal cleanups, done the careful way, every visit.</p>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="#services" data-page="services">See Services →</a>
+        <a class="btn btn-line" href="tel:+14122247857">(412) 224-7857</a>
+      </div>
+      <span class="hours-pill" id="hoursPill"><span class="dot"></span><span id="hoursText">Checking today's hours…</span></span>
+      <div class="hero-meta">
+        <div class="hstat reveal"><strong>7 AM - 6 PM</strong><span>Six days a week, Monday through Saturday</span></div>
+        <div class="hstat reveal"><strong>1407 Fallowfield Ave</strong><span>Brookline, Pittsburgh, PA 15216</span></div>
+        <div class="hstat reveal"><strong>Free estimates</strong><span>Call for a walkthrough of your yard</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap row">
+      <div class="copy reveal">
+        <span class="eyebrow">Lawn care</span>
+        <h2>A cut that looks sharp, every single time</h2>
+        <p>Straight lines, crisp edges, clippings cleaned up, not left behind. Routine mowing is the backbone of what we do, and we treat it like a craft.</p>
+        <ul class="checks">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#2F6B34" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Weekly and biweekly mowing schedules</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#2F6B34" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Edging along walks, drives and beds</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#2F6B34" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Full cleanup of clippings after every visit</li>
+        </ul>
+        <a class="btn btn-solid" href="#services" data-page="services">Explore services →</a>
+      </div>
+      <div class="visual reveal" style="background:linear-gradient(140deg,#2F6B34,#1F4A24)">
+        <svg viewBox="0 0 100 100"><path d="M8 84 h84" stroke="#DDEBD3" stroke-width="6" stroke-linecap="round"/><path d="M20 84 V50 M32 84 V42 M44 84 V58 M56 84 V44 M68 84 V56 M80 84 V48" stroke="#7BC47F" stroke-width="6" stroke-linecap="round"/><path d="M14 84 V62 M26 84 V54 M38 84 V66 M50 84 V50 M62 84 V64 M74 84 V56 M86 84 V66" stroke="#5C9A5F" stroke-width="5" stroke-linecap="round"/></svg>
+        <span class="vtag">Sample image · real photos soon</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="band alt">
+    <div class="wrap row flip">
+      <div class="copy reveal">
+        <span class="eyebrow">Garden beds &amp; planting</span>
+        <h2>Beds that bloom, not beds that beg</h2>
+        <p>Overgrown beds, tired mulch, empty corners. We dig in, weed out, plant right for Pittsburgh's seasons, and finish with fresh mulch that makes everything pop.</p>
+        <ul class="checks">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#C25E2E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Bed cleanup, weeding and redefining edges</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#C25E2E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Shrub, flower and ornamental planting</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#C25E2E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Fresh mulch to hold moisture and stop weeds</li>
+        </ul>
+        <a class="btn btn-line" href="#contact" data-page="contact">Get a free estimate →</a>
+      </div>
+      <div class="visual reveal" style="background:linear-gradient(140deg,#C25E2E,#97451F)">
+        <svg viewBox="0 0 100 100"><path d="M10 78 Q50 66 90 78 L86 92 L14 92 Z" fill="#5A3A24"/><path d="M50 78 V40" stroke="#2F6B34" stroke-width="6" stroke-linecap="round"/><ellipse cx="50" cy="30" rx="18" ry="14" fill="#7C8B3F"/><ellipse cx="38" cy="36" rx="10" ry="8" fill="#9BAE52"/><ellipse cx="62" cy="36" rx="10" ry="8" fill="#9BAE52"/><circle cx="50" cy="22" r="5" fill="#E4658F"/><circle cx="42" cy="30" r="4" fill="#E8A93D"/><circle cx="58" cy="30" r="4" fill="#E8A93D"/></svg>
+        <span class="vtag">Sample image · real photos soon</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="wrap row">
+      <div class="copy reveal">
+        <span class="eyebrow">Seasonal cleanups</span>
+        <h2>Spring wake-ups and fall put-to-beds</h2>
+        <p>Pittsburgh yards work hard through the seasons. We clear winter debris in spring and put beds and lawns to rest properly in fall, so next year starts strong.</p>
+        <ul class="checks">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#7C8B3F" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Leaf removal and debris hauling</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#7C8B3F" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Shrub trimming and perennial cutback</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#7C8B3F" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Final mow and bed prep before winter</li>
+        </ul>
+      </div>
+      <div class="visual reveal" style="background:linear-gradient(140deg,#7C8B3F,#55612B)">
+        <svg viewBox="0 0 100 100"><path d="M50 14 C66 30 70 52 50 78 C30 52 34 30 50 14Z" fill="#E8A93D"/><path d="M50 20 V72" stroke="#97451F" stroke-width="4" stroke-linecap="round"/><path d="M50 34 l14 -8 M50 48 l-14 -8 M50 60 l14 -8" stroke="#97451F" stroke-width="3" stroke-linecap="round"/><circle cx="28" cy="72" r="5" fill="#C25E2E"/><circle cx="72" cy="70" r="5" fill="#C25E2E"/><circle cx="38" cy="82" r="5" fill="#97451F"/></svg>
+        <span class="vtag">Sample image · real photos soon</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-svc">
+      <span class="eyebrow">What we do</span>
+      <h2>Gardening services, done the careful way</h2>
+      <p>From a weekly mow to a full bed makeover, one call covers it all. Free estimates, fair prices, and we clean up after ourselves.</p>
+    </div>
+
+    <div class="cards">
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#2F6B34" stroke-width="2" stroke-linecap="round"><path d="M4 20h16M7 20V10m10 10V10M7 10l5-7 5 7"/><path d="M3 20h18" stroke-linecap="round"/></svg></div>
+        <h3>Lawn Mowing</h3>
+        <p>Weekly or biweekly cuts with crisp edging along every walk, drive and bed. Clippings bagged or mulched, never scattered.</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#C25E2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-8m0 0c0-4 3-7 8-7 0 5-3 8-8 7zm0 0c0-4-3-7-8-7 0 5 3 8 8 7z"/></svg></div>
+        <h3>Garden Bed Care</h3>
+        <p>Weeding, edging, bed redefinition and fresh mulch. Tired beds come back to life and stay that way.</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#7C8B3F" stroke-width="2" stroke-linecap="round"><path d="M12 22v-8"/><circle cx="12" cy="8" r="5"/><path d="M12 3v2M5 8H3m16 0h2" /></svg></div>
+        <h3>Planting</h3>
+        <p>Shrubs, flowers and ornamentals chosen for Pittsburgh soil and seasons, planted right so they actually thrive.</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#2F6B34" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21V8l-4 4m4-4l4 4M16 3v13l-4-4m4 4l4-4"/></svg></div>
+        <h3>Shrub &amp; Hedge Trimming</h3>
+        <p>Overgrown hedges tamed and shaped. Clean lines that make the whole property look cared for.</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#C25E2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-4 4-6 8-6 12a6 6 0 0012 0c0-4-2-8-6-12z"/></svg></div>
+        <h3>Spring &amp; Fall Cleanups</h3>
+        <p>Leaf removal, debris hauling, perennial cutback and bed prep. We open the season right and close it properly.</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#7C8B3F" stroke-width="2" stroke-linecap="round"><path d="M4 4h16v12H4z"/><path d="M4 9h16M9 4v5"/></svg></div>
+        <h3>Sod &amp; Lawn Repair</h3>
+        <p>Patchy spots, thin areas, worn paths. We repair, reseed and lay sod to bring tired lawns back.</p>
+      </div>
+    </div>
+
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-about">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-about">
+      <span class="eyebrow">About us</span>
+      <h2>A gardener who treats your yard like his own</h2>
+      <p>Elias landscape Service is a local Pittsburgh gardening outfit, the kind where the person who answers the phone is the person who shows up with the mower.</p>
+    </div>
+
+    <div class="band" style="padding-top:10px">
+      <div class="wrap row">
+        <div class="copy reveal">
+          <h2>Careful work, honest pricing, clean finish</h2>
+          <p>Based on Fallowfield Ave in Brookline, we serve homeowners across the South Hills who want a yard that looks cared for without having to think about it.</p>
+          <p>No upsells, no disappearing acts. We show up when we say we will, do the work the way we'd want it done at our own place, and leave the property cleaner than we found it.</p>
+          <ul class="checks">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#2F6B34" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Free, no-pressure estimates</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#2F6B34" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>One call for mowing, beds, planting and cleanups</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="#2F6B34" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Local, dependable, easy to reach</li>
+          </ul>
+          <a class="btn btn-solid" href="#contact" data-page="contact">Work with us →</a>
+        </div>
+        <div class="visual reveal" style="background:linear-gradient(140deg,#2F6B34,#1F4A24)">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="#DDEBD3" stroke-width="5"/><path d="M50 26 C62 36 64 50 50 64 C36 50 38 36 50 26Z" fill="#7BC47F"/><path d="M50 30 V60" stroke="#1F4A24" stroke-width="3" stroke-linecap="round"/></svg>
+          <span class="vtag">Sample image · real photos soon</span>
+        </div>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-gal">
+      <span class="eyebrow">Gallery</span>
+      <h2>The kind of yards we leave behind</h2>
+      <p>Artistic previews of our work. Real before-and-after photos from Pittsburgh yards are on the way.</p>
+    </div>
+
+    <div class="masonry">
+      <div class="mtile reveal"><div class="art" style="background:linear-gradient(140deg,#2F6B34,#1F4A24)"><span class="badge">Photo soon</span><svg viewBox="0 0 100 100"><path d="M8 84 h84" stroke="#DDEBD3" stroke-width="6" stroke-linecap="round"/><path d="M20 84 V46 M34 84 V38 M48 84 V54 M62 84 V40 M76 84 V52" stroke="#7BC47F" stroke-width="6" stroke-linecap="round"/></svg></div><div class="cap"><strong>Fresh weekly cut</strong><small>Striped, edged, cleaned up</small></div></div>
+      <div class="mtile reveal"><div class="art" style="background:linear-gradient(140deg,#C25E2E,#97451F)"><span class="badge">Photo soon</span><svg viewBox="0 0 100 100" style="padding:52px 0"><path d="M10 78 Q50 66 90 78 L86 92 L14 92 Z" fill="#5A3A24"/><path d="M50 78 V40" stroke="#2F6B34" stroke-width="6" stroke-linecap="round"/><ellipse cx="50" cy="30" rx="18" ry="14" fill="#7C8B3F"/></svg></div><div class="cap"><strong>Fresh mulch beds</strong><small>Weeded, edged, replanted</small></div></div>
+      <div class="mtile reveal"><div class="art" style="background:linear-gradient(140deg,#7C8B3F,#55612B)"><span class="badge">Photo soon</span><svg viewBox="0 0 100 100" style="padding:22px 0"><path d="M20 70 L50 20 L80 70" fill="none" stroke="#DDEBD3" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><path d="M32 56 L50 30 L68 56" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"/></svg></div><div class="cap"><strong>Hedge shaping</strong><small>Overgrown to orderly</small></div></div>
+      <div class="mtile reveal"><div class="art" style="background:linear-gradient(140deg,#2F6B34,#243318)"><span class="badge">Photo soon</span><svg viewBox="0 0 100 100" style="padding:48px 0"><path d="M50 14 C66 30 70 52 50 78 C30 52 34 30 50 14Z" fill="#E8A93D"/><path d="M50 20 V72" stroke="#97451F" stroke-width="4" stroke-linecap="round"/></svg></div><div class="cap"><strong>Fall leaf cleanup</strong><small>Beds cleared, lawn put to rest</small></div></div>
+      <div class="mtile reveal"><div class="art" style="background:linear-gradient(140deg,#97451F,#5A2F12)"><span class="badge">Photo soon</span><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="34" fill="#7BC47F"/><circle cx="50" cy="50" r="22" fill="#5C9A5F"/><circle cx="50" cy="50" r="10" fill="#DDEBD3"/></svg></div><div class="cap"><strong>Shrub planting</strong><small>Chosen for Pittsburgh seasons</small></div></div>
+      <div class="mtile reveal"><div class="art" style="background:linear-gradient(140deg,#5C9A5F,#2F6B34)"><span class="badge">Photo soon</span><svg viewBox="0 0 100 100" style="padding:44px 0"><rect x="18" y="52" width="64" height="26" rx="6" fill="#1F4A24"/><circle cx="34" cy="70" r="8" fill="#333"/><circle cx="66" cy="70" r="8" fill="#333"/><path d="M24 52 L50 30 L76 52" fill="#7C8B3F"/></svg></div><div class="cap"><strong>Debris hauling</strong><small>We take it with us</small></div></div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-rev">
+      <span class="eyebrow">Reviews</span>
+      <h2>What neighbors say</h2>
+      <p>Find us on Google Maps to read current reviews and ratings for Elias landscape Service.</p>
+    </div>
+
+    <div class="rs-strip">
+      <p class="rs-note">We are still gathering our first reviews on Google. If we have worked on your yard, we would love to hear from you there.</p>
+      <div><a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJbysFAZD3NIgRufrucEzcq5k" target="_blank" rel="noopener">See reviews on Google</a></div>
+    </div>
+
+    <div class="rev-stack">
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>"A local gardener who actually shows up and does careful work. This is the kind of service South Hills yards need."</p>
+        <cite>Sample review · badge for illustration</cite>
+      </div>
+      <div class="rev reveal">
+        <div class="stars">★★★★★</div>
+        <p>"Beds weeded, mulch fresh, edges crisp. The yard looks like someone cares about it, because someone does."</p>
+        <cite>Sample review · badge for illustration</cite>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-contact">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-contact">
+      <span class="eyebrow">Contact</span>
+      <h2>Let's talk about your yard</h2>
+      <p>Call for a free estimate. Tell us what the yard needs and we'll walk it together.</p>
+    </div>
+
+    <div class="info-grid">
+      <div class="info reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#2F6B34" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg> Call us</h3>
+        <p>Free estimates, Monday through Saturday:</p>
+        <a class="big" href="tel:+14122247857">(412) 224-7857</a>
+        <p style="margin-top:10px">Prefer to talk through the project first? Just call, we pick up.</p>
+      </div>
+      <div class="info reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#2F6B34" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Hours</h3>
+        <table class="hours-table" id="hoursTable">
+          <tr><td>Monday</td><td>7:00 AM - 6:00 PM</td></tr>
+          <tr><td>Tuesday</td><td>7:00 AM - 6:00 PM</td></tr>
+          <tr><td>Wednesday</td><td>7:00 AM - 6:00 PM</td></tr>
+          <tr><td>Thursday</td><td>7:00 AM - 6:00 PM</td></tr>
+          <tr><td>Friday</td><td>7:00 AM - 6:00 PM</td></tr>
+          <tr><td>Saturday</td><td>7:00 AM - 6:00 PM</td></tr>
+          <tr><td>Sunday</td><td>Call for hours</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="mapbox reveal">
+      <div class="map-pin">
+        <strong>1407 Fallowfield Ave fl1</strong>
+        <small>Pittsburgh, PA 15216</small><br>
+        <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJbysFAZD3NIgRufrucEzcq5k" target="_blank" rel="noopener">Get Directions →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-cta">
+    <div class="wrap">
+      <h2>A better yard is <em>one call away.</em></h2>
+      <p>Mowing, beds, planting, cleanups. Elias landscape Service, Brookline, Pittsburgh. Free estimates, six days a week.</p>
+      <a class="btn btn-solid" href="tel:+14122247857" style="color:#fff">Call (412) 224-7857</a>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="foot-cols">
+      <div>
+        <h4>Elias landscape Service</h4>
+        <p>Gardener serving Brookline, Beechview and the South Hills of Pittsburgh, PA.</p>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <p>1407 Fallowfield Ave fl1<br>Pittsburgh, PA 15216<br><a href="tel:+14122247857">(412) 224-7857</a></p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <p><a href="#services" data-page="services">Services</a><br><a href="#gallery" data-page="gallery">Gallery</a><br><a href="#reviews" data-page="reviews">Reviews</a><br><a href="#contact" data-page="contact">Contact</a></p>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© Elias landscape Service</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "contact"];
+  var drawer = document.getElementById("sideDrawer");
+  var scrim = document.getElementById("scrim");
+  var openBtn = document.getElementById("drawerOpen");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(drawer){ drawer.classList.remove("open"); }
+    if(scrim){ scrim.classList.remove("on"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(openBtn){
+    openBtn.addEventListener("click", function(){
+      if(drawer){ drawer.classList.add("open"); }
+      if(scrim){ scrim.classList.add("on"); }
+    });
+  }
+  if(scrim){
+    scrim.addEventListener("click", closeMenu);
+  }
+
+  /* ---------- live hours (America/New_York) ---------- */
+  var HOURS = {0:null,1:[7,18],2:[7,18],3:[7,18],4:[7,18],5:[7,18],6:[7,18]};
+  var DOW = {"Sun":0,"Mon":1,"Tue":2,"Wed":3,"Thu":4,"Fri":5,"Sat":6};
+  function fmt(h){
+    var ap = h < 12 ? "AM" : "PM";
+    var hh = h % 12;
+    if(hh === 0){ hh = 12; }
+    return hh + ":00 " + ap;
+  }
+  try{
+    var parts = new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",weekday:"short",hour:"numeric",hour12:false}).formatToParts(new Date());
+    var wd = "Mon", hr = 12;
+    parts.forEach(function(p){
+      if(p.type === "weekday"){ wd = p.value; }
+      if(p.type === "hour"){ hr = parseInt(p.value, 10) % 24; }
+    });
+    var day = DOW[wd] !== undefined ? DOW[wd] : 1;
+    var pill = document.getElementById("hoursPill");
+    var txt = document.getElementById("hoursText");
+    if(pill && txt){
+      var today = HOURS[day];
+      if(day === 0){
+        txt.textContent = "Call for hours";
+      } else if(today && hr >= today[0] && hr < today[1]){
+        txt.textContent = "Open now · until " + fmt(today[1]) + " today";
+      } else {
+        pill.classList.add("closed");
+        var nd = day, opensAt = null, label = "";
+        if(today && hr < today[0]){ nd = day; opensAt = today[0]; label = "today"; }
+        else{
+          for(var k = 1; k <= 7; k++){
+            var c = (day + k) % 7;
+            if(HOURS[c]){ nd = c; opensAt = HOURS[c][0]; break; }
+          }
+          var dayName = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][nd];
+          label = (k === 1) ? "tomorrow" : dayName;
+        }
+        txt.textContent = "Opens " + label + " at " + fmt(opensAt);
+      }
+    }
+    var rows = document.querySelectorAll("#hoursTable tr");
+    var idx = (day + 6) % 7; /* rows run Mon..Sun */
+    if(rows[idx]){ rows[idx].classList.add("today"); }
+  }catch(e){ /* leave default pill text */ }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
