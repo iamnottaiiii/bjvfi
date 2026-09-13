@@ -861,28 +861,57 @@ function wireQueue(el){
   if(gr) gr.addEventListener('click', grabRandom);
 }
 
-/* Pre-grab preview: caller must view the business site before grabbing. */
+/* Pre-grab preview: caller must open the business site, then wait 2 minutes, before grabbing. */
 function showGrabPreview(slug){
   const bySlug = catalogBySlug();
   const l = bySlug[slug] || normalizeLead({ s: slug, n: slug, p: '' });
   const url = siteUrlFor(l);
+  const WAIT_S = 120;
+  let siteOpened = false;
+  let remaining = WAIT_S;
+  let iv = null;
+  function fmt(s){ return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
   let html = '<h2>Review before you grab</h2>' +
-    '<p class="muted" style="font-size:13px;line-height:1.55;margin-bottom:14px">Look at their site first. Know who they are before you claim this lead.</p>' +
+    '<p class="muted" style="font-size:13px;line-height:1.55;margin-bottom:14px">Open their site and study it for <strong>2 minutes</strong>. Know who they are before you claim this lead.</p>' +
     '<div style="font-size:15px;font-weight:600;margin-bottom:4px">' + esc(l.name) + '</div>' +
     (l.category ? '<div class="muted" style="font-size:12px;margin-bottom:2px">' + esc(l.category) + '</div>' : '') +
     (hasPhone(l.phone) ? '<div style="font-size:13px;margin-bottom:2px">' + esc(l.phone) + '</div>' : '') +
     (l.address ? '<div class="muted" style="font-size:12px;margin-bottom:10px">' + esc(l.address) + '</div>' : '<div style="margin-bottom:10px"></div>') +
-    '<a class="btn block" href="' + esc(url) + '" target="_blank" rel="noopener" style="margin-bottom:10px">Open their site</a>' +
+    '<button class="btn block" id="grab-site-open" type="button" style="margin-bottom:10px">Open their site</button>' +
     '<div class="row" style="margin-top:14px">' +
     '<button class="btn ghost" id="grab-preview-cancel" type="button" style="flex:1">Cancel</button>' +
-    '<button class="btn" id="grab-preview-confirm" type="button" style="flex:2">Grab this lead</button>' +
+    '<button class="btn" id="grab-preview-confirm" type="button" style="flex:2" disabled>Open the site first</button>' +
     '</div>';
   showModal(html);
-  document.getElementById('grab-preview-cancel').addEventListener('click', closeModal);
-  document.getElementById('grab-preview-confirm').addEventListener('click', function(){
+  const confirmBtn = document.getElementById('grab-preview-confirm');
+  const openBtn = document.getElementById('grab-site-open');
+  function stopTimer(){ if(iv){ clearInterval(iv); iv = null; } }
+  function refresh(){
+    if(!document.body.contains(confirmBtn)){ stopTimer(); return; }
+    if(!siteOpened){ confirmBtn.disabled = true; confirmBtn.textContent = 'Open the site first'; return; }
+    if(remaining > 0){ confirmBtn.disabled = true; confirmBtn.textContent = 'Grab in ' + fmt(remaining); return; }
+    confirmBtn.disabled = false; confirmBtn.textContent = 'Grab this lead';
+  }
+  openBtn.addEventListener('click', function(){
+    window.open(url, '_blank', 'noopener');
+    if(!siteOpened){
+      siteOpened = true;
+      openBtn.textContent = 'Site opened \u2713 Reopen';
+      iv = setInterval(function(){
+        remaining--;
+        if(remaining <= 0){ remaining = 0; stopTimer(); }
+        refresh();
+      }, 1000);
+    }
+    refresh();
+  });
+  document.getElementById('grab-preview-cancel').addEventListener('click', function(){ stopTimer(); closeModal(); });
+  confirmBtn.addEventListener('click', function(){
+    stopTimer();
     closeModal();
     grabLead(slug);
   });
+  refresh();
 }
 
 async function grabLead(slug){
