@@ -60,7 +60,7 @@
   --safe-b: env(safe-area-inset-bottom, 0px);
   --safe-l: env(safe-area-inset-left, 0px);
   --safe-r: env(safe-area-inset-right, 0px);
-  --header-h: 40px;
+  --header-h: 22px;
   --bottom-h: 64px;
   --page-max: 36rem;
   --gutter: 16px;
@@ -291,10 +291,10 @@ nav.top-nav {
   right: 0;
   z-index: 28;
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: center;
-  min-height: calc(var(--safe-t) + var(--header-h));
-  padding: var(--safe-t) 16px 6px;
+  min-height: 0;
+  padding: calc(var(--safe-t) + 6px) 16px 0;
   font-family: var(--font-serif);
   font-size: 1.2rem;
   font-weight: 600;
@@ -2237,14 +2237,6 @@ body.page-thread .thread-compose {
 
 .receipt { opacity: 0.75; font-size: 0.85em; }
 
-/* App-wide accent themes */
-html[data-accent="blue"] { --accent: #5b9cff; --accent-ink: #041018; }
-html[data-accent="violet"] { --accent: #b48cff; --accent-ink: #120818; }
-html[data-accent="green"] { --accent: #3ddc84; --accent-ink: #04140c; }
-html[data-accent="amber"] { --accent: #ffb020; --accent-ink: #1a1000; }
-html[data-accent="rose"] { --accent: #ff6b8a; --accent-ink: #18040a; }
-html[data-accent="default"] { --accent: var(--ink); --accent-ink: var(--bg); }
-
 /* ---- full-UI themes: recolor the whole app, same design ---- */
 html[data-uitheme="ocean"] {
   --bg: #04121f; --bg2: #061826; --bg3: #0a2233;
@@ -2257,16 +2249,6 @@ html[data-uitheme="ocean"] {
   --unread: #4fd6e8; --red: #f0857f;
   --bubble-theirs: rgba(79, 214, 232, 0.07);
   color-scheme: dark;
-}
-/* custom accent color (from the color picker) */
-html[data-accent="custom"] { --accent: var(--accent-custom, #5b9cff); --accent-ink: #ffffff; }
-.accent-pick[data-accent="custom"] {
-  background: conic-gradient(#f55, #ff5, #5f5, #5ff, #55f, #f5f, #f55);
-}
-.accent-custom-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
-.accent-custom-row input[type="color"] {
-  width: 36px; height: 36px; border-radius: 999px; border: 2px solid var(--ink);
-  padding: 0; background: none; cursor: pointer;
 }
 /* theme preset swatches */
 .theme-picks { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -2290,28 +2272,6 @@ html[data-accent="custom"] { --accent: var(--accent-custom, #5b9cff); --accent-i
   background: var(--accent, var(--ink));
   color: var(--accent-ink, var(--bg));
 }
-
-
-.accent-picks {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.accent-pick {
-  width: 36px;
-  height: 36px;
-  border-radius: 999px;
-  border: 2px solid transparent;
-  cursor: pointer;
-  appearance: none;
-}
-.accent-pick.on { border-color: var(--ink); box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--ink); }
-.accent-pick[data-accent="default"] { background: linear-gradient(135deg, #fff, #888); }
-.accent-pick[data-accent="blue"] { background: #5b9cff; }
-.accent-pick[data-accent="violet"] { background: #b48cff; }
-.accent-pick[data-accent="green"] { background: #3ddc84; }
-.accent-pick[data-accent="amber"] { background: #ffb020; }
-.accent-pick[data-accent="rose"] { background: #ff6b8a; }
 
 .bookmark-list, .block-list {
   display: flex;
@@ -2456,15 +2416,24 @@ html[data-uitheme="paper"] {
 /* custom whole-UI theme: variables are set inline by JS (applyUitheme) */
 html[data-uitheme="custom"] { color-scheme: dark; }
 
-/* custom theme color row */
-.theme-custom-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
-.theme-custom-row input[type="color"] {
-  width: 36px; height: 36px; border-radius: 12px; border: 2px solid var(--muted2);
+/* custom theme color row: background / highlight / text */
+.theme-custom-row { display: flex; align-items: flex-end; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
+.color-pick {
+  display: inline-flex; flex-direction: column; align-items: center; gap: 5px;
+  font-size: 11px; color: var(--muted); text-transform: lowercase; letter-spacing: 0.02em;
+  cursor: pointer;
+}
+.color-pick input[type="color"] {
+  width: 44px; height: 34px; border-radius: 10px; border: 2px solid var(--muted2);
   padding: 0; background: none; cursor: pointer; flex: none;
 }
 .theme-custom-row input[type="color"]::-webkit-color-swatch-wrapper { padding: 2px; }
 .theme-custom-row input[type="color"]::-webkit-color-swatch { border: none; border-radius: 8px; }
 .theme-custom-row input[type="color"]::-moz-color-swatch { border: none; border-radius: 8px; }
+
+/* settings entry points */
+.settings-link-row { margin: 2px 0 16px; }
+.settings-back-row { margin-bottom: 6px; }
 
 /* ---- real-app feel: tap feedback, smooth theme shifts, pending states ---- */
 .btn { transition: transform 0.12s ease, opacity 0.15s ease, background-color 0.2s ease; }
