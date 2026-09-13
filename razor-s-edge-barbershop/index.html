@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Razor's Edge Barbershop | Macungie, PA</title>
+<meta name="description" content="Razor's Edge Barbershop, 27 E Main St, Macungie, PA 18062. Classic cuts, fades, and shaves. Call (610) 966-5772.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1d1a16; --bone:#f7f3ea; --card:#fffdf8; --rule:#ddd2bd;
+  --crimson:#a31621; --muted:#6d6355; --steel:#4a5468;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Inter",system-ui,sans-serif;background:var(--bone);color:var(--ink);line-height:1.7}
+h1,h2,h3,.serif{font-family:"Playfair Display",Georgia,serif}
+a{color:inherit}
+.wrap{max-width:1060px;margin:0 auto;padding:0 24px}
+
+/* ---------- centered logo nav ---------- */
+.masthead{border-bottom:3px double var(--ink);padding:26px 0 0;text-align:center;background:var(--card)}
+.masthead .brand{font-family:"Playfair Display";font-weight:900;font-size:clamp(2rem,5vw,3rem);line-height:1}
+.masthead .brand .edge{color:var(--crimson);font-style:italic}
+.masthead .tagline{font-size:.78rem;text-transform:uppercase;letter-spacing:.32em;color:var(--muted);margin:8px 0 0}
+nav.main{margin-top:18px;border-top:1px solid var(--rule);display:flex;justify-content:center;gap:4px;flex-wrap:wrap;padding:10px 0}
+nav.main a[data-page]{text-decoration:none;font-size:.82rem;font-weight:600;text-transform:uppercase;letter-spacing:.18em;padding:10px 18px;color:var(--muted)}
+nav.main a[data-page]:hover{color:var(--ink)}
+nav.main a[data-page].active{color:var(--crimson);box-shadow:inset 0 -2px 0 var(--crimson)}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* ---------- editorial hero ---------- */
+.hero{padding:56px 0 40px;text-align:center}
+.dateline{font-size:.78rem;text-transform:uppercase;letter-spacing:.3em;color:var(--muted);margin-bottom:18px}
+.hero h1{font-size:clamp(2.8rem,7vw,5rem);font-weight:900;line-height:1.04;max-width:16ch;margin:0 auto}
+.hero h1 em{font-style:italic;color:var(--crimson)}
+.hero .standfirst{max-width:56ch;margin:22px auto 0;font-size:1.12rem;color:var(--muted)}
+.hero-ctas{margin-top:28px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-block;text-decoration:none;font-weight:600;padding:13px 30px;font-size:.95rem}
+.btn.solid{background:var(--ink);color:var(--bone)}
+.btn.line{border:1px solid var(--ink);color:var(--ink)}
+.hero-facts{margin:44px auto 0;max-width:860px;display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.hero-facts div{padding:18px 12px;font-size:.88rem;color:var(--muted)}
+.hero-facts div+div{border-left:1px solid var(--rule)}
+.hero-facts strong{display:block;color:var(--ink);font-size:.78rem;text-transform:uppercase;letter-spacing:.2em;margin-bottom:4px}
+
+/* ---------- magazine rhythm ---------- */
+.sect{padding:44px 0}
+.sect-kicker{font-size:.78rem;text-transform:uppercase;letter-spacing:.3em;color:var(--crimson);margin-bottom:10px}
+.sect h2{font-size:clamp(1.9rem,4vw,2.8rem);font-weight:900;line-height:1.1;margin-bottom:14px}
+.lede{font-size:1.15rem;color:var(--muted);max-width:62ch;margin-bottom:28px}
+.columns{column-count:2;column-gap:44px;max-width:900px}
+.columns p{margin-bottom:1.1em;break-inside:avoid}
+.dropcap::first-letter{font-family:"Playfair Display";font-weight:900;font-size:3.4em;float:left;line-height:.85;padding:4px 10px 0 0;color:var(--crimson)}
+.pull{font-family:"Playfair Display";font-style:italic;font-size:1.5rem;line-height:1.4;color:var(--ink);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:22px 0;margin:30px 0;max-width:640px}
+.folio{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--rule);margin-top:30px;background:var(--card)}
+.folio div{padding:26px 24px}
+.folio div+div{border-left:1px solid var(--rule)}
+.folio .n{font-family:"Playfair Display";font-weight:900;font-size:2rem;color:var(--crimson)}
+.folio h3{font-size:1.1rem;margin:8px 0 6px}
+.folio p{font-size:.92rem;color:var(--muted)}
+
+/* ---------- price table ---------- */
+.price-wrap{background:var(--card);border:1px solid var(--rule);padding:36px 34px;margin-top:8px}
+table.prices{width:100%;border-collapse:collapse}
+table.prices th{text-align:left;font-size:.75rem;text-transform:uppercase;letter-spacing:.22em;color:var(--muted);padding:10px 8px;border-bottom:2px solid var(--ink)}
+table.prices td{padding:15px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+table.prices tr:last-child td{border-bottom:none}
+table.prices .svc{font-family:"Playfair Display";font-weight:700;font-size:1.08rem}
+table.prices .det{font-size:.88rem;color:var(--muted);max-width:40ch}
+table.prices .pr{font-weight:700;white-space:nowrap;text-align:right}
+.sample-badge{display:inline-block;font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;background:#f3e3e4;color:var(--crimson);border-radius:4px;padding:3px 8px;margin-left:8px;vertical-align:middle}
+.price-note{margin-top:18px;font-size:.88rem;color:var(--muted);font-style:italic}
+
+/* ---------- arch tiles gallery ---------- */
+.arches{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:8px}
+.arch{background:var(--card);border:1px solid var(--rule);border-radius:150px 150px 10px 10px;overflow:hidden;text-align:center;padding-bottom:18px}
+.arch .art{height:230px;border-radius:150px 150px 0 0;position:relative;display:flex;align-items:center;justify-content:center}
+.arch h3{font-size:1rem;margin:14px 12px 4px}
+.arch p{font-size:.8rem;color:var(--muted);padding:0 14px}
+.ph-badge{position:absolute;top:14px;left:50%;transform:translateX(-50%);background:rgba(29,26,22,.85);color:var(--bone);font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;padding:5px 10px;border-radius:4px}
+.g1{background:linear-gradient(160deg,#2b2f3a,#14161c)}
+.g1::before{content:"";width:96px;height:96px;border-radius:50%;background:radial-gradient(circle,#c9a86a,transparent 70%)}
+.g2{background:linear-gradient(160deg,#a31621,#5e0c13)}
+.g2::before{content:"";width:0;height:0;border-left:52px solid transparent;border-right:52px solid transparent;border-bottom:90px solid rgba(247,243,234,.3)}
+.g3{background:linear-gradient(160deg,#4a5468,#232a38)}
+.g3::before{content:"";width:110px;height:110px;border:12px solid rgba(201,168,106,.6);border-radius:50%}
+.g4{background:linear-gradient(160deg,#1d1a16,#4a3a24)}
+.g4::before{content:"";width:110px;height:54px;background:rgba(163,22,33,.6);border-radius:54px 54px 0 0}
+
+/* ---------- reviews ---------- */
+.rev-links{display:flex;gap:12px;flex-wrap:wrap;margin:6px 0 30px}
+.rev-links a{text-decoration:none;font-weight:600;font-size:.9rem;border:1px solid var(--ink);padding:12px 22px;background:var(--card)}
+.rev-links a:first-child{background:var(--ink);color:var(--bone)}
+.rev-item{border-top:1px solid var(--rule);padding:26px 0;max-width:760px}
+.rev-item .stars{color:var(--crimson);letter-spacing:.2em;margin-bottom:8px}
+.rev-item p{font-family:"Playfair Display";font-size:1.25rem;line-height:1.5;font-style:italic}
+.rev-item .who{margin-top:10px;font-size:.85rem;color:var(--muted)}
+
+/* ---------- contact ---------- */
+.contact-cols{display:grid;grid-template-columns:1fr 1fr;gap:36px;max-width:900px}
+.contact-cols h3{font-size:1.3rem;margin-bottom:12px}
+.contact-cols p{margin-bottom:10px;color:var(--muted)}
+.contact-cols a{color:var(--ink);font-weight:600}
+.hours{width:100%;border-collapse:collapse;font-size:.95rem}
+.hours td{padding:9px 0;border-bottom:1px solid var(--rule)}
+.hours tr:last-child td{border-bottom:none}
+.hours td:last-child{text-align:right;font-weight:600}
+.maplink{display:inline-block;margin-top:18px;background:var(--ink);color:var(--bone);text-decoration:none;font-weight:600;padding:13px 30px}
+
+/* ---------- minimal footer ---------- */
+footer{margin-top:60px;border-top:3px double var(--ink);padding:26px 0;text-align:center;background:var(--card)}
+footer .flinks{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+footer .flinks a[data-page]{text-decoration:none;font-size:.78rem;text-transform:uppercase;letter-spacing:.18em;color:var(--muted);padding:6px 12px}
+footer .flinks a[data-page]:hover{color:var(--ink)}
+footer .copy{font-size:.82rem;color:var(--muted)}
+
+@media(max-width:820px){
+  .columns{column-count:1}
+  .folio{grid-template-columns:1fr}
+  .folio div+div{border-left:none;border-top:1px solid var(--rule)}
+  .arches{grid-template-columns:repeat(2,1fr)}
+  .hero-facts{grid-template-columns:1fr}
+  .hero-facts div+div{border-left:none;border-top:1px solid var(--rule)}
+  .contact-cols{grid-template-columns:1fr}
+  table.prices .det{display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="brand">Razor&rsquo;s <span class="edge">Edge</span></div>
+    <div class="tagline">Barbershop &middot; Macungie, Pennsylvania</div>
+    <nav class="main" id="mainNav" aria-label="Site navigation">
+      <a data-page="home" href="#home">Home</a>
+      <a data-page="services" href="#services">Services</a>
+      <a data-page="about" href="#about">About</a>
+      <a data-page="reviews" href="#reviews">Reviews</a>
+      <a data-page="contact" href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<section class="page" id="page-home">
+  <div class="wrap">
+    <div class="hero">
+      <div class="dateline">Est. on Main Street &middot; Macungie, PA</div>
+      <h1>The classic cut, <em>honed</em> to an edge.</h1>
+      <p class="standfirst">Razor&rsquo;s Edge Barbershop is a neighborhood shop on East Main Street in Macungie, where walk-ins are welcome and every haircut gets a careful finish.</p>
+      <div class="hero-ctas">
+        <a class="btn solid" data-page="contact" href="#contact">Plan Your Visit</a>
+        <a class="btn line" data-page="services" href="#services">View Services</a>
+      </div>
+      <div class="hero-facts">
+        <div><strong>Address</strong>27 E Main St, Macungie, PA 18062</div>
+        <div><strong>Phone</strong><a href="tel:+16109665772">(610) 966-5772</a></div>
+        <div><strong>Walk-Ins</strong>Welcome during shop hours</div>
+      </div>
+    </div>
+
+    <div class="sect">
+      <div class="sect-kicker">The Shop</div>
+      <h2>A barbershop in the old tradition</h2>
+      <p class="lede">No appointments, no fuss. Just a chair, sharp tools, and a barber who takes the work seriously.</p>
+      <div class="columns">
+        <p class="dropcap">Razor&rsquo;s Edge Barbershop sits at 27 E Main Street in the heart of Macungie. It is the kind of shop where regulars are known by name and first-timers are treated like regulars from the first visit.</p>
+        <p>The menu covers the essentials of the trade: clean haircuts, close fades, beard trims, and straight razor work. Walk-ins are welcome, so you can stop by whenever the moment strikes.</p>
+        <p>Families across the Lehigh Valley make the trip for honest pricing and consistent results. The shop keeps its hours steady through the week, with Saturday mornings set aside for the early risers.</p>
+      </div>
+      <div class="pull">&ldquo;The kind of shop where regulars are known by name and first-timers are treated like regulars.&rdquo;</div>
+      <div class="folio">
+        <div><div class="n">01</div><h3>Walk-Ins Welcome</h3><p>No appointment needed. Come by during shop hours and take the next open chair.</p></div>
+        <div><div class="n">02</div><h3>Honest Pricing</h3><p>Straightforward prices for straightforward work, with no surprises at the end of the visit.</p></div>
+        <div><div class="n">03</div><h3>Main Street Roots</h3><p>A fixture of downtown Macungie, serving the borough and the surrounding Lehigh Valley.</p></div>
+      </div>
+    </div>
+
+    <div class="sect">
+      <div class="sect-kicker">Gallery</div>
+      <h2>From the shop floor</h2>
+      <p class="lede">Placeholders the owner can swap for real shop photos.</p>
+      <div class="arches">
+        <div class="arch"><div class="art g1"><span class="ph-badge">Placeholder</span></div><h3>The Chair</h3><p>Swap in a real shop photo</p></div>
+        <div class="arch"><div class="art g2"><span class="ph-badge">Placeholder</span></div><h3>Fade Detail</h3><p>Swap in a real cut photo</p></div>
+        <div class="arch"><div class="art g3"><span class="ph-badge">Placeholder</span></div><h3>Tools</h3><p>Swap in a real tools photo</p></div>
+        <div class="arch"><div class="art g4"><span class="ph-badge">Placeholder</span></div><h3>Finished Cut</h3><p>Swap in a real result photo</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div class="sect">
+      <div class="sect-kicker">Services</div>
+      <h2>The price list</h2>
+      <p class="lede">Classic barbershop services. Prices shown are samples, call the shop to confirm current pricing.</p>
+      <div class="price-wrap">
+        <table class="prices">
+          <tr><th>Service</th><th>Details</th><th style="text-align:right">Price</th></tr>
+          <tr><td class="svc">Men&rsquo;s Haircut</td><td class="det">Consultation, precision cut, and styled finish</td><td class="pr">$30<span class="sample-badge">Sample</span></td></tr>
+          <tr><td class="svc">Skin Fade</td><td class="det">Seamless blend from skin to length, crisp lineup</td><td class="pr">$32<span class="sample-badge">Sample</span></td></tr>
+          <tr><td class="svc">Cut and Beard Combo</td><td class="det">Full haircut plus beard sculpt and hot lather edge</td><td class="pr">$45<span class="sample-badge">Sample</span></td></tr>
+          <tr><td class="svc">Beard Trim</td><td class="det">Shape, detail, and conditioned finish</td><td class="pr">$18<span class="sample-badge">Sample</span></td></tr>
+          <tr><td class="svc">Straight Razor Shave</td><td class="det">Hot towel, hot lather, straight razor finish</td><td class="pr">$28<span class="sample-badge">Sample</span></td></tr>
+          <tr><td class="svc">Boys&rsquo; Cut</td><td class="det">Patient, careful cuts for young clients</td><td class="pr">$25<span class="sample-badge">Sample</span></td></tr>
+        </table>
+        <p class="price-note">Sample pricing shown for illustration. Call <a href="tel:+16109665772">(610) 966-5772</a> for the shop&rsquo;s current prices.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-about">
+  <div class="wrap">
+    <div class="sect">
+      <div class="sect-kicker">About</div>
+      <h2>A Main Street institution</h2>
+      <div class="columns">
+        <p class="dropcap">Razor&rsquo;s Edge Barbershop has served Macungie from its East Main Street storefront for years, building a steady base of regulars across the borough and the Lehigh Valley.</p>
+        <p>The shop keeps things simple: walk in, take a seat, and get a careful, consistent cut. There are no gimmicks here, just the fundamentals of the trade done well, week after week.</p>
+        <p>Whether it is a weekly cleanup, a first haircut for a young client, or a straight razor shave for a special occasion, the shop treats every visit with the same attention.</p>
+        <p>Located in downtown Macungie, the shop is an easy stop for anyone in the area. Come see why neighbors keep coming back.</p>
+      </div>
+      <div class="pull">&ldquo;No gimmicks, just the fundamentals of the trade done well.&rdquo;</div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div class="sect">
+      <div class="sect-kicker">Reviews</div>
+      <h2>What the neighborhood says</h2>
+      <p class="lede">Read client reviews of Razor&rsquo;s Edge Barbershop on Google.</p>
+      <div class="rev-links">
+        <a href="https://www.google.com/maps/place/?q=place_id:ChIJc7SqD8EvxIkRONdKU6wKupE" target="_blank" rel="noopener">See reviews on Google</a>
+        <a href="https://www.google.com/maps/place/?q=place_id:ChIJc7SqD8EvxIkRONdKU6wKupE" target="_blank" rel="noopener">Leave a Google review</a>
+      </div>
+      <div class="rev-item">
+        <div class="stars">★★★★★</div>
+        <p>&ldquo;Great haircut at a great price. In and out, and the fade was exactly what I asked for.&rdquo;</p>
+        <div class="who"><strong>Sample review</strong> · placeholder, replace with a real client review</div>
+      </div>
+      <div class="rev-item">
+        <div class="stars">★★★★★</div>
+        <p>&ldquo;Walked in on a Saturday morning and was in the chair within minutes. Friendly service, sharp cut.&rdquo;</p>
+        <div class="who"><strong>Sample review</strong> · placeholder, replace with a real client review</div>
+      </div>
+      <div class="rev-item">
+        <div class="stars">★★★★★</div>
+        <p>&ldquo;Been coming here for years. Consistent every single time, and the hot towel finish is a nice touch.&rdquo;</p>
+        <div class="who"><strong>Sample review</strong> · placeholder, replace with a real client review</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-contact">
+  <div class="wrap">
+    <div class="sect">
+      <div class="sect-kicker">Contact</div>
+      <h2>Find us on Main Street</h2>
+      <p class="lede">Walk-ins welcome during shop hours, or call ahead to check the wait.</p>
+      <div class="contact-cols">
+        <div>
+          <h3>Razor&rsquo;s Edge Barbershop</h3>
+          <p><strong>Address</strong><br>Razor's Edge Barbershop, 27 E Main St, Macungie, PA 18062</p>
+          <p><strong>Phone</strong><br><a href="tel:+16109665772">(610) 966-5772</a></p>
+          <a class="maplink" href="https://www.google.com/maps/place/?q=place_id:ChIJc7SqD8EvxIkRONdKU6wKupE" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+        <div>
+          <h3>Shop Hours</h3>
+          <table class="hours">
+            <tr><td>Monday</td><td>9:00 AM - 2:00 PM</td></tr>
+            <tr><td>Tuesday</td><td>9:00 AM - 6:00 PM</td></tr>
+            <tr><td>Wednesday</td><td>9:00 AM - 2:00 PM</td></tr>
+            <tr><td>Thursday</td><td>9:00 AM - 6:00 PM</td></tr>
+            <tr><td>Friday</td><td>9:00 AM - 6:00 PM</td></tr>
+            <tr><td>Saturday</td><td>8:00 AM - 12:00 PM</td></tr>
+            <tr><td>Sunday</td><td>Closed</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="flinks">
+      <a data-page="home" href="#home">Home</a>
+      <a data-page="services" href="#services">Services</a>
+      <a data-page="about" href="#about">About</a>
+      <a data-page="reviews" href="#reviews">Reviews</a>
+      <a data-page="contact" href="#contact">Contact</a>
+    </div>
+    <div class="copy">© Razor's Edge Barbershop</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var PAGES = ["home","services","about","reviews","contact"];
+  var nav = document.getElementById("mainNav");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

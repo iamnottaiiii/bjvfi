@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>R &amp; F Threading Salon · Threading and Beauty Studio, Brooklyn, NY</title>
+<meta name="description" content="R & F Threading Salon at 2074 E 14th St, Brooklyn, NY 11229. Expert eyebrow threading, hair removal, waxing and makeup services. Call (718) 872-6181.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&family=Jost:wght@400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+<style>
+:root{
+  --parch:#F7F0E1; --parch-2:#EFE4CC; --parch-3:#FBF7EC;
+  --ink:#2B2118; --ink-soft:#6E5D4B;
+  --gold:#C9A227; --gold-soft:#F1E3B6; --gold-deep:#8A6D15;
+  --wax:#8C2B2E; --wax-deep:#5F1C1F; --rouge:#A63D40;
+  --sage:#7D8C6F; --sage-soft:#E3E8D8;
+  --radius:14px;
+  --shadow:0 18px 40px -18px rgba(43,33,24,.3);
+  --shadow-sm:0 8px 22px -10px rgba(43,33,24,.22);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Jost",system-ui,sans-serif;
+  background:var(--parch);
+  background-image:radial-gradient(rgba(138,109,21,.07) 1.2px, transparent 1.3px);
+  background-size:26px 26px;
+  color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased;
+}
+img{max-width:100%}
+a{color:var(--wax)}
+::selection{background:var(--gold-soft);color:var(--ink)}
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+.script{font-family:"Great Vibes",cursive;font-weight:400}
+
+/* ---------- monogram-seal nav ---------- */
+header.site{
+  position:sticky;top:0;z-index:50;background:var(--parch-3);
+  border-bottom:3px solid var(--gold);
+  box-shadow:0 6px 20px -8px rgba(43,33,24,.25);
+}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:10px 0}
+.brand{display:flex;align-items:center;gap:14px;text-decoration:none;color:var(--ink)}
+.seal{
+  width:58px;height:58px;flex:none;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #A93A3D, var(--wax) 60%, var(--wax-deep));
+  display:flex;align-items:center;justify-content:center;position:relative;
+  box-shadow:0 4px 10px rgba(95,28,31,.4), inset 0 0 0 3px rgba(255,255,255,.12), inset 0 0 0 6px var(--wax);
+}
+.seal span{
+  font-family:"Playfair Display",serif;font-weight:800;font-size:1.15rem;color:#F7EFD9;
+  text-shadow:0 1px 2px rgba(0,0,0,.4);letter-spacing:1px;
+}
+.brand-name{font-family:"Playfair Display",serif;font-weight:800;font-size:1.18rem;line-height:1.1}
+.brand-name small{display:block;font-family:"Jost",sans-serif;font-weight:600;font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold-deep)}
+nav.main{display:flex;align-items:center;gap:8px}
+.seal-link{
+  text-decoration:none;color:var(--ink);font-weight:600;font-size:.86rem;letter-spacing:.8px;
+  padding:10px 16px;border-radius:999px;border:2px solid transparent;white-space:nowrap;
+  transition:all .2s;
+}
+.seal-link:hover{border-color:var(--gold);background:#fff}
+.seal-link.active{
+  background:radial-gradient(circle at 35% 30%, #A93A3D, var(--wax) 65%, var(--wax-deep));
+  color:#F7EFD9;border-color:var(--wax-deep);box-shadow:0 4px 10px rgba(95,28,31,.3);
+}
+.call-btn{
+  display:inline-flex;align-items:center;gap:8px;background:var(--wax);color:#fff;text-decoration:none;
+  font-weight:600;padding:11px 20px;border-radius:999px;box-shadow:var(--shadow-sm);
+  transition:transform .18s,background .18s;white-space:nowrap;font-size:.95rem;
+}
+.call-btn:hover{background:var(--wax-deep);transform:translateY(-2px)}
+.burger{display:none;background:none;border:0;cursor:pointer;padding:10px}
+.burger span{display:block;width:26px;height:3px;border-radius:3px;background:var(--ink);margin:5px 0;transition:.25s}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- parchment-scroll hero ---------- */
+.hero{padding:60px 0 70px;position:relative;overflow:hidden}
+.scroll-panel{
+  background:linear-gradient(175deg,#FFFDF4,var(--parch-3) 40%,var(--parch-2));
+  border:2px solid rgba(138,109,21,.35);border-radius:18px;box-shadow:var(--shadow);
+  padding:56px 54px;position:relative;overflow:hidden;
+}
+.scroll-panel::before,.scroll-panel::after{
+  content:"";position:absolute;top:0;bottom:0;width:34px;pointer-events:none;
+  background:
+    radial-gradient(circle at 50% 12px, rgba(138,109,21,.22) 6px, transparent 7px),
+    radial-gradient(circle at 50% 36px, rgba(138,109,21,.22) 6px, transparent 7px),
+    radial-gradient(circle at 50% 60px, rgba(138,109,21,.22) 6px, transparent 7px),
+    radial-gradient(circle at 50% 84px, rgba(138,109,21,.22) 6px, transparent 7px),
+    radial-gradient(circle at 50% 108px, rgba(138,109,21,.22) 6px, transparent 7px);
+  background-repeat:repeat-y;background-size:34px 132px;
+}
+.scroll-panel::before{left:0;border-right:2px dashed rgba(138,109,21,.4)}
+.scroll-panel::after{right:0;border-left:2px dashed rgba(138,109,21,.4)}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:44px;align-items:center;position:relative}
+.hero-flag{
+  display:inline-flex;align-items:center;gap:10px;font-family:"Jost",sans-serif;font-weight:600;
+  font-size:.72rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--wax-deep);
+  background:#fff;border:2px solid var(--gold);padding:8px 18px;border-radius:999px;margin-bottom:20px;
+  box-shadow:var(--shadow-sm);
+}
+h1{
+  font-family:"Playfair Display",serif;font-weight:900;color:var(--ink);
+  font-size:clamp(2.5rem,5.2vw,4.2rem);line-height:1.04;letter-spacing:-.5px;margin-bottom:10px;
+}
+h1 .script{font-size:clamp(2.9rem,6vw,4.8rem);color:var(--wax);display:block;margin-bottom:2px}
+.lede{font-size:1.08rem;color:var(--ink-soft);max-width:33rem;margin-bottom:8px}
+.lede::first-letter{
+  font-family:"Playfair Display",serif;font-weight:900;font-size:2.6rem;line-height:1;
+  color:var(--wax);float:left;margin:6px 10px 0 0;
+}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin:22px 0}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:600;
+  padding:14px 26px;border-radius:999px;font-size:1rem;transition:transform .18s,box-shadow .18s,background .18s;
+}
+.btn-solid{background:var(--wax);color:#fff;box-shadow:var(--shadow-sm)}
+.btn-solid:hover{background:var(--wax-deep);transform:translateY(-2px)}
+.btn-ghost{background:#fff;color:var(--ink);border:2px solid rgba(43,33,24,.25)}
+.btn-ghost:hover{border-color:var(--gold-deep);color:var(--wax-deep);transform:translateY(-2px)}
+.hours-pill{
+  display:inline-flex;align-items:center;gap:10px;background:var(--ink);color:var(--parch);
+  padding:10px 20px;border-radius:999px;font-weight:500;font-size:.95rem;box-shadow:var(--shadow-sm);
+}
+.hours-pill .dot{width:10px;height:10px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px rgba(201,162,39,.25);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+.atelier-stage{position:relative;display:flex;justify-content:center}
+.spool-frame{
+  background:#fff;border:2px solid rgba(138,109,21,.35);border-radius:16px;box-shadow:var(--shadow);
+  padding:34px;position:relative;transform:rotate(1.5deg);max-width:400px;width:100%;
+}
+.spool-frame .pin{
+  position:absolute;top:-16px;left:50%;transform:translateX(-50%) rotate(8deg);
+  width:14px;height:34px;background:var(--gold);border-radius:7px;box-shadow:0 2px 6px rgba(0,0,0,.25);
+}
+.spool-frame .pin::after{content:"";position:absolute;top:5px;left:50%;transform:translateX(-50%);width:6px;height:6px;border-radius:50%;background:#fff}
+.frame-cap{font-family:"Great Vibes",cursive;font-size:1.6rem;color:var(--gold-deep);text-align:center;margin-top:12px}
+
+/* ---------- measuring-tape rhythm bands ---------- */
+.tape{
+  height:44px;overflow:hidden;position:relative;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 9px, rgba(43,33,24,.5) 9px 10px),
+    repeating-linear-gradient(90deg, transparent 0 49px, rgba(43,33,24,.7) 49px 51px),
+    linear-gradient(180deg,var(--gold-soft),var(--gold));
+  border-top:3px solid var(--gold-deep);border-bottom:3px solid var(--gold-deep);
+}
+.tape .tape-label{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:"Jost",sans-serif;font-weight:700;font-size:.72rem;letter-spacing:4px;text-transform:uppercase;
+  color:var(--ink);background:linear-gradient(90deg,transparent,var(--parch-3) 30%,var(--parch-3) 70%,transparent);
+  padding:0 30px;
+}
+
+/* ---------- sections ---------- */
+section.block{padding:60px 0}
+.sec-head{text-align:center;max-width:44rem;margin:0 auto 40px}
+.sec-head .script{font-size:2.2rem;color:var(--wax)}
+h2{font-family:"Playfair Display",serif;font-weight:800;font-size:clamp(1.9rem,3.6vw,2.7rem);line-height:1.1;margin:6px 0 12px;letter-spacing:-.3px}
+.sec-head p{color:var(--ink-soft)}
+
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.card{
+  background:#fff;border-radius:var(--radius);padding:30px 26px;box-shadow:var(--shadow-sm);
+  border:2px solid rgba(138,109,21,.35);position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;
+}
+.card::before{content:"";position:absolute;top:0;left:0;right:0;height:8px;background:linear-gradient(90deg,var(--gold),var(--wax),var(--gold))}
+.card:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+.card .icon{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:16px;background:var(--gold-soft);border:2px solid var(--gold)}
+.card .icon svg{width:30px;height:30px}
+.card h3{font-family:"Playfair Display",serif;font-size:1.3rem;margin-bottom:8px}
+.card p{color:var(--ink-soft);font-size:.97rem}
+
+/* split */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.split h2{margin-top:6px}
+.split p{color:var(--ink-soft);margin-bottom:14px}
+.check-list{list-style:none;margin:20px 0;display:grid;gap:12px}
+.check-list li{display:flex;gap:12px;align-items:flex-start;font-weight:500}
+.check-list svg{flex:none;width:24px;height:24px;margin-top:2px}
+.quote-card{
+  background:var(--wax);color:#F7EFD9;border-radius:var(--radius);padding:40px 36px;position:relative;box-shadow:var(--shadow);
+}
+.quote-card::before{content:"\201C";position:absolute;top:2px;left:26px;font-family:"Playfair Display",serif;font-size:5rem;color:var(--gold);opacity:.6}
+.quote-card p{font-family:"Playfair Display",serif;font-style:italic;font-size:1.35rem;line-height:1.5;margin-bottom:14px;position:relative}
+.quote-card cite{font-style:normal;font-weight:600;color:var(--gold-soft);font-size:.85rem;letter-spacing:2px;text-transform:uppercase}
+
+/* ---------- pattern cards (services) ---------- */
+.pattern-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+.pattern{
+  background:#fff;border-radius:6px;box-shadow:var(--shadow-sm);padding:30px 30px 26px;position:relative;
+  border:3px dashed rgba(138,109,21,.55);transition:transform .2s;
+}
+.pattern:hover{transform:translateY(-5px)}
+.pattern .pno{
+  position:absolute;top:-15px;left:26px;background:var(--ink);color:var(--gold-soft);
+  font-size:.68rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:5px 14px;border-radius:6px;
+}
+.pattern h3{font-family:"Playfair Display",serif;font-size:1.45rem;margin:8px 0 6px;display:flex;align-items:center;gap:12px}
+.pattern h3 svg{width:30px;height:30px;flex:none}
+.pattern p{color:var(--ink-soft);font-size:.97rem;margin-bottom:14px}
+.pattern .swatch-row{display:flex;gap:8px;margin-bottom:14px}
+.swatch{width:34px;height:34px;border-radius:50%;border:2px solid rgba(43,33,24,.25);box-shadow:inset 0 0 0 3px #fff}
+.pattern .price-line{display:flex;align-items:baseline;gap:12px;border-top:2px dashed rgba(138,109,21,.4);padding-top:14px}
+.pattern .price-line strong{font-family:"Playfair Display",serif;font-size:1.4rem;color:var(--wax-deep)}
+.pattern .price-line small{color:var(--ink-soft);font-size:.8rem}
+.pattern .flag{display:inline-block;background:var(--sage-soft);color:#4E5B42;font-size:.68rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 12px;border-radius:999px;margin-left:auto}
+.price-note{background:#fff;border:3px dashed rgba(138,109,21,.5);border-radius:var(--radius);padding:18px 24px;margin-top:26px;font-size:.95rem;color:var(--ink-soft)}
+.price-note strong{color:var(--wax-deep)}
+
+/* ---------- swatch-book gallery ---------- */
+.swatch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+.swatch-card{
+  background:#fff;border-radius:4px;box-shadow:var(--shadow-sm);padding:14px 14px 18px;position:relative;
+  clip-path:polygon(0 3%, 3% 0, 97% 0, 100% 3%, 100% 97%, 97% 100%, 3% 100%, 0 97%);
+  transition:transform .2s;
+}
+.swatch-card:nth-child(odd){transform:rotate(-1deg)}
+.swatch-card:nth-child(even){transform:rotate(1deg)}
+.swatch-card:hover{transform:rotate(0) translateY(-6px)}
+.swatch-card .cloth{
+  aspect-ratio:4/3.2;border-radius:2px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;
+  border:2px solid rgba(43,33,24,.2);
+}
+.swatch-card .cloth svg{width:44%;height:auto;filter:drop-shadow(0 8px 12px rgba(0,0,0,.2))}
+.swatch-card .safety-pin{
+  position:absolute;top:6px;right:12px;width:26px;height:44px;z-index:2;transform:rotate(14deg);
+}
+.swatch-card .soon{
+  position:absolute;top:10px;left:12px;background:var(--wax);color:#fff;font-size:.64rem;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;padding:5px 12px;border-radius:999px;z-index:2;
+}
+.swatch-card .tag{padding:12px 4px 0;text-align:center}
+.swatch-card .tag strong{font-family:"Playfair Display",serif;font-size:1.1rem;display:block}
+.swatch-card .tag small{color:var(--ink-soft);font-size:.82rem}
+.swatch-card .stitch{border-top:2px dashed rgba(138,109,21,.5);margin:10px 4px 0}
+
+/* ---------- reviews ---------- */
+.rs-strip{margin:0 auto 34px;max-width:680px;background:#fff;border:2px solid rgba(138,109,21,.4);border-radius:14px;padding:20px 24px;text-align:center;box-shadow:var(--shadow-sm)}
+.rs-note{margin:0 0 12px;font-size:.95rem;color:var(--ink-soft);line-height:1.55}
+.rs-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rs-btn{display:inline-block;background:var(--wax);color:#fff;padding:11px 26px;border-radius:999px;font-weight:600;text-decoration:none;font-size:.95rem;line-height:1.2;transition:transform .18s,background .18s}
+.rs-btn:hover{background:var(--wax-deep);transform:translateY(-2px)}
+.rs-btn.alt{background:var(--ink)}
+.rev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.rev{background:#fff;border-radius:var(--radius);padding:28px;box-shadow:var(--shadow-sm);position:relative;border:2px solid rgba(138,109,21,.3)}
+.rev .stars{color:var(--gold-deep);font-size:1.2rem;letter-spacing:3px;margin-bottom:12px}
+.rev p{font-size:1rem;margin-bottom:14px;font-style:italic}
+.rev .sample-badge{display:inline-block;background:var(--gold-soft);color:var(--gold-deep);font-size:.66rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 12px;border-radius:999px;margin-bottom:10px;border:1px solid var(--gold)}
+.rev.featured{background:var(--ink);color:#F7EFD9;border-color:var(--gold)}
+.rev.featured p{color:#EFE4CC}
+.rev.featured cite{color:var(--gold-soft);font-style:normal;font-weight:600;font-size:.85rem;letter-spacing:1px}
+.cta-band{background:var(--wax);border-radius:22px;color:#fff;padding:48px;text-align:center;margin-top:44px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.cta-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 20%, rgba(201,162,39,.35), transparent 50%)}
+.cta-band h2{color:#fff;position:relative}
+.cta-band p{color:#F1DECF;position:relative;max-width:36rem;margin:0 auto 24px}
+.cta-band .btn-solid{background:#fff;color:var(--wax-deep);position:relative}
+.cta-band .btn-solid:hover{background:var(--gold-soft)}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-bottom:26px}
+.info-card{background:#fff;border:2px solid rgba(138,109,21,.35);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm)}
+.info-card h3{font-family:"Playfair Display",serif;font-size:1.4rem;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.info-card h3 svg{width:28px;height:28px}
+.info-card p{color:var(--ink-soft);margin-bottom:8px}
+.info-card a.big{font-family:"Playfair Display",serif;font-size:1.45rem;font-weight:700;color:var(--wax-deep);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.hours-note{background:var(--gold-soft);border:2px dashed var(--gold-deep);border-radius:12px;padding:16px 20px;font-size:.97rem;color:#5A4600;margin-top:6px}
+.map-card{
+  border:2px solid rgba(138,109,21,.4);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:340px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 46px, rgba(140,43,46,.12) 46px 48px),
+    repeating-linear-gradient(90deg, transparent 0 46px, rgba(140,43,46,.12) 46px 48px),
+    linear-gradient(140deg,var(--parch-3),var(--parch-2));
+  display:flex;align-items:center;justify-content:center;
+}
+.map-pin{
+  text-align:center;background:#fff;padding:26px 34px;border-radius:14px;box-shadow:var(--shadow);
+  max-width:78%;position:relative;border:2px solid rgba(138,109,21,.4);
+}
+.map-pin svg{width:44px;height:44px;margin-bottom:8px}
+.map-pin strong{font-family:"Playfair Display",serif;font-size:1.15rem;display:block}
+.map-pin small{color:var(--ink-soft)}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- tailor-label footer ---------- */
+footer{background:var(--ink);margin-top:20px;color:#EFE4CC}
+.label-zone{padding:52px 24px 10px;display:flex;justify-content:center}
+.tailor-label{
+  background:var(--parch-3);color:var(--ink);border-radius:6px;padding:30px 44px;text-align:center;max-width:560px;width:100%;
+  border:2px dashed rgba(138,109,21,.6);position:relative;box-shadow:var(--shadow);
+}
+.tailor-label .seal{margin:0 auto 12px}
+.tailor-label h3{font-family:"Playfair Display",serif;font-weight:900;font-size:1.5rem;letter-spacing:1px}
+.tailor-label .made{font-size:.7rem;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--gold-deep);margin-top:6px}
+.foot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:30px;padding:40px 0 30px}
+.foot-grid h4{font-family:"Playfair Display",serif;color:var(--gold-soft);font-size:1.15rem;margin-bottom:12px}
+.foot-grid p,.foot-grid a{color:#CBBFA4;font-size:.95rem}
+.foot-grid a{text-decoration:none}.foot-grid a:hover{color:var(--gold-soft)}
+.foot-grid .navline a{display:inline-block;border:1px solid rgba(203,191,164,.4);border-radius:999px;padding:6px 14px;margin:0 6px 8px 0;font-size:.82rem;font-weight:600;color:#EFE4CC}
+.foot-grid .navline a:hover{border-color:var(--gold);color:var(--gold-soft)}
+.foot-bottom{border-top:1px solid rgba(203,191,164,.25);padding:20px 0 26px;display:flex;justify-content:center;flex-wrap:wrap;gap:10px;font-size:.85rem;color:#8A7B5E}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+/* page hero strips */
+.strip{border-radius:18px;padding:54px 46px;color:#fff;position:relative;overflow:hidden;margin-bottom:44px;box-shadow:var(--shadow)}
+.strip::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(255,255,255,.18), transparent 50%)}
+.strip h2{color:#fff;font-size:clamp(2rem,4vw,3rem);position:relative;margin:4px 0 10px}
+.strip p{color:rgba(255,255,255,.9);max-width:36rem;position:relative}
+.strip .script{font-size:2.2rem;position:relative;color:var(--gold-soft)}
+.strip.s-services{background:linear-gradient(120deg,#8C2B2E,#4A1416)}
+.strip.s-story{background:linear-gradient(120deg,#4E5B42,#232A1D)}
+.strip.s-gal{background:linear-gradient(120deg,#8A6D15,#4A3A0C)}
+.strip.s-rev{background:linear-gradient(120deg,#A63D40,#5F1C1F)}
+.strip.s-visit{background:linear-gradient(120deg,#5B6B54,#2C3327)}
+
+@media(max-width:940px){
+  .hero-grid,.split,.visit-grid{grid-template-columns:1fr}
+  .cards{grid-template-columns:1fr 1fr}
+  .swatch-grid{grid-template-columns:1fr 1fr}
+  .pattern-grid{grid-template-columns:1fr}
+  nav.main{
+    display:none;position:absolute;top:100%;left:0;right:0;background:var(--parch-3);
+    flex-direction:column;align-items:stretch;padding:12px 20px 20px;gap:6px;
+    border-bottom:3px solid var(--gold);box-shadow:var(--shadow);
+  }
+  nav.main.open{display:flex}
+  .burger{display:block}
+  .bar .call-btn{display:none}
+  .rev-grid{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr}
+  .strip{padding:40px 28px}
+  .scroll-panel{padding:40px 26px}
+}
+@media(max-width:600px){
+  .cards,.swatch-grid{grid-template-columns:1fr}
+  .hero{padding:40px 0 50px}
+  .cta-band{padding:36px 24px}
+}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap bar">
+    <a class="brand" href="#home" data-page="home" aria-label="R and F Threading Salon, home">
+      <span class="seal"><span>R&amp;F</span></span>
+      <span class="brand-name">R &amp; F Threading Salon<small>Beauty Studio · Brooklyn</small></span>
+    </a>
+    <nav class="main" id="mainNav" aria-label="Main navigation">
+      <a class="seal-link active" href="#home" data-page="home" aria-current="page">Home</a>
+      <a class="seal-link" href="#services" data-page="services">Services</a>
+      <a class="seal-link" href="#story" data-page="story">Our Story</a>
+      <a class="seal-link" href="#gallery" data-page="gallery">Gallery</a>
+      <a class="seal-link" href="#reviews" data-page="reviews">Reviews</a>
+      <a class="seal-link" href="#visit" data-page="visit">Visit</a>
+      <a class="call-btn" href="tel:+17188726181">(718) 872-6181</a>
+    </nav>
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="wrap">
+      <div class="scroll-panel">
+        <div class="hero-grid">
+          <div>
+            <span class="hero-flag">E 14th St · Brooklyn, NY</span>
+            <h1><span class="script">The art of</span>Perfect Brows</h1>
+            <p class="lede"><strong>R &amp; F Threading Salon</strong> is a Brooklyn beauty studio known for exceptional eyebrow threading. Clients keep coming back for years, some traveling across boroughs, for brows shaped with precision and care.</p>
+            <div class="cta-row">
+              <a class="btn btn-solid" href="#services" data-page="services">View services</a>
+              <a class="btn btn-ghost" href="tel:+17188726181">Call (718) 872-6181</a>
+            </div>
+            <span class="hours-pill"><span class="dot"></span><span>Call for hours · (718) 872-6181</span></span>
+          </div>
+          <div class="atelier-stage">
+            <div class="spool-frame">
+              <span class="pin" aria-hidden="true"></span>
+              <svg viewBox="0 0 200 200" role="img" aria-label="Illustration of a thread spool and needle" style="width:100%;height:auto;display:block">
+                <ellipse cx="100" cy="178" rx="70" ry="10" fill="#2B2118" opacity=".1"/>
+                <rect x="78" y="60" width="44" height="96" rx="8" fill="#C9A227"/>
+                <rect x="66" y="46" width="68" height="20" rx="8" fill="#8A6D15"/>
+                <rect x="66" y="154" width="68" height="20" rx="8" fill="#8A6D15"/>
+                <path d="M78 78 h44 M78 96 h44 M78 114 h44 M78 132 h44" stroke="#F7F0E1" stroke-width="3" opacity=".8"/>
+                <path d="M122 60 C150 44 168 40 184 34" fill="none" stroke="#8C2B2E" stroke-width="2.5"/>
+                <path d="M128 46 L168 20" stroke="#2B2118" stroke-width="3" stroke-linecap="round"/>
+                <ellipse cx="131" cy="43" rx="4" ry="6" fill="none" stroke="#2B2118" stroke-width="2.5"/>
+                <path d="M132 46 C150 56 160 60 178 66" fill="none" stroke="#8C2B2E" stroke-width="2.5"/>
+                <circle cx="184" cy="34" r="3" fill="#8C2B2E"/>
+                <circle cx="178" cy="66" r="3" fill="#8C2B2E"/>
+              </svg>
+              <div class="frame-cap">threaded with care</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tape" aria-hidden="true"><span class="tape-label">Measure twice · thread once · measure twice · thread once</span></div>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="script">the atelier touch</span>
+        <h2>Why clients stay<br>for years</h2>
+        <p>A small studio with a big reputation: precise threading, a warm welcome, and results clients trust completely.</p>
+      </div>
+      <div class="cards">
+        <div class="card reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#8C2B2E" stroke-width="2" stroke-linecap="round"><path d="M3 8c3 3 6 3 9 0s6-3 9 0"/><path d="M3 16c3-3 6-3 9 0s6 3 9 0"/></svg></div>
+          <h3>Exceptional threading</h3>
+          <p>Reviewers call the eyebrow work exceptional and consistently excellent. Brows come out neat, natural and perfectly shaped.</p>
+        </div>
+        <div class="card reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#8C2B2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21C7 17 3 13.5 3 9.5 3 7 5 5 7.5 5c1.7 0 3.3.9 4.5 2.6C13.2 5.9 14.8 5 16.5 5 19 5 21 7 21 9.5c0 4-4 7.5-9 11.5z"/></svg></div>
+          <h3>Clients feel like family</h3>
+          <p>The team is praised for friendliness and warmth. People describe it as their favorite place to go, visit after visit.</p>
+        </div>
+        <div class="card reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#8C2B2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg></div>
+          <h3>Worth the trip</h3>
+          <p>Some clients travel from as far as Staten Island just for their brows here. That kind of loyalty is earned.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="tape" aria-hidden="true"><span class="tape-label">Brows · Threading · Waxing · Makeup</span></div>
+
+  <section class="block" style="padding-top:0">
+    <div class="wrap split">
+      <div class="reveal">
+        <span class="script">from the workbench</span>
+        <h2>Precision you<br>can see</h2>
+        <p>Threading is a craft of small, exact movements, and R &amp; F Threading Salon treats it that way. Every brow is shaped to your face, never rushed, never overdone.</p>
+        <p>Beyond brows, the studio offers hair removal, waxing and makeup services, including bridal makeup, so you can walk in for one thing and leave polished head to toe.</p>
+        <ul class="check-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#7D8C6F" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Eyebrow threading and shaping</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#7D8C6F" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Hair removal and waxing services</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#7D8C6F" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Makeup and bridal makeup</li>
+        </ul>
+        <a class="btn btn-ghost" href="#services" data-page="services">See the full menu</a>
+      </div>
+      <div class="quote-card reveal">
+        <p>The best place ever. Consistently excellent, I trust their work completely.</p>
+        <cite>Review themes on Birdeye · paraphrased</cite>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="cta-band reveal">
+      <h2>Your brows deserve the best hands.</h2>
+      <p>2074 E 14th St, Brooklyn, NY 11229 · Call for hours and appointments.</p>
+      <a class="btn btn-solid" href="tel:+17188726181">Call (718) 872-6181</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-services">
+      <span class="script">the pattern book</span>
+      <h2>Services, cut<br>to fit you</h2>
+      <p>Every service is tailored to your face and your day. Prices below are samples: call for exact pricing.</p>
+    </div>
+
+    <div class="pattern-grid">
+      <div class="pattern reveal">
+        <span class="pno">Pattern No. 1</span>
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#8C2B2E" stroke-width="2" stroke-linecap="round"><path d="M3 8c3 3 6 3 9 0s6-3 9 0"/><path d="M3 16c3-3 6-3 9 0s6 3 9 0"/></svg>Eyebrow Threading <span class="flag">Signature</span></h3>
+        <p>The salon&#8217;s signature craft. Precise threading that shapes brows to your face, neat, natural and never overdone. Reviewers call it exceptional.</p>
+        <div class="swatch-row" aria-hidden="true">
+          <span class="swatch" style="background:#8C2B2E"></span><span class="swatch" style="background:#C9A227"></span><span class="swatch" style="background:#7D8C6F"></span><span class="swatch" style="background:#A63D40"></span>
+        </div>
+        <div class="price-line"><strong>from $10*</strong><small>sample price, call to confirm</small></div>
+      </div>
+      <div class="pattern reveal">
+        <span class="pno">Pattern No. 2</span>
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#8C2B2E" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="18" r="2.6"/><circle cx="6" cy="6" r="2.6"/><path d="M8.2 7.4 L20 19 M8.2 16.6 L20 5"/></svg>Eyebrow Shaping</h3>
+        <p>Full brow design and shaping for a polished, balanced look that frames your face.</p>
+        <div class="swatch-row" aria-hidden="true">
+          <span class="swatch" style="background:#2B2118"></span><span class="swatch" style="background:#C9A227"></span><span class="swatch" style="background:#EFE4CC"></span>
+        </div>
+        <div class="price-line"><strong>from $12*</strong><small>sample price, call to confirm</small></div>
+      </div>
+      <div class="pattern reveal">
+        <span class="pno">Pattern No. 3</span>
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#8C2B2E" stroke-width="2" stroke-linecap="round"><path d="M4 12c2-4 4-6 8-6s6 2 8 6c-2 4-4 6-8 6s-6-2-8-6z"/><circle cx="12" cy="12" r="2.4"/></svg>Hair Removal and Waxing</h3>
+        <p>Gentle, thorough hair removal and waxing services for a smooth finish.</p>
+        <div class="swatch-row" aria-hidden="true">
+          <span class="swatch" style="background:#A63D40"></span><span class="swatch" style="background:#C9A227"></span><span class="swatch" style="background:#7D8C6F"></span>
+        </div>
+        <div class="price-line"><strong>from $10*</strong><small>sample price, varies by area</small></div>
+      </div>
+      <div class="pattern reveal">
+        <span class="pno">Pattern No. 4</span>
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#8C2B2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 4.5L18 9l-4.2 1.5L12 15l-1.8-4.5L6 9l4.2-1.5z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"/></svg>Makeup Services</h3>
+        <p>Professional makeup for nights out, photos and special occasions, applied with a steady hand.</p>
+        <div class="swatch-row" aria-hidden="true">
+          <span class="swatch" style="background:#8C2B2E"></span><span class="swatch" style="background:#C2258B"></span><span class="swatch" style="background:#C9A227"></span><span class="swatch" style="background:#2B2118"></span>
+        </div>
+        <div class="price-line"><strong>from $40*</strong><small>sample price, call to confirm</small></div>
+      </div>
+      <div class="pattern reveal">
+        <span class="pno">Pattern No. 5</span>
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#8C2B2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21C7 17 3 13.5 3 9.5 3 7 5 5 7.5 5c1.7 0 3.3.9 4.5 2.6C13.2 5.9 14.8 5 16.5 5 19 5 21 7 21 9.5c0 4-4 7.5-9 11.5z"/></svg>Bridal Makeup <span class="flag">By appointment</span></h3>
+        <p>Your big day, done beautifully. Bridal makeup that photographs well and lasts through the celebration.</p>
+        <div class="swatch-row" aria-hidden="true">
+          <span class="swatch" style="background:#EFE4CC"></span><span class="swatch" style="background:#F1E3B6"></span><span class="swatch" style="background:#A63D40"></span>
+        </div>
+        <div class="price-line"><strong>call for quote*</strong><small>consultation recommended</small></div>
+      </div>
+      <div class="pattern reveal">
+        <span class="pno">Pattern No. 6</span>
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#8C2B2E" stroke-width="2" stroke-linecap="round"><path d="M4 20h16M6 20v-6a2 2 0 012-2h8a2 2 0 012 2v6M12 12V8M12 8c-4 0-5-2-5-4 3 0 4 1 5 2 1-1 2-2 5-2 0 2-1 4-5 4z"/></svg>Walk-ins Welcome</h3>
+        <p>Listings note that walk-ins are welcome, so you can stop by when your brows can&#8217;t wait. Calling ahead is always smart.</p>
+        <div class="swatch-row" aria-hidden="true">
+          <span class="swatch" style="background:#7D8C6F"></span><span class="swatch" style="background:#C9A227"></span>
+        </div>
+        <div class="price-line"><strong>no appointment needed*</strong><small>subject to availability</small></div>
+      </div>
+    </div>
+
+    <div class="price-note reveal">
+      <strong>* Sample prices only.</strong> The services above come from the salon&#8217;s published listings; prices shown are samples to give you an idea, not the salon&#8217;s actual prices. Call <strong>(718) 872-6181</strong> for exact pricing and to book.
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Ready for your fitting?</h2>
+      <p>Call ahead and we will have the chair ready.</p>
+      <a class="btn btn-solid" href="tel:+17188726181">Call (718) 872-6181</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-story">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-story">
+      <span class="script">our story</span>
+      <h2>Stitched into<br>the neighborhood</h2>
+      <p>R &amp; F Threading Salon is a Brooklyn beauty studio built on precision, warmth and trust.</p>
+    </div>
+
+    <div class="split" style="margin-bottom:56px">
+      <div class="reveal">
+        <span class="script">the short version</span>
+        <h2>A craft,<br>not a chore</h2>
+        <p>Threading is one of the oldest hair-removal arts in the world, and R &amp; F Threading Salon practices it like a craft: careful, exact and personal.</p>
+        <p>Clients describe the studio as their favorite place to go, a place where the team feels like family. Some have been coming for many years, and a few travel from as far as Staten Island just to have their brows done here.</p>
+        <p>That kind of loyalty does not happen by accident. It comes from consistent, excellent work, visit after visit, and from making every client feel welcome the moment they walk in.</p>
+      </div>
+      <div class="quote-card reveal">
+        <p>The best place ever. I trust their work completely.</p>
+        <cite>Review themes on Birdeye · paraphrased</cite>
+      </div>
+    </div>
+
+    <div class="cards" style="margin-bottom:56px">
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#8C2B2E" stroke-width="2" stroke-linecap="round"><path d="M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5"/></svg></div>
+        <h3>Tradition in every thread</h3>
+        <p>Threading shaped by skill and patience, the gentle way to perfectly defined brows.</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#8C2B2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div>
+        <h3>Like family</h3>
+        <p>Reviewers keep saying the same thing: the staff are friendly, the vibe is warm, and clients feel at home.</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#8C2B2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></div>
+        <h3>Walk-ins welcome</h3>
+        <p>Listings note that walk-ins are welcome, and the studio accepts credit cards. Easy in, beautiful out.</p>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <div class="cta-band reveal">
+        <h2>Come see what the fuss is about.</h2>
+        <p>2074 E 14th St, Brooklyn, NY 11229 · Call for hours and appointments.</p>
+        <a class="btn btn-solid" href="#visit" data-page="visit">Plan your visit</a>
+      </div>
+      <div style="height:56px"></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-gal">
+      <span class="script">the swatch book</span>
+      <h2>A look at<br>the craft</h2>
+      <p>Artistic previews of the studio&#8217;s work. Real photos are on the way.</p>
+    </div>
+
+    <div class="swatch-grid">
+      <div class="swatch-card reveal">
+        <span class="soon">Photo soon</span>
+        <svg class="safety-pin" viewBox="0 0 26 44" aria-hidden="true"><rect x="11" y="2" width="4" height="40" rx="2" fill="#C0C4CC"/><circle cx="13" cy="6" r="5" fill="none" stroke="#8A8F99" stroke-width="2.5"/><circle cx="13" cy="38" r="2.5" fill="#8A8F99"/></svg>
+        <div class="cloth" style="background:linear-gradient(140deg,#C9A227,#8A6D15)">
+          <svg viewBox="0 0 100 100"><path d="M20 45 q15 -14 30 0 q15 14 30 0" fill="none" stroke="#2B2118" stroke-width="5" stroke-linecap="round"/><path d="M20 58 q15 -14 30 0 q15 14 30 0" fill="none" stroke="#2B2118" stroke-width="5" stroke-linecap="round" opacity=".55"/></svg>
+        </div>
+        <div class="stitch"></div>
+        <div class="tag"><strong>Signature Brows</strong><small>Neat, natural, perfectly shaped</small></div>
+      </div>
+      <div class="swatch-card reveal">
+        <span class="soon">Photo soon</span>
+        <svg class="safety-pin" viewBox="0 0 26 44" aria-hidden="true"><rect x="11" y="2" width="4" height="40" rx="2" fill="#C0C4CC"/><circle cx="13" cy="6" r="5" fill="none" stroke="#8A8F99" stroke-width="2.5"/><circle cx="13" cy="38" r="2.5" fill="#8A8F99"/></svg>
+        <div class="cloth" style="background:linear-gradient(140deg,#8C2B2E,#5F1C1F)">
+          <svg viewBox="0 0 100 100"><path d="M50 12 C34 36 38 62 50 86 C62 62 66 36 50 12Z" fill="none" stroke="#F7F0E1" stroke-width="4"/><path d="M50 24 C42 40 44 58 50 74" fill="none" stroke="#C9A227" stroke-width="3" stroke-linecap="round"/></svg>
+        </div>
+        <div class="stitch"></div>
+        <div class="tag"><strong>Thread Work</strong><small>The art of the thread</small></div>
+      </div>
+      <div class="swatch-card reveal">
+        <span class="soon">Photo soon</span>
+        <svg class="safety-pin" viewBox="0 0 26 44" aria-hidden="true"><rect x="11" y="2" width="4" height="40" rx="2" fill="#C0C4CC"/><circle cx="13" cy="6" r="5" fill="none" stroke="#8A8F99" stroke-width="2.5"/><circle cx="13" cy="38" r="2.5" fill="#8A8F99"/></svg>
+        <div class="cloth" style="background:linear-gradient(140deg,#7D8C6F,#4E5B42)">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="26" fill="none" stroke="#F7F0E1" stroke-width="4"/><path d="M50 24 v52 M24 50 h52" stroke="#F7F0E1" stroke-width="3" opacity=".6"/></svg>
+        </div>
+        <div class="stitch"></div>
+        <div class="tag"><strong>Full Face Polish</strong><small>Smooth, even finish</small></div>
+      </div>
+      <div class="swatch-card reveal">
+        <span class="soon">Photo soon</span>
+        <svg class="safety-pin" viewBox="0 0 26 44" aria-hidden="true"><rect x="11" y="2" width="4" height="40" rx="2" fill="#C0C4CC"/><circle cx="13" cy="6" r="5" fill="none" stroke="#8A8F99" stroke-width="2.5"/><circle cx="13" cy="38" r="2.5" fill="#8A8F99"/></svg>
+        <div class="cloth" style="background:linear-gradient(140deg,#A63D40,#7A2B2D)">
+          <svg viewBox="0 0 100 100"><path d="M30 70 Q32 40 50 36 Q68 40 70 70 Q50 80 30 70Z" fill="#F7F0E1"/><path d="M38 52 q12 -8 24 0" fill="none" stroke="#8C2B2E" stroke-width="3" stroke-linecap="round"/><circle cx="50" cy="64" r="5" fill="#C9A227"/></svg>
+        </div>
+        <div class="stitch"></div>
+        <div class="tag"><strong>Makeup Artistry</strong><small>Polished for any occasion</small></div>
+      </div>
+      <div class="swatch-card reveal">
+        <span class="soon">Photo soon</span>
+        <svg class="safety-pin" viewBox="0 0 26 44" aria-hidden="true"><rect x="11" y="2" width="4" height="40" rx="2" fill="#C0C4CC"/><circle cx="13" cy="6" r="5" fill="none" stroke="#8A8F99" stroke-width="2.5"/><circle cx="13" cy="38" r="2.5" fill="#8A8F99"/></svg>
+        <div class="cloth" style="background:linear-gradient(140deg,#C2258B,#7A134F)">
+          <svg viewBox="0 0 100 100"><path d="M50 80 C30 66 32 46 42 38 C46 50 44 60 48 68 C52 60 50 50 56 42 C68 48 70 66 50 80Z" fill="#F7F0E1"/><circle cx="50" cy="55" r="4" fill="#C9A227"/></svg>
+        </div>
+        <div class="stitch"></div>
+        <div class="tag"><strong>Bridal Looks</strong><small>Beautiful on the big day</small></div>
+      </div>
+      <div class="swatch-card reveal">
+        <span class="soon">Photo soon</span>
+        <svg class="safety-pin" viewBox="0 0 26 44" aria-hidden="true"><rect x="11" y="2" width="4" height="40" rx="2" fill="#C0C4CC"/><circle cx="13" cy="6" r="5" fill="none" stroke="#8A8F99" stroke-width="2.5"/><circle cx="13" cy="38" r="2.5" fill="#8A8F99"/></svg>
+        <div class="cloth" style="background:linear-gradient(140deg,#2B2118,#4A3A28)">
+          <svg viewBox="0 0 100 100"><rect x="30" y="20" width="40" height="60" rx="6" fill="none" stroke="#C9A227" stroke-width="4"/><path d="M40 34 h20 M40 46 h20 M40 58 h14" stroke="#C9A227" stroke-width="3" stroke-linecap="round"/></svg>
+        </div>
+        <div class="stitch"></div>
+        <div class="tag"><strong>The Studio</strong><small>Warm, welcoming space</small></div>
+      </div>
+    </div>
+
+    <div class="price-note reveal" style="margin-top:28px">
+      <strong>Coming soon:</strong> real photos of the studio&#8217;s actual work. The swatches above are artistic previews. The real thing looks even better in person.
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-rev">
+      <span class="script">kind words</span>
+      <h2>What clients<br>are saying</h2>
+      <p>Based on 118 reviews on Birdeye. Here are the themes people keep coming back to.</p>
+    </div>
+    <div class="rs-strip">
+      <p class="rs-note">Review themes on this page are paraphrased from public feedback. Open the source to read current reviews and ratings.</p>
+      <div class="rs-links">
+        <a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJ7XpskYxEwokRgUdYGvz2pO8" target="_blank" rel="noopener">See reviews on Google</a>
+        <a class="rs-btn alt" href="https://reviews.birdeye.com/r-f-threading-salon-170095903761837" target="_blank" rel="noopener">Read reviews on Birdeye</a>
+        <a class="rs-btn alt" href="https://www.bestprosintown.com/ny/brooklyn/r-and-f-threading-salon-/" target="_blank" rel="noopener">Read reviews on BestProsInTown</a>
+      </div>
+    </div>
+
+    <div class="rev-grid">
+      <div class="rev featured reveal">
+        <span class="sample-badge">Sample · paraphrased theme</span>
+        <div class="stars">★★★★★</div>
+        <p>Exceptional eyebrow threading. I have been coming for years and trust their work completely. The best place ever.</p>
+        <cite>Based on 118 reviews on Birdeye</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="sample-badge">Sample · paraphrased theme</span>
+        <div class="stars">★★★★★</div>
+        <p>The staff are so friendly, they make you feel like family. It is my favorite place to go, and the results are consistently excellent.</p>
+        <cite>Based on 118 reviews on Birdeye</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="sample-badge">Sample · paraphrased theme</span>
+        <div class="stars">★★★★★</div>
+        <p>I travel from Staten Island just to get my brows done here. Worth every mile. She did a very good job.</p>
+        <cite>Based on reviews on BestProsInTown</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="sample-badge">Sample · paraphrased theme</span>
+        <div class="stars">★★★★★</div>
+        <p>My brows come out neat and natural every single time. I would not trust anyone else with them.</p>
+        <cite>Based on 118 reviews on Birdeye</cite>
+      </div>
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Love your brows? Tell the neighborhood.</h2>
+      <p>Your review keeps a beloved studio thriving. It takes a minute, and it means the world.</p>
+      <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJ7XpskYxEwokRgUdYGvz2pO8" target="_blank" rel="noopener">Leave us a Google review</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-visit">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-visit">
+      <span class="script">visit us</span>
+      <h2>Find us on<br>E 14th St</h2>
+      <p>A cozy studio in Brooklyn. Call ahead for hours and appointments.</p>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#8C2B2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Find us</h3>
+        <p><strong>R &amp; F Threading Salon</strong><br>2074 E 14th St<br>Brooklyn, NY 11229</p>
+        <p>Street parking in the area. Listings note walk-ins are welcome.</p>
+      </div>
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#8C2B2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg> Call us</h3>
+        <p>Hours, bookings and quotes:</p>
+        <a class="big" href="tel:+17188726181">(718) 872-6181</a>
+        <p style="margin-top:10px">Please call ahead to confirm hours before visiting.</p>
+      </div>
+    </div>
+
+    <div class="visit-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#8C2B2E" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> Hours</h3>
+        <p>Call for hours: <a href="tel:+17188726181" style="font-weight:700">(718) 872-6181</a></p>
+        <div class="hours-note">Online listings generally show Tuesday through Saturday, 10:30 AM - 6:30 PM, closed Monday and Sunday, but listings differ, so please call to confirm before visiting.</div>
+      </div>
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <svg viewBox="0 0 24 24" fill="#8C2B2E"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#fff"/></svg>
+          <strong>2074 E 14th St</strong>
+          <small>Brooklyn, NY 11229</small><br>
+          <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJ7XpskYxEwokRgUdYGvz2pO8" target="_blank" rel="noopener">Get Directions</a>
+        </div>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="label-zone">
+    <div class="tailor-label">
+      <span class="seal"><span>R&amp;F</span></span>
+      <h3>R &amp; F Threading Salon</h3>
+      <div class="made">Handcrafted in Brooklyn · Est. with care</div>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <h4>About</h4>
+        <p>A Brooklyn beauty studio known for exceptional eyebrow threading, plus hair removal, waxing and makeup services.</p>
+      </div>
+      <div>
+        <h4>Find us</h4>
+        <p>2074 E 14th St<br>Brooklyn, NY 11229<br><a href="tel:+17188726181">(718) 872-6181</a><br>Call for hours</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <div class="navline">
+          <a href="#home" data-page="home">Home</a>
+          <a href="#services" data-page="services">Services</a>
+          <a href="#story" data-page="story">Story</a>
+          <a href="#gallery" data-page="gallery">Gallery</a>
+          <a href="#reviews" data-page="reviews">Reviews</a>
+          <a href="#visit" data-page="visit">Visit</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© R &amp; F Threading Salon</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "story", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

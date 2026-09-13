@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>R L Hobin Co · Landscaper, Holden, MA</title>
+<meta name="description" content="R L Hobin Co is a landscaping company in Holden, MA. Lawn care, garden beds, mulch, seasonal cleanups, hedge trimming. Call (508) 829-4040.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#F7F5EC; --cream-2:#EFEBDA; --card:#FFFFFF;
+  --ink:#22301F; --ink-2:#55624F;
+  --leaf:#4C7A3F; --leaf-d:#33592A; --leaf-soft:#E2EBD8;
+  --moss:#2E4A2A; --gold:#C99B3F;
+  --radius:16px;
+  --shadow:0 16px 34px -18px rgba(34,48,31,.28);
+  --shadow-sm:0 8px 20px -12px rgba(34,48,31,.22);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Public Sans",system-ui,sans-serif;background:var(--cream);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased}
+img{max-width:100%}
+a{color:var(--leaf-d)}
+::selection{background:var(--leaf);color:#fff}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.serif{font-family:"Fraunces",serif}
+
+/* ---------- minimal nav ---------- */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(247,245,236,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid rgba(76,122,63,.2)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px 0;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--ink)}
+.brand svg{width:40px;height:40px;flex:none}
+.brand-name{font-family:"Fraunces",serif;font-weight:700;font-size:1.22rem;line-height:1.05}
+.brand-name small{display:block;font-family:"Public Sans",sans-serif;font-weight:700;font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--leaf-d)}
+nav.min{display:flex;align-items:center;gap:2px;flex-wrap:wrap}
+nav.min a{text-decoration:none;color:var(--ink);font-weight:600;font-size:.93rem;padding:9px 13px;border-radius:999px;transition:background .18s,color .18s;white-space:nowrap}
+nav.min a:hover{background:var(--leaf-soft)}
+nav.min a.active{background:var(--leaf);color:#fff}
+.call-chip{display:inline-flex;align-items:center;gap:8px;background:var(--moss);color:#fff;text-decoration:none;font-weight:700;padding:10px 20px;border-radius:999px;font-size:.93rem;transition:background .18s,transform .18s;white-space:nowrap}
+.call-chip:hover{background:var(--leaf-d);transform:translateY(-2px)}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- full-bleed hero ---------- */
+.hero{position:relative;min-height:86vh;display:flex;align-items:center;overflow:hidden;color:#fff;
+  background:linear-gradient(180deg,#7FB069 0%,#5C8A4A 34%,#33592A 68%,#223B1D 100%)}
+.hero-bg{position:absolute;inset:0;pointer-events:none}
+.hero-bg svg{width:100%;height:100%;display:block}
+.hero-inner{position:relative;z-index:2;padding:90px 0 70px;max-width:1120px;margin:0 auto;width:100%}
+.kicker{display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.16);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.35);font-size:.78rem;font-weight:700;letter-spacing:2.6px;text-transform:uppercase;padding:9px 20px;border-radius:999px;margin-bottom:22px}
+.hero h1{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(2.8rem,6vw,4.8rem);line-height:1.02;letter-spacing:-.4px;margin-bottom:18px;max-width:16ch}
+.hero h1 em{font-style:italic;color:#FFE9A8}
+.lede{font-size:1.12rem;color:#F0F4E8;max-width:36rem;margin-bottom:28px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:24px}
+.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;padding:14px 28px;border-radius:999px;font-size:1rem;transition:transform .18s,background .18s,box-shadow .18s}
+.btn-solid{background:#fff;color:var(--moss);box-shadow:var(--shadow-sm)}
+.btn-solid:hover{transform:translateY(-2px);background:#FFF6DC}
+.btn-ghost{background:rgba(255,255,255,.12);color:#fff;border:2px solid rgba(255,255,255,.55)}
+.btn-ghost:hover{background:rgba(255,255,255,.22);transform:translateY(-2px)}
+.hours-pill{display:inline-flex;align-items:center;gap:10px;background:rgba(20,30,18,.55);border:1px solid rgba(255,255,255,.3);color:#fff;padding:10px 20px;border-radius:999px;font-weight:600;font-size:.93rem}
+
+/* ---------- alternating bands ---------- */
+section.band{padding:64px 0}
+.band.alt{background:var(--cream-2)}
+.band.plain{background:var(--cream)}
+.sec-head{max-width:46rem;margin-bottom:36px}
+.sec-head.center{margin-left:auto;margin-right:auto;text-align:center}
+.sec-head .tag{font-family:"Fraunces",serif;font-size:1.05rem;color:var(--leaf-d);display:block;margin-bottom:6px}
+h2{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(1.9rem,3.6vw,2.7rem);line-height:1.1;margin-bottom:12px;letter-spacing:-.3px}
+.sec-head p{color:var(--ink-2)}
+.split2{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.split2 p{color:var(--ink-2);margin-bottom:14px}
+.check-list{list-style:none;margin:20px 0;display:grid;gap:12px}
+.check-list li{display:flex;gap:12px;align-items:flex-start;font-weight:500}
+.check-list svg{flex:none;width:24px;height:24px;margin-top:2px}
+.leaf-card{background:var(--moss);color:#EDF2E4;border-radius:22px;padding:40px 36px;position:relative;box-shadow:var(--shadow);overflow:hidden}
+.leaf-card::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 12%, rgba(201,155,63,.35), transparent 50%)}
+.leaf-card p{font-family:"Fraunces",serif;font-size:1.35rem;line-height:1.5;margin-bottom:14px;position:relative}
+.leaf-card cite{font-style:normal;font-weight:600;color:var(--gold);font-size:.85rem;letter-spacing:1.5px;text-transform:uppercase;position:relative}
+
+/* ---------- cards (services) ---------- */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.card{background:var(--card);border-radius:var(--radius);padding:32px 28px;box-shadow:var(--shadow-sm);border-top:6px solid var(--leaf);transition:transform .2s,box-shadow .2s}
+.card:nth-child(3n+2){border-top-color:var(--gold)}
+.card:nth-child(3n){border-top-color:var(--moss)}
+.card:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+.card .icon{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;background:var(--leaf-soft)}
+.card:nth-child(3n+2) .icon{background:#F6ECD4}
+.card:nth-child(3n) .icon{background:#DCE5D2}
+.card .icon svg{width:30px;height:30px}
+.card h3{font-family:"Fraunces",serif;font-size:1.3rem;margin-bottom:8px}
+.card p{color:var(--ink-2);font-size:.95rem}
+.card .more{display:inline-block;margin-top:12px;font-weight:700;font-size:.9rem;color:var(--leaf-d);text-decoration:none}
+.card .more:hover{text-decoration:underline}
+
+/* ---------- gallery: masonry ---------- */
+.masonry{columns:3 260px;column-gap:18px}
+.mtile{break-inside:avoid;margin-bottom:18px;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);background:var(--card);border:1px solid rgba(76,122,63,.18)}
+.mtile .art{display:flex;align-items:center;justify-content:center;position:relative}
+.mtile .art svg{width:44%;height:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.16))}
+.mtile .soon{position:absolute;top:12px;left:12px;background:rgba(34,48,31,.85);color:#F7F5EC;font-size:.64rem;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;padding:5px 12px;border-radius:999px}
+.mtile .cap{padding:15px 20px}
+.mtile .cap strong{font-family:"Fraunces",serif;font-size:1.05rem;display:block}
+.mtile .cap small{color:var(--ink-2)}
+.tall .art{height:280px}.mid .art{height:215px}.short .art{height:170px}
+
+/* ---------- reviews ---------- */
+.rs-strip{margin:26px auto 34px;max-width:660px;background:var(--card);border:2px dashed rgba(76,122,63,.55);border-radius:var(--radius);padding:22px 26px;text-align:center}
+.rs-note{margin:0 0 14px;font-size:.95rem;color:var(--ink-2);line-height:1.55}
+.rs-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rs-btn{display:inline-block;background:var(--leaf);color:#fff;padding:11px 26px;border-radius:999px;font-weight:700;text-decoration:none;font-size:.95rem}
+.rs-btn:hover{background:var(--leaf-d)}
+.rs-btn.alt{background:var(--moss)}
+.rev-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.rev{background:var(--card);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow-sm);border:1px solid rgba(76,122,63,.18)}
+.rev .stars{color:var(--gold);font-size:1.15rem;letter-spacing:3px;margin-bottom:12px}
+.rev p{font-size:1rem;margin-bottom:14px}
+.rev .sample{display:inline-block;font-size:.68rem;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;color:var(--leaf-d);background:var(--leaf-soft);padding:4px 12px;border-radius:999px;margin-bottom:12px}
+.rev cite{font-style:normal;font-weight:700;font-size:.85rem;color:var(--ink-2)}
+.rev.featured{background:var(--moss);color:#EDF2E4}
+.rev.featured p{color:#DFE8D2}
+.rev.featured cite{color:var(--gold)}
+.cta-band{background:linear-gradient(120deg,var(--leaf),var(--leaf-d));border-radius:24px;color:#fff;padding:52px 40px;text-align:center;margin-top:44px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.cta-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 82% 18%, rgba(255,255,255,.22), transparent 52%)}
+.cta-band h2{color:#fff;position:relative}
+.cta-band p{color:#EAF1DF;position:relative;max-width:36rem;margin:0 auto 24px}
+.cta-band .btn-solid{background:#fff;color:var(--leaf-d);position:relative}
+.cta-band .btn-solid:hover{background:#FFF6DC}
+
+/* ---------- contact ---------- */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:22px}
+.info-card{background:var(--card);border-radius:var(--radius);padding:34px;box-shadow:var(--shadow-sm);border:1px solid rgba(76,122,63,.18)}
+.info-card h3{font-family:"Fraunces",serif;font-size:1.4rem;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.info-card h3 svg{width:28px;height:28px}
+.info-card p{color:var(--ink-2);margin-bottom:8px}
+.info-card a.big{font-family:"Fraunces",serif;font-size:1.55rem;font-weight:700;color:var(--leaf-d);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.hours-note{background:var(--leaf-soft);border:2px dashed rgba(76,122,63,.55);border-radius:var(--radius);padding:18px 24px;font-size:.95rem;color:#33592A;margin-top:16px}
+.map-card{border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);min-height:360px;position:relative;
+  background:
+    linear-gradient(rgba(76,122,63,.1), rgba(76,122,63,.1)),
+    repeating-linear-gradient(0deg, transparent 0 46px, rgba(46,74,42,.14) 46px 48px),
+    repeating-linear-gradient(90deg, transparent 0 46px, rgba(46,74,42,.14) 46px 48px),
+    linear-gradient(140deg,#E4E8D2,#CFD8BC);
+  display:flex;align-items:center;justify-content:center}
+.map-pin{text-align:center;background:var(--card);padding:28px 36px;border-radius:18px;box-shadow:var(--shadow);max-width:80%;position:relative}
+.map-pin::after{content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);border:14px solid transparent;border-top-color:var(--card);border-bottom:0}
+.map-pin svg{width:44px;height:44px;margin-bottom:8px}
+.map-pin strong{font-family:"Fraunces",serif;font-size:1.15rem;display:block}
+.map-pin small{color:var(--ink-2)}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- page strips ---------- */
+.strip{border-radius:22px;padding:54px 46px;color:#fff;position:relative;overflow:hidden;margin-bottom:38px;box-shadow:var(--shadow)}
+.strip::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(255,255,255,.2), transparent 50%)}
+.strip .tag{font-family:"Fraunces",serif;font-size:1.05rem;position:relative;display:block;margin-bottom:6px;color:#FFE9A8}
+.strip h2{color:#fff;font-size:clamp(2rem,4vw,3rem);position:relative;margin-bottom:10px}
+.strip p{color:rgba(255,255,255,.88);max-width:38rem;position:relative}
+.strip.s-svc{background:linear-gradient(120deg,#4C7A3F,#2A4A22)}
+.strip.s-about{background:linear-gradient(120deg,#2E4A2A,#16240F)}
+.strip.s-gal{background:linear-gradient(120deg,#6B7F57,#3A4A30)}
+.strip.s-rev{background:linear-gradient(120deg,#7A6A2E,#4A3F18)}
+.strip.s-contact{background:linear-gradient(120deg,#22301F,#0E150C)}
+
+/* ---------- footer: multi-column ---------- */
+footer{background:var(--moss);color:#E4EAD6;margin-top:24px}
+.foot-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:36px;padding:54px 0 34px}
+.foot-grid h4{font-family:"Fraunces",serif;color:#fff;font-size:1.12rem;margin-bottom:14px}
+.foot-grid p,.foot-grid a{color:#C6D1B4;font-size:.94rem}
+.foot-grid a{text-decoration:none}
+.foot-grid a:hover{color:#FFE9A8}
+.foot-brand{display:flex;align-items:center;gap:11px;margin-bottom:14px}
+.foot-brand svg{width:42px;height:42px}
+.foot-brand span{font-family:"Fraunces",serif;font-weight:700;color:#fff;font-size:1.2rem}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.16);padding:20px 0 26px;display:flex;justify-content:center;font-size:.87rem;color:#A9B795}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:940px){
+  .split2{grid-template-columns:1fr}
+  .cards{grid-template-columns:1fr 1fr}
+  .contact-grid{grid-template-columns:1fr}
+  .rev-grid{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr 1fr}
+  .strip{padding:40px 28px}
+  .hero{min-height:auto}
+  .hero-inner{padding:64px 0 54px}
+}
+@media(max-width:600px){
+  .cards{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr}
+  .cta-band{padding:36px 24px}
+  .bar{justify-content:center;text-align:center}
+  nav.min{justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap bar">
+    <a class="brand" href="#home" data-page="home" aria-label="R L Hobin Co, home">
+      <svg viewBox="0 0 64 64" role="img" aria-label="Tree and leaf mark"><circle cx="32" cy="32" r="29" fill="#4C7A3F"/><path d="M32 50 L32 30 M32 38 L22 30 M32 34 L42 26" stroke="#F7F5EC" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M32 14 q-12 0 -14 14 q10 -2 14 -14 q4 12 14 14 q-2 -14 -14 -14" fill="#F7F5EC"/><circle cx="20" cy="18" r="3" fill="#C99B3F"/><circle cx="46" cy="20" r="2.4" fill="#C99B3F"/></svg>
+      <span class="brand-name">R L Hobin Co<small>Landscaping · Holden</small></span>
+    </a>
+    <nav class="min" aria-label="Main navigation">
+      <a href="#home" data-page="home" class="active" aria-current="page">Home</a>
+      <a href="#services" data-page="services">Services</a>
+      <a href="#about" data-page="about">About</a>
+      <a href="#gallery" data-page="gallery">Gallery</a>
+      <a href="#reviews" data-page="reviews">Reviews</a>
+      <a href="#contact" data-page="contact">Contact</a>
+    </nav>
+    <a class="call-chip" href="tel:+15088294040">(508) 829-4040</a>
+  </div>
+</header>
+
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-bg" aria-hidden="true">
+      <svg viewBox="0 0 1200 700" preserveAspectRatio="xMidYMax slice">
+        <circle cx="980" cy="120" r="62" fill="#FFE9A8" opacity=".85"/>
+        <path d="M0 520 Q 300 420 600 500 T 1200 480 L1200 700 L0 700 Z" fill="#33592A" opacity=".85"/>
+        <path d="M0 580 Q 350 500 700 570 T 1200 560 L1200 700 L0 700 Z" fill="#223B1D"/>
+        <g fill="#2E4A2A">
+          <path d="M120 560 l34 -78 34 78 z"/><rect x="150" y="556" width="8" height="26"/>
+          <path d="M880 540 l40 -92 40 92 z"/><rect x="915" y="536" width="10" height="30"/>
+          <path d="M1060 570 l28 -64 28 64 z"/><rect x="1084" y="566" width="8" height="22"/>
+        </g>
+        <g fill="#4C7A3F" opacity=".9">
+          <ellipse cx="300" cy="600" rx="90" ry="26"/><ellipse cx="700" cy="630" rx="110" ry="30"/>
+        </g>
+        <g stroke="#FFE9A8" stroke-width="3" opacity=".5">
+          <line x1="60" y1="120" x2="60" y2="60"/><line x1="60" y1="90" x2="110" y2="90"/>
+        </g>
+      </svg>
+    </div>
+    <div class="wrap hero-inner">
+      <span class="kicker">Landscaper · Holden, MA</span>
+      <h1>A healthier lawn <em>starts here.</em></h1>
+      <p class="lede">R L Hobin Co is a landscaping company based in Holden, Massachusetts. Lawn care, garden beds, mulch, and seasonal cleanups, done with care and done on schedule.</p>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="tel:+15088294040">Call (508) 829-4040</a>
+        <a class="btn btn-ghost" href="#services" data-page="services">See services</a>
+      </div>
+      <span class="hours-pill">Call for hours · Mon-Fri availability</span>
+    </div>
+  </div>
+
+  <section class="band plain">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="tag">What we do</span>
+        <h2>Yards that look cared for, all season</h2>
+        <p>From weekly mowing to spring wake-ups and fall cleanups, we keep Holden-area properties neat, healthy, and easy to enjoy.</p>
+      </div>
+      <div class="cards">
+        <div class="card reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#33592A" stroke-width="2" stroke-linecap="round"><path d="M4 20c2-6 5-9 9-11l6-3 1 4-5 3c-3 2-5 4-6 7z"/><circle cx="18" cy="7" r="2.2"/><path d="M4 20h16"/></svg></div>
+          <h3>Lawn Care &amp; Mowing</h3>
+          <p>Regular mowing, edging, and trimming that keeps grass healthy and the yard looking sharp week after week.</p>
+          <a class="more" href="#services" data-page="services">All services</a>
+        </div>
+        <div class="card reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#7A5E1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-8M12 13c-4 0-7-2.5-7-6 4 0 7 2.5 7 6zM12 11c4 0 7-2.5 7-6-4 0-7 2.5-7 6z"/><path d="M8 21h8"/></svg></div>
+          <h3>Garden Beds &amp; Planting</h3>
+          <p>Bed design, planting, and mulching that gives flower beds and borders a clean, finished look.</p>
+          <a class="more" href="#services" data-page="services">All services</a>
+        </div>
+        <div class="card reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#33592A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14l4-8 4 8M10 14l4-8 4 8M14 6l3-2"/><path d="M3 18h18M5 21h14"/></svg></div>
+          <h3>Seasonal Cleanups</h3>
+          <p>Spring debris clearing and fall leaf removal, so your yard starts and ends the season right.</p>
+          <a class="more" href="#services" data-page="services">All services</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band alt">
+    <div class="wrap split2">
+      <div class="reveal">
+        <span class="tag">Why Hobin</span>
+        <h2>The local crew that shows up</h2>
+        <p>R L Hobin Co is based at 571 Bullard St in Holden, MA, serving homeowners across the area with dependable, no-drama landscaping.</p>
+        <ul class="check-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#4C7A3F" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Consistent scheduling you can plan around</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#4C7A3F" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Lawns, beds, mulch, hedges, and cleanups</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#4C7A3F" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Straightforward pricing, call for a quote</li>
+        </ul>
+        <div class="cta-row" style="margin-top:8px">
+          <a class="btn btn-solid" href="#about" data-page="about" style="background:var(--leaf);color:#fff">About us</a>
+        </div>
+      </div>
+      <div class="leaf-card reveal">
+        <p>A yard should be something you enjoy, not something on your to-do list. That is what we are here for.</p>
+        <cite>R L Hobin Co · Holden, MA</cite>
+      </div>
+    </div>
+  </section>
+
+  <section class="band plain">
+    <div class="wrap">
+      <div class="sec-head center reveal">
+        <span class="tag">Season by season</span>
+        <h2>We keep up, so you don't have to</h2>
+        <p>One call sets up the season. We handle the rhythm: mowing in summer, leaves in fall, fresh beds in spring.</p>
+      </div>
+      <div class="cards">
+        <div class="card reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#33592A" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg></div>
+          <h3>Spring</h3>
+          <p>Debris clearing, bed edging, fresh mulch, and the first mow. Your yard wakes up right.</p>
+        </div>
+        <div class="card reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#7A5E1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-5-4-8-7-8-11a5 5 0 019-3 5 5 0 019 3c0 4-3 7-8 11z" opacity="0"/><path d="M12 3c3 4 6 7 6 11a6 6 0 01-12 0c0-4 3-7 6-11z"/><path d="M12 12v9"/></svg></div>
+          <h3>Summer</h3>
+          <p>Steady mowing, trimming, and bed care through the growing season. Green stays green.</p>
+        </div>
+        <div class="card reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#33592A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-8"/><path d="M12 13l-6-6M12 13l6-6M12 13L6 5M12 13l6-8" opacity=".9"/><path d="M7 21h10"/></svg></div>
+          <h3>Fall</h3>
+          <p>Leaf removal, perennial cutbacks, and final mows. Put the yard to bed properly.</p>
+        </div>
+      </div>
+      <div class="cta-band reveal">
+        <h2>Let's talk about your yard.</h2>
+        <p>R L Hobin Co · 571 Bullard St, Holden, MA 01520. Call for hours, quotes, and scheduling.</p>
+        <a class="btn btn-solid" href="tel:+15088294040">Call (508) 829-4040</a>
+      </div>
+      <div style="height:8px"></div>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-svc">
+      <span class="tag">Our services</span>
+      <h2>Full-service yard care</h2>
+      <p>Landscaping and garden services for Holden, MA area homes. Call for a quote on any project, big or small.</p>
+    </div>
+
+    <div class="cards">
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#33592A" stroke-width="2" stroke-linecap="round"><path d="M4 20c2-6 5-9 9-11l6-3 1 4-5 3c-3 2-5 4-6 7z"/><circle cx="18" cy="7" r="2.2"/><path d="M4 20h16"/></svg></div>
+        <h3>Lawn Mowing &amp; Maintenance</h3>
+        <p>Scheduled mowing with crisp edging along walks and beds. Regular visits keep the lawn thick, even, and healthy.</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#7A5E1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-8M12 13c-4 0-7-2.5-7-6 4 0 7 2.5 7 6zM12 11c4 0 7-2.5 7-6-4 0-7 2.5-7 6z"/><path d="M8 21h8"/></svg></div>
+        <h3>Garden Beds &amp; Planting</h3>
+        <p>New beds, replanting tired ones, and seasonal flowers. We design beds that look good with minimal fuss.</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#33592A" stroke-width="2" stroke-linecap="round"><path d="M4 16c3-1 6-1 8 0s5 1 8 0"/><path d="M4 12c3-1 6-1 8 0s5 1 8 0"/><path d="M12 4v6M9 6l3 2 3-2"/></svg></div>
+        <h3>Mulch &amp; Edging</h3>
+        <p>Fresh mulch and clean bed edges. Instant curb appeal, better moisture retention, fewer weeds.</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#33592A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20c4-1 12-1 16 0"/><path d="M7 17c1-4 3-7 5-9 2 2 4 5 5 9"/><circle cx="12" cy="6" r="2.5"/></svg></div>
+        <h3>Hedge &amp; Shrub Trimming</h3>
+        <p>Shaping and thinning hedges and shrubs for healthy growth and a tidy silhouette.</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#7A5E1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v10M12 13l-5-5M12 13l5-5"/><path d="M4 17h16M6 21h12"/></svg></div>
+        <h3>Spring Cleanups</h3>
+        <p>Winter debris, dead growth, and bed prep. We clear the way for the growing season.</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#33592A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-4 5-7 8-7 12a7 7 0 0014 0c0-4-3-7-7-12z"/><path d="M12 8v9M9 12l3 3 3-3"/></svg></div>
+        <h3>Fall Cleanups</h3>
+        <p>Leaf removal, perennial cutbacks, and final mowing. Your yard goes into winter clean and ready.</p>
+      </div>
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Not sure what your yard needs?</h2>
+      <p>Describe it over the phone and we will recommend a plan. Free to ask, easy to schedule.</p>
+      <a class="btn btn-solid" href="tel:+15088294040">Call (508) 829-4040</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-about">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-about">
+      <span class="tag">About us</span>
+      <h2>Rooted in Holden</h2>
+      <p>R L Hobin Co is a landscaping company based at 571 Bullard St in Holden, Massachusetts, caring for local lawns and gardens.</p>
+    </div>
+
+    <div class="split2" style="margin-bottom:48px">
+      <div class="reveal">
+        <span class="tag">Our approach</span>
+        <h2>Steady care, honest work</h2>
+        <p>Good landscaping is not dramatic. It is showing up on schedule, mowing at the right height, edging the beds, and noticing the small things before they become big things.</p>
+        <p>That is how R L Hobin Co works: consistent, careful yard care for homeowners in Holden and the surrounding area. Lawns stay healthy, beds stay tidy, and you get your weekends back.</p>
+        <p>Whether you need weekly mowing, a one-time cleanup, or a full refresh of tired beds, one call gets it scheduled.</p>
+      </div>
+      <div class="leaf-card reveal">
+        <p>We treat every yard like it is the one the neighbors are judging. Because around here, it usually is.</p>
+        <cite>R L Hobin Co · Holden, MA</cite>
+      </div>
+    </div>
+
+    <div class="cards" style="margin-bottom:56px">
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#33592A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></div>
+        <h3>On schedule</h3>
+        <p>Regular routes you can count on. Your lawn gets cut on its day, rain or shine, with makeups when weather wins.</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#7A5E1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21C7 17 3 13.5 3 9.5 3 7 5 5 7.5 5c1.7 0 3.3.9 4.5 2.6C13.2 5.9 14.8 5 16.5 5 19 5 21 7 21 9.5c0 4-4 7.5-9 11.5z"/></svg></div>
+        <h3>Careful with your property</h3>
+        <p>Gates closed, beds respected, clippings blown off the walk. The details that separate a crew from a company.</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#33592A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+        <h3>Easy to reach</h3>
+        <p>Call (508) 829-4040 and talk to a real person about your yard. Quotes are straightforward, scheduling is simple.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-gal">
+      <span class="tag">Gallery</span>
+      <h2>Fresh work, every week</h2>
+      <p>Illustrated previews of our core services. Real photos of our work are on the way.</p>
+    </div>
+
+    <div class="masonry reveal">
+      <div class="mtile tall">
+        <div class="art" style="background:linear-gradient(140deg,#8FBF77,#4C7A3F)"><span class="soon">Photo soon</span>
+          <svg viewBox="0 0 100 100"><g stroke="#2E4A2A" stroke-width="4" stroke-linecap="round"><line x1="20" y1="80" x2="20" y2="40"/><line x1="80" y1="80" x2="80" y2="40"/><line x1="50" y1="80" x2="50" y2="30"/></g><g fill="#33592A"><circle cx="20" cy="32" r="16"/><circle cx="80" cy="32" r="16"/><circle cx="50" cy="22" r="18"/></g><rect x="10" y="80" width="80" height="8" rx="4" fill="#2E4A2A"/></svg>
+        </div>
+        <div class="cap"><strong>Lawn Stripes</strong><small>Sample illustration · weekly mowing</small></div>
+      </div>
+      <div class="mtile short">
+        <div class="art" style="background:linear-gradient(140deg,#D9C9A8,#B39B68)"><span class="soon">Photo soon</span>
+          <svg viewBox="0 0 100 100"><ellipse cx="50" cy="70" rx="36" ry="12" fill="#5A4A2E"/><g fill="#C96A1E"><circle cx="38" cy="58" r="6"/><circle cx="52" cy="54" r="7"/><circle cx="64" cy="60" r="6"/></g><path d="M38 58 q2 -10 6 -14 M52 54 q0 -12 4 -16 M64 60 q4 -8 8 -10" stroke="#4C7A3F" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>Fresh Mulch</strong><small>Sample illustration · bed refresh</small></div>
+      </div>
+      <div class="mtile mid">
+        <div class="art" style="background:linear-gradient(140deg,#A9C68F,#6B9A55)"><span class="soon">Photo soon</span>
+          <svg viewBox="0 0 100 100"><rect x="24" y="50" width="52" height="22" rx="10" fill="#33592A"/><circle cx="32" cy="44" r="10" fill="#4C7A3F"/><circle cx="50" cy="40" r="12" fill="#4C7A3F"/><circle cx="68" cy="44" r="10" fill="#4C7A3F"/><rect x="46" y="72" width="8" height="14" fill="#2E4A2A"/></svg>
+        </div>
+        <div class="cap"><strong>Hedge Shaping</strong><small>Sample illustration · shrub trimming</small></div>
+      </div>
+      <div class="mtile mid">
+        <div class="art" style="background:linear-gradient(140deg,#F2D8A8,#D9AE62)"><span class="soon">Photo soon</span>
+          <svg viewBox="0 0 100 100"><ellipse cx="50" cy="72" rx="34" ry="10" fill="#8A6A34"/><g fill="#E4658F"><circle cx="40" cy="58" r="6"/><circle cx="58" cy="54" r="7"/><circle cx="50" cy="64" r="5"/></g><g fill="#4C7A3F"><ellipse cx="34" cy="64" rx="8" ry="4"/><ellipse cx="64" cy="62" rx="8" ry="4"/></g></svg>
+        </div>
+        <div class="cap"><strong>Flower Beds</strong><small>Sample illustration · planting</small></div>
+      </div>
+      <div class="mtile tall">
+        <div class="art" style="background:linear-gradient(140deg,#C9B98F,#9A8A5A)"><span class="soon">Photo soon</span>
+          <svg viewBox="0 0 100 100"><g fill="#B3772E"><ellipse cx="30" cy="66" rx="9" ry="5" transform="rotate(-24 30 66)"/><ellipse cx="52" cy="72" rx="9" ry="5" transform="rotate(12 52 72)"/><ellipse cx="70" cy="62" rx="9" ry="5" transform="rotate(-14 70 62)"/><ellipse cx="42" cy="56" rx="9" ry="5" transform="rotate(20 42 56)"/></g><path d="M20 82 q30 -8 60 0" stroke="#4C7A3F" stroke-width="6" fill="none" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cap"><strong>Fall Cleanup</strong><small>Sample illustration · leaf removal</small></div>
+      </div>
+      <div class="mtile short">
+        <div class="art" style="background:linear-gradient(140deg,#BFD6AC,#86A86C)"><span class="soon">Photo soon</span>
+          <svg viewBox="0 0 100 100"><path d="M14 78 h72" stroke="#2E4A2A" stroke-width="6" stroke-linecap="round"/><g stroke="#4C7A3F" stroke-width="4" stroke-linecap="round"><line x1="28" y1="78" x2="32" y2="56"/><line x1="44" y1="78" x2="44" y2="52"/><line x1="60" y1="78" x2="62" y2="58"/><line x1="74" y1="78" x2="72" y2="54"/></g></svg>
+        </div>
+        <div class="cap"><strong>Clean Edges</strong><small>Sample illustration · edging</small></div>
+      </div>
+      <div class="mtile mid">
+        <div class="art" style="background:linear-gradient(140deg,#9CC184,#5C8A4A)"><span class="soon">Photo soon</span>
+          <svg viewBox="0 0 100 100"><path d="M50 84 L50 44 M50 60 L34 48 M50 54 L66 42" stroke="#F7F5EC" stroke-width="5" stroke-linecap="round"/><path d="M50 28 q-16 0 -18 18 q13 -2 18 -18 q5 16 18 18 q-2 -18 -18 -18" fill="#F7F5EC"/><circle cx="50" cy="84" r="8" fill="#2E4A2A"/></svg>
+        </div>
+        <div class="cap"><strong>New Plantings</strong><small>Sample illustration · shrubs &amp; trees</small></div>
+      </div>
+      <div class="mtile short">
+        <div class="art" style="background:linear-gradient(140deg,#DCE5CE,#AEC49A)"><span class="soon">Photo soon</span>
+          <svg viewBox="0 0 100 100"><rect x="22" y="60" width="56" height="12" rx="6" fill="#8A6A34"/><rect x="30" y="44" width="40" height="16" rx="8" fill="#B39B68"/><circle cx="50" cy="36" r="8" fill="#4C7A3F"/></svg>
+        </div>
+        <div class="cap"><strong>Spring Wake-Up</strong><small>Sample illustration · bed prep</small></div>
+      </div>
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Want your yard in here?</h2>
+      <p>Join the route and get steady, professional care all season long.</p>
+      <a class="btn btn-solid" href="tel:+15088294040">Call (508) 829-4040</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-rev">
+      <span class="tag">Reviews</span>
+      <h2>What customers say</h2>
+      <p>Find R L Hobin Co on the review sites below and read what local customers have posted.</p>
+    </div>
+    <div class="rs-strip reveal">
+      <p class="rs-note">Review cards below are samples. Read current, verified reviews at the real sources linked here.</p>
+      <div class="rs-links">
+        <a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJDRDxs-j444kRLrqw28429sM" target="_blank" rel="noopener">See reviews on Google</a>
+        <a class="rs-btn alt" href="https://www.bbb.org/us/ma/holden/profile/landscape-contractors/r-l-hobin-co-0261-351412" target="_blank" rel="noopener">BBB profile</a>
+      </div>
+    </div>
+
+    <div class="rev-grid">
+      <div class="rev featured reveal">
+        <span class="sample">Sample review</span>
+        <div class="stars">★★★★★</div>
+        <p>"Reliable every single week. The lawn has never looked better and the edging is always crisp."</p>
+        <cite>Illustrative sample</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="sample">Sample review</span>
+        <div class="stars">★★★★★</div>
+        <p>"Did our spring cleanup and mulched all the beds. Huge difference, fair price, friendly crew."</p>
+        <cite>Illustrative sample</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="sample">Sample review</span>
+        <div class="stars">★★★★★</div>
+        <p>"Trimmed our overgrown hedges back into shape without butchering them. You can tell they know plants."</p>
+        <cite>Illustrative sample</cite>
+      </div>
+      <div class="rev reveal">
+        <span class="sample">Sample review</span>
+        <div class="stars">★★★★★</div>
+        <p>"Fall leaf cleanup was fast and thorough. They even blew off the patio and walkway."</p>
+        <cite>Illustrative sample</cite>
+      </div>
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Happy with our work? Tell Holden.</h2>
+      <p>Your review helps a local landscaping company keep growing. It takes a minute, and it means a lot.</p>
+      <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJDRDxs-j444kRLrqw28429sM" target="_blank" rel="noopener">Leave a Google review</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-contact">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-contact">
+      <span class="tag">Contact</span>
+      <h2>Get your yard on the schedule</h2>
+      <p>Call for hours, quotes, and scheduling. Tell us about your yard and we will take it from there.</p>
+    </div>
+
+    <div class="contact-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#4C7A3F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg> Call us</h3>
+        <p>Quotes, scheduling, questions:</p>
+        <a class="big" href="tel:+15088294040">(508) 829-4040</a>
+        <div class="hours-note"><strong>Hours:</strong> call for hours. We will let you know the best time to reach us and get your service scheduled.</div>
+      </div>
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#4C7A3F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Find us</h3>
+        <p><strong>R L Hobin Co, 571 Bullard St, Holden, MA 01520</strong></p>
+        <p>Based in Holden, MA and serving the surrounding area.</p>
+      </div>
+    </div>
+
+    <div class="map-card reveal">
+      <div class="map-pin">
+        <svg viewBox="0 0 24 24" fill="#4C7A3F"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#F7F5EC"/></svg>
+        <strong>571 Bullard St</strong>
+        <small>Holden, MA 01520</small><br>
+        <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJDRDxs-j444kRLrqw28429sM" target="_blank" rel="noopener">Get Directions</a>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand">
+          <svg viewBox="0 0 64 64" role="img" aria-label="Tree and leaf mark"><circle cx="32" cy="32" r="29" fill="#4C7A3F"/><path d="M32 50 L32 30 M32 38 L22 30 M32 34 L42 26" stroke="#F7F5EC" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M32 14 q-12 0 -14 14 q10 -2 14 -14 q4 12 14 14 q-2 -14 -14 -14" fill="#F7F5EC"/></svg>
+          <span>R L Hobin Co</span>
+        </div>
+        <p>Landscaping company based in Holden, MA. Lawn care, garden beds, mulch, and seasonal cleanups.</p>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <p>R L Hobin Co, 571 Bullard St, Holden, MA 01520<br><a href="tel:+15088294040">(508) 829-4040</a></p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <p><a href="#services" data-page="services">Services</a><br><a href="#gallery" data-page="gallery">Gallery</a><br><a href="#reviews" data-page="reviews">Reviews</a><br><a href="#contact" data-page="contact">Contact</a></p>
+      </div>
+      <div>
+        <h4>Reviews</h4>
+        <p><a href="https://www.google.com/maps/place/?q=place_id:ChIJDRDxs-j444kRLrqw28429sM" target="_blank" rel="noopener">Google reviews</a><br><a href="https://www.bbb.org/us/ma/holden/profile/landscape-contractors/r-l-hobin-co-0261-351412" target="_blank" rel="noopener">BBB profile</a><br><a href="https://www.google.com/maps/place/?q=place_id:ChIJDRDxs-j444kRLrqw28429sM" target="_blank" rel="noopener">Get directions</a></p>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© R L Hobin Co</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "contact"];
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.min a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>

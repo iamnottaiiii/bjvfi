@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raheela Beauty parlor · Beauty Salon, 1117 Coney Island Ave, Brooklyn, NY</title>
+<meta name="description" content="Raheela Beauty parlor, a beauty salon at 1117 Coney Island Ave, Brooklyn, NY. Bridal hair and makeup, threading, henna, facials and waxing. Call (718) 859-3133.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FFF9F2; --paper:#FFFDF9; --ink:#3A222B; --ink-soft:#7A5A63;
+  --plum:#7A2E4D; --plum-deep:#521C34; --plum-soft:#F6DFE7;
+  --gold:#C9A227; --gold-soft:#F7ECCB; --rose:#E79A8B;
+  --radius:18px; --shadow:0 18px 40px -18px rgba(82,28,52,.3);
+  --shadow-sm:0 8px 22px -10px rgba(82,28,52,.22);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Public Sans",system-ui,sans-serif;background:var(--cream);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:var(--plum)}
+::selection{background:var(--gold);color:var(--ink)}
+
+/* ---------- fixed left sidebar ---------- */
+.sidebar{
+  position:fixed;top:0;left:0;bottom:0;width:264px;z-index:60;
+  background:linear-gradient(170deg,var(--plum-deep),var(--plum));
+  color:#F7EAD9;display:flex;flex-direction:column;padding:30px 24px;
+  transition:transform .3s ease;overflow-y:auto;
+}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:#fff;margin-bottom:34px}
+.brand svg{width:52px;height:52px;flex:none}
+.brand-name{font-family:"Fraunces",serif;font-weight:900;font-size:1.28rem;line-height:1.05}
+.brand-name small{display:block;font-family:"Public Sans",sans-serif;font-weight:700;font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-top:4px}
+.snav{display:flex;flex-direction:column;gap:4px;margin-bottom:30px}
+.snav a{
+  text-decoration:none;color:#F1DCC6;font-weight:600;font-size:1rem;
+  padding:11px 16px;border-radius:12px;transition:background .2s,color .2s;
+}
+.snav a:hover{background:rgba(255,255,255,.1);color:#fff}
+.snav a.active,.snav a[aria-current="page"]{background:var(--gold);color:var(--plum-deep)}
+.side-contact{margin-top:auto;font-size:.9rem;color:#E8CDB4}
+.side-contact p{margin-bottom:8px}
+.side-contact a{color:#fff;font-weight:700;text-decoration:none}
+.side-contact a:hover{text-decoration:underline}
+.side-call{
+  display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--plum-deep);
+  text-decoration:none;font-weight:700;padding:12px 20px;border-radius:999px;margin-top:10px;
+  transition:transform .18s;box-shadow:var(--shadow-sm);white-space:nowrap;
+}
+.side-call:hover{transform:translateY(-2px)}
+.topbar{display:none;position:sticky;top:0;z-index:55;background:rgba(255,249,242,.94);backdrop-filter:blur(10px);border-bottom:2px solid rgba(122,46,77,.14);padding:10px 18px;align-items:center;gap:12px}
+.topbar .brand-name{font-size:1.05rem;color:var(--ink)}
+.topbar .brand-name small{color:var(--plum)}
+.burger{display:none;background:none;border:0;cursor:pointer;padding:10px;margin-left:auto}
+.burger span{display:block;width:26px;height:3px;border-radius:3px;background:var(--ink);margin:5px 0;transition:.25s}
+.main{margin-left:264px;min-height:100vh;display:flex;flex-direction:column}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+
+/* ---------- router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- full-bleed hero ---------- */
+.hero{
+  position:relative;overflow:hidden;color:#fff;padding:96px 0 88px;
+  background:
+    radial-gradient(circle at 82% 18%, rgba(201,162,39,.35), transparent 46%),
+    radial-gradient(circle at 12% 85%, rgba(231,154,139,.28), transparent 44%),
+    linear-gradient(140deg,#521C34,#7A2E4D 60%,#8E3A5C);
+}
+.hero::before{
+  content:"";position:absolute;inset:0;opacity:.12;
+  background-image:radial-gradient(#fff 1.4px, transparent 1.5px);background-size:30px 30px;
+}
+.hero-inner{position:relative}
+.kicker{
+  display:inline-block;font-size:.78rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;
+  color:var(--gold-soft);border:1.5px solid rgba(247,236,203,.5);padding:7px 18px;border-radius:999px;margin-bottom:20px;
+}
+h1{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(2.7rem,6vw,4.6rem);line-height:1.03;letter-spacing:-.5px;margin-bottom:18px}
+h1 .glow{color:var(--gold)}
+.lede{font-size:1.12rem;color:#F6DFE7;max-width:36rem;margin-bottom:28px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:26px}
+.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;padding:14px 28px;border-radius:999px;font-size:1rem;transition:transform .18s,background .18s}
+.btn-solid{background:var(--gold);color:var(--plum-deep);box-shadow:var(--shadow-sm)}
+.btn-solid:hover{background:#fff;transform:translateY(-2px)}
+.btn-ghost{background:rgba(255,255,255,.12);color:#fff;border:2px solid rgba(255,255,255,.5)}
+.btn-ghost:hover{background:rgba(255,255,255,.22);transform:translateY(-2px)}
+.hero-facts{display:flex;flex-wrap:wrap;gap:10px;font-size:.9rem;color:#F6DFE7}
+.hero-facts span{background:rgba(255,255,255,.12);padding:8px 16px;border-radius:999px}
+
+/* ---------- magazine panels ---------- */
+section.block{padding:64px 0}
+.sec-head{max-width:46rem;margin-bottom:42px}
+.eyebrow{font-family:"Fraunces",serif;font-style:italic;font-size:1.35rem;color:var(--plum)}
+h2{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(2rem,3.8vw,2.9rem);line-height:1.08;letter-spacing:-.3px;margin:8px 0 12px}
+.sec-head p{color:var(--ink-soft)}
+.mag{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;align-items:center;margin-bottom:56px}
+.mag:last-child{margin-bottom:0}
+.mag-text{grid-column:1/8;background:var(--paper);border-radius:var(--radius);padding:42px 40px;box-shadow:var(--shadow-sm);border-left:8px solid var(--gold)}
+.mag-text h3{font-family:"Fraunces",serif;font-size:1.7rem;margin-bottom:10px}
+.mag-text p{color:var(--ink-soft);margin-bottom:12px}
+.mag-art{grid-column:8/13;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);min-height:300px;display:flex;align-items:center;justify-content:center;position:relative}
+.mag-art svg{width:46%;height:auto;filter:drop-shadow(0 12px 16px rgba(0,0,0,.2))}
+.mag.flip .mag-text{grid-column:6/13;grid-row:1;border-left:0;border-right:8px solid var(--plum);order:2}
+.mag.flip .mag-art{grid-column:1/6;grid-row:1;order:1}
+.tagline{display:inline-block;background:var(--plum-soft);color:var(--plum-deep);font-size:.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 14px;border-radius:999px;margin-bottom:12px}
+
+/* ---------- service cards ---------- */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.card{background:var(--paper);border-radius:var(--radius);padding:30px 26px;box-shadow:var(--shadow-sm);border-top:6px solid var(--gold);transition:transform .2s,box-shadow .2s}
+.card:nth-child(3n+2){border-top-color:var(--plum)}
+.card:nth-child(3n){border-top-color:var(--rose)}
+.card:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+.card .icon{width:54px;height:54px;border-radius:16px;background:var(--gold-soft);display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.card:nth-child(3n+2) .icon{background:var(--plum-soft)}
+.card:nth-child(3n) .icon{background:#FBE3DA}
+.card .icon svg{width:30px;height:30px}
+.card h3{font-family:"Fraunces",serif;font-size:1.3rem;margin-bottom:8px}
+.card p{color:var(--ink-soft);font-size:.97rem}
+
+/* ---------- scroll strip gallery ---------- */
+.strip-scroll{display:flex;gap:20px;overflow-x:auto;padding:6px 4px 22px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+.strip-scroll::-webkit-scrollbar{height:10px}
+.strip-scroll::-webkit-scrollbar-thumb{background:var(--plum);border-radius:99px}
+.tile{flex:0 0 300px;scroll-snap-align:start;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);background:var(--paper)}
+.tile .art{aspect-ratio:1/1.05;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.tile .art svg{width:44%;height:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.18))}
+.tile .ph{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.9);font-size:.66rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 12px;border-radius:999px;color:var(--ink-soft)}
+.tile .cap{padding:16px 20px}
+.tile .cap strong{font-family:"Fraunces",serif;font-size:1.08rem;display:block}
+.tile .cap small{color:var(--ink-soft)}
+
+/* ---------- page strips ---------- */
+.strip{border-radius:26px;padding:54px 46px;color:#fff;position:relative;overflow:hidden;margin-bottom:42px;box-shadow:var(--shadow)}
+.strip::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(255,255,255,.22), transparent 50%)}
+.strip h2{color:#fff;font-size:clamp(2rem,4vw,3rem);position:relative;margin:6px 0 10px}
+.strip p{color:rgba(255,255,255,.9);max-width:36rem;position:relative}
+.strip.s-services{background:linear-gradient(120deg,#521C34,#7A2E4D)}
+.strip.s-gal{background:linear-gradient(120deg,#8E3A5C,#521C34)}
+.strip.s-rev{background:linear-gradient(120deg,#7A2E4D,#3F1426)}
+.strip.s-visit{background:linear-gradient(120deg,#5C1F38,#2E0E1D)}
+
+/* ---------- reviews ---------- */
+.rs-strip{margin:0 auto 34px;max-width:660px;background:var(--paper);border:1px solid var(--gold-soft);border-radius:14px;padding:18px 22px;text-align:center;box-shadow:var(--shadow-sm)}
+.rs-note{margin:0 0 12px;font-size:.95rem;color:var(--ink-soft);line-height:1.55}
+.rs-btn{display:inline-block;background:var(--plum);color:#fff;padding:10px 26px;border-radius:999px;font-weight:700;text-decoration:none;font-size:.95rem}
+.rs-btn:hover{background:var(--plum-deep)}
+.rev-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:44px}
+.rev{background:var(--paper);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow-sm)}
+.rev .stars{color:var(--gold);font-size:1.15rem;letter-spacing:3px;margin-bottom:12px}
+.rev p{font-size:1.02rem;margin-bottom:14px}
+.rev cite{font-style:normal;font-weight:700;font-size:.85rem;color:var(--plum-deep);letter-spacing:.5px}
+.cta-band{background:linear-gradient(120deg,var(--plum),var(--plum-deep));border-radius:26px;color:#fff;padding:48px;text-align:center;box-shadow:var(--shadow);position:relative;overflow:hidden;margin-bottom:56px}
+.cta-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 20%, rgba(201,162,39,.35), transparent 50%)}
+.cta-band h2{color:#fff;position:relative}
+.cta-band p{color:#F6DFE7;position:relative;max-width:36rem;margin:0 auto 24px}
+.cta-band .btn-solid{background:#fff;color:var(--plum-deep);position:relative}
+
+/* ---------- visit ---------- */
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-bottom:26px}
+.info-card{background:var(--paper);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm)}
+.info-card h3{font-family:"Fraunces",serif;font-size:1.4rem;margin-bottom:14px}
+.info-card p{color:var(--ink-soft);margin-bottom:8px}
+.info-card a.big{font-family:"Fraunces",serif;font-size:1.5rem;font-weight:700;color:var(--plum-deep);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.hours-table{width:100%;border-collapse:collapse;font-size:.98rem}
+.hours-table td{padding:10px 6px;border-bottom:1px dashed rgba(58,34,43,.2)}
+.hours-table td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.map-card{border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:340px;background:linear-gradient(140deg,#F3D9C8,#EAC3AE);display:flex;align-items:center;justify-content:center}
+.map-pin{text-align:center;background:var(--paper);padding:26px 34px;border-radius:20px;box-shadow:var(--shadow);max-width:80%}
+.map-pin strong{font-family:"Fraunces",serif;font-size:1.15rem;display:block}
+.map-pin small{color:var(--ink-soft)}
+.map-pin .btn{margin-top:14px}
+
+/* ---------- big-type footer ---------- */
+footer{background:var(--plum-deep);color:#F1DCC6;margin-top:auto}
+.bigtype{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(3.6rem,13vw,11rem);line-height:1;color:#fff;letter-spacing:-2px;padding:56px 0 8px;text-align:center}
+.bigtype span{color:var(--gold)}
+.foot-cols{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:36px;padding:36px 0}
+.foot-cols h4{font-family:"Fraunces",serif;color:#fff;font-size:1.15rem;margin-bottom:12px}
+.foot-cols p,.foot-cols a{color:#E8CDB4;font-size:.95rem;text-decoration:none}
+.foot-cols a:hover{color:var(--gold)}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.14);padding:20px 0 26px;text-align:center;font-size:.88rem;color:#D9BFA4}
+
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:980px){
+  .sidebar{transform:translateX(-102%)}
+  .sidebar.open{transform:none;box-shadow:var(--shadow)}
+  .main{margin-left:0}
+  .topbar{display:flex}
+  .burger{display:block}
+  .mag-text{grid-column:1/13}
+  .mag-art{grid-column:1/13;min-height:220px}
+  .mag.flip .mag-text{grid-column:1/13;order:1}
+  .mag.flip .mag-art{grid-column:1/13;order:2}
+  .cards{grid-template-columns:1fr 1fr}
+  .rev-grid{grid-template-columns:1fr}
+  .visit-grid{grid-template-columns:1fr}
+  .foot-cols{grid-template-columns:1fr}
+  .strip{padding:40px 28px}
+}
+@media(max-width:600px){
+  .cards{grid-template-columns:1fr}
+  .hero{padding:64px 0 56px}
+  .tile{flex-basis:260px}
+}
+</style>
+</head>
+<body>
+
+<aside class="sidebar" id="mainNav" aria-label="Main navigation">
+  <a class="brand" href="#home" data-page="home" aria-label="Raheela Beauty parlor, home">
+    <svg viewBox="0 0 64 64" role="img" aria-label="Lotus logo"><circle cx="32" cy="32" r="29" fill="none" stroke="#C9A227" stroke-width="3"/><path d="M32 48 C24 40 20 32 22 24 C30 28 34 34 32 48Z" fill="#E79A8B"/><path d="M32 48 C40 40 44 32 42 24 C34 28 30 34 32 48Z" fill="#F6DFE7"/><path d="M32 50 C28 40 28 30 32 20 C36 30 36 40 32 50Z" fill="#C9A227"/></svg>
+    <span class="brand-name">Raheela<small>Beauty parlor</small></span>
+  </a>
+  <nav class="snav main">
+    <a href="#home" data-page="home" class="active" aria-current="page">Home</a>
+    <a href="#services" data-page="services">Services</a>
+    <a href="#gallery" data-page="gallery">Gallery</a>
+    <a href="#reviews" data-page="reviews">Reviews</a>
+    <a href="#visit" data-page="visit">Visit Us</a>
+  </nav>
+  <div class="side-contact">
+    <p>1117 Coney Island Ave<br>Brooklyn, NY 11230</p>
+    <p><a href="tel:+17188593133">(718) 859-3133</a></p>
+    <a class="side-call" href="tel:+17188593133">Call to book</a>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <a class="brand" href="#home" data-page="home" style="text-decoration:none">
+      <span class="brand-name">Raheela<small>Beauty parlor</small></span>
+    </a>
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+
+  <section class="page active" id="page-home">
+    <div class="hero">
+      <div class="wrap hero-inner">
+        <span class="kicker">Little Pakistan · Coney Island Ave, Brooklyn</span>
+        <h1>Where Brooklyn<br>comes to <span class="glow">glow.</span></h1>
+        <p class="lede">Raheela Beauty parlor is a neighborhood beauty salon in the heart of Little Pakistan on Coney Island Avenue. Bridal hair and makeup, threading, henna, facials and waxing, all under one roof.</p>
+        <div class="cta-row">
+          <a class="btn btn-solid" href="#services" data-page="services">Explore services</a>
+          <a class="btn btn-ghost" href="tel:+17188593133">Call (718) 859-3133</a>
+        </div>
+        <div class="hero-facts">
+          <span>Bridal hair and makeup</span><span>Eyebrow threading</span><span>Henna tattoos</span><span>Facials and waxing</span>
+        </div>
+      </div>
+    </div>
+
+    <section class="block">
+      <div class="wrap">
+        <div class="sec-head reveal">
+          <span class="eyebrow">The parlor</span>
+          <h2>A beauty home for every celebration</h2>
+          <p>Mrs. Raheela brings more than 30 years of experience in the beauty industry to her Coney Island Avenue salon, a one stop shop for hair, skin, brows and bridal.</p>
+        </div>
+
+        <div class="mag reveal">
+          <div class="mag-text">
+            <span class="tagline">Bridal atelier</span>
+            <h3>Your wedding day, perfected</h3>
+            <p>From classic South Asian bridal looks to modern party glam, the parlor specializes in bridal hair and makeup, photo shoot makeup, and full bridal packages.</p>
+            <p>Reviewers on wedding sites praise the traditional bridal makeup and recommend booking a trial before the big day.</p>
+            <a class="btn btn-ghost" href="#services" data-page="services" style="color:var(--plum-deep);border-color:var(--plum)">See bridal services</a>
+          </div>
+          <div class="mag-art" style="background:linear-gradient(140deg,#8E3A5C,#521C34)">
+            <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="34" fill="none" stroke="#C9A227" stroke-width="3"/><path d="M50 16 C40 32 40 56 50 84 C60 56 60 32 50 16Z" fill="#E79A8B"/><path d="M50 84 C42 66 44 44 50 30" fill="none" stroke="#F6DFE7" stroke-width="2.4"/><circle cx="50" cy="12" r="5" fill="#C9A227"/></svg>
+          </div>
+        </div>
+
+        <div class="mag flip reveal">
+          <div class="mag-text">
+            <span class="tagline">Threading and glow</span>
+            <h3>Everyday rituals, done beautifully</h3>
+            <p>Precise eyebrow threading, intricate henna tattoos, smoothing facials and full waxing services keep you polished between the big occasions.</p>
+            <p>Customers call the eyebrow threading some of the best in the city, and walk ins for brows are a neighborhood habit.</p>
+          </div>
+          <div class="mag-art" style="background:linear-gradient(140deg,#C9A227,#8E5A10)">
+            <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M30 70 Q32 44 50 40 Q68 44 70 70 Q50 78 30 70Z" fill="#FFF6E8"/><path d="M38 62 q12 -10 24 0" stroke="#7A2E4D" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="50" cy="46" r="3" fill="#C9A227"/><path d="M44 40 q6 -6 12 0" stroke="#521C34" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="block" style="padding-top:0">
+      <div class="wrap">
+        <div class="sec-head reveal">
+          <span class="eyebrow">Services</span>
+          <h2>Everything you need, in one visit</h2>
+        </div>
+        <div class="cards">
+          <div class="card reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#7A2E4D" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="6" r="2.6"/><circle cx="6" cy="18" r="2.6"/><path d="M8.2 7.5L20 19M8.2 16.5L20 5"/></svg></div><h3>Hair Styling</h3><p>Cuts, styling and event ready hair for every occasion.</p></div>
+          <div class="card reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#521C34" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21C7 17 3 13.5 3 9.5 3 7 5 5 7.5 5c1.7 0 3.3.9 4.5 2.6C13.2 5.9 14.8 5 16.5 5 19 5 21 7 21 9.5c0 4-4 7.5-9 11.5z"/></svg></div><h3>Bridal Hair and Makeup</h3><p>Complete bridal looks, from classic desi glam to modern chic.</p></div>
+          <div class="card reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#7A2E4D" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9 10h.01M15 10h.01M8.5 15c1 1 2.2 1.6 3.5 1.6s2.5-.6 3.5-1.6"/></svg></div><h3>Party and Photo Makeup</h3><p>Camera ready makeup for parties, events and photo shoots.</p></div>
+          <div class="card reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#521C34" stroke-width="2" stroke-linecap="round"><path d="M4 20h16M6 20v-6a2 2 0 012-2h8a2 2 0 012 2v6M12 12V8M12 8c-4 0-5-2-5-4 3 0 4 1 5 2 1-1 2-2 5-2 0 2-1 4-5 4z"/></svg></div><h3>Highlights</h3><p>Dimension and shine with professional highlighting.</p></div>
+          <div class="card reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#7A2E4D" stroke-width="2" stroke-linecap="round"><path d="M3 12c2-4 5-6 9-6s7 2 9 6c-2 4-5 6-9 6s-7-2-9-6z"/><circle cx="12" cy="12" r="2.4"/></svg></div><h3>Eyebrow Threading</h3><p>Precise threading for clean, beautifully defined brows.</p></div>
+          <div class="card reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#521C34" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-4 4-6 8-6 11a6 6 0 0012 0c0-3-2-7-6-11z"/></svg></div><h3>Henna Tattoos</h3><p>Intricate henna designs for weddings and celebrations.</p></div>
+        </div>
+        <div style="text-align:center;margin-top:32px" class="reveal">
+          <a class="btn btn-solid" href="#services" data-page="services">See all services</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="block" style="padding-top:0">
+      <div class="wrap">
+        <div class="sec-head reveal">
+          <span class="eyebrow">A peek inside</span>
+          <h2>The gallery</h2>
+          <p>Swipe through. Real photos of our work are on the way.</p>
+        </div>
+      </div>
+      <div class="wrap">
+        <div class="strip-scroll reveal">
+          <div class="tile"><div class="art" style="background:linear-gradient(140deg,#F6DFE7,#E79A8B)"><span class="ph">Photo placeholder</span><svg viewBox="0 0 100 100"><path d="M50 16 C40 32 40 56 50 84 C60 56 60 32 50 16Z" fill="#7A2E4D"/><circle cx="50" cy="12" r="5" fill="#C9A227"/></svg></div><div class="cap"><strong>Bridal Makeup</strong><small>Classic desi glam</small></div></div>
+          <div class="tile"><div class="art" style="background:linear-gradient(140deg,#C9A227,#8E5A10)"><span class="ph">Photo placeholder</span><svg viewBox="0 0 100 100"><path d="M30 70 Q32 44 50 40 Q68 44 70 70 Q50 78 30 70Z" fill="#FFF6E8"/><path d="M38 62 q12 -10 24 0" stroke="#7A2E4D" stroke-width="3" fill="none" stroke-linecap="round"/></svg></div><div class="cap"><strong>Eyebrow Threading</strong><small>Clean, defined brows</small></div></div>
+          <div class="tile"><div class="art" style="background:linear-gradient(140deg,#8E3A5C,#521C34)"><span class="ph">Photo placeholder</span><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="30" fill="none" stroke="#F6DFE7" stroke-width="3"/><path d="M50 26 q10 12 0 24 q-10 12 0 24 q10 8 0 0" fill="none" stroke="#C9A227" stroke-width="2.6"/><circle cx="50" cy="50" r="6" fill="#C9A227"/></svg></div><div class="cap"><strong>Henna Art</strong><small>Intricate celebration designs</small></div></div>
+          <div class="tile"><div class="art" style="background:linear-gradient(140deg,#F7ECCB,#E8C76A)"><span class="ph">Photo placeholder</span><svg viewBox="0 0 100 100"><circle cx="6" cy="6" r="2.6" fill="none" stroke="#7A2E4D" stroke-width="3"/><circle cx="6" cy="94" r="2.6" fill="none" stroke="#7A2E4D" stroke-width="3" transform="translate(88,-76) scale(1)"/><path d="M20 30 L80 70 M20 70 L80 30" stroke="#521C34" stroke-width="4" stroke-linecap="round"/></svg></div><div class="cap"><strong>Hair Styling</strong><small>Cuts and event hair</small></div></div>
+          <div class="tile"><div class="art" style="background:linear-gradient(140deg,#FBE3DA,#F0B49E)"><span class="ph">Photo placeholder</span><svg viewBox="0 0 100 100"><ellipse cx="50" cy="54" rx="28" ry="30" fill="#FFF6E8"/><path d="M34 50 q16 -8 32 0" stroke="#C9A227" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="50" cy="66" r="8" fill="none" stroke="#7A2E4D" stroke-width="3"/></svg></div><div class="cap"><strong>Facials</strong><small>Skin smoothing glow</small></div></div>
+        </div>
+      </div>
+      <div class="wrap" style="margin-top:26px">
+        <div class="cta-band reveal">
+          <h2>Ready for your glow up?</h2>
+          <p>1117 Coney Island Ave, Brooklyn. Call ahead for bridal and party bookings.</p>
+          <a class="btn btn-solid" href="tel:+17188593133">Call (718) 859-3133</a>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <section class="page" id="page-services">
+    <div class="wrap">
+      <div style="height:44px"></div>
+      <div class="strip s-services">
+        <span class="eyebrow" style="color:var(--gold-soft)">Our services</span>
+        <h2>Hair, skin, brows and bridal</h2>
+        <p>Every service below comes from the parlor's own menu of specialties. Call for current pricing and to book.</p>
+      </div>
+      <div class="cards" style="margin-bottom:56px">
+        <div class="card reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#7A2E4D" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="6" r="2.6"/><circle cx="6" cy="18" r="2.6"/><path d="M8.2 7.5L20 19M8.2 16.5L20 5"/></svg></div><h3>Hair Salon</h3><p>Cuts, styling, and blowouts for everyday polish and special nights.</p></div>
+        <div class="card reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#521C34" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21C7 17 3 13.5 3 9.5 3 7 5 5 7.5 5c1.7 0 3.3.9 4.5 2.6C13.2 5.9 14.8 5 16.5 5 19 5 21 7 21 9.5c0 4-4 7.5-9 11.5z"/></svg></div><h3>Bridal Hair</h3><p>Traditional and modern bridal hairstyles, styled to last all day.</p></div>
+        <div class="card reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#7A2E4D" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9 10h.01M15 10h.01M8.5 15c1 1 2.2 1.6 3.5 1.6s2.5-.6 3.5-1.6"/></svg></div><h3>Bridal Makeup</h3><p>Classic South Asian bridal looks plus soft modern glam.</p></div>
+        <div class="card reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#521C34" stroke-width="2" stroke-linecap="round"><rect x="4" y="7" width="16" height="12" rx="2"/><circle cx="12" cy="11" r="3"/><path d="M9 7l1.5-2.5h3L15 7"/></svg></div><h3>Photo Shoot Makeup</h3><p>Makeup that holds up under studio lights and camera lenses.</p></div>
+        <div class="card reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#7A2E4D" stroke-width="2" stroke-linecap="round"><path d="M4 20h16M6 20v-6a2 2 0 012-2h8a2 2 0 012 2v6M12 12V8M12 8c-4 0-5-2-5-4 3 0 4 1 5 2 1-1 2-2 5-2 0 2-1 4-5 4z"/></svg></div><h3>Highlights</h3><p>Highlites that add dimension, shine and movement to your hair.</p></div>
+        <div class="card reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#521C34" stroke-width="2" stroke-linecap="round"><path d="M3 12c2-4 5-6 9-6s7 2 9 6c-2 4-5 6-9 6s-7-2-9-6z"/><circle cx="12" cy="12" r="2.4"/></svg></div><h3>Eyebrow Threading</h3><p>Precise threading for clean, beautifully defined brows.</p></div>
+        <div class="card reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#7A2E4D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-4 4-6 8-6 11a6 6 0 0012 0c0-3-2-7-6-11z"/></svg></div><h3>Henna Tattoo</h3><p>Intricate henna designs for weddings, Eids and celebrations.</p></div>
+        <div class="card reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#521C34" stroke-width="2" stroke-linecap="round"><ellipse cx="12" cy="13" rx="7" ry="8"/><path d="M9 11h.01M15 11h.01M9.5 15.5c1 .8 2 1.2 2.5 1.2s1.5-.4 2.5-1.2"/></svg></div><h3>Facials</h3><p>Skin smoothing facials for a fresh, rested glow.</p></div>
+        <div class="card reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#7A2E4D" stroke-width="2" stroke-linecap="round"><path d="M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5"/></svg></div><h3>Waxing</h3><p>Full waxing services for smooth, lasting results.</p></div>
+      </div>
+      <div class="cta-band reveal">
+        <h2>Book your appointment.</h2>
+        <p>Bridal and party services book up fast. Call to reserve your chair.</p>
+        <a class="btn btn-solid" href="tel:+17188593133">Call (718) 859-3133</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="page-gallery">
+    <div class="wrap">
+      <div style="height:44px"></div>
+      <div class="strip s-gal">
+        <span class="eyebrow" style="color:var(--gold-soft)">The gallery</span>
+        <h2>A peek inside the parlor</h2>
+        <p>Artistic previews of our specialties. Real photos of our work are on the way.</p>
+      </div>
+      <div class="strip-scroll reveal" style="margin-bottom:56px">
+        <div class="tile"><div class="art" style="background:linear-gradient(140deg,#F6DFE7,#E79A8B)"><span class="ph">Photo placeholder</span><svg viewBox="0 0 100 100"><path d="M50 16 C40 32 40 56 50 84 C60 56 60 32 50 16Z" fill="#7A2E4D"/><circle cx="50" cy="12" r="5" fill="#C9A227"/></svg></div><div class="cap"><strong>Bridal Makeup</strong><small>Classic desi glam</small></div></div>
+        <div class="tile"><div class="art" style="background:linear-gradient(140deg,#C9A227,#8E5A10)"><span class="ph">Photo placeholder</span><svg viewBox="0 0 100 100"><path d="M30 70 Q32 44 50 40 Q68 44 70 70 Q50 78 30 70Z" fill="#FFF6E8"/><path d="M38 62 q12 -10 24 0" stroke="#7A2E4D" stroke-width="3" fill="none" stroke-linecap="round"/></svg></div><div class="cap"><strong>Eyebrow Threading</strong><small>Clean, defined brows</small></div></div>
+        <div class="tile"><div class="art" style="background:linear-gradient(140deg,#8E3A5C,#521C34)"><span class="ph">Photo placeholder</span><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="30" fill="none" stroke="#F6DFE7" stroke-width="3"/><path d="M50 26 q10 12 0 24 q-10 12 0 24" fill="none" stroke="#C9A227" stroke-width="2.6"/><circle cx="50" cy="50" r="6" fill="#C9A227"/></svg></div><div class="cap"><strong>Henna Art</strong><small>Intricate celebration designs</small></div></div>
+        <div class="tile"><div class="art" style="background:linear-gradient(140deg,#F7ECCB,#E8C76A)"><span class="ph">Photo placeholder</span><svg viewBox="0 0 100 100"><path d="M20 30 L80 70 M20 70 L80 30" stroke="#521C34" stroke-width="4" stroke-linecap="round"/><circle cx="20" cy="30" r="5" fill="none" stroke="#7A2E4D" stroke-width="3"/><circle cx="20" cy="70" r="5" fill="none" stroke="#7A2E4D" stroke-width="3"/></svg></div><div class="cap"><strong>Hair Styling</strong><small>Cuts and event hair</small></div></div>
+        <div class="tile"><div class="art" style="background:linear-gradient(140deg,#FBE3DA,#F0B49E)"><span class="ph">Photo placeholder</span><svg viewBox="0 0 100 100"><ellipse cx="50" cy="54" rx="28" ry="30" fill="#FFF6E8"/><path d="M34 50 q16 -8 32 0" stroke="#C9A227" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="50" cy="66" r="8" fill="none" stroke="#7A2E4D" stroke-width="3"/></svg></div><div class="cap"><strong>Facials</strong><small>Skin smoothing glow</small></div></div>
+        <div class="tile"><div class="art" style="background:linear-gradient(140deg,#521C34,#2E0E1D)"><span class="ph">Photo placeholder</span><svg viewBox="0 0 100 100"><rect x="30" y="30" width="40" height="40" rx="8" fill="none" stroke="#C9A227" stroke-width="3"/><circle cx="50" cy="50" r="8" fill="#E79A8B"/></svg></div><div class="cap"><strong>Party Makeup</strong><small>Event ready glam</small></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="page-reviews">
+    <div class="wrap">
+      <div style="height:44px"></div>
+      <div class="strip s-rev">
+        <span class="eyebrow" style="color:var(--gold-soft)">Reviews</span>
+        <h2>What the neighborhood says</h2>
+        <p>Rated 4.2 stars across 52 reviews in online business directories. Here are the themes that come up again and again.</p>
+      </div>
+      <div class="rs-strip">
+        <p class="rs-note">Review themes on this page are paraphrased from public feedback. Open the source to read current reviews and ratings.</p>
+        <a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJmX4Z5nFFwokRU9Y5-DsCGp0" target="_blank" rel="noopener">See reviews on Google</a>
+      </div>
+      <div class="rev-grid">
+        <div class="rev reveal">
+          <div class="stars">★★★★★</div>
+          <p>Brides praise the classic South Asian bridal makeup, and recommend booking a makeup trial before the wedding day.</p>
+          <cite>Based on WeddingWire reviews, 2012 and 2015</cite>
+        </div>
+        <div class="rev reveal">
+          <div class="stars">★★★★★</div>
+          <p>Customers call the eyebrow threading some of the best in the city, praising the gentle, precise work.</p>
+          <cite>Based on 35 published reviews, 3.1 stars average</cite>
+        </div>
+        <div class="rev reveal">
+          <div class="stars">★★★★★</div>
+          <p>Walk in clients love the quick, clean brow threading, often in and out in minutes.</p>
+          <cite>Based on recent published reviews</cite>
+        </div>
+        <div class="rev reveal">
+          <div class="stars">★★★★★</div>
+          <p>Fans of the parlor call it a true one stop shop, with facials, henna, hair and makeup all in one visit.</p>
+          <cite>Based on 52 published reviews, 4.2 stars average</cite>
+        </div>
+      </div>
+      <div class="cta-band reveal">
+        <h2>Had a lovely visit? Tell the neighborhood.</h2>
+        <p>Your review helps a neighborhood salon keep growing. It takes a minute, and it means the world.</p>
+        <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJmX4Z5nFFwokRU9Y5-DsCGp0" target="_blank" rel="noopener">Leave us a Google review</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="page-visit">
+    <div class="wrap">
+      <div style="height:44px"></div>
+      <div class="strip s-visit">
+        <span class="eyebrow" style="color:var(--gold-soft)">Visit us</span>
+        <h2>Come say salaam</h2>
+        <p>On Coney Island Avenue in the heart of Little Pakistan, easy to reach by subway and bus.</p>
+      </div>
+      <div class="visit-grid">
+        <div class="info-card reveal">
+          <h3>Find us</h3>
+          <p><strong>Raheela Beauty parlor</strong><br>1117 Coney Island Ave<br>Brooklyn, NY 11230</p>
+          <p>Call ahead for bridal and party bookings.</p>
+        </div>
+        <div class="info-card reveal">
+          <h3>Call us</h3>
+          <p>Questions, pricing and appointments:</p>
+          <a class="big" href="tel:+17188593133">(718) 859-3133</a>
+        </div>
+      </div>
+      <div class="visit-grid">
+        <div class="info-card reveal">
+          <h3>Hours</h3>
+          <table class="hours-table" id="hoursTable">
+            <tr><td>Monday</td><td>10:00 AM to 7:00 PM</td></tr>
+            <tr><td>Tuesday</td><td>10:00 AM to 7:00 PM</td></tr>
+            <tr><td>Wednesday</td><td>10:00 AM to 7:00 PM</td></tr>
+            <tr><td>Thursday</td><td>10:00 AM to 7:00 PM</td></tr>
+            <tr><td>Friday</td><td>10:00 AM to 7:00 PM</td></tr>
+            <tr><td>Saturday</td><td>10:00 AM to 8:00 PM</td></tr>
+            <tr><td>Sunday</td><td>10:00 AM to 8:00 PM</td></tr>
+          </table>
+        </div>
+        <div class="map-card reveal">
+          <div class="map-pin">
+            <strong>1117 Coney Island Ave</strong><br>
+            <small>Brooklyn, NY 11230</small><br>
+            <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJmX4Z5nFFwokRU9Y5-DsCGp0" target="_blank" rel="noopener">Get Directions</a>
+          </div>
+        </div>
+      </div>
+      <div style="height:56px"></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <div class="bigtype">Raheela<span>.</span></div>
+      <div class="foot-cols">
+        <div>
+          <h4>Raheela Beauty parlor</h4>
+          <p>A neighborhood beauty salon on Coney Island Avenue in Brooklyn. Bridal, hair, threading, henna and more.</p>
+        </div>
+        <div>
+          <h4>Visit</h4>
+          <p>1117 Coney Island Ave<br>Brooklyn, NY 11230<br><a href="tel:+17188593133">(718) 859-3133</a></p>
+        </div>
+        <div>
+          <h4>Explore</h4>
+          <p><a href="#services" data-page="services">Services</a><br><a href="#gallery" data-page="gallery">Gallery</a><br><a href="#reviews" data-page="reviews">Reviews</a><br><a href="#visit" data-page="visit">Visit Us</a></p>
+        </div>
+      </div>
+      <div class="foot-bottom">
+        <span>© Raheela Beauty parlor</span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "gallery", "reviews", "visit"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      var open = nav.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+
+  /* ---------- live hours (America/New_York) ---------- */
+  var HOURS = {0:[10,20],1:[10,19],2:[10,19],3:[10,19],4:[10,19],5:[10,19],6:[10,20]};
+  var DOW = {"Sun":0,"Mon":1,"Tue":2,"Wed":3,"Thu":4,"Fri":5,"Sat":6};
+  function fmt(h){
+    var ap = h < 12 ? "AM" : "PM";
+    var hh = h % 12;
+    if(hh === 0){ hh = 12; }
+    return hh + ":00 " + ap;
+  }
+  try{
+    var parts = new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",weekday:"short",hour:"numeric",hour12:false}).formatToParts(new Date());
+    var wd = "Mon", hr = 12;
+    parts.forEach(function(p){
+      if(p.type === "weekday"){ wd = p.value; }
+      if(p.type === "hour"){ hr = parseInt(p.value, 10) % 24; }
+    });
+    var day = DOW[wd] !== undefined ? DOW[wd] : 1;
+    var rows = document.querySelectorAll("#hoursTable tr");
+    var idx = (day + 6) % 7; /* rows run Mon..Sun */
+    if(rows[idx]){ rows[idx].style.fontWeight = "800"; }
+  }catch(e){ /* leave table as-is */ }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
