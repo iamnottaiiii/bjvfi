@@ -201,12 +201,27 @@ function ghHeaders(){
 
 async function ghFetch(path, opts){
   opts = opts || {};
-  const res = await fetch(GH_API + path, {
-    method: opts.method || 'GET',
-    cache: 'no-store',
-    headers: ghHeaders(),
-    body: opts.body ? JSON.stringify(opts.body) : undefined
-  });
+  const ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+  const timeoutMs = opts.timeout || 30000;
+  let timer = null;
+  if(ctrl) timer = setTimeout(function(){ try{ ctrl.abort(); }catch(e){} }, timeoutMs);
+  let res;
+  try{
+    res = await fetch(GH_API + path, {
+      method: opts.method || 'GET',
+      cache: 'no-store',
+      headers: ghHeaders(),
+      body: opts.body ? JSON.stringify(opts.body) : undefined,
+      signal: ctrl ? ctrl.signal : undefined
+    });
+  }catch(e){
+    if(timer) clearTimeout(timer);
+    if(e && e.name === 'AbortError'){
+      throw new Error('Network timed out during ' + (opts.action || ('GitHub ' + (opts.method || 'GET') + ' ' + path)) + '. Check your connection and retry.');
+    }
+    throw e;
+  }
+  if(timer) clearTimeout(timer);
   const text = await res.text();
   let json = null;
   try{ json = text ? JSON.parse(text) : null; }catch(e){ json = null; }
@@ -446,7 +461,16 @@ function maybeNotifGate(){
 
 async function fetchCatalog(){
   if(state.catalog.length && Date.now() - state.catalogAt < 10*60*1000) return;
-  const res = await fetch(CATALOG_URL);
+  const ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+  const timer = ctrl ? setTimeout(function(){ try{ ctrl.abort(); }catch(e){} }, 45000) : null;
+  let res;
+  try{
+    res = await fetch(CATALOG_URL, ctrl ? { signal: ctrl.signal } : undefined);
+  }catch(e){
+    if(timer) clearTimeout(timer);
+    throw new Error('Could not load the lead catalog. Check your connection and tap Retry.');
+  }
+  if(timer) clearTimeout(timer);
   if(!res.ok) throw new Error('Could not load the lead catalog (bjvfi.com).');
   const raw = await res.json();
   const list = Array.isArray(raw) ? raw : (raw.sites || raw.leads || []);
@@ -1175,7 +1199,7 @@ async function uploadIntakeFiles(intakeId, input, onProgress){
         name = sanitizeFileName(f.name);
       }
       const path = 'intakes/' + intakeId + '/' + name;
-      await ghFetch('/contents/' + path, { method: 'PUT',
+      await ghFetch('/contents/' + path, { method: 'PUT', timeout: 120000,
         body: { message: 'sitedesk: intake file ' + intakeId + '/' + name, content: base64 },
         action: 'upload ' + name });
       out.push({ name: name, path: path });
