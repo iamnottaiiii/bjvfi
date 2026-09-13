@@ -320,19 +320,7 @@ function toast(msg){
 }
 
 /* Generic modal. showModal(html) renders content, closeModal() dismisses. */
-function showModal(html){
-  closeModal();
-  const ov = document.createElement('div');
-  ov.id = 'modal-ov';
-  ov.className = 'modal-back';
-  ov.innerHTML = '<div class="modal">' + html + '</div>';
-  ov.addEventListener('click', function(e){ if(e.target === ov) closeModal(); });
-  document.body.appendChild(ov);
-}
-function closeModal(){
-  const ov = document.getElementById('modal-ov');
-  if(ov) ov.remove();
-}
+function showModal(html){ openModal(html); }
 
 function openModal(html){
   const root = document.getElementById('modal-root');
