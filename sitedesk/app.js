@@ -1618,11 +1618,94 @@ async function bootData(announce){
   }
 }
 
-function init(){
-  if(typeof document === 'undefined') return;
-  if(state.booted) return;
-  state.booted = true;
-  bindGlobal();
+var deferredInstallPrompt = null;
+
+function isStandalone(){
+  try{
+    if(window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) return true;
+    if(window.navigator && window.navigator.standalone === true) return true;
+  }catch(e){}
+  return false;
+}
+
+function isIOS(){
+  return /iphone|ipad|ipod/i.test(navigator.userAgent || '');
+}
+
+function registerServiceWorker(){
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('sw.js').catch(function(){});
+    });
+  }
+}
+
+function closeInstallGate(){
+  var g = document.getElementById('install-gate');
+  if(g && g.parentNode) g.parentNode.removeChild(g);
+}
+
+function updateGateNote(){
+  var note = document.getElementById('gate-note');
+  if(!note) return;
+  note.textContent = deferredInstallPrompt
+    ? 'Tap Install below to add SiteDesk to your device, then open it from your home screen.'
+    : 'Waiting for the install prompt. If nothing appears, open your browser menu and choose "Install app" or "Add to Home screen", then open SiteDesk from the new icon.';
+}
+
+function triggerInstall(){
+  if(deferredInstallPrompt){
+    var p = deferredInstallPrompt;
+    p.prompt();
+    if(p.userChoice && p.userChoice.then){
+      p.userChoice.then(function(choice){
+        if(choice && choice.outcome === 'accepted') deferredInstallPrompt = null;
+        else updateGateNote();
+      }).catch(function(){ updateGateNote(); });
+    }
+  } else {
+    updateGateNote();
+  }
+}
+
+function renderInstallGate(){
+  closeInstallGate();
+  var ios = isIOS();
+  var gate = document.createElement('div');
+  gate.id = 'install-gate';
+  var inner = '<div class="gate-card">' +
+    '<div class="gate-logo">sitedesk</div>' +
+    '<h1>Install SiteDesk to continue</h1>' +
+    '<p class="muted">SiteDesk must be installed on your home screen before you can use it. As an installed app your call and payout notifications will pop up properly. In a normal browser tab they will not.</p>' +
+    '<div id="gate-action"></div>';
+  if(ios){
+    inner += '<ol class="gate-steps">' +
+      '<li>Tap the <b>Share</b> button in Safari.</li>' +
+      '<li>Tap <b>Add to Home Screen</b>.</li>' +
+      '<li>Tap <b>Add</b>, then open SiteDesk from your home screen.</li>' +
+      '</ol>';
+  }
+  inner += '</div>';
+  gate.innerHTML = inner;
+  document.body.appendChild(gate);
+  if(!ios){
+    var action = gate.querySelector('#gate-action');
+    var btn = document.createElement('button');
+    btn.className = 'btn block';
+    btn.textContent = 'Install SiteDesk';
+    btn.addEventListener('click', triggerInstall);
+    action.appendChild(btn);
+    var note = document.createElement('p');
+    note.className = 'muted gate-note';
+    note.id = 'gate-note';
+    action.appendChild(note);
+    updateGateNote();
+  }
+}
+
+function bootMain(){
+  if(state.mainBooted) return;
+  state.mainBooted = true;
   const s = loadSession();
   if(s && SITEDESK_DATA_TOKEN && SITEDESK_DATA_TOKEN !== 'PUT_TOKEN_HERE'){
     state.user = { username: s.username, role: s.role, name: s.name };
@@ -1636,6 +1719,36 @@ function init(){
     }
     renderHome();
   }
+}
+
+function init(){
+  if(typeof document === 'undefined') return;
+  if(state.booted) return;
+  state.booted = true;
+  bindGlobal();
+  registerServiceWorker();
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    updateGateNote();
+  });
+  window.addEventListener('appinstalled', function(){
+    deferredInstallPrompt = null;
+    closeInstallGate();
+    bootMain();
+    setTimeout(function(){ toast('Installed. Open SiteDesk from your home screen so notifications pop up.'); }, 400);
+  });
+  document.addEventListener('visibilitychange', function(){
+    if(!document.hidden && isStandalone() && document.getElementById('install-gate')){
+      closeInstallGate();
+      bootMain();
+    }
+  });
+  if(!isStandalone()){
+    renderInstallGate();
+    return;
+  }
+  bootMain();
 }
 
 if(typeof document !== 'undefined'){
