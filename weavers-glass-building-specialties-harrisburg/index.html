@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weaver's Glass &amp; Building Specialties, Inc. · Commercial Glass &amp; Glazing, Harrisburg, PA</title>
+<meta name="description" content="Weaver's Glass & Building Specialties, Inc., 7631 Derry St, Harrisburg, PA 17111. Commercial glass and glazing: aluminum storefronts, entrances, curtain walls, skylights, panels and specialty metals. Call (717) 564-7000.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --steel:#14222F; --steel-2:#1D3245; --slate:#41576B; --slate-soft:#6E8398;
+  --glass:#2E9BC6; --glass-deep:#17729B; --ice:#EAF4FA;
+  --concrete:#F2F4F5; --paper:#FFFFFF;
+  --amber:#E8A93D; --amber-deep:#B97916;
+  --ink:#1A2632; --ink-soft:#52687B;
+  --radius:18px;
+  --shadow:0 20px 44px -20px rgba(20,34,47,.35);
+  --shadow-sm:0 10px 26px -12px rgba(20,34,47,.28);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Inter",system-ui,sans-serif;
+  background:var(--concrete);color:var(--ink);line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%}
+a{color:var(--glass-deep)}
+::selection{background:var(--amber);color:var(--steel)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+
+/* ---------- header + side drawer ---------- */
+header.site{
+  position:sticky;top:0;z-index:60;
+  background:rgba(20,34,47,.96);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border-bottom:3px solid var(--glass);
+}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:#fff}
+.brand svg{width:46px;height:46px;flex:none}
+.brand-name{font-family:"Archivo",sans-serif;font-weight:800;font-size:1.12rem;line-height:1.1;letter-spacing:.2px}
+.brand-name small{display:block;font-family:"Inter",sans-serif;font-weight:600;font-size:.62rem;letter-spacing:3px;text-transform:uppercase;color:var(--glass)}
+.burger{
+  display:flex;align-items:center;gap:10px;background:none;border:2px solid rgba(255,255,255,.25);
+  color:#fff;cursor:pointer;padding:10px 16px;border-radius:999px;font-weight:700;font-size:.85rem;letter-spacing:1.5px;text-transform:uppercase;
+}
+.burger:hover{border-color:var(--glass)}
+.burger .lines{display:block}
+.burger .lines span{display:block;width:24px;height:3px;border-radius:3px;background:#fff;margin:4px 0;transition:.25s}
+.scrim{
+  position:fixed;inset:0;background:rgba(10,20,28,.55);z-index:70;
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.scrim.show{opacity:1;pointer-events:auto}
+nav.main.drawer{
+  position:fixed;top:0;right:0;bottom:0;width:min(400px,88vw);z-index:80;
+  background:var(--steel);color:#fff;
+  transform:translateX(105%);transition:transform .35s cubic-bezier(.22,.8,.3,1);
+  display:flex;flex-direction:column;padding:28px 30px 34px;
+  border-left:4px solid var(--glass);box-shadow:-24px 0 60px rgba(0,0,0,.4);
+}
+nav.main.drawer.open{transform:translateX(0)}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px}
+.drawer-head strong{font-family:"Archivo",sans-serif;font-size:1.05rem;letter-spacing:2px;text-transform:uppercase;color:var(--glass)}
+.drawer-close{background:none;border:2px solid rgba(255,255,255,.25);color:#fff;border-radius:50%;width:42px;height:42px;font-size:1.1rem;cursor:pointer;line-height:1}
+.drawer-close:hover{border-color:var(--amber);color:var(--amber)}
+nav.main.drawer a.navlink{
+  display:flex;align-items:center;justify-content:space-between;
+  text-decoration:none;color:#fff;font-family:"Archivo",sans-serif;font-weight:700;font-size:1.35rem;
+  padding:15px 6px;border-bottom:1px solid rgba(255,255,255,.1);transition:padding .2s,color .2s;
+}
+nav.main.drawer a.navlink:hover{color:var(--amber);padding-left:14px}
+nav.main.drawer a.navlink.active{color:var(--amber)}
+nav.main.drawer a.navlink .n{font-size:.75rem;color:var(--glass);font-family:"Inter",sans-serif;font-weight:600;letter-spacing:2px}
+.drawer-call{
+  margin-top:auto;background:var(--glass);color:#fff;text-decoration:none;font-weight:700;
+  padding:16px;border-radius:14px;text-align:center;font-size:1.05rem;box-shadow:var(--shadow-sm);
+}
+.drawer-call:hover{background:var(--glass-deep)}
+.drawer-note{margin-top:12px;font-size:.85rem;color:#9DB2C4;text-align:center}
+
+/* ---------- pages / router ---------- */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- card hero ---------- */
+.hero-zone{position:relative;overflow:hidden;padding:64px 0 56px;background:
+  radial-gradient(circle at 12% 18%, rgba(46,155,198,.14), transparent 46%),
+  repeating-linear-gradient(0deg, transparent 0 39px, rgba(20,34,47,.07) 39px 41px),
+  repeating-linear-gradient(90deg, transparent 0 39px, rgba(20,34,47,.07) 39px 41px),
+  linear-gradient(160deg,#EAF2F7,#DCE9F1);}
+.hero-card{
+  background:var(--paper);border-radius:26px;box-shadow:var(--shadow);
+  padding:52px 54px;display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center;
+  border:1px solid rgba(20,34,47,.08);position:relative;overflow:hidden;
+}
+.hero-card::before{content:"";position:absolute;top:0;left:0;right:0;height:8px;background:linear-gradient(90deg,var(--glass),var(--amber))}
+.kicker{
+  display:inline-block;font-weight:700;font-size:.75rem;letter-spacing:2.5px;text-transform:uppercase;
+  color:var(--glass-deep);background:var(--ice);padding:8px 16px;border-radius:999px;margin-bottom:18px;
+}
+h1{font-family:"Archivo",sans-serif;font-weight:900;font-size:clamp(2.2rem,4.6vw,3.6rem);line-height:1.04;letter-spacing:-.5px;margin-bottom:16px}
+h1 .hl{color:var(--glass-deep)}
+.lede{font-size:1.1rem;color:var(--ink-soft);max-width:36rem;margin-bottom:26px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:24px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;
+  padding:14px 26px;border-radius:999px;font-size:1rem;transition:transform .18s,background .18s,box-shadow .18s;
+}
+.btn-solid{background:var(--steel);color:#fff;box-shadow:var(--shadow-sm)}
+.btn-solid:hover{background:var(--steel-2);transform:translateY(-2px)}
+.btn-blue{background:var(--glass);color:#fff;box-shadow:var(--shadow-sm)}
+.btn-blue:hover{background:var(--glass-deep);transform:translateY(-2px)}
+.btn-ghost{background:#fff;color:var(--steel);border:2px solid rgba(20,34,47,.2)}
+.btn-ghost:hover{border-color:var(--glass-deep);color:var(--glass-deep);transform:translateY(-2px)}
+.hero-facts{display:flex;flex-wrap:wrap;gap:10px}
+.hero-facts span{background:var(--concrete);border:1px solid rgba(20,34,47,.1);border-radius:999px;padding:7px 15px;font-size:.82rem;font-weight:600;color:var(--slate)}
+.hero-art{background:linear-gradient(150deg,#1D3245,#0F1C27);border-radius:20px;padding:30px;position:relative;overflow:hidden;min-height:320px;display:flex;align-items:center;justify-content:center}
+.hero-art::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 15%, rgba(46,155,198,.4), transparent 55%);pointer-events:none}
+.hero-art svg{width:100%;height:auto;position:relative;z-index:1}
+.hero-tag{position:absolute;bottom:18px;left:22px;z-index:2;background:var(--amber);color:var(--steel);font-weight:800;font-size:.8rem;letter-spacing:1.5px;text-transform:uppercase;padding:8px 18px;border-radius:999px;transform:rotate(-2deg)}
+
+/* ---------- magazine rhythm ---------- */
+section.block{padding:60px 0}
+.mag-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
+.mag-num{font-family:"Archivo",sans-serif;font-weight:900;font-size:4.4rem;color:rgba(46,155,198,.18);line-height:1;margin-bottom:6px}
+h2{font-family:"Archivo",sans-serif;font-weight:800;font-size:clamp(1.8rem,3.4vw,2.6rem);line-height:1.12;letter-spacing:-.3px;margin-bottom:14px}
+.eyebrow{font-weight:700;font-size:.78rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--glass-deep);margin-bottom:10px;display:block}
+.mag-copy p{color:var(--ink-soft);margin-bottom:14px}
+.mag-copy p.dropcap::first-letter{
+  font-family:"Archivo",sans-serif;font-weight:900;font-size:3.4rem;line-height:.9;
+  float:left;margin:6px 12px 0 0;color:var(--glass-deep);
+}
+.pullquote{
+  background:var(--steel);color:#fff;border-radius:var(--radius);padding:44px 40px;position:relative;box-shadow:var(--shadow);
+}
+.pullquote::before{content:"\201C";position:absolute;top:2px;left:24px;font-family:"Archivo",sans-serif;font-size:5rem;color:var(--amber);opacity:.6}
+.pullquote p{font-family:"Archivo",sans-serif;font-size:1.45rem;font-weight:700;line-height:1.45;margin-bottom:12px;position:relative}
+.pullquote cite{font-style:normal;font-weight:600;color:var(--amber);font-size:.85rem;letter-spacing:2px;text-transform:uppercase}
+.pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.pillar{background:var(--paper);border-radius:var(--radius);padding:32px 28px;box-shadow:var(--shadow-sm);border-top:6px solid var(--glass);transition:transform .2s}
+.pillar:nth-child(2){border-top-color:var(--amber)}
+.pillar:nth-child(3){border-top-color:var(--steel)}
+.pillar:hover{transform:translateY(-6px)}
+.pillar h3{font-family:"Archivo",sans-serif;font-size:1.3rem;margin-bottom:10px}
+.pillar p{color:var(--ink-soft);font-size:.97rem}
+.pillar .go{display:inline-block;margin-top:14px;font-weight:700;color:var(--glass-deep);text-decoration:none}
+.pillar .go:hover{text-decoration:underline}
+.factband{background:linear-gradient(120deg,var(--glass-deep),var(--steel));border-radius:26px;color:#fff;padding:52px 48px;display:grid;grid-template-columns:repeat(3,1fr);gap:32px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.factband::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 20%, rgba(232,169,61,.3), transparent 50%)}
+.fact{position:relative}
+.fact strong{font-family:"Archivo",sans-serif;font-size:2rem;font-weight:900;display:block;color:var(--amber)}
+.fact span{color:#D8E7F1;font-size:.95rem}
+
+/* ---------- strips (inner page heroes) ---------- */
+.strip{border-radius:26px;padding:54px 48px;color:#fff;position:relative;overflow:hidden;margin-bottom:44px;box-shadow:var(--shadow)}
+.strip::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 15%, rgba(255,255,255,.2), transparent 50%)}
+.strip h2{color:#fff;font-size:clamp(1.9rem,3.8vw,2.9rem);position:relative;margin:4px 0 10px}
+.strip p{color:rgba(255,255,255,.88);max-width:38rem;position:relative}
+.strip .eyebrow{color:var(--amber);position:relative}
+.strip.s-blue{background:linear-gradient(120deg,#17729B,#0F1C27)}
+.strip.s-steel{background:linear-gradient(120deg,#2C4459,#14222F)}
+.strip.s-amber{background:linear-gradient(120deg,#B97916,#7A4d12)}
+
+/* ---------- tabbed offerings ---------- */
+.tabs-bar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:26px}
+.tab-btn{
+  border:2px solid rgba(20,34,47,.16);background:var(--paper);color:var(--steel);
+  font-family:"Archivo",sans-serif;font-weight:700;font-size:.95rem;padding:12px 22px;border-radius:999px;cursor:pointer;
+  transition:background .2s,color .2s,border-color .2s;
+}
+.tab-btn:hover{border-color:var(--glass-deep);color:var(--glass-deep)}
+.tab-btn.on{background:var(--steel);color:#fff;border-color:var(--steel)}
+.tab-panel{display:none;background:var(--paper);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:44px 44px;border-left:8px solid var(--glass);animation:fadeIn .25s ease}
+.tab-panel.on{display:block}
+.tab-panel h3{font-family:"Archivo",sans-serif;font-size:1.7rem;margin-bottom:8px}
+.tab-panel .sub{color:var(--ink-soft);margin-bottom:20px;max-width:44rem}
+.tab-list{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:12px 28px;margin-bottom:20px}
+.tab-list li{display:flex;gap:12px;align-items:flex-start;font-weight:500}
+.tab-list svg{flex:none;width:24px;height:24px;margin-top:2px}
+.tab-note{background:var(--ice);border-radius:14px;padding:16px 22px;font-size:.93rem;color:var(--slate)}
+.tab-note strong{color:var(--glass-deep)}
+
+/* ---------- horizontal strip gallery ---------- */
+.strip-x{display:flex;gap:20px;overflow-x:auto;padding:6px 4px 22px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+.tile{
+  flex:0 0 300px;scroll-snap-align:start;background:var(--paper);border-radius:var(--radius);overflow:hidden;
+  box-shadow:var(--shadow-sm);transition:transform .2s;position:relative;
+}
+.tile:hover{transform:translateY(-5px)}
+.tile .art{height:210px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.tile .art svg{width:42%;height:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.25))}
+.tile .cap{padding:16px 20px}
+.tile .cap strong{font-family:"Archivo",sans-serif;font-size:1.05rem;display:block}
+.tile .cap small{color:var(--ink-soft)}
+.tile .ph{position:absolute;top:12px;left:12px;background:rgba(20,34,47,.85);color:#fff;font-size:.68rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 12px;border-radius:999px}
+.scroll-hint{font-size:.85rem;color:var(--slate-soft);font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px}
+
+/* ---------- reviews ---------- */
+.rs-strip{margin:0 0 30px;background:var(--paper);border:1px solid rgba(46,155,198,.3);border-radius:16px;padding:22px 26px;text-align:center;box-shadow:var(--shadow-sm)}
+.rs-note{margin:0 0 14px;font-size:.95rem;color:var(--ink-soft);line-height:1.55}
+.rs-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rs-btn{display:inline-block;background:var(--glass-deep);color:#fff;padding:12px 28px;border-radius:999px;font-weight:700;text-decoration:none;font-size:.95rem}
+.rs-btn:hover{background:var(--steel)}
+.rev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.rev{background:var(--paper);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm)}
+.rev .who{font-weight:700;color:var(--glass-deep);font-size:.85rem;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
+.rev p{font-size:1.02rem;color:var(--ink-soft)}
+.cta-band{background:linear-gradient(120deg,var(--steel),var(--glass-deep));border-radius:26px;color:#fff;padding:52px 48px;text-align:center;margin-top:44px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.cta-band::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 20%, rgba(232,169,61,.35), transparent 50%)}
+.cta-band h2{color:#fff;position:relative}
+.cta-band p{color:#D8E7F1;position:relative;max-width:38rem;margin:0 auto 24px}
+.cta-band .btn-solid{background:#fff;color:var(--steel);position:relative}
+.cta-band .btn-solid:hover{background:var(--ice)}
+
+/* ---------- contact ---------- */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-bottom:26px}
+.info-card{background:var(--paper);border-radius:var(--radius);padding:34px;box-shadow:var(--shadow-sm)}
+.info-card h3{font-family:"Archivo",sans-serif;font-size:1.35rem;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.info-card h3 svg{width:28px;height:28px;flex:none}
+.info-card p{color:var(--ink-soft);margin-bottom:8px}
+.info-card a.big{font-family:"Archivo",sans-serif;font-size:1.6rem;font-weight:800;color:var(--glass-deep);text-decoration:none}
+.info-card a.big:hover{text-decoration:underline}
+.map-card{
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;min-height:320px;
+  background:
+    linear-gradient(rgba(23,114,155,.08), rgba(23,114,155,.08)),
+    repeating-linear-gradient(0deg, transparent 0 46px, rgba(23,114,155,.18) 46px 48px),
+    repeating-linear-gradient(90deg, transparent 0 46px, rgba(23,114,155,.18) 46px 48px),
+    linear-gradient(140deg,#EAF2F7,#D3E3EE);
+  display:flex;align-items:center;justify-content:center;
+}
+.map-pin{text-align:center;background:var(--paper);padding:26px 34px;border-radius:20px;box-shadow:var(--shadow);max-width:80%;position:relative}
+.map-pin::after{content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);border:14px solid transparent;border-top-color:var(--paper);border-bottom:0}
+.map-pin svg{width:44px;height:44px;margin-bottom:8px}
+.map-pin strong{font-family:"Archivo",sans-serif;font-size:1.12rem;display:block}
+.map-pin small{color:var(--ink-soft)}
+.map-pin .btn{margin-top:14px}
+.service-area{background:var(--paper);border-radius:var(--radius);padding:30px 34px;box-shadow:var(--shadow-sm);display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.service-area svg{width:40px;height:40px;flex:none}
+.service-area p{color:var(--ink-soft)}
+.service-area strong{color:var(--steel)}
+
+/* ---------- footer (multi-column) ---------- */
+footer{background:var(--steel);color:#C9D8E4;margin-top:20px;border-top:4px solid var(--glass)}
+.foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;padding:56px 0 36px}
+.foot-grid h4{font-family:"Archivo",sans-serif;color:#fff;font-size:1.02rem;margin-bottom:16px;letter-spacing:1.5px;text-transform:uppercase}
+.foot-grid p,.foot-grid a{color:#9DB2C4;font-size:.94rem}
+.foot-grid a{text-decoration:none;display:block;padding:5px 0}
+.foot-grid a:hover{color:var(--amber)}
+.foot-brand{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.foot-brand svg{width:44px;height:44px}
+.foot-brand span{font-family:"Archivo",sans-serif;font-weight:800;color:#fff;font-size:1.15rem;line-height:1.1}
+.foot-brand span small{display:block;font-size:.62rem;letter-spacing:3px;color:var(--glass);font-weight:600}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.12);padding:20px 0 26px;text-align:center;font-size:.88rem;color:#8AA0B3}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:940px){
+  .hero-card{grid-template-columns:1fr;padding:40px 32px}
+  .mag-grid{grid-template-columns:1fr;gap:36px}
+  .pillars{grid-template-columns:1fr}
+  .factband{grid-template-columns:1fr;padding:40px 32px}
+  .rev-grid{grid-template-columns:1fr}
+  .contact-grid{grid-template-columns:1fr}
+  .tab-list{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr 1fr}
+  .strip{padding:40px 28px}
+}
+@media(max-width:600px){
+  .foot-grid{grid-template-columns:1fr}
+  .cta-band{padding:38px 26px}
+  .hero-zone{padding:44px 0 40px}
+  .tile{flex-basis:260px}
+}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap bar">
+    <a class="brand" href="#home" data-page="home" aria-label="Weaver's Glass and Building Specialties, home">
+      <svg viewBox="0 0 64 64" role="img" aria-label="Glass panel logo"><rect x="12" y="8" width="40" height="48" rx="3" fill="#2E9BC6" opacity=".9"/><rect x="17" y="13" width="30" height="38" rx="2" fill="#BFE2F2"/><path d="M17 13 L47 51 M47 13 L17 51" stroke="#fff" stroke-width="2.4" opacity=".9"/><rect x="12" y="8" width="40" height="48" rx="3" fill="none" stroke="#E8A93D" stroke-width="3"/></svg>
+      <span class="brand-name">Weaver's Glass<small>Building Specialties · Harrisburg</small></span>
+    </a>
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span class="lines"><span></span><span></span><span></span></span>Menu</button>
+  </div>
+</header>
+
+<div class="scrim" id="scrim"></div>
+<nav class="main drawer" id="mainNav" aria-label="Main navigation">
+  <div class="drawer-head">
+    <strong>Menu</strong>
+    <button class="drawer-close" id="drawerClose" aria-label="Close menu">✕</button>
+  </div>
+  <a class="navlink active" href="#home" data-page="home" aria-current="page"><span>Home</span><span class="n">01</span></a>
+  <a class="navlink" href="#services" data-page="services"><span>Services</span><span class="n">02</span></a>
+  <a class="navlink" href="#about" data-page="about"><span>About</span><span class="n">03</span></a>
+  <a class="navlink" href="#gallery" data-page="gallery"><span>Gallery</span><span class="n">04</span></a>
+  <a class="navlink" href="#reviews" data-page="reviews"><span>Reviews</span><span class="n">05</span></a>
+  <a class="navlink" href="#contact" data-page="contact"><span>Contact</span><span class="n">06</span></a>
+  <a class="drawer-call" href="tel:+17175647000">Call (717) 564-7000</a>
+  <p class="drawer-note">Weaver's Glass &amp; Building Specialties, Inc.<br>7631 Derry St, Harrisburg, PA 17111</p>
+</nav>
+
+<section class="page active" id="page-home">
+  <div class="hero-zone">
+    <div class="wrap">
+      <div class="hero-card">
+        <div>
+          <span class="kicker">Commercial contractor · Harrisburg, PA</span>
+          <h1>Glass, glazing &amp; <span class="hl">building specialties</span></h1>
+          <p class="lede">Weaver's Glass &amp; Building Specialties, Inc. fabricates and installs aluminum storefronts, entrances, curtain walls and skylights for commercial projects across Central Pennsylvania.</p>
+          <div class="cta-row">
+            <a class="btn btn-blue" href="#services" data-page="services">Explore Services</a>
+            <a class="btn btn-ghost" href="tel:+17175647000">Call (717) 564-7000</a>
+          </div>
+          <div class="hero-facts">
+            <span>Listed in the Blue Book since 1987</span>
+            <span>Glass &amp; glazing contractors</span>
+            <span>Central PA service area</span>
+          </div>
+        </div>
+        <div class="hero-art">
+          <svg viewBox="0 0 320 300" role="img" aria-label="Illustration of a glass curtain wall building">
+            <rect x="70" y="30" width="180" height="230" fill="#0B1620"/>
+            <g fill="#9FD4EC" opacity=".92">
+              <rect x="80" y="42" width="76" height="52"/><rect x="164" y="42" width="76" height="52"/>
+              <rect x="80" y="102" width="76" height="52"/><rect x="164" y="102" width="76" height="52"/>
+              <rect x="80" y="162" width="76" height="52"/><rect x="164" y="162" width="76" height="52"/>
+            </g>
+            <g stroke="#2E9BC6" stroke-width="5">
+              <line x1="80" y1="42" x2="80" y2="248"/><line x1="160" y1="42" x2="160" y2="248"/><line x1="240" y1="42" x2="240" y2="248"/>
+              <line x1="80" y1="98" x2="240" y2="98"/><line x1="80" y1="158" x2="240" y2="158"/><line x1="80" y1="218" x2="240" y2="218"/>
+            </g>
+            <rect x="130" y="222" width="60" height="38" fill="#E8A93D"/>
+            <line x1="160" y1="222" x2="160" y2="260" stroke="#0B1620" stroke-width="5"/>
+            <path d="M40 268 h240" stroke="#2E9BC6" stroke-width="8" stroke-linecap="round"/>
+            <circle cx="52" cy="60" r="14" fill="#E8A93D" opacity=".85"/>
+          </svg>
+          <span class="hero-tag">Commercial glazing</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="block">
+    <div class="wrap mag-grid">
+      <div class="mag-copy reveal">
+        <span class="mag-num">01</span>
+        <span class="eyebrow">Who we are</span>
+        <h2>Fabrication and installation, under one roof</h2>
+        <p class="dropcap">Weaver's Glass &amp; Building Specialties, Inc. is a Harrisburg commercial contractor focused on architectural glass and aluminum. Directory listings describe the company as serving the Central Pennsylvania region for more than 20 years, with a 60,000 square foot warehousing facility and in-house CAD shop drawing development.</p>
+        <p>The core of the work is the building envelope: aluminum entrances and storefronts, curtain walls, skylights, glass and glazing, plus aluminum panels, fascia, soffits and column wraps in aluminum and stainless steel.</p>
+        <a class="btn btn-solid" href="#about" data-page="about" style="margin-top:8px">More About Us</a>
+      </div>
+      <div class="pullquote reveal">
+        <p>Storefronts, curtain walls, skylights and glass, fabricated and installed by one Central PA team.</p>
+        <cite>Weaver's Glass &amp; Building Specialties, Inc.</cite>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" style="padding-top:0">
+    <div class="wrap">
+      <div class="reveal" style="margin-bottom:32px">
+        <span class="eyebrow">What we do</span>
+        <h2>Three specialties, one contractor</h2>
+      </div>
+      <div class="pillars">
+        <div class="pillar reveal">
+          <h3>Storefronts &amp; Entrances</h3>
+          <p>Aluminum entrances and storefront systems, plus doors in aluminum, bronze and stainless steel, fabricated and installed for commercial buildings.</p>
+          <a class="go" href="#services" data-page="services">See services →</a>
+        </div>
+        <div class="pillar reveal">
+          <h3>Curtain Walls &amp; Skylights</h3>
+          <p>Curtain wall fabrication and installation and skylight work, backed by in-house CAD shop drawing development.</p>
+          <a class="go" href="#services" data-page="services">See services →</a>
+        </div>
+        <div class="pillar reveal">
+          <h3>Panels &amp; Specialty Metals</h3>
+          <p>Aluminum panels, fascia, soffits, column wraps and suspended glass smoke screens, with custom furniture grade glass ordering.</p>
+          <a class="go" href="#services" data-page="services">See services →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" style="padding-top:0">
+    <div class="wrap">
+      <div class="factband reveal">
+        <div class="fact">
+          <strong>60,000 sq ft</strong>
+          <span>On-site warehousing facility supporting fabrication and staging</span>
+        </div>
+        <div class="fact">
+          <strong>Since 1987</strong>
+          <span>Listed in the Blue Book construction directory</span>
+        </div>
+        <div class="fact">
+          <strong>In-house CAD</strong>
+          <span>Shop drawing development done by the company's own team</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="cta-band reveal">
+      <h2>Have a commercial glazing project?</h2>
+      <p>Talk to the team at 7631 Derry St in Harrisburg about storefronts, curtain walls, skylights and glass for your building.</p>
+      <a class="btn btn-solid" href="tel:+17175647000">Call (717) 564-7000</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-services">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-blue">
+      <span class="eyebrow">Services</span>
+      <h2>Commercial glass &amp; building specialties</h2>
+      <p>Fabrication and installation across the building envelope. Select a specialty to see what the team handles.</p>
+    </div>
+
+    <div data-tabs>
+      <div class="tabs-bar reveal" role="tablist" aria-label="Service categories">
+        <button class="tab-btn on" data-tab="storefronts" role="tab" aria-selected="true">Storefronts &amp; Entrances</button>
+        <button class="tab-btn" data-tab="curtain" role="tab" aria-selected="false">Curtain Walls &amp; Skylights</button>
+        <button class="tab-btn" data-tab="glazing" role="tab" aria-selected="false">Glass &amp; Glazing</button>
+        <button class="tab-btn" data-tab="metals" role="tab" aria-selected="false">Panels &amp; Specialty Metals</button>
+        <button class="tab-btn" data-tab="support" role="tab" aria-selected="false">Design &amp; Fabrication Support</button>
+      </div>
+
+      <div class="tab-panel on reveal" data-tabpanel="storefronts">
+        <h3>Storefronts &amp; Entrances</h3>
+        <p class="sub">Aluminum entrance and storefront systems for commercial buildings, from fabrication through installation.</p>
+        <ul class="tab-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#17729B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Aluminum entrances, fabricated and installed</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#17729B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Aluminum-framed storefront systems</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#17729B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Doors in aluminum, bronze and stainless steel</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#17729B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>All-glass entrances and storefronts</li>
+        </ul>
+        <div class="tab-note"><strong>Good to know:</strong> call for project details, scheduling and current lead times.</div>
+      </div>
+
+      <div class="tab-panel reveal" data-tabpanel="curtain">
+        <h3>Curtain Walls &amp; Skylights</h3>
+        <p class="sub">Larger glazed systems for the building facade and overhead daylighting.</p>
+        <ul class="tab-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#17729B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Curtain wall fabrication and installation</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#17729B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Skylight installation</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#17729B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Entrances, storefronts and curtain wall service work</li>
+        </ul>
+        <div class="tab-note"><strong>Good to know:</strong> call for project details, scheduling and current lead times.</div>
+      </div>
+
+      <div class="tab-panel reveal" data-tabpanel="glazing">
+        <h3>Glass &amp; Glazing</h3>
+        <p class="sub">Glass installation and specialty glass work for commercial interiors and exteriors.</p>
+        <ul class="tab-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#17729B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Glass installation for commercial projects</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#17729B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Custom ordering of furniture grade glass</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#17729B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Suspended glass smoke screens</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#17729B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Glazing maintenance and service</li>
+        </ul>
+        <div class="tab-note"><strong>Good to know:</strong> call for project details, scheduling and current lead times.</div>
+      </div>
+
+      <div class="tab-panel reveal" data-tabpanel="metals">
+        <h3>Panels &amp; Specialty Metals</h3>
+        <p class="sub">Architectural metalwork that pairs with the glazing: cladding, trim and column finishes.</p>
+        <ul class="tab-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#17729B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Aluminum panels</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#17729B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Aluminum fascia and soffits</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#17729B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Aluminum column wraps</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#17729B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Stainless steel column wraps</li>
+        </ul>
+        <div class="tab-note"><strong>Good to know:</strong> call for project details, scheduling and current lead times.</div>
+      </div>
+
+      <div class="tab-panel reveal" data-tabpanel="support">
+        <h3>Design &amp; Fabrication Support</h3>
+        <p class="sub">The in-house capabilities behind the installations.</p>
+        <ul class="tab-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#17729B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>In-house CAD shop drawing development</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#17729B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>60,000 square foot warehousing facility</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#17729B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Fabrication staging and material handling</li>
+        </ul>
+        <div class="tab-note"><strong>Good to know:</strong> call for project details, scheduling and current lead times.</div>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-about">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-steel">
+      <span class="eyebrow">About</span>
+      <h2>A Central PA glass &amp; glazing contractor</h2>
+      <p>What public business directories record about Weaver's Glass &amp; Building Specialties, Inc.</p>
+    </div>
+
+    <div class="mag-grid" style="margin-bottom:56px">
+      <div class="mag-copy reveal">
+        <span class="mag-num">02</span>
+        <span class="eyebrow">The company</span>
+        <h2>Built around the building envelope</h2>
+        <p class="dropcap">Weaver's Glass &amp; Building Specialties, Inc. is based at 7631 Derry St in Harrisburg, PA, and works as a specialty contractor in glass and glazing. The Blue Book construction directory lists the company under doors (aluminum, bronze and stainless steel), glass and glazing contractors, and storefronts, with a listing that dates to 1987.</p>
+        <p>Directory profiles describe service across Eastern Pennsylvania, including Dauphin County and the Harrisburg area, for commercial, healthcare and institutional projects. Pennsylvania corporate records list the company as an active business corporation formed in 1986.</p>
+        <p>Operationally, the company runs a 60,000 square foot warehousing facility and keeps CAD shop drawing development in house, supporting both fabrication and installation crews.</p>
+      </div>
+      <div>
+        <div class="pullquote reveal" style="margin-bottom:22px">
+          <p>One contractor for entrances, storefronts, curtain walls, skylights and the metalwork around them.</p>
+          <cite>Company profile</cite>
+        </div>
+        <div class="info-card reveal">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="#17729B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4"/></svg> At a glance</h3>
+          <p><strong>Business name:</strong> Weaver's Glass &amp; Building Specialties, Inc.</p>
+          <p><strong>Location:</strong> 7631 Derry St, Harrisburg, PA 17111</p>
+          <p><strong>Phone:</strong> <a href="tel:+17175647000">(717) 564-7000</a></p>
+          <p><strong>Trade:</strong> Glass &amp; glazing contractors, storefronts, specialty metals</p>
+          <p><strong>Service area:</strong> Central Pennsylvania, including Dauphin County</p>
+          <p><strong>Hours:</strong> Call for hours</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <div class="cta-band reveal">
+        <h2>Talk through your project.</h2>
+        <p>Call the Harrisburg office to discuss storefronts, curtain walls, skylights or specialty metalwork.</p>
+        <a class="btn btn-solid" href="tel:+17175647000">Call (717) 564-7000</a>
+      </div>
+      <div style="height:56px"></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-gallery">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-amber">
+      <span class="eyebrow">Gallery</span>
+      <h2>Work preview</h2>
+      <p>Illustrated previews of the project types the team handles. The owner can swap in real project photos at any time.</p>
+    </div>
+
+    <p class="scroll-hint reveal">Scroll sideways →</p>
+    <div class="strip-x reveal">
+      <div class="tile">
+        <span class="ph">Placeholder image</span>
+        <div class="art" style="background:linear-gradient(140deg,#BFE2F2,#7FB9D9)">
+          <svg viewBox="0 0 100 100"><rect x="14" y="20" width="72" height="60" fill="#0B1620"/><rect x="20" y="26" width="28" height="22" fill="#EAF4FA"/><rect x="52" y="26" width="28" height="22" fill="#EAF4FA"/><rect x="20" y="52" width="28" height="22" fill="#EAF4FA"/><rect x="52" y="52" width="28" height="22" fill="#EAF4FA"/><rect x="44" y="60" width="12" height="20" fill="#E8A93D"/></svg>
+        </div>
+        <div class="cap"><strong>Aluminum storefront</strong><small>Entrance and storefront glazing</small></div>
+      </div>
+      <div class="tile">
+        <span class="ph">Placeholder image</span>
+        <div class="art" style="background:linear-gradient(140deg,#9FD4EC,#2E9BC6)">
+          <svg viewBox="0 0 100 100"><rect x="18" y="10" width="64" height="80" fill="#0B1620"/><g fill="#DDF0FA"><rect x="24" y="16" width="26" height="18"/><rect x="52" y="16" width="26" height="18"/><rect x="24" y="38" width="26" height="18"/><rect x="52" y="38" width="26" height="18"/><rect x="24" y="60" width="26" height="18"/><rect x="52" y="60" width="26" height="18"/></g></svg>
+        </div>
+        <div class="cap"><strong>Curtain wall</strong><small>Facade glazing systems</small></div>
+      </div>
+      <div class="tile">
+        <span class="ph">Placeholder image</span>
+        <div class="art" style="background:linear-gradient(140deg,#F6C453,#E8A93D)">
+          <svg viewBox="0 0 100 100"><path d="M15 55 L50 25 L85 55 Z" fill="#BFE2F2" stroke="#0B1620" stroke-width="4"/><path d="M15 55 h70" stroke="#0B1620" stroke-width="4"/><line x1="50" y1="25" x2="50" y2="55" stroke="#0B1620" stroke-width="3"/></svg>
+        </div>
+        <div class="cap"><strong>Skylight</strong><small>Overhead daylighting</small></div>
+      </div>
+      <div class="tile">
+        <span class="ph">Placeholder image</span>
+        <div class="art" style="background:linear-gradient(140deg,#DCE9F1,#A9C6DB)">
+          <svg viewBox="0 0 100 100"><rect x="30" y="12" width="40" height="76" fill="#0B1620"/><rect x="35" y="17" width="30" height="30" fill="#EAF4FA"/><rect x="35" y="51" width="30" height="30" fill="#EAF4FA"/><rect x="30" y="12" width="40" height="76" fill="none" stroke="#E8A93D" stroke-width="4"/></svg>
+        </div>
+        <div class="cap"><strong>Glass entrance</strong><small>Doors in aluminum, bronze, stainless</small></div>
+      </div>
+      <div class="tile">
+        <span class="ph">Placeholder image</span>
+        <div class="art" style="background:linear-gradient(140deg,#C9D8E4,#8AA0B3)">
+          <svg viewBox="0 0 100 100"><rect x="38" y="10" width="24" height="80" fill="#5A6B7C"/><rect x="38" y="10" width="24" height="80" fill="none" stroke="#E8A93D" stroke-width="3"/><rect x="30" y="82" width="40" height="8" fill="#0B1620"/></svg>
+        </div>
+        <div class="cap"><strong>Column wraps</strong><small>Aluminum and stainless finishes</small></div>
+      </div>
+      <div class="tile">
+        <span class="ph">Placeholder image</span>
+        <div class="art" style="background:linear-gradient(140deg,#E4EBF0,#B9CDDC)">
+          <svg viewBox="0 0 100 100"><rect x="12" y="30" width="76" height="14" fill="#5A6B7C"/><rect x="12" y="48" width="76" height="10" fill="#8AA0B3"/><path d="M12 30 L88 30" stroke="#E8A93D" stroke-width="3"/></svg>
+        </div>
+        <div class="cap"><strong>Fascia &amp; soffit</strong><small>Architectural metal trim</small></div>
+      </div>
+    </div>
+
+    <div class="tab-note reveal" style="margin-top:8px;margin-bottom:56px">
+      <strong>For the owner:</strong> each tile above is marked as a placeholder. Send real project photos and they can replace these one for one, keeping the captions.
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-reviews">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-blue">
+      <span class="eyebrow">Reviews</span>
+      <h2>What customers say</h2>
+      <p>We do not publish made-up testimonials. Read current, verified reviews at the source.</p>
+    </div>
+
+    <div class="rs-strip reveal">
+      <p class="rs-note">Review themes on this page are paraphrased from public feedback. Open the source to read current reviews and ratings.</p>
+      <div class="rs-links"><a class="rs-btn" href="https://www.google.com/maps/place/?q=place_id:ChIJs1_QQDC_yIkRk25oJvzdEsg" target="_blank" rel="noopener">See reviews on Google</a></div>
+    </div>
+
+    <div class="rev-grid" style="margin-bottom:8px">
+      <div class="rev reveal">
+        <div class="who">About this page</div>
+        <p>We have not included sample quotes or star counts here, because we only show feedback we can verify. The button above opens the business's live Google listing, where current reviews and ratings are published.</p>
+      </div>
+      <div class="rev reveal">
+        <div class="who">Worked with Weaver's Glass?</div>
+        <p>If this company handled your storefront, curtain wall, skylight or glazing project, your review on Google helps other Central PA building owners find a contractor they can call.</p>
+      </div>
+    </div>
+
+    <div class="cta-band reveal">
+      <h2>Read verified reviews.</h2>
+      <p>See what building owners and contractors say about working with Weaver's Glass &amp; Building Specialties, Inc.</p>
+      <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJs1_QQDC_yIkRk25oJvzdEsg" target="_blank" rel="noopener">Open Google Reviews</a>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<section class="page" id="page-contact">
+  <div class="wrap">
+    <div style="height:44px"></div>
+    <div class="strip s-steel">
+      <span class="eyebrow">Contact</span>
+      <h2>Get in touch</h2>
+      <p>Call the Harrisburg office to discuss your commercial glazing project.</p>
+    </div>
+
+    <div class="contact-grid">
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#17729B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Address</h3>
+        <p><strong>Weaver's Glass &amp; Building Specialties, Inc.</strong></p>
+        <p>Weaver's Glass &amp; Building Specialties, Inc., 7631 Derry St, Harrisburg, PA 17111</p>
+      </div>
+      <div class="info-card reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="#17729B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg> Phone &amp; hours</h3>
+        <p>Call for project inquiries and scheduling:</p>
+        <a class="big" href="tel:+17175647000">(717) 564-7000</a>
+        <p style="margin-top:10px"><strong>Hours:</strong> Call for hours</p>
+      </div>
+    </div>
+
+    <div class="contact-grid">
+      <div class="map-card reveal">
+        <div class="map-pin">
+          <svg viewBox="0 0 24 24" fill="#17729B"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3" fill="#fff"/></svg>
+          <strong>7631 Derry St</strong>
+          <small>Harrisburg, PA 17111</small><br>
+          <a class="btn btn-blue" href="https://www.google.com/maps/place/?q=place_id:ChIJs1_QQDC_yIkRk25oJvzdEsg" target="_blank" rel="noopener">Get Directions →</a>
+        </div>
+      </div>
+      <div class="service-area reveal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#17729B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.9 5.7 3.9 9S14.5 18.4 12 21c-2.5-2.6-3.9-5.7-3.9-9S9.5 5.6 12 3z"/></svg>
+        <p><strong>Service area:</strong> Central Pennsylvania, including Dauphin County and the Harrisburg area. Directory profiles also note commercial, healthcare and institutional project experience.</p>
+      </div>
+    </div>
+    <div style="height:56px"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand">
+          <svg viewBox="0 0 64 64" role="img" aria-label="Glass panel logo"><rect x="12" y="8" width="40" height="48" rx="3" fill="#2E9BC6" opacity=".9"/><rect x="17" y="13" width="30" height="38" rx="2" fill="#BFE2F2"/><path d="M17 13 L47 51 M47 13 L17 51" stroke="#fff" stroke-width="2.4" opacity=".9"/><rect x="12" y="8" width="40" height="48" rx="3" fill="none" stroke="#E8A93D" stroke-width="3"/></svg>
+          <span>Weaver's Glass<small>Building Specialties · Harrisburg</small></span>
+        </div>
+        <p>Commercial glass and glazing contractor in Harrisburg, PA: aluminum storefronts, entrances, curtain walls, skylights, panels and specialty metals.</p>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <p>Weaver's Glass &amp; Building Specialties, Inc., 7631 Derry St, Harrisburg, PA 17111</p>
+        <p style="margin-top:8px"><a href="tel:+17175647000">(717) 564-7000</a></p>
+        <p>Call for hours</p>
+      </div>
+      <div>
+        <h4>Pages</h4>
+        <a href="#home" data-page="home">Home</a>
+        <a href="#services" data-page="services">Services</a>
+        <a href="#about" data-page="about">About</a>
+        <a href="#gallery" data-page="gallery">Gallery</a>
+        <a href="#reviews" data-page="reviews">Reviews</a>
+        <a href="#contact" data-page="contact">Contact</a>
+      </div>
+      <div>
+        <h4>Services</h4>
+        <a href="#services" data-page="services">Storefronts &amp; Entrances</a>
+        <a href="#services" data-page="services">Curtain Walls &amp; Skylights</a>
+        <a href="#services" data-page="services">Glass &amp; Glazing</a>
+        <a href="#services" data-page="services">Panels &amp; Specialty Metals</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© Weaver's Glass &amp; Building Specialties, Inc.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var PAGES = ["home", "services", "about", "gallery", "reviews", "contact"];
+  var nav = document.getElementById("mainNav");
+  var burger = document.getElementById("burger");
+  var scrim = document.getElementById("scrim");
+  var drawerClose = document.getElementById("drawerClose");
+
+  function cleanHash(){
+    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+  }
+
+  function closeMenu(){
+    if(nav){ nav.classList.remove("open"); }
+    if(scrim){ scrim.classList.remove("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  }
+
+  function navigateTo(page, updateHash){
+    if(PAGES.indexOf(page) === -1){ page = "home"; }
+
+    var sections = document.querySelectorAll(".page");
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
+    }
+
+    var links = document.querySelectorAll("nav.main a[data-page]");
+    for(var j = 0; j < links.length; j++){
+      var on = links[j].getAttribute("data-page") === page;
+      links[j].classList.toggle("active", on);
+      if(on){ links[j].setAttribute("aria-current", "page"); }
+      else { links[j].removeAttribute("aria-current"); }
+    }
+
+    if(updateHash !== false && location.hash !== "#" + page){
+      location.hash = "#" + page;
+    }
+
+    closeMenu();
+    window.scrollTo(0, 0);
+    observeReveals();
+  }
+
+  document.addEventListener("click", function(e){
+    var el = e.target.closest("a[data-page], button[data-page]");
+    if(!el) return;
+    e.preventDefault();
+    navigateTo(el.getAttribute("data-page"));
+  });
+
+  window.addEventListener("hashchange", function(){
+    navigateTo(cleanHash() || "home");
+  });
+
+  function openMenu(){
+    if(nav){ nav.classList.add("open"); }
+    if(scrim){ scrim.classList.add("show"); }
+    if(burger){ burger.setAttribute("aria-expanded", "true"); }
+  }
+
+  if(burger && nav){
+    burger.addEventListener("click", function(){
+      if(nav.classList.contains("open")){ closeMenu(); } else { openMenu(); }
+    });
+  }
+  if(drawerClose){ drawerClose.addEventListener("click", closeMenu); }
+  if(scrim){ scrim.addEventListener("click", closeMenu); }
+
+  /* ---------- service tabs ---------- */
+  var tabGroups = document.querySelectorAll("[data-tabs]");
+  for(var t = 0; t < tabGroups.length; t++){
+    (function(group){
+      group.addEventListener("click", function(e){
+        var btn = e.target.closest("[data-tab]");
+        if(!btn || !group.contains(btn)) return;
+        var id = btn.getAttribute("data-tab");
+        var btns = group.querySelectorAll("[data-tab]");
+        var panels = group.querySelectorAll("[data-tabpanel]");
+        for(var i = 0; i < btns.length; i++){
+          var on = btns[i] === btn;
+          btns[i].classList.toggle("on", on);
+          btns[i].setAttribute("aria-selected", on ? "true" : "false");
+        }
+        for(var k = 0; k < panels.length; k++){
+          panels[k].classList.toggle("on", panels[k].getAttribute("data-tabpanel") === id);
+        }
+      });
+    })(tabGroups[t]);
+  }
+
+  /* ---------- reveal on scroll ---------- */
+  var io = null;
+  if("IntersectionObserver" in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12});
+  }
+  function observeReveals(){
+    if(!io){ return; }
+    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
+    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
+  }
+
+  /* ---------- boot ---------- */
+  navigateTo(cleanHash() || "home", false);
+})();
+</script>
+</body>
+</html>
