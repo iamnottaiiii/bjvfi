@@ -1020,6 +1020,10 @@ function leadCard(claim){
       '<div class="field"><label>Email</label><input id="in-email" type="email" inputmode="email" placeholder="owner@business.com"/></div>' +
       '<div class="field"><label>What they want *</label><textarea id="in-wants" placeholder="Pages, features, vibe, must-haves"></textarea></div>' +
       '<div class="field"><label>Notes</label><textarea id="in-notes" placeholder="Anything else for the builder"></textarea></div>' +
+      '<div class="field"><label>Photos & files</label>' +
+      '<input id="in-files" type="file" multiple accept="image/*,.pdf,.doc,.docx,.txt"/>' +
+      '<div class="file-previews" id="in-files-preview"></div>' +
+      '<p class="muted" style="font-size:11px;margin-top:8px;line-height:1.5">Site photos, logo, menus, anything the builder needs. Images are resized automatically.</p></div>' +
       '<button class="btn block" id="btn-intake" type="button">Submit to builders</button>' +
       '<div class="err" id="intake-err"></div></div>';
   }
@@ -1061,6 +1065,136 @@ function wireLeadCard(claim){
   on('btn-outcome', function(){ saveOutcome(claim); });
   on('btn-release', function(){ releaseLead(claim); });
   on('btn-intake', function(){ submitIntake(claim); });
+  const fi = document.getElementById('in-files');
+  if(fi) fi.addEventListener('change', function(){ previewIntakeFiles(fi); });
+}
+
+/* Thumbnails for the intake file picker. */
+function previewIntakeFiles(input){
+  const prev = document.getElementById('in-files-preview');
+  if(!prev) return;
+  prev.innerHTML = '';
+  const files = input.files ? Array.prototype.slice.call(input.files) : [];
+  files.slice(0, 12).forEach(function(f){
+    if(f.type.indexOf('image/') === 0){
+      const img = document.createElement('img');
+      img.alt = f.name;
+      try{ img.src = URL.createObjectURL(f); }catch(e){}
+      prev.appendChild(img);
+    } else {
+      const d = document.createElement('div');
+      d.className = 'fp-file';
+      d.textContent = f.name;
+      prev.appendChild(d);
+    }
+  });
+}
+
+function sanitizeFileName(name){
+  const parts = String(name || 'file').split('.');
+  const ext = parts.length > 1 ? parts.pop().toLowerCase().replace(/[^a-z0-9]/g,'') : '';
+  let base = parts.join('.').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'') || 'file';
+  if(base.length > 40) base = base.slice(0, 40);
+  return base + (ext ? '.' + ext : '');
+}
+
+/* Downscale an image file to max 1600px, returns {base64, name}. */
+function downscaleImage(file){
+  return new Promise(function(resolve, reject){
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = function(){
+      try{
+        URL.revokeObjectURL(url);
+        const max = 1600;
+        let w = img.naturalWidth || img.width, h = img.naturalHeight || img.height;
+        const scale = Math.min(1, max / Math.max(w, h));
+        w = Math.round(w * scale); h = Math.round(h * scale);
+        const c = document.createElement('canvas');
+        c.width = w; c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        const dataUrl = c.toDataURL('image/jpeg', 0.85);
+        resolve({ base64: dataUrl.split(',')[1], name: sanitizeFileName(file.name).replace(/\.[a-z0-9]+$/, '') + '.jpg' });
+      }catch(e){ reject(e); }
+    };
+    img.onerror = function(){ URL.revokeObjectURL(url); reject(new Error('Could not read image')); };
+    img.src = url;
+  });
+}
+
+function readFileBase64(file){
+  return file.arrayBuffer().then(function(buf){ return b64encode(new Uint8Array(buf)); });
+}
+
+/* Upload intake attachments to the data repo. Returns [{name, path}]. */
+async function uploadIntakeFiles(intakeId, input, onProgress){
+  const files = input && input.files ? Array.prototype.slice.call(input.files) : [];
+  const out = [];
+  let done = 0;
+  for(const f of files.slice(0, 12)){
+    if(f.size > 15 * 1024 * 1024){ toast('Skipped (too big): ' + f.name); continue; }
+    try{
+      let base64, name;
+      if(f.type.indexOf('image/') === 0){
+        const r = await downscaleImage(f);
+        base64 = r.base64; name = r.name;
+      } else {
+        base64 = await readFileBase64(f);
+        name = sanitizeFileName(f.name);
+      }
+      const path = 'intakes/' + intakeId + '/' + name;
+      await ghFetch('/contents/' + path, { method: 'PUT',
+        body: { message: 'sitedesk: intake file ' + intakeId + '/' + name, content: base64 },
+        action: 'upload ' + name });
+      out.push({ name: name, path: path });
+    }catch(e){
+      toast('Upload failed: ' + f.name);
+    }
+    done++;
+    if(onProgress) onProgress(done, Math.min(files.length, 12));
+  }
+  return out;
+}
+
+/* Fetch a repo file's base64 content (for private-repo attachments). */
+async function ghGetFileBase64(path){
+  const file = await ghFetch('/contents/' + path + '?ref=main', { action: 'read ' + path });
+  return { content: (file.content || '').replace(/\s/g,''), name: path.split('/').pop() };
+}
+
+function mimeForFile(name){
+  const ext = String(name || '').split('.').pop().toLowerCase();
+  if(ext === 'jpg' || ext === 'jpeg') return 'image/jpeg';
+  if(ext === 'png') return 'image/png';
+  if(ext === 'gif') return 'image/gif';
+  if(ext === 'webp') return 'image/webp';
+  if(ext === 'pdf') return 'application/pdf';
+  return 'application/octet-stream';
+}
+
+/* Tap an intake attachment to view it. */
+async function viewIntakeFile(path, name){
+  toast('Loading file...');
+  try{
+    const f = await ghGetFileBase64(path);
+    const mime = mimeForFile(name);
+    if(mime.indexOf('image/') === 0){
+      showModal('<div style="text-align:right;margin-bottom:8px"><button class="btn ghost sm" id="modal-close" type="button">Close</button></div>' +
+        '<img src="data:' + mime + ';base64,' + f.content + '" style="width:100%;border-radius:12px" alt="' + esc(name) + '"/>');
+    } else {
+      const bin = b64decodeToBytes(f.content);
+      const blob = new Blob([bin], { type: mime });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = name;
+      document.body.appendChild(a); a.click();
+      setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+      toast('Download started');
+      return;
+    }
+    const mc = document.getElementById('modal-close');
+    if(mc) mc.addEventListener('click', closeModal);
+  }catch(e){ toast(e.message); }
 }
 
 async function saveOutcome(claim){
@@ -1076,7 +1210,10 @@ async function saveOutcome(claim){
   try{
     const rec = await ghGetJson('claims/' + claim.slug + '.json');
     await ghPutJson('claims/' + claim.slug + '.json', claim, rec ? rec.sha : null, 'sitedesk: outcome ' + claim.slug);
-  }catch(e){ err.textContent = e.message; return; }
+  }catch(e){
+    err.textContent = e.message;
+    return;
+  }
   if(outcome !== 'interested'){
     await releaseLead(claim, true);
     return;
@@ -1115,16 +1252,31 @@ async function submitIntake(claim){
     id: uid('intake'), slug: claim.slug, business: business, contact_name: contact,
     phone: phone, email: email, wants: wants, notes: notes,
     claimer: state.user.username, claimer_name: state.user.name,
-    status: 'open', created_at: nowISO()
+    status: 'open', created_at: nowISO(), files: []
   };
+  const btn = document.getElementById('btn-intake');
+  const fileInput = document.getElementById('in-files');
+  const nFiles = fileInput && fileInput.files ? Math.min(fileInput.files.length, 12) : 0;
   try{
+    if(nFiles){
+      if(btn){ btn.disabled = true; }
+      err.textContent = '';
+      intake.files = await uploadIntakeFiles(intake.id, fileInput, function(d, total){
+        if(btn) btn.textContent = 'Uploading ' + d + '/' + total + '...';
+      });
+      if(btn){ btn.disabled = false; btn.textContent = 'Submit to builders'; }
+    }
     await ghPutJson('intakes/' + intake.id + '.json', intake, null, 'sitedesk: intake ' + intake.id);
     claim.status = 'sold';
     claim.timeline = claim.timeline || [];
     claim.timeline.push({ t: nowISO(), k: 'intake submitted', note: 'Build details sent to builders' });
     const rec = await ghGetJson('claims/' + claim.slug + '.json');
     if(rec) await ghPutJson('claims/' + claim.slug + '.json', claim, rec.sha, 'sitedesk: sold ' + claim.slug);
-  }catch(e){ err.textContent = e.message; return; }
+  }catch(e){
+    err.textContent = e.message;
+    if(btn){ btn.disabled = false; btn.textContent = 'Submit to builders'; }
+    return;
+  }
   await postEvent('admin', 'Intake: ' + business, state.user.name + ' submitted build details for ' + business + '.', '');
   clearTreeCache();
   delete state.claimsBySlug[claim.slug];
@@ -1248,6 +1400,11 @@ async function renderIntakesInto(el){
         ' \xB7 ' + esc(fmtTime(i.created_at)) + '</div></div>' + badge(i.status) + '</div>' +
         '<div class="copybox" style="margin-bottom:10px">' + esc(i.wants || '') +
         (i.notes ? '\n\nNotes: ' + i.notes : '') + '</div>' +
+        (i.files && i.files.length ?
+          '<div class="field" style="margin-bottom:10px"><label>Attached files (' + i.files.length + ')</label><div class="row">' +
+          i.files.map(function(f){
+            return '<button type="button" class="btn ghost sm" data-intake-file="' + esc(f.path) + '" data-intake-filename="' + esc(f.name) + '">\uD83D\uDCCE ' + esc(f.name) + '</button>';
+          }).join('') + '</div></div>' : '') +
         '<div class="field" style="margin-bottom:0"><label>Build status</label><div class="chiprow">' +
         INTAKE_STATUSES.map(function(p){
           return '<button type="button" class="chip' + (i.status === p[0] ? ' on' : '') +
@@ -1265,6 +1422,11 @@ async function renderIntakesInto(el){
   });
   el.querySelectorAll('[data-intake]').forEach(function(chip){
     chip.addEventListener('click', function(){ setIntakeStatus(chip, el); });
+  });
+  el.querySelectorAll('[data-intake-file]').forEach(function(b){
+    b.addEventListener('click', function(){
+      viewIntakeFile(b.getAttribute('data-intake-file'), b.getAttribute('data-intake-filename'));
+    });
   });
 }
 
