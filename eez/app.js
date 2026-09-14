@@ -5,50 +5,11 @@
   const modalCancel = document.getElementById("modal-cancel");
   const toastEl = document.getElementById("toast");
 
-  const HISTORY_MAX = 12;
-  const SORT_KEY = "eez_stack_sort";
   const INSTALL_KEY = "eez_install_dismissed_at";
   const SHARE_KEY = "eez_share_nudge_at";
   const SAFETY_KEY = "eez_safety_tip_seen";
   const SHARE_URL = "https://bjvfi.com/eez";
   const TWO_DAYS = 2 * 24 * 60 * 60 * 1000;
-
-  function loadStackSort() {
-    try {
-      const s = localStorage.getItem(SORT_KEY);
-      if (s === "active" || s === "oldest" || s === "unseen") return s;
-    } catch { /* ignore */ }
-    return "active";
-  }
-
-  function saveStackSort(s) {
-    state.stackSort = s;
-    try { localStorage.setItem(SORT_KEY, s); } catch { /* ignore */ }
-  }
-
-  function formatPresence(ts) {
-    if (!ts) return "a while ago";
-    const diff = Date.now() - Number(ts);
-    if (diff < 2 * 60 * 1000) return "active now";
-    if (diff < 60 * 60 * 1000) {
-      const m = Math.max(1, Math.floor(diff / 60000));
-      return m + "m ago";
-    }
-    if (diff < 24 * 60 * 60 * 1000) {
-      const h = Math.max(1, Math.floor(diff / 3600000));
-      return h + "h ago";
-    }
-    if (diff < 30 * 24 * 60 * 60 * 1000) {
-      const d = Math.max(1, Math.floor(diff / 86400000));
-      return d === 1 ? "1d ago" : d + "d ago";
-    }
-    if (diff < 365 * 24 * 60 * 60 * 1000) {
-      const mo = Math.max(1, Math.floor(diff / (30 * 86400000)));
-      return mo === 1 ? "1mo ago" : mo + "mo ago";
-    }
-    const y = Math.max(1, Math.floor(diff / (365 * 86400000)));
-    return y === 1 ? "a year ago" : y + "y ago";
-  }
 
   function isStandalone() {
     try {
@@ -68,16 +29,13 @@
   }
   const state = {
     me: null,
-    exclude: loadExclude(),
-    history: [],
-    pendingAnswer: null,
-    card: null,
-    enterFrom: "right",
-    enterMode: "forward",
     toastTimer: null,
     guestKey: loadGuestKey(),
-    stackSort: loadStackSort(),
     deferredInstall: null,
+    deckIdx: 0,
+    deckQs: [],
+    projIdx: 0,
+    projList: [],
   };
   let renderGen = 0;
 
@@ -274,7 +232,9 @@
   const CUSTOM_DEFAULTS = { bg: "#101318", accent: "#5b9cff", text: "#f4f5f7" };
   const CUSTOM_THEME_VARS = ["--bg", "--bg2", "--bg3", "--surface", "--ink", "--muted", "--muted2",
     "--accent", "--accent-soft", "--accent-ink", "--btn-bg", "--btn-fg", "--toast-bg", "--toast-fg",
-    "--modal", "--unread", "--red", "--bubble-theirs"];
+    "--modal", "--unread", "--red", "--bubble-theirs", "--bubble-mine", "--fade-well", "--sep",
+    "--soft-inset", "--well-focus", "--chip", "--chip-strong", "--chip-soft", "--chip-faint",
+    "--chip-ghost", "--composer-bg", "--skel", "--skel-shine", "--modal-scrim"];
 
   function storedUitheme() {
     try {
@@ -373,6 +333,26 @@
       "--unread": accent,
       "--red": "#e08080",
       "--bubble-theirs": hexAlpha(accent, 0.08),
+      "--bubble-mine": dark
+        ? "color-mix(in srgb, var(--accent-soft) 30%, #2a2624)"
+        : "color-mix(in srgb, var(--accent-soft) 35%, #fffaf4)",
+      "--fade-well": dark
+        ? "linear-gradient(165deg, rgba(255, 255, 255, 0.075) 0%, rgba(255, 255, 255, 0.03) 100%)"
+        : "linear-gradient(165deg, " + hexAlpha(ink, 0.07) + " 0%, " + hexAlpha(ink, 0.03) + " 100%)",
+      "--sep": "linear-gradient(90deg, transparent, " + hexAlpha(ink, 0.1) + " 18%, " + hexAlpha(ink, 0.1) + " 82%, transparent)",
+      "--soft-inset": dark ? "inset 0 1px 0 rgba(255, 255, 255, 0.06)" : "inset 0 1px 0 rgba(255, 255, 255, 0.55)",
+      "--well-focus": hexAlpha(ink, dark ? 0.09 : 0.08),
+      "--chip": hexAlpha(ink, dark ? 0.08 : 0.06),
+      "--chip-strong": hexAlpha(ink, dark ? 0.14 : 0.12),
+      "--chip-soft": hexAlpha(ink, 0.06),
+      "--chip-faint": hexAlpha(ink, 0.05),
+      "--chip-ghost": hexAlpha(ink, 0.045),
+      "--composer-bg": dark ? "#000000" : "linear-gradient(to top, " + hexAlpha(bg, 0.94) + " 55%, transparent)",
+      "--skel": hexAlpha(ink, 0.07),
+      "--skel-shine": dark ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0.45)",
+      "--modal-scrim": dark
+        ? "radial-gradient(circle at 50% 70%, rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.64))"
+        : "radial-gradient(circle at 50% 70%, " + hexAlpha(ink, 0.18) + ", " + hexAlpha(ink, 0.42) + ")",
     };
     Object.keys(vars).forEach((k) => root.style.setProperty(k, vars[k]));
     root.style.colorScheme = dark ? "dark" : "light";
@@ -648,31 +628,6 @@
     } catch {
       /* ignore */
     }
-  }
-
-  function loadExclude() {
-    try {
-      const raw = localStorage.getItem("eez_exclude");
-      const arr = raw ? JSON.parse(raw) : [];
-      return Array.isArray(arr) ? arr.filter((x) => typeof x === "string") : [];
-    } catch {
-      return [];
-    }
-  }
-
-  function saveExclude() {
-    localStorage.setItem("eez_exclude", JSON.stringify(state.exclude.slice(-200)));
-  }
-
-  function rememberExclude(id) {
-    if (!id || state.exclude.includes(id)) return;
-    state.exclude.push(id);
-    saveExclude();
-  }
-
-  function forgetExclude(id) {
-    state.exclude = state.exclude.filter((x) => x !== id);
-    saveExclude();
   }
 
   function loadGuestKey() {
@@ -1014,6 +969,23 @@ async function buildConvoView(c, me, users, messages, prefs){
   var msgs = messages.filter(function(m){ return m.conversation_id === c.id; });
   var last = msgs.length ? msgs[msgs.length - 1] : null;
   var lastRead = mine.last_read_at || 0;
+  var projTitle = '';
+  if(c.project_id){
+    try{
+      var pjAll = ((await ghGetJson('projects.json', true)) || {data: []}).data;
+      var pr0 = pjAll.find(function(x){ return x.id === c.project_id; });
+      if(pr0 && pr0.body) projTitle = 'project: ' + clip(String(pr0.body).replace(/\s+/g, ' ').trim(), 44);
+    }catch(e){ /* ignore */ }
+  }
+  var weeklyTitle = '';
+  if(c.weekly && c.weekly.markers){
+    var mm = c.weekly.markers || {};
+    var mineM = mm[me.id] || '';
+    var peerM = '';
+    Object.keys(mm).forEach(function(k){ if(k !== me.id && !peerM) peerM = mm[k]; });
+    if(mineM && peerM) weeklyTitle = mineM.split('-').join(' ') + ' ⇄ ' + peerM.split('-').join(' ');
+    else weeklyTitle = 'weekly chat';
+  }
   var unread = !!last && last.sender_id !== me.id && last.created_at > lastRead;
   var replied = msgs.some(function(m){ return m.sender_id === oid && m.kind !== 'system'; });
   var waiting = c.initiator_id === me.id && !replied;
@@ -1034,6 +1006,8 @@ async function buildConvoView(c, me, users, messages, prefs){
     bumped: false,
     waiting: waiting,
     expires_at: expiresAt,
+    project_title: projTitle,
+    weekly_title: weeklyTitle,
     muted: !!mine.muted,
     read_receipts: mine.read_receipts !== 0,
     other_last_read_at: (function(){ var op = myPrefs(prefs, oid, c.id); return op && op.last_read_at ? s2ms(op.last_read_at) : null; })()
@@ -1101,6 +1075,43 @@ async function ghUpload(formData){
 }
 
 /* ---- the api() router: implements every /api/* endpoint locally ---- */
+/* ---------- weekly: deterministic client-side math (no server) ---------- */
+function hashStr(s){
+  var h = 0x811c9dc5;
+  s = String(s);
+  for(var i = 0; i < s.length; i++){
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h >>> 0;
+}
+function currentWeekId(d){
+  d = d || new Date();
+  var t = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+  var day = new Date(t).getUTCDay();
+  var monday = t - ((day + 6) % 7) * 864e5;
+  return "w" + Math.floor(monday / 6048e5);
+}
+var WEEKLY_K = 8;
+var WEEKLY_COLORS = ["teal", "amber", "coral", "sage", "plum", "sky", "clay", "moss"];
+var WEEKLY_SHAPES = ["circle", "square", "triangle", "diamond", "hexagon", "star", "wave", "cross"];
+function cohortOf(identity, weekId){
+  return hashStr(String(identity) + "|" + weekId) % WEEKLY_K;
+}
+function markerFor(identity, weekId){
+  var c = WEEKLY_COLORS[hashStr(String(identity) + "|" + weekId + "|c") % WEEKLY_COLORS.length];
+  var s = WEEKLY_SHAPES[hashStr(String(identity) + "|" + weekId + "|s") % WEEKLY_SHAPES.length];
+  return c + "-" + s;
+}
+var WEEKLY_FALLBACK_PROMPTS = [
+  "what did you make this week that surprised you?",
+  "what is something small you got better at this week?",
+  "what are you working on that nobody knows about yet?",
+  "what did you learn the hard way this week?",
+  "what is one thing you would do again exactly the same?",
+  "what took longer than it should have, and why?"
+];
+
 async function ghApi(path, opts){
   opts = opts || {};
   var method = (opts.method || 'GET').toUpperCase();
@@ -1169,6 +1180,9 @@ async function ghApi(path, opts){
     await mutateJson('reports.json', function(b){ return b.filter(function(x){ return x.reporter_id !== uid && x.reported_id !== uid; }); }, 'eez: delete account');
     await mutateJson('conversation_prefs.json', function(b){ return b.filter(function(x){ return x.user_id !== uid; }); }, 'eez: delete account');
     await mutateJson('feed.json', function(b){ return b.filter(function(x){ return x.user_id !== uid; }); }, 'eez: delete account');
+    await mutateJson('weekly_shares.json', function(b){ return b.filter(function(x){ return x.author_id !== uid; }); }, 'eez: delete account');
+    await mutateJson('weekly_comments.json', function(b){ return b.filter(function(x){ return x.author_id !== uid; }); }, 'eez: delete account');
+    await mutateJson('projects.json', function(b){ return b.filter(function(x){ return x.author_id !== uid; }); }, 'eez: delete account');
     clearSession();
     return {};
   }
@@ -1377,7 +1391,7 @@ async function ghApi(path, opts){
           return x.question_id === qidA && !x.parent_id &&
             (meA ? x.author_id === meA.id : (x.guest_key && x.guest_key === gkA));
         });
-        if(dup) throw bad('you already answered this — edit your answer instead', 409);
+        if(dup) throw bad('you already answered this. edit your answer instead', 409);
       }else{
         var parent = an.find(function(x){ return x.id === parentIdA && x.question_id === qidA; });
         if(!parent) throw bad('that answer is gone', 404);
@@ -1430,43 +1444,6 @@ async function ghApi(path, opts){
   if(threadM && method === 'GET'){
     var meT = await requireMe();
     return await ghThreadData(threadM[1], meT, true);
-  }
-  if(p === '/api/conversations/from-card' && method === 'POST'){
-    var meF = await requireMe();
-    var recip = String((json||{}).recipient_id || '');
-    var fbody = String((json||{}).body || '').trim();
-    if(!recip || recip === meF.id) throw bad('invalid recipient');
-    if(!fbody) throw bad('write something first');
-    if(fbody.length > 2000) throw bad('keep it under 2000 characters');
-    var other = await findUserById(recip);
-    if(!other) throw bad('person not found', 404);
-    var ts = nowS(), cid, firstMsg;
-    var convosF = await getConvos();
-    var existing = convosF.find(function(c){
-      return (c.initiator_id === meF.id && c.recipient_id === recip) || (c.initiator_id === recip && c.recipient_id === meF.id);
-    });
-    if(existing){
-      cid = existing.id;
-    }else{
-      cid = newId();
-      await mutateJson('conversations.json', function(cs){
-        cs.push({id: cid, initiator_id: meF.id, recipient_id: recip, created_at: ts, last_activity_at: ts, hidden_from_initiator: 0, bump_sent_at: 0});
-      }, 'eez: new conversation');
-    }
-    firstMsg = {id: newId(), conversation_id: cid, sender_id: meF.id, body: fbody, kind: 'user', created_at: ts};
-    await mutateJson('messages.json', function(ms){ ms.push(firstMsg); }, 'eez: first message');
-    await mutateJson('conversations.json', function(cs){
-      var c = cs.find(function(x){ return x.id === cid; });
-      if(c) c.last_activity_at = ts;
-    }, 'eez: touch convo');
-    await mutateJson('conversation_prefs.json', function(ps){
-      var mp = ps.find(function(x){ return x.user_id === meF.id && x.conversation_id === cid; });
-      if(!mp) ps.push({user_id: meF.id, conversation_id: cid, title: '', muted: 0, read_receipts: 1, last_read_at: ts});
-      else mp.last_read_at = ts;
-    }, 'eez: mark read');
-    feedPush(recip, 'message', 'someone answered your card', cid);
-    await touchSeen(meF);
-    return {conversation_id: cid};
   }
   var msgM = /^\/api\/conversations\/([^/]+)\/messages$/.exec(p);
   if(msgM && method === 'POST'){
@@ -1595,6 +1572,244 @@ async function ghApi(path, opts){
     }};
   }
 
+  /* ----- weekly ----- */
+  if(p === '/api/weekly' && method === 'GET'){
+    var sessWl = loadSession();
+    var meWl = sessWl ? await findUserById(sessWl.uid) : null;
+    var identWl = meWl ? meWl.id : guestKey();
+    var weekId = currentWeekId();
+    var cohort = cohortOf(identWl, weekId);
+    var marker = markerFor(identWl, weekId);
+    // lazy expiry: prune stale weeks, writing only when something is stale
+    var shRaw = await ghGetJson('weekly_shares.json', true);
+    var cmRaw = await ghGetJson('weekly_comments.json', true);
+    var shAll = (shRaw && shRaw.data) || [];
+    var cmAll = (cmRaw && cmRaw.data) || [];
+    if(shAll.some(function(s){ return s.week_id !== weekId; }))
+      await mutateJson('weekly_shares.json', function(arr){ return arr.filter(function(s){ return s.week_id === weekId; }); }, 'eez: weekly prune');
+    if(cmAll.some(function(c){ return c.week_id !== weekId; }))
+      await mutateJson('weekly_comments.json', function(arr){ return arr.filter(function(c){ return c.week_id === weekId; }); }, 'eez: weekly prune');
+    shAll = shAll.filter(function(s){ return s.week_id === weekId; });
+    cmAll = cmAll.filter(function(c){ return c.week_id === weekId; });
+    var prompts = ((await ghGetJson('prompts.json', true)) || {data: []}).data || [];
+    if(!prompts.length) prompts = WEEKLY_FALLBACK_PROMPTS.map(function(t, i){ return {id: 'fb' + i, text: t}; });
+    var prompt = prompts[hashStr(weekId + '|cohort|' + cohort) % prompts.length];
+    var mineShare = shAll.find(function(s){
+      return s.cohort === cohort && (meWl ? s.author_id === meWl.id : (s.guest_key && s.guest_key === identWl));
+    });
+    var hasShared = !!mineShare;
+    var shares = [];
+    if(hasShared){
+      shares = shAll.filter(function(s){ return s.cohort === cohort; })
+        .sort(function(a, b){ return a.created_at - b.created_at; })
+        .map(function(s){
+          var smine = meWl ? s.author_id === meWl.id : (s.guest_key && s.guest_key === identWl);
+          var comms = cmAll.filter(function(c){ return c.share_id === s.id; })
+            .sort(function(a, b){ return a.created_at - b.created_at; })
+            .map(function(c){
+              var cmine = meWl ? c.author_id === meWl.id : (c.guest_key && c.guest_key === identWl);
+              return {id: c.id, marker: c.marker, body: c.body, mine: !!cmine, created_at: s2ms(c.created_at)};
+            });
+          return {id: s.id, marker: s.marker, body: s.body, mine: !!smine, created_at: s2ms(s.created_at), comments: comms};
+        });
+    }
+    return {week_id: weekId, cohort: cohort, marker: marker, prompt: {id: prompt.id, text: prompt.text}, has_shared: hasShared, shares: shares};
+  }
+  if(p === '/api/weekly/shares' && method === 'POST'){
+    var sessWs = loadSession();
+    var meWs = sessWs ? await findUserById(sessWs.uid) : null;
+    var identWs = meWs ? meWs.id : guestKey();
+    var weekIdWs = currentWeekId();
+    var cohortWs = cohortOf(identWs, weekIdWs);
+    var markerWs = markerFor(identWs, weekIdWs);
+    var wbody = String((json || {}).body || '').trim();
+    if(!wbody) throw bad('write something first');
+    if(wbody.length > 1000) throw bad('keep it under 1000 characters');
+    var createdWs;
+    await mutateJson('weekly_shares.json', function(arr){
+      var dup = arr.some(function(s){
+        return s.week_id === weekIdWs && (meWs ? s.author_id === meWs.id : (s.guest_key && s.guest_key === identWs));
+      });
+      if(dup) throw bad('you already shared this week', 409);
+      createdWs = {id: newId(), week_id: weekIdWs, cohort: cohortWs,
+        author_id: meWs ? meWs.id : null, guest_key: meWs ? '' : identWs,
+        marker: markerWs, body: wbody, created_at: nowS()};
+      arr.push(createdWs);
+    }, 'eez: weekly share');
+    if(meWs) await touchSeen(meWs);
+    return {share: {id: createdWs.id, marker: createdWs.marker}};
+  }
+  if(p === '/api/weekly/comments' && method === 'POST'){
+    var sessWc = loadSession();
+    var meWc = sessWc ? await findUserById(sessWc.uid) : null;
+    var identWc = meWc ? meWc.id : guestKey();
+    var weekIdWc = currentWeekId();
+    var cohortWc = cohortOf(identWc, weekIdWc);
+    var cbody = String((json || {}).body || '').trim();
+    if(!cbody) throw bad('write something first');
+    if(cbody.length > 1000) throw bad('keep it under 1000 characters');
+    var shareIdWc = String((json || {}).share_id || '');
+    var sharesWc = ((await ghGetJson('weekly_shares.json', true)) || {data: []}).data;
+    var targetWc = sharesWc.find(function(s){ return s.id === shareIdWc && s.week_id === weekIdWc && s.cohort === cohortWc; });
+    if(!targetWc) throw bad('that share is gone', 404);
+    var ownWc = sharesWc.some(function(s){
+      return s.week_id === weekIdWc && s.cohort === cohortWc &&
+        (meWc ? s.author_id === meWc.id : (s.guest_key && s.guest_key === identWc));
+    });
+    if(!ownWc) throw bad('share yours first to join in', 403);
+    var markerWc = markerFor(identWc, weekIdWc);
+    var createdWc;
+    await mutateJson('weekly_comments.json', function(arr){
+      createdWc = {id: newId(), share_id: shareIdWc, week_id: weekIdWc,
+        author_id: meWc ? meWc.id : null, guest_key: meWc ? '' : identWc,
+        marker: markerWc, body: cbody, created_at: nowS()};
+      arr.push(createdWc);
+    }, 'eez: weekly comment');
+    if(meWc) await touchSeen(meWc);
+    return {comment: {id: createdWc.id, marker: createdWc.marker}};
+  }
+
+  /* ----- projects ----- */
+  function projMine(x, me, ident){
+    return me ? x.author_id === me.id : (x.guest_key && x.guest_key === ident);
+  }
+  if(p === '/api/projects' && method === 'GET'){
+    var sessP = loadSession();
+    var meP = sessP ? await findUserById(sessP.uid) : null;
+    var identP = meP ? meP.id : guestKey();
+    var projs = ((await ghGetJson('projects.json', true)) || {data: []}).data;
+    var list = projs
+      .filter(function(x){ return !x.closed || projMine(x, meP, identP); })
+      .sort(function(a, b){ return b.created_at - a.created_at; })
+      .slice(0, 200)
+      .map(function(x){
+        return {id: x.id, body: x.body, mine: !!projMine(x, meP, identP), closed: !!x.closed, created_at: s2ms(x.created_at)};
+      });
+    return {projects: list};
+  }
+  if(p === '/api/projects' && method === 'POST'){
+    var sessPp = loadSession();
+    var mePp = sessPp ? await findUserById(sessPp.uid) : null;
+    var pbody = String((json || {}).body || '').trim();
+    if(!pbody) throw bad('write something first');
+    if(pbody.length > 1000) throw bad('keep it under 1000 characters');
+    var createdPp;
+    await mutateJson('projects.json', function(arr){
+      createdPp = {id: newId(), author_id: mePp ? mePp.id : null, guest_key: mePp ? '' : guestKey(),
+        body: pbody, created_at: nowS(), closed: 0};
+      arr.push(createdPp);
+    }, 'eez: new project');
+    if(mePp) await touchSeen(mePp);
+    return {project: {id: createdPp.id}};
+  }
+  var projM = /^\/api\/projects\/([^/]+)$/.exec(p);
+  if(projM && (method === 'PATCH' || method === 'DELETE')){
+    var sessPe = loadSession();
+    var mePe = sessPe ? await findUserById(sessPe.uid) : null;
+    var identPe = mePe ? mePe.id : guestKey();
+    var pidPe = projM[1];
+    var pj = json || {};
+    await mutateJson('projects.json', function(arr){
+      var tgt = arr.find(function(x){ return x.id === pidPe; });
+      if(!tgt) throw bad('project gone', 404);
+      if(!projMine(tgt, mePe, identPe)) throw bad('not yours', 403);
+      if(method === 'DELETE') return arr.filter(function(x){ return x.id !== pidPe; });
+      if(typeof pj.body === 'string'){
+        var nb = pj.body.trim();
+        if(!nb) throw bad('write something first');
+        if(nb.length > 1000) throw bad('keep it under 1000 characters');
+        tgt.body = nb;
+      }
+      if(typeof pj.closed === 'boolean') tgt.closed = pj.closed ? 1 : 0;
+    }, 'eez: update project');
+    if(mePe) await touchSeen(mePe);
+    return {};
+  }
+
+  /* ----- conversations from weekly / projects (share openConversation) ----- */
+  async function openConversation(me, recipId, fbody, extras){
+    var other = await findUserById(recipId);
+    if(!other) throw bad('person not found', 404);
+    var ts = nowS(), cid;
+    var convosOc = await getConvos();
+    var existing = convosOc.find(function(c){
+      return (c.initiator_id === me.id && c.recipient_id === recipId) || (c.initiator_id === recipId && c.recipient_id === me.id);
+    });
+    if(existing){
+      cid = existing.id;
+    }else{
+      cid = newId();
+      await mutateJson('conversations.json', function(cs){
+        var rec = {id: cid, initiator_id: me.id, recipient_id: recipId, created_at: ts, last_activity_at: ts, hidden_from_initiator: 0, bump_sent_at: 0};
+        if(extras && extras.project_id) rec.project_id = extras.project_id;
+        if(extras && extras.weekly) rec.weekly = extras.weekly;
+        cs.push(rec);
+      }, 'eez: new conversation');
+    }
+    var firstMsg = {id: newId(), conversation_id: cid, sender_id: me.id, body: fbody, kind: 'user', created_at: ts};
+    await mutateJson('messages.json', function(ms){ ms.push(firstMsg); }, 'eez: first message');
+    await mutateJson('conversations.json', function(cs){
+      var c = cs.find(function(x){ return x.id === cid; });
+      if(c) c.last_activity_at = ts;
+    }, 'eez: touch convo');
+    await mutateJson('conversation_prefs.json', function(ps){
+      var mp = ps.find(function(x){ return x.user_id === me.id && x.conversation_id === cid; });
+      if(!mp) ps.push({user_id: me.id, conversation_id: cid, title: '', muted: 0, read_receipts: 1, last_read_at: ts});
+      else mp.last_read_at = ts;
+    }, 'eez: mark read');
+    await touchSeen(me);
+    return cid;
+  }
+  if(p === '/api/conversations/from-card' && method === 'POST'){
+    var meF = await requireMe();
+    var recip = String((json || {}).recipient_id || '');
+    var fbody = String((json || {}).body || '').trim();
+    if(!recip || recip === meF.id) throw bad('invalid recipient');
+    if(!fbody) throw bad('write something first');
+    if(fbody.length > 2000) throw bad('keep it under 2000 characters');
+    var cid = await openConversation(meF, recip, fbody, null);
+    feedPush(recip, 'message', 'someone answered your card', cid);
+    return {conversation_id: cid};
+  }
+  if(p === '/api/conversations/from-weekly' && method === 'POST'){
+    var meFw = await requireMe();
+    var shareIdFw = String((json || {}).share_id || '');
+    var fbodyFw = String((json || {}).body || '').trim();
+    if(!fbodyFw) throw bad('write something first');
+    if(fbodyFw.length > 2000) throw bad('keep it under 2000 characters');
+    var weekIdFw = currentWeekId();
+    var cohortFw = cohortOf(meFw.id, weekIdFw);
+    var sharesFw = ((await ghGetJson('weekly_shares.json', true)) || {data: []}).data;
+    var shFw = sharesFw.find(function(s){ return s.id === shareIdFw && s.week_id === weekIdFw && s.cohort === cohortFw; });
+    if(!shFw) throw bad('that share is gone', 404);
+    var peerFw = shFw.author_id || null;
+    if(!peerFw) throw bad('they need an account before you can message', 403);
+    if(peerFw === meFw.id) throw bad('that is your own share');
+    var markersFw = {};
+    markersFw[meFw.id] = markerFor(meFw.id, weekIdFw);
+    markersFw[peerFw] = shFw.marker || markerFor(peerFw, weekIdFw);
+    var cidFw = await openConversation(meFw, peerFw, fbodyFw,
+      {weekly: {week_id: weekIdFw, cohort: cohortFw, markers: markersFw}});
+    feedPush(peerFw, 'message', 'someone messaged you from weekly', cidFw);
+    return {conversation_id: cidFw};
+  }
+  if(p === '/api/conversations/from-project' && method === 'POST'){
+    var meFp = await requireMe();
+    var pidFp = String((json || {}).project_id || '');
+    var fbodyFp = String((json || {}).body || '').trim();
+    if(!fbodyFp) throw bad('write something first');
+    if(fbodyFp.length > 2000) throw bad('keep it under 2000 characters');
+    var projsFp = ((await ghGetJson('projects.json', true)) || {data: []}).data;
+    var prFp = projsFp.find(function(x){ return x.id === pidFp && !x.closed; });
+    if(!prFp) throw bad('that project is gone', 404);
+    var ownerFp = prFp.author_id || null;
+    if(!ownerFp) throw bad('they need an account before you can message', 403);
+    if(ownerFp === meFp.id) throw bad('that is your own project');
+    var cidFp = await openConversation(meFp, ownerFp, fbodyFp, {project_id: pidFp});
+    feedPush(ownerFp, 'message', 'someone messaged you about your project', cidFp);
+    return {conversation_id: cidFp};
+  }
+
   /* ----- misc ----- */
   if(p === '/api/presence' && method === 'POST') return {};
   if(p === '/api/feed' && method === 'GET'){
@@ -1691,7 +1906,6 @@ var lastSendAt = 0;
   }
 
   modalCancel.addEventListener("click", () => {
-    state.pendingAnswer = null;
     hideModal();
   });
 
@@ -1708,13 +1922,7 @@ var lastSendAt = 0;
       });
       await refreshMe();
       hideModal();
-      if (state.pendingAnswer) {
-        const pending = state.pendingAnswer;
-        state.pendingAnswer = null;
-        await sendAnswer(pending.id, pending.body);
-      } else {
-        render();
-      }
+      render();
     } catch (err) {
       alert(err.message);
     }
@@ -1726,501 +1934,14 @@ var lastSendAt = 0;
     return false;
   }
 
-  async function sendAnswer(recipientId, body) {
-    const data = await api("/api/conversations/from-card", {
-      method: "POST",
-      body: JSON.stringify({ recipient_id: recipientId, body }),
-    });
-    rememberExclude(recipientId);
-    location.hash = "#/messages/" + data.conversation_id;
-  }
-
-  async function renderHome(g) {
-    setNav("home");
-    const sort = (state.me && state.me.stack_sort) || state.stackSort || "active";
-    app.innerHTML = `<div class="home-wrap">
-      <div class="sort-bar" role="group" aria-label="sort stack">
-        <button type="button" class="sort-chip ${sort === "active" ? "on" : ""}" data-sort="active">active now</button>
-        <button type="button" class="sort-chip ${sort === "oldest" ? "on" : ""}" data-sort="oldest">oldest</button>
-        <button type="button" class="sort-chip ${sort === "unseen" ? "on" : ""}" data-sort="unseen">haven’t seen</button>
-      </div>
-      <div class="stage" aria-live="polite"><div class="slide" id="slide">
-      <div class="slide-body">
-        <div class="skel skel-line w40"></div>
-        <div class="skel skel-line"></div>
-        <div class="skel skel-line w80"></div>
-        <div class="skel skel-line w60"></div>
-      </div>
-    </div></div></div>`;
-    app.querySelectorAll("[data-sort]").forEach((btn) => {
-      btn.addEventListener("click", async () => {
-        const next = btn.getAttribute("data-sort");
-        saveStackSort(next);
-        if (state.me) {
-          try {
-            const data = await api("/api/me", { method: "PATCH", body: JSON.stringify({ stack_sort: next }) });
-            state.me = data.user;
-          } catch { /* local still applied */ }
-        }
-        state.exclude = [];
-        saveExclude();
-        state.history = [];
-        state.enterMode = "forward";
-        app.querySelectorAll("[data-sort]").forEach((b) => b.classList.toggle("on", b.getAttribute("data-sort") === next));
-        await loadCard(g);
-      });
-    });
-    state.enterFrom = "right";
-    state.enterMode = "forward";
-    await loadCard(g);
-  }
-
-  async function loadCard(g) {
-    const params = new URLSearchParams();
-    if (state.exclude.length) params.set("exclude", state.exclude.join(","));
-    const sort = (state.me && state.me.stack_sort) || state.stackSort || "active";
-    params.set("sort", sort);
-    const qs = params.toString() ? "?" + params.toString() : "";
-    let data;
-    try {
-      data = await api("/api/stack" + qs);
-    } catch (err) {
-      if (stale(g)) return;
-      const stage = app.querySelector(".stage");
-      if (!stage) return;
-      stage.innerHTML = `<div class="state-block">
-        <p class="empty-lead">couldn’t load</p>
-        <p class="empty-sub">${escapeHtml(err.message)}</p>
-        <button type="button" class="btn" id="retry-stack">try again</button>
-      </div>`;
-      const b = document.getElementById("retry-stack");
-      if (b) b.addEventListener("click", () => loadCard(g));
-      return;
-    }
-    if (stale(g)) return;
-    const stage = app.querySelector(".stage");
-    if (!stage) return;
-    if (!data.profile) {
-      stage.innerHTML = `<div class="state-block">
-        <p class="empty-lead">that’s the stack for now</p>
-        <p class="empty-sub">come back later, or bring one back if you moved past too fast.</p>
-        ${state.history.length ? `<button type="button" class="btn" id="empty-back">previous</button>` : ""}
-      </div>`;
-      state.card = null;
-      const eb = document.getElementById("empty-back");
-      if (eb) eb.addEventListener("click", goBack);
-      return;
-    }
-    mountProfile(data.profile, state.enterMode || "forward");
-  }
-
-  function mountProfile(profile, mode) {
-    const stage = app.querySelector(".stage");
-    if (!stage) return;
-    state.card = profile;
-    state.enterMode = mode;
-    stage.innerHTML = slideHtml(profile);
-    const el = stage.querySelector(".slide");
-    bindSlide(el, profile);
-    enterSlide(el, mode);
-  }
-
-  function slideHtml(p) {
-    const canBack = state.history.length > 0;
-    const presence = formatPresence(Number(p.last_seen_at) || 0);
-    const live = presence === "active now";
-    return `
-      <article class="slide" id="slide">
-        <div class="slide-body">
-          <div class="presence-row" title="last activity">
-            <span class="presence-dot ${live ? "live" : ""}" aria-hidden="true"></span>
-            <span class="presence-label">${escapeHtml(presence)}</span>
-          </div>
-          <dl class="qa">
-            <div>
-              <dt>Why are you here?</dt>
-              <dd>${escapeHtml(p.why_here)}</dd>
-            </div>
-            <div>
-              <dt>What are you into right now?</dt>
-              <dd>${escapeHtml(p.into_now)}</dd>
-            </div>
-            <div>
-              <dt>Ask them something.</dt>
-              <dd class="ask">${escapeHtml(p.ask_them)}</dd>
-            </div>
-          </dl>
-          <form class="answer-ambient" hidden>
-            <label class="sr-only" for="answer-body">your answer</label>
-            <textarea id="answer-body" name="body" required maxlength="2000" rows="3" placeholder="answer their question… (Enter to send)"></textarea>
-          </form>
-        </div>
-        <div class="slide-bar" id="slide-bar">
-          <button type="button" class="back-chip" data-act="back" aria-label="previous" ${canBack ? "" : "hidden"}>‹</button>
-          <button type="button" class="btn primary sm" data-act="answer">answer</button>
-          <div class="more-wrap">
-            <button type="button" class="text-act more-btn" data-act="more" aria-label="more" aria-expanded="false" aria-haspopup="menu">:</button>
-            <div class="more-menu" hidden role="menu">
-              <button type="button" class="text-act" data-act="bookmark" role="menuitem">bookmark</button>
-              <button type="button" class="text-act danger" data-act="report" role="menuitem">report</button>
-              <button type="button" class="text-act danger" data-act="block" role="menuitem">block</button>
-            </div>
-          </div>
-        </div>
-      </article>`;
-  }
-
-  function enterSlide(el, mode) {
-    if (!el) return;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) {
-      el.classList.add("in");
-      return;
-    }
-    el.classList.remove("in", "out-ul", "out-dr", "enter-ul", "enter-dr", "enter-left", "enter-right", "out-left", "out-right");
-    // forward after dismiss-ul AND bring-back: enter moving down-to-right
-    el.classList.add("enter-dr");
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        el.classList.remove("enter-ul", "enter-dr", "enter-left", "enter-right");
-        el.classList.add("in");
-      });
-    });
-  }
-
-  function bindSlide(el, profile) {
-    if (!el) return;
-    const box = el.querySelector(".answer-ambient");
-    const ta = box.querySelector("textarea");
-    const moreBtn = el.querySelector('[data-act="more"]');
-    const moreMenu = el.querySelector(".more-menu");
-
-    function closeMore() {
-      if (!moreMenu || !moreBtn) return;
-      moreMenu.hidden = true;
-      moreBtn.setAttribute("aria-expanded", "false");
-    }
-
-    function exitAnswer() {
-      box.hidden = true;
-      el.classList.remove("answering");
-      if (ta) ta.blur();
-    }
-
-    const reportBtn = el.querySelector('[data-act="report"]');
-    if (reportBtn) {
-      reportBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        closeMore();
-        onReport(profile);
-      });
-    }
-    el.querySelector('[data-act="block"]').addEventListener("click", (e) => {
-      e.stopPropagation();
-      closeMore();
-      onBlock(profile);
-    });
-    const bmBtn = el.querySelector('[data-act="bookmark"]');
-    if (bmBtn) {
-      bmBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        closeMore();
-        onBookmark(profile);
-      });
-    }
-
-    if (moreBtn && moreMenu) {
-      moreBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const open = moreMenu.hidden;
-        moreMenu.hidden = !open;
-        moreBtn.setAttribute("aria-expanded", open ? "true" : "false");
-      });
-      // Close on outside tap within this slide only (no document listener leak).
-      el.addEventListener(
-        "pointerdown",
-        (ev) => {
-          if (!moreMenu.hidden && !ev.target.closest(".more-wrap")) closeMore();
-        },
-        true,
-      );
-    }
-
-    el.querySelector('[data-act="answer"]').addEventListener("click", (e) => {
-      e.stopPropagation();
-      closeMore();
-      box.hidden = false;
-      el.classList.add("answering");
-      ta.focus();
-    });
-
-    const backBtn = el.querySelector('[data-act="back"]');
-    if (backBtn) {
-      backBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        closeMore();
-        goBack();
-      });
-    }
-
-    box.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const text = String(new FormData(box).get("body") || "").trim();
-      if (text) onAnswer(profile, text);
-    });
-
-    ta.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
-        e.preventDefault();
-        exitAnswer();
-        return;
-      }
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        box.requestSubmit();
-      }
-    });
-
-    let startX = 0;
-    let startY = 0;
-    let dx = 0;
-    let dy = 0;
-    let tracking = false;
-    let locked = null;
-
-    const onStart = (x, y) => {
-      if (el.classList.contains("answering")) return;
-      tracking = true;
-      locked = null;
-      startX = x;
-      startY = y;
-      dx = 0;
-      dy = 0;
-      el.classList.add("dragging");
-    };
-    const onMove = (x, y) => {
-      if (!tracking) return;
-      dx = x - startX;
-      dy = y - startY;
-      if (locked === null && Math.hypot(dx, dy) > 10) {
-        // favor diagonal / horizontal for swipe; vertical stays for body scroll
-        locked = Math.abs(dx) > Math.abs(dy) * 0.7 ? "x" : "y";
-      }
-      if (locked !== "x") return;
-      // unmistakable diagonal: left→up-left, right→down-right + rotate
-      const ty = dx < 0 ? dx * 0.72 : dx * 0.72;
-      const rot = Math.max(-14, Math.min(14, dx / 18));
-      const sc = Math.max(0.9, 1 - Math.abs(dx) / 900);
-      const fade = Math.max(0.22, 1 - Math.abs(dx) / 380);
-      el.style.transform = `translate(${dx}px, ${ty}px) rotate(${rot}deg) scale(${sc})`;
-      el.style.opacity = String(fade);
-    };
-    const onEnd = () => {
-      if (!tracking) return;
-      tracking = false;
-      el.classList.remove("dragging");
-      if (locked === "x" && Math.abs(dx) > 64) {
-        if (dx < 0) {
-          // dismiss forward: exit up-left
-          pushHistory(profile);
-          dismiss("ul", () => skip(profile.id));
-        } else if (state.history.length) {
-          // opposite: bring back — exit current down-right then restore
-          goBack();
-        } else {
-          // no history: also advance forward via right (still up-left exit energy flipped? use ul for next)
-          pushHistory(profile);
-          dismiss("ul", () => skip(profile.id));
-        }
-      } else {
-        el.style.transform = "";
-        el.style.opacity = "";
-      }
-    };
-
-    el.addEventListener(
-      "touchstart",
-      (e) => {
-        if (e.target.closest("button, textarea, input, form, a")) return;
-        const t = e.changedTouches[0];
-        onStart(t.clientX, t.clientY);
-      },
-      { passive: true },
-    );
-    el.addEventListener(
-      "touchmove",
-      (e) => {
-        const t = e.changedTouches[0];
-        onMove(t.clientX, t.clientY);
-        if (locked === "x") e.preventDefault();
-      },
-      { passive: false },
-    );
-    el.addEventListener("touchend", onEnd);
-    el.addEventListener("touchcancel", onEnd);
-
-    el.addEventListener("pointerdown", (e) => {
-      if (e.pointerType === "touch") return;
-      if (e.target.closest("button, textarea, input, form, a")) return;
-      el.setPointerCapture(e.pointerId);
-      onStart(e.clientX, e.clientY);
-    });
-    el.addEventListener("pointermove", (e) => {
-      if (e.pointerType === "touch") return;
-      onMove(e.clientX, e.clientY);
-    });
-    el.addEventListener("pointerup", (e) => {
-      if (e.pointerType === "touch") return;
-      onEnd();
-    });
-  }
-
-  function pushHistory(profile) {
-    if (!profile) return;
-    state.history.push({ ...profile });
-    if (state.history.length > HISTORY_MAX) state.history.shift();
-  }
-
-  function dismiss(dir, after) {
-    const el = document.getElementById("slide");
-    if (!el) {
-      after();
-      return;
-    }
-    el.style.transform = "";
-    el.style.opacity = "";
-    el.classList.remove("in", "enter-ul", "enter-dr", "enter-left", "enter-right");
-    // ul = up-left (dismiss), dr = down-right (leaving when going back to previous)
-    el.classList.add(dir === "dr" ? "out-dr" : "out-ul");
-    const ms = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 420;
-    setTimeout(after, ms);
-  }
-
-  async function skip(id) {
-    rememberExclude(id);
-    try {
-      await api("/api/stack/skip", { method: "POST", body: JSON.stringify({ id }) });
-    } catch {
-      /* guests skip locally */
-    }
-    state.enterMode = "forward";
-    await loadCard();
-  }
-
-  function goBack() {
-    if (!state.history.length) return;
-    const prev = state.history.pop();
-    forgetExclude(prev.id);
-    const current = state.card;
-    const finish = () => {
-      state.enterMode = "back";
-      mountProfile(prev, "back");
-    };
-    if (current) {
-      // current leaves down-right; previous comes in down-to-right
-      dismiss("dr", finish);
-    } else {
-      finish();
-    }
-  }
-
-  async function onBookmark(profile) {
-    if (!(await requireLogin())) return;
-    try {
-      await api("/api/bookmarks", { method: "POST", body: JSON.stringify({ id: profile.id }) });
-      showToast("bookmarked");
-    } catch (err) {
-      alert(err.message);
-    }
-  }
-
-  async function onBlock(profile) {
-    if (!(await requireLogin())) return;
-    const ok = confirm("Block this person? They will not show again.");
-    if (!ok) return;
-    try {
-      await api("/api/stack/block", { method: "POST", body: JSON.stringify({ id: profile.id, reason: "block" }) });
-      rememberExclude(profile.id);
-      state.history = state.history.filter((h) => h.id !== profile.id);
-      state.enterMode = "forward";
-      dismiss("ul", loadCard);
-    } catch (err) {
-      alert(err.message);
-    }
-  }
-
-  async function onReport(profile) {
-    if (!(await requireLogin())) return;
-    const ok = confirm("Report this person? They leave your stack. At 20 distinct reports their account is removed.");
-    if (!ok) return;
-    try {
-      await api("/api/stack/report", { method: "POST", body: JSON.stringify({ id: profile.id, reason: "report" }) });
-      showToast("reported");
-      rememberExclude(profile.id);
-      state.history = state.history.filter((h) => h.id !== profile.id);
-      state.enterMode = "forward";
-      dismiss("ul", loadCard);
-    } catch (err) {
-      alert(err.message);
-    }
-  }
-
-  async function onAnswer(profile, text) {
-    if (!text) return;
+  /* ---------- Q&A deck: home is one question at a time (no swipe stack, no feed) ---------- */
+  function askPanelHtml() {
     if (!state.me) {
-      state.pendingAnswer = { id: profile.id, body: text };
-      showModal();
-      return;
+      return `<section class="ask-guest ask-sticky">
+           <p class="hint"><a href="#/login">log in</a> to ask. Anyone can answer, no names.</p>
+         </section>`;
     }
-    try {
-      await sendAnswer(profile.id, text);
-    } catch (err) {
-      alert(err.message);
-    }
-  }
-
-  function pollHtml(q) {
-    const opts = q.options || [];
-    const total = opts.reduce((n, o) => n + (o.votes || 0), 0) || 0;
-    const my = q.my_vote || null;
-    return `<div class="poll" data-qid="${escapeHtml(q.id)}">
-      ${opts
-        .map((o) => {
-          const pct = total ? Math.round((100 * (o.votes || 0)) / total) : 0;
-          const mine = my === o.id ? "mine" : "";
-          const voted = my ? "voted" : "";
-          return `<button type="button" class="poll-opt ${voted} ${mine}" data-oid="${escapeHtml(o.id)}" ${my ? "disabled" : ""}>
-            <span class="bar" style="width:${my ? pct : 0}%"></span>
-            <span class="poll-row">
-              <span class="poll-label">${escapeHtml(o.label)}</span>
-              <span class="poll-count">${my ? pct + "%" : ""}</span>
-            </span>
-          </button>`;
-        })
-        .join("")}
-    </div>`;
-  }
-
-  async function renderQa(g) {
-    setNav("qa");
-    app.innerHTML = fadeWrap(`<div class="qa-page">
-      <h1>q&amp;a</h1>
-      <div class="skel skel-title"></div>
-      <div class="skel skel-line"></div>
-      <div class="skel skel-line w80"></div>
-      <div class="skel skel-line w60"></div>
-    </div>`);
-    let data;
-    try {
-      data = await api("/api/questions");
-    } catch (err) {
-      if (stale(g)) return;
-      renderError(err.message);
-      return;
-    }
-    if (stale(g)) return;
-    const ask = state.me
-      ? `<section class="ask-panel ask-sticky" aria-label="ask a question">
+    return `<section class="ask-panel ask-sticky" aria-label="ask a question">
            <p class="ask-prompt">Ask something</p>
            <form id="ask-form">
              <div class="ask-kind" role="tablist" aria-label="question type">
@@ -2252,65 +1973,164 @@ var lastSendAt = 0;
                <button class="btn primary" type="submit">post</button>
              </div>
            </form>
-         </section>`
-      : `<section class="ask-guest ask-sticky">
-           <p class="hint"><a href="#/login">log in</a> to ask. Anyone can answer, no names.</p>
          </section>`;
+  }
 
-    const items = (data.questions || [])
-      .map((q) => {
-        const kindLabel = q.kind === "poll" ? "poll" : q.kind === "image" ? "image" : "question";
-        const media =
-          q.image_url
-            ? `<div class="q-media"><img src="${escapeHtml(q.image_url)}" alt="" loading="lazy" /></div>`
-            : "";
-        const poll = (q.kind === "poll" || (q.options && q.options.length)) ? pollHtml(q) : "";
-        const allAns = q.answers || [];
-        const tops = allAns.filter((a) => !a.parent_id);
-        const repliesBy = {};
-        allAns.filter((a) => a.parent_id).forEach((r) => {
-          (repliesBy[r.parent_id] = repliesBy[r.parent_id] || []).push(r);
-        });
-        const myTop = tops.find((a) => a.mine);
-        const ansActions = (a, isReply) => {
-          const edit = a.mine
-            ? `<button type="button" class="linklike" data-ans-edit="${escapeHtml(a.id)}">edit</button>`
-            : "";
-          const rep = !isReply
-            ? `<button type="button" class="linklike" data-ans-reply="${escapeHtml(a.id)}">reply</button>`
-            : "";
-          return edit || rep ? `<div class="ans-actions">${edit}${rep}</div>` : "";
-        };
-        const answers = tops
-          .map((a) => {
-            const reps = (repliesBy[a.id] || [])
-              .map(
-                (r) => `<div class="q-answer q-reply" data-answer="${escapeHtml(r.id)}">
+  function bindAskForm(rerender) {
+    const askForm = document.getElementById("ask-form");
+    if (!askForm) return;
+    const kindInput = askForm.querySelector('input[name="kind"]');
+    const pollFields = document.getElementById("poll-fields");
+    const pollCompose = document.getElementById("poll-compose");
+    const pollAdd = document.getElementById("poll-add-opt");
+    const imgPick = document.getElementById("img-pick");
+    const preview = document.getElementById("img-preview");
+    const syncPollRequired = (on) => {
+      if (!pollCompose) return;
+      pollCompose.querySelectorAll('input[name="opt"]').forEach((inp, i) => {
+        inp.required = on && i < 2;
+      });
+    };
+    syncPollRequired(false);
+    if (pollAdd && pollCompose) {
+      pollAdd.addEventListener("click", () => {
+        const n = pollCompose.querySelectorAll('input[name="opt"]').length;
+        if (n >= 10) {
+          showToast("max 10 options");
+          return;
+        }
+        const wrap = document.createElement("label");
+        wrap.className = "sr-only";
+        wrap.textContent = "option " + (n + 1);
+        const inp = document.createElement("input");
+        inp.name = "opt";
+        inp.maxLength = 80;
+        inp.placeholder = "option " + (n + 1);
+        pollCompose.appendChild(wrap);
+        pollCompose.appendChild(inp);
+        inp.focus();
+      });
+    }
+    askForm.querySelectorAll(".ask-kind button").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        askForm.querySelectorAll(".ask-kind button").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        const k = btn.getAttribute("data-kind");
+        kindInput.value = k;
+        pollFields.hidden = k !== "poll";
+        imgPick.hidden = k !== "image";
+        syncPollRequired(k === "poll");
+        const imgInput = askForm.querySelector('input[name="image"]');
+        if (imgInput) imgInput.required = k === "image";
+      });
+    });
+    const fileInput = askForm.querySelector('input[name="image"]');
+    if (fileInput) {
+      fileInput.addEventListener("change", () => {
+        const f = fileInput.files && fileInput.files[0];
+        if (!f) {
+          preview.classList.remove("show");
+          preview.removeAttribute("src");
+          return;
+        }
+        preview.src = URL.createObjectURL(f);
+        preview.classList.add("show");
+      });
+    }
+    askForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const postBtn = askForm.querySelector('button[type="submit"]');
+      if (postBtn && postBtn.disabled) return;
+      const fd = new FormData(askForm);
+      const kind = String(fd.get("kind") || "text");
+      const payload = { body: fd.get("body"), kind };
+      if (postBtn) {
+        postBtn.disabled = true;
+        postBtn.innerHTML = '<span class="btn-spinner"></span>posting';
+      }
+      try {
+        if (kind === "poll") {
+          const options = fd.getAll("opt")
+            .map((x) => String(x || "").trim())
+            .filter(Boolean);
+          if (options.length < 2) throw new Error("add at least 2 options");
+          payload.options = options;
+        }
+        if (kind === "image") {
+          const file = fd.get("image");
+          if (!(file instanceof File) || !file.size) throw new Error("image required");
+          const up = new FormData();
+          up.append("file", file);
+          const uploaded = await api("/api/upload", { method: "POST", body: up });
+          payload.image_key = uploaded.key;
+        }
+        await api("/api/questions", { method: "POST", body: JSON.stringify(payload) });
+        showToast("saved");
+        rerender();
+      } catch (err) {
+        alert(err.message);
+        if (postBtn) {
+          postBtn.disabled = false;
+          postBtn.textContent = "post";
+        }
+      }
+    });
+  }
+
+  function qCardHtml(q) {
+    const kindLabel = q.kind === "poll" ? "poll" : q.kind === "image" ? "image" : "question";
+    const media =
+      q.image_url
+        ? `<div class="q-media"><img src="${escapeHtml(q.image_url)}" alt="" loading="lazy" /></div>`
+        : "";
+    const poll = (q.kind === "poll" || (q.options && q.options.length)) ? pollHtml(q) : "";
+    const allAns = q.answers || [];
+    const tops = allAns.filter((a) => !a.parent_id);
+    const repliesBy = {};
+    allAns.filter((a) => a.parent_id).forEach((r) => {
+      (repliesBy[r.parent_id] = repliesBy[r.parent_id] || []).push(r);
+    });
+    const myTop = tops.find((a) => a.mine);
+    const ansActions = (a, isReply) => {
+      const edit = a.mine
+        ? `<button type="button" class="linklike" data-ans-edit="${escapeHtml(a.id)}">edit</button>`
+        : "";
+      // reply control shows only on other people's answers, never your own
+      const rep = !isReply && !a.mine
+        ? `<button type="button" class="linklike" data-ans-reply="${escapeHtml(a.id)}">reply</button>`
+        : "";
+      return edit || rep ? `<div class="ans-actions">${edit}${rep}</div>` : "";
+    };
+    const answers = tops
+      .map((a) => {
+        const reps = (repliesBy[a.id] || [])
+          .map(
+            (r) => `<div class="q-answer q-reply" data-answer="${escapeHtml(r.id)}">
               <div class="q-answer-body">${escapeHtml(r.body)}</div>
               ${ansActions(r, true)}
             </div>`,
-              )
-              .join("");
-            return `<div class="q-answer" data-answer="${escapeHtml(a.id)}">
+          )
+          .join("");
+        return `<div class="q-answer" data-answer="${escapeHtml(a.id)}">
               <div class="q-answer-body">${escapeHtml(a.body)}</div>
               ${ansActions(a, false)}
               ${reps ? `<div class="q-replies">${reps}</div>` : ""}
             </div>`;
-          })
-          .join("");
-        const reply =
-          q.kind === "poll" || myTop
-            ? ""
-            : `<form class="reply-row ans-form" data-qid="${escapeHtml(q.id)}">
+      })
+      .join("");
+    const reply =
+      q.kind === "poll" || myTop
+        ? ""
+        : `<form class="reply-row ans-form" data-qid="${escapeHtml(q.id)}">
             <label class="sr-only" for="ans-${escapeHtml(q.id)}">answer</label>
             <textarea id="ans-${escapeHtml(q.id)}" name="body" required maxlength="1000" placeholder="answer…" rows="2"></textarea>
             <button class="btn sm" type="submit">reply</button>
           </form>`;
-        const answersBlock =
-          q.kind === "poll"
-            ? ""
-            : `<div class="q-answers">${answers || `<p class="q-empty">no answers yet</p>`}</div>`;
-        return `<article class="q-card" data-qid="${escapeHtml(q.id)}">
+    const answersBlock =
+      q.kind === "poll"
+        ? ""
+        : `<div class="q-answers">${answers || `<p class="q-empty">no answers yet</p>`}</div>`;
+    return `<article class="q-card" data-qid="${escapeHtml(q.id)}">
           <div class="q-meta">${kindLabel}</div>
           <div class="q-body">${escapeHtml(q.body)}</div>
           ${media}
@@ -2318,115 +2138,10 @@ var lastSendAt = 0;
           ${answersBlock}
           ${reply}
         </article>`;
-      })
-      .join("");
+  }
 
-    app.innerHTML = fadeWrap(`<div class="qa-page"><h1>q&amp;a</h1>${ask}<div class="qa-feed">${
-      items ||
-      `<div class="state-block"><p class="empty-lead">quiet so far</p><p class="empty-sub">ask something, or check back when the room has a pulse.</p></div>`
-    }</div></div>`);
-
-    const askForm = document.getElementById("ask-form");
-    if (askForm) {
-      const kindInput = askForm.querySelector('input[name="kind"]');
-      const pollFields = document.getElementById("poll-fields");
-      const pollCompose = document.getElementById("poll-compose");
-      const pollAdd = document.getElementById("poll-add-opt");
-      const imgPick = document.getElementById("img-pick");
-      const preview = document.getElementById("img-preview");
-      const syncPollRequired = (on) => {
-        if (!pollCompose) return;
-        pollCompose.querySelectorAll('input[name="opt"]').forEach((inp, i) => {
-          inp.required = on && i < 2;
-        });
-      };
-      syncPollRequired(false);
-      if (pollAdd && pollCompose) {
-        pollAdd.addEventListener("click", () => {
-          const n = pollCompose.querySelectorAll('input[name="opt"]').length;
-          if (n >= 10) {
-            showToast("max 10 options");
-            return;
-          }
-          const wrap = document.createElement("label");
-          wrap.className = "sr-only";
-          wrap.textContent = "option " + (n + 1);
-          const inp = document.createElement("input");
-          inp.name = "opt";
-          inp.maxLength = 80;
-          inp.placeholder = "option " + (n + 1);
-          pollCompose.appendChild(wrap);
-          pollCompose.appendChild(inp);
-          inp.focus();
-        });
-      }
-      askForm.querySelectorAll(".ask-kind button").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          askForm.querySelectorAll(".ask-kind button").forEach((b) => b.classList.remove("active"));
-          btn.classList.add("active");
-          const k = btn.getAttribute("data-kind");
-          kindInput.value = k;
-          pollFields.hidden = k !== "poll";
-          imgPick.hidden = k !== "image";
-          syncPollRequired(k === "poll");
-          const imgInput = askForm.querySelector('input[name="image"]');
-          if (imgInput) imgInput.required = k === "image";
-        });
-      });
-      const fileInput = askForm.querySelector('input[name="image"]');
-      if (fileInput) {
-        fileInput.addEventListener("change", () => {
-          const f = fileInput.files && fileInput.files[0];
-          if (!f) {
-            preview.classList.remove("show");
-            preview.removeAttribute("src");
-            return;
-          }
-          preview.src = URL.createObjectURL(f);
-          preview.classList.add("show");
-        });
-      }
-      askForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const postBtn = askForm.querySelector('button[type="submit"]');
-        if (postBtn && postBtn.disabled) return;
-        const fd = new FormData(askForm);
-        const kind = String(fd.get("kind") || "text");
-        const payload = { body: fd.get("body"), kind };
-        if (postBtn) {
-          postBtn.disabled = true;
-          postBtn.innerHTML = '<span class="btn-spinner"></span>posting';
-        }
-        try {
-          if (kind === "poll") {
-            const options = fd.getAll("opt")
-              .map((x) => String(x || "").trim())
-              .filter(Boolean);
-            if (options.length < 2) throw new Error("add at least 2 options");
-            payload.options = options;
-          }
-          if (kind === "image") {
-            const file = fd.get("image");
-            if (!(file instanceof File) || !file.size) throw new Error("image required");
-            const up = new FormData();
-            up.append("file", file);
-            const uploaded = await api("/api/upload", { method: "POST", body: up });
-            payload.image_key = uploaded.key;
-          }
-          await api("/api/questions", { method: "POST", body: JSON.stringify(payload) });
-          showToast("saved");
-          renderQa();
-        } catch (err) {
-          alert(err.message);
-          if (postBtn) {
-            postBtn.disabled = false;
-            postBtn.textContent = "post";
-          }
-        }
-      });
-    }
-
-    app.querySelectorAll(".poll").forEach((pollEl) => {
+  function bindQuestionCard(root, rerender) {
+    root.querySelectorAll(".poll").forEach((pollEl) => {
       pollEl.querySelectorAll(".poll-opt").forEach((btn) => {
         btn.addEventListener("click", async () => {
           if (btn.disabled) return;
@@ -2437,7 +2152,7 @@ var lastSendAt = 0;
               body: JSON.stringify({ option_id: btn.getAttribute("data-oid") }),
             });
             showToast("saved");
-            renderQa();
+            rerender();
           } catch (err) {
             pollEl.classList.remove("posting-pending");
             alert(err.message);
@@ -2446,7 +2161,7 @@ var lastSendAt = 0;
       });
     });
 
-    app.querySelectorAll(".ans-form").forEach((form) => {
+    root.querySelectorAll(".ans-form").forEach((form) => {
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
         const fd = new FormData(form);
@@ -2456,7 +2171,7 @@ var lastSendAt = 0;
             body: JSON.stringify({ body: fd.get("body") }),
           });
           showToast("saved");
-          renderQa();
+          rerender();
         } catch (err) {
           alert(err.message);
         }
@@ -2464,7 +2179,7 @@ var lastSendAt = 0;
     });
 
     // edit my own answer inline
-    app.querySelectorAll("[data-ans-edit]").forEach((btn) => {
+    root.querySelectorAll("[data-ans-edit]").forEach((btn) => {
       btn.addEventListener("click", () => {
         const box = btn.closest("[data-answer]");
         const bodyEl = box ? box.querySelector(":scope > .q-answer-body") : null;
@@ -2492,7 +2207,7 @@ var lastSendAt = 0;
               body: JSON.stringify({ body: form.querySelector("textarea").value }),
             });
             showToast("saved");
-            renderQa();
+            rerender();
           } catch (err) {
             alert(err.message);
           }
@@ -2500,8 +2215,8 @@ var lastSendAt = 0;
       });
     });
 
-    // reply to someone's answer (one level deep)
-    app.querySelectorAll("[data-ans-reply]").forEach((btn) => {
+    // reply to someone else's answer (one level deep)
+    root.querySelectorAll("[data-ans-reply]").forEach((btn) => {
       btn.addEventListener("click", () => {
         const box = btn.closest("[data-answer]");
         if (!box) return;
@@ -2527,7 +2242,7 @@ var lastSendAt = 0;
               body: JSON.stringify({ body: form.querySelector("textarea").value, parent_id: aid }),
             });
             showToast("saved");
-            renderQa();
+            rerender();
           } catch (err) {
             alert(err.message);
           }
@@ -2536,9 +2251,428 @@ var lastSendAt = 0;
     });
   }
 
+  function showDeckCard() {
+    const box = document.getElementById("deck");
+    if (!box) return;
+    const qs = state.deckQs || [];
+    if (!qs.length) {
+      box.innerHTML = `<div class="state-block"><p class="empty-lead">quiet so far</p><p class="empty-sub">ask something, or check back when the room has a pulse.</p></div>`;
+      return;
+    }
+    if (state.deckIdx < 0) state.deckIdx = 0;
+    if (state.deckIdx >= qs.length) state.deckIdx = qs.length - 1;
+    const q = qs[state.deckIdx];
+    const atFirst = state.deckIdx === 0;
+    const atLast = state.deckIdx === qs.length - 1;
+    box.innerHTML = `${qCardHtml(q)}
+      <div class="deck-pager">
+        <button type="button" class="btn ghost sm" id="deck-prev"${atFirst ? " disabled" : ""}>prev</button>
+        <span class="deck-count">${state.deckIdx + 1} of ${qs.length}</span>
+        <button type="button" class="btn ghost sm" id="deck-next"${atLast ? " disabled" : ""}>next</button>
+      </div>`;
+    bindQuestionCard(box, () => renderHome());
+    const prev = document.getElementById("deck-prev");
+    const next = document.getElementById("deck-next");
+    if (prev) prev.addEventListener("click", () => { if (state.deckIdx > 0) { state.deckIdx--; showDeckCard(); } });
+    if (next) next.addEventListener("click", () => { if (state.deckIdx < (state.deckQs || []).length - 1) { state.deckIdx++; showDeckCard(); } });
+  }
+
+  async function renderHome(g) {
+    setNav("home");
+    app.innerHTML = fadeWrap(`<div class="qa-page deck-page">
+      <h1>q&amp;a</h1>
+      ${askPanelHtml()}
+      <div class="deck" id="deck" aria-live="polite">
+        <div class="skel skel-title"></div>
+        <div class="skel skel-line"></div>
+        <div class="skel skel-line w80"></div>
+        <div class="skel skel-line w60"></div>
+      </div>
+    </div>`);
+    bindAskForm(() => renderHome());
+    let data;
+    try {
+      data = await api("/api/questions");
+    } catch (err) {
+      if (stale(g)) return;
+      renderError(err.message);
+      return;
+    }
+    if (stale(g)) return;
+    state.deckQs = data.questions || [];
+    if (state.deckIdx >= state.deckQs.length) state.deckIdx = 0;
+    showDeckCard();
+  }
+
+  /* ---------- weekly: one prompt, one cohort, anonymous markers, ephemeral ---------- */
+  function markerChipHtml(marker, shareId, isMine) {
+    const label = String(marker || "").split("-").join(" ");
+    if (isMine) return `<span class="marker-chip">${escapeHtml(label)}</span>`;
+    return `<button type="button" class="marker-chip" data-weekly-msg="${escapeHtml(shareId)}">${escapeHtml(label)}</button>`;
+  }
+
+  function weeklyShareHtml(s) {
+    const comments = (s.comments || [])
+      .map(
+        (c) => `<div class="w-comment${c.mine ? " mine" : ""}">
+          ${markerChipHtml(c.marker, s.id, c.mine)}
+          <div class="w-comment-body">${escapeHtml(c.body)}</div>
+        </div>`,
+      )
+      .join("");
+    return `<article class="w-share${s.mine ? " mine" : ""}" data-share="${escapeHtml(s.id)}">
+      ${markerChipHtml(s.marker, s.id, s.mine)}
+      <div class="w-share-body">${escapeHtml(s.body)}</div>
+      ${comments ? `<div class="w-comments">${comments}</div>` : ""}
+      <form class="w-comment-form" data-share="${escapeHtml(s.id)}">
+        <label class="sr-only" for="wc-${escapeHtml(s.id)}">comment</label>
+        <textarea id="wc-${escapeHtml(s.id)}" name="body" required maxlength="1000" placeholder="comment…" rows="2"></textarea>
+        <button class="btn sm" type="submit">comment</button>
+      </form>
+      <div class="w-msgbox" hidden>
+        <form class="w-msg-form" data-share="${escapeHtml(s.id)}">
+          <p class="hint">message this person. opens a 1:1 thread</p>
+          <label class="sr-only" for="wm-${escapeHtml(s.id)}">message</label>
+          <textarea id="wm-${escapeHtml(s.id)}" name="body" required maxlength="2000" rows="2" placeholder="say hi…"></textarea>
+          <div class="row-btns"><button class="btn sm primary" type="submit">send</button></div>
+        </form>
+      </div>
+    </article>`;
+  }
+
+  async function renderWeekly(g) {
+    setNav("weekly");
+    app.innerHTML = fadeWrap(`<div class="weekly-page">
+      <div class="page-head"><h1>weekly</h1></div>
+      <div class="skel skel-title"></div>
+      <div class="skel skel-line"></div>
+      <div class="skel skel-line w80"></div>
+    </div>`);
+    let data;
+    try {
+      data = await api("/api/weekly");
+    } catch (err) {
+      if (stale(g)) return;
+      renderError(err.message);
+      return;
+    }
+    if (stale(g)) return;
+    const prompt = data.prompt || {};
+    const locked = !data.has_shared;
+    const shares = data.shares || [];
+    app.innerHTML = fadeWrap(`<div class="weekly-page">
+      <div class="page-head"><h1>weekly</h1></div>
+      <article class="q-card prompt-card">
+        <div class="q-meta">this week</div>
+        <div class="q-body">${escapeHtml(prompt.text || "what did you get into this week?")}</div>
+      </article>
+      ${
+        locked
+          ? `<form class="w-compose" id="w-compose">
+               <p class="hint">share what you did to unlock everyone else's shares. the week wipes clean after.</p>
+               <label class="sr-only" for="w-body">your share</label>
+               <textarea id="w-body" name="body" required maxlength="1000" rows="4" placeholder="share what you did…"></textarea>
+               <div><button class="btn primary" type="submit">share</button></div>
+             </form>`
+          : shares.length
+            ? `<div class="w-shares">${shares.map(weeklyShareHtml).join("")}</div>`
+            : `<div class="state-block"><p class="empty-lead">you’re first</p><p class="empty-sub">your share is in. others land here as they post.</p></div>`
+      }
+    </div>`);
+
+    const comp = document.getElementById("w-compose");
+    if (comp) {
+      comp.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const btn = comp.querySelector('button[type="submit"]');
+        if (btn) btn.disabled = true;
+        try {
+          await api("/api/weekly/shares", {
+            method: "POST",
+            body: JSON.stringify({ body: comp.querySelector("textarea").value }),
+          });
+          showToast("shared");
+          renderWeekly();
+        } catch (err) {
+          alert(err.message);
+          if (btn) btn.disabled = false;
+        }
+      });
+    }
+
+    app.querySelectorAll(".w-comment-form").forEach((form) => {
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        try {
+          await api("/api/weekly/comments", {
+            method: "POST",
+            body: JSON.stringify({ share_id: form.getAttribute("data-share"), body: form.querySelector("textarea").value }),
+          });
+          showToast("saved");
+          renderWeekly();
+        } catch (err) {
+          alert(err.message);
+        }
+      });
+    });
+
+    // tapping a marker opens a 1:1 thread with that share's author
+    app.querySelectorAll(".marker-chip[data-weekly-msg]").forEach((chip) => {
+      chip.addEventListener("click", async () => {
+        if (!(await requireLogin())) return;
+        const art = chip.closest("[data-share]");
+        const box = art ? art.querySelector(".w-msgbox") : null;
+        if (!box) return;
+        const wasHidden = box.hidden;
+        app.querySelectorAll(".w-msgbox").forEach((b) => { b.hidden = true; });
+        box.hidden = !wasHidden;
+        if (!box.hidden) {
+          const ta = box.querySelector("textarea");
+          if (ta) ta.focus();
+        }
+      });
+    });
+
+    app.querySelectorAll(".w-msg-form").forEach((form) => {
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const btn = form.querySelector('button[type="submit"]');
+        if (btn) btn.disabled = true;
+        try {
+          const res = await api("/api/conversations/from-weekly", {
+            method: "POST",
+            body: JSON.stringify({ share_id: form.getAttribute("data-share"), body: form.querySelector("textarea").value }),
+          });
+          location.hash = "#/messages/" + res.conversation_id;
+        } catch (err) {
+          alert(err.message);
+          if (btn) btn.disabled = false;
+        }
+      });
+    });
+  }
+
+  /* ---------- projects: one card at a time ---------- */
+  function projCardHtml(p) {
+    const mine = !!p.mine;
+    const chip = p.closed ? `<span class="proj-closed">closed</span>` : "";
+    const owner = mine
+      ? `<div class="ans-actions proj-owner">
+           <button type="button" class="linklike" data-proj-edit="${escapeHtml(p.id)}">edit</button>
+           <button type="button" class="linklike" data-proj-toggle="${escapeHtml(p.id)}">${p.closed ? "reopen" : "close"}</button>
+           <button type="button" class="linklike" data-proj-del="${escapeHtml(p.id)}">delete</button>
+         </div>`
+      : "";
+    const msg = mine
+      ? ""
+      : `<div class="proj-msg-row"><button type="button" class="btn sm" data-proj-msg="${escapeHtml(p.id)}">message</button></div>`;
+    return `<article class="proj-card${mine ? " mine" : ""}" data-proj="${escapeHtml(p.id)}">
+      <div class="q-meta">project ${chip}</div>
+      <div class="q-body proj-body">${escapeHtml(p.body)}</div>
+      ${owner}
+      ${msg}
+      <div class="w-msgbox" hidden>
+        <form class="proj-msg-form" data-proj="${escapeHtml(p.id)}">
+          <p class="hint">message the owner. opens a 1:1 thread</p>
+          <label class="sr-only" for="pm-${escapeHtml(p.id)}">message</label>
+          <textarea id="pm-${escapeHtml(p.id)}" name="body" required maxlength="2000" rows="2" placeholder="say hi…"></textarea>
+          <div class="row-btns"><button class="btn sm primary" type="submit">send</button></div>
+        </form>
+      </div>
+    </article>`;
+  }
+
+  function showProjCard() {
+    const box = document.getElementById("proj-deck");
+    if (!box) return;
+    const ps = state.projList || [];
+    if (!ps.length) {
+      box.innerHTML = `<div class="state-block"><p class="empty-lead">no projects yet</p><p class="empty-sub">post what you’re working on. someone might want in.</p></div>`;
+      return;
+    }
+    if (state.projIdx < 0) state.projIdx = 0;
+    if (state.projIdx >= ps.length) state.projIdx = ps.length - 1;
+    const p = ps[state.projIdx];
+    const atFirst = state.projIdx === 0;
+    const atLast = state.projIdx === ps.length - 1;
+    box.innerHTML = `${projCardHtml(p)}
+      <div class="deck-pager">
+        <button type="button" class="btn ghost sm" id="proj-prev"${atFirst ? " disabled" : ""}>prev</button>
+        <span class="deck-count">${state.projIdx + 1} of ${ps.length}</span>
+        <button type="button" class="btn ghost sm" id="proj-next"${atLast ? " disabled" : ""}>next</button>
+      </div>`;
+    const prev = document.getElementById("proj-prev");
+    const next = document.getElementById("proj-next");
+    if (prev) prev.addEventListener("click", () => { if (state.projIdx > 0) { state.projIdx--; showProjCard(); } });
+    if (next) next.addEventListener("click", () => { if (state.projIdx < (state.projList || []).length - 1) { state.projIdx++; showProjCard(); } });
+
+    box.querySelectorAll("[data-proj-edit]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const card = btn.closest("[data-proj]");
+        const bodyEl = card ? card.querySelector(".proj-body") : null;
+        if (!card || !bodyEl || card.querySelector(".proj-edit-form")) return;
+        const form = document.createElement("form");
+        form.className = "proj-edit-form";
+        form.innerHTML = `<textarea required maxlength="1000" rows="4"></textarea>
+          <div class="row-btns"><button class="btn sm primary" type="submit">save</button>
+          <button class="btn sm ghost" type="button" data-cancel>cancel</button></div>`;
+        form.querySelector("textarea").value = bodyEl.textContent;
+        bodyEl.hidden = true;
+        card.insertBefore(form, bodyEl);
+        form.querySelector("[data-cancel]").addEventListener("click", () => { form.remove(); bodyEl.hidden = false; });
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          try {
+            await api(`/api/projects/${btn.getAttribute("data-proj-edit")}`, {
+              method: "PATCH",
+              body: JSON.stringify({ body: form.querySelector("textarea").value }),
+            });
+            showToast("saved");
+            renderProjects();
+          } catch (err) { alert(err.message); }
+        });
+      });
+    });
+    box.querySelectorAll("[data-proj-toggle]").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        try {
+          await api(`/api/projects/${btn.getAttribute("data-proj-toggle")}`, {
+            method: "PATCH",
+            body: JSON.stringify({ closed: !ps[state.projIdx].closed }),
+          });
+          showToast("saved");
+          renderProjects();
+        } catch (err) { alert(err.message); }
+      });
+    });
+    box.querySelectorAll("[data-proj-del]").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        if (!window.confirm("delete this project?")) return;
+        try {
+          await api(`/api/projects/${btn.getAttribute("data-proj-del")}`, { method: "DELETE" });
+          showToast("deleted");
+          state.projIdx = 0;
+          renderProjects();
+        } catch (err) { alert(err.message); }
+      });
+    });
+    box.querySelectorAll("[data-proj-msg]").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        if (!(await requireLogin())) return;
+        const card = btn.closest("[data-proj]");
+        const msgbox = card ? card.querySelector(".w-msgbox") : null;
+        if (!msgbox) return;
+        msgbox.hidden = !msgbox.hidden;
+        if (!msgbox.hidden) {
+          const ta = msgbox.querySelector("textarea");
+          if (ta) ta.focus();
+        }
+      });
+    });
+    box.querySelectorAll(".proj-msg-form").forEach((form) => {
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const btn = form.querySelector('button[type="submit"]');
+        if (btn) btn.disabled = true;
+        try {
+          const res = await api("/api/conversations/from-project", {
+            method: "POST",
+            body: JSON.stringify({ project_id: form.getAttribute("data-proj"), body: form.querySelector("textarea").value }),
+          });
+          location.hash = "#/messages/" + res.conversation_id;
+        } catch (err) {
+          alert(err.message);
+          if (btn) btn.disabled = false;
+        }
+      });
+    });
+  }
+
+  async function renderProjects(g) {
+    setNav("projects");
+    app.innerHTML = fadeWrap(`<div class="projects-page">
+      <div class="page-head"><h1>projects</h1></div>
+      <form class="proj-form" id="proj-form">
+        <p class="ask-prompt">Post a project</p>
+        <label>what you’re working on
+          <textarea name="working" required maxlength="500" rows="2" placeholder="what are you working on?"></textarea>
+        </label>
+        <label>what you could use help with
+          <textarea name="help" required maxlength="500" rows="2" placeholder="what could use a hand?"></textarea>
+        </label>
+        <div><button class="btn primary" type="submit">post</button></div>
+      </form>
+      <div class="deck" id="proj-deck" aria-live="polite">
+        <div class="skel skel-title"></div>
+        <div class="skel skel-line"></div>
+        <div class="skel skel-line w80"></div>
+      </div>
+    </div>`);
+    const form = document.getElementById("proj-form");
+    if (form) {
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const btn = form.querySelector('button[type="submit"]');
+        if (btn) btn.disabled = true;
+        try {
+          const fd = new FormData(form);
+          const working = String(fd.get("working") || "").trim();
+          const help = String(fd.get("help") || "").trim();
+          if (!working || !help) throw new Error("fill in both fields");
+          await api("/api/projects", {
+            method: "POST",
+            body: JSON.stringify({ body: "working on: " + working + "\ncould use help with: " + help }),
+          });
+          showToast("posted");
+          state.projIdx = 0;
+          renderProjects();
+        } catch (err) {
+          alert(err.message);
+          if (btn) btn.disabled = false;
+        }
+      });
+    }
+    let data;
+    try {
+      data = await api("/api/projects");
+    } catch (err) {
+      if (stale(g)) return;
+      renderError(err.message);
+      return;
+    }
+    if (stale(g)) return;
+    state.projList = data.projects || [];
+    if (state.projIdx >= state.projList.length) state.projIdx = 0;
+    showProjCard();
+  }
+
+  function pollHtml(q) {
+    const opts = q.options || [];
+    const total = opts.reduce((n, o) => n + (o.votes || 0), 0) || 0;
+    const my = q.my_vote || null;
+    return `<div class="poll" data-qid="${escapeHtml(q.id)}">
+      ${opts
+        .map((o) => {
+          const pct = total ? Math.round((100 * (o.votes || 0)) / total) : 0;
+          const mine = my === o.id ? "mine" : "";
+          const voted = my ? "voted" : "";
+          return `<button type="button" class="poll-opt ${voted} ${mine}" data-oid="${escapeHtml(o.id)}" ${my ? "disabled" : ""}>
+            <span class="bar" style="width:${my ? pct : 0}%"></span>
+            <span class="poll-row">
+              <span class="poll-label">${escapeHtml(o.label)}</span>
+              <span class="poll-count">${my ? pct + "%" : ""}</span>
+            </span>
+          </button>`;
+        })
+        .join("")}
+    </div>`;
+  }
+
   function convoLabel(c) {
     const custom = (c.custom_title || "").trim();
     if (custom) return clip(custom, 48);
+    if (c.project_title) return clip(c.project_title, 48);
+    if (c.weekly_title) return clip(c.weekly_title, 48);
     return substanceLabel(c.other_ask, 48) || "conversation";
   }
 
@@ -3333,13 +3467,7 @@ var lastSendAt = 0;
           body: JSON.stringify(payload),
         });
         state.me = data.user;
-        if (state.pendingAnswer) {
-          const pending = state.pendingAnswer;
-          state.pendingAnswer = null;
-          await sendAnswer(pending.id, pending.body);
-        } else {
-          location.hash = "#/you";
-        }
+        location.hash = "#/you";
       } catch (ex) {
         err.hidden = false;
         err.textContent = ex.message;
@@ -3355,7 +3483,9 @@ var lastSendAt = 0;
       // Drop thread socket when leaving a conversation view
       if (!(r.parts[0] === "messages" && r.parts[1])) closeRealtime("thread");
       ensureInboxRealtime();
-      if (r.parts[0] === "qa") return await renderQa(g);
+      if (r.parts[0] === "qa") { location.hash = "#/"; return; }
+      if (r.parts[0] === "weekly") return await renderWeekly(g);
+      if (r.parts[0] === "projects") return await renderProjects(g);
       if (r.parts[0] === "messages" && r.parts[1]) return await renderThread(r.parts[1], g);
       if (r.parts[0] === "messages") return await renderMessages(g);
       if (r.parts[0] === "you") return await renderYou(g);
@@ -3374,57 +3504,6 @@ var lastSendAt = 0;
   window.addEventListener("hashchange", () => {
     render();
   });
-
-  window.addEventListener("keydown", (e) => {
-    if (route().parts.length) return;
-    if (!document.body.classList.contains("page-home")) return;
-    const slide = document.getElementById("slide");
-    if (slide && slide.classList.contains("answering")) return;
-    if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
-      if (!state.card) return;
-      e.preventDefault();
-      pushHistory(state.card);
-      dismiss("ul", () => skip(state.card.id));
-    } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
-      e.preventDefault();
-      if (state.history.length) goBack();
-      else if (state.card) {
-        pushHistory(state.card);
-        dismiss("ul", () => skip(state.card.id));
-      }
-    }
-  });
-
-  // desktop wheel / trackpad: opposite diagonal energy
-  let wheelLock = false;
-  window.addEventListener(
-    "wheel",
-    (e) => {
-      if (!document.body.classList.contains("page-home")) return;
-      if (route().parts.length) return;
-      const slide = document.getElementById("slide");
-      if (!slide || slide.classList.contains("answering")) return;
-      if (Math.abs(e.deltaX) < 8 && Math.abs(e.deltaY) < 8) return;
-      if (wheelLock) return;
-      // left / up-ish → dismiss; right / down-ish → back
-      const forward = e.deltaX < -18 || (Math.abs(e.deltaX) < 10 && e.deltaY < -28);
-      const backward = e.deltaX > 18 || (Math.abs(e.deltaX) < 10 && e.deltaY > 28);
-      if (!forward && !backward) return;
-      e.preventDefault();
-      wheelLock = true;
-      setTimeout(() => {
-        wheelLock = false;
-      }, 420);
-      if (forward && state.card) {
-        pushHistory(state.card);
-        dismiss("ul", () => skip(state.card.id));
-      } else if (backward) {
-        if (state.history.length) goBack();
-      }
-    },
-    { passive: false },
-  );
-
 
   function renderLegal(kind) {
     setNav("you");
@@ -3525,7 +3604,7 @@ var lastSendAt = 0;
     }
     list.innerHTML = events
       .map((e) => {
-        const href = e.kind === "answer" ? "#/qa" : e.ref_id ? "#/messages/" + encodeURIComponent(e.ref_id) : "#/messages";
+        const href = e.kind === "answer" ? "#/" : e.ref_id ? "#/messages/" + encodeURIComponent(e.ref_id) : "#/messages";
         return `<a class="alert-row" href="${href}"><span class="alert-kind">${escapeHtml(e.kind)}</span><span class="alert-sum">${escapeHtml(e.summary)}</span><span class="alert-time">${escapeHtml(formatRel(e.created_at))}</span></a>`;
       })
       .join("");
@@ -3671,7 +3750,6 @@ var lastSendAt = 0;
   setTimeout(scrubLegacyTopChrome, 0);
   refreshMe()
     .then(() => {
-      if (state.me && state.me.stack_sort) saveStackSort(state.me.stack_sort);
       applyUserAppearance(state.me);
       ensureInboxRealtime();
       refreshAlerts();
