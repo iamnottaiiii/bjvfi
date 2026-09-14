@@ -11,6 +11,33 @@
   const SHARE_URL = "https://bjvfi.com/eez";
   const TWO_DAYS = 2 * 24 * 60 * 60 * 1000;
 
+  const HISTORY_MAX = 12;
+  const SORT_KEY = "eez_stack_sort";
+
+  function loadStackSort() {
+    try {
+      const s = localStorage.getItem(SORT_KEY);
+      if (s === "active" || s === "oldest" || s === "unseen") return s;
+    } catch { /* ignore */ }
+    return "active";
+  }
+
+  function saveStackSort(s) {
+    state.stackSort = s;
+    try { localStorage.setItem(SORT_KEY, s); } catch { /* ignore */ }
+  }
+
+  function formatPresence(ts) {
+    if (!ts) return "a while ago";
+    const diff = Date.now() - ts;
+    if (diff < 0) return "a while ago";
+    if (diff < 60 * 1000) return "active now";
+    if (diff < 60 * 60 * 1000) return Math.floor(diff / 60000) + "m ago";
+    if (diff < 24 * 60 * 60 * 1000) return Math.floor(diff / 3600000) + "h ago";
+    const d = Math.floor(diff / 86400000);
+    return d === 1 ? "yesterday" : d + "d ago";
+  }
+
   function isStandalone() {
     try {
       if (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) return true;
@@ -29,13 +56,18 @@
   }
   const state = {
     me: null,
+    exclude: loadExclude(),
+    history: [],
+    pendingAnswer: null,
+    card: null,
+    enterFrom: "right",
+    enterMode: "forward",
     toastTimer: null,
     guestKey: loadGuestKey(),
+    stackSort: loadStackSort(),
     deferredInstall: null,
-    deckIdx: 0,
-    deckQs: [],
-    projIdx: 0,
-    projList: [],
+    qaIdx: 0,
+    qaQs: [],
   };
   let renderGen = 0;
 
@@ -404,7 +436,9 @@
       if (preview) return; // draft preview: paint only, persist on save
       if (t) localStorage.setItem(UITHEME_KEY, t);
       else localStorage.removeItem(UITHEME_KEY);
-      if (custom && (custom.bg || custom.accent || custom.text)) {
+      // Only the custom theme owns the custom color keys. A preset save must
+      // not clobber them (e.g. with defaults when the user never picked custom).
+      if (t === "custom" && custom && (custom.bg || custom.accent || custom.text)) {
         const c = { ...storedUithemeCustom(), ...custom };
         localStorage.setItem(UITHEME_BG_KEY, c.bg);
         localStorage.setItem(UITHEME_ACCENT_KEY, c.accent);
@@ -434,9 +468,17 @@
       if (t === "custom") patch.theme_custom = packCustom(draft.custom);
       const data = await api("/api/me", { method: "PATCH", body: JSON.stringify(patch) });
       state.me = data.user;
-    } catch {
-      /* keep the local choice */
+    } catch (err) {
+      // The save did not stick server-side. Roll the UI back to the true saved
+      // state instead of leaving a theme that the next render (e.g. going back
+      // to the you page, which applies state.me) would silently revert.
+      applyUserAppearance(state.me);
+      throw err;
     }
+    // Reconcile: the user may have navigated away while the PATCH was in
+    // flight, in which case the new page applied the then-stale state.me.
+    // Re-apply the confirmed theme so the current page matches the save.
+    applyUserAppearance(state.me);
   }
   function uithemePicksHtml(current) {
     const cur = current || "";
@@ -628,6 +670,31 @@
     } catch {
       /* ignore */
     }
+  }
+
+  function loadExclude() {
+    try {
+      const raw = localStorage.getItem("eez_exclude");
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr.filter((x) => typeof x === "string") : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function saveExclude() {
+    localStorage.setItem("eez_exclude", JSON.stringify(state.exclude.slice(-200)));
+  }
+
+  function rememberExclude(id) {
+    if (!id || state.exclude.includes(id)) return;
+    state.exclude.push(id);
+    saveExclude();
+  }
+
+  function forgetExclude(id) {
+    state.exclude = state.exclude.filter((x) => x !== id);
+    saveExclude();
   }
 
   function loadGuestKey() {
@@ -969,14 +1036,6 @@ async function buildConvoView(c, me, users, messages, prefs){
   var msgs = messages.filter(function(m){ return m.conversation_id === c.id; });
   var last = msgs.length ? msgs[msgs.length - 1] : null;
   var lastRead = mine.last_read_at || 0;
-  var projTitle = '';
-  if(c.project_id){
-    try{
-      var pjAll = ((await ghGetJson('projects.json', true)) || {data: []}).data;
-      var pr0 = pjAll.find(function(x){ return x.id === c.project_id; });
-      if(pr0 && pr0.body) projTitle = 'project: ' + clip(String(pr0.body).replace(/\s+/g, ' ').trim(), 44);
-    }catch(e){ /* ignore */ }
-  }
   var weeklyTitle = '';
   if(c.weekly && c.weekly.markers){
     var mm = c.weekly.markers || {};
@@ -1006,7 +1065,6 @@ async function buildConvoView(c, me, users, messages, prefs){
     bumped: false,
     waiting: waiting,
     expires_at: expiresAt,
-    project_title: projTitle,
     weekly_title: weeklyTitle,
     muted: !!mine.muted,
     read_receipts: mine.read_receipts !== 0,
@@ -1674,64 +1732,8 @@ async function ghApi(path, opts){
     return {comment: {id: createdWc.id, marker: createdWc.marker}};
   }
 
-  /* ----- projects ----- */
-  function projMine(x, me, ident){
-    return me ? x.author_id === me.id : (x.guest_key && x.guest_key === ident);
-  }
-  if(p === '/api/projects' && method === 'GET'){
-    var sessP = loadSession();
-    var meP = sessP ? await findUserById(sessP.uid) : null;
-    var identP = meP ? meP.id : guestKey();
-    var projs = ((await ghGetJson('projects.json', true)) || {data: []}).data;
-    var list = projs
-      .filter(function(x){ return !x.closed || projMine(x, meP, identP); })
-      .sort(function(a, b){ return b.created_at - a.created_at; })
-      .slice(0, 200)
-      .map(function(x){
-        return {id: x.id, body: x.body, mine: !!projMine(x, meP, identP), closed: !!x.closed, created_at: s2ms(x.created_at)};
-      });
-    return {projects: list};
-  }
-  if(p === '/api/projects' && method === 'POST'){
-    var sessPp = loadSession();
-    var mePp = sessPp ? await findUserById(sessPp.uid) : null;
-    var pbody = String((json || {}).body || '').trim();
-    if(!pbody) throw bad('write something first');
-    if(pbody.length > 1000) throw bad('keep it under 1000 characters');
-    var createdPp;
-    await mutateJson('projects.json', function(arr){
-      createdPp = {id: newId(), author_id: mePp ? mePp.id : null, guest_key: mePp ? '' : guestKey(),
-        body: pbody, created_at: nowS(), closed: 0};
-      arr.push(createdPp);
-    }, 'eez: new project');
-    if(mePp) await touchSeen(mePp);
-    return {project: {id: createdPp.id}};
-  }
-  var projM = /^\/api\/projects\/([^/]+)$/.exec(p);
-  if(projM && (method === 'PATCH' || method === 'DELETE')){
-    var sessPe = loadSession();
-    var mePe = sessPe ? await findUserById(sessPe.uid) : null;
-    var identPe = mePe ? mePe.id : guestKey();
-    var pidPe = projM[1];
-    var pj = json || {};
-    await mutateJson('projects.json', function(arr){
-      var tgt = arr.find(function(x){ return x.id === pidPe; });
-      if(!tgt) throw bad('project gone', 404);
-      if(!projMine(tgt, mePe, identPe)) throw bad('not yours', 403);
-      if(method === 'DELETE') return arr.filter(function(x){ return x.id !== pidPe; });
-      if(typeof pj.body === 'string'){
-        var nb = pj.body.trim();
-        if(!nb) throw bad('write something first');
-        if(nb.length > 1000) throw bad('keep it under 1000 characters');
-        tgt.body = nb;
-      }
-      if(typeof pj.closed === 'boolean') tgt.closed = pj.closed ? 1 : 0;
-    }, 'eez: update project');
-    if(mePe) await touchSeen(mePe);
-    return {};
-  }
+  /* ----- conversations from weekly (shares openConversation) ----- */
 
-  /* ----- conversations from weekly / projects (share openConversation) ----- */
   async function openConversation(me, recipId, fbody, extras){
     var other = await findUserById(recipId);
     if(!other) throw bad('person not found', 404);
@@ -1746,7 +1748,6 @@ async function ghApi(path, opts){
       cid = newId();
       await mutateJson('conversations.json', function(cs){
         var rec = {id: cid, initiator_id: me.id, recipient_id: recipId, created_at: ts, last_activity_at: ts, hidden_from_initiator: 0, bump_sent_at: 0};
-        if(extras && extras.project_id) rec.project_id = extras.project_id;
         if(extras && extras.weekly) rec.weekly = extras.weekly;
         cs.push(rec);
       }, 'eez: new conversation');
@@ -1797,22 +1798,6 @@ async function ghApi(path, opts){
       {weekly: {week_id: weekIdFw, cohort: cohortFw, markers: markersFw}});
     feedPush(peerFw, 'message', 'someone messaged you from weekly', cidFw);
     return {conversation_id: cidFw};
-  }
-  if(p === '/api/conversations/from-project' && method === 'POST'){
-    var meFp = await requireMe();
-    var pidFp = String((json || {}).project_id || '');
-    var fbodyFp = String((json || {}).body || '').trim();
-    if(!fbodyFp) throw bad('write something first');
-    if(fbodyFp.length > 2000) throw bad('keep it under 2000 characters');
-    var projsFp = ((await ghGetJson('projects.json', true)) || {data: []}).data;
-    var prFp = projsFp.find(function(x){ return x.id === pidFp && !x.closed; });
-    if(!prFp) throw bad('that project is gone', 404);
-    var ownerFp = prFp.author_id || null;
-    if(!ownerFp) throw bad('they need an account before you can message', 403);
-    if(ownerFp === meFp.id) throw bad('that is your own project');
-    var cidFp = await openConversation(meFp, ownerFp, fbodyFp, {project_id: pidFp});
-    feedPush(ownerFp, 'message', 'someone messaged you about your project', cidFp);
-    return {conversation_id: cidFp};
   }
 
   /* ----- misc ----- */
@@ -1939,7 +1924,7 @@ var lastSendAt = 0;
     return false;
   }
 
-  /* ---------- Q&A deck: home is one question at a time (no swipe stack, no feed) ---------- */
+  /* ---------- Q&A: ask panel + question cards (detail rendering shared) ---------- */
   function askPanelHtml() {
     if (!state.me) {
       return `<section class="ask-guest ask-sticky">
@@ -2256,45 +2241,651 @@ var lastSendAt = 0;
     });
   }
 
-  function showDeckCard() {
-    const box = document.getElementById("deck");
-    if (!box) return;
-    const qs = state.deckQs || [];
-    if (!qs.length) {
-      box.innerHTML = `<div class="state-block"><p class="empty-lead">quiet so far</p><p class="empty-sub">ask something, or check back when the room has a pulse.</p></div>`;
-      return;
-    }
-    if (state.deckIdx < 0) state.deckIdx = 0;
-    if (state.deckIdx >= qs.length) state.deckIdx = qs.length - 1;
-    const q = qs[state.deckIdx];
-    const atFirst = state.deckIdx === 0;
-    const atLast = state.deckIdx === qs.length - 1;
-    box.innerHTML = `${qCardHtml(q)}
-      <div class="deck-pager">
-        <button type="button" class="btn ghost sm" id="deck-prev"${atFirst ? " disabled" : ""}>prev</button>
-        <span class="deck-count">${state.deckIdx + 1} of ${qs.length}</span>
-        <button type="button" class="btn ghost sm" id="deck-next"${atLast ? " disabled" : ""}>next</button>
-      </div>`;
-    bindQuestionCard(box, () => renderHome());
-    const prev = document.getElementById("deck-prev");
-    const next = document.getElementById("deck-next");
-    if (prev) prev.addEventListener("click", () => { if (state.deckIdx > 0) { state.deckIdx--; showDeckCard(); } });
-    if (next) next.addEventListener("click", () => { if (state.deckIdx < (state.deckQs || []).length - 1) { state.deckIdx++; showDeckCard(); } });
+  async function sendAnswer(recipientId, body) {
+    const data = await api("/api/conversations/from-card", {
+      method: "POST",
+      body: JSON.stringify({ recipient_id: recipientId, body }),
+    });
+    rememberExclude(recipientId);
+    location.hash = "#/messages/" + data.conversation_id;
   }
 
   async function renderHome(g) {
     setNav("home");
-    app.innerHTML = fadeWrap(`<div class="qa-page deck-page">
-      <h1>q&amp;a</h1>
-      ${askPanelHtml()}
-      <div class="deck" id="deck" aria-live="polite">
-        <div class="skel skel-title"></div>
+    const sort = (state.me && state.me.stack_sort) || state.stackSort || "active";
+    app.innerHTML = `<div class="home-wrap">
+      <div class="sort-bar" role="group" aria-label="sort stack">
+        <button type="button" class="sort-chip ${sort === "active" ? "on" : ""}" data-sort="active">active now</button>
+        <button type="button" class="sort-chip ${sort === "oldest" ? "on" : ""}" data-sort="oldest">oldest</button>
+        <button type="button" class="sort-chip ${sort === "unseen" ? "on" : ""}" data-sort="unseen">haven’t seen</button>
+      </div>
+      <div class="stage" aria-live="polite"><div class="slide" id="slide">
+      <div class="slide-body">
+        <div class="skel skel-line w40"></div>
         <div class="skel skel-line"></div>
         <div class="skel skel-line w80"></div>
         <div class="skel skel-line w60"></div>
       </div>
+    </div></div></div>`;
+    app.querySelectorAll("[data-sort]").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const next = btn.getAttribute("data-sort");
+        saveStackSort(next);
+        if (state.me) {
+          try {
+            const data = await api("/api/me", { method: "PATCH", body: JSON.stringify({ stack_sort: next }) });
+            state.me = data.user;
+          } catch { /* local still applied */ }
+        }
+        state.exclude = [];
+        saveExclude();
+        state.history = [];
+        state.enterMode = "forward";
+        app.querySelectorAll("[data-sort]").forEach((b) => b.classList.toggle("on", b.getAttribute("data-sort") === next));
+        await loadCard(g);
+      });
+    });
+    state.enterFrom = "right";
+    state.enterMode = "forward";
+    await loadCard(g);
+  }
+
+  async function loadCard(g) {
+    const params = new URLSearchParams();
+    if (state.exclude.length) params.set("exclude", state.exclude.join(","));
+    const sort = (state.me && state.me.stack_sort) || state.stackSort || "active";
+    params.set("sort", sort);
+    const qs = params.toString() ? "?" + params.toString() : "";
+    let data;
+    try {
+      data = await api("/api/stack" + qs);
+    } catch (err) {
+      if (stale(g)) return;
+      const stage = app.querySelector(".stage");
+      if (!stage) return;
+      stage.innerHTML = `<div class="state-block">
+        <p class="empty-lead">couldn’t load</p>
+        <p class="empty-sub">${escapeHtml(err.message)}</p>
+        <button type="button" class="btn" id="retry-stack">try again</button>
+      </div>`;
+      const b = document.getElementById("retry-stack");
+      if (b) b.addEventListener("click", () => loadCard(g));
+      return;
+    }
+    if (stale(g)) return;
+    const stage = app.querySelector(".stage");
+    if (!stage) return;
+    if (!data.profile) {
+      stage.innerHTML = `<div class="state-block">
+        <p class="empty-lead">that’s the stack for now</p>
+        <p class="empty-sub">come back later, or bring one back if you moved past too fast.</p>
+        ${state.history.length ? `<button type="button" class="btn" id="empty-back">previous</button>` : ""}
+      </div>`;
+      state.card = null;
+      const eb = document.getElementById("empty-back");
+      if (eb) eb.addEventListener("click", goBack);
+      return;
+    }
+    mountProfile(data.profile, state.enterMode || "forward");
+  }
+
+  function mountProfile(profile, mode) {
+    const stage = app.querySelector(".stage");
+    if (!stage) return;
+    state.card = profile;
+    state.enterMode = mode;
+    stage.innerHTML = slideHtml(profile);
+    const el = stage.querySelector(".slide");
+    bindSlide(el, profile);
+    enterSlide(el, mode);
+  }
+
+  function slideHtml(p) {
+    const canBack = state.history.length > 0;
+    const presence = formatPresence(Number(p.last_seen_at) || 0);
+    const live = presence === "active now";
+    return `
+      <article class="slide" id="slide">
+        <div class="slide-body">
+          <div class="presence-row" title="last activity">
+            <span class="presence-dot ${live ? "live" : ""}" aria-hidden="true"></span>
+            <span class="presence-label">${escapeHtml(presence)}</span>
+          </div>
+          <dl class="qa">
+            <div>
+              <dt>Why are you here?</dt>
+              <dd>${escapeHtml(p.why_here)}</dd>
+            </div>
+            <div>
+              <dt>What are you into right now?</dt>
+              <dd>${escapeHtml(p.into_now)}</dd>
+            </div>
+            <div>
+              <dt>Ask them something.</dt>
+              <dd class="ask">${escapeHtml(p.ask_them)}</dd>
+            </div>
+          </dl>
+          <form class="answer-ambient" hidden>
+            <label class="sr-only" for="answer-body">your answer</label>
+            <textarea id="answer-body" name="body" required maxlength="2000" rows="3" placeholder="answer their question… (Enter to send)"></textarea>
+          </form>
+        </div>
+        <div class="slide-bar" id="slide-bar">
+          <button type="button" class="back-chip" data-act="back" aria-label="previous" ${canBack ? "" : "hidden"}>‹</button>
+          <button type="button" class="btn primary sm" data-act="answer">answer</button>
+          <div class="more-wrap">
+            <button type="button" class="text-act more-btn" data-act="more" aria-label="more" aria-expanded="false" aria-haspopup="menu">:</button>
+            <div class="more-menu" hidden role="menu">
+              <button type="button" class="text-act" data-act="bookmark" role="menuitem">bookmark</button>
+              <button type="button" class="text-act danger" data-act="report" role="menuitem">report</button>
+              <button type="button" class="text-act danger" data-act="block" role="menuitem">block</button>
+            </div>
+          </div>
+        </div>
+      </article>`;
+  }
+
+  function enterSlide(el, mode) {
+    if (!el) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) {
+      el.classList.add("in");
+      return;
+    }
+    el.classList.remove("in", "out-ul", "out-dr", "enter-ul", "enter-dr", "enter-left", "enter-right", "out-left", "out-right");
+    // forward after dismiss-ul AND bring-back: enter moving down-to-right
+    el.classList.add("enter-dr");
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        el.classList.remove("enter-ul", "enter-dr", "enter-left", "enter-right");
+        el.classList.add("in");
+      });
+    });
+  }
+
+  function bindSlide(el, profile) {
+    if (!el) return;
+    const box = el.querySelector(".answer-ambient");
+    const ta = box.querySelector("textarea");
+    const moreBtn = el.querySelector('[data-act="more"]');
+    const moreMenu = el.querySelector(".more-menu");
+
+    function closeMore() {
+      if (!moreMenu || !moreBtn) return;
+      moreMenu.hidden = true;
+      moreBtn.setAttribute("aria-expanded", "false");
+    }
+
+    function exitAnswer() {
+      box.hidden = true;
+      el.classList.remove("answering");
+      if (ta) ta.blur();
+    }
+
+    const reportBtn = el.querySelector('[data-act="report"]');
+    if (reportBtn) {
+      reportBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        closeMore();
+        onReport(profile);
+      });
+    }
+    el.querySelector('[data-act="block"]').addEventListener("click", (e) => {
+      e.stopPropagation();
+      closeMore();
+      onBlock(profile);
+    });
+    const bmBtn = el.querySelector('[data-act="bookmark"]');
+    if (bmBtn) {
+      bmBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        closeMore();
+        onBookmark(profile);
+      });
+    }
+
+    if (moreBtn && moreMenu) {
+      moreBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const open = moreMenu.hidden;
+        moreMenu.hidden = !open;
+        moreBtn.setAttribute("aria-expanded", open ? "true" : "false");
+      });
+      // Close on outside tap within this slide only (no document listener leak).
+      el.addEventListener(
+        "pointerdown",
+        (ev) => {
+          if (!moreMenu.hidden && !ev.target.closest(".more-wrap")) closeMore();
+        },
+        true,
+      );
+    }
+
+    el.querySelector('[data-act="answer"]').addEventListener("click", (e) => {
+      e.stopPropagation();
+      closeMore();
+      box.hidden = false;
+      el.classList.add("answering");
+      ta.focus();
+    });
+
+    const backBtn = el.querySelector('[data-act="back"]');
+    if (backBtn) {
+      backBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        closeMore();
+        goBack();
+      });
+    }
+
+    box.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const text = String(new FormData(box).get("body") || "").trim();
+      if (text) onAnswer(profile, text);
+    });
+
+    ta.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        exitAnswer();
+        return;
+      }
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        box.requestSubmit();
+      }
+    });
+
+    let startX = 0;
+    let startY = 0;
+    let dx = 0;
+    let dy = 0;
+    let tracking = false;
+    let locked = null;
+
+    const onStart = (x, y) => {
+      if (el.classList.contains("answering")) return;
+      tracking = true;
+      locked = null;
+      startX = x;
+      startY = y;
+      dx = 0;
+      dy = 0;
+      el.classList.add("dragging");
+    };
+    const onMove = (x, y) => {
+      if (!tracking) return;
+      dx = x - startX;
+      dy = y - startY;
+      if (locked === null && Math.hypot(dx, dy) > 10) {
+        // favor diagonal / horizontal for swipe; vertical stays for body scroll
+        locked = Math.abs(dx) > Math.abs(dy) * 0.7 ? "x" : "y";
+      }
+      if (locked !== "x") return;
+      // unmistakable diagonal: left→up-left, right→down-right + rotate
+      const ty = dx < 0 ? dx * 0.72 : dx * 0.72;
+      const rot = Math.max(-14, Math.min(14, dx / 18));
+      const sc = Math.max(0.9, 1 - Math.abs(dx) / 900);
+      const fade = Math.max(0.22, 1 - Math.abs(dx) / 380);
+      el.style.transform = `translate(${dx}px, ${ty}px) rotate(${rot}deg) scale(${sc})`;
+      el.style.opacity = String(fade);
+    };
+    const onEnd = () => {
+      if (!tracking) return;
+      tracking = false;
+      el.classList.remove("dragging");
+      if (locked === "x" && Math.abs(dx) > 64) {
+        if (dx < 0) {
+          // dismiss forward: exit up-left
+          pushHistory(profile);
+          dismiss("ul", () => skip(profile.id));
+        } else if (state.history.length) {
+          // opposite: bring back - exit current down-right then restore
+          goBack();
+        } else {
+          // no history: also advance forward via right (still up-left exit energy flipped? use ul for next)
+          pushHistory(profile);
+          dismiss("ul", () => skip(profile.id));
+        }
+      } else {
+        el.style.transform = "";
+        el.style.opacity = "";
+      }
+    };
+
+    el.addEventListener(
+      "touchstart",
+      (e) => {
+        if (e.target.closest("button, textarea, input, form, a")) return;
+        const t = e.changedTouches[0];
+        onStart(t.clientX, t.clientY);
+      },
+      { passive: true },
+    );
+    el.addEventListener(
+      "touchmove",
+      (e) => {
+        const t = e.changedTouches[0];
+        onMove(t.clientX, t.clientY);
+        if (locked === "x") e.preventDefault();
+      },
+      { passive: false },
+    );
+    el.addEventListener("touchend", onEnd);
+    el.addEventListener("touchcancel", onEnd);
+
+    el.addEventListener("pointerdown", (e) => {
+      if (e.pointerType === "touch") return;
+      if (e.target.closest("button, textarea, input, form, a")) return;
+      el.setPointerCapture(e.pointerId);
+      onStart(e.clientX, e.clientY);
+    });
+    el.addEventListener("pointermove", (e) => {
+      if (e.pointerType === "touch") return;
+      onMove(e.clientX, e.clientY);
+    });
+    el.addEventListener("pointerup", (e) => {
+      if (e.pointerType === "touch") return;
+      onEnd();
+    });
+  }
+
+  function pushHistory(profile) {
+    if (!profile) return;
+    state.history.push({ ...profile });
+    if (state.history.length > HISTORY_MAX) state.history.shift();
+  }
+
+  function dismiss(dir, after) {
+    const el = document.getElementById("slide");
+    if (!el) {
+      after();
+      return;
+    }
+    el.style.transform = "";
+    el.style.opacity = "";
+    el.classList.remove("in", "enter-ul", "enter-dr", "enter-left", "enter-right");
+    // ul = up-left (dismiss), dr = down-right (leaving when going back to previous)
+    el.classList.add(dir === "dr" ? "out-dr" : "out-ul");
+    const ms = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 420;
+    setTimeout(after, ms);
+  }
+
+  async function skip(id) {
+    rememberExclude(id);
+    try {
+      await api("/api/stack/skip", { method: "POST", body: JSON.stringify({ id }) });
+    } catch {
+      /* guests skip locally */
+    }
+    state.enterMode = "forward";
+    await loadCard();
+  }
+
+  function goBack() {
+    if (!state.history.length) return;
+    const prev = state.history.pop();
+    forgetExclude(prev.id);
+    const current = state.card;
+    const finish = () => {
+      state.enterMode = "back";
+      mountProfile(prev, "back");
+    };
+    if (current) {
+      // current leaves down-right; previous comes in down-to-right
+      dismiss("dr", finish);
+    } else {
+      finish();
+    }
+  }
+
+  async function onBookmark(profile) {
+    if (!(await requireLogin())) return;
+    try {
+      await api("/api/bookmarks", { method: "POST", body: JSON.stringify({ id: profile.id }) });
+      showToast("bookmarked");
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
+  async function onBlock(profile) {
+    if (!(await requireLogin())) return;
+    const ok = confirm("Block this person? They will not show again.");
+    if (!ok) return;
+    try {
+      await api("/api/stack/block", { method: "POST", body: JSON.stringify({ id: profile.id, reason: "block" }) });
+      rememberExclude(profile.id);
+      state.history = state.history.filter((h) => h.id !== profile.id);
+      state.enterMode = "forward";
+      dismiss("ul", loadCard);
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
+  async function onReport(profile) {
+    if (!(await requireLogin())) return;
+    const ok = confirm("Report this person? They leave your stack. At 20 distinct reports their account is removed.");
+    if (!ok) return;
+    try {
+      await api("/api/stack/report", { method: "POST", body: JSON.stringify({ id: profile.id, reason: "report" }) });
+      showToast("reported");
+      rememberExclude(profile.id);
+      state.history = state.history.filter((h) => h.id !== profile.id);
+      state.enterMode = "forward";
+      dismiss("ul", loadCard);
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
+  async function onAnswer(profile, text) {
+    if (!text) return;
+    if (!state.me) {
+      state.pendingAnswer = { id: profile.id, body: text };
+      showModal();
+      return;
+    }
+    try {
+      await sendAnswer(profile.id, text);
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
+
+  /* ---------- Q&A: one question at a time in the home-style swipe stack ---------- */
+  function qaStackCardHtml(q) {
+    const kindLabel = q.kind === "poll" ? "poll" : q.kind === "image" ? "image" : "question";
+    const media =
+      q.image_url
+        ? `<div class="q-media"><img src="${escapeHtml(q.image_url)}" alt="" loading="lazy" /></div>`
+        : "";
+    const tops = (q.answers || []).filter((a) => !a.parent_id);
+    const n = tops.length;
+    const countLabel = n === 0 ? "no answers yet" : n === 1 ? "1 answer" : n + " answers";
+    const canBack = state.qaIdx > 0;
+    return `
+      <article class="slide qa-slide" id="slide">
+        <div class="slide-body">
+          <div class="q-meta">${kindLabel}</div>
+          <div class="q-body">${escapeHtml(q.body)}</div>
+          ${media}
+          <p class="q-count">${countLabel}</p>
+          <p class="tap-hint">tap to open</p>
+        </div>
+        <div class="slide-bar" id="slide-bar">
+          <button type="button" class="back-chip" data-act="back" aria-label="previous" ${canBack ? "" : "hidden"}>‹</button>
+          <button type="button" class="btn primary sm" data-act="open">open</button>
+        </div>
+      </article>`;
+  }
+
+  function mountQaCard(idx, mode) {
+    const stage = app.querySelector(".stage");
+    if (!stage) return;
+    const qs = state.qaQs || [];
+    if (!qs.length) {
+      stage.innerHTML = `<div class="state-block"><p class="empty-lead">quiet so far</p><p class="empty-sub">ask something, or check back when the room has a pulse.</p></div>`;
+      return;
+    }
+    if (idx < 0) idx = 0;
+    if (idx >= qs.length) idx = qs.length - 1;
+    state.qaIdx = idx;
+    stage.innerHTML = qaStackCardHtml(qs[idx]);
+    const el = stage.querySelector(".slide");
+    bindQaCard(el, qs[idx]);
+    enterSlide(el, mode || "forward");
+  }
+
+  function qaNext() {
+    const qs = state.qaQs || [];
+    const el = document.getElementById("slide");
+    if (state.qaIdx >= qs.length - 1) {
+      if (el) {
+        el.style.transform = "";
+        el.style.opacity = "";
+      }
+      showToast("that's everything");
+      return;
+    }
+    dismiss("ul", () => mountQaCard(state.qaIdx + 1, "forward"));
+  }
+
+  function qaBack() {
+    const el = document.getElementById("slide");
+    if (state.qaIdx <= 0) {
+      if (el) {
+        el.style.transform = "";
+        el.style.opacity = "";
+      }
+      return;
+    }
+    dismiss("dr", () => mountQaCard(state.qaIdx - 1, "back"));
+  }
+
+  function bindQaCard(el, q) {
+    if (!el) return;
+    const open = () => {
+      location.hash = "#/qa/" + q.id;
+    };
+    el.querySelector('[data-act="open"]').addEventListener("click", (e) => {
+      e.stopPropagation();
+      open();
+    });
+    const backBtn = el.querySelector('[data-act="back"]');
+    if (backBtn) {
+      backBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        qaBack();
+      });
+    }
+
+    let startX = 0;
+    let startY = 0;
+    let dx = 0;
+    let dy = 0;
+    let tracking = false;
+    let locked = null;
+
+    const onStart = (x, y) => {
+      tracking = true;
+      locked = null;
+      startX = x;
+      startY = y;
+      dx = 0;
+      dy = 0;
+      el.classList.add("dragging");
+    };
+    const onMove = (x, y) => {
+      if (!tracking) return;
+      dx = x - startX;
+      dy = y - startY;
+      if (locked === null && Math.hypot(dx, dy) > 10) {
+        // favor diagonal / horizontal for swipe; vertical stays for body scroll
+        locked = Math.abs(dx) > Math.abs(dy) * 0.7 ? "x" : "y";
+      }
+      if (locked !== "x") return;
+      const ty = dx * 0.72;
+      const rot = Math.max(-14, Math.min(14, dx / 18));
+      const sc = Math.max(0.9, 1 - Math.abs(dx) / 900);
+      const fade = Math.max(0.22, 1 - Math.abs(dx) / 380);
+      el.style.transform = `translate(${dx}px, ${ty}px) rotate(${rot}deg) scale(${sc})`;
+      el.style.opacity = String(fade);
+    };
+    const onEnd = () => {
+      if (!tracking) return;
+      tracking = false;
+      el.classList.remove("dragging");
+      if (locked === "x" && Math.abs(dx) > 64) {
+        if (dx < 0) qaNext();
+        else qaBack();
+      } else {
+        el.style.transform = "";
+        el.style.opacity = "";
+      }
+    };
+
+    el.addEventListener("click", (e) => {
+      if (e.target.closest("button, a")) return;
+      if (Math.abs(dx) > 10) return; // it was a drag, not a tap
+      open();
+    });
+
+    el.addEventListener(
+      "touchstart",
+      (e) => {
+        if (e.target.closest("button, textarea, input, form, a")) return;
+        const t = e.changedTouches[0];
+        onStart(t.clientX, t.clientY);
+      },
+      { passive: true },
+    );
+    el.addEventListener(
+      "touchmove",
+      (e) => {
+        const t = e.changedTouches[0];
+        onMove(t.clientX, t.clientY);
+        if (locked === "x") e.preventDefault();
+      },
+      { passive: false },
+    );
+    el.addEventListener("touchend", onEnd);
+    el.addEventListener("touchcancel", onEnd);
+
+    el.addEventListener("pointerdown", (e) => {
+      if (e.pointerType === "touch") return;
+      if (e.target.closest("button, textarea, input, form, a")) return;
+      el.setPointerCapture(e.pointerId);
+      onStart(e.clientX, e.clientY);
+    });
+    el.addEventListener("pointermove", (e) => {
+      if (e.pointerType === "touch") return;
+      onMove(e.clientX, e.clientY);
+    });
+    el.addEventListener("pointerup", (e) => {
+      if (e.pointerType === "touch") return;
+      onEnd();
+    });
+  }
+
+  async function renderQa(g) {
+    setNav("qa");
+    app.innerHTML = fadeWrap(`<div class="qa-page">
+      <div class="qa-topbar">
+        <button type="button" class="qa-plus" id="qa-ask-open" aria-label="ask a question">+</button>
+        <h1>q&amp;a</h1>
+      </div>
+      <div class="stage" aria-live="polite"><div class="slide" id="slide">
+        <div class="slide-body">
+          <div class="skel skel-line w40"></div>
+          <div class="skel skel-line"></div>
+          <div class="skel skel-line w80"></div>
+        </div>
+      </div></div>
     </div>`);
-    bindAskForm(() => renderHome());
+    document.getElementById("qa-ask-open").addEventListener("click", openAskOverlay);
     let data;
     try {
       data = await api("/api/questions");
@@ -2304,9 +2895,78 @@ var lastSendAt = 0;
       return;
     }
     if (stale(g)) return;
-    state.deckQs = data.questions || [];
-    if (state.deckIdx >= state.deckQs.length) state.deckIdx = 0;
-    showDeckCard();
+    state.qaQs = data.questions || [];
+    if (state.qaIdx >= state.qaQs.length) state.qaIdx = 0;
+    mountQaCard(state.qaIdx, "forward");
+  }
+
+  async function renderQaDetail(id, g) {
+    setNav("qa");
+    app.innerHTML = fadeWrap(`<div class="qa-page">
+      <div class="qa-topbar">
+        <button type="button" class="qa-plus" id="qa-ask-open" aria-label="ask a question">+</button>
+        <h1>q&amp;a</h1>
+      </div>
+      <div class="qa-detail" id="qa-detail" aria-live="polite">
+        <div class="skel skel-title"></div>
+        <div class="skel skel-line"></div>
+        <div class="skel skel-line w80"></div>
+      </div>
+    </div>`);
+    document.getElementById("qa-ask-open").addEventListener("click", openAskOverlay);
+    let data;
+    try {
+      data = await api("/api/questions");
+    } catch (err) {
+      if (stale(g)) return;
+      renderError(err.message);
+      return;
+    }
+    if (stale(g)) return;
+    const q = (data.questions || []).find((x) => x.id === id);
+    const box = document.getElementById("qa-detail");
+    if (!box) return;
+    if (!q) {
+      box.innerHTML = `<div class="state-block">
+        <p class="empty-lead">gone</p>
+        <p class="empty-sub">that question isn't here anymore.</p>
+        <button type="button" class="btn" id="qa-detail-back">back to questions</button>
+      </div>`;
+    } else {
+      box.innerHTML = `<button type="button" class="back-chip qa-back" id="qa-detail-back" aria-label="back to questions">‹ back</button>
+        ${qCardHtml(q)}`;
+      bindQuestionCard(box, () => renderQaDetail(id));
+    }
+    document.getElementById("qa-detail-back").addEventListener("click", () => {
+      location.hash = "#/qa";
+    });
+  }
+
+  function openAskOverlay() {
+    if (document.getElementById("ask-overlay")) return;
+    const scrim = document.createElement("div");
+    scrim.className = "ask-scrim";
+    scrim.id = "ask-overlay";
+    scrim.innerHTML = `<div class="ask-sheet" role="dialog" aria-modal="true" aria-label="ask a question">
+      <button type="button" class="ask-close" aria-label="close">×</button>
+      ${askPanelHtml()}
+    </div>`;
+    document.body.appendChild(scrim);
+    const close = () => scrim.remove();
+    scrim.querySelector(".ask-close").addEventListener("click", close);
+    scrim.addEventListener("click", (e) => {
+      if (e.target === scrim) close();
+    });
+    document.addEventListener("keydown", function esc(e) {
+      if (e.key === "Escape") {
+        close();
+        document.removeEventListener("keydown", esc);
+      }
+    });
+    bindAskForm(() => {
+      close();
+      renderQa();
+    });
   }
 
   /* ---------- weekly: one prompt, one cohort, anonymous markers, ephemeral ---------- */
@@ -2457,200 +3117,6 @@ var lastSendAt = 0;
     });
   }
 
-  /* ---------- projects: one card at a time ---------- */
-  function projCardHtml(p) {
-    const mine = !!p.mine;
-    const chip = p.closed ? `<span class="proj-closed">closed</span>` : "";
-    const owner = mine
-      ? `<div class="ans-actions proj-owner">
-           <button type="button" class="linklike" data-proj-edit="${escapeHtml(p.id)}">edit</button>
-           <button type="button" class="linklike" data-proj-toggle="${escapeHtml(p.id)}">${p.closed ? "reopen" : "close"}</button>
-           <button type="button" class="linklike" data-proj-del="${escapeHtml(p.id)}">delete</button>
-         </div>`
-      : "";
-    const msg = mine
-      ? ""
-      : `<div class="proj-msg-row"><button type="button" class="btn sm" data-proj-msg="${escapeHtml(p.id)}">message</button></div>`;
-    return `<article class="proj-card${mine ? " mine" : ""}" data-proj="${escapeHtml(p.id)}">
-      <div class="q-meta">project ${chip}</div>
-      <div class="q-body proj-body">${escapeHtml(p.body)}</div>
-      ${owner}
-      ${msg}
-      <div class="w-msgbox" hidden>
-        <form class="proj-msg-form" data-proj="${escapeHtml(p.id)}">
-          <p class="hint">message the owner. opens a 1:1 thread</p>
-          <label class="sr-only" for="pm-${escapeHtml(p.id)}">message</label>
-          <textarea id="pm-${escapeHtml(p.id)}" name="body" required maxlength="2000" rows="2" placeholder="say hi…"></textarea>
-          <div class="row-btns"><button class="btn sm primary" type="submit">send</button></div>
-        </form>
-      </div>
-    </article>`;
-  }
-
-  function showProjCard() {
-    const box = document.getElementById("proj-deck");
-    if (!box) return;
-    const ps = state.projList || [];
-    if (!ps.length) {
-      box.innerHTML = `<div class="state-block"><p class="empty-lead">no projects yet</p><p class="empty-sub">post what you’re working on. someone might want in.</p></div>`;
-      return;
-    }
-    if (state.projIdx < 0) state.projIdx = 0;
-    if (state.projIdx >= ps.length) state.projIdx = ps.length - 1;
-    const p = ps[state.projIdx];
-    const atFirst = state.projIdx === 0;
-    const atLast = state.projIdx === ps.length - 1;
-    box.innerHTML = `${projCardHtml(p)}
-      <div class="deck-pager">
-        <button type="button" class="btn ghost sm" id="proj-prev"${atFirst ? " disabled" : ""}>prev</button>
-        <span class="deck-count">${state.projIdx + 1} of ${ps.length}</span>
-        <button type="button" class="btn ghost sm" id="proj-next"${atLast ? " disabled" : ""}>next</button>
-      </div>`;
-    const prev = document.getElementById("proj-prev");
-    const next = document.getElementById("proj-next");
-    if (prev) prev.addEventListener("click", () => { if (state.projIdx > 0) { state.projIdx--; showProjCard(); } });
-    if (next) next.addEventListener("click", () => { if (state.projIdx < (state.projList || []).length - 1) { state.projIdx++; showProjCard(); } });
-
-    box.querySelectorAll("[data-proj-edit]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const card = btn.closest("[data-proj]");
-        const bodyEl = card ? card.querySelector(".proj-body") : null;
-        if (!card || !bodyEl || card.querySelector(".proj-edit-form")) return;
-        const form = document.createElement("form");
-        form.className = "proj-edit-form";
-        form.innerHTML = `<textarea required maxlength="1000" rows="4"></textarea>
-          <div class="row-btns"><button class="btn sm primary" type="submit">save</button>
-          <button class="btn sm ghost" type="button" data-cancel>cancel</button></div>`;
-        form.querySelector("textarea").value = bodyEl.textContent;
-        bodyEl.hidden = true;
-        card.insertBefore(form, bodyEl);
-        form.querySelector("[data-cancel]").addEventListener("click", () => { form.remove(); bodyEl.hidden = false; });
-        form.addEventListener("submit", async (e) => {
-          e.preventDefault();
-          try {
-            await api(`/api/projects/${btn.getAttribute("data-proj-edit")}`, {
-              method: "PATCH",
-              body: JSON.stringify({ body: form.querySelector("textarea").value }),
-            });
-            showToast("saved");
-            renderProjects();
-          } catch (err) { alert(err.message); }
-        });
-      });
-    });
-    box.querySelectorAll("[data-proj-toggle]").forEach((btn) => {
-      btn.addEventListener("click", async () => {
-        try {
-          await api(`/api/projects/${btn.getAttribute("data-proj-toggle")}`, {
-            method: "PATCH",
-            body: JSON.stringify({ closed: !ps[state.projIdx].closed }),
-          });
-          showToast("saved");
-          renderProjects();
-        } catch (err) { alert(err.message); }
-      });
-    });
-    box.querySelectorAll("[data-proj-del]").forEach((btn) => {
-      btn.addEventListener("click", async () => {
-        if (!window.confirm("delete this project?")) return;
-        try {
-          await api(`/api/projects/${btn.getAttribute("data-proj-del")}`, { method: "DELETE" });
-          showToast("deleted");
-          state.projIdx = 0;
-          renderProjects();
-        } catch (err) { alert(err.message); }
-      });
-    });
-    box.querySelectorAll("[data-proj-msg]").forEach((btn) => {
-      btn.addEventListener("click", async () => {
-        if (!(await requireLogin())) return;
-        const card = btn.closest("[data-proj]");
-        const msgbox = card ? card.querySelector(".w-msgbox") : null;
-        if (!msgbox) return;
-        msgbox.hidden = !msgbox.hidden;
-        if (!msgbox.hidden) {
-          const ta = msgbox.querySelector("textarea");
-          if (ta) ta.focus();
-        }
-      });
-    });
-    box.querySelectorAll(".proj-msg-form").forEach((form) => {
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const btn = form.querySelector('button[type="submit"]');
-        if (btn) btn.disabled = true;
-        try {
-          const res = await api("/api/conversations/from-project", {
-            method: "POST",
-            body: JSON.stringify({ project_id: form.getAttribute("data-proj"), body: form.querySelector("textarea").value }),
-          });
-          location.hash = "#/messages/" + res.conversation_id;
-        } catch (err) {
-          alert(err.message);
-          if (btn) btn.disabled = false;
-        }
-      });
-    });
-  }
-
-  async function renderProjects(g) {
-    setNav("projects");
-    app.innerHTML = fadeWrap(`<div class="projects-page">
-      <div class="page-head"><h1>projects</h1></div>
-      <form class="proj-form" id="proj-form">
-        <p class="ask-prompt">Post a project</p>
-        <label>what you’re working on
-          <textarea name="working" required maxlength="500" rows="2" placeholder="what are you working on?"></textarea>
-        </label>
-        <label>what you could use help with
-          <textarea name="help" required maxlength="500" rows="2" placeholder="what could use a hand?"></textarea>
-        </label>
-        <div><button class="btn primary" type="submit">post</button></div>
-      </form>
-      <div class="deck" id="proj-deck" aria-live="polite">
-        <div class="skel skel-title"></div>
-        <div class="skel skel-line"></div>
-        <div class="skel skel-line w80"></div>
-      </div>
-    </div>`);
-    const form = document.getElementById("proj-form");
-    if (form) {
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const btn = form.querySelector('button[type="submit"]');
-        if (btn) btn.disabled = true;
-        try {
-          const fd = new FormData(form);
-          const working = String(fd.get("working") || "").trim();
-          const help = String(fd.get("help") || "").trim();
-          if (!working || !help) throw new Error("fill in both fields");
-          await api("/api/projects", {
-            method: "POST",
-            body: JSON.stringify({ body: "working on: " + working + "\ncould use help with: " + help }),
-          });
-          showToast("posted");
-          state.projIdx = 0;
-          renderProjects();
-        } catch (err) {
-          alert(err.message);
-          if (btn) btn.disabled = false;
-        }
-      });
-    }
-    let data;
-    try {
-      data = await api("/api/projects");
-    } catch (err) {
-      if (stale(g)) return;
-      renderError(err.message);
-      return;
-    }
-    if (stale(g)) return;
-    state.projList = data.projects || [];
-    if (state.projIdx >= state.projList.length) state.projIdx = 0;
-    showProjCard();
-  }
-
   function pollHtml(q) {
     const opts = q.options || [];
     const total = opts.reduce((n, o) => n + (o.votes || 0), 0) || 0;
@@ -2676,7 +3142,6 @@ var lastSendAt = 0;
   function convoLabel(c) {
     const custom = (c.custom_title || "").trim();
     if (custom) return clip(custom, 48);
-    if (c.project_title) return clip(c.project_title, 48);
     if (c.weekly_title) return clip(c.weekly_title, 48);
     return substanceLabel(c.other_ask, 48) || "conversation";
   }
@@ -3488,9 +3953,10 @@ var lastSendAt = 0;
       // Drop thread socket when leaving a conversation view
       if (!(r.parts[0] === "messages" && r.parts[1])) closeRealtime("thread");
       ensureInboxRealtime();
-      if (r.parts[0] === "qa") { location.hash = "#/"; return; }
+      if (r.parts[0] === "qa" && r.parts[1]) return await renderQaDetail(r.parts[1], g);
+      if (r.parts[0] === "qa") return await renderQa(g);
       if (r.parts[0] === "weekly") return await renderWeekly(g);
-      if (r.parts[0] === "projects") return await renderProjects(g);
+      if (r.parts[0] === "projects") { location.hash = "#/"; return; }
       if (r.parts[0] === "messages" && r.parts[1]) return await renderThread(r.parts[1], g);
       if (r.parts[0] === "messages") return await renderMessages(g);
       if (r.parts[0] === "you") return await renderYou(g);
@@ -3609,7 +4075,7 @@ var lastSendAt = 0;
     }
     list.innerHTML = events
       .map((e) => {
-        const href = e.kind === "answer" ? "#/" : e.ref_id ? "#/messages/" + encodeURIComponent(e.ref_id) : "#/messages";
+        const href = e.kind === "answer" ? (e.ref_id ? "#/qa/" + encodeURIComponent(e.ref_id) : "#/qa") : e.ref_id ? "#/messages/" + encodeURIComponent(e.ref_id) : "#/messages";
         return `<a class="alert-row" href="${href}"><span class="alert-kind">${escapeHtml(e.kind)}</span><span class="alert-sum">${escapeHtml(e.summary)}</span><span class="alert-time">${escapeHtml(formatRel(e.created_at))}</span></a>`;
       })
       .join("");
