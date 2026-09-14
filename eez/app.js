@@ -123,9 +123,10 @@
       );
     } else {
       const mine = state.me && msg.sender_id === state.me.id;
-      // Drop matching optimistic bubble (no data-mid) with same body from me
+      // Drop matching optimistic bubble (no data-mid) with same body from me.
+      // Failed ones (data-failed) are never dropped — they stay as "not sent".
       if (mine) {
-        const opts = thread.querySelectorAll(".bubble.mine:not([data-mid])");
+        const opts = thread.querySelectorAll(".bubble.mine:not([data-mid]):not([data-failed])");
         for (const el of opts) {
           if (el.textContent === msg.body) {
             const next = el.nextElementSibling;
@@ -726,6 +727,53 @@
         toastEl.hidden = true;
       }, 240);
     }, 1600);
+  }
+
+  /* Submit feedback: the instant a submit is tapped the button shows a
+     spinner + label and locks, so there's never dead silence while the
+     request is in flight — and a second tap can't double-submit.
+     Returns a restore() that puts the original label back and re-enables
+     the button; call it when the request fails. Returns null when the
+     button is already busy (caller should bail out). */
+  function btnBusy(btn, label) {
+    if (!btn || btn.disabled) return null;
+    const orig = btn.innerHTML;
+    btn.disabled = true;
+    btn.setAttribute("aria-busy", "true");
+    btn.innerHTML =
+      '<span class="btn-spinner" aria-hidden="true"></span>' + escapeHtml(label || "sending");
+    return function restoreBusy() {
+      if (!btn.isConnected) return;
+      btn.disabled = false;
+      btn.removeAttribute("aria-busy");
+      btn.innerHTML = orig;
+    };
+  }
+
+  /* Optimistic placeholder for answers/replies/comments: shows the text
+     immediately in the real item markup, dimmed with a "sending…" note.
+     Returns { el, empty } so the caller can remove it (and unhide the
+     empty-state) if the request fails. */
+  function insertPendingNote(container, body, wrapClass, bodyClass) {
+    if (!container) return null;
+    const empty = container.querySelector(".q-empty");
+    if (empty) empty.hidden = true;
+    const div = document.createElement("div");
+    div.className = wrapClass + " is-pending";
+    div.innerHTML =
+      '<div class="' +
+      bodyClass +
+      '">' +
+      escapeHtml(body) +
+      '</div><div class="pending-note">sending…</div>';
+    container.appendChild(div);
+    return { el: div, empty: empty };
+  }
+
+  function removePendingNote(pending) {
+    if (!pending) return;
+    if (pending.el && pending.el.isConnected) pending.el.remove();
+    if (pending.empty) pending.empty.hidden = false;
   }
 
 /* ================= eez GitHub data layer =================
@@ -2060,6 +2108,9 @@ var lastSendAt = 0;
 
   modalForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+    const btn = modalForm.querySelector('button[type="submit"]');
+    const restore = btnBusy(btn, "logging in…");
+    if (!restore) return; // already in flight — ignore the second tap
     const fd = new FormData(modalForm);
     try {
       await api("/api/auth/login", {
@@ -2073,6 +2124,7 @@ var lastSendAt = 0;
       hideModal();
       render();
     } catch (err) {
+      restore();
       alert(err.message);
     }
   });
@@ -2313,15 +2365,31 @@ var lastSendAt = 0;
     root.querySelectorAll(".ans-form").forEach((form) => {
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const fd = new FormData(form);
+        const btn = form.querySelector('button[type="submit"]');
+        const restore = btnBusy(btn, "sending");
+        if (!restore) return; // already in flight — ignore the second tap
+        const ta = form.querySelector("textarea");
+        const body = String(new FormData(form).get("body") || "").trim();
+        if (!body) {
+          restore();
+          return;
+        }
+        // optimistic: show the answer immediately, marked sending
+        const card = form.closest(".q-card");
+        const list = card ? card.querySelector(".q-answers") : null;
+        const pending = insertPendingNote(list, body, "q-answer", "q-answer-body");
+        if (ta) ta.value = "";
         try {
           await api(`/api/questions/${form.getAttribute("data-qid")}/answers`, {
             method: "POST",
-            body: JSON.stringify({ body: fd.get("body") }),
+            body: JSON.stringify({ body }),
           });
           showToast("saved");
           rerender();
         } catch (err) {
+          removePendingNote(pending);
+          if (ta) ta.value = body; // keep the draft
+          restore();
           alert(err.message);
         }
       });
@@ -2350,6 +2418,9 @@ var lastSendAt = 0;
         });
         form.addEventListener("submit", async (e) => {
           e.preventDefault();
+          const btn = form.querySelector('button[type="submit"]');
+          const restore = btnBusy(btn, "saving");
+          if (!restore) return; // already in flight — ignore the second tap
           try {
             await api(`/api/answers/${btn.getAttribute("data-ans-edit")}`, {
               method: "PATCH",
@@ -2358,6 +2429,7 @@ var lastSendAt = 0;
             showToast("saved");
             rerender();
           } catch (err) {
+            restore();
             alert(err.message);
           }
         });
@@ -2385,14 +2457,35 @@ var lastSendAt = 0;
         form.querySelector("textarea").focus();
         form.addEventListener("submit", async (e) => {
           e.preventDefault();
+          const btn = form.querySelector('button[type="submit"]');
+          const restore = btnBusy(btn, "sending");
+          if (!restore) return; // already in flight — ignore the second tap
+          const ta = form.querySelector("textarea");
+          const body = String(ta.value || "").trim();
+          if (!body) {
+            restore();
+            return;
+          }
+          // optimistic: show the reply immediately, marked sending
+          let reps = box.querySelector(":scope > .q-replies");
+          if (!reps) {
+            reps = document.createElement("div");
+            reps.className = "q-replies";
+            box.appendChild(reps);
+          }
+          const pending = insertPendingNote(reps, body, "q-answer q-reply", "q-answer-body");
+          ta.value = "";
           try {
             await api(`/api/questions/${qid}/answers`, {
               method: "POST",
-              body: JSON.stringify({ body: form.querySelector("textarea").value, parent_id: aid }),
+              body: JSON.stringify({ body, parent_id: aid }),
             });
             showToast("saved");
             rerender();
           } catch (err) {
+            removePendingNote(pending);
+            ta.value = body; // keep the draft
+            restore();
             alert(err.message);
           }
         });
@@ -2640,10 +2733,23 @@ var lastSendAt = 0;
 
     /* v15: ‹ back-chip removed; swipe right / swipe down / arrow keys go back. */
 
-    box.addEventListener("submit", (e) => {
+    box.addEventListener("submit", async (e) => {
       e.preventDefault();
       const text = String(new FormData(box).get("body") || "").trim();
-      if (text) onAnswer(profile, text);
+      if (!text || box.dataset.busy) return; // already sending — ignore the second tap
+      box.dataset.busy = "1";
+      ta.disabled = true;
+      const hint = document.createElement("div");
+      hint.className = "pending-note";
+      hint.textContent = "sending…";
+      box.appendChild(hint);
+      try {
+        await onAnswer(profile, text);
+      } finally {
+        delete box.dataset.busy;
+        ta.disabled = false;
+        hint.remove();
+      }
     });
 
     ta.addEventListener("keydown", (e) => {
@@ -3398,7 +3504,8 @@ var lastSendAt = 0;
         comp.addEventListener("submit", async (e) => {
           e.preventDefault();
           const btn = comp.querySelector('button[type="submit"]');
-          if (btn) btn.disabled = true;
+          const restore = btnBusy(btn, "sharing");
+          if (!restore) return; // already in flight — ignore the second tap
           try {
             await api("/api/weekly/shares", {
               method: "POST",
@@ -3407,8 +3514,8 @@ var lastSendAt = 0;
             showToast("shared");
             renderWeekly();
           } catch (err) {
+            restore();
             alert(err.message);
-            if (btn) btn.disabled = false;
           }
         });
       }
@@ -3466,14 +3573,36 @@ var lastSendAt = 0;
     el.querySelectorAll(".w-comment-form").forEach((form) => {
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
+        const btn = form.querySelector('button[type="submit"]');
+        const restore = btnBusy(btn, "sending");
+        if (!restore) return; // already in flight — ignore the second tap
+        const ta = form.querySelector("textarea");
+        const body = String(ta.value || "").trim();
+        if (!body) {
+          restore();
+          return;
+        }
+        // optimistic: show the comment immediately, marked sending
+        const shareEl = form.closest(".w-share");
+        let list = shareEl ? shareEl.querySelector(".w-comments") : null;
+        if (shareEl && !list) {
+          list = document.createElement("div");
+          list.className = "w-comments";
+          shareEl.insertBefore(list, form);
+        }
+        const pending = insertPendingNote(list, body, "w-comment mine", "w-comment-body");
+        ta.value = "";
         try {
           await api("/api/weekly/comments", {
             method: "POST",
-            body: JSON.stringify({ share_id: form.getAttribute("data-share"), body: form.querySelector("textarea").value }),
+            body: JSON.stringify({ share_id: form.getAttribute("data-share"), body }),
           });
           showToast("saved");
           refreshWeeklyCard();
         } catch (err) {
+          removePendingNote(pending);
+          ta.value = body; // keep the draft
+          restore();
           alert(err.message);
         }
       });
@@ -3502,16 +3631,23 @@ var lastSendAt = 0;
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
         const btn = form.querySelector('button[type="submit"]');
-        if (btn) btn.disabled = true;
+        const restore = btnBusy(btn, "sending");
+        if (!restore) return; // already in flight — ignore the second tap
+        const ta = form.querySelector("textarea");
+        const body = String(ta.value || "").trim();
+        if (!body) {
+          restore();
+          return;
+        }
         try {
           const res = await api("/api/conversations/from-weekly", {
             method: "POST",
-            body: JSON.stringify({ share_id: form.getAttribute("data-share"), comment_id: form.getAttribute("data-comment") || "", body: form.querySelector("textarea").value }),
+            body: JSON.stringify({ share_id: form.getAttribute("data-share"), comment_id: form.getAttribute("data-comment") || "", body }),
           });
           location.hash = "#/messages/" + res.conversation_id;
         } catch (err) {
+          restore();
           alert(err.message);
-          if (btn) btn.disabled = false;
         }
       });
     });
@@ -3953,36 +4089,42 @@ var lastSendAt = 0;
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       const text = String(ta.value || "").trim();
-      if (!text || btn.disabled) return;
+      if (!text) return;
+      const restore = btnBusy(btn, "");
+      if (!restore) return; // already sending — ignore the second tap
       // Safety tip on first send if not yet seen
       try {
         if (!localStorage.getItem(SAFETY_KEY) && !document.querySelector(".safety-tip")) {
           maybeShowSafetyTip();
         }
       } catch { /* ignore */ }
-      btn.disabled = true;
       ta.value = "";
       autosize(ta);
       const thread = scroller.querySelector(".thread");
       const nowTs = Date.now();
+      // optimistic bubble, honestly marked "sending" until the server confirms
+      let optBubble = null;
+      let optTime = null;
       if (thread) {
-        const receiptBit =
-          receiptsOn
-            ? ` · <span class="receipt">delivered</span>`
-            : "";
-        thread.insertAdjacentHTML(
-          "beforeend",
-          `<div class="bubble mine">${escapeHtml(text)}</div><div class="bubble-time mine">${escapeHtml(formatClock(nowTs))}${receiptBit}</div>`,
-        );
+        optBubble = document.createElement("div");
+        optBubble.className = "bubble mine pending";
+        optBubble.textContent = text;
+        optTime = document.createElement("div");
+        optTime.className = "bubble-time mine";
+        optTime.innerHTML =
+          escapeHtml(formatClock(nowTs)) + ' · <span class="receipt sending">sending</span>';
+        thread.appendChild(optBubble);
+        thread.appendChild(optTime);
         scrollThreadEnd(scroller);
       }
-      showToast("sent");
       try {
         const sent = await api(`/api/conversations/${id}/messages`, {
           method: "POST",
           body: JSON.stringify({ body: text }),
         });
+        // the confirmed message replaces the optimistic bubble (matched by body)
         if (sent && sent.message) appendLiveMessage(sent.message);
+        restore();
         api("/api/conversations/" + id).then(async (fresh) => {
           if (stale(g) || route().parts[1] !== id) return;
           const subEl = document.querySelector(".thread-sub");
@@ -4001,9 +4143,25 @@ var lastSendAt = 0;
           }
         }).catch(() => { /* ignore subtitle refresh */ });
       } catch (err) {
+        // honest failure: mark the bubble, keep the draft in the composer
+        if (optBubble) {
+          optBubble.classList.remove("pending");
+          optBubble.classList.add("failed");
+          optBubble.setAttribute("data-failed", "1");
+        }
+        if (optTime) {
+          const r = optTime.querySelector(".receipt");
+          if (r) {
+            r.classList.remove("sending");
+            r.classList.add("failed");
+            r.textContent = "not sent";
+          }
+        }
+        ta.value = text;
+        autosize(ta);
+        restore();
         alert(err.message);
       } finally {
-        btn.disabled = false;
         ta.focus({ preventScroll: true });
       }
     });
@@ -4298,7 +4456,11 @@ var lastSendAt = 0;
     applyUserAppearance(u);
     document.getElementById("you-form").addEventListener("submit", async (e) => {
       e.preventDefault();
-      const fd = new FormData(e.target);
+      const form = e.target;
+      const btn = form.querySelector('button[type="submit"]');
+      const restore = btnBusy(btn, "saving");
+      if (!restore) return; // already in flight — ignore the second tap
+      const fd = new FormData(form);
       const err = document.getElementById("you-err");
       try {
         const data = await api("/api/me", {
@@ -4312,7 +4474,9 @@ var lastSendAt = 0;
         state.me = data.user;
         err.hidden = true;
         showToast("saved");
+        restore();
       } catch (ex) {
+        restore();
         err.hidden = false;
         err.textContent = ex.message;
       }
@@ -4357,7 +4521,11 @@ var lastSendAt = 0;
   function bindAuth(kind) {
     document.getElementById("auth-form").addEventListener("submit", async (e) => {
       e.preventDefault();
-      const fd = new FormData(e.target);
+      const form = e.target;
+      const btn = form.querySelector('button[type="submit"]');
+      const restore = btnBusy(btn, kind === "register" ? "creating…" : "logging in…");
+      if (!restore) return; // already in flight — ignore the second tap
+      const fd = new FormData(form);
       const err = document.getElementById("auth-err");
       const payload = { email: fd.get("email"), password: fd.get("password") };
       if (kind === "register") {
@@ -4373,6 +4541,7 @@ var lastSendAt = 0;
         state.me = data.user;
         location.hash = "#/you";
       } catch (ex) {
+        restore();
         err.hidden = false;
         err.textContent = ex.message;
       }
