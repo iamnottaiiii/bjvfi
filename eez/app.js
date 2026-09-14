@@ -68,6 +68,10 @@
     deferredInstall: null,
     qaIdx: 0,
     qaQs: [],
+    wIdx: 0,
+    wShares: [],
+    wLocked: true,
+    wPrompt: {},
   };
   let renderGen = 0;
 
@@ -352,8 +356,8 @@
       "--bg3": shade(bg, dark ? 10 : -8),
       "--surface": hexAlpha(shade(bg, dark ? 8 : -6), 0.85),
       "--ink": ink,
-      "--muted": mixHex(ink, bg, 0.35),
-      "--muted2": mixHex(ink, bg, 0.55),
+      "--muted": mixHex(ink, bg, 0.30),
+      "--muted2": mixHex(ink, bg, 0.42),
       "--accent": accent,
       "--accent-soft": shade(accent, -12),
       "--accent-ink": onAccent,
@@ -1037,12 +1041,16 @@ async function buildConvoView(c, me, users, messages, prefs){
   var last = msgs.length ? msgs[msgs.length - 1] : null;
   var lastRead = mine.last_read_at || 0;
   var weeklyTitle = '';
+  var weeklyMarkers = null;
   if(c.weekly && c.weekly.markers){
     var mm = c.weekly.markers || {};
     var mineM = mm[me.id] || '';
     var peerM = '';
     Object.keys(mm).forEach(function(k){ if(k !== me.id && !peerM) peerM = mm[k]; });
-    if(mineM && peerM) weeklyTitle = mineM.split('-').join(' ') + ' ⇄ ' + peerM.split('-').join(' ');
+    if(mineM && peerM){
+      weeklyTitle = mineM.split('-').join(' ') + ' ⇄ ' + peerM.split('-').join(' ');
+      weeklyMarkers = { mine: mineM, peer: peerM };
+    }
     else weeklyTitle = 'weekly chat';
   }
   var unread = !!last && last.sender_id !== me.id && last.created_at > lastRead;
@@ -1066,6 +1074,7 @@ async function buildConvoView(c, me, users, messages, prefs){
     waiting: waiting,
     expires_at: expiresAt,
     weekly_title: weeklyTitle,
+    weekly_markers: weeklyMarkers,
     muted: !!mine.muted,
     read_receipts: mine.read_receipts !== 0,
     other_last_read_at: (function(){ var op = myPrefs(prefs, oid, c.id); return op && op.last_read_at ? s2ms(op.last_read_at) : null; })()
@@ -1153,6 +1162,38 @@ function currentWeekId(d){
 var WEEKLY_K = 8;
 var WEEKLY_COLORS = ["teal", "amber", "coral", "sage", "plum", "sky", "clay", "moss"];
 var WEEKLY_SHAPES = ["circle", "square", "triangle", "diamond", "hexagon", "star", "wave", "cross"];
+/* v14: marker chips render as pure visual shapes (no text labels). Fixed hex per
+   color name, same on every theme; shape drawn as inline SVG. */
+var WEEKLY_MARKER_HEX = {
+  teal: "#14b8a6", amber: "#f59e0b", coral: "#f97066", sage: "#9caf88",
+  plum: "#8e4585", sky: "#38bdf8", clay: "#c2703d", moss: "#7a8b3f"
+};
+var WEEKLY_SHAPE_SVG = {
+  circle: '<circle cx="12" cy="12" r="8.5" fill="%%C%%"/>',
+  square: '<rect x="4.5" y="4.5" width="15" height="15" rx="3.5" fill="%%C%%"/>',
+  triangle: '<path d="M12 4.5 L20 19 L4 19 Z" fill="%%C%%"/>',
+  diamond: '<path d="M12 3.5 L20.5 12 L12 20.5 L3.5 12 Z" fill="%%C%%"/>',
+  hexagon: '<path d="M12 2.5 L20.2 7.25 V16.75 L12 21.5 L3.8 16.75 V7.25 Z" fill="%%C%%"/>',
+  star: '<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" fill="%%C%%"/>',
+  wave: '<path d="M2.5 12c2.3 0 2.3-5.5 4.75-5.5S9.5 17.5 12 17.5s2.25-11 4.75-11S19 12 21.5 12" fill="none" stroke="%%C%%" stroke-width="2.6" stroke-linecap="round"/>',
+  cross: '<path d="M10 4h4v6h6v4h-6v6h-4v-6H4v-4h6z" fill="%%C%%"/>'
+};
+function markerSvg(marker) {
+  var parts = String(marker || "").split("-");
+  var hex = WEEKLY_MARKER_HEX[parts[0]] || "currentColor";
+  var inner = WEEKLY_SHAPE_SVG[parts[1]] || WEEKLY_SHAPE_SVG.circle;
+  return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+    inner.split("%%C%%").join(hex) + "</svg>";
+}
+/* v14: weekly-spawned 1:1 thread titles render as a wordless marker pair
+   (two visual shapes + separator) — never color/shape words on screen. */
+function weeklyPairHtml(mineM, peerM) {
+  if (!mineM || !peerM) return "";
+  return '<span class="marker-pair" aria-label="anonymous weekly chat">' +
+    markerSvg(mineM) +
+    '<span class="pair-sep" aria-hidden="true">⇄</span>' +
+    markerSvg(peerM) + "</span>";
+}
 function cohortOf(identity, weekId){
   return hashStr(String(identity) + "|" + weekId) % WEEKLY_K;
 }
@@ -1780,6 +1821,7 @@ async function ghApi(path, opts){
   if(p === '/api/conversations/from-weekly' && method === 'POST'){
     var meFw = await requireMe();
     var shareIdFw = String((json || {}).share_id || '');
+    var commentIdFw = String((json || {}).comment_id || '');
     var fbodyFw = String((json || {}).body || '').trim();
     if(!fbodyFw) throw bad('write something first');
     if(fbodyFw.length > 2000) throw bad('keep it under 2000 characters');
@@ -1789,11 +1831,19 @@ async function ghApi(path, opts){
     var shFw = sharesFw.find(function(s){ return s.id === shareIdFw && s.week_id === weekIdFw && s.cohort === cohortFw; });
     if(!shFw) throw bad('that share is gone', 404);
     var peerFw = shFw.author_id || null;
+    var peerMarkerFw = shFw.marker || null;
+    if(commentIdFw){
+      var cmsFw = ((await ghGetJson('weekly_comments.json', true)) || {data: []}).data;
+      var cmFw = cmsFw.find(function(c){ return c.id === commentIdFw && c.share_id === shareIdFw && c.week_id === weekIdFw; });
+      if(!cmFw) throw bad('that comment is gone', 404);
+      peerFw = cmFw.author_id || null;
+      peerMarkerFw = cmFw.marker || null;
+    }
     if(!peerFw) throw bad('they need an account before you can message', 403);
     if(peerFw === meFw.id) throw bad('that is your own share');
     var markersFw = {};
     markersFw[meFw.id] = markerFor(meFw.id, weekIdFw);
-    markersFw[peerFw] = shFw.marker || markerFor(peerFw, weekIdFw);
+    markersFw[peerFw] = peerMarkerFw || markerFor(peerFw, weekIdFw);
     var cidFw = await openConversation(meFw, peerFw, fbodyFw,
       {weekly: {week_id: weekIdFw, cohort: cohortFw, markers: markersFw}});
     feedPush(peerFw, 'message', 'someone messaged you from weekly', cidFw);
@@ -2696,92 +2746,11 @@ var lastSendAt = 0;
 
 
   /* ---------- Q&A: one question at a time in the home-style swipe stack ---------- */
-  function qaStackCardHtml(q) {
-    const kindLabel = q.kind === "poll" ? "poll" : q.kind === "image" ? "image" : "question";
-    const media =
-      q.image_url
-        ? `<div class="q-media"><img src="${escapeHtml(q.image_url)}" alt="" loading="lazy" /></div>`
-        : "";
-    const tops = (q.answers || []).filter((a) => !a.parent_id);
-    const n = tops.length;
-    const countLabel = n === 0 ? "no answers yet" : n === 1 ? "1 answer" : n + " answers";
-    const canBack = state.qaIdx > 0;
-    return `
-      <article class="slide qa-slide" id="slide">
-        <div class="slide-body">
-          <div class="q-meta">${kindLabel}</div>
-          <div class="q-body">${escapeHtml(q.body)}</div>
-          ${media}
-          <p class="q-count">${countLabel}</p>
-          <p class="tap-hint">tap to open</p>
-        </div>
-        <div class="slide-bar" id="slide-bar">
-          <button type="button" class="back-chip" data-act="back" aria-label="previous" ${canBack ? "" : "hidden"}>‹</button>
-          <button type="button" class="btn primary sm" data-act="open">open</button>
-        </div>
-      </article>`;
-  }
-
-  function mountQaCard(idx, mode) {
-    const stage = app.querySelector(".stage");
-    if (!stage) return;
-    const qs = state.qaQs || [];
-    if (!qs.length) {
-      stage.innerHTML = `<div class="state-block"><p class="empty-lead">quiet so far</p><p class="empty-sub">ask something, or check back when the room has a pulse.</p></div>`;
-      return;
-    }
-    if (idx < 0) idx = 0;
-    if (idx >= qs.length) idx = qs.length - 1;
-    state.qaIdx = idx;
-    stage.innerHTML = qaStackCardHtml(qs[idx]);
-    const el = stage.querySelector(".slide");
-    bindQaCard(el, qs[idx]);
-    enterSlide(el, mode || "forward");
-  }
-
-  function qaNext() {
-    const qs = state.qaQs || [];
-    const el = document.getElementById("slide");
-    if (state.qaIdx >= qs.length - 1) {
-      if (el) {
-        el.style.transform = "";
-        el.style.opacity = "";
-      }
-      showToast("that's everything");
-      return;
-    }
-    dismiss("ul", () => mountQaCard(state.qaIdx + 1, "forward"));
-  }
-
-  function qaBack() {
-    const el = document.getElementById("slide");
-    if (state.qaIdx <= 0) {
-      if (el) {
-        el.style.transform = "";
-        el.style.opacity = "";
-      }
-      return;
-    }
-    dismiss("dr", () => mountQaCard(state.qaIdx - 1, "back"));
-  }
-
-  function bindQaCard(el, q) {
+  /* shared horizontal-swipe card binder: swipe left = next, right = previous.
+     vertical stays native scroll inside .slide-body (touch-action: pan-y).
+     touches starting on buttons/inputs/forms/links are ignored. */
+  function bindSwipe(el, onNext, onBack) {
     if (!el) return;
-    const open = () => {
-      location.hash = "#/qa/" + q.id;
-    };
-    el.querySelector('[data-act="open"]').addEventListener("click", (e) => {
-      e.stopPropagation();
-      open();
-    });
-    const backBtn = el.querySelector('[data-act="back"]');
-    if (backBtn) {
-      backBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        qaBack();
-      });
-    }
-
     let startX = 0;
     let startY = 0;
     let dx = 0;
@@ -2819,19 +2788,13 @@ var lastSendAt = 0;
       tracking = false;
       el.classList.remove("dragging");
       if (locked === "x" && Math.abs(dx) > 64) {
-        if (dx < 0) qaNext();
-        else qaBack();
+        if (dx < 0) onNext();
+        else onBack();
       } else {
         el.style.transform = "";
         el.style.opacity = "";
       }
     };
-
-    el.addEventListener("click", (e) => {
-      if (e.target.closest("button, a")) return;
-      if (Math.abs(dx) > 10) return; // it was a drag, not a tap
-      open();
-    });
 
     el.addEventListener(
       "touchstart",
@@ -2868,6 +2831,90 @@ var lastSendAt = 0;
       if (e.pointerType === "touch") return;
       onEnd();
     });
+  }
+
+  function qaStackCardHtml(q) {
+    const canBack = state.qaIdx > 0;
+    return `
+      <article class="slide qa-slide" id="slide">
+        <div class="slide-body">
+          ${qCardHtml(q)}
+        </div>
+        <div class="slide-bar" id="slide-bar">
+          <button type="button" class="back-chip" data-act="back" aria-label="previous" ${canBack ? "" : "hidden"}>‹</button>
+        </div>
+      </article>`;
+  }
+
+  function mountQaCard(idx, mode) {
+    const stage = app.querySelector(".stage");
+    if (!stage) return;
+    const qs = state.qaQs || [];
+    if (!qs.length) {
+      stage.innerHTML = `<div class="state-block"><p class="empty-lead">quiet so far</p><p class="empty-sub">ask something, or check back when the room has a pulse.</p></div>`;
+      return;
+    }
+    if (idx < 0) idx = 0;
+    if (idx >= qs.length) idx = qs.length - 1;
+    state.qaIdx = idx;
+    stage.innerHTML = qaStackCardHtml(qs[idx]);
+    const el = stage.querySelector(".slide");
+    bindQaCard(el);
+    enterSlide(el, mode || "forward");
+  }
+
+  function qaNext() {
+    const qs = state.qaQs || [];
+    const el = document.getElementById("slide");
+    if (state.qaIdx >= qs.length - 1) {
+      if (el) {
+        el.style.transform = "";
+        el.style.opacity = "";
+      }
+      showToast("that's everything");
+      return;
+    }
+    dismiss("ul", () => mountQaCard(state.qaIdx + 1, "forward"));
+  }
+
+  function qaBack() {
+    const el = document.getElementById("slide");
+    if (state.qaIdx <= 0) {
+      if (el) {
+        el.style.transform = "";
+        el.style.opacity = "";
+      }
+      return;
+    }
+    dismiss("dr", () => mountQaCard(state.qaIdx - 1, "back"));
+  }
+
+  function bindQaCard(el) {
+    if (!el) return;
+    bindQuestionCard(el, () => refreshQaCard());
+    const backBtn = el.querySelector('[data-act="back"]');
+    if (backBtn) {
+      backBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        qaBack();
+      });
+    }
+    bindSwipe(el, qaNext, qaBack);
+  }
+
+  async function refreshQaCard() {
+    if (!/^#\/qa$/.test(location.hash)) return;
+    let data;
+    try {
+      data = await api("/api/questions");
+    } catch (err) {
+      alert(err.message);
+      return;
+    }
+    if (!/^#\/qa$/.test(location.hash)) return;
+    state.qaQs = data.questions || [];
+    if (state.qaIdx >= state.qaQs.length) state.qaIdx = Math.max(0, state.qaQs.length - 1);
+    mountQaCard(state.qaIdx, "forward");
   }
 
   async function renderQa(g) {
@@ -2970,23 +3017,24 @@ var lastSendAt = 0;
   }
 
   /* ---------- weekly: one prompt, one cohort, anonymous markers, ephemeral ---------- */
-  function markerChipHtml(marker, shareId, isMine) {
-    const label = String(marker || "").split("-").join(" ");
-    if (isMine) return `<span class="marker-chip">${escapeHtml(label)}</span>`;
-    return `<button type="button" class="marker-chip" data-weekly-msg="${escapeHtml(shareId)}">${escapeHtml(label)}</button>`;
+  function markerChipHtml(marker, shareId, commentId, isMine) {
+    var svg = markerSvg(marker);
+    if (isMine) return `<span class="marker-chip" aria-label="your anonymous marker">${svg}</span>`;
+    var cattr = commentId ? ` data-comment="${escapeHtml(commentId)}"` : "";
+    return `<button type="button" class="marker-chip" data-weekly-msg="${escapeHtml(shareId)}"${cattr} aria-label="message this person">${svg}</button>`;
   }
 
   function weeklyShareHtml(s) {
     const comments = (s.comments || [])
       .map(
         (c) => `<div class="w-comment${c.mine ? " mine" : ""}">
-          ${markerChipHtml(c.marker, s.id, c.mine)}
+          ${markerChipHtml(c.marker, s.id, c.id, c.mine)}
           <div class="w-comment-body">${escapeHtml(c.body)}</div>
         </div>`,
       )
       .join("");
     return `<article class="w-share${s.mine ? " mine" : ""}" data-share="${escapeHtml(s.id)}">
-      ${markerChipHtml(s.marker, s.id, s.mine)}
+      ${markerChipHtml(s.marker, s.id, null, s.mine)}
       <div class="w-share-body">${escapeHtml(s.body)}</div>
       ${comments ? `<div class="w-comments">${comments}</div>` : ""}
       <form class="w-comment-form" data-share="${escapeHtml(s.id)}">
@@ -3009,9 +3057,14 @@ var lastSendAt = 0;
     setNav("weekly");
     app.innerHTML = fadeWrap(`<div class="weekly-page">
       <div class="page-head"><h1>weekly</h1></div>
-      <div class="skel skel-title"></div>
-      <div class="skel skel-line"></div>
-      <div class="skel skel-line w80"></div>
+      <div class="weekly-prompt" id="w-prompt" hidden></div>
+      <div class="stage" aria-live="polite"><div class="slide" id="slide">
+        <div class="slide-body">
+          <div class="skel skel-title"></div>
+          <div class="skel skel-line"></div>
+          <div class="skel skel-line w80"></div>
+        </div>
+      </div></div>
     </div>`);
     let data;
     try {
@@ -3022,50 +3075,119 @@ var lastSendAt = 0;
       return;
     }
     if (stale(g)) return;
-    const prompt = data.prompt || {};
-    const locked = !data.has_shared;
-    const shares = data.shares || [];
-    app.innerHTML = fadeWrap(`<div class="weekly-page">
-      <div class="page-head"><h1>weekly</h1></div>
-      <article class="q-card prompt-card">
-        <div class="q-meta">this week</div>
-        <div class="q-body">${escapeHtml(prompt.text || "what did you get into this week?")}</div>
-      </article>
-      ${
-        locked
-          ? `<form class="w-compose" id="w-compose">
-               <p class="hint">share what you did to unlock everyone else's shares. the week wipes clean after.</p>
-               <label class="sr-only" for="w-body">your share</label>
-               <textarea id="w-body" name="body" required maxlength="1000" rows="4" placeholder="share what you did…"></textarea>
-               <div><button class="btn primary" type="submit">share</button></div>
-             </form>`
-          : shares.length
-            ? `<div class="w-shares">${shares.map(weeklyShareHtml).join("")}</div>`
-            : `<div class="state-block"><p class="empty-lead">you’re first</p><p class="empty-sub">your share is in. others land here as they post.</p></div>`
-      }
-    </div>`);
+    state.wPrompt = data.prompt || {};
+    state.wLocked = !data.has_shared;
+    state.wShares = data.shares || [];
+    if (state.wIdx >= weeklyCardCount()) state.wIdx = 0;
+    const promptEl = document.getElementById("w-prompt");
+    if (promptEl) {
+      promptEl.hidden = false;
+      promptEl.innerHTML = `<div class="q-meta">this week</div><div class="q-body">${escapeHtml(state.wPrompt.text || "what did you get into this week?")}</div>`;
+    }
+    mountWeeklyCard(state.wIdx, "forward");
+  }
 
-    const comp = document.getElementById("w-compose");
-    if (comp) {
-      comp.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const btn = comp.querySelector('button[type="submit"]');
-        if (btn) btn.disabled = true;
-        try {
-          await api("/api/weekly/shares", {
-            method: "POST",
-            body: JSON.stringify({ body: comp.querySelector("textarea").value }),
-          });
-          showToast("shared");
-          renderWeekly();
-        } catch (err) {
-          alert(err.message);
-          if (btn) btn.disabled = false;
-        }
+  function weeklyCardCount() {
+    return state.wLocked ? 1 : (state.wShares || []).length;
+  }
+
+  function mountWeeklyCard(idx, mode) {
+    const stage = app.querySelector(".stage");
+    if (!stage) return;
+    if (state.wLocked) {
+      stage.innerHTML = `
+        <article class="slide w-slide" id="slide">
+          <div class="slide-body">
+            <form class="w-compose" id="w-compose">
+              <p class="hint">share what you did to unlock everyone else's shares. the week wipes clean after.</p>
+              <label class="sr-only" for="w-body">your share</label>
+              <textarea id="w-body" name="body" required maxlength="1000" rows="4" placeholder="share what you did…"></textarea>
+              <div><button class="btn primary" type="submit">share</button></div>
+            </form>
+          </div>
+        </article>`;
+      const el = stage.querySelector(".slide");
+      const comp = document.getElementById("w-compose");
+      if (comp) {
+        comp.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const btn = comp.querySelector('button[type="submit"]');
+          if (btn) btn.disabled = true;
+          try {
+            await api("/api/weekly/shares", {
+              method: "POST",
+              body: JSON.stringify({ body: comp.querySelector("textarea").value }),
+            });
+            showToast("shared");
+            renderWeekly();
+          } catch (err) {
+            alert(err.message);
+            if (btn) btn.disabled = false;
+          }
+        });
+      }
+      enterSlide(el, mode || "forward");
+      return;
+    }
+    const shares = state.wShares || [];
+    if (!shares.length) {
+      stage.innerHTML = `<div class="state-block"><p class="empty-lead">you're first</p><p class="empty-sub">your share is in. others land here as they post.</p></div>`;
+      return;
+    }
+    if (idx < 0) idx = 0;
+    if (idx >= shares.length) idx = shares.length - 1;
+    state.wIdx = idx;
+    const s = shares[idx];
+    const canBack = state.wIdx > 0;
+    stage.innerHTML = `
+      <article class="slide w-slide" id="slide">
+        <div class="slide-body">
+          ${weeklyShareHtml(s)}
+        </div>
+        <div class="slide-bar">
+          <button type="button" class="back-chip" data-act="back" aria-label="previous" ${canBack ? "" : "hidden"}>‹</button>
+        </div>
+      </article>`;
+    const el = stage.querySelector(".slide");
+    bindWeeklyCard(el);
+    enterSlide(el, mode || "forward");
+  }
+
+  function weeklyNext() {
+    const el = document.getElementById("slide");
+    if (state.wIdx >= weeklyCardCount() - 1) {
+      if (el) {
+        el.style.transform = "";
+        el.style.opacity = "";
+      }
+      showToast("that's everything");
+      return;
+    }
+    dismiss("ul", () => mountWeeklyCard(state.wIdx + 1, "forward"));
+  }
+
+  function weeklyBack() {
+    const el = document.getElementById("slide");
+    if (state.wIdx <= 0) {
+      if (el) {
+        el.style.transform = "";
+        el.style.opacity = "";
+      }
+      return;
+    }
+    dismiss("dr", () => mountWeeklyCard(state.wIdx - 1, "back"));
+  }
+
+  function bindWeeklyCard(el) {
+    if (!el) return;
+    const backBtn = el.querySelector('[data-act="back"]');
+    if (backBtn) {
+      backBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        weeklyBack();
       });
     }
-
-    app.querySelectorAll(".w-comment-form").forEach((form) => {
+    el.querySelectorAll(".w-comment-form").forEach((form) => {
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
         try {
@@ -3074,31 +3196,33 @@ var lastSendAt = 0;
             body: JSON.stringify({ share_id: form.getAttribute("data-share"), body: form.querySelector("textarea").value }),
           });
           showToast("saved");
-          renderWeekly();
+          refreshWeeklyCard();
         } catch (err) {
           alert(err.message);
         }
       });
     });
-
-    // tapping a marker opens a 1:1 thread with that share's author
-    app.querySelectorAll(".marker-chip[data-weekly-msg]").forEach((chip) => {
+    // tapping a marker opens a 1:1 thread with that person (share author or commenter)
+    el.querySelectorAll(".marker-chip[data-weekly-msg]").forEach((chip) => {
       chip.addEventListener("click", async () => {
         if (!(await requireLogin())) return;
-        const art = chip.closest("[data-share]");
-        const box = art ? art.querySelector(".w-msgbox") : null;
+        const box = el.querySelector(".w-msgbox");
         if (!box) return;
         const wasHidden = box.hidden;
-        app.querySelectorAll(".w-msgbox").forEach((b) => { b.hidden = true; });
         box.hidden = !wasHidden;
         if (!box.hidden) {
+          const form = box.querySelector(".w-msg-form");
+          if (form) {
+            const cid = chip.getAttribute("data-comment");
+            if (cid) form.setAttribute("data-comment", cid);
+            else form.removeAttribute("data-comment");
+          }
           const ta = box.querySelector("textarea");
           if (ta) ta.focus();
         }
       });
     });
-
-    app.querySelectorAll(".w-msg-form").forEach((form) => {
+    el.querySelectorAll(".w-msg-form").forEach((form) => {
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
         const btn = form.querySelector('button[type="submit"]');
@@ -3106,7 +3230,7 @@ var lastSendAt = 0;
         try {
           const res = await api("/api/conversations/from-weekly", {
             method: "POST",
-            body: JSON.stringify({ share_id: form.getAttribute("data-share"), body: form.querySelector("textarea").value }),
+            body: JSON.stringify({ share_id: form.getAttribute("data-share"), comment_id: form.getAttribute("data-comment") || "", body: form.querySelector("textarea").value }),
           });
           location.hash = "#/messages/" + res.conversation_id;
         } catch (err) {
@@ -3115,6 +3239,24 @@ var lastSendAt = 0;
         }
       });
     });
+    bindSwipe(el, weeklyNext, weeklyBack);
+  }
+
+  async function refreshWeeklyCard() {
+    if (!/^#\/weekly$/.test(location.hash)) return;
+    let data;
+    try {
+      data = await api("/api/weekly");
+    } catch (err) {
+      alert(err.message);
+      return;
+    }
+    if (!/^#\/weekly$/.test(location.hash)) return;
+    state.wPrompt = data.prompt || {};
+    state.wLocked = !data.has_shared;
+    state.wShares = data.shares || [];
+    if (state.wIdx >= weeklyCardCount()) state.wIdx = Math.max(0, weeklyCardCount() - 1);
+    mountWeeklyCard(state.wIdx, "forward");
   }
 
   function pollHtml(q) {
@@ -3139,11 +3281,15 @@ var lastSendAt = 0;
     </div>`;
   }
 
-  function convoLabel(c) {
+  /* v14: HTML variant — weekly marker pairs render as wordless SVG shapes,
+     never color/shape words. Trusted HTML: markers map through fixed dicts. */
+  function convoLabelHtml(c) {
     const custom = (c.custom_title || "").trim();
-    if (custom) return clip(custom, 48);
-    if (c.weekly_title) return clip(c.weekly_title, 48);
-    return substanceLabel(c.other_ask, 48) || "conversation";
+    if (custom) return escapeHtml(clip(custom, 48));
+    const wm = c.weekly_markers || null;
+    if (wm && wm.mine && wm.peer) return weeklyPairHtml(wm.mine, wm.peer);
+    if (c.weekly_title) return escapeHtml(clip(c.weekly_title, 48));
+    return escapeHtml(substanceLabel(c.other_ask, 48) || "conversation");
   }
 
   function convoFlag(c) {
@@ -3193,7 +3339,7 @@ var lastSendAt = 0;
           c.last_kind === "system" ? "" : c.last_sender_id === state.me.id ? "you · " : "";
         return `<a class="inbox-row ${c.unread ? "unread" : ""}" href="#/messages/${escapeHtml(c.id)}">
           <div class="inbox-main">
-            <div class="inbox-title">${escapeHtml(convoLabel(c))}</div>
+            <div class="inbox-title">${convoLabelHtml(c)}</div>
             <div class="inbox-preview">${escapeHtml(who + preview)}</div>
           </div>
           <div class="inbox-aside">
@@ -3387,9 +3533,15 @@ var lastSendAt = 0;
     if (stale(g)) return;
     refreshInboxBadge();
     const convo = data.conversation || {};
-    const title = (convo.custom_title && String(convo.custom_title).trim())
-      || substanceLabel(convo.other_ask, 42)
-      || "conversation";
+    const customTitle = (convo.custom_title && String(convo.custom_title).trim()) || "";
+    const tWm = convo.weekly_markers || null;
+    const tPair = (tWm && tWm.mine && tWm.peer) ? weeklyPairHtml(tWm.mine, tWm.peer) : "";
+    /* v14: weekly pair renders as wordless SVG shapes; rename-prompt default stays plain text. */
+    const titleHtml = customTitle ? escapeHtml(customTitle)
+      : tPair ? tPair
+      : escapeHtml(convo.weekly_title || substanceLabel(convo.other_ask, 42) || "conversation");
+    const title = customTitle
+      || (tPair ? "weekly chat" : (convo.weekly_title || substanceLabel(convo.other_ask, 42) || "conversation"));
     const sub = threadSub(convo);
     const receiptsOn = convo.read_receipts !== false;
     let otherLastRead = convo.other_last_read_at ?? null;
@@ -3402,7 +3554,7 @@ var lastSendAt = 0;
       <header class="thread-head">
         <a class="thread-back" href="#/messages" aria-label="back to messages">‹</a>
         <div class="thread-heading">
-          <button type="button" class="thread-title thread-title-btn" id="rename-chat" title="rename">${escapeHtml(title)}</button>
+          <button type="button" class="thread-title thread-title-btn" id="rename-chat" title="rename">${titleHtml}</button>
           ${sub ? `<div class="thread-sub">${escapeHtml(sub)}</div>` : ""}
         </div>
         <button type="button" class="thread-menu-btn" id="thread-menu" aria-label="chat settings">⋯</button>
@@ -3506,10 +3658,12 @@ var lastSendAt = 0;
             method: "PATCH",
             body: JSON.stringify({ title: String(next).trim() }),
           });
-          const label = (res.custom_title && String(res.custom_title).trim())
-            || substanceLabel(convo.other_ask, 42)
-            || "conversation";
-          renameBtn.textContent = label;
+          const newCustom = (res.custom_title && String(res.custom_title).trim()) || "";
+          const rWm = convo.weekly_markers || null;
+          /* v14: fall back to the wordless SVG pair for weekly threads. */
+          if (newCustom) renameBtn.textContent = newCustom;
+          else if (rWm && rWm.mine && rWm.peer) renameBtn.innerHTML = weeklyPairHtml(rWm.mine, rWm.peer);
+          else renameBtn.textContent = convo.weekly_title || substanceLabel(convo.other_ask, 42) || "conversation";
           showToast("renamed");
         } catch (err) {
           alert(err.message);
