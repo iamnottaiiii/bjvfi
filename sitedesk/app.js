@@ -961,7 +961,7 @@ function filteredOpen(openTaken){
 function leadRowHtml(l){
   return '<div class="lead-row"><div>' +
     '<div class="lead-row-name">' + esc(l.name) + '</div>' +
-    '<div class="muted" style="font-size:12px">' + (hasPhone(l.phone) ? esc(l.phone) : 'no phone') + '</div>' +
+    (l.category ? '<div class="muted" style="font-size:12px">' + esc(l.category) + '</div>' : '') +
     '</div><div class="row">' +
     '<a class="btn ghost sm" href="' + esc(siteUrlFor(l)) + '" target="_blank" rel="noopener">site</a>' +
     '<button class="btn sm" data-grab="' + esc(l.slug) + '" type="button">Grab</button>' +
@@ -996,7 +996,7 @@ async function renderQueueInto(el){
     if(atCap) html += '<p class="err" style="margin-bottom:12px">Claim cap reached (' + active + '/' + MAX_ACTIVE_CLAIMS + '). Release or finish an active lead first.</p>';
     html += '<p class="review-note"><strong>Review first.</strong> Open the business page and understand who they are, what they do, how they sound, before you call or send a message.</p>';
     html += '<div class="card"><h2>Board</h2><div class="filters">' +
-      '<input id="queue-q" value="' + esc(state.q) + '" placeholder="Name, slug, phone"/>' +
+      '<input id="queue-q" value="' + esc(state.q) + '" placeholder="Name or slug"/>' +
       '</div>';
     if(shown.length){
       html += '<div class="open-board">' + shown.map(leadRowHtml).join('') + '</div>' +
@@ -1097,7 +1097,6 @@ function showGrabPreview(slug){
     '<p class="muted" style="font-size:13px;line-height:1.55;margin-bottom:14px">Study their site first: what they do, their services, their vibe, so you sound like you know them on the call. The timer gives you <strong>2 minutes</strong> to look, then the grab unlocks.</p>' +
     '<div style="font-size:15px;font-weight:600;margin-bottom:4px">' + esc(l.name) + '</div>' +
     (l.category ? '<div class="muted" style="font-size:12px;margin-bottom:2px">' + esc(l.category) + '</div>' : '') +
-    (hasPhone(l.phone) ? '<div style="font-size:13px;margin-bottom:2px">' + esc(l.phone) + '</div>' : '') +
     (!hasPhone(l.phone) ? '<p class="muted" style="font-size:12px;margin-bottom:10px;line-height:1.55">No number on this lead? Open their site, it is usually listed there.</p>' : '') +
     (l.address ? '<div class="muted" style="font-size:12px;margin-bottom:10px">' + esc(l.address) + '</div>' : '<div style="margin-bottom:10px"></div>') +
     '<button class="btn block" id="grab-site-open" type="button" style="margin-bottom:10px">Open their site</button>' +
