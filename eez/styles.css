@@ -2189,8 +2189,8 @@ body.page-thread .thread-compose {
   cursor: pointer;
 }
 .sort-chip.on {
-  color: var(--fg, #f2f2f2);
-  border-color: var(--fg, #f2f2f2);
+  color: var(--ink);
+  border-color: var(--muted2);
 }
 .presence-row {
   display: flex;
@@ -2240,9 +2240,9 @@ body.page-thread .thread-compose {
 .install-sheet[hidden] { display: none !important; }
 .install-card {
   width: min(420px, 100%);
-  background: var(--card, #0a0a0a);
-  color: var(--fg, #f2f2f2);
-  border: 1px solid var(--border, #222);
+  background: var(--modal);
+  color: var(--ink);
+  border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
   border-radius: 16px;
   padding: 1.1rem 1.15rem 1.2rem;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
@@ -2252,7 +2252,7 @@ body.page-thread .thread-compose {
   font-size: 1.1rem;
 }
 .legal-copy p { margin: 0 0 0.85rem; line-height: 1.45; color: var(--muted, #b0b0b0); }
-.legal-copy strong { color: var(--fg, #f2f2f2); font-weight: 600; }
+.legal-copy strong { color: var(--ink); font-weight: 600; }
 
 
 /* Clickable brand → share */
@@ -2297,7 +2297,7 @@ body.page-thread .thread-compose {
 .share-sheet[hidden] { display: none !important; }
 .share-card {
   width: min(420px, 100%);
-  background: var(--card, #0a0a0a);
+  background: var(--modal);
   color: var(--ink);
   border: 1px solid var(--line, #222);
   border-radius: 16px;
@@ -2332,7 +2332,7 @@ body.page-thread .thread-compose {
   margin: 8px 12px;
   padding: 12px 14px;
   border-radius: 14px;
-  background: color-mix(in srgb, var(--accent, #fff) 12%, var(--card, #111));
+  background: color-mix(in srgb, var(--accent, #fff) 12%, var(--modal));
   border: 1px solid color-mix(in srgb, var(--accent, #fff) 28%, transparent);
   display: flex;
   flex-direction: column;
@@ -2516,10 +2516,21 @@ html[data-uitheme="paper"] {
   --soft-shadow-sm: 0 6px 20px -10px rgba(26, 29, 36, 0.14), 0 2px 8px -4px rgba(26, 29, 36, 0.08);
   --chip: rgba(255, 255, 255, 0.72);
   --chip-strong: rgba(255, 255, 255, 0.95);
+  --soft-inset: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  --fade-well: linear-gradient(165deg, rgba(28, 26, 23, 0.07) 0%, rgba(28, 26, 23, 0.03) 100%);
+  --well-focus: rgba(28, 26, 23, 0.08);
+  --sep: linear-gradient(90deg, transparent, rgba(28, 26, 23, 0.1) 18%, rgba(28, 26, 23, 0.1) 82%, transparent);
+  --chip-soft: rgba(28, 26, 23, 0.06);
+  --chip-faint: rgba(28, 26, 23, 0.05);
+  --chip-ghost: rgba(28, 26, 23, 0.045);
+  --bubble-mine: color-mix(in srgb, var(--accent-soft) 35%, #fffaf4);
+  --composer-bg: linear-gradient(to top, rgba(232, 234, 238, 0.94) 55%, transparent);
+  --skel: rgba(28, 26, 23, 0.07);
+  --skel-shine: rgba(255, 255, 255, 0.45);
+  --modal-scrim: radial-gradient(circle at 50% 70%, rgba(28, 26, 23, 0.18), rgba(28, 26, 23, 0.42));
   color-scheme: light;
 }
-/* custom whole-UI theme: variables are set inline by JS (applyUitheme) */
-html[data-uitheme="custom"] { color-scheme: dark; }
+/* custom whole-UI theme: variables and color-scheme are set inline by JS (applyCustomThemeVars) */
 
 /* custom theme color row: background / highlight / text */
 .theme-custom-row { display: flex; align-items: flex-end; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
@@ -2558,3 +2569,68 @@ body { transition: background-color 0.25s ease, color 0.25s ease; }
 }
 @keyframes btn-spin { to { transform: rotate(360deg); } }
 .posting-pending { opacity: 0.55; pointer-events: none; }
+
+/* ---- v12: five-pill nav, Q&A deck, weekly, projects ---- */
+.bottom-nav { gap: 6px; }
+.bottom-nav a { padding: 10px 12px; }
+@media (max-width: 380px) {
+  .bottom-nav { gap: 4px; }
+  .bottom-nav a { padding: 10px 9px; font-size: 11px; }
+}
+
+.deck-page { min-height: 100%; }
+body.page-home .app { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.deck-pager {
+  display: flex; align-items: center; justify-content: center;
+  gap: 14px; margin: 14px 0 6px;
+}
+.deck-count { font-size: 0.8rem; color: var(--muted2); min-width: 70px; text-align: center; }
+.deck-pager .btn[disabled] { opacity: 0.35; cursor: default; }
+
+.prompt-card { margin-bottom: 14px; }
+.w-compose { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+.w-shares { display: flex; flex-direction: column; gap: 12px; }
+.w-share {
+  background: var(--fade-well);
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: var(--soft-inset);
+}
+.w-share.mine { outline: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); }
+.w-share-body { margin: 8px 0 2px; white-space: pre-wrap; }
+.marker-chip {
+  appearance: none; border: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
+  background: transparent; color: var(--muted);
+  font: inherit; font-size: 0.72rem; letter-spacing: 0.03em; text-transform: lowercase;
+  border-radius: 999px; padding: 0.2rem 0.7rem; cursor: pointer;
+}
+.marker-chip:active { transform: scale(0.96); }
+span.marker-chip { cursor: default; }
+.w-comments {
+  margin-top: 10px; padding-left: 10px;
+  border-left: 2px solid color-mix(in srgb, var(--ink) 12%, transparent);
+  display: flex; flex-direction: column; gap: 10px;
+}
+.w-comment { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.w-comment-body { font-size: 0.92rem; }
+.w-comment-form, .w-msg-form, .proj-msg-form { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.w-msgbox { margin-top: 6px; }
+
+.proj-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+.proj-form label { display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem; color: var(--muted); }
+.proj-card {
+  background: var(--fade-well);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: var(--soft-inset);
+}
+.proj-card.mine { outline: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); }
+.proj-body { white-space: pre-wrap; }
+.proj-closed {
+  font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--muted2); border: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
+  border-radius: 999px; padding: 0.1rem 0.55rem; margin-left: 6px;
+}
+.proj-owner { margin-top: 8px; }
+.proj-msg-row { margin-top: 10px; }
+.proj-edit-form { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
