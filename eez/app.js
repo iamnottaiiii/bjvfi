@@ -838,8 +838,23 @@ async function ghFetchRaw(path, opts){
 
 /* In-memory file cache: path -> {data|bytes, sha, etag, isJson} */
 var fileCache = {};
+/* In-flight GET dedup: path -> promise. Concurrent etag reads for the same
+   file share one network request instead of firing duplicates. Fresh
+   (pre-write) reads bypass it so they always hit the network. */
+var inflightReads = {};
 
 async function ghGetJson(path, useEtag){
+  if(useEtag && inflightReads[path]) return inflightReads[path];
+  var p = ghGetJsonOnce(path, useEtag);
+  if(useEtag){
+    inflightReads[path] = p;
+    try { return await p; }
+    finally { if(inflightReads[path] === p) delete inflightReads[path]; }
+  }
+  return p;
+}
+
+async function ghGetJsonOnce(path, useEtag){
   var cached = fileCache[path];
   var headers = null;
   if(useEtag && cached && cached.etag){ headers = {'If-None-Match': cached.etag}; }
@@ -987,6 +1002,7 @@ async function requireMe(){
   if(!u){ clearSession(); var e2 = new Error('log in first'); e2.status = 401; throw e2; }
   return u;
 }
+/* Presence write. Callers await this to preserve v14 write ordering. */
 async function touchSeen(u){
   if(!u) return;
   try{
@@ -1033,11 +1049,39 @@ function myPrefs(prefs, uid, cid){
 function convoParty(c, uid){ return c.initiator_id === uid || c.recipient_id === uid; }
 function otherId(c, uid){ return c.initiator_id === uid ? c.recipient_id : c.initiator_id; }
 
-async function buildConvoView(c, me, users, messages, prefs){
+/* Perf: indexes for the inbox conversation list, built once per render instead
+   of scanning users/messages/prefs per conversation. First match wins in each
+   map, exactly like the find()/filter() calls they replace, and per-conversation
+   message arrays keep the original relative order. */
+function convoViewIndexes(users, messages, prefs){
+  var userById = Object.create(null);
+  for(var i = 0; i < users.length; i++){ var u = users[i]; if(!(u.id in userById)) userById[u.id] = u; }
+  var msgsByConvo = Object.create(null);
+  for(var j = 0; j < messages.length; j++){
+    var m = messages[j], k = m.conversation_id;
+    if(msgsByConvo[k]) msgsByConvo[k].push(m); else msgsByConvo[k] = [m];
+  }
+  var prefsByKey = Object.create(null);
+  for(var l = 0; l < prefs.length; l++){
+    var pf = prefs[l], pk = pf.user_id + '|' + pf.conversation_id;
+    if(!(pk in prefsByKey)) prefsByKey[pk] = pf;
+  }
+  return {userById: userById, msgsByConvo: msgsByConvo, prefsByKey: prefsByKey};
+}
+async function buildConvoView(c, me, users, messages, prefs, idx){
   var oid = otherId(c, me.id);
-  var other = users.find(function(u){ return u.id === oid; }) || null;
-  var mine = myPrefs(prefs, me.id, c.id) || {};
-  var msgs = messages.filter(function(m){ return m.conversation_id === c.id; });
+  var other, mine, msgs, opref;
+  if(idx){
+    other = idx.userById[oid] || null;
+    mine = idx.prefsByKey[me.id + '|' + c.id] || {};
+    msgs = idx.msgsByConvo[c.id] || [];
+    opref = idx.prefsByKey[oid + '|' + c.id] || null;
+  }else{
+    other = users.find(function(u){ return u.id === oid; }) || null;
+    mine = myPrefs(prefs, me.id, c.id) || {};
+    msgs = messages.filter(function(m){ return m.conversation_id === c.id; });
+    opref = myPrefs(prefs, oid, c.id);
+  }
   var last = msgs.length ? msgs[msgs.length - 1] : null;
   var lastRead = mine.last_read_at || 0;
   var weeklyTitle = '';
@@ -1077,24 +1121,41 @@ async function buildConvoView(c, me, users, messages, prefs){
     weekly_markers: weeklyMarkers,
     muted: !!mine.muted,
     read_receipts: mine.read_receipts !== 0,
-    other_last_read_at: (function(){ var op = myPrefs(prefs, oid, c.id); return op && op.last_read_at ? s2ms(op.last_read_at) : null; })()
+    other_last_read_at: (opref && opref.last_read_at ? s2ms(opref.last_read_at) : null)
   };
 }
 
 async function ghThreadData(id, me, touch){
-  var convos = await getConvos();
+  // Perf: four independent reads fire together. Same data as before.
+  var pConvosT = getConvos();
+  var pUsersT = getUsers();
+  var pMsgsT = getMessages();
+  var pPrefsT = getPrefs();
+  var convos = await pConvosT;
   var c = convos.find(function(x){ return x.id === id; });
   if(!c || !convoParty(c, me.id)){ var e = new Error('not found'); e.status = 404; throw e; }
-  var users = await getUsers();
-  var messages = await getMessages();
-  var prefs = await getPrefs();
+  var users = await pUsersT;
+  var messages = await pMsgsT;
+  var prefs = await pPrefsT;
   if(touch){
-    await mutateJson('conversation_prefs.json', function(ps){
-      var p = ps.find(function(x){ return x.user_id === me.id && x.conversation_id === id; });
-      if(!p){ p = {user_id: me.id, conversation_id: id, title: '', muted: 0, read_receipts: 1, last_read_at: 0}; ps.push(p); }
-      p.last_read_at = nowS();
-    }, 'eez: mark read');
-    prefs = await getPrefs();
+    // Perf: only write last_read_at when a newer incoming message actually
+    // arrived (same pattern as the poll path). Skipping the write leaves the
+    // semantic read state unchanged: no message is newer than last_read_at.
+    var myPr = myPrefs(prefs, me.id, id);
+    var lastRd = myPr ? (myPr.last_read_at || 0) : 0;
+    var newestIn = 0;
+    for(var mi = 0; mi < messages.length; mi++){
+      var mm = messages[mi];
+      if(mm.conversation_id === id && mm.sender_id !== me.id && mm.created_at > newestIn) newestIn = mm.created_at;
+    }
+    if(newestIn > lastRd){
+      // Perf: mutateJson returns the updated array, so the extra re-read is gone.
+      prefs = await mutateJson('conversation_prefs.json', function(ps){
+        var p = ps.find(function(x){ return x.user_id === me.id && x.conversation_id === id; });
+        if(!p){ p = {user_id: me.id, conversation_id: id, title: '', muted: 0, read_receipts: 1, last_read_at: 0}; ps.push(p); }
+        p.last_read_at = newestIn;
+      }, 'eez: mark read');
+    }
   }
   var view = await buildConvoView(c, me, users, messages, prefs);
   var msgs = messages.filter(function(m){ return m.conversation_id === id; })
@@ -1162,38 +1223,8 @@ function currentWeekId(d){
 var WEEKLY_K = 8;
 var WEEKLY_COLORS = ["teal", "amber", "coral", "sage", "plum", "sky", "clay", "moss"];
 var WEEKLY_SHAPES = ["circle", "square", "triangle", "diamond", "hexagon", "star", "wave", "cross"];
-/* v14: marker chips render as pure visual shapes (no text labels). Fixed hex per
-   color name, same on every theme; shape drawn as inline SVG. */
-var WEEKLY_MARKER_HEX = {
-  teal: "#14b8a6", amber: "#f59e0b", coral: "#f97066", sage: "#9caf88",
-  plum: "#8e4585", sky: "#38bdf8", clay: "#c2703d", moss: "#7a8b3f"
-};
-var WEEKLY_SHAPE_SVG = {
-  circle: '<circle cx="12" cy="12" r="8.5" fill="%%C%%"/>',
-  square: '<rect x="4.5" y="4.5" width="15" height="15" rx="3.5" fill="%%C%%"/>',
-  triangle: '<path d="M12 4.5 L20 19 L4 19 Z" fill="%%C%%"/>',
-  diamond: '<path d="M12 3.5 L20.5 12 L12 20.5 L3.5 12 Z" fill="%%C%%"/>',
-  hexagon: '<path d="M12 2.5 L20.2 7.25 V16.75 L12 21.5 L3.8 16.75 V7.25 Z" fill="%%C%%"/>',
-  star: '<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" fill="%%C%%"/>',
-  wave: '<path d="M2.5 12c2.3 0 2.3-5.5 4.75-5.5S9.5 17.5 12 17.5s2.25-11 4.75-11S19 12 21.5 12" fill="none" stroke="%%C%%" stroke-width="2.6" stroke-linecap="round"/>',
-  cross: '<path d="M10 4h4v6h6v4h-6v6h-4v-6H4v-4h6z" fill="%%C%%"/>'
-};
-function markerSvg(marker) {
-  var parts = String(marker || "").split("-");
-  var hex = WEEKLY_MARKER_HEX[parts[0]] || "currentColor";
-  var inner = WEEKLY_SHAPE_SVG[parts[1]] || WEEKLY_SHAPE_SVG.circle;
-  return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
-    inner.split("%%C%%").join(hex) + "</svg>";
-}
-/* v14: weekly-spawned 1:1 thread titles render as a wordless marker pair
-   (two visual shapes + separator) — never color/shape words on screen. */
-function weeklyPairHtml(mineM, peerM) {
-  if (!mineM || !peerM) return "";
-  return '<span class="marker-pair" aria-label="anonymous weekly chat">' +
-    markerSvg(mineM) +
-    '<span class="pair-sep" aria-hidden="true">⇄</span>' +
-    markerSvg(peerM) + "</span>";
-}
+/* v15: marker identity data (color+shape strings like "teal-circle") still lives in
+   state/data for message routing, but no shape visuals are rendered anywhere. */
 function cohortOf(identity, weekId){
   return hashStr(String(identity) + "|" + weekId) % WEEKLY_K;
 }
@@ -1265,10 +1296,12 @@ async function ghApi(path, opts){
   if(p === '/api/me' && method === 'DELETE'){
     var meDel = await requireMe();
     var uid = meDel.id;
-    var qr0 = await ghGetJson('questions.json', true);
+    var pQr0 = ghGetJson('questions.json', true);
+    var pCr0 = ghGetJson('conversations.json', true);
+    var qr0 = await pQr0;
     var myQids = {};
     (qr0 ? qr0.data : []).forEach(function(x){ if(x.author_id === uid) myQids[x.id] = 1; });
-    var cr0 = await ghGetJson('conversations.json', true);
+    var cr0 = await pCr0;
     var myCids = {};
     (cr0 ? cr0.data : []).forEach(function(x){ if(x.initiator_id === uid || x.recipient_id === uid) myCids[x.id] = 1; });
     await mutateJson('users.json', function(us){ return us.filter(function(x){ return x.id !== uid; }); }, 'eez: delete account');
@@ -1333,11 +1366,17 @@ async function ghApi(path, opts){
   /* ----- stack ----- */
   if(p === '/api/stack' && method === 'GET'){
     var sess = loadSession();
-    var meS = sess ? await findUserById(sess.uid) : null;
-    var users = await getUsers();
-    var blocks = (await ghGetJson('blocks.json', true) || {data: []}).data;
-    var skips = meS ? ((await ghGetJson('skips.json', true) || {data: []}).data.filter(function(x){ return x.user_id === meS.id; })) : [];
-    var reps = meS ? ((await ghGetJson('reports.json', true) || {data: []}).data.filter(function(x){ return x.reporter_id === meS.id; })) : [];
+    // Perf: the four independent file reads fire together (in-flight dedup
+    // keeps the users.json pair to a single request). Same data as before.
+    var pUsersS = getUsers();
+    var pBlocksS = ghGetJson('blocks.json', true);
+    var pSkipsS = sess ? ghGetJson('skips.json', true) : null;
+    var pRepsS = sess ? ghGetJson('reports.json', true) : null;
+    var users = await pUsersS;
+    var meS = sess ? (users.find(function(u){ return u.id === sess.uid && !u.deleted; }) || null) : null;
+    var blocks = ((await pBlocksS) || {data: []}).data;
+    var skips = meS ? (((await pSkipsS) || {data: []}).data.filter(function(x){ return x.user_id === meS.id; })) : [];
+    var reps = meS ? (((await pRepsS) || {data: []}).data.filter(function(x){ return x.reporter_id === meS.id; })) : [];
     var excl = {};
     (q.get('exclude') || '').split(',').forEach(function(id){ if(id) excl[id] = 1; });
     skips.forEach(function(x){ excl[x.skipped_id] = 1; });
@@ -1407,35 +1446,62 @@ async function ghApi(path, opts){
   /* ----- Q&A ----- */
   if(p === '/api/questions' && method === 'GET'){
     var sessQ = loadSession();
-    var meQ = sessQ ? await findUserById(sessQ.uid) : null;
+    // Perf: five independent file reads fire together (dedup keeps the
+    // users.json pair to one request). Same data as the sequential version.
+    var pUsersQ = getUsers();
+    var pQsQ = ghGetJson('questions.json', true);
+    var pAnsQ = ghGetJson('answers.json', true);
+    var pOptsQ = ghGetJson('poll_options.json', true);
+    var pVotesQ = ghGetJson('poll_votes.json', true);
+    var usersQ = await pUsersQ;
+    var meQ = sessQ ? (usersQ.find(function(u){ return u.id === sessQ.uid && !u.deleted; }) || null) : null;
     var vkey = meQ ? meQ.id : guestKey();
-    var qs = (await ghGetJson('questions.json', true) || {data: []}).data;
-    var ans = (await ghGetJson('answers.json', true) || {data: []}).data;
-    var popts = (await ghGetJson('poll_options.json', true) || {data: []}).data;
-    var pvotes = (await ghGetJson('poll_votes.json', true) || {data: []}).data;
+    var gkQ = guestKey();
+    var qs = ((await pQsQ) || {data: []}).data;
+    var ans = ((await pAnsQ) || {data: []}).data;
+    var popts = ((await pOptsQ) || {data: []}).data;
+    var pvotes = ((await pVotesQ) || {data: []}).data;
+    // Perf: index the joins once (O(n)) instead of filtering per question
+    // and per option (O(n^2)). Output identical — verified by benchmark.
+    var optsByQ = Object.create(null);
+    popts.forEach(function(o){ (optsByQ[o.question_id] || (optsByQ[o.question_id] = [])).push(o); });
+    var votesByOpt = Object.create(null);
+    var myVoteByQ = Object.create(null);
+    pvotes.forEach(function(v){
+      votesByOpt[v.option_id] = (votesByOpt[v.option_id] || 0) + 1;
+      if(v.voter_key === vkey && myVoteByQ[v.question_id] === undefined) myVoteByQ[v.question_id] = v.option_id;
+    });
+    var ansByQ = Object.create(null);
+    ans.forEach(function(a){ (ansByQ[a.question_id] || (ansByQ[a.question_id] = [])).push(a); });
     var out = [];
+    var imgJobs = [];
     var sorted = qs.slice().sort(function(a,b){ return b.created_at - a.created_at; });
     for(var i=0;i<sorted.length;i++){
       var qq = sorted[i];
-      var opts = popts.filter(function(o){ return o.question_id === qq.id; })
+      var opts = (optsByQ[qq.id] || []).slice()
         .sort(function(a,b){ return a.sort_order - b.sort_order; })
         .map(function(o){
-          var vc = pvotes.filter(function(v){ return v.option_id === o.id; }).length;
-          return {id: o.id, label: o.label, votes: vc};
+          return {id: o.id, label: o.label, votes: votesByOpt[o.id] || 0};
         });
-      var mv = pvotes.find(function(v){ return v.question_id === qq.id && v.voter_key === vkey; });
-      var qans = ans.filter(function(a){ return a.question_id === qq.id; })
+      var mv = myVoteByQ[qq.id] || null;
+      var qans = (ansByQ[qq.id] || []).slice()
         .sort(function(a,b){ return a.created_at - b.created_at; })
         .map(function(a){
-          var mine = (meQ && a.author_id === meQ.id) || (a.guest_key && a.guest_key === guestKey());
+          var mine = (meQ && a.author_id === meQ.id) || (a.guest_key && a.guest_key === gkQ);
           return {id: a.id, body: a.body, mine: !!mine, parent_id: a.parent_id || null};
         });
-      out.push({
+      let rec = {
         id: qq.id, kind: qq.kind || 'text', body: qq.body,
-        image_url: qq.image_key ? await resolveImageUrl(qq.image_key) : null,
-        options: opts, my_vote: mv ? mv.option_id : null, answers: qans
-      });
+        image_url: null,
+        options: opts, my_vote: mv, answers: qans
+      };
+      out.push(rec);
+      // Perf: image questions resolve concurrently instead of one by one.
+      if(qq.image_key){
+        imgJobs.push(resolveImageUrl(qq.image_key).then(function(url){ rec.image_url = url; }));
+      }
     }
+    if(imgJobs.length) await Promise.all(imgJobs);
     return {questions: out};
   }
   if(p === '/api/questions' && method === 'POST'){
@@ -1528,19 +1594,26 @@ async function ghApi(path, opts){
 
   /* ----- conversations ----- */
   if(p === '/api/conversations' && method === 'GET'){
-    var meC = await requireMe();
-    var convos = await getConvos();
-    var usersC = await getUsers();
-    var msgsC = await getMessages();
-    var prefsC = await getPrefs();
+    // Perf: five independent reads fire together (in-flight dedup keeps the
+    // users.json pair to one request). Same data as the sequential version.
+    var pMeC = requireMe();
+    var pConvosC = getConvos();
+    var pUsersC = getUsers();
+    var pMsgsC = getMessages();
+    var pPrefsC = getPrefs();
+    var meC = await pMeC;
+    var convos = await pConvosC;
+    var usersC = await pUsersC;
+    var msgsC = await pMsgsC;
+    var prefsC = await pPrefsC;
     var mine = convos.filter(function(c){
       if(!convoParty(c, meC.id)) return false;
       if(c.initiator_id === meC.id && c.hidden_from_initiator) return false;
       if(convoExpired(c, meC)) return false;
       return true;
     });
-    var views = [];
-    for(var ci=0; ci<mine.length; ci++) views.push(await buildConvoView(mine[ci], meC, usersC, msgsC, prefsC));
+    var idxC = convoViewIndexes(usersC, msgsC, prefsC);
+    var views = await Promise.all(mine.map(function(ci){ return buildConvoView(ci, meC, usersC, msgsC, prefsC, idxC); }));
     views.sort(function(a,b){ return b.last_activity_at - a.last_activity_at; });
     return {conversations: views};
   }
@@ -1606,8 +1679,11 @@ async function ghApi(path, opts){
   /* ----- bookmarks / blocks ----- */
   if(p === '/api/bookmarks' && method === 'GET'){
     var meBk = await requireMe();
-    var bms = (await ghGetJson('bookmarks.json', true) || {data: []}).data.filter(function(x){ return x.user_id === meBk.id; });
-    var usBk = await getUsers();
+    // Perf: independent reads fire together. Same data as before.
+    var pBms = ghGetJson('bookmarks.json', true);
+    var pUsBk = getUsers();
+    var bms = (((await pBms) || {data: []}).data).filter(function(x){ return x.user_id === meBk.id; });
+    var usBk = await pUsBk;
     return {bookmarks: bms.map(function(b){
       var u = usBk.find(function(x){ return x.id === b.bookmarked_id && !x.deleted; });
       if(!u) return null;
@@ -1635,8 +1711,11 @@ async function ghApi(path, opts){
   }
   if(p === '/api/blocks' && method === 'GET'){
     var meBl = await requireMe();
-    var bls = (await ghGetJson('blocks.json', true) || {data: []}).data.filter(function(x){ return x.blocker_id === meBl.id; });
-    var usBl = await getUsers();
+    // Perf: independent reads fire together. Same data as before.
+    var pBls = ghGetJson('blocks.json', true);
+    var pUsBl = getUsers();
+    var bls = (((await pBls) || {data: []}).data).filter(function(x){ return x.blocker_id === meBl.id; });
+    var usBl = await pUsBl;
     return {blocks: bls.map(function(b){
       var u = usBl.find(function(x){ return x.id === b.blocked_id; });
       return {id: b.blocked_id, ask_them: u ? (u.ask_them || '') : '', why_here: u ? (u.why_here || '') : ''};
@@ -1655,17 +1734,23 @@ async function ghApi(path, opts){
   if(p === '/api/me/export' && method === 'GET'){
     var meE = await requireMe();
     var uidE = meE.id;
-    var qE = (await ghGetJson('questions.json', true) || {data: []}).data.filter(function(x){ return x.author_id === uidE; });
+    // Perf: independent reads fire together; joins stay in memory afterwards.
+    var pQeE = ghGetJson('questions.json', true);
+    var pAeE = ghGetJson('answers.json', true);
+    var pCeE = getConvos();
+    var pMsgE = getMessages();
+    var pBmE = ghGetJson('bookmarks.json', true);
+    var qE = ((await pQeE) || {data: []}).data.filter(function(x){ return x.author_id === uidE; });
     var qidsE = {};
     qE.forEach(function(x){ qidsE[x.id] = 1; });
-    var aE = (await ghGetJson('answers.json', true) || {data: []}).data.filter(function(x){ return x.author_id === uidE || qidsE[x.question_id]; });
-    var cE = await getConvos();
+    var aE = ((await pAeE) || {data: []}).data.filter(function(x){ return x.author_id === uidE || qidsE[x.question_id]; });
+    var cE = await pCeE;
     var myCE = cE.filter(function(x){ return convoParty(x, uidE); });
     var cidsE = {};
     myCE.forEach(function(x){ cidsE[x.id] = 1; });
-    var mE = (await getMessages()).filter(function(x){ return cidsE[x.conversation_id]; })
+    var mE = (await pMsgE).filter(function(x){ return cidsE[x.conversation_id]; })
       .map(function(x){ return {id: x.id, conversation_id: x.conversation_id, sender_id: x.sender_id, kind: x.kind, body: x.body, created_at: s2ms(x.created_at)}; });
-    var bmE = (await ghGetJson('bookmarks.json', true) || {data: []}).data.filter(function(x){ return x.user_id === uidE; });
+    var bmE = ((await pBmE) || {data: []}).data.filter(function(x){ return x.user_id === uidE; });
     return {export: {
       profile: await publicUser(meE),
       questions: qE.map(function(x){ return {id: x.id, body: x.body, kind: x.kind, created_at: s2ms(x.created_at)}; }),
@@ -1679,14 +1764,20 @@ async function ghApi(path, opts){
   /* ----- weekly ----- */
   if(p === '/api/weekly' && method === 'GET'){
     var sessWl = loadSession();
-    var meWl = sessWl ? await findUserById(sessWl.uid) : null;
+    // Perf: four independent file reads fire together. Same data as before.
+    var pUsersWl = getUsers();
+    var pShWl = ghGetJson('weekly_shares.json', true);
+    var pCmWl = ghGetJson('weekly_comments.json', true);
+    var pPromptsWl = ghGetJson('prompts.json', true);
+    var usersWl = await pUsersWl;
+    var meWl = sessWl ? (usersWl.find(function(u){ return u.id === sessWl.uid && !u.deleted; }) || null) : null;
     var identWl = meWl ? meWl.id : guestKey();
     var weekId = currentWeekId();
     var cohort = cohortOf(identWl, weekId);
     var marker = markerFor(identWl, weekId);
     // lazy expiry: prune stale weeks, writing only when something is stale
-    var shRaw = await ghGetJson('weekly_shares.json', true);
-    var cmRaw = await ghGetJson('weekly_comments.json', true);
+    var shRaw = await pShWl;
+    var cmRaw = await pCmWl;
     var shAll = (shRaw && shRaw.data) || [];
     var cmAll = (cmRaw && cmRaw.data) || [];
     if(shAll.some(function(s){ return s.week_id !== weekId; }))
@@ -1695,7 +1786,10 @@ async function ghApi(path, opts){
       await mutateJson('weekly_comments.json', function(arr){ return arr.filter(function(c){ return c.week_id === weekId; }); }, 'eez: weekly prune');
     shAll = shAll.filter(function(s){ return s.week_id === weekId; });
     cmAll = cmAll.filter(function(c){ return c.week_id === weekId; });
-    var prompts = ((await ghGetJson('prompts.json', true)) || {data: []}).data || [];
+    // Perf: index comments by share once instead of filtering per share.
+    var cmByShare = Object.create(null);
+    cmAll.forEach(function(c){ (cmByShare[c.share_id] || (cmByShare[c.share_id] = [])).push(c); });
+    var prompts = ((await pPromptsWl) || {data: []}).data || [];
     if(!prompts.length) prompts = WEEKLY_FALLBACK_PROMPTS.map(function(t, i){ return {id: 'fb' + i, text: t}; });
     var prompt = prompts[hashStr(weekId + '|cohort|' + cohort) % prompts.length];
     var mineShare = shAll.find(function(s){
@@ -1708,7 +1802,7 @@ async function ghApi(path, opts){
         .sort(function(a, b){ return a.created_at - b.created_at; })
         .map(function(s){
           var smine = meWl ? s.author_id === meWl.id : (s.guest_key && s.guest_key === identWl);
-          var comms = cmAll.filter(function(c){ return c.share_id === s.id; })
+          var comms = (cmByShare[s.id] || []).slice()
             .sort(function(a, b){ return a.created_at - b.created_at; })
             .map(function(c){
               var cmine = meWl ? c.author_id === meWl.id : (c.guest_key && c.guest_key === identWl);
@@ -1827,13 +1921,16 @@ async function ghApi(path, opts){
     if(fbodyFw.length > 2000) throw bad('keep it under 2000 characters');
     var weekIdFw = currentWeekId();
     var cohortFw = cohortOf(meFw.id, weekIdFw);
+    // Perf: the comments read starts together with the shares read and is
+    // only awaited when replying to a comment. Same data as before.
+    var pCmsFw = commentIdFw ? ghGetJson('weekly_comments.json', true) : null;
     var sharesFw = ((await ghGetJson('weekly_shares.json', true)) || {data: []}).data;
     var shFw = sharesFw.find(function(s){ return s.id === shareIdFw && s.week_id === weekIdFw && s.cohort === cohortFw; });
     if(!shFw) throw bad('that share is gone', 404);
     var peerFw = shFw.author_id || null;
     var peerMarkerFw = shFw.marker || null;
     if(commentIdFw){
-      var cmsFw = ((await ghGetJson('weekly_comments.json', true)) || {data: []}).data;
+      var cmsFw = ((await pCmsFw) || {data: []}).data;
       var cmFw = cmsFw.find(function(c){ return c.id === commentIdFw && c.share_id === shareIdFw && c.week_id === weekIdFw; });
       if(!cmFw) throw bad('that comment is gone', 404);
       peerFw = cmFw.author_id || null;
@@ -1853,8 +1950,14 @@ async function ghApi(path, opts){
   /* ----- misc ----- */
   if(p === '/api/presence' && method === 'POST') return {};
   if(p === '/api/feed' && method === 'GET'){
-    var meFd = await requireMe();
-    return {events: await getFeed(meFd.id)};
+    // Perf: independent reads fire together. Same data as before.
+    var pMeFd = requireMe();
+    var pFeedFd = ghGetJson('feed.json', true);
+    var meFd = await pMeFd;
+    var feedFd = (await pFeedFd) || {data: []};
+    return {events: (feedFd.data || []).filter(function(x){ return x.user_id === meFd.id; }).slice(-50).reverse().map(function(x){
+      return {id: x.id, kind: x.kind, title: x.title, ref_id: x.ref_id || null, created_at: s2ms(x.created_at), seen: !!x.seen};
+    })};
   }
 
   throw bad('unknown endpoint', 404);
@@ -1863,26 +1966,32 @@ async function ghApi(path, opts){
    last_read_at when a new incoming message actually arrived. */
 async function ghThreadPoll(id){
   var sess = loadSession();
-  var me = sess ? await findUserById(sess.uid) : null;
+  // Perf: four independent reads fire together (dedup keeps users.json to one
+  // request). Same data as the sequential version.
+  var pMePl = sess ? findUserById(sess.uid) : Promise.resolve(null);
+  var pConvosPl = getConvos();
+  var pPrefsPl = getPrefs();
+  var pMsgsPl = getMessages();
+  var me = await pMePl;
   if(!me){ var e = new Error('log in first'); e.status = 401; throw e; }
-  var convos = await getConvos();
+  var convos = await pConvosPl;
   var c = convos.find(function(x){ return x.id === id; });
   if(!c || !convoParty(c, me.id)){ var e2 = new Error('not found'); e2.status = 404; throw e2; }
-  var prefs = await getPrefs();
+  var prefs = await pPrefsPl;
   var mp = myPrefs(prefs, me.id, id);
   var lastRead = mp ? (mp.last_read_at || 0) : 0;
-  var messages = await getMessages();
+  var messages = await pMsgsPl;
   var msgs = messages.filter(function(m){ return m.conversation_id === id; })
     .sort(function(a,b){ return a.created_at - b.created_at; });
   var newest = 0;
   msgs.forEach(function(m){ if(m.sender_id !== me.id && m.created_at > newest) newest = m.created_at; });
   if(newest > lastRead){
-    await mutateJson('conversation_prefs.json', function(ps){
+    // Perf: reuse the updated array instead of re-reading the file.
+    prefs = await mutateJson('conversation_prefs.json', function(ps){
       var p = ps.find(function(x){ return x.user_id === me.id && x.conversation_id === id; });
       if(!p){ p = {user_id: me.id, conversation_id: id, title: '', muted: 0, read_receipts: 1, last_read_at: 0}; ps.push(p); }
       p.last_read_at = newest;
     }, 'eez: mark read');
-    prefs = await getPrefs();
   }
   var op = myPrefs(prefs, otherId(c, me.id), id);
   var readAt = (op && op.last_read_at && (mp ? mp.read_receipts !== 0 : true)) ? s2ms(op.last_read_at) : null;
@@ -2340,28 +2449,29 @@ var lastSendAt = 0;
     await loadCard(g);
   }
 
-  async function loadCard(g) {
+  function fetchStackData() {
     const params = new URLSearchParams();
     if (state.exclude.length) params.set("exclude", state.exclude.join(","));
     const sort = (state.me && state.me.stack_sort) || state.stackSort || "active";
     params.set("sort", sort);
     const qs = params.toString() ? "?" + params.toString() : "";
-    let data;
-    try {
-      data = await api("/api/stack" + qs);
-    } catch (err) {
-      if (stale(g)) return;
-      const stage = app.querySelector(".stage");
-      if (!stage) return;
-      stage.innerHTML = `<div class="state-block">
-        <p class="empty-lead">couldn’t load</p>
-        <p class="empty-sub">${escapeHtml(err.message)}</p>
-        <button type="button" class="btn" id="retry-stack">try again</button>
-      </div>`;
-      const b = document.getElementById("retry-stack");
-      if (b) b.addEventListener("click", () => loadCard(g));
-      return;
-    }
+    return api("/api/stack" + qs);
+  }
+
+  function renderStackError(err, g) {
+    if (stale(g)) return;
+    const stage = app.querySelector(".stage");
+    if (!stage) return;
+    stage.innerHTML = `<div class="state-block">
+      <p class="empty-lead">couldn’t load</p>
+      <p class="empty-sub">${escapeHtml(err.message)}</p>
+      <button type="button" class="btn" id="retry-stack">try again</button>
+    </div>`;
+    const b = document.getElementById("retry-stack");
+    if (b) b.addEventListener("click", () => loadCard(g));
+  }
+
+  function renderStackData(data, g) {
     if (stale(g)) return;
     const stage = app.querySelector(".stage");
     if (!stage) return;
@@ -2379,6 +2489,17 @@ var lastSendAt = 0;
     mountProfile(data.profile, state.enterMode || "forward");
   }
 
+  async function loadCard(g) {
+    let data;
+    try {
+      data = await fetchStackData();
+    } catch (err) {
+      renderStackError(err, g);
+      return;
+    }
+    renderStackData(data, g);
+  }
+
   function mountProfile(profile, mode) {
     const stage = app.querySelector(".stage");
     if (!stage) return;
@@ -2391,7 +2512,6 @@ var lastSendAt = 0;
   }
 
   function slideHtml(p) {
-    const canBack = state.history.length > 0;
     const presence = formatPresence(Number(p.last_seen_at) || 0);
     const live = presence === "active now";
     return `
@@ -2421,7 +2541,6 @@ var lastSendAt = 0;
           </form>
         </div>
         <div class="slide-bar" id="slide-bar">
-          <button type="button" class="back-chip" data-act="back" aria-label="previous" ${canBack ? "" : "hidden"}>‹</button>
           <button type="button" class="btn primary sm" data-act="answer">answer</button>
           <div class="more-wrap">
             <button type="button" class="text-act more-btn" data-act="more" aria-label="more" aria-expanded="false" aria-haspopup="menu">:</button>
@@ -2519,14 +2638,7 @@ var lastSendAt = 0;
       ta.focus();
     });
 
-    const backBtn = el.querySelector('[data-act="back"]');
-    if (backBtn) {
-      backBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        closeMore();
-        goBack();
-      });
-    }
+    /* v15: ‹ back-chip removed; swipe right / swipe down / arrow keys go back. */
 
     box.addEventListener("submit", (e) => {
       e.preventDefault();
@@ -2552,6 +2664,10 @@ var lastSendAt = 0;
     let dy = 0;
     let tracking = false;
     let locked = null;
+    let wasTouch = false;
+    let scrollEl = null;
+    let scrollTop0 = 0;
+    let rafPending = 0; // Perf: coalesce transform writes to one per frame.
 
     const onStart = (x, y) => {
       if (el.classList.contains("answering")) return;
@@ -2561,7 +2677,21 @@ var lastSendAt = 0;
       startY = y;
       dx = 0;
       dy = 0;
+      wasTouch = false;
+      scrollEl = null;
+      scrollTop0 = 0;
       el.classList.add("dragging");
+    };
+    // Perf: paint on rAF so rapid move events coalesce to one style write per frame.
+    const paintCard = () => {
+      rafPending = 0;
+      // unmistakable diagonal: left→up-left, right→down-right + rotate
+      const ty = dx < 0 ? dx * 0.72 : dx * 0.72;
+      const rot = Math.max(-14, Math.min(14, dx / 18));
+      const sc = Math.max(0.9, 1 - Math.abs(dx) / 900);
+      const fade = Math.max(0.22, 1 - Math.abs(dx) / 380);
+      el.style.transform = `translate(${dx}px, ${ty}px) rotate(${rot}deg) scale(${sc})`;
+      el.style.opacity = String(fade);
     };
     const onMove = (x, y) => {
       if (!tracking) return;
@@ -2572,31 +2702,36 @@ var lastSendAt = 0;
         locked = Math.abs(dx) > Math.abs(dy) * 0.7 ? "x" : "y";
       }
       if (locked !== "x") return;
-      // unmistakable diagonal: left→up-left, right→down-right + rotate
-      const ty = dx < 0 ? dx * 0.72 : dx * 0.72;
-      const rot = Math.max(-14, Math.min(14, dx / 18));
-      const sc = Math.max(0.9, 1 - Math.abs(dx) / 900);
-      const fade = Math.max(0.22, 1 - Math.abs(dx) / 380);
-      el.style.transform = `translate(${dx}px, ${ty}px) rotate(${rot}deg) scale(${sc})`;
-      el.style.opacity = String(fade);
+      if (!rafPending) rafPending = requestAnimationFrame(paintCard);
     };
     const onEnd = () => {
       if (!tracking) return;
       tracking = false;
+      if (rafPending){ cancelAnimationFrame(rafPending); rafPending = 0; }
       el.classList.remove("dragging");
       if (locked === "x" && Math.abs(dx) > 64) {
         if (dx < 0) {
-          // dismiss forward: exit up-left
+          // dismiss forward: exit up-left (skip() plays the dismiss while fetching next)
           pushHistory(profile);
-          dismiss("ul", () => skip(profile.id));
+          skip(profile.id);
         } else if (state.history.length) {
           // opposite: bring back - exit current down-right then restore
           goBack();
         } else {
           // no history: also advance forward via right (still up-left exit energy flipped? use ul for next)
           pushHistory(profile);
-          dismiss("ul", () => skip(profile.id));
+          skip(profile.id);
         }
+      } else if (
+        wasTouch &&
+        locked === "y" &&
+        dy > 64 &&
+        Math.abs(dy) > Math.abs(dx) * 1.25 &&
+        !swipeScrolledContent(scrollEl, scrollTop0) &&
+        state.history.length
+      ) {
+        // v15: touch swipe down = back, but never when the user was scrolling card content
+        goBack();
       } else {
         el.style.transform = "";
         el.style.opacity = "";
@@ -2609,6 +2744,9 @@ var lastSendAt = 0;
         if (e.target.closest("button, textarea, input, form, a")) return;
         const t = e.changedTouches[0];
         onStart(t.clientX, t.clientY);
+        wasTouch = true;
+        scrollEl = scrollableAncestor(e.target, el);
+        scrollTop0 = scrollEl ? scrollEl.scrollTop : 0;
       },
       { passive: true },
     );
@@ -2638,6 +2776,16 @@ var lastSendAt = 0;
       if (e.pointerType === "touch") return;
       onEnd();
     });
+    // v15: desktop wheel / trackpad flips cards; plain vertical wheel keeps scrolling card content
+    bindStackWheel(
+      el,
+      () => {
+        if (el.classList.contains("answering")) return;
+        pushHistory(profile);
+        skip(profile.id);
+      },
+      goBack,
+    );
   }
 
   function pushHistory(profile) {
@@ -2661,15 +2809,30 @@ var lastSendAt = 0;
     setTimeout(after, ms);
   }
 
+  function dismissAsPromise(dir) {
+    return new Promise(function (resolve) { dismiss(dir, resolve); });
+  }
+
   async function skip(id) {
     rememberExclude(id);
-    try {
-      await api("/api/stack/skip", { method: "POST", body: JSON.stringify({ id }) });
-    } catch {
+    // Perf: the skip write lands in the background — the local exclude list
+    // already guards the next fetch, so the swipe doesn't wait on it.
+    api("/api/stack/skip", { method: "POST", body: JSON.stringify({ id }) }).catch(function () {
       /* guests skip locally */
-    }
+    });
     state.enterMode = "forward";
-    await loadCard();
+    // Perf: the next card's network starts now, while the dismiss animation
+    // plays — the render happens when both are done.
+    const dataP = fetchStackData();
+    await dismissAsPromise("ul");
+    let data;
+    try {
+      data = await dataP;
+    } catch (err) {
+      renderStackError(err);
+      return;
+    }
+    renderStackData(data);
   }
 
   function goBack() {
@@ -2746,9 +2909,112 @@ var lastSendAt = 0;
 
 
   /* ---------- Q&A: one question at a time in the home-style swipe stack ---------- */
+  /* v15: all ‹ back buttons are gone. Backs happen via swipe right / swipe down
+     (touch), horizontal wheel or shift+wheel / arrow keys (desktop), or Esc / Alt+Left. */
+  function scrollableAncestor(el, root) {
+    let n = el && el.nodeType === 1 ? el : null;
+    while (n && n !== root && root.contains(n)) {
+      if (n.scrollHeight > n.clientHeight + 8) return n;
+      n = n.parentElement;
+    }
+    return null;
+  }
+
+  function swipeScrolledContent(scrollEl, scrollTop0) {
+    return !!scrollEl && Math.abs(scrollEl.scrollTop - scrollTop0) > 4;
+  }
+
+  // Touch: swipe right = back. Swipe down = back ONLY when the gesture did not
+  // scroll content (keeps vertical scrolling inside long cards/threads intact).
+  // Gestures starting on buttons, inputs, forms or links are ignored.
+  function bindViewBack(root, onBack) {
+    if (!root) return;
+    let startX = 0;
+    let startY = 0;
+    let dx = 0;
+    let dy = 0;
+    let tracking = false;
+    let locked = null;
+    let scrollEl = null;
+    let scrollTop0 = 0;
+    root.addEventListener(
+      "touchstart",
+      (e) => {
+        if (e.target.closest("button, textarea, input, select, form, a, [contenteditable]")) return;
+        const t = e.changedTouches[0];
+        tracking = true;
+        locked = null;
+        startX = t.clientX;
+        startY = t.clientY;
+        dx = 0;
+        dy = 0;
+        scrollEl = scrollableAncestor(e.target, root);
+        scrollTop0 = scrollEl ? scrollEl.scrollTop : 0;
+      },
+      { passive: true },
+    );
+    root.addEventListener(
+      "touchmove",
+      (e) => {
+        if (!tracking) return;
+        const t = e.changedTouches[0];
+        dx = t.clientX - startX;
+        dy = t.clientY - startY;
+        if (locked === null && Math.hypot(dx, dy) > 10) {
+          locked = Math.abs(dx) > Math.abs(dy) * 0.7 ? "x" : "y";
+        }
+        if (locked === "x") e.preventDefault();
+      },
+      { passive: false },
+    );
+    const end = () => {
+      if (!tracking) return;
+      tracking = false;
+      if (locked === "x" && dx > 64) {
+        onBack();
+        return;
+      }
+      if (locked === "y" && dy > 72 && Math.abs(dy) > Math.abs(dx) * 1.25 && !swipeScrolledContent(scrollEl, scrollTop0)) {
+        onBack();
+      }
+    };
+    root.addEventListener("touchend", end);
+    root.addEventListener("touchcancel", end);
+  }
+
+  // Desktop: horizontal wheel (or shift+wheel) flips stack cards left/right.
+  // Plain vertical wheel is untouched so long card content keeps scrolling.
+  let wheelNavAt = 0;
+  function bindStackWheel(el, onNext, onBack) {
+    if (!el) return;
+    el.addEventListener(
+      "wheel",
+      (e) => {
+        if (e.target.closest("input, textarea, select, [contenteditable]")) return;
+        const unit = e.deltaMode === 1 ? 16 : 1;
+        const dx = e.deltaX * unit;
+        const dy = e.deltaY * unit;
+        const horiz = Math.abs(dx) > Math.abs(dy) || (e.shiftKey && dy !== 0);
+        if (!horiz || !(dx || dy)) return;
+        const d = Math.abs(dx) > Math.abs(dy) ? dx : dy;
+        const now = Date.now();
+        if (now - wheelNavAt < 700) {
+          e.preventDefault();
+          return;
+        }
+        wheelNavAt = now;
+        e.preventDefault();
+        if (d > 0) onNext();
+        else onBack();
+      },
+      { passive: false },
+    );
+  }
+
   /* shared horizontal-swipe card binder: swipe left = next, right = previous.
      vertical stays native scroll inside .slide-body (touch-action: pan-y).
-     touches starting on buttons/inputs/forms/links are ignored. */
+     touches starting on buttons/inputs/forms/links are ignored.
+     v15: touch swipe down = previous too, when it didn't scroll content. */
   function bindSwipe(el, onNext, onBack) {
     if (!el) return;
     let startX = 0;
@@ -2757,6 +3023,10 @@ var lastSendAt = 0;
     let dy = 0;
     let tracking = false;
     let locked = null;
+    let wasTouch = false;
+    let scrollEl = null;
+    let scrollTop0 = 0;
+    let rafPending = 0; // Perf: coalesce transform writes to one per frame.
 
     const onStart = (x, y) => {
       tracking = true;
@@ -2765,7 +3035,20 @@ var lastSendAt = 0;
       startY = y;
       dx = 0;
       dy = 0;
+      wasTouch = false;
+      scrollEl = null;
+      scrollTop0 = 0;
       el.classList.add("dragging");
+    };
+    // Perf: paint on rAF so rapid move events coalesce to one style write per frame.
+    const paintCard = () => {
+      rafPending = 0;
+      const ty = dx * 0.72;
+      const rot = Math.max(-14, Math.min(14, dx / 18));
+      const sc = Math.max(0.9, 1 - Math.abs(dx) / 900);
+      const fade = Math.max(0.22, 1 - Math.abs(dx) / 380);
+      el.style.transform = `translate(${dx}px, ${ty}px) rotate(${rot}deg) scale(${sc})`;
+      el.style.opacity = String(fade);
     };
     const onMove = (x, y) => {
       if (!tracking) return;
@@ -2776,20 +3059,25 @@ var lastSendAt = 0;
         locked = Math.abs(dx) > Math.abs(dy) * 0.7 ? "x" : "y";
       }
       if (locked !== "x") return;
-      const ty = dx * 0.72;
-      const rot = Math.max(-14, Math.min(14, dx / 18));
-      const sc = Math.max(0.9, 1 - Math.abs(dx) / 900);
-      const fade = Math.max(0.22, 1 - Math.abs(dx) / 380);
-      el.style.transform = `translate(${dx}px, ${ty}px) rotate(${rot}deg) scale(${sc})`;
-      el.style.opacity = String(fade);
+      if (!rafPending) rafPending = requestAnimationFrame(paintCard);
     };
     const onEnd = () => {
       if (!tracking) return;
       tracking = false;
+      if (rafPending){ cancelAnimationFrame(rafPending); rafPending = 0; }
       el.classList.remove("dragging");
       if (locked === "x" && Math.abs(dx) > 64) {
         if (dx < 0) onNext();
         else onBack();
+      } else if (
+        wasTouch &&
+        locked === "y" &&
+        dy > 64 &&
+        Math.abs(dy) > Math.abs(dx) * 1.25 &&
+        !swipeScrolledContent(scrollEl, scrollTop0)
+      ) {
+        // v15: touch swipe down = previous, but never when the user was scrolling card content
+        onBack();
       } else {
         el.style.transform = "";
         el.style.opacity = "";
@@ -2802,6 +3090,9 @@ var lastSendAt = 0;
         if (e.target.closest("button, textarea, input, form, a")) return;
         const t = e.changedTouches[0];
         onStart(t.clientX, t.clientY);
+        wasTouch = true;
+        scrollEl = scrollableAncestor(e.target, el);
+        scrollTop0 = scrollEl ? scrollEl.scrollTop : 0;
       },
       { passive: true },
     );
@@ -2831,17 +3122,15 @@ var lastSendAt = 0;
       if (e.pointerType === "touch") return;
       onEnd();
     });
+    // v15: desktop wheel / trackpad flips cards; plain vertical wheel keeps scrolling card content
+    bindStackWheel(el, onNext, onBack);
   }
 
   function qaStackCardHtml(q) {
-    const canBack = state.qaIdx > 0;
     return `
       <article class="slide qa-slide" id="slide">
         <div class="slide-body">
           ${qCardHtml(q)}
-        </div>
-        <div class="slide-bar" id="slide-bar">
-          <button type="button" class="back-chip" data-act="back" aria-label="previous" ${canBack ? "" : "hidden"}>‹</button>
         </div>
       </article>`;
   }
@@ -2892,13 +3181,7 @@ var lastSendAt = 0;
   function bindQaCard(el) {
     if (!el) return;
     bindQuestionCard(el, () => refreshQaCard());
-    const backBtn = el.querySelector('[data-act="back"]');
-    if (backBtn) {
-      backBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        qaBack();
-      });
-    }
+    /* v15: ‹ back-chip removed; swipe right / swipe down / wheel / arrow keys go back. */
     bindSwipe(el, qaNext, qaBack);
   }
 
@@ -2980,13 +3263,13 @@ var lastSendAt = 0;
         <button type="button" class="btn" id="qa-detail-back">back to questions</button>
       </div>`;
     } else {
-      box.innerHTML = `<button type="button" class="back-chip qa-back" id="qa-detail-back" aria-label="back to questions">‹ back</button>
-        ${qCardHtml(q)}`;
+      /* v15: ‹ back button removed; swipe right / swipe down / Esc / Alt+Left return to the stack. */
+      box.innerHTML = qCardHtml(q);
       bindQuestionCard(box, () => renderQaDetail(id));
     }
-    document.getElementById("qa-detail-back").addEventListener("click", () => {
-      location.hash = "#/qa";
-    });
+    const qb = document.getElementById("qa-detail-back");
+    if (qb) qb.addEventListener("click", () => { location.hash = "#/qa"; });
+    bindViewBack(document.querySelector(".qa-page"), () => { location.hash = "#/qa"; });
   }
 
   function openAskOverlay() {
@@ -3016,26 +3299,29 @@ var lastSendAt = 0;
     });
   }
 
-  /* ---------- weekly: one prompt, one cohort, anonymous markers, ephemeral ---------- */
-  function markerChipHtml(marker, shareId, commentId, isMine) {
-    var svg = markerSvg(marker);
-    if (isMine) return `<span class="marker-chip" aria-label="your anonymous marker">${svg}</span>`;
+  /* ---------- weekly: one prompt, one cohort, ephemeral ---------- */
+  /* v15: no marker visuals anywhere — shares/comments render plain text with a
+     "message" button. Identity routing stays in data: the comment id (when
+     present) is posted with share_id to /api/conversations/from-weekly so the
+     1:1 thread opens with the commenter, not the share author. */
+  function msgBtnHtml(commentId, isMine) {
+    if (isMine) return "";
     var cattr = commentId ? ` data-comment="${escapeHtml(commentId)}"` : "";
-    return `<button type="button" class="marker-chip" data-weekly-msg="${escapeHtml(shareId)}"${cattr} aria-label="message this person">${svg}</button>`;
+    return `<button type="button" class="btn sm w-msg-btn"${cattr}>message</button>`;
   }
 
   function weeklyShareHtml(s) {
     const comments = (s.comments || [])
       .map(
         (c) => `<div class="w-comment${c.mine ? " mine" : ""}">
-          ${markerChipHtml(c.marker, s.id, c.id, c.mine)}
           <div class="w-comment-body">${escapeHtml(c.body)}</div>
+          ${msgBtnHtml(c.id, c.mine)}
         </div>`,
       )
       .join("");
     return `<article class="w-share${s.mine ? " mine" : ""}" data-share="${escapeHtml(s.id)}">
-      ${markerChipHtml(s.marker, s.id, null, s.mine)}
       <div class="w-share-body">${escapeHtml(s.body)}</div>
+      <div class="w-share-actions">${msgBtnHtml(null, s.mine)}</div>
       ${comments ? `<div class="w-comments">${comments}</div>` : ""}
       <form class="w-comment-form" data-share="${escapeHtml(s.id)}">
         <label class="sr-only" for="wc-${escapeHtml(s.id)}">comment</label>
@@ -3138,14 +3424,10 @@ var lastSendAt = 0;
     if (idx >= shares.length) idx = shares.length - 1;
     state.wIdx = idx;
     const s = shares[idx];
-    const canBack = state.wIdx > 0;
     stage.innerHTML = `
       <article class="slide w-slide" id="slide">
         <div class="slide-body">
           ${weeklyShareHtml(s)}
-        </div>
-        <div class="slide-bar">
-          <button type="button" class="back-chip" data-act="back" aria-label="previous" ${canBack ? "" : "hidden"}>‹</button>
         </div>
       </article>`;
     const el = stage.querySelector(".slide");
@@ -3180,13 +3462,7 @@ var lastSendAt = 0;
 
   function bindWeeklyCard(el) {
     if (!el) return;
-    const backBtn = el.querySelector('[data-act="back"]');
-    if (backBtn) {
-      backBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        weeklyBack();
-      });
-    }
+    /* v15: ‹ back-chip removed; swipe right / swipe down / wheel / arrow keys go back. */
     el.querySelectorAll(".w-comment-form").forEach((form) => {
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -3202,9 +3478,9 @@ var lastSendAt = 0;
         }
       });
     });
-    // tapping a marker opens a 1:1 thread with that person (share author or commenter)
-    el.querySelectorAll(".marker-chip[data-weekly-msg]").forEach((chip) => {
-      chip.addEventListener("click", async () => {
+    // the message button opens the inline 1:1 composer for that person (share author or commenter)
+    el.querySelectorAll(".w-msg-btn").forEach((btn) => {
+      btn.addEventListener("click", async () => {
         if (!(await requireLogin())) return;
         const box = el.querySelector(".w-msgbox");
         if (!box) return;
@@ -3213,7 +3489,7 @@ var lastSendAt = 0;
         if (!box.hidden) {
           const form = box.querySelector(".w-msg-form");
           if (form) {
-            const cid = chip.getAttribute("data-comment");
+            const cid = btn.getAttribute("data-comment");
             if (cid) form.setAttribute("data-comment", cid);
             else form.removeAttribute("data-comment");
           }
@@ -3281,13 +3557,13 @@ var lastSendAt = 0;
     </div>`;
   }
 
-  /* v14: HTML variant — weekly marker pairs render as wordless SVG shapes,
-     never color/shape words. Trusted HTML: markers map through fixed dicts. */
+  /* v15: weekly 1:1 thread titles use the neutral "weekly chat" label —
+     no shapes, no names, no marker words anywhere in the inbox. */
   function convoLabelHtml(c) {
     const custom = (c.custom_title || "").trim();
     if (custom) return escapeHtml(clip(custom, 48));
     const wm = c.weekly_markers || null;
-    if (wm && wm.mine && wm.peer) return weeklyPairHtml(wm.mine, wm.peer);
+    if (wm && wm.mine && wm.peer) return "weekly chat";
     if (c.weekly_title) return escapeHtml(clip(c.weekly_title, 48));
     return escapeHtml(substanceLabel(c.other_ask, 48) || "conversation");
   }
@@ -3504,7 +3780,7 @@ var lastSendAt = 0;
     }
     app.innerHTML = `<div class="thread-page page-fade">
       <header class="thread-head">
-        <a class="thread-back" href="#/messages" aria-label="back to messages">‹</a>
+        <span class="sr-only">swipe right or press escape to go back to messages</span>
         <div class="thread-heading"><div class="thread-title">conversation</div></div>
         <button type="button" class="thread-menu-btn" id="thread-menu" aria-label="chat settings">⋯</button>
       </header>
@@ -3535,13 +3811,13 @@ var lastSendAt = 0;
     const convo = data.conversation || {};
     const customTitle = (convo.custom_title && String(convo.custom_title).trim()) || "";
     const tWm = convo.weekly_markers || null;
-    const tPair = (tWm && tWm.mine && tWm.peer) ? weeklyPairHtml(tWm.mine, tWm.peer) : "";
-    /* v14: weekly pair renders as wordless SVG shapes; rename-prompt default stays plain text. */
+    const tWeekly = (tWm && tWm.mine && tWm.peer);
+    /* v15: weekly 1:1 titles are the neutral "weekly chat" — no shapes, no names. */
     const titleHtml = customTitle ? escapeHtml(customTitle)
-      : tPair ? tPair
+      : tWeekly ? "weekly chat"
       : escapeHtml(convo.weekly_title || substanceLabel(convo.other_ask, 42) || "conversation");
     const title = customTitle
-      || (tPair ? "weekly chat" : (convo.weekly_title || substanceLabel(convo.other_ask, 42) || "conversation"));
+      || (tWeekly ? "weekly chat" : (convo.weekly_title || substanceLabel(convo.other_ask, 42) || "conversation"));
     const sub = threadSub(convo);
     const receiptsOn = convo.read_receipts !== false;
     let otherLastRead = convo.other_last_read_at ?? null;
@@ -3552,7 +3828,7 @@ var lastSendAt = 0;
     const isFirstChat = !(data.messages || []).some((m) => m.kind === "user" && m.sender_id === state.me.id);
     app.innerHTML = `<div class="thread-page page-fade">
       <header class="thread-head">
-        <a class="thread-back" href="#/messages" aria-label="back to messages">‹</a>
+        <span class="sr-only">swipe right or press escape to go back to messages</span>
         <div class="thread-heading">
           <button type="button" class="thread-title thread-title-btn" id="rename-chat" title="rename">${titleHtml}</button>
           ${sub ? `<div class="thread-sub">${escapeHtml(sub)}</div>` : ""}
@@ -3580,9 +3856,13 @@ var lastSendAt = 0;
       <form id="msg-form" class="composer thread-compose">
         <label class="sr-only" for="msg-body">write</label>
         <textarea id="msg-body" name="body" required maxlength="2000" rows="1" placeholder="write"></textarea>
-        <button class="btn primary" type="submit">send</button>
+        <button class="send-btn" type="submit" aria-label="send">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 19V5m0 0l-6 6m6-6l6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
       </form>
     </div>`;
+    // v15: ‹ back link removed; swipe right / swipe down / Esc / Alt+Left return to the thread list
+    bindViewBack(document.querySelector(".thread-page"), () => { location.hash = "#/messages"; });
     if (isFirstChat) maybeShowSafetyTip();
     else {
       try {
@@ -3660,9 +3940,9 @@ var lastSendAt = 0;
           });
           const newCustom = (res.custom_title && String(res.custom_title).trim()) || "";
           const rWm = convo.weekly_markers || null;
-          /* v14: fall back to the wordless SVG pair for weekly threads. */
+          /* v15: fall back to the neutral "weekly chat" for weekly threads. */
           if (newCustom) renameBtn.textContent = newCustom;
-          else if (rWm && rWm.mine && rWm.peer) renameBtn.innerHTML = weeklyPairHtml(rWm.mine, rWm.peer);
+          else if (rWm && rWm.mine && rWm.peer) renameBtn.textContent = "weekly chat";
           else renameBtn.textContent = convo.weekly_title || substanceLabel(convo.other_ask, 42) || "conversation";
           showToast("renamed");
         } catch (err) {
@@ -3736,9 +4016,7 @@ var lastSendAt = 0;
     const customVals = persist ? parsePackedCustom(u.theme_custom || "") : storedUithemeCustom();
     const currentPreset = persist ? u.theme_preset || "" : storedUitheme();
     app.innerHTML = fadeWrap(`<div class="settings">
-      <div class="row-btns settings-back-row">
-        <a class="btn ghost sm" href="#/you">&larr; back</a>
-      </div>
+      <span class="sr-only">swipe right or press escape to go back to you</span>
       <h1>settings</h1>
       <section class="settings-group">
         <h2>look</h2>
@@ -3818,6 +4096,8 @@ var lastSendAt = 0;
         </div>
       </section>
     </div>`);
+    // v15: ← back link removed; swipe right / Esc / Alt+Left return to you
+    bindViewBack(document.querySelector(".settings"), () => { location.hash = "#/you"; });
     bindUithemeControls(persist);
     if (persist) bindSettingsSections();
     applyUserAppearance(u);
@@ -4130,6 +4410,78 @@ var lastSendAt = 0;
     render();
   });
 
+  /* v15: keyboard navigation. Replaces the removed ‹ back buttons on desktop:
+     - ArrowRight / ArrowLeft flip stack cards on home, q&a, weekly
+     - Escape backs out of a view (thread → messages, question detail → q&a,
+       settings → you, stacks → previous card)
+     - Alt+Left does the same as Escape */
+  function keyBackTarget() {
+    const r = route();
+    if (r.parts[0] === "messages" && r.parts[1]) return "#/messages";
+    if (r.parts[0] === "qa" && r.parts[1]) return "#/qa";
+    if (r.parts[0] === "settings") return "#/you";
+    return null;
+  }
+  function keyStackKind() {
+    const r = route();
+    if (r.path === "/" || r.path === "") return "home";
+    if (r.parts[0] === "qa" && !r.parts[1]) return "qa";
+    if (r.parts[0] === "weekly") return "weekly";
+    return null;
+  }
+  function homeAdvance() {
+    const p = state.card;
+    const el = document.getElementById("slide");
+    if (!p || !el || el.classList.contains("answering")) return;
+    pushHistory(p);
+    skip(p.id);
+  }
+  function keyStackBack(kind) {
+    if (kind === "home") {
+      if (state.history.length) goBack();
+    } else if (kind === "qa") qaBack();
+    else if (kind === "weekly") weeklyBack();
+  }
+  document.addEventListener("keydown", (e) => {
+    if (e.defaultPrevented) return;
+    // overlays and open menus own their keys (the ask sheet already handles Escape)
+    if (document.querySelector(".ask-scrim") || document.querySelector(".more-menu:not([hidden])")) return;
+    const ae = document.activeElement;
+    const typing = !!ae && (/^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName) || ae.isContentEditable);
+    const backTo = keyBackTarget();
+    if (e.key === "Escape") {
+      if (typing) return;
+      if (backTo) {
+        location.hash = backTo;
+        return;
+      }
+      keyStackBack(keyStackKind());
+      return;
+    }
+    if (e.altKey && (e.key === "ArrowLeft" || e.key === "Left")) {
+      if (typing) return;
+      e.preventDefault();
+      if (backTo) {
+        location.hash = backTo;
+        return;
+      }
+      keyStackBack(keyStackKind());
+      return;
+    }
+    if (typing || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+    const kind = keyStackKind();
+    if (!kind) return;
+    if (e.key === "ArrowRight" || e.key === "Right") {
+      e.preventDefault();
+      if (kind === "home") homeAdvance();
+      else if (kind === "qa") qaNext();
+      else if (kind === "weekly") weeklyNext();
+    } else if (e.key === "ArrowLeft" || e.key === "Left") {
+      e.preventDefault();
+      keyStackBack(kind);
+    }
+  });
+
   function renderLegal(kind) {
     setNav("you");
     const isTerms = kind === "terms";
@@ -4377,8 +4729,8 @@ var lastSendAt = 0;
     .then(() => {
       applyUserAppearance(state.me);
       ensureInboxRealtime();
-      refreshAlerts();
-      return refreshInboxBadge();
+      // Perf: alerts + inbox badge are independent — fetch together, not in series.
+      return Promise.all([refreshAlerts(), refreshInboxBadge()]);
     })
     .catch(() => {})
     .finally(render);
