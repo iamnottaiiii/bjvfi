@@ -961,7 +961,6 @@ function filteredOpen(openTaken){
 function leadRowHtml(l){
   return '<div class="lead-row"><div>' +
     '<div class="lead-row-name">' + esc(l.name) + '</div>' +
-    (l.category ? '<div class="muted" style="font-size:12px">' + esc(l.category) + '</div>' : '') +
     '</div><div class="row">' +
     '<a class="btn ghost sm" href="' + esc(siteUrlFor(l)) + '" target="_blank" rel="noopener">site</a>' +
     '<button class="btn sm" data-grab="' + esc(l.slug) + '" type="button">Grab</button>' +
