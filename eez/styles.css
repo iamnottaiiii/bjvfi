@@ -856,7 +856,7 @@ select {
 input:focus,
 textarea:focus,
 select:focus {
-  box-shadow: var(--soft-shadow), var(--soft-inset);
+  box-shadow: var(--soft-shadow-sm), var(--soft-inset);
   background: var(--well-focus);
 }
 
@@ -2346,7 +2346,7 @@ body.page-thread .thread-compose {
 html[data-uitheme="ocean"] {
   --bg: #04121f; --bg2: #061826; --bg3: #0a2233;
   --surface: rgba(13, 38, 58, 0.82);
-  --ink: #dcefef; --muted: #7fa3b8; --muted2: #54707f;
+  --ink: #dcefef; --muted: #7fa3b8; --muted2: #6b8a9c;
   --accent: #4fd6e8; --accent-soft: #2aa8bc; --accent-ink: #031318;
   --btn-bg: #dcefef; --btn-fg: #061826;
   --toast-bg: #dcefef; --toast-fg: #061826;
@@ -2505,7 +2505,7 @@ html[data-uitheme="midnight"] {
 html[data-uitheme="paper"] {
   --bg: #e8eaee; --bg2: #f2f4f6; --bg3: #dde1e6;
   --surface: rgba(255, 255, 255, 0.88);
-  --ink: #1c1a17; --muted: #6f6a63; --muted2: #9a948a;
+  --ink: #1c1a17; --muted: #6f6a63; --muted2: #7b756e;
   --accent: #c46a52; --accent-soft: #a8563f; --accent-ink: #fff6f0;
   --btn-bg: #1c1a17; --btn-fg: #f2f4f6;
   --toast-bg: #1c1a17; --toast-fg: #f2f4f6;
@@ -2608,6 +2608,16 @@ body.page-home .app { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscrol
 }
 .qa-plus:active { transform: scale(0.94); }
 .qa-page .stage { min-height: 56vh; }
+.weekly-page .stage { min-height: 56vh; }
+.weekly-prompt {
+  width: 100%;
+  max-width: 34rem;
+  margin: 0 auto 10px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border-radius: 14px;
+}
+.weekly-prompt .q-body { font-size: 1rem; }
 .q-count {
   font-size: 0.85rem;
   color: var(--muted2);
@@ -2619,7 +2629,6 @@ body.page-home .app { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscrol
   margin: 0;
   opacity: 0.8;
 }
-.qa-slide .q-body { cursor: pointer; }
 .qa-back { margin-bottom: 12px; }
 .ask-scrim {
   position: fixed;
@@ -2672,13 +2681,13 @@ body.page-home .app { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscrol
 .w-share.mine { outline: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); }
 .w-share-body { margin: 8px 0 2px; white-space: pre-wrap; }
 .marker-chip {
-  appearance: none; border: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
-  background: transparent; color: var(--muted);
-  font: inherit; font-size: 0.72rem; letter-spacing: 0.03em; text-transform: lowercase;
-  border-radius: 999px; padding: 0.2rem 0.7rem; cursor: pointer;
+  appearance: none; background: transparent; border: 0; padding: 2px; margin: 0;
+  display: inline-flex; align-items: center; justify-content: center; flex: none;
+  width: 26px; height: 26px; border-radius: 8px; cursor: pointer;
 }
-.marker-chip:active { transform: scale(0.96); }
+.marker-chip:active { transform: scale(0.92); }
 span.marker-chip { cursor: default; }
+.marker-chip svg { width: 20px; height: 20px; display: block; }
 .w-comments {
   margin-top: 10px; padding-left: 10px;
   border-left: 2px solid color-mix(in srgb, var(--ink) 12%, transparent);
@@ -2688,3 +2697,47 @@ span.marker-chip { cursor: default; }
 .w-comment-body { font-size: 0.92rem; }
 .w-comment-form, .w-msg-form { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
 .w-msgbox { margin-top: 6px; }
+
+/* v14: tone down oversized highlight/accent elements in composer surfaces (size/weight only, no color changes) */
+.ask-actions .btn.primary,
+.w-compose .btn.primary {
+  min-height: 44px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.ask-panel .ask-prompt { font-size: 1.05rem; }
+.ask-kind button.active { box-shadow: none; }
+
+/* v14: transparency pass — reduce solid fills app-wide (user direction).
+   Ghost buttons, hairline borders, translucent washes. Purely visual;
+   no functional changes. Button/prompt text renders in --ink over
+   transparent, so contrast matches body text on every theme by
+   construction (midnight, paper, ocean, custom light/dark). */
+.btn.primary {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid color-mix(in srgb, var(--ink) 30%, transparent);
+  box-shadow: none;
+}
+.weekly-prompt {
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
+}
+.ask-sheet {
+  background: color-mix(in srgb, var(--modal, var(--bg)) 86%, transparent);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+.switch .knob {
+  background: color-mix(in srgb, var(--ink) 12%, transparent);
+}
+.switch input:checked + .knob {
+  background: color-mix(in srgb, var(--accent) 40%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 65%, transparent);
+}
+
+/* v14: wordless weekly marker pair for 1:1 thread titles (inbox + thread view) */
+.marker-pair { display: inline-flex; align-items: center; gap: 6px; vertical-align: middle; }
+.marker-pair svg { width: 20px; height: 20px; display: block; }
+.marker-pair .pair-sep { opacity: .55; font-size: 13px; line-height: 1; }
