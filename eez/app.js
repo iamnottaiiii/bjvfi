@@ -1145,7 +1145,12 @@ async function ghApi(path, opts){
       if(patch.stack_sort && ['active','oldest','unseen'].indexOf(patch.stack_sort) >= 0) t.stack_sort = patch.stack_sort;
       if(typeof patch.theme_accent === 'string') t.theme_accent = patch.theme_accent.slice(0, 24);
       if(typeof patch.theme_preset === 'string') t.theme_preset = patch.theme_preset.slice(0, 24);
-      if(typeof patch.theme_custom === 'string' && /^#[0-9a-fA-F]{6}$/.test(patch.theme_custom)) t.theme_custom = patch.theme_custom;
+      if(typeof patch.theme_custom === 'string'){
+        var tc = patch.theme_custom.trim();
+        var parts = tc.split(',');
+        var okPacked = parts.length === 3 && parts.every(function(x){ return /^#[0-9a-fA-F]{6}$/.test(x.trim()); });
+        if(/^#[0-9a-fA-F]{6}$/.test(tc) || okPacked) t.theme_custom = okPacked ? parts.map(function(x){ return x.trim(); }).join(',') : tc;
+      }
       if(typeof patch.theme_bg_key === 'string') t.theme_bg_key = patch.theme_bg_key.slice(0, 200);
       if(patch.clear_theme_bg) t.theme_bg_key = '';
       if(typeof patch.quiet_mode === 'boolean') t.quiet_mode = patch.quiet_mode ? 1 : 0;
