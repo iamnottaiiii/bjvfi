@@ -643,7 +643,11 @@ async function fetchCatalog(){
     const list = Array.isArray(c0) ? c0 : [];
     state.catalog = list.map(normalizeLead).filter(function(l){ return l.slug; });
     state.catalogAt = Date.now();
-    fetchCatalogRest(total); /* background, never awaited */
+    /* Start the background load after a short delay so the user's own taps
+       (login boot data, buttons) win the network first. The background load
+       itself is throttled to 2 chunks at a time with pauses, so it never
+       starves the app's real requests. */
+    setTimeout(function(){ fetchCatalogRest(total); }, 1500);
     return state.catalog;
   }catch(e){
     return fetchCatalogFull();
@@ -670,25 +674,32 @@ async function fetchCatalogFull(){
 }
 
 /* Merge the remaining chunks quietly, then refresh the board once if it is
-   still on screen. Never throws: the board is already painted from chunk 0. */
+   still on screen. Loads 2 chunks at a time with pauses between batches, so
+   the background download never floods the network and every tap stays
+   instant. Never throws: the board is already painted from chunk 0. */
 async function fetchCatalogRest(total){
   if(!total || total < 2 || state._catalogRestRunning) return;
   state._catalogRestRunning = true;
   try{
     const seen = {};
     state.catalog.forEach(function(l){ seen[l.slug] = 1; });
-    const jobs = [];
-    for(let i = 1; i < total; i++){
-      jobs.push(fetch(queueChunkUrl(i)).then(function(r){ return r.ok ? r.json() : []; })
-        .catch(function(){ return []; }));
-    }
-    const chunks = await Promise.all(jobs);
-    chunks.forEach(function(arr){
-      (Array.isArray(arr) ? arr : []).forEach(function(e){
-        const l = normalizeLead(e);
-        if(l.slug && !seen[l.slug]){ seen[l.slug] = 1; state.catalog.push(l); }
+    var CONC = 2, GAP_MS = 150;
+    for(let i = 1; i < total; i += CONC){
+      const batch = [];
+      for(let k = 0; k < CONC && (i + k) < total; k++) batch.push(i + k);
+      const results = await Promise.all(batch.map(function(n){
+        return fetch(queueChunkUrl(n)).then(function(r){ return r.ok ? r.json() : []; })
+          .catch(function(){ return []; });
+      }));
+      results.forEach(function(arr){
+        (Array.isArray(arr) ? arr : []).forEach(function(e){
+          const l = normalizeLead(e);
+          if(l.slug && !seen[l.slug]){ seen[l.slug] = 1; state.catalog.push(l); }
+        });
       });
-    });
+      /* let the network and the main thread breathe between batches */
+      await new Promise(function(res){ setTimeout(res, GAP_MS); });
+    }
     state.catalogAt = Date.now();
     if(state.tab === 'queue'){
       const y = (typeof window !== 'undefined') ? window.scrollY : 0;
