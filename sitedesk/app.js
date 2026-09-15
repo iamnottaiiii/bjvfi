@@ -1115,9 +1115,8 @@ function paintQueue(el, openTaken, syncing){
     if(shown.length){
       html += '<div class="open-board">' + shown.map(leadRowHtml).join('') + '</div>' +
         '<p class="muted" style="font-size:11px;margin:10px 0">Showing ' + fmtNum(shown.length) + ' of ' + fmtNum(list.length) + ' open leads</p>' +
-        '<div class="board-actions" style="display:flex;gap:8px">' +
-        '<button class="btn ghost" style="flex:1" id="btn-prev-batch" type="button"' + (state.boardPage === 0 ? ' disabled' : '') + '>Previous 20</button>' +
-        '<button class="btn ghost" style="flex:1" id="btn-next-batch" type="button"' + (nextAtEnd ? ' disabled' : '') + '>Next 20</button></div>';
+        '<div class="board-actions">' +
+        '<button class="btn ghost block" id="btn-next-batch" type="button"' + (nextAtEnd ? ' disabled' : '') + '>Next 20</button></div>';
     } else {
       html += '<div class="empty">No open leads.<br/><button class="btn" id="btn-grab-empty" type="button">Grab random</button></div>';
     }
@@ -1222,16 +1221,6 @@ function wireQueue(el){
     state.hasPhoneOnly = !state.hasPhoneOnly;
     state.boardOrder = [];
     renderQueueInto(el);
-  });
-  const pb = el.querySelector('#btn-prev-batch');
-  if(pb) pb.addEventListener('click', function(){
-    if(state.boardPage > 0){
-      state.boardPage--;
-      const qEl = el.querySelector('#queue-q');
-      if(qEl) state.q = qEl.value;
-      paintQueue(el, state._lastTaken || {}, false);
-      window.scrollTo(0, 0);
-    }
   });
   const nb = el.querySelector('#btn-next-batch');
   if(nb) nb.addEventListener('click', function(){
