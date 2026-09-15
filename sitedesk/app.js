@@ -1090,20 +1090,19 @@ async function renderQueueInto(el){
       .slice(0, state.boardShown);
 
     let html = statsRow();
-    /* Global Leads folder: the whole shared pool in one labeled place with its total. */
-    html += '<div class="card" id="global-leads-folder">' +
-      '<div class="row" style="justify-content:space-between;align-items:flex-start;margin-bottom:4px"><div>' +
-      '<h2 style="font-size:18px">Global Leads</h2>' +
-      '<p class="muted" style="font-size:12px">' + list.length + ' total \xB7 unclaimed only \xB7 scattered \xB7 45 min claim \xB7 ' +
+    html += '<div class="row" style="justify-content:space-between;margin-bottom:14px"><div>' +
+      '<h2 style="font-size:18px">Open leads</h2>' +
+      '<p class="muted" style="font-size:12px">Unclaimed only \xB7 scattered \xB7 45 min claim \xB7 ' +
       '<strong>' + active + '/' + MAX_ACTIVE_CLAIMS + '</strong> claimed</p></div>' +
       '<button class="btn sm" id="btn-grab-random" type="button"' + (atCap ? ' disabled' : '') + '>Grab random</button></div>';
     if(atCap) html += '<p class="err" style="margin-bottom:12px">Claim cap reached (' + active + '/' + MAX_ACTIVE_CLAIMS + '). Release or finish an active lead first.</p>';
     html += '<p class="review-note"><strong>Review first.</strong> Open the business page and understand who they are, what they do, how they sound, before you call or send a message.</p>';
-    html += '<div class="filters">' +
+    html += '<div class="card"><h2>Board</h2><div class="filters">' +
       '<input id="queue-q" value="' + esc(state.q) + '" placeholder="Name or slug"/>' +
       '</div>';
     if(shown.length){
       html += '<div class="open-board">' + shown.map(leadRowHtml).join('') + '</div>' +
+        '<p class="muted" style="font-size:11px;margin:10px 0">' + list.length + ' open match' + (list.length === 1 ? '' : 'es') + '</p>' +
         '<div class="board-actions"><button class="btn ghost block" id="btn-next-batch" type="button">Next \xB7 scatter more</button></div>';
     } else {
       html += '<div class="empty">No open leads.<br/><button class="btn" id="btn-grab-empty" type="button">Grab random</button></div>';
