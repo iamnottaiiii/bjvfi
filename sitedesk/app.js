@@ -269,6 +269,24 @@ function treePaths(prefix){
 }
 function clearTreeCache(){ treeCache = null; }
 
+/* Run async jobs with capped concurrency: much faster than one-by-one,
+   and safer than unbounded Promise.all (no connection thrash or 429s). */
+async function mapLimit(items, limit, fn){
+  const out = new Array(items.length);
+  let i = 0;
+  async function worker(){
+    while(i < items.length){
+      const idx = i++;
+      out[idx] = await fn(items[idx], idx);
+    }
+  }
+  const workers = [];
+  const n = Math.min(limit, items.length);
+  for(let w = 0; w < n; w++) workers.push(worker());
+  await Promise.all(workers);
+  return out;
+}
+
 /* ================= state ================= */
 
 var state = {
@@ -735,8 +753,9 @@ async function getClaim(slug){
 /* Resolve which slugs are open: no claim file, or claim expired. */
 async function resolveOpenSet(slugs){
   const claimed = (state.treeSlugs || []).filter(function(s){ return slugs.indexOf(s) !== -1; });
-  const jobs = claimed.map(function(s){ return getClaim(s).then(function(c){ return [s, c]; }); });
-  const pairs = await Promise.all(jobs);
+  const pairs = await mapLimit(claimed, 10, function(s){
+    return getClaim(s).then(function(c){ return [s, c]; });
+  });
   const taken = {};
   pairs.forEach(function(pair){
     const s = pair[0], c = pair[1];
@@ -754,11 +773,12 @@ function catalogBySlug(){
 async function refreshMyClaims(){
   state.myClaims = [];
   if(!state.treeSlugs) await refreshTree();
+  const me = state.user.username;
   const mine = [];
-  for(const slug of state.treeSlugs){
+  await mapLimit(state.treeSlugs, 8, async function(slug){
     const c = await getClaim(slug);
-    if(c && c.claimer === state.user.username && !claimExpired(c)) mine.push(c);
-  }
+    if(c && c.claimer === me && !claimExpired(c)) mine.push(c);
+  });
   mine.sort(function(a,b){ return (b.claimed_at||0) - (a.claimed_at||0); });
   state.myClaims = mine;
   if(state.meSlug && !mine.some(function(c){ return c.slug === state.meSlug; })) state.meSlug = null;
@@ -768,12 +788,13 @@ async function refreshMyClaims(){
 async function refreshMyIntakes(){
   state.myIntakes = [];
   const paths = treePaths('intakes/').filter(function(p){ return p.slice(-5) === '.json'; });
-  for(const p of paths){
+  const me = state.user.username;
+  await mapLimit(paths, 8, async function(p){
     try{
       const rec = await ghGetJson(p);
-      if(rec && rec.data && rec.data.claimer === state.user.username) state.myIntakes.push(rec.data);
+      if(rec && rec.data && rec.data.claimer === me) state.myIntakes.push(rec.data);
     }catch(e){}
-  }
+  });
 }
 
 function activeClaimCount(){
@@ -1051,7 +1072,9 @@ async function renderQueueInto(el){
   el.innerHTML = '<div class="card"><div class="empty">Loading leads...</div></div>';
   try{
     await fetchCatalog();
-    if(!state.treeSlugs) await refreshTree();
+    /* Fresh tree on every queue render: one cheap call, and any lead
+       taken since the last render drops off the screen. */
+    await refreshTree();
     const slugs = state.catalog.map(function(l){ return l.slug; });
     const taken = await resolveOpenSet(slugs);
     const list = filteredOpen(taken);
@@ -1215,6 +1238,7 @@ function showGrabPreview(slug){
 }
 
 async function grabLead(slug){
+  if(installRequiredForClaim()){ gateClaimInstall(slug); return; }
   if(activeClaimCount() >= MAX_ACTIVE_CLAIMS){ toast('Claim cap reached. Release a lead first.'); return; }
   const lead = state.catalog.find(function(l){ return l.slug === slug; });
   if(!lead){ toast('Lead not found in catalog.'); return; }
@@ -2993,11 +3017,10 @@ function bindGlobal(){
 async function bootData(announce){
   await loadDismissedServer();
   await refreshTree();
-  await fetchFeed(announce);
-  if(canClaim()){
-    await refreshMyClaims();
-    await refreshMyIntakes();
-  }
+  /* Feed, my claims, and my intakes are independent: fetch together. */
+  const jobs = [fetchFeed(announce)];
+  if(canClaim()){ jobs.push(refreshMyClaims(), refreshMyIntakes()); }
+  await Promise.all(jobs);
 }
 
 var deferredInstallPrompt = null;
@@ -3027,6 +3050,33 @@ function registerServiceWorker(){
 function closeInstallGate(){
   var g = document.getElementById('install-gate');
   if(g && g.parentNode) g.parentNode.removeChild(g);
+}
+
+/* The install gate no longer blocks the whole app. People can register,
+   browse, and read everything in a normal browser tab. The gate appears
+   only when they try to TAKE a lead: leads can be claimed solely from the
+   installed app, so call and payout notifications pop up properly. */
+var pendingGrabSlug = null;
+
+function installRequiredForClaim(){
+  try{
+    if(isStandalone()) return false;
+    if(/testbypass=1/.test(location.search)) return false;
+  }catch(e){}
+  return true;
+}
+
+function gateClaimInstall(slug){
+  pendingGrabSlug = slug;
+  renderInstallGate();
+}
+
+function resumeAfterInstall(){
+  closeInstallGate();
+  var slug = pendingGrabSlug;
+  pendingGrabSlug = null;
+  setTimeout(function(){ toast('Installed. Open SiteDesk from your home screen so notifications pop up.'); }, 400);
+  if(slug) grabLead(slug);
 }
 
 function updateGateNote(){
@@ -3059,8 +3109,8 @@ function renderInstallGate(){
   gate.id = 'install-gate';
   var inner = '<div class="gate-card">' +
     '<div class="gate-logo">sitedesk</div>' +
-    '<h1>Install SiteDesk to continue</h1>' +
-    '<p class="muted">SiteDesk must be installed on your home screen before you can use it. As an installed app your call and payout notifications will pop up properly. In a normal browser tab they will not.</p>' +
+    '<h1>Install SiteDesk to take this lead</h1>' +
+    '<p class="muted">One quick step. Leads can only be taken from the installed app, because your call and payout notifications need it to pop up properly. In a normal browser tab they will not.</p>' +
     '<div id="gate-action"></div>';
   if(ios){
     inner += '<ol class="gate-steps">' +
@@ -3125,20 +3175,14 @@ function init(){
   });
   window.addEventListener('appinstalled', function(){
     deferredInstallPrompt = null;
-    closeInstallGate();
-    bootMain();
-    setTimeout(function(){ toast('Installed. Open SiteDesk from your home screen so notifications pop up.'); }, 400);
+    if(document.getElementById('install-gate')) resumeAfterInstall();
+    else bootMain();
   });
   document.addEventListener('visibilitychange', function(){
     if(!document.hidden && isStandalone() && document.getElementById('install-gate')){
-      closeInstallGate();
-      bootMain();
+      resumeAfterInstall();
     }
   });
-  if(!isStandalone() && !/testbypass=1/.test(location.search)){
-    renderInstallGate();
-    return;
-  }
   bootMain();
 }
 
