@@ -269,24 +269,6 @@ function treePaths(prefix){
 }
 function clearTreeCache(){ treeCache = null; }
 
-/* Run async jobs with capped concurrency: much faster than one-by-one,
-   and safer than unbounded Promise.all (no connection thrash or 429s). */
-async function mapLimit(items, limit, fn){
-  const out = new Array(items.length);
-  let i = 0;
-  async function worker(){
-    while(i < items.length){
-      const idx = i++;
-      out[idx] = await fn(items[idx], idx);
-    }
-  }
-  const workers = [];
-  const n = Math.min(limit, items.length);
-  for(let w = 0; w < n; w++) workers.push(worker());
-  await Promise.all(workers);
-  return out;
-}
-
 /* ================= state ================= */
 
 var state = {
@@ -465,6 +447,9 @@ function startFeedPoll(){
   try{ if(state.feedPoll) clearInterval(state.feedPoll); }catch(e){}
   state.feedPoll = setInterval(function(){
     if(!state.user) return;
+    /* No alert polling while the tab is hidden: it only burns API calls.
+       The next tick after the user comes back catches up. */
+    if(typeof document !== 'undefined' && document.hidden) return;
     fetchFeed(true).catch(function(){});
   }, 30000);
 }
@@ -634,75 +619,8 @@ async function savePushSub(sj){
 
 /* ================= catalog + claims ================= */
 
-/* ---------- on-device catalog cache (IndexedDB) ----------
-   The lead catalog is several megabytes; downloading + parsing it on
-   every cold start is what makes the queue feel slow. The last good copy
-   is kept on the device so the board paints instantly, while a quiet
-   background refresh keeps it fresh. Claim/taken filtering always runs
-   live against the server, so taken leads never show. */
-var CATALOG_IDB = 'sitedesk';
-var CATALOG_IDB_STORE = 'kv';
-var CATALOG_IDB_KEY = 'catalog-v1';
-var _catalogDbPromise = null;
-
-function catalogDb(){
-  if(_catalogDbPromise) return _catalogDbPromise;
-  _catalogDbPromise = new Promise(function(resolve){
-    try{
-      if(!('indexedDB' in window)){ resolve(null); return; }
-      var rq = indexedDB.open(CATALOG_IDB, 1);
-      rq.onupgradeneeded = function(){ try{ rq.result.createObjectStore(CATALOG_IDB_STORE); }catch(e){} };
-      rq.onsuccess = function(){ resolve(rq.result); };
-      rq.onerror = function(){ resolve(null); };
-      rq.onblocked = function(){ resolve(null); };
-    }catch(e){ resolve(null); }
-  });
-  return _catalogDbPromise;
-}
-
-function idbGet(db, key){
-  return new Promise(function(resolve){
-    try{
-      var tx = db.transaction(CATALOG_IDB_STORE, 'readonly');
-      var rq = tx.objectStore(CATALOG_IDB_STORE).get(key);
-      rq.onsuccess = function(){ resolve(rq.result || null); };
-      rq.onerror = function(){ resolve(null); };
-    }catch(e){ resolve(null); }
-  });
-}
-
-function idbSet(db, key, val){
-  return new Promise(function(resolve){
-    try{
-      var tx = db.transaction(CATALOG_IDB_STORE, 'readwrite');
-      tx.objectStore(CATALOG_IDB_STORE).put(val, key);
-      tx.oncomplete = function(){ resolve(true); };
-      tx.onerror = function(){ resolve(false); };
-    }catch(e){ resolve(false); }
-  });
-}
-
-async function loadCatalogCache(){
-  try{
-    const db = await catalogDb();
-    if(!db) return false;
-    const cached = await idbGet(db, CATALOG_IDB_KEY);
-    if(!cached || !Array.isArray(cached.leads) || !cached.leads.length) return false;
-    state.catalog = cached.leads.map(normalizeLead).filter(function(l){ return l.slug; });
-    state.catalogAt = cached.at || 0;
-    return state.catalog.length > 0;
-  }catch(e){ return false; }
-}
-
-async function saveCatalogCache(){
-  try{
-    const db = await catalogDb();
-    if(!db) return;
-    await idbSet(db, CATALOG_IDB_KEY, { at: Date.now(), leads: state.catalog });
-  }catch(e){}
-}
-
-async function fetchCatalogNetwork(){
+async function fetchCatalog(){
+  if(state.catalog.length && Date.now() - state.catalogAt < 10*60*1000) return;
   const ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
   const timer = ctrl ? setTimeout(function(){ try{ ctrl.abort(); }catch(e){} }, 45000) : null;
   let res;
@@ -718,49 +636,122 @@ async function fetchCatalogNetwork(){
   const list = Array.isArray(raw) ? raw : (raw.sites || raw.leads || []);
   state.catalog = list.map(normalizeLead).filter(function(l){ return l.slug; });
   state.catalogAt = Date.now();
-  saveCatalogCache();
-}
-
-async function fetchCatalog(){
-  if(state.catalog.length && Date.now() - state.catalogAt < 10*60*1000) return;
-  if(!state.catalog.length){
-    /* Cold start: paint instantly from the on-device copy, refresh quietly. */
-    if(await loadCatalogCache()){
-      fetchCatalogNetwork().catch(function(){});
-      return;
-    }
-  }
-  await fetchCatalogNetwork();
 }
 
 async function refreshTree(){
   clearTreeCache();
   const paths = await ghTree();
-  state.treeSlugs = paths.filter(function(p){ return p.indexOf('claims/') === 0 && p.slice(-5) === '.json'; })
+  state.treeSlugs = paths.filter(function(p){ return p.indexOf('claims/') === 0 && p.slice(-5) === '.json' && p !== 'claims/index.json'; })
     .map(function(p){ return p.slice(7, -5); });
 }
 
-async function getClaim(slug){
+async function getClaim(slug, quiet){
   if(state.claimsBySlug[slug] !== undefined) return state.claimsBySlug[slug];
   let rec = null;
-  try{ rec = await ghGetJson('claims/' + slug + '.json'); }catch(e){ toast(e.message); return null; }
+  try{ rec = await ghGetJson('claims/' + slug + '.json'); }catch(e){ if(!quiet) toast(e.message); return null; }
   const claim = rec ? rec.data : null;
   if(claim) claim._sha = rec.sha;
   state.claimsBySlug[slug] = claim;
   return claim;
 }
 
+/* ============ claim index: one read instead of one per claimed lead ============ */
+/* claims/index.json maps slug -> {c: claimer, e: claim_expires_at, s: status}.
+   The queue and my-leads reads use this single file; every claim write updates
+   it. If the index ever drifts from the repo tree it rebuilds itself. */
+var claimIndexCache = null;
+var claimIndexSha = null;
+var claimIndexAt = 0;
+
+async function getClaimIndex(force){
+  if(!force && claimIndexCache && Date.now() - claimIndexAt < 60000) return claimIndexCache;
+  let rec = null;
+  try{ rec = await ghGetJson('claims/index.json'); }catch(e){ rec = null; }
+  claimIndexCache = (rec && rec.data && typeof rec.data === 'object') ? rec.data : {};
+  claimIndexSha = rec ? rec.sha : null;
+  claimIndexAt = Date.now();
+  return claimIndexCache;
+}
+
+function indexEntryFor(claim){
+  return { c: claim.claimer || '', e: Number(claim.claim_expires_at) || 0, s: claim.status || 'claimed' };
+}
+
+function indexTaken(entry, nowMs){
+  if(!entry || !entry.c) return false;
+  /* In-build and sold leads never expire back to the queue. */
+  if(entry.s === 'build' || entry.s === 'sold') return true;
+  return (nowMs == null ? Date.now() : nowMs) < Number(entry.e);
+}
+
+/* Apply a mutation to the index with conflict retry. Uses the in-memory copy
+   when fresh, refetches when stale or on conflict. Never throws. */
+async function updateClaimIndex(mutator){
+  for(let attempt = 0; attempt < 3; attempt++){
+    if(attempt > 0 || !claimIndexCache || Date.now() - claimIndexAt >= 60000){
+      await getClaimIndex(true);
+    }
+    const before = JSON.stringify(claimIndexCache);
+    try{ mutator(claimIndexCache); }catch(e){ return false; }
+    if(JSON.stringify(claimIndexCache) === before) return true;
+    try{
+      const res = await ghPutJson('claims/index.json', claimIndexCache, claimIndexSha, 'sitedesk: claim index');
+      if(res && res.content && res.content.sha){ claimIndexSha = res.content.sha; claimIndexAt = Date.now(); }
+      else { claimIndexSha = null; claimIndexAt = 0; }
+      return true;
+    }catch(e){
+      if(!isConflictError(e)) return false;
+    }
+  }
+  return false;
+}
+
+/* Slow path, only on drift: rebuild the whole index from the claim files. */
+async function rebuildClaimIndex(){
+  await getClaimIndex(true);
+  const idx = {};
+  const jobs = (state.treeSlugs || []).map(function(s){
+    return getClaim(s, true).then(function(c){
+      if(c && c.claimer) idx[s] = indexEntryFor(c);
+    }).catch(function(){});
+  });
+  await Promise.all(jobs);
+  for(const k in claimIndexCache) delete claimIndexCache[k];
+  for(const k in idx) claimIndexCache[k] = idx[k];
+  try{
+    const res = await ghPutJson('claims/index.json', claimIndexCache, claimIndexSha, 'sitedesk: rebuild claim index');
+    if(res && res.content && res.content.sha){ claimIndexSha = res.content.sha; claimIndexAt = Date.now(); }
+    else { claimIndexSha = null; claimIndexAt = 0; }
+  }catch(e){}
+  return claimIndexCache;
+}
+
+/* Make sure the index matches the repo tree (self-healing on drift). */
+async function ensureClaimIndex(){
+  if(!state.treeSlugs) await refreshTree();
+  await getClaimIndex();
+  const drifted = state.treeSlugs.some(function(s){ return !claimIndexCache[s]; });
+  if(drifted){ await rebuildClaimIndex(); return; }
+  const orphans = [];
+  for(const k in claimIndexCache){
+    if(state.treeSlugs.indexOf(k) === -1) orphans.push(k);
+  }
+  /* The deletes must happen inside the mutator so updateClaimIndex sees the
+     change and actually pushes it to GitHub (its no-change shortcut skips
+     the write when the mutator is a no-op). */
+  if(orphans.length) await updateClaimIndex(function(idx){
+    orphans.forEach(function(k){ delete idx[k]; });
+  });
+}
+
 /* Resolve which slugs are open: no claim file, or claim expired. */
 async function resolveOpenSet(slugs){
-  const claimed = (state.treeSlugs || []).filter(function(s){ return slugs.indexOf(s) !== -1; });
-  const pairs = await mapLimit(claimed, 10, function(s){
-    return getClaim(s).then(function(c){ return [s, c]; });
-  });
+  await ensureClaimIndex();
+  const nowMs = Date.now();
   const taken = {};
-  pairs.forEach(function(pair){
-    const s = pair[0], c = pair[1];
-    if(c && !claimExpired(c)) taken[s] = true;
-  });
+  for(let i = 0; i < slugs.length; i++){
+    if(indexTaken(claimIndexCache[slugs[i]], nowMs)) taken[slugs[i]] = true;
+  }
   return taken;
 }
 
@@ -772,13 +763,22 @@ function catalogBySlug(){
 
 async function refreshMyClaims(){
   state.myClaims = [];
-  if(!state.treeSlugs) await refreshTree();
-  const me = state.user.username;
+  await ensureClaimIndex();
+  /* Narrow to my slugs via the index first: one read per own claim file
+     instead of one per claim file in the whole repo. */
+  const nowMs = Date.now();
+  const mineSlugs = [];
+  for(const s in claimIndexCache){
+    const e = claimIndexCache[s];
+    if(e && e.c === state.user.username && (e.s === 'build' || e.s === 'sold' || nowMs < Number(e.e))){
+      mineSlugs.push(s);
+    }
+  }
   const mine = [];
-  await mapLimit(state.treeSlugs, 8, async function(slug){
+  for(const slug of mineSlugs){
     const c = await getClaim(slug);
-    if(c && c.claimer === me && !claimExpired(c)) mine.push(c);
-  });
+    if(c && c.claimer === state.user.username && !claimExpired(c)) mine.push(c);
+  }
   mine.sort(function(a,b){ return (b.claimed_at||0) - (a.claimed_at||0); });
   state.myClaims = mine;
   if(state.meSlug && !mine.some(function(c){ return c.slug === state.meSlug; })) state.meSlug = null;
@@ -788,13 +788,12 @@ async function refreshMyClaims(){
 async function refreshMyIntakes(){
   state.myIntakes = [];
   const paths = treePaths('intakes/').filter(function(p){ return p.slice(-5) === '.json'; });
-  const me = state.user.username;
-  await mapLimit(paths, 8, async function(p){
+  for(const p of paths){
     try{
       const rec = await ghGetJson(p);
-      if(rec && rec.data && rec.data.claimer === me) state.myIntakes.push(rec.data);
+      if(rec && rec.data && rec.data.claimer === state.user.username) state.myIntakes.push(rec.data);
     }catch(e){}
-  });
+  }
 }
 
 function activeClaimCount(){
@@ -1068,16 +1067,18 @@ function leadRowHtml(l){
     '</div></div>';
 }
 
-async function renderQueueInto(el){
-  el.innerHTML = '<div class="card"><div class="empty">Loading leads...</div></div>';
-  try{
-    await fetchCatalog();
-    /* Fresh tree on every queue render: one cheap call, and any lead
-       taken since the last render drops off the screen. */
-    await refreshTree();
-    const slugs = state.catalog.map(function(l){ return l.slug; });
-    const taken = await resolveOpenSet(slugs);
-    const list = filteredOpen(taken);
+/* The set of taken (claimed and unexpired) slugs, cached in localStorage so the
+   board can paint instantly from the last known state while fresh claim data
+   loads in the background. */
+function takenCacheLoad(){
+  try{ return JSON.parse(localStorage.getItem('sd_taken_v1') || '{}'); }catch(e){ return {}; }
+}
+function takenCacheSave(t){
+  try{ localStorage.setItem('sd_taken_v1', JSON.stringify(t)); }catch(e){}
+}
+
+function paintQueue(el, openTaken, syncing){
+    const list = filteredOpen(openTaken);
     if(!state.boardOrder.length || state._boardKey !== boardKey()){
       state.boardOrder = shuffle(list.map(function(l){ return l.slug; }));
       state._boardKey = boardKey();
@@ -1093,7 +1094,8 @@ async function renderQueueInto(el){
     html += '<div class="row" style="justify-content:space-between;margin-bottom:14px"><div>' +
       '<h2 style="font-size:18px">Open leads</h2>' +
       '<p class="muted" style="font-size:12px">Unclaimed only \xB7 scattered \xB7 45 min claim \xB7 ' +
-      '<strong>' + active + '/' + MAX_ACTIVE_CLAIMS + '</strong> claimed</p></div>' +
+      '<strong>' + active + '/' + MAX_ACTIVE_CLAIMS + '</strong> claimed' +
+      (syncing ? ' \xB7 updating&hellip;' : '') + '</p></div>' +
       '<button class="btn sm" id="btn-grab-random" type="button"' + (atCap ? ' disabled' : '') + '>Grab random</button></div>';
     if(atCap) html += '<p class="err" style="margin-bottom:12px">Claim cap reached (' + active + '/' + MAX_ACTIVE_CLAIMS + '). Release or finish an active lead first.</p>';
     html += '<p class="review-note"><strong>Review first.</strong> Open the business page and understand who they are, what they do, how they sound, before you call or send a message.</p>';
@@ -1118,11 +1120,53 @@ async function renderQueueInto(el){
       '</div>';
     el.innerHTML = html;
     wireQueue(el);
+}
+
+/* Paint the board instantly from cache, then refresh the catalog and the claim
+   set in the background. The old version awaited the whole network chain
+   (catalog download, repo tree, one API request per claimed lead) before the
+   first paint, which is why "Loading leads..." sat for seconds on mobile. */
+async function renderQueueInto(el){
+  let instant = state.catalog.length > 0;
+  if(instant){
+    try{ paintQueue(el, takenCacheLoad(), true); }
+    catch(e){ instant = false; }
+  }
+  if(!instant) el.innerHTML = '<div class="card"><div class="empty">Loading leads...</div></div>';
+  try{
+    await fetchCatalog();
   }catch(e){
-    el.innerHTML = '<div class="card"><div class="empty">' + esc(e.message) +
-      '<br/><button class="btn" id="btn-retry-queue" type="button">Retry</button></div></div>';
-    const r = document.getElementById('btn-retry-queue');
-    if(r) r.addEventListener('click', function(){ renderQueueInto(el); });
+    if(!instant){
+      el.innerHTML = '<div class="card"><div class="empty">' + esc(e.message) +
+        '<br/><button class="btn" id="btn-retry-queue" type="button">Retry</button></div></div>';
+      const r = document.getElementById('btn-retry-queue');
+      if(r) r.addEventListener('click', function(){ renderQueueInto(el); });
+    }else{
+      toast('Could not refresh leads. Showing saved copy.');
+    }
+    return;
+  }
+  instant = true;
+  /* Fresh catalog in hand: paint right away with the last known claim state,
+     then resolve the real claim set without blocking the visible list. */
+  try{
+    const qEl = el.querySelector('#queue-q');
+    if(qEl) state.q = qEl.value;
+    paintQueue(el, takenCacheLoad(), true);
+  }catch(e){}
+  try{
+    const slugs = state.catalog.map(function(l){ return l.slug; });
+    const taken = await resolveOpenSet(slugs);
+    takenCacheSave(taken);
+    const qEl2 = el.querySelector('#queue-q');
+    if(qEl2) state.q = qEl2.value;
+    paintQueue(el, taken, false);
+  }catch(e){
+    try{
+      const qEl3 = el.querySelector('#queue-q');
+      if(qEl3) state.q = qEl3.value;
+      paintQueue(el, takenCacheLoad(), false);
+    }catch(_){}
   }
 }
 
@@ -1238,7 +1282,6 @@ function showGrabPreview(slug){
 }
 
 async function grabLead(slug){
-  if(installRequiredForClaim()){ gateClaimInstall(slug); return; }
   if(activeClaimCount() >= MAX_ACTIVE_CLAIMS){ toast('Claim cap reached. Release a lead first.'); return; }
   const lead = state.catalog.find(function(l){ return l.slug === slug; });
   if(!lead){ toast('Lead not found in catalog.'); return; }
@@ -1256,6 +1299,7 @@ async function grabLead(slug){
     return;
   }
   clearTreeCache();
+  await updateClaimIndex(function(idx){ idx[slug] = indexEntryFor(claim); });
   state.claimsBySlug[slug] = claim;
   if(state.treeSlugs && state.treeSlugs.indexOf(slug) === -1) state.treeSlugs.push(slug);
   toast('Claimed: ' + lead.name);
@@ -1642,6 +1686,7 @@ async function saveOutcome(claim){
     return;
   }
   toast('Saved: interested');
+  await updateClaimIndex(function(idx){ idx[claim.slug] = indexEntryFor(claim); });
   state.claimsBySlug[claim.slug] = claim;
   state.meSlug = claim.slug;
   /* Advance straight to the build-details form instead of leaving the caller waiting. */
@@ -1661,6 +1706,7 @@ async function releaseLead(claim, silent){
     return;
   }
   clearTreeCache();
+  await updateClaimIndex(function(idx){ delete idx[claim.slug]; });
   delete state.claimsBySlug[claim.slug];
   if(state.treeSlugs) state.treeSlugs = state.treeSlugs.filter(function(s){ return s !== claim.slug; });
   state.boardOrder = [];
@@ -1748,6 +1794,7 @@ async function submitIntake(claim){
   try{
     await postEvent('staff', 'Intake: ' + business, state.user.name + ' submitted build details for ' + business + '.', 'intake:' + intake.id);
     clearTreeCache();
+    await updateClaimIndex(function(idx){ idx[claim.slug] = indexEntryFor(claim); });
     delete state.claimsBySlug[claim.slug];
     await refreshMyClaims();
     await refreshMyIntakes();
@@ -1816,6 +1863,7 @@ async function markSold(claim){
     await postEvent('staff', 'Sold: ' + (claim.business_name || claim.slug),
       state.user.name + ' marked ' + (claim.business_name || claim.slug) + ' sold.', 'intake:' + intakeId);
     clearTreeCache();
+    await updateClaimIndex(function(idx){ const e = indexEntryFor(claim); e.s = 'sold'; idx[claim.slug] = e; });
     delete state.claimsBySlug[claim.slug];
     await refreshMyClaims();
     await refreshMyIntakes();
@@ -1827,19 +1875,7 @@ async function markSold(claim){
   }catch(e){ if(err) err.textContent = e.message; else toast(e.message); restore(); }
 }
 
-async function renderMineInto(el){
-  el.innerHTML = '<div class="card"><div class="empty">Loading your leads...</div></div>';
-  try{
-    await fetchCatalog();
-    await refreshMyClaims();
-    await refreshMyIntakes();
-  }catch(e){
-    el.innerHTML = '<div class="card"><div class="empty">' + esc(e.message) +
-      '<br/><button class="btn" id="btn-retry-mine" type="button">Retry</button></div></div>';
-    const r = document.getElementById('btn-retry-mine');
-    if(r) r.addEventListener('click', function(){ renderMineInto(el); });
-    return;
-  }
+function paintMine(el){
   const q = state.mineQ.trim().toLowerCase();
   let list = state.myClaims.slice();
   if(state.mineStatus !== 'all') list = list.filter(function(c){ return c.status === state.mineStatus; });
@@ -1887,6 +1923,36 @@ async function renderMineInto(el){
     state.pendingLeadSlug = null;
     if(list.some(function(c){ return c.slug === slug; })) openLeadModal(slug);
   }
+}
+
+/* Same instant-paint pattern as the queue: show the last known list
+   immediately, refresh quietly underneath. */
+async function renderMineInto(el){
+  let instant = !!state.mineLoaded;
+  if(instant){
+    try{ paintMine(el); }
+    catch(e){ instant = false; }
+  }
+  if(!instant) el.innerHTML = '<div class="card"><div class="empty">Loading your leads...</div></div>';
+  try{
+    await fetchCatalog();
+    await refreshMyClaims();
+    await refreshMyIntakes();
+  }catch(e){
+    if(!instant){
+      el.innerHTML = '<div class="card"><div class="empty">' + esc(e.message) +
+        '<br/><button class="btn" id="btn-retry-mine" type="button">Retry</button></div></div>';
+      const r = document.getElementById('btn-retry-mine');
+      if(r) r.addEventListener('click', function(){ renderMineInto(el); });
+    }else{
+      toast('Could not refresh your leads. Showing saved copy.');
+    }
+    return;
+  }
+  state.mineLoaded = true;
+  const mqEl = el.querySelector('#mine-q');
+  if(mqEl) state.mineQ = mqEl.value;
+  try{ paintMine(el); }catch(e){}
 }
 
 /* ================= intakes (builder / admin) ================= */
@@ -2427,6 +2493,7 @@ async function userAction(username, act, el){
             if(rec) await ghDeleteFile('claims/' + c.slug + '.json', rec.sha);
           }catch(e){}
         }
+        updateClaimIndex(function(idx){ mine.forEach(function(c){ delete idx[c.slug]; }); });
       }catch(e){}
       /* Drop their push subscriptions so no pushes go to a deleted account. */
       try{
@@ -2567,6 +2634,7 @@ function wireAdminTools(el){
         try{
           await ghDeleteFile('claims/' + slug + '.json', rec.sha);
           clearTreeCache();
+          updateClaimIndex(function(idx){ delete idx[slug]; });
           delete state.claimsBySlug[slug];
           toast('Claim unlocked');
           res.innerHTML = '<p class="muted">Claim deleted. The lead is open again.</p>';
@@ -2879,6 +2947,7 @@ function deleteOwnAccount(){
           }catch(e){}
         }
       }
+      updateClaimIndex(function(idx){ claims.forEach(function(c){ delete idx[c.slug]; }); });
       await loadUsers();
       delete state.users[me];
       await ghPutJson('users.json', state.users, state.usersSha, 'sitedesk: delete account @' + me);
@@ -3017,10 +3086,11 @@ function bindGlobal(){
 async function bootData(announce){
   await loadDismissedServer();
   await refreshTree();
-  /* Feed, my claims, and my intakes are independent: fetch together. */
-  const jobs = [fetchFeed(announce)];
-  if(canClaim()){ jobs.push(refreshMyClaims(), refreshMyIntakes()); }
-  await Promise.all(jobs);
+  await fetchFeed(announce);
+  if(canClaim()){
+    await refreshMyClaims();
+    await refreshMyIntakes();
+  }
 }
 
 var deferredInstallPrompt = null;
@@ -3050,33 +3120,6 @@ function registerServiceWorker(){
 function closeInstallGate(){
   var g = document.getElementById('install-gate');
   if(g && g.parentNode) g.parentNode.removeChild(g);
-}
-
-/* The install gate no longer blocks the whole app. People can register,
-   browse, and read everything in a normal browser tab. The gate appears
-   only when they try to TAKE a lead: leads can be claimed solely from the
-   installed app, so call and payout notifications pop up properly. */
-var pendingGrabSlug = null;
-
-function installRequiredForClaim(){
-  try{
-    if(isStandalone()) return false;
-    if(/testbypass=1/.test(location.search)) return false;
-  }catch(e){}
-  return true;
-}
-
-function gateClaimInstall(slug){
-  pendingGrabSlug = slug;
-  renderInstallGate();
-}
-
-function resumeAfterInstall(){
-  closeInstallGate();
-  var slug = pendingGrabSlug;
-  pendingGrabSlug = null;
-  setTimeout(function(){ toast('Installed. Open SiteDesk from your home screen so notifications pop up.'); }, 400);
-  if(slug) grabLead(slug);
 }
 
 function updateGateNote(){
@@ -3109,8 +3152,8 @@ function renderInstallGate(){
   gate.id = 'install-gate';
   var inner = '<div class="gate-card">' +
     '<div class="gate-logo">sitedesk</div>' +
-    '<h1>Install SiteDesk to take this lead</h1>' +
-    '<p class="muted">One quick step. Leads can only be taken from the installed app, because your call and payout notifications need it to pop up properly. In a normal browser tab they will not.</p>' +
+    '<h1>Install SiteDesk to continue</h1>' +
+    '<p class="muted">SiteDesk must be installed on your home screen before you can use it. As an installed app your call and payout notifications will pop up properly. In a normal browser tab they will not.</p>' +
     '<div id="gate-action"></div>';
   if(ios){
     inner += '<ol class="gate-steps">' +
@@ -3175,14 +3218,20 @@ function init(){
   });
   window.addEventListener('appinstalled', function(){
     deferredInstallPrompt = null;
-    if(document.getElementById('install-gate')) resumeAfterInstall();
-    else bootMain();
+    closeInstallGate();
+    bootMain();
+    setTimeout(function(){ toast('Installed. Open SiteDesk from your home screen so notifications pop up.'); }, 400);
   });
   document.addEventListener('visibilitychange', function(){
     if(!document.hidden && isStandalone() && document.getElementById('install-gate')){
-      resumeAfterInstall();
+      closeInstallGate();
+      bootMain();
     }
   });
+  if(!isStandalone() && !/testbypass=1/.test(location.search)){
+    renderInstallGate();
+    return;
+  }
   bootMain();
 }
 
