@@ -1122,14 +1122,6 @@ function paintQueue(el, openTaken, syncing){
       html += '<div class="empty">No open leads.<br/><button class="btn" id="btn-grab-empty" type="button">Grab random</button></div>';
     }
     html += '</div>';
-    html += '<div class="card script-card"><h2>Scripts</h2>' +
-      '<p class="muted" style="font-size:12px;margin-bottom:8px;line-height:1.55">Guide only, adapt in your own words.</p>' +
-      '<div class="copybox" id="sales-line">' + esc(salesLine()) + '</div>' +
-      '<div class="row" style="margin-top:8px"><button class="btn ghost sm" data-copy="sales-line" type="button">Copy sales line</button></div>' +
-      '<h3 style="margin-top:14px">SMS draft</h3>' +
-      '<div class="copybox" id="sms-template">' + esc(smsDraft('<name>', '<caller>', '<url>')) + '</div>' +
-      '<div class="row" style="margin-top:8px"><button class="btn ghost sm" data-copy="sms-template" type="button">Copy SMS template</button></div>' +
-      '</div>';
     el.innerHTML = html;
     wireQueue(el);
 }
