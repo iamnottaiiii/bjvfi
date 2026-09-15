@@ -7,6 +7,7 @@
 
 /* ================= pure helpers (node-testable) ================= */
 
+function fmtNum(n){ try{ return Number(n).toLocaleString('en-US'); }catch(e){ return String(n); } }
 function esc(s){
   return String(s == null ? '' : s)
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
@@ -285,7 +286,7 @@ var state = {
   unread: 0,
   q: '', cat: '', hasPhoneOnly: false,
   boardOrder: [],
-  boardShown: 60,
+  boardShown: 20,
   mineQ: '', mineStatus: 'all', meSlug: null,
   userQ: '', userStatus: '',
   adminSec: 'users',
@@ -619,39 +620,97 @@ async function savePushSub(sj){
 
 /* ================= catalog + claims ================= */
 
-/* ============ chunked lead catalog: instant first paint ============ */
-/* The queue shows 60 leads at a time, so shipping the whole 8MB catalog before
-   the first paint is pure waste. The catalog is split into ~200KB chunks;
-   chunk 0 holds a scattered sample and arrives in a fraction of a second, so
-   the board paints immediately. The rest merge in the background and the
-   board refreshes once when complete. If chunks are unreachable, fall back
-   to the old full-catalog download. */
+/* ============ chunked lead catalog: only what is displayed ============ */
+/* The queue shows 20 leads at a time, so the app only downloads what it
+   shows. Boot loads the tiny manifest plus chunk 0 (2,000 leads) and stops.
+   Tapping "Next 20" pages through the loaded leads and pulls the next chunk
+   only when the loaded pool runs out. A text search is the one action that
+   truly needs every lead, so it loads the remaining chunks on demand with a
+   progress note. Nothing else ever downloads the full catalog. If chunks are
+   unreachable, fall back to the old full-catalog download. */
 var QUEUE_MANIFEST_URL = 'https://bjvfi.com/sitedesk/data/queue/manifest.json';
 function queueChunkUrl(i){ return 'https://bjvfi.com/sitedesk/data/queue/c' + (i < 10 ? '0' : '') + i + '.json'; }
 
+/* chunk bookkeeping: which chunks are merged into state.catalog */
+var _chunksLoaded = {};
+var _seenSlugs = {};
+var _fullLoading = null;
+
+function chunksTotal(){ return state.chunksTotal || 0; }
+function allChunksLoaded(){
+  const t = chunksTotal();
+  if(!t) return false;
+  for(let i = 0; i < t; i++) if(!_chunksLoaded[i]) return false;
+  return true;
+}
+function firstMissingChunk(){
+  const t = chunksTotal();
+  for(let i = 0; i < t; i++) if(!_chunksLoaded[i]) return i;
+  return -1;
+}
+function mergeChunkLeads(arr){
+  (Array.isArray(arr) ? arr : []).forEach(function(e){
+    const l = normalizeLead(e);
+    if(l.slug && !_seenSlugs[l.slug]){ _seenSlugs[l.slug] = 1; state.catalog.push(l); }
+  });
+}
+
+/* Fetch one chunk on demand and merge it. Never throws fatally; callers decide. */
+async function ensureChunk(i){
+  if(_chunksLoaded[i]) return;
+  const r = await fetch(queueChunkUrl(i));
+  if(!r.ok) throw new Error('Could not load more leads.');
+  mergeChunkLeads(await r.json());
+  _chunksLoaded[i] = true;
+  state.catalogAt = Date.now();
+}
+
+/* Boot: manifest + chunk 0 only. That is the whole download. */
 async function fetchCatalog(){
   if(state.catalog.length && Date.now() - state.catalogAt < 10*60*1000) return state.catalog;
   try{
+    state.catalog = [];
+    _seenSlugs = {};
+    _chunksLoaded = {};
+    _fullLoading = null;
+    state.boardOrder = [];
     const mRes = await fetch(QUEUE_MANIFEST_URL);
     if(!mRes.ok) throw new Error('no queue manifest');
     const manifest = await mRes.json();
-    const total = Number(manifest.chunks) || 0;
-    if(!total) throw new Error('bad queue manifest');
-    const cRes = await fetch(queueChunkUrl(0));
-    if(!cRes.ok) throw new Error('no queue chunk 0');
-    const c0 = await cRes.json();
-    const list = Array.isArray(c0) ? c0 : [];
-    state.catalog = list.map(normalizeLead).filter(function(l){ return l.slug; });
+    state.chunksTotal = Number(manifest.chunks) || 0;
+    state.catalogTotal = Number(manifest.total) || 0;
+    if(!state.chunksTotal) throw new Error('bad queue manifest');
+    await ensureChunk(0);
     state.catalogAt = Date.now();
-    /* Start the background load after a short delay so the user's own taps
-       (login boot data, buttons) win the network first. The background load
-       itself is throttled to 2 chunks at a time with pauses, so it never
-       starves the app's real requests. */
-    setTimeout(function(){ fetchCatalogRest(total); }, 1500);
     return state.catalog;
   }catch(e){
     return fetchCatalogFull();
   }
+}
+
+/* Full load, throttled, with progress. Only used for explicit text search,
+   the one action that needs every lead. Shared promise so concurrent callers
+   do not double-download. */
+function ensureFullCatalog(onProgress){
+  if(_fullLoading) return _fullLoading;
+  _fullLoading = (async function(){
+    const missing = [];
+    const t = chunksTotal();
+    for(let i = 0; i < t; i++) if(!_chunksLoaded[i]) missing.push(i);
+    let done = 0;
+    for(let s = 0; s < missing.length; s += 3){
+      const batch = missing.slice(s, s + 3);
+      await Promise.all(batch.map(function(i){
+        return ensureChunk(i).catch(function(){ /* keep going */ });
+      }));
+      done += batch.length;
+      if(onProgress){ try{ onProgress(done, missing.length); }catch(e){} }
+      await new Promise(function(res){ setTimeout(res, 80); });
+    }
+    state.catalogAt = Date.now();
+  })();
+  _fullLoading.then(function(){ _fullLoading = null; }, function(){ _fullLoading = null; });
+  return _fullLoading;
 }
 
 async function fetchCatalogFull(){
@@ -671,48 +730,6 @@ async function fetchCatalogFull(){
   state.catalog = list.map(normalizeLead).filter(function(l){ return l.slug; });
   state.catalogAt = Date.now();
   return state.catalog;
-}
-
-/* Merge the remaining chunks quietly, then refresh the board once if it is
-   still on screen. Loads 2 chunks at a time with pauses between batches, so
-   the background download never floods the network and every tap stays
-   instant. Never throws: the board is already painted from chunk 0. */
-async function fetchCatalogRest(total){
-  if(!total || total < 2 || state._catalogRestRunning) return;
-  state._catalogRestRunning = true;
-  try{
-    const seen = {};
-    state.catalog.forEach(function(l){ seen[l.slug] = 1; });
-    var CONC = 2, GAP_MS = 150;
-    for(let i = 1; i < total; i += CONC){
-      const batch = [];
-      for(let k = 0; k < CONC && (i + k) < total; k++) batch.push(i + k);
-      const results = await Promise.all(batch.map(function(n){
-        return fetch(queueChunkUrl(n)).then(function(r){ return r.ok ? r.json() : []; })
-          .catch(function(){ return []; });
-      }));
-      results.forEach(function(arr){
-        (Array.isArray(arr) ? arr : []).forEach(function(e){
-          const l = normalizeLead(e);
-          if(l.slug && !seen[l.slug]){ seen[l.slug] = 1; state.catalog.push(l); }
-        });
-      });
-      /* let the network and the main thread breathe between batches */
-      await new Promise(function(res){ setTimeout(res, GAP_MS); });
-    }
-    state.catalogAt = Date.now();
-    if(state.tab === 'queue'){
-      const y = (typeof window !== 'undefined') ? window.scrollY : 0;
-      const app = document.getElementById('app');
-      const view = app ? app.querySelector('#view') : null;
-      if(view){
-        state.boardOrder = [];
-        try{ await renderQueueInto(view); }catch(e){}
-        if(typeof window !== 'undefined' && typeof window.scrollTo === 'function') window.scrollTo(0, y);
-      }
-    }
-  }catch(e){}
-  state._catalogRestRunning = false;
 }
 
 async function refreshTree(){
@@ -1181,8 +1198,9 @@ function paintQueue(el, openTaken, syncing){
       '</div>';
     if(shown.length){
       html += '<div class="open-board">' + shown.map(leadRowHtml).join('') + '</div>' +
-        '<p class="muted" style="font-size:11px;margin:10px 0">' + list.length + ' open match' + (list.length === 1 ? '' : 'es') + '</p>' +
-        '<div class="board-actions"><button class="btn ghost block" id="btn-next-batch" type="button">Next \xB7 scatter more</button></div>';
+        '<p class="muted" style="font-size:11px;margin:10px 0">' + list.length + ' open match' + (list.length === 1 ? '' : 'es') +
+        ' \xB7 ' + fmtNum(state.catalog.length) + ' of ' + fmtNum(state.catalogTotal || state.catalog.length) + ' leads loaded</p>' +
+        '<div class="board-actions"><button class="btn ghost block" id="btn-next-batch" type="button">Next 20</button></div>';
     } else {
       html += '<div class="empty">No open leads.<br/><button class="btn" id="btn-grab-empty" type="button">Grab random</button></div>';
     }
@@ -1224,25 +1242,47 @@ async function renderQueueInto(el){
     return;
   }
   instant = true;
+  /* A text search needs every lead to be correct, so it is the one action
+     that pulls the remaining chunks, with a progress note. Browsing never
+     does this: it pages through what is already loaded. */
+  const deepQ = state.q.trim();
+  if(deepQ && !allChunksLoaded()){
+    try{
+      el.innerHTML = '<div class="card"><div class="empty">Searching all ' +
+        fmtNum(state.catalogTotal || 0) + ' leads&hellip;<br><span id="qprog" class="muted"></span></div></div>';
+      await ensureFullCatalog(function(d, t){
+        const p = document.getElementById('qprog');
+        if(p) p.textContent = d + ' of ' + t + ' sections loaded';
+      });
+      state.boardOrder = [];
+    }catch(e){ toast('Full search unavailable; searching loaded leads.'); }
+  }
   /* Fresh catalog in hand: paint right away with the last known claim state,
      then resolve the real claim set without blocking the visible list. */
   try{
     const qEl = el.querySelector('#queue-q');
     if(qEl) state.q = qEl.value;
-    paintQueue(el, takenCacheLoad(), true);
+    state._lastTaken = takenCacheLoad();
+    paintQueue(el, state._lastTaken, true);
   }catch(e){}
   try{
     const slugs = state.catalog.map(function(l){ return l.slug; });
     const taken = await resolveOpenSet(slugs);
     takenCacheSave(taken);
+    state._lastTaken = taken;
     const qEl2 = el.querySelector('#queue-q');
     if(qEl2) state.q = qEl2.value;
     paintQueue(el, taken, false);
+    if(deepQ){
+      const nq = el.querySelector('#queue-q');
+      if(nq){ nq.focus(); try{ nq.setSelectionRange(nq.value.length, nq.value.length); }catch(e){} }
+    }
   }catch(e){
     try{
       const qEl3 = el.querySelector('#queue-q');
       if(qEl3) state.q = qEl3.value;
-      paintQueue(el, takenCacheLoad(), false);
+      state._lastTaken = takenCacheLoad();
+      paintQueue(el, state._lastTaken, false);
     }catch(_){}
   }
 }
@@ -1253,7 +1293,7 @@ function wireQueue(el){
   const q = el.querySelector('#queue-q');
   const apply = function(){
     state.q = q ? q.value : '';
-    state.boardShown = 60;
+    state.boardShown = 20;
     state.boardOrder = [];
     renderQueueInto(el);
   };
@@ -1279,7 +1319,7 @@ function wireQueue(el){
   el.querySelectorAll('[data-cat]').forEach(function(chip){
     chip.addEventListener('click', function(){
       state.cat = chip.getAttribute('data-cat');
-      state.boardShown = 60;
+      state.boardShown = 20;
       state.boardOrder = [];
       renderQueueInto(el);
     });
@@ -1291,10 +1331,23 @@ function wireQueue(el){
     renderQueueInto(el);
   });
   const nb = el.querySelector('#btn-next-batch');
-  if(nb) nb.addEventListener('click', function(){
-    state.boardOrder = shuffle(state.boardOrder);
-    state.boardShown = 60;
-    renderQueueInto(el);
+  if(nb) nb.addEventListener('click', async function(){
+    nb.disabled = true;
+    try{
+      const list = filteredOpen(state._lastTaken || {});
+      if(state.boardShown >= list.length){
+        const nx = firstMissingChunk();
+        if(nx >= 0){
+          nb.textContent = 'Loading more\u2026';
+          await ensureChunk(nx);
+          state.boardOrder = [];
+        }
+      }
+      state.boardShown += 20;
+      const qEl = el.querySelector('#queue-q');
+      if(qEl) state.q = qEl.value;
+      paintQueue(el, state._lastTaken || {}, false);
+    }catch(e){ toast('Could not load more leads.'); }
   });
   el.querySelectorAll('[data-copy]').forEach(function(b){
     b.addEventListener('click', function(){
@@ -1882,7 +1935,7 @@ async function submitIntake(claim){
     /* best-effort refresh: still re-render below so the button never sticks */
   }
   /* The intake form lives in a modal that renderApp() does not touch, so close
-     it explicitly — otherwise the button sits stuck on "Submitting...". */
+     it explicitly - otherwise the button sits stuck on "Submitting...". */
   closeModal();
   renderApp();
 }
