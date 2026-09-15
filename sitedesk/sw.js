@@ -1,4 +1,4 @@
-var CACHE = 'sitedesk-v3';
+var CACHE = 'sitedesk-v4';
 var CORE = ['index.html', 'styles.css', 'app.js', 'config.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon.svg'];
 
 self.addEventListener('install', function(e){
@@ -17,6 +17,24 @@ self.addEventListener('activate', function(e){
 
 self.addEventListener('fetch', function(e){
   if(e.request.method !== 'GET') return;
+  var url = new URL(e.request.url);
+  /* Lead catalog: serve the cached copy instantly, refresh it quietly in the
+     background. This is what makes repeat visits paint with no spinner. */
+  if(url.pathname.replace(/\/+$/, '') === '/sites.json'){
+    e.respondWith(
+      caches.match(e.request).then(function(cached){
+        var net = fetch(e.request).then(function(resp){
+          if(resp && resp.ok){
+            var copy = resp.clone();
+            caches.open(CACHE).then(function(c){ c.put(e.request, copy); });
+          }
+          return resp;
+        }).catch(function(){ return cached; });
+        return cached || net;
+      })
+    );
+    return;
+  }
   e.respondWith(
     fetch(e.request).then(function(resp){
       var copy = resp.clone();
