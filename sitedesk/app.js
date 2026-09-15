@@ -286,7 +286,7 @@ var state = {
   unread: 0,
   q: '', cat: '', hasPhoneOnly: false,
   boardOrder: [],
-  boardShown: 20,
+  boardPage: 0,
   mineQ: '', mineStatus: 'all', meSlug: null,
   userQ: '', userStatus: '',
   adminSec: 'users',
@@ -634,7 +634,6 @@ function queueChunkUrl(i){ return 'https://bjvfi.com/sitedesk/data/queue/c' + (i
 /* chunk bookkeeping: which chunks are merged into state.catalog */
 var _chunksLoaded = {};
 var _seenSlugs = {};
-var _fullLoading = null;
 
 function chunksTotal(){ return state.chunksTotal || 0; }
 function allChunksLoaded(){
@@ -672,8 +671,8 @@ async function fetchCatalog(){
     state.catalog = [];
     _seenSlugs = {};
     _chunksLoaded = {};
-    _fullLoading = null;
     state.boardOrder = [];
+    state.boardPage = 0;
     const mRes = await fetch(QUEUE_MANIFEST_URL);
     if(!mRes.ok) throw new Error('no queue manifest');
     const manifest = await mRes.json();
@@ -691,27 +690,6 @@ async function fetchCatalog(){
 /* Full load, throttled, with progress. Only used for explicit text search,
    the one action that needs every lead. Shared promise so concurrent callers
    do not double-download. */
-function ensureFullCatalog(onProgress){
-  if(_fullLoading) return _fullLoading;
-  _fullLoading = (async function(){
-    const missing = [];
-    const t = chunksTotal();
-    for(let i = 0; i < t; i++) if(!_chunksLoaded[i]) missing.push(i);
-    let done = 0;
-    for(let s = 0; s < missing.length; s += 3){
-      const batch = missing.slice(s, s + 3);
-      await Promise.all(batch.map(function(i){
-        return ensureChunk(i).catch(function(){ /* keep going */ });
-      }));
-      done += batch.length;
-      if(onProgress){ try{ onProgress(done, missing.length); }catch(e){} }
-      await new Promise(function(res){ setTimeout(res, 80); });
-    }
-    state.catalogAt = Date.now();
-  })();
-  _fullLoading.then(function(){ _fullLoading = null; }, function(){ _fullLoading = null; });
-  return _fullLoading;
-}
 
 async function fetchCatalogFull(){
   const ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
@@ -1182,7 +1160,7 @@ function paintQueue(el, openTaken, syncing){
     const shown = state.boardOrder
       .map(function(s){ return state.catalog.find(function(l){ return l.slug === s; }); })
       .filter(Boolean)
-      .slice(0, state.boardShown);
+      .slice(state.boardPage * 20, state.boardPage * 20 + 20);
 
     let html = statsRow();
     html += '<div class="row" style="justify-content:space-between;margin-bottom:14px"><div>' +
@@ -1196,16 +1174,14 @@ function paintQueue(el, openTaken, syncing){
     html += '<div class="card"><h2>Board</h2><div class="filters">' +
       '<input id="queue-q" value="' + esc(state.q) + '" placeholder="Name or slug"/>' +
       '</div>';
-    if(state.q.trim() && !allChunksLoaded()){
-      html += '<div class="board-actions" style="margin:0 0 10px"><button class="btn ghost sm" id="btn-search-all" type="button">Search all ' +
-        fmtNum(state.catalogTotal || 0) + ' leads</button>' +
-        '<p class="muted" style="font-size:11px;margin:6px 0 0">Searching ' + fmtNum(state.catalog.length) + ' loaded leads. Full search loads the rest once.</p></div>';
-    }
+    const nextAtEnd = (state.boardPage + 1) * 20 >= state.boardOrder.length && allChunksLoaded();
     if(shown.length){
       html += '<div class="open-board">' + shown.map(leadRowHtml).join('') + '</div>' +
         '<p class="muted" style="font-size:11px;margin:10px 0">Showing ' + fmtNum(shown.length) + ' of ' + fmtNum(list.length) + ' open matches' +
         ' \xB7 ' + fmtNum(state.catalog.length) + ' of ' + fmtNum(state.catalogTotal || state.catalog.length) + ' leads loaded</p>' +
-        '<div class="board-actions"><button class="btn ghost block" id="btn-next-batch" type="button">Next 20</button></div>';
+        '<div class="board-actions" style="display:flex;gap:8px">' +
+        '<button class="btn ghost" style="flex:1" id="btn-prev-batch" type="button"' + (state.boardPage === 0 ? ' disabled' : '') + '>Previous 20</button>' +
+        '<button class="btn ghost" style="flex:1" id="btn-next-batch" type="button"' + (nextAtEnd ? ' disabled' : '') + '>Next 20</button></div>';
     } else {
       html += '<div class="empty">No open leads.<br/><button class="btn" id="btn-grab-empty" type="button">Grab random</button></div>';
     }
@@ -1282,7 +1258,7 @@ function wireQueue(el){
   const q = el.querySelector('#queue-q');
   const apply = function(){
     state.q = q ? q.value : '';
-    state.boardShown = 20;
+    state.boardPage = 0;
     state.boardOrder = [];
     renderQueueInto(el);
   };
@@ -1308,7 +1284,7 @@ function wireQueue(el){
   el.querySelectorAll('[data-cat]').forEach(function(chip){
     chip.addEventListener('click', function(){
       state.cat = chip.getAttribute('data-cat');
-      state.boardShown = 20;
+      state.boardPage = 0;
       state.boardOrder = [];
       renderQueueInto(el);
     });
@@ -1319,41 +1295,41 @@ function wireQueue(el){
     state.boardOrder = [];
     renderQueueInto(el);
   });
+  const pb = el.querySelector('#btn-prev-batch');
+  if(pb) pb.addEventListener('click', function(){
+    if(state.boardPage > 0){
+      state.boardPage--;
+      const qEl = el.querySelector('#queue-q');
+      if(qEl) state.q = qEl.value;
+      paintQueue(el, state._lastTaken || {}, false);
+      window.scrollTo(0, 0);
+    }
+  });
   const nb = el.querySelector('#btn-next-batch');
   if(nb) nb.addEventListener('click', async function(){
     nb.disabled = true;
     try{
-      const list = filteredOpen(state._lastTaken || {});
-      if(state.boardShown >= list.length){
+      /* Out of loaded leads: pull exactly one more chunk (189KB) and append
+         its leads to the order, so the pages already seen never shift. */
+      if((state.boardPage + 1) * 20 >= state.boardOrder.length){
         const nx = firstMissingChunk();
         if(nx >= 0){
           nb.textContent = 'Loading more\u2026';
           await ensureChunk(nx);
-          state.boardOrder = [];
+          const taken = state._lastTaken || {};
+          const have = {};
+          state.boardOrder.forEach(function(s){ have[s] = 1; });
+          const fresh = shuffle(filteredOpen(taken).map(function(l){ return l.slug; })
+            .filter(function(s){ return !have[s]; }));
+          state.boardOrder = state.boardOrder.concat(fresh);
         }
       }
-      state.boardShown += 20;
+      state.boardPage++;
       const qEl = el.querySelector('#queue-q');
       if(qEl) state.q = qEl.value;
       paintQueue(el, state._lastTaken || {}, false);
+      window.scrollTo(0, 0);
     }catch(e){ toast('Could not load more leads.'); }
-  });
-  const sa = el.querySelector('#btn-search-all');
-  if(sa) sa.addEventListener('click', async function(){
-    sa.disabled = true;
-    try{
-      sa.textContent = 'Loading all leads…';
-      const prog = document.createElement('span');
-      prog.className = 'muted';
-      prog.style.cssText = 'font-size:11px;margin-left:8px';
-      sa.parentNode.appendChild(prog);
-      await ensureFullCatalog(function(d, t){ prog.textContent = d + ' of ' + t + ' sections'; });
-      state.boardOrder = [];
-      state.boardShown = 20;
-      const qEl = el.querySelector('#queue-q');
-      if(qEl) state.q = qEl.value;
-      renderQueueInto(el);
-    }catch(e){ toast('Full search unavailable.'); sa.disabled = false; sa.textContent = 'Search all leads'; }
   });
   el.querySelectorAll('[data-copy]').forEach(function(b){
     b.addEventListener('click', function(){
