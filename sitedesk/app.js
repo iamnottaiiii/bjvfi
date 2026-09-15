@@ -1196,9 +1196,14 @@ function paintQueue(el, openTaken, syncing){
     html += '<div class="card"><h2>Board</h2><div class="filters">' +
       '<input id="queue-q" value="' + esc(state.q) + '" placeholder="Name or slug"/>' +
       '</div>';
+    if(state.q.trim() && !allChunksLoaded()){
+      html += '<div class="board-actions" style="margin:0 0 10px"><button class="btn ghost sm" id="btn-search-all" type="button">Search all ' +
+        fmtNum(state.catalogTotal || 0) + ' leads</button>' +
+        '<p class="muted" style="font-size:11px;margin:6px 0 0">Searching ' + fmtNum(state.catalog.length) + ' loaded leads. Full search loads the rest once.</p></div>';
+    }
     if(shown.length){
       html += '<div class="open-board">' + shown.map(leadRowHtml).join('') + '</div>' +
-        '<p class="muted" style="font-size:11px;margin:10px 0">' + list.length + ' open match' + (list.length === 1 ? '' : 'es') +
+        '<p class="muted" style="font-size:11px;margin:10px 0">Showing ' + fmtNum(shown.length) + ' of ' + fmtNum(list.length) + ' open matches' +
         ' \xB7 ' + fmtNum(state.catalog.length) + ' of ' + fmtNum(state.catalogTotal || state.catalog.length) + ' leads loaded</p>' +
         '<div class="board-actions"><button class="btn ghost block" id="btn-next-batch" type="button">Next 20</button></div>';
     } else {
@@ -1242,21 +1247,9 @@ async function renderQueueInto(el){
     return;
   }
   instant = true;
-  /* A text search needs every lead to be correct, so it is the one action
-     that pulls the remaining chunks, with a progress note. Browsing never
-     does this: it pages through what is already loaded. */
-  const deepQ = state.q.trim();
-  if(deepQ && !allChunksLoaded()){
-    try{
-      el.innerHTML = '<div class="card"><div class="empty">Searching all ' +
-        fmtNum(state.catalogTotal || 0) + ' leads&hellip;<br><span id="qprog" class="muted"></span></div></div>';
-      await ensureFullCatalog(function(d, t){
-        const p = document.getElementById('qprog');
-        if(p) p.textContent = d + ' of ' + t + ' sections loaded';
-      });
-      state.boardOrder = [];
-    }catch(e){ toast('Full search unavailable; searching loaded leads.'); }
-  }
+  /* Search filters the leads already loaded, instantly, the same way the
+     catalog page filters its in-memory list. The full catalog is never pulled
+     on its own; a "Search all leads" button offers it explicitly. */
   /* Fresh catalog in hand: paint right away with the last known claim state,
      then resolve the real claim set without blocking the visible list. */
   try{
@@ -1273,10 +1266,6 @@ async function renderQueueInto(el){
     const qEl2 = el.querySelector('#queue-q');
     if(qEl2) state.q = qEl2.value;
     paintQueue(el, taken, false);
-    if(deepQ){
-      const nq = el.querySelector('#queue-q');
-      if(nq){ nq.focus(); try{ nq.setSelectionRange(nq.value.length, nq.value.length); }catch(e){} }
-    }
   }catch(e){
     try{
       const qEl3 = el.querySelector('#queue-q');
@@ -1348,6 +1337,23 @@ function wireQueue(el){
       if(qEl) state.q = qEl.value;
       paintQueue(el, state._lastTaken || {}, false);
     }catch(e){ toast('Could not load more leads.'); }
+  });
+  const sa = el.querySelector('#btn-search-all');
+  if(sa) sa.addEventListener('click', async function(){
+    sa.disabled = true;
+    try{
+      sa.textContent = 'Loading all leads…';
+      const prog = document.createElement('span');
+      prog.className = 'muted';
+      prog.style.cssText = 'font-size:11px;margin-left:8px';
+      sa.parentNode.appendChild(prog);
+      await ensureFullCatalog(function(d, t){ prog.textContent = d + ' of ' + t + ' sections'; });
+      state.boardOrder = [];
+      state.boardShown = 20;
+      const qEl = el.querySelector('#queue-q');
+      if(qEl) state.q = qEl.value;
+      renderQueueInto(el);
+    }catch(e){ toast('Full search unavailable.'); sa.disabled = false; sa.textContent = 'Search all leads'; }
   });
   el.querySelectorAll('[data-copy]').forEach(function(b){
     b.addEventListener('click', function(){
