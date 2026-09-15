@@ -619,8 +619,38 @@ async function savePushSub(sj){
 
 /* ================= catalog + claims ================= */
 
+/* ============ chunked lead catalog: instant first paint ============ */
+/* The queue shows 60 leads at a time, so shipping the whole 8MB catalog before
+   the first paint is pure waste. The catalog is split into ~200KB chunks;
+   chunk 0 holds a scattered sample and arrives in a fraction of a second, so
+   the board paints immediately. The rest merge in the background and the
+   board refreshes once when complete. If chunks are unreachable, fall back
+   to the old full-catalog download. */
+var QUEUE_MANIFEST_URL = 'https://bjvfi.com/sitedesk/data/queue/manifest.json';
+function queueChunkUrl(i){ return 'https://bjvfi.com/sitedesk/data/queue/c' + (i < 10 ? '0' : '') + i + '.json'; }
+
 async function fetchCatalog(){
-  if(state.catalog.length && Date.now() - state.catalogAt < 10*60*1000) return;
+  if(state.catalog.length && Date.now() - state.catalogAt < 10*60*1000) return state.catalog;
+  try{
+    const mRes = await fetch(QUEUE_MANIFEST_URL);
+    if(!mRes.ok) throw new Error('no queue manifest');
+    const manifest = await mRes.json();
+    const total = Number(manifest.chunks) || 0;
+    if(!total) throw new Error('bad queue manifest');
+    const cRes = await fetch(queueChunkUrl(0));
+    if(!cRes.ok) throw new Error('no queue chunk 0');
+    const c0 = await cRes.json();
+    const list = Array.isArray(c0) ? c0 : [];
+    state.catalog = list.map(normalizeLead).filter(function(l){ return l.slug; });
+    state.catalogAt = Date.now();
+    fetchCatalogRest(total); /* background, never awaited */
+    return state.catalog;
+  }catch(e){
+    return fetchCatalogFull();
+  }
+}
+
+async function fetchCatalogFull(){
   const ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
   const timer = ctrl ? setTimeout(function(){ try{ ctrl.abort(); }catch(e){} }, 45000) : null;
   let res;
@@ -636,6 +666,42 @@ async function fetchCatalog(){
   const list = Array.isArray(raw) ? raw : (raw.sites || raw.leads || []);
   state.catalog = list.map(normalizeLead).filter(function(l){ return l.slug; });
   state.catalogAt = Date.now();
+  return state.catalog;
+}
+
+/* Merge the remaining chunks quietly, then refresh the board once if it is
+   still on screen. Never throws: the board is already painted from chunk 0. */
+async function fetchCatalogRest(total){
+  if(!total || total < 2 || state._catalogRestRunning) return;
+  state._catalogRestRunning = true;
+  try{
+    const seen = {};
+    state.catalog.forEach(function(l){ seen[l.slug] = 1; });
+    const jobs = [];
+    for(let i = 1; i < total; i++){
+      jobs.push(fetch(queueChunkUrl(i)).then(function(r){ return r.ok ? r.json() : []; })
+        .catch(function(){ return []; }));
+    }
+    const chunks = await Promise.all(jobs);
+    chunks.forEach(function(arr){
+      (Array.isArray(arr) ? arr : []).forEach(function(e){
+        const l = normalizeLead(e);
+        if(l.slug && !seen[l.slug]){ seen[l.slug] = 1; state.catalog.push(l); }
+      });
+    });
+    state.catalogAt = Date.now();
+    if(state.tab === 'queue'){
+      const y = (typeof window !== 'undefined') ? window.scrollY : 0;
+      const app = document.getElementById('app');
+      const view = app ? app.querySelector('#view') : null;
+      if(view){
+        state.boardOrder = [];
+        try{ await renderQueueInto(view); }catch(e){}
+        if(typeof window !== 'undefined' && typeof window.scrollTo === 'function') window.scrollTo(0, y);
+      }
+    }
+  }catch(e){}
+  state._catalogRestRunning = false;
 }
 
 async function refreshTree(){
@@ -1282,6 +1348,7 @@ function showGrabPreview(slug){
 }
 
 async function grabLead(slug){
+  if(grabNeedsInstall()) return;
   if(activeClaimCount() >= MAX_ACTIVE_CLAIMS){ toast('Claim cap reached. Release a lead first.'); return; }
   const lead = state.catalog.find(function(l){ return l.slug === slug; });
   if(!lead){ toast('Lead not found in catalog.'); return; }
@@ -1311,6 +1378,7 @@ async function grabLead(slug){
 }
 
 async function grabRandom(){
+  if(grabNeedsInstall()) return;
   if(activeClaimCount() >= MAX_ACTIVE_CLAIMS){ toast('Claim cap reached. Release a lead first.'); return; }
   toast('Finding a lead...');
   try{
@@ -3145,15 +3213,21 @@ function triggerInstall(){
   }
 }
 
-function renderInstallGate(){
+function renderInstallGate(reason){
   closeInstallGate();
   var ios = isIOS();
   var gate = document.createElement('div');
   gate.id = 'install-gate';
+  var heading = 'Install SiteDesk to continue';
+  var body = 'SiteDesk must be installed on your home screen before you can use it. As an installed app your call and payout notifications will pop up properly. In a normal browser tab they will not.';
+  if(reason === 'grab'){
+    heading = 'Install SiteDesk to grab this lead';
+    body = 'You can browse leads right here in your browser, but grabbing a lead needs the installed app. As an installed app your call and payout notifications will pop up properly. In a normal browser tab they will not.';
+  }
   var inner = '<div class="gate-card">' +
     '<div class="gate-logo">sitedesk</div>' +
-    '<h1>Install SiteDesk to continue</h1>' +
-    '<p class="muted">SiteDesk must be installed on your home screen before you can use it. As an installed app your call and payout notifications will pop up properly. In a normal browser tab they will not.</p>' +
+    '<h1>' + heading + '</h1>' +
+    '<p class="muted">' + body + '</p>' +
     '<div id="gate-action"></div>';
   if(ios){
     inner += '<ol class="gate-steps">' +
@@ -3182,7 +3256,21 @@ function renderInstallGate(){
   note.className = 'muted gate-note';
   note.id = 'gate-note';
   action.appendChild(note);
+  var later = document.createElement('button');
+  later.className = 'btn ghost block';
+  later.textContent = 'Not now';
+  later.style.marginTop = '8px';
+  later.addEventListener('click', closeInstallGate);
+  action.appendChild(later);
   updateGateNote();
+}
+
+/* The install gate only appears when someone tries to grab a lead while not
+   running the installed app. Browsing and login work in a regular tab. */
+function grabNeedsInstall(){
+  if(isStandalone()) return false;
+  renderInstallGate('grab');
+  return true;
 }
 
 function bootMain(){
@@ -3228,10 +3316,8 @@ function init(){
       bootMain();
     }
   });
-  if(!isStandalone() && !/testbypass=1/.test(location.search)){
-    renderInstallGate();
-    return;
-  }
+  /* No startup install gate (2026-09-15 per user). Login and browsing work in a
+     regular browser tab; the install gate only appears when grabbing a lead. */
   bootMain();
 }
 

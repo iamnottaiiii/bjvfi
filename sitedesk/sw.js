@@ -1,4 +1,4 @@
-var CACHE = 'sitedesk-v4';
+var CACHE = 'sitedesk-v5';
 var CORE = ['index.html', 'styles.css', 'app.js', 'config.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon.svg'];
 
 self.addEventListener('install', function(e){
@@ -18,9 +18,11 @@ self.addEventListener('activate', function(e){
 self.addEventListener('fetch', function(e){
   if(e.request.method !== 'GET') return;
   var url = new URL(e.request.url);
-  /* Lead catalog: serve the cached copy instantly, refresh it quietly in the
-     background. This is what makes repeat visits paint with no spinner. */
-  if(url.pathname.replace(/\/+$/, '') === '/sites.json'){
+  /* Lead catalog + queue chunks: serve the cached copy instantly, refresh it
+     quietly in the background. This is what makes repeat visits paint with
+     no spinner. */
+  if(url.pathname.replace(/\/+$/, '') === '/sites.json' ||
+     url.pathname.indexOf('/sitedesk/data/queue/') === 0){
     e.respondWith(
       caches.match(e.request).then(function(cached){
         var net = fetch(e.request).then(function(resp){
