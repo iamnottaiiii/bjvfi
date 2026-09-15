@@ -620,95 +620,32 @@ async function savePushSub(sj){
 
 /* ================= catalog + claims ================= */
 
-/* ============ chunked lead catalog: only what is displayed ============ */
-/* The queue shows 20 leads at a time, so the app only downloads what it
-   shows. Boot loads the tiny manifest plus chunk 0 (2,000 leads) and stops.
-   Tapping "Next 20" pages through the loaded leads and pulls the next chunk
-   only when the loaded pool runs out. A text search is the one action that
-   truly needs every lead, so it loads the remaining chunks on demand with a
-   progress note. Nothing else ever downloads the full catalog. If chunks are
-   unreachable, fall back to the old full-catalog download. */
-var QUEUE_MANIFEST_URL = 'https://bjvfi.com/sitedesk/data/queue/manifest.json';
-function queueChunkUrl(i){ return 'https://bjvfi.com/sitedesk/data/queue/c' + (i < 10 ? '0' : '') + i + '.json'; }
+/* ============ queue leads: one small file, 20 at a time ============ */
+/* The queue shows 20 leads at a time from a single 189KB file holding 2,000
+   scattered leads (100 pages). That is the entire download. Previous/Next
+   page through them; nothing else is ever fetched. */
+var QUEUE_URL = 'https://bjvfi.com/sitedesk/data/queue.json';
 
-/* chunk bookkeeping: which chunks are merged into state.catalog */
-var _chunksLoaded = {};
-var _seenSlugs = {};
-
-function chunksTotal(){ return state.chunksTotal || 0; }
-function allChunksLoaded(){
-  const t = chunksTotal();
-  if(!t) return false;
-  for(let i = 0; i < t; i++) if(!_chunksLoaded[i]) return false;
-  return true;
-}
-function firstMissingChunk(){
-  const t = chunksTotal();
-  for(let i = 0; i < t; i++) if(!_chunksLoaded[i]) return i;
-  return -1;
-}
-function mergeChunkLeads(arr){
-  (Array.isArray(arr) ? arr : []).forEach(function(e){
-    const l = normalizeLead(e);
-    if(l.slug && !_seenSlugs[l.slug]){ _seenSlugs[l.slug] = 1; state.catalog.push(l); }
-  });
-}
-
-/* Fetch one chunk on demand and merge it. Never throws fatally; callers decide. */
-async function ensureChunk(i){
-  if(_chunksLoaded[i]) return;
-  const r = await fetch(queueChunkUrl(i));
-  if(!r.ok) throw new Error('Could not load more leads.');
-  mergeChunkLeads(await r.json());
-  _chunksLoaded[i] = true;
-  state.catalogAt = Date.now();
-}
-
-/* Boot: manifest + chunk 0 only. That is the whole download. */
 async function fetchCatalog(){
   if(state.catalog.length && Date.now() - state.catalogAt < 10*60*1000) return state.catalog;
-  try{
-    state.catalog = [];
-    _seenSlugs = {};
-    _chunksLoaded = {};
-    state.boardOrder = [];
-    state.boardPage = 0;
-    const mRes = await fetch(QUEUE_MANIFEST_URL);
-    if(!mRes.ok) throw new Error('no queue manifest');
-    const manifest = await mRes.json();
-    state.chunksTotal = Number(manifest.chunks) || 0;
-    state.catalogTotal = Number(manifest.total) || 0;
-    if(!state.chunksTotal) throw new Error('bad queue manifest');
-    await ensureChunk(0);
-    state.catalogAt = Date.now();
-    return state.catalog;
-  }catch(e){
-    return fetchCatalogFull();
-  }
+  state.catalog = [];
+  state.boardOrder = [];
+  state.boardPage = 0;
+  const r = await fetch(QUEUE_URL);
+  if(!r.ok) throw new Error('Could not load leads.');
+  const arr = await r.json();
+  (Array.isArray(arr) ? arr : []).forEach(function(e){
+    const l = normalizeLead(e);
+    if(l.slug) state.catalog.push(l);
+  });
+  state.catalogAt = Date.now();
+  return state.catalog;
 }
 
 /* Full load, throttled, with progress. Only used for explicit text search,
    the one action that needs every lead. Shared promise so concurrent callers
    do not double-download. */
 
-async function fetchCatalogFull(){
-  const ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
-  const timer = ctrl ? setTimeout(function(){ try{ ctrl.abort(); }catch(e){} }, 45000) : null;
-  let res;
-  try{
-    res = await fetch(CATALOG_URL, ctrl ? { signal: ctrl.signal } : undefined);
-  }catch(e){
-    if(timer) clearTimeout(timer);
-    throw new Error('Could not load the lead catalog. Check your connection and tap Retry.');
-  }
-  if(timer) clearTimeout(timer);
-  if(!res.ok) throw new Error('Could not load the lead catalog (bjvfi.com).');
-  const raw = await res.json();
-  const list = Array.isArray(raw) ? raw : (raw.sites || raw.leads || []);
-  state.catalog = list.map(normalizeLead).filter(function(l){ return l.slug; });
-  state.catalogAt = Date.now();
-  return state.catalog;
-}
 
 async function refreshTree(){
   clearTreeCache();
@@ -1174,11 +1111,10 @@ function paintQueue(el, openTaken, syncing){
     html += '<div class="card"><h2>Board</h2><div class="filters">' +
       '<input id="queue-q" value="' + esc(state.q) + '" placeholder="Name or slug"/>' +
       '</div>';
-    const nextAtEnd = (state.boardPage + 1) * 20 >= state.boardOrder.length && allChunksLoaded();
+    const nextAtEnd = (state.boardPage + 1) * 20 >= state.boardOrder.length;
     if(shown.length){
       html += '<div class="open-board">' + shown.map(leadRowHtml).join('') + '</div>' +
-        '<p class="muted" style="font-size:11px;margin:10px 0">Showing ' + fmtNum(shown.length) + ' of ' + fmtNum(list.length) + ' open matches' +
-        ' \xB7 ' + fmtNum(state.catalog.length) + ' of ' + fmtNum(state.catalogTotal || state.catalog.length) + ' leads loaded</p>' +
+        '<p class="muted" style="font-size:11px;margin:10px 0">Showing ' + fmtNum(shown.length) + ' of ' + fmtNum(list.length) + ' open leads</p>' +
         '<div class="board-actions" style="display:flex;gap:8px">' +
         '<button class="btn ghost" style="flex:1" id="btn-prev-batch" type="button"' + (state.boardPage === 0 ? ' disabled' : '') + '>Previous 20</button>' +
         '<button class="btn ghost" style="flex:1" id="btn-next-batch" type="button"' + (nextAtEnd ? ' disabled' : '') + '>Next 20</button></div>';
@@ -1306,30 +1242,12 @@ function wireQueue(el){
     }
   });
   const nb = el.querySelector('#btn-next-batch');
-  if(nb) nb.addEventListener('click', async function(){
-    nb.disabled = true;
-    try{
-      /* Out of loaded leads: pull exactly one more chunk (189KB) and append
-         its leads to the order, so the pages already seen never shift. */
-      if((state.boardPage + 1) * 20 >= state.boardOrder.length){
-        const nx = firstMissingChunk();
-        if(nx >= 0){
-          nb.textContent = 'Loading more\u2026';
-          await ensureChunk(nx);
-          const taken = state._lastTaken || {};
-          const have = {};
-          state.boardOrder.forEach(function(s){ have[s] = 1; });
-          const fresh = shuffle(filteredOpen(taken).map(function(l){ return l.slug; })
-            .filter(function(s){ return !have[s]; }));
-          state.boardOrder = state.boardOrder.concat(fresh);
-        }
-      }
-      state.boardPage++;
-      const qEl = el.querySelector('#queue-q');
-      if(qEl) state.q = qEl.value;
-      paintQueue(el, state._lastTaken || {}, false);
-      window.scrollTo(0, 0);
-    }catch(e){ toast('Could not load more leads.'); }
+  if(nb) nb.addEventListener('click', function(){
+    state.boardPage++;
+    const qEl = el.querySelector('#queue-q');
+    if(qEl) state.q = qEl.value;
+    paintQueue(el, state._lastTaken || {}, false);
+    window.scrollTo(0, 0);
   });
   el.querySelectorAll('[data-copy]').forEach(function(b){
     b.addEventListener('click', function(){
