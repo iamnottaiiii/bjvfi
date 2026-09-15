@@ -631,6 +631,11 @@ async function fetchCatalog(){
   state.catalog = [];
   state.boardOrder = [];
   state.boardPage = 0;
+  fetch('https://bjvfi.com/sitedesk/data/total.json').then(function(r){
+    return r.ok ? r.json() : null;
+  }).then(function(j){
+    if(j && j.total) state.catalogTotal = j.total;
+  }).catch(function(){});
   const r = await fetch(QUEUE_URL);
   if(!r.ok) throw new Error('Could not load leads.');
   const arr = await r.json();
@@ -1114,7 +1119,7 @@ function paintQueue(el, openTaken, syncing){
     const nextAtEnd = (state.boardPage + 1) * 20 >= state.boardOrder.length;
     if(shown.length){
       html += '<div class="open-board">' + shown.map(leadRowHtml).join('') + '</div>' +
-        '<p class="muted" style="font-size:11px;margin:10px 0">Showing ' + fmtNum(shown.length) + ' of ' + fmtNum(list.length) + ' open leads</p>' +
+        '<p class="muted" style="font-size:11px;margin:10px 0">Showing ' + fmtNum(shown.length) + ' of ' + fmtNum(state.catalogTotal || list.length) + ' open leads</p>' +
         '<div class="board-actions">' +
         '<button class="btn ghost block" id="btn-next-batch" type="button"' + (nextAtEnd ? ' disabled' : '') + '>Next 20</button></div>';
     } else {
@@ -1242,6 +1247,7 @@ function wireQueue(el){
 
 /* Pre-grab preview: caller must open the business site, then wait 2 minutes, before grabbing. */
 function showGrabPreview(slug){
+  if(grabNeedsInstall()) return;
   const bySlug = catalogBySlug();
   const l = bySlug[slug] || normalizeLead({ s: slug, n: slug, p: '' });
   const url = siteUrlFor(l);
