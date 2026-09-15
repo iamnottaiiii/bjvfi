@@ -616,8 +616,75 @@ async function savePushSub(sj){
 
 /* ================= catalog + claims ================= */
 
-async function fetchCatalog(){
-  if(state.catalog.length && Date.now() - state.catalogAt < 10*60*1000) return;
+/* ---------- on-device catalog cache (IndexedDB) ----------
+   The lead catalog is several megabytes; downloading + parsing it on
+   every cold start is what makes the queue feel slow. The last good copy
+   is kept on the device so the board paints instantly, while a quiet
+   background refresh keeps it fresh. Claim/taken filtering always runs
+   live against the server, so taken leads never show. */
+var CATALOG_IDB = 'sitedesk';
+var CATALOG_IDB_STORE = 'kv';
+var CATALOG_IDB_KEY = 'catalog-v1';
+var _catalogDbPromise = null;
+
+function catalogDb(){
+  if(_catalogDbPromise) return _catalogDbPromise;
+  _catalogDbPromise = new Promise(function(resolve){
+    try{
+      if(!('indexedDB' in window)){ resolve(null); return; }
+      var rq = indexedDB.open(CATALOG_IDB, 1);
+      rq.onupgradeneeded = function(){ try{ rq.result.createObjectStore(CATALOG_IDB_STORE); }catch(e){} };
+      rq.onsuccess = function(){ resolve(rq.result); };
+      rq.onerror = function(){ resolve(null); };
+      rq.onblocked = function(){ resolve(null); };
+    }catch(e){ resolve(null); }
+  });
+  return _catalogDbPromise;
+}
+
+function idbGet(db, key){
+  return new Promise(function(resolve){
+    try{
+      var tx = db.transaction(CATALOG_IDB_STORE, 'readonly');
+      var rq = tx.objectStore(CATALOG_IDB_STORE).get(key);
+      rq.onsuccess = function(){ resolve(rq.result || null); };
+      rq.onerror = function(){ resolve(null); };
+    }catch(e){ resolve(null); }
+  });
+}
+
+function idbSet(db, key, val){
+  return new Promise(function(resolve){
+    try{
+      var tx = db.transaction(CATALOG_IDB_STORE, 'readwrite');
+      tx.objectStore(CATALOG_IDB_STORE).put(val, key);
+      tx.oncomplete = function(){ resolve(true); };
+      tx.onerror = function(){ resolve(false); };
+    }catch(e){ resolve(false); }
+  });
+}
+
+async function loadCatalogCache(){
+  try{
+    const db = await catalogDb();
+    if(!db) return false;
+    const cached = await idbGet(db, CATALOG_IDB_KEY);
+    if(!cached || !Array.isArray(cached.leads) || !cached.leads.length) return false;
+    state.catalog = cached.leads.map(normalizeLead).filter(function(l){ return l.slug; });
+    state.catalogAt = cached.at || 0;
+    return state.catalog.length > 0;
+  }catch(e){ return false; }
+}
+
+async function saveCatalogCache(){
+  try{
+    const db = await catalogDb();
+    if(!db) return;
+    await idbSet(db, CATALOG_IDB_KEY, { at: Date.now(), leads: state.catalog });
+  }catch(e){}
+}
+
+async function fetchCatalogNetwork(){
   const ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
   const timer = ctrl ? setTimeout(function(){ try{ ctrl.abort(); }catch(e){} }, 45000) : null;
   let res;
@@ -633,6 +700,19 @@ async function fetchCatalog(){
   const list = Array.isArray(raw) ? raw : (raw.sites || raw.leads || []);
   state.catalog = list.map(normalizeLead).filter(function(l){ return l.slug; });
   state.catalogAt = Date.now();
+  saveCatalogCache();
+}
+
+async function fetchCatalog(){
+  if(state.catalog.length && Date.now() - state.catalogAt < 10*60*1000) return;
+  if(!state.catalog.length){
+    /* Cold start: paint instantly from the on-device copy, refresh quietly. */
+    if(await loadCatalogCache()){
+      fetchCatalogNetwork().catch(function(){});
+      return;
+    }
+  }
+  await fetchCatalogNetwork();
 }
 
 async function refreshTree(){
