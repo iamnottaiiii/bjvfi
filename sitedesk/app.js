@@ -3031,36 +3031,35 @@ function adminUsersHtml(){
       '<div style="font-weight:600">' + esc(u.name || r.username) + '</div>' +
       '<div class="muted" style="font-size:12px">@' + esc(r.username) + '</div>' +
       '<div class="muted" style="font-size:12px">' + esc(u.phone || 'no phone') + '</div></div>' +
-      '<div class="umenu-wrap"><button class="btn ghost sm" data-umenu="' + esc(r.username) + '" type="button" aria-label="Actions for @' + esc(r.username) + '">⋯</button>' +
-      '<div class="umenu" hidden>' + umenuItems(r, u) + '</div></div></div>' +
+      '<div class="uact-wrap"><select class="uact-sel" data-username="' + esc(r.username) + '" aria-label="Actions for @' + esc(r.username) + '">' +
+      '<option value="">Actions</option>' + uactOptions(r, u) + '</select></div></div>' +
       '<div class="row" style="gap:6px">' + badge(u.status) + badge(u.role) + '</div></div>';
   }).join('');
   return html + '</div>';
 }
 
-/* The three-dot menu on an admin user card: everything that can be done to
-   that user lives here instead of a crowded row of buttons. */
-function umenuItems(r, u){
-  let items = '<button type="button" class="umenu-item" data-udash="' + esc(r.username) + '">Dashboard</button>';
+/* The Actions dropdown on an admin user card: everything that can be done to
+   that user lives in one plain select. */
+function uactOptions(r, u){
+  let items = '<option value="dash">Dashboard</option>';
   if(u.role !== 'head'){
     if(u.status === 'pending'){
-      items += '<button type="button" class="umenu-item" data-uact="approve" data-u="' + esc(r.username) + '">Approve</button>' +
-        '<button type="button" class="umenu-item" data-uact="reject" data-u="' + esc(r.username) + '">Reject</button>';
+      items += '<option value="approve">Approve</option>' +
+        '<option value="reject">Reject</option>';
     }
     items += u.status !== 'disabled'
-      ? '<button type="button" class="umenu-item" data-uact="disable" data-u="' + esc(r.username) + '">Disable</button>'
-      : '<button type="button" class="umenu-item" data-uact="approve" data-u="' + esc(r.username) + '">Re-enable</button>';
-    items += '<button type="button" class="umenu-item" data-uact="resetpw" data-u="' + esc(r.username) + '">Reset password</button>';
+      ? '<option value="disable">Disable</option>'
+      : '<option value="approve">Re-enable</option>';
+    items += '<option value="resetpw">Reset password</option>';
     if(r.username !== state.user.username){
-      items += '<button type="button" class="umenu-item danger" data-uact="delete" data-u="' + esc(r.username) + '">Delete</button>';
+      items += '<option value="delete">Delete</option>';
     }
     if(state.user.role === 'head'){
-      items += '<div class="umenu-sep"></div><div class="umenu-label">Set role</div>' +
-        ['caller','builder','admin'].map(function(ro){
-          const label = ro.charAt(0).toUpperCase() + ro.slice(1);
-          return '<button type="button" class="umenu-item" data-uact="role:' + ro + '" data-u="' + esc(r.username) + '">' +
-            (u.role === ro ? '✓ ' : '') + label + '</button>';
-        }).join('');
+      ['caller','builder','admin'].forEach(function(ro){
+        const label = ro.charAt(0).toUpperCase() + ro.slice(1);
+        items += '<option value="role:' + ro + '"' + (u.role === ro ? ' disabled' : '') + '>' +
+          (u.role === ro ? 'Role: ' + label + ' (current)' : 'Set role: ' + label) + '</option>';
+      });
     }
   }
   return items;
@@ -3079,38 +3078,22 @@ function wireAdminUsers(el){
   });
   const nu = el.querySelector('#btn-new-user');
   if(nu) nu.addEventListener('click', function(){ newUserModal(el); });
-  el.querySelectorAll('[data-uact]').forEach(function(b){
-    b.addEventListener('click', function(){
-      /* Immediate feedback: disable until the save round-trip finishes, so a
-         slow network does not read as "the click did nothing". */
-      b.disabled = true;
-      const rearm = function(){ try{ b.disabled = false; }catch(e){} };
-      try{
-        const r = userAction(b.getAttribute('data-u'), b.getAttribute('data-uact'), el);
-        if(r && r.then) r.then(rearm, rearm); else rearm();
-      }catch(e){ rearm(); }
-    });
-  });
-  el.querySelectorAll('[data-udash]').forEach(function(b){
-    b.addEventListener('click', function(){ state.adminUser = b.getAttribute('data-udash'); renderAdminInto(el); });
-  });
-  /* Three-dot menus: one open at a time, tap outside to close. */
-  el.querySelectorAll('[data-umenu]').forEach(function(btn){
-    btn.addEventListener('click', function(e){
-      e.stopPropagation();
-      const menu = btn.parentElement.querySelector('.umenu');
-      if(!menu) return;
-      const wasHidden = menu.hidden;
-      el.querySelectorAll('.umenu').forEach(function(m){ m.hidden = true; });
-      if(wasHidden){
-        menu.hidden = false;
-        document.addEventListener('click', function closer(ev){
-          if(!menu.contains(ev.target)){
-            menu.hidden = true;
-            document.removeEventListener('click', closer);
-          }
-        });
+  /* Admin user Actions dropdowns: pick an action, it runs, the select resets. */
+  el.querySelectorAll('.uact-sel').forEach(function(sel){
+    sel.addEventListener('change', function(){
+      const v = sel.value;
+      if(!v) return;
+      sel.value = '';
+      const username = sel.getAttribute('data-username');
+      if(v === 'dash'){
+        state.adminUser = username;
+        renderAdminInto(el);
+        return;
       }
+      try{
+        const r = userAction(username, v, el);
+        if(r && r.then) r.then(function(){}, function(){});
+      }catch(e){}
     });
   });
 }
@@ -3248,6 +3231,8 @@ async function saveUsers(){  const rec = await ghGetJson('users.json');
   await loadUsers();
 }
 
+/* Armed delete confirmations for the admin Actions dropdowns. */
+const deleteArmed = {};
 async function userAction(username, act, el){
   const u = state.users[username];
   if(!u){ toast('User not found.'); return; }
@@ -3286,20 +3271,14 @@ async function userAction(username, act, el){
       toast('Role updated');
     } else if(act === 'delete'){
       if(username === state.user.username){ toast('Delete your own account from Profile.'); return; }
-      /* Two-tap confirm, same pattern as Profile self-delete. */
-      let btn = null;
-      el.querySelectorAll('[data-uact="delete"]').forEach(function(x){
-        if(x.getAttribute('data-u') === username) btn = x;
-      });
-      if(btn && !btn.getAttribute('data-confirm')){
-        btn.setAttribute('data-confirm', '1');
-        btn.textContent = 'Tap again to delete @' + username;
-        setTimeout(function(){
-          try{ btn.removeAttribute('data-confirm'); btn.textContent = 'Delete'; }catch(e){}
-        }, 6000);
+      /* Two-tap confirm: pick Delete, get warned, pick Delete again within 6s. */
+      if(!deleteArmed[username]){
+        deleteArmed[username] = true;
+        toast('Pick Delete again to delete @' + username);
+        setTimeout(function(){ delete deleteArmed[username]; }, 6000);
         return;
       }
-      if(btn){ btn.disabled = true; btn.textContent = 'Deleting...'; }
+      delete deleteArmed[username];
       await loadUsers();
       const target = state.users[username];
       if(!target){ toast('User not found.'); renderAdminInto(el); return; }
