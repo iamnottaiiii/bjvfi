@@ -1,4 +1,11 @@
 'use strict';
+/* Login needs crypto.subtle, which only exists on https pages. If the app was
+   opened over plain http, hop to https before anything else runs. */
+try{
+  if(typeof location!=='undefined'&&location.protocol==='http:'&&/(^|\.)bjvfi\.com$/.test(location.hostname)){
+    location.replace('https://'+location.host+location.pathname+location.search+location.hash);
+  }
+}catch(e){}
 /* SiteDesk caller app. Static frontend, GitHub is the database.
    Data repo: iamnottaiiii/sitedesk-data via api.github.com.
    Lead catalog: https://bjvfi.com/sites.json (no auth).
@@ -119,32 +126,120 @@ function getSubtle(){
   try{ return require('crypto').webcrypto.subtle; }catch(e){ return null; }
 }
 
+/* Pure-JS SHA-256 / HMAC-SHA256 / PBKDF2 fallback. Used when crypto.subtle is
+   missing (page loaded over plain http, a non-secure context). Produces
+   byte-identical results to WebCrypto, so hashes stay compatible. */
+function sha256Bytes(data){
+  var h=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  var K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+    0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+    0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+    0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+    0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+    0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+    0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+    0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  var l=data.length, bitLen=l*8, i, j;
+  var paddedLen=(((l+8)>>6)+1)<<6;
+  var w=new Uint32Array(64), msg=new Uint8Array(paddedLen);
+  msg.set(data);
+  msg[l]=0x80;
+  var dv=new DataView(msg.buffer);
+  dv.setUint32(paddedLen-8,Math.floor(bitLen/0x100000000),false);
+  dv.setUint32(paddedLen-4,bitLen>>>0,false);
+  function rotr(x,n){ return (x>>>n)|(x<<(32-n)); }
+  for(i=0;i<paddedLen;i+=64){
+    for(j=0;j<16;j++) w[j]=dv.getUint32(i+j*4,false);
+    for(j=16;j<64;j++){
+      var s0=rotr(w[j-15],7)^rotr(w[j-15],18)^(w[j-15]>>>3);
+      var s1=rotr(w[j-2],17)^rotr(w[j-2],19)^(w[j-2]>>>10);
+      w[j]=(w[j-16]+s0+w[j-7]+s1)|0;
+    }
+    var a=h[0],b=h[1],c=h[2],d=h[3],e=h[4],f=h[5],g=h[6],hh=h[7];
+    for(j=0;j<64;j++){
+      var S1=rotr(e,6)^rotr(e,11)^rotr(e,25);
+      var ch=(e&f)^(~e&g);
+      var t1=(hh+S1+ch+K[j]+w[j])|0;
+      var S0=rotr(a,2)^rotr(a,13)^rotr(a,22);
+      var maj=(a&b)^(a&c)^(b&c);
+      var t2=(S0+maj)|0;
+      hh=g; g=f; f=e; e=(d+t1)|0; d=c; c=b; b=a; a=(t1+t2)|0;
+    }
+    h[0]=(h[0]+a)|0; h[1]=(h[1]+b)|0; h[2]=(h[2]+c)|0; h[3]=(h[3]+d)|0;
+    h[4]=(h[4]+e)|0; h[5]=(h[5]+f)|0; h[6]=(h[6]+g)|0; h[7]=(h[7]+hh)|0;
+  }
+  var out=new Uint8Array(32);
+  var od=new DataView(out.buffer);
+  for(i=0;i<8;i++) od.setUint32(i*4,h[i]>>>0,false);
+  return out;
+}
+
+function hmacSha256Bytes(keyBytes,msgBytes){
+  var key=keyBytes.length>64?sha256Bytes(keyBytes):keyBytes;
+  var block=new Uint8Array(64), ipad=new Uint8Array(64), opad=new Uint8Array(64), i;
+  block.set(key);
+  for(i=0;i<64;i++){ ipad[i]=block[i]^0x36; opad[i]=block[i]^0x5c; }
+  var inner=new Uint8Array(64+msgBytes.length);
+  inner.set(ipad); inner.set(msgBytes,64);
+  var innerHash=sha256Bytes(inner);
+  var outer=new Uint8Array(64+32);
+  outer.set(opad); outer.set(innerHash,64);
+  return sha256Bytes(outer);
+}
+
+function pbkdf2Sha256(passwordBytes,saltBytes,iterations,keyLen){
+  var dk=new Uint8Array(keyLen), blockIndex=1, offset=0;
+  while(offset<keyLen){
+    var sb=new Uint8Array(saltBytes.length+4);
+    sb.set(saltBytes);
+    sb[saltBytes.length]=(blockIndex>>>24)&0xff;
+    sb[saltBytes.length+1]=(blockIndex>>>16)&0xff;
+    sb[saltBytes.length+2]=(blockIndex>>>8)&0xff;
+    sb[saltBytes.length+3]=blockIndex&0xff;
+    var u=hmacSha256Bytes(passwordBytes,sb);
+    var t=u.slice();
+    for(var i=1;i<iterations;i++){
+      u=hmacSha256Bytes(passwordBytes,u);
+      for(var j=0;j<t.length;j++) t[j]^=u[j];
+    }
+    var take=Math.min(t.length,keyLen-offset);
+    dk.set(t.subarray(0,take),offset);
+    offset+=take; blockIndex++;
+  }
+  return dk;
+}
+
+async function pbkdf2Derive(passwordBytes,saltBytes,iterations){
+  var subtle=getSubtle();
+  if(subtle){
+    var key=await subtle.importKey('raw',passwordBytes,'PBKDF2',false,['deriveBits']);
+    var bits=await subtle.deriveBits({name:'PBKDF2',salt:saltBytes,iterations:iterations,hash:'SHA-256'},key,256);
+    return new Uint8Array(bits);
+  }
+  return pbkdf2Sha256(passwordBytes,saltBytes,iterations,32);
+}
+
 /* Format: pbkdf2$<iterations>$<salt-b64>$<hash-b64>, SHA-256, 256-bit key. */
 async function pbkdf2Hash(password, iterations){
-  const subtle = getSubtle();
-  const iters = iterations || 600000;
-  const salt = new Uint8Array(16);
+  var iters = iterations || 600000;
+  var salt = new Uint8Array(16);
   if(typeof crypto !== 'undefined' && crypto.getRandomValues) crypto.getRandomValues(salt);
   else require('crypto').randomFillSync(salt);
-  const key = await subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits']);
-  const bits = await subtle.deriveBits({name:'PBKDF2', salt: salt, iterations: iters, hash:'SHA-256'}, key, 256);
-  return 'pbkdf2$' + iters + '$' + b64encode(salt) + '$' + b64encode(new Uint8Array(bits));
+  var derived = await pbkdf2Derive(new TextEncoder().encode(password), salt, iters);
+  return 'pbkdf2$' + iters + '$' + b64encode(salt) + '$' + b64encode(derived);
 }
 
 async function pbkdf2Verify(password, stored){
-  const m = /^pbkdf2\$(\d+)\$([A-Za-z0-9+/=]+)\$([A-Za-z0-9+/=]+)$/.exec(String(stored||''));
+  var m = /^pbkdf2\$(\d+)\$([A-Za-z0-9+/=]+)\$([A-Za-z0-9+/=]+)$/.exec(String(stored||''));
   if(!m) return false;
-  const subtle = getSubtle();
-  const iters = parseInt(m[1],10);
+  var iters = parseInt(m[1],10);
   if(!(iters >= 1000 && iters <= 2000000)) return false;
-  const salt = b64decodeToBytes(m[2]);
-  const want = b64decodeToBytes(m[3]);
-  const key = await subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits']);
-  const bits = await subtle.deriveBits({name:'PBKDF2', salt: salt, iterations: iters, hash:'SHA-256'}, key, 256);
-  const got = new Uint8Array(bits);
+  var salt = b64decodeToBytes(m[2]);
+  var want = b64decodeToBytes(m[3]);
+  var got = await pbkdf2Derive(new TextEncoder().encode(password), salt, iters);
   if(got.length !== want.length) return false;
-  let diff = 0;
-  for(let i=0;i<got.length;i++) diff |= got[i] ^ want[i];
+  var diff = 0;
+  for(var i=0;i<got.length;i++) diff |= got[i] ^ want[i];
   return diff === 0;
 }
 
@@ -296,6 +391,10 @@ var state = {
   /* Unsaved builder inputs (built site URL / payment link) per intake, so a
      re-render (e.g. tapping a status chip) never wipes what was typed. */
   draftBuild: {},
+  /* Site editor (replaced the old intakes listing). */
+  editorQ: '', editorSlug: null, editorLiveCode: null, editorLiveErr: '',
+  editorLiveLoading: false, editorNotFound: false, editorDraft: null,
+  editorJobs: [], editorIntake: null, pendingEditorSlug: null,
 };
 
 var LS_SESSION = 'sitedesk_session_v1';
@@ -527,8 +626,15 @@ function goAlertLink(link){
   } else if(link.indexOf('intake:') === 0){
     if(!canInbox()){ toast('You do not have builder access.'); return; }
     state.tab = 'inbox';
-    state.pendingIntakeId = link.slice(7);
-    renderApp();
+    state.pendingEditorSlug = null;
+    state.editorSlug = null;
+    /* The old intakes listing is now the site editor: open the intake's
+       lead directly in the editor. */
+    ghGetJson('intakes/' + link.slice(7) + '.json').then(function(rec){
+      if(rec && rec.data && rec.data.slug) state.pendingEditorSlug = rec.data.slug;
+      renderApp();
+    }).catch(function(){ renderApp(); });
+    return;
   } else if(link === 'tab:profile'){
     state.tab = 'profile';
     renderApp();
@@ -980,6 +1086,9 @@ function logout(){
   state.feed = []; state.unread = 0; state.feedMaxTs = 0;
   state.claimsBySlug = {}; state.treeSlugs = null;
   state.dismissedLoaded = false;
+  state.editorQ = ''; state.editorSlug = null; state.editorLiveCode = null;
+  state.editorDraft = null; state.editorJobs = []; state.editorIntake = null;
+  state.pendingEditorSlug = null; state._editorPrefillSlug = null;
   renderHome();
 }
 
@@ -994,7 +1103,7 @@ function tabDefs(){
   if(!u) return [];
   const tabs = [];
   if(canClaim()){ tabs.push(['queue','Queue','\u2630'], ['mine','My leads','\u25CF']); }
-  if(canInbox()) tabs.push(['inbox', u.role === 'builder' ? 'Builds' : 'Intakes', '\u25A3']);
+  if(canInbox()) tabs.push(['inbox', 'Editor', '\u25A3']);
   if(isManager()) tabs.push(['admin','Admin','\u25C6']);
   tabs.push(['notifs','Alerts', state.unread ? String(state.unread) : '\xB7']);
   tabs.push(['profile','Profile','\u25CE']);
@@ -1032,9 +1141,8 @@ function shell(content){
       }).join('') + '</div>' +
     '</div></header>' +
     '<main class="main">' + notifBannerHtml() + content + '</main>' +
-    '<nav class="bottom-nav">' + tabs.map(function(t){
-      return '<button class="' + (state.tab === t[0] ? 'active' : '') +
-        (t[0] === 'notifs' && state.unread ? ' unread-alert' : '') + '" data-tab="' + t[0] + '" type="button">' +
+    '<nav class="bottom-nav">' + tabs.filter(function(t){ return t[0] !== 'notifs'; }).map(function(t){
+      return '<button class="' + (state.tab === t[0] ? 'active' : '') + '" data-tab="' + t[0] + '" type="button">' +
         '<span class="ico">' + esc(t[2]) + '</span><span>' + esc(t[1]) + '</span></button>';
     }).join('') + '</nav>';
 }
@@ -1401,6 +1509,9 @@ function leadCard(claim){
       if(intake.site_url){
         html += '<div class="row" style="margin:10px 0"><a class="btn sm" href="' + esc(intake.site_url) + '" target="_blank" rel="noopener">View built site</a></div>';
       }
+      if(canInbox()){
+        html += '<div class="row" style="margin:10px 0"><button class="btn ghost sm" id="btn-open-editor" type="button">Open in site editor</button></div>';
+      }
       if(intake.status === 'ready' && intake.pay_link){
         html += '<div class="field"><label>Client payment link</label>' +
           '<div class="copybox" id="pay-link-text">' + esc(intake.pay_link) + '</div>' +
@@ -1539,6 +1650,13 @@ function wireLeadCard(claim){
     if(t) copyText(t.textContent, 'Payment link');
   });
   on('btn-mark-sold', function(){ markSold(claim); });
+  on('btn-open-editor', function(){
+    closeModal();
+    state.tab = 'inbox';
+    state.pendingEditorSlug = claim.slug;
+    state.editorSlug = null;
+    renderApp();
+  });
   const fi = document.getElementById('in-files');
   if(fi) fi.addEventListener('change', function(){ previewIntakeFiles(fi); });
 }
@@ -1995,106 +2113,536 @@ async function loadIntakes(scope){
 
 var INTAKE_STATUSES = [['open','Open'],['building','Building'],['ready','Ready'],['done','Done']];
 
-async function renderIntakesInto(el){
-  el.innerHTML = '<div class="card"><div class="empty">Loading intakes...</div></div>';
-  let items = [];
-  try{
-    /* Always fetch a fresh tree: new intakes submitted while the app sits open
-       must appear without a manual reload. */
-    clearTreeCache();
-    items = await loadIntakes('all');
+/* The site editor: search a lead by business name, open its live site code,
+   paste new code, save a draft or publish. Publishing joins a persistent
+   queue in the data repo that a server worker drains one job at a time, so
+   two publishes can never overlap and wipe each other's work. */
+
+var RAW_SITE_URL = 'https://raw.githubusercontent.com/iamnottaiiii/bjvfi/main/';
+
+function liveCodeUrl(slug){
+  return RAW_SITE_URL + encodeURIComponent(slug) + '/index.html';
+}
+
+/* Pure: filter leads by business name, the same UX pattern as the queue
+   search (case-insensitive substring over name, slug, phone). */
+function editorFilterLeads(catalog, q){
+  q = String(q || '').trim().toLowerCase();
+  if(!q) return [];
+  return catalog.filter(function(l){
+    const hay = (l.name + ' ' + l.slug + ' ' + (l.phone || '')).toLowerCase();
+    return hay.indexOf(q) !== -1;
+  });
+}
+
+/* Pure: validate pasted site code before it may be queued to publish.
+   Mirrors the server worker's checks. */
+function validateSiteCode(code, businessName){
+  code = String(code == null ? '' : code);
+  if(!code.trim()) return { ok: false, reason: 'The code is empty.' };
+  if(/[\u2014\u2013]/.test(code)) return { ok: false, reason: 'The code contains an em dash or en dash. Remove it first.' };
+  if(code.indexOf('sticky-footer-fix-v1') === -1) return { ok: false, reason: 'The code is missing the sticky-footer-fix-v1 marker.' };
+  if(!/<\/html>\s*$/.test(code)) return { ok: false, reason: 'The code must end with </html>.' };
+  const name = String(businessName || '').trim();
+  if(name){
+    const m = /<footer[^>]*>([\s\S]*?)<\/footer>/i.exec(code);
+    if(!m) return { ok: false, reason: 'No <footer> found in the code.' };
+    const text = m[1].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+    if(text !== '\u00A9 ' + name) return { ok: false, reason: 'The footer must be exactly "\u00A9 ' + name + '".' };
   }
-  catch(e){
+  return { ok: true, reason: '' };
+}
+
+async function renderEditorInto(el){
+  el.innerHTML = '<div class="card"><div class="empty">Loading editor...</div></div>';
+  try{
+    await fetchCatalog();
+    /* Fresh tree so drafts and queue jobs appear without a reload. */
+    clearTreeCache();
+    await ghTree();
+  }catch(e){
     el.innerHTML = '<div class="card"><div class="empty">' + esc(e.message) +
-      '<br/><button class="btn" id="btn-retry-intakes" type="button">Retry</button></div></div>';
-    const r = document.getElementById('btn-retry-intakes');
-    if(r) r.addEventListener('click', function(){ renderIntakesInto(el); });
+      '<br/><button class="btn" id="btn-retry-editor" type="button">Retry</button></div></div>';
+    const r = document.getElementById('btn-retry-editor');
+    if(r) r.addEventListener('click', function(){ renderEditorInto(el); });
     return;
   }
-  if(state.intakeStatusFilter !== 'all') items = items.filter(function(i){ return i.status === state.intakeStatusFilter; });
-  let html = '<div class="card"><h2>' + (state.user.role === 'builder' ? 'Builds' : 'Intakes') +
-    (items.length ? ' \xB7 ' + items.length : '') + '</h2>' +
-    '<div class="chiprow" style="margin-bottom:12px">' +
-    [['all','All'],['open','Open'],['building','Building'],['ready','Ready'],['done','Done']].map(function(p){
-      return '<button type="button" class="chip' + (state.intakeStatusFilter === p[0] ? ' on' : '') + '" data-istatus="' + p[0] + '">' + p[1] + '</button>';
-    }).join('') + '</div>';
-  if(!items.length){
-    html += '<div class="empty">No intakes yet.</div>';
-  } else {
-    html += items.map(function(i){
-      return '<div class="card" id="intake-card-' + esc(i.id) + '" style="margin-bottom:10px;padding:14px">' +
-        '<div class="row" style="justify-content:space-between;margin-bottom:8px"><div>' +
-        '<div style="font-weight:600">' + esc(i.business || i.slug) + '</div>' +
-        '<div class="muted" style="font-size:12px">' + esc(i.contact_name || '') +
-        (i.phone ? ' \xB7 ' + esc(i.phone) : '') + '</div>' +
-        '<div class="muted" style="font-size:11px">from ' + esc(i.claimer_name || i.claimer || '') +
-        ' \xB7 ' + esc(fmtTime(i.created_at)) + '</div></div>' + badge(i.status) + '</div>' +
-        '<div class="copybox" style="margin-bottom:10px">' + esc(i.wants || '') +
-        (i.brand_colors ? '\n\nBrand colors: ' + esc(i.brand_colors) : '') +
-        (i.notes ? '\n\nNotes: ' + esc(i.notes) : '') + '</div>' +
-        (i.files && i.files.length ?
-          '<div class="field" style="margin-bottom:10px"><label>Attached files (' + i.files.length + ')</label><div class="row">' +
-          i.files.map(function(f){
-            return '<button type="button" class="btn ghost sm" data-intake-file="' + esc(f.path) + '" data-intake-filename="' + esc(f.name) + '">\uD83D\uDCCE ' + esc(f.name) + '</button>';
-          }).join('') + '</div></div>' : '') +
-        '<div class="field" style="margin-bottom:0"><label>Build status</label><div class="chiprow">' +
-        INTAKE_STATUSES.map(function(p){
-          return '<button type="button" class="chip' + (i.status === p[0] ? ' on' : '') +
-            '" data-intake="' + esc(i.id) + '" data-inewstatus="' + p[0] + '">' + p[1] + '</button>';
-        }).join('') + '</div></div>' +
-        (i.site_url ? '<div style="margin-top:8px;font-size:13px"><strong>Built site:</strong> <a href="' + esc(i.site_url) + '" target="_blank" rel="noopener">Open</a></div>' : '') +
-        (i.pay_link ? '<div style="margin-top:4px;font-size:13px"><strong>Payment link:</strong> <a href="' + esc(i.pay_link) + '" target="_blank" rel="noopener">Open</a></div>' : '') +
-        (canInbox() ?
-          '<div class="field" style="margin-top:10px"><label>Built site URL</label>' +
-          '<input id="bs-site-' + esc(i.id) + '" placeholder="https://..." value="' + esc(buildDraft(i.id, 'site') || i.site_url || '') + '"/>' +
-          '<label style="margin-top:8px">Client payment link</label>' +
-          '<input id="bs-pay-' + esc(i.id) + '" placeholder="https://..." value="' + esc(buildDraft(i.id, 'pay') || i.pay_link || '') + '"/>' +
-          '<div class="row" style="margin-top:8px"><button type="button" class="btn sm" data-submit-build="' + esc(i.id) + '">Submit built site</button></div>' +
-          '<div class="err" id="bs-err-' + esc(i.id) + '"></div></div>' +
-          (i.builder_name ? '<div class="muted" style="font-size:11px">Builder: ' + esc(i.builder_name) + '</div>' : '')
-          : '') +
-        '</div>';
-    }).join('');
+  paintEditor(el);
+  /* Deep link from an alert: open the slug straight away. */
+  if(state.pendingEditorSlug){
+    const slug = state.pendingEditorSlug;
+    state.pendingEditorSlug = null;
+    openEditorSlug(slug, el);
+  } else if(state.editorSlug){
+    openEditorSlug(state.editorSlug, el);
   }
-  html += '</div>';
+}
+
+function paintEditor(el){
+  let html = '<div class="card"><h2>Site editor</h2>' +
+    '<p class="muted" style="font-size:12px;margin-bottom:12px;line-height:1.55">Search a business by name, open its live site code, paste your new code, save a draft or publish. Publishing joins a queue and goes live one at a time.</p>' +
+    '<div class="filters"><input id="editor-q" value="' + esc(state.editorQ) + '" placeholder="Search business name"/>' +
+    '</div><div id="editor-results"></div></div>';
+  html += '<div class="card" style="margin-top:14px"><h2>My drafts</h2><div id="editor-drafts"><div class="empty">Loading...</div></div></div>';
+  html += '<div class="card" style="margin-top:14px"><h2>Publish queue</h2><div id="editor-jobs"><div class="empty">Loading...</div></div></div>';
+  html += '<div id="editor-panel"></div>';
   el.innerHTML = html;
-  el.querySelectorAll('[data-istatus]').forEach(function(chip){
-    chip.addEventListener('click', function(){
-      state.intakeStatusFilter = chip.getAttribute('data-istatus');
-      renderIntakesInto(el);
-    });
+  wireEditorSearch(el);
+  loadEditorDrafts(el);
+  loadEditorJobs(el);
+}
+
+function wireEditorSearch(el){
+  const q = el.querySelector('#editor-q');
+  if(!q) return;
+  let deb = null;
+  q.addEventListener('input', function(){
+    if(deb) clearTimeout(deb);
+    deb = setTimeout(function(){
+      state.editorQ = q.value;
+      paintEditorResults(el);
+      const nq = el.querySelector('#editor-q');
+      if(nq){
+        nq.focus();
+        try{ nq.setSelectionRange(nq.value.length, nq.value.length); }catch(e){}
+      }
+    }, 350);
   });
-  el.querySelectorAll('[data-intake]').forEach(function(chip){
+  q.addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){ state.editorQ = q.value; paintEditorResults(el); }
+  });
+  paintEditorResults(el);
+}
+
+function paintEditorResults(el){
+  const box = el.querySelector('#editor-results');
+  if(!box) return;
+  const q = state.editorQ.trim();
+  if(!q){
+    box.innerHTML = '<p class="muted" style="font-size:12px;margin-top:8px">Type a business name to find its site. Tapping a result opens the editor for that site, not the site page.</p>';
+    return;
+  }
+  const hits = editorFilterLeads(state.catalog, q).slice(0, 30);
+  if(!hits.length){
+    box.innerHTML = '<div class="empty" style="margin-top:8px">No leads match "' + esc(q) + '".</div>';
+    return;
+  }
+  box.innerHTML = '<div class="open-board" style="margin-top:8px">' + hits.map(function(l){
+    return '<div class="lead-row"><div><div class="lead-row-name">' + esc(l.name) + '</div>' +
+      '<div class="muted" style="font-size:11px">' + esc(l.slug) + '</div></div>' +
+      '<div class="row"><button class="btn sm" data-edit-slug="' + esc(l.slug) + '" type="button">Edit</button></div></div>';
+  }).join('') + '</div>';
+  box.querySelectorAll('[data-edit-slug]').forEach(function(b){
+    b.addEventListener('click', function(){ openEditorSlug(b.getAttribute('data-edit-slug'), el); });
+  });
+}
+
+async function openEditorSlug(slug, el){
+  state.editorSlug = slug;
+  state.editorLiveCode = null;
+  state.editorLiveErr = '';
+  state.editorNotFound = false;
+  state.editorLiveLoading = true;
+  state.editorDraft = null;
+  state.editorJobs = [];
+  state.editorIntake = null;
+  state._editorPrefillSlug = null;
+  paintEditorPanel(el);
+  /* Live code, straight from the repo that serves the sites. */
+  try{
+    const r = await fetch(liveCodeUrl(slug), { cache: 'no-store' });
+    if(r.status === 404){
+      state.editorNotFound = true;
+    } else if(!r.ok){
+      throw new Error('Could not load the live site (HTTP ' + r.status + ').');
+    } else {
+      state.editorLiveCode = await r.text();
+    }
+  }catch(e){
+    state.editorLiveCode = null;
+    state.editorLiveErr = e.message;
+  }
+  state.editorLiveLoading = false;
+  /* Draft, intake record, and publish jobs for this slug, best effort. */
+  try{
+    const rec = await ghGetJson('site-drafts/' + slug + '.json');
+    if(rec){ state.editorDraft = rec.data; state.editorDraft._sha = rec.sha; }
+  }catch(e){}
+  try{ state.editorJobs = await loadJobsForSlug(slug); }catch(e){}
+  try{
+    const rec = await ghGetJson('intakes/intake-' + slug + '.json');
+    if(rec){ state.editorIntake = rec.data; state.editorIntake._sha = rec.sha; }
+  }catch(e){}
+  paintEditorPanel(el);
+  const panel = el.querySelector('#editor-panel');
+  if(panel && panel.scrollIntoView) panel.scrollIntoView({ block: 'start' });
+}
+
+function editorLead(){
+  const slug = state.editorSlug;
+  return state.catalog.find(function(l){ return l.slug === slug; }) || normalizeLead({ s: slug, n: slug });
+}
+
+function paintEditorPanel(el){
+  const host = el.querySelector('#editor-panel');
+  if(!host) return;
+  const slug = state.editorSlug;
+  if(!slug){ host.innerHTML = ''; return; }
+  const lead = editorLead();
+
+  let html = '<div class="card" style="margin-top:14px"><div class="row" style="justify-content:space-between;margin-bottom:10px">' +
+    '<div><h2 style="margin:0">' + esc(lead.name) + '</h2>' +
+    '<div class="muted" style="font-size:11px">' + esc(slug) + '</div></div>' +
+    '<a class="btn ghost sm" href="' + esc(siteUrlFor(lead)) + '" target="_blank" rel="noopener">Open live site</a></div>';
+
+  html += editorIntakeHtml(lead);
+
+  html += '<h3 style="margin:14px 0 8px">Current live code</h3>';
+  if(state.editorLiveLoading){
+    html += '<div class="empty">Loading live code...</div>';
+  } else if(state.editorNotFound){
+    html += '<p class="muted" style="font-size:12px;line-height:1.55">No live site exists for this slug yet. Paste the full site code below and publish to create it.</p>';
+  } else if(state.editorLiveCode != null){
+    html += '<pre class="codebox" id="editor-live-code">' + esc(state.editorLiveCode) + '</pre>' +
+      '<div class="row" style="margin:8px 0 4px"><button class="btn ghost sm" id="btn-code-select" type="button">Select all</button>' +
+      '<button class="btn ghost sm" id="btn-code-copy" type="button">Copy</button>' +
+      '<button class="btn ghost sm" id="btn-code-refresh" type="button">Refresh</button></div>';
+  } else {
+    html += '<p class="err">' + esc(state.editorLiveErr || 'Could not load the live code.') + '</p>' +
+      '<div class="row"><button class="btn ghost sm" id="btn-code-refresh" type="button">Retry</button></div>';
+  }
+
+  if(!state.editorLiveLoading){
+    /* Prefill the code box once per slug-open (draft first, then live code).
+       Later repaints keep whatever is already typed. */
+    let prefill;
+    if(state._editorPrefillSlug === slug){
+      const existing = document.getElementById('editor-new-code');
+      prefill = existing ? existing.value : '';
+    } else {
+      prefill = (state.editorDraft && state.editorDraft.code != null ? state.editorDraft.code :
+        (state.editorLiveCode != null ? state.editorLiveCode : ''));
+      state._editorPrefillSlug = slug;
+    }
+    html += '<h3 style="margin:14px 0 8px">New site code</h3>' +
+      '<p class="muted" style="font-size:12px;margin-bottom:8px;line-height:1.55">Paste the full site HTML here. It is checked automatically, then queued to publish one at a time.</p>' +
+      '<textarea id="editor-new-code" class="editor-area" spellcheck="false">' + esc(prefill) + '</textarea>' +
+      '<div class="row" style="margin-top:10px"><button class="btn ghost" id="btn-save-draft" type="button" style="flex:1">Save draft</button>' +
+      '<button class="btn" id="btn-publish" type="button" style="flex:2">Publish</button></div>' +
+      '<div class="err" id="editor-err"></div>';
+  }
+
+  html += '<h3 style="margin:16px 0 8px">Publish history</h3><div id="editor-job-history">' +
+    editorJobRowsHtml(state.editorJobs, true) + '</div>';
+
+  html += '</div>';
+  host.innerHTML = html;
+  wireEditorPanel(el);
+}
+
+/* The build record for this lead: status badge, builder name and phone,
+   built site URL, payment link, plus the builder status controls. This is
+   the intake info that used to live on the old listing page. */
+function editorIntakeHtml(lead){
+  const i = state.editorIntake;
+  if(!i) return '<p class="muted" style="font-size:12px;margin-bottom:10px;line-height:1.55">No build record for this lead yet. One appears here once a caller submits build details.</p>';
+  let html = '<div class="card" style="margin:10px 0;padding:14px"><h3 style="margin:0 0 8px">Build record</h3>' +
+    '<div class="row" style="margin-bottom:8px">' + badge(i.status) + '</div>';
+  if(i.builder_name){
+    html += '<div style="font-size:13px;margin-bottom:6px"><strong>Builder:</strong> ' + esc(i.builder_name) + '</div>';
+    if(i.builder_phone){
+      const bt = 'Hi ' + i.builder_name + ', checking on the ' + (i.business || lead.name) + ' site build.';
+      html += '<div class="phone-line"><span class="num">' + esc(i.builder_phone) + '</span>' +
+        '<a class="btn call sm" href="' + esc(telHref(i.builder_phone)) + '">Call</a>' +
+        '<a class="btn sms sm" href="' + esc(smsHref(i.builder_phone, bt)) + '">Text</a></div>';
+    }
+  }
+  if(i.site_url) html += '<div style="margin-top:8px;font-size:13px"><strong>Built site:</strong> <a href="' + esc(i.site_url) + '" target="_blank" rel="noopener">Open</a></div>';
+  if(i.pay_link) html += '<div style="margin-top:4px;font-size:13px"><strong>Payment link:</strong> <a href="' + esc(i.pay_link) + '" target="_blank" rel="noopener">Open</a></div>';
+  html += '<div class="field" style="margin-top:10px"><label>Build status</label><div class="chiprow">' +
+    INTAKE_STATUSES.map(function(p){
+      return '<button type="button" class="chip' + (i.status === p[0] ? ' on' : '') +
+        '" data-intake="' + esc(i.id) + '" data-inewstatus="' + p[0] + '">' + p[1] + '</button>';
+    }).join('') + '</div></div>' +
+    '<div class="field" style="margin-top:10px"><label>Built site URL</label>' +
+    '<input id="bs-site-' + esc(i.id) + '" placeholder="https://..." value="' + esc(buildDraft(i.id, 'site') || i.site_url || '') + '"/>' +
+    '<label style="margin-top:8px">Client payment link</label>' +
+    '<input id="bs-pay-' + esc(i.id) + '" placeholder="https://..." value="' + esc(buildDraft(i.id, 'pay') || i.pay_link || '') + '"/>' +
+    '<div class="row" style="margin-top:8px"><button type="button" class="btn sm" data-submit-build="' + esc(i.id) + '">Submit built site</button></div>' +
+    '<div class="err" id="bs-err-' + esc(i.id) + '"></div></div>';
+  html += '</div>';
+  return html;
+}
+
+function wireEditorPanel(el){
+  const panel = el.querySelector('#editor-panel');
+  if(!panel) return;
+  const sel = document.getElementById('btn-code-select');
+  if(sel) sel.addEventListener('click', function(){
+    const pre = document.getElementById('editor-live-code');
+    if(!pre || !window.getSelection) return;
+    const range = document.createRange();
+    range.selectNodeContents(pre);
+    const s = window.getSelection();
+    s.removeAllRanges();
+    s.addRange(range);
+  });
+  const cp = document.getElementById('btn-code-copy');
+  if(cp) cp.addEventListener('click', function(){
+    if(state.editorLiveCode != null) copyText(state.editorLiveCode, 'Live code');
+  });
+  const rf = document.getElementById('btn-code-refresh');
+  if(rf) rf.addEventListener('click', function(){ openEditorSlug(state.editorSlug, el); });
+  const sd = document.getElementById('btn-save-draft');
+  if(sd) sd.addEventListener('click', function(){ saveEditorDraft(el); });
+  const pb = document.getElementById('btn-publish');
+  if(pb) pb.addEventListener('click', function(){ publishEditorCode(el); });
+  panel.querySelectorAll('[data-intake]').forEach(function(chip){
     chip.addEventListener('click', function(){ setIntakeStatus(chip, el); });
   });
-  el.querySelectorAll('[data-submit-build]').forEach(function(b){
+  panel.querySelectorAll('[data-submit-build]').forEach(function(b){
     b.addEventListener('click', function(){ submitBuiltSite(b.getAttribute('data-submit-build'), el); });
   });
-  /* Keep unsaved builder inputs across re-renders. */
-  el.querySelectorAll('[id^="bs-site-"]').forEach(function(inp){
+  panel.querySelectorAll('[id^="bs-site-"]').forEach(function(inp){
     inp.addEventListener('input', function(){ buildDraft(inp.id.slice(8), 'site', inp.value); });
   });
-  el.querySelectorAll('[id^="bs-pay-"]').forEach(function(inp){
+  panel.querySelectorAll('[id^="bs-pay-"]').forEach(function(inp){
     inp.addEventListener('input', function(){ buildDraft(inp.id.slice(7), 'pay', inp.value); });
   });
-  el.querySelectorAll('[data-intake-file]').forEach(function(b){
-    b.addEventListener('click', function(){
-      viewIntakeFile(b.getAttribute('data-intake-file'), b.getAttribute('data-intake-filename'));
-    });
+  panel.querySelectorAll('[data-revert-job]').forEach(function(b){
+    b.addEventListener('click', function(){ revertJob(b.getAttribute('data-revert-job'), el); });
   });
-  /* Deep link from a tapped alert: scroll to the intake and flash it. */
-  if(state.pendingIntakeId){
-    const pid = state.pendingIntakeId;
-    state.pendingIntakeId = null;
-    setTimeout(function(){
-      const card = document.getElementById('intake-card-' + pid);
-      if(card){
-        card.scrollIntoView({ block: 'start' });
-        card.style.outline = '2px solid var(--amber)';
-        setTimeout(function(){ card.style.outline = ''; }, 2600);
-      }
-    }, 120);
+}
+
+/* After an intake change from the editor, refresh just the intake block so
+   anything typed in the code box is kept. */
+function refreshIntakeView(el){
+  if(state.editorSlug){
+    ghGetJson('intakes/intake-' + state.editorSlug + '.json').then(function(rec){
+      if(rec){ state.editorIntake = rec.data; state.editorIntake._sha = rec.sha; }
+      paintEditorPanel(el);
+    }).catch(function(){ paintEditorPanel(el); });
+  } else { renderApp(); }
+}
+
+/* Fresh tree so drafts and queue jobs reflect the latest writes. */
+async function refreshEditorTree(){
+  clearTreeCache();
+  try{ await ghTree(); }catch(e){}
+}
+
+/* Drafts live in the data repo, so a builder resumes from any device.
+   They never touch the repo that serves the sites. */
+async function saveEditorDraft(el){
+  const slug = state.editorSlug;
+  if(!slug) return;
+  const ta = document.getElementById('editor-new-code');
+  const code = ta ? ta.value : '';
+  const btn = document.getElementById('btn-save-draft');
+  const err = document.getElementById('editor-err');
+  if(err) err.textContent = '';
+  if(btn){ btn.disabled = true; btn.textContent = 'Saving...'; }
+  try{
+    const lead = editorLead();
+    let sha = (state.editorDraft && state.editorDraft._sha) || null;
+    if(!sha){
+      const rec = await ghGetJson('site-drafts/' + slug + '.json').catch(function(){ return null; });
+      if(rec) sha = rec.sha;
+    }
+    const draft = { slug: slug, business_name: lead.name || slug, code: code,
+      author: state.user.username, author_name: state.user.name, updated_at: nowISO() };
+    try{
+      await ghPutJson('site-drafts/' + slug + '.json', draft, sha, 'sitedesk: draft ' + slug);
+    }catch(e){
+      if(isConflictError(e)){
+        const rec2 = await ghGetJson('site-drafts/' + slug + '.json');
+        await ghPutJson('site-drafts/' + slug + '.json', draft, rec2 ? rec2.sha : null,
+          'sitedesk: draft ' + slug + ' (retry)');
+      } else { throw e; }
+    }
+    const rec3 = await ghGetJson('site-drafts/' + slug + '.json').catch(function(){ return null; });
+    state.editorDraft = draft;
+    if(rec3) state.editorDraft._sha = rec3.sha;
+    toast('Draft saved');
+    loadEditorDrafts(el);
+  }catch(e){
+    if(err) err.textContent = e.message;
+    else toast(e.message);
   }
+  if(btn){ btn.disabled = false; btn.textContent = 'Save draft'; }
+}
+
+async function publishEditorCode(el){
+  const slug = state.editorSlug;
+  if(!slug) return;
+  const ta = document.getElementById('editor-new-code');
+  const code = ta ? ta.value : '';
+  const err = document.getElementById('editor-err');
+  if(err) err.textContent = '';
+  const lead = editorLead();
+  const v = validateSiteCode(code, lead.name);
+  if(!v.ok){
+    if(err) err.textContent = v.reason;
+    else toast(v.reason);
+    return;
+  }
+  const btn = document.getElementById('btn-publish');
+  if(btn){ btn.disabled = true; btn.textContent = 'Queueing...'; }
+  try{
+    const jobid = uid('job');
+    const job = { jobid: jobid, slug: slug, business_name: lead.name || slug, code: code,
+      author: state.user.username, author_name: state.user.name,
+      created_at: nowISO(), status: 'queued',
+      previous_code: null, commit_sha: null, reason: '', revert_of: null };
+    await ghPutJson('site-publish-queue/pending/' + jobid + '.json', job, null,
+      'sitedesk: queue publish ' + slug);
+    toast('Queued for publish');
+    try{ state.editorJobs = await loadJobsForSlug(slug); }catch(e){}
+    paintEditorPanel(el);
+    loadEditorJobs(el);
+  }catch(e){
+    if(err) err.textContent = e.message;
+    else toast(e.message);
+  }
+  if(btn){ btn.disabled = false; btn.textContent = 'Publish'; }
+}
+
+async function readJobFile(path){
+  try{
+    const rec = await ghGetJson(path);
+    return rec ? rec.data : null;
+  }catch(e){ return null; }
+}
+
+function jobPaths(kind){
+  return treePaths('site-publish-queue/' + kind + '/').filter(function(p){ return p.slice(-5) === '.json'; });
+}
+
+async function loadJobsForSlug(slug){
+  await refreshEditorTree();
+  const out = [];
+  const pending = jobPaths('pending');
+  for(const p of pending){
+    const j = await readJobFile(p);
+    if(j && j.slug === slug) out.push(j);
+  }
+  const live = jobPaths('live').slice(-40);
+  for(const p of live){
+    const j = await readJobFile(p);
+    if(j && j.slug === slug) out.push(j);
+  }
+  const failed = jobPaths('failed').slice(-40);
+  for(const p of failed){
+    const j = await readJobFile(p);
+    if(j && j.slug === slug) out.push(j);
+  }
+  out.sort(function(a, b){ return String(b.created_at || '').localeCompare(String(a.created_at || '')); });
+  return out;
+}
+
+function editorJobRowsHtml(jobs, showRevert){
+  if(!jobs || !jobs.length) return '<div class="empty">No publish jobs yet.</div>';
+  return jobs.map(function(j){
+    let extra = '';
+    if(j.status === 'failed' && j.reason) extra = '<div class="err" style="margin-top:4px">' + esc(j.reason) + '</div>';
+    if(j.status === 'live' && j.commit_sha) extra = '<div class="muted" style="font-size:11px;margin-top:4px">commit ' + esc(String(j.commit_sha).slice(0, 12)) + '</div>';
+    const rev = (showRevert && j.status === 'live' && isManager() && j.previous_code)
+      ? '<button class="btn ghost sm" data-revert-job="' + esc(j.jobid) + '" type="button">Revert</button>' : '';
+    return '<div class="job-row"><div style="min-width:0"><div style="font-weight:600;font-size:13px">' + esc(j.business_name || j.slug) + '</div>' +
+      '<div class="muted" style="font-size:11px">' + esc(j.slug) + ' \xB7 by ' + esc(j.author_name || j.author || '') +
+      ' \xB7 ' + esc(fmtTime(j.created_at)) + '</div>' + extra + '</div>' +
+      '<div class="row" style="flex:none">' + badge(j.status) + rev + '</div></div>';
+  }).join('');
+}
+
+async function loadEditorDrafts(el){
+  const box = el.querySelector('#editor-drafts');
+  if(!box) return;
+  await refreshEditorTree();
+  try{
+    const paths = treePaths('site-drafts/').filter(function(p){ return p.slice(-5) === '.json'; });
+    const list = [];
+    for(const p of paths.slice(-30)){
+      const d = await readJobFile(p);
+      if(!d) continue;
+      /* Builders see their own drafts; admins see everyone's. */
+      if(!isManager() && d.author !== state.user.username) continue;
+      list.push(d);
+    }
+    list.sort(function(a, b){ return String(b.updated_at || '').localeCompare(String(a.updated_at || '')); });
+    if(!list.length){ box.innerHTML = '<div class="empty">No drafts yet.</div>'; return; }
+    box.innerHTML = list.map(function(d){
+      return '<div class="job-row"><div><div style="font-weight:600;font-size:13px">' + esc(d.business_name || d.slug) + '</div>' +
+        '<div class="muted" style="font-size:11px">by ' + esc(d.author_name || d.author || '') + ' \xB7 ' + esc(fmtTime(d.updated_at)) + '</div></div>' +
+        '<div class="row" style="flex:none">' + badge('draft') +
+        '<button class="btn ghost sm" data-open-draft="' + esc(d.slug) + '" type="button">Open</button></div></div>';
+    }).join('');
+    box.querySelectorAll('[data-open-draft]').forEach(function(b){
+      b.addEventListener('click', function(){ openEditorSlug(b.getAttribute('data-open-draft'), el); });
+    });
+  }catch(e){ box.innerHTML = '<div class="empty">' + esc(e.message) + '</div>'; }
+}
+
+async function loadEditorJobs(el){
+  const box = el.querySelector('#editor-jobs');
+  if(!box) return;
+  await refreshEditorTree();
+  try{
+    const jobs = [];
+    const pend = jobPaths('pending');
+    for(const p of pend){
+      const j = await readJobFile(p);
+      if(j) jobs.push(j);
+    }
+    const live = jobPaths('live').slice(-15);
+    for(const p of live){
+      const j = await readJobFile(p);
+      if(j) jobs.push(j);
+    }
+    const failed = jobPaths('failed').slice(-15);
+    for(const p of failed){
+      const j = await readJobFile(p);
+      if(j) jobs.push(j);
+    }
+    jobs.sort(function(a, b){ return String(b.created_at || '').localeCompare(String(a.created_at || '')); });
+    const queued = jobs.filter(function(j){ return j.status === 'queued' || j.status === 'publishing'; });
+    const rest = jobs.filter(function(j){ return j.status !== 'queued' && j.status !== 'publishing'; }).slice(0, 10);
+    let html = '';
+    if(queued.length) html += '<h3 style="margin:0 0 8px">Waiting (' + queued.length + ')</h3>' + editorJobRowsHtml(queued, true);
+    html += '<h3 style="margin:' + (queued.length ? '14px' : '0') + ' 0 8px">Recent</h3>' + editorJobRowsHtml(rest, true);
+    box.innerHTML = html;
+    box.querySelectorAll('[data-revert-job]').forEach(function(b){
+      b.addEventListener('click', function(){ revertJob(b.getAttribute('data-revert-job'), el); });
+    });
+  }catch(e){ box.innerHTML = '<div class="empty">' + esc(e.message) + '</div>'; }
+}
+
+/* Admin/head only: queue a new job that restores the code from before a
+   live publish. The revert goes through the same validation and queue. */
+async function revertJob(jobid, el){
+  if(!isManager()){ toast('Only admin or head can revert a publish.'); return; }
+  let job = null;
+  try{
+    const rec = await ghGetJson('site-publish-queue/live/' + jobid + '.json');
+    job = rec ? rec.data : null;
+  }catch(e){ toast(e.message); return; }
+  if(!job || job.previous_code == null){ toast('No previous version saved for this publish.'); return; }
+  const v = validateSiteCode(job.previous_code, job.business_name);
+  if(!v.ok){ toast('The previous version fails the checks: ' + v.reason); return; }
+  try{
+    const nid = uid('job');
+    const rej = { jobid: nid, slug: job.slug, business_name: job.business_name, code: job.previous_code,
+      author: state.user.username, author_name: state.user.name, created_at: nowISO(),
+      status: 'queued', previous_code: null, commit_sha: null, reason: '', revert_of: jobid };
+    await ghPutJson('site-publish-queue/pending/' + nid + '.json', rej, null,
+      'sitedesk: revert publish ' + job.slug);
+    toast('Revert queued');
+    loadEditorJobs(el);
+    if(state.editorSlug === job.slug){
+      try{ state.editorJobs = await loadJobsForSlug(job.slug); }catch(e){}
+      paintEditorPanel(el);
+    }
+  }catch(e){ toast(e.message); }
 }
 
 async function setIntakeStatus(chip, el){
@@ -2119,7 +2667,7 @@ async function setIntakeStatus(chip, el){
         'Build status: ' + ns + '.', 'lead:' + intake.slug);
     }
     toast('Status: ' + ns);
-    renderIntakesInto(el);
+    refreshIntakeView(el);
   }catch(e){ toast(e.message); chip.disabled = false; }
 }
 
@@ -2158,7 +2706,7 @@ async function submitBuiltSite(id, el){
       /* Already submitted (double tap): nothing to show, just refresh. */
       toast('Submitted. The caller was notified.');
       delete state.draftBuild[id];
-      renderIntakesInto(el);
+      refreshIntakeView(el);
       return;
     }
     intake.site_url = siteUrl;
@@ -2178,7 +2726,7 @@ async function submitBuiltSite(id, el){
         if(rec2 && applied(rec2.data)){
           toast('Submitted. The caller was notified.');
           delete state.draftBuild[id];
-          renderIntakesInto(el);
+          refreshIntakeView(el);
           return;
         }
       }
@@ -2190,7 +2738,7 @@ async function submitBuiltSite(id, el){
     }
     toast('Submitted. The caller was notified.');
     delete state.draftBuild[id];
-    renderIntakesInto(el);
+    refreshIntakeView(el);
   }catch(e){ if(err) err.textContent = e.message; else toast(e.message); restore(); }
 }
 
@@ -3011,8 +3559,8 @@ function helpHtml(){
     '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">Log what happened. <strong>No answer</strong> or <strong>sent message</strong> resets your 45-minute timer so you can follow up. <strong>Interested</strong> opens the build-details form: write down what they want and <strong>attach photos and files</strong> (logo, menus, site pictures), the builder sees all of it. After you submit, the lead shows as <strong>In build</strong>: you can see the builder and call or text them from the lead. When the builder submits the finished site and the client payment link, you get notified, send the link to the client, and hit <strong>Mark sold</strong> once they pay. <strong>Release</strong> gives a lead back to the queue.</p>';
   }
   if(builder){
-    h += '<h3 style="margin:14px 0 8px">Builds</h3>' +
-    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">New intakes from callers land in <strong>' + (u.role === 'builder' ? 'Builds' : 'Intakes') + '</strong> with the customer details, what they want, and attached photos and files. Tap a file to view it. Set the build status (Open, Building) so the caller stays in the loop. When the site is finished, enter the <strong>built site URL</strong> and the <strong>client payment link</strong>, then hit <strong>Submit built site</strong>: the caller gets notified and can mark it sold.</p>';
+    h += '<h3 style="margin:14px 0 8px">Site editor</h3>' +
+    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">The <strong>Editor</strong> tab is where sites get built and updated. Search a business by name, open its live site code, paste your new code over it, then <strong>Save draft</strong> to finish later or <strong>Publish</strong> to queue it. Publishing goes one at a time through a queue, so two publishes can never overlap and wipe each other out. Every publish keeps the previous version, and admins can revert a bad publish in one tap.</p>';
   }
   if(admin){
     h += '<h3 style="margin:14px 0 8px">Admin</h3>' +
@@ -3039,9 +3587,11 @@ function renderApp(){
     bindApp(app);
     renderMineInto(app.querySelector('#view'));
   } else if(state.tab === 'inbox'){
+    /* Callers must never reach the editor, even via a deep link. */
+    if(!canInbox()){ state.tab = 'queue'; renderApp(); return; }
     app.innerHTML = shell('<div id="view"></div>');
     bindApp(app);
-    renderIntakesInto(app.querySelector('#view'));
+    renderEditorInto(app.querySelector('#view'));
   } else if(state.tab === 'admin'){
     app.innerHTML = shell('<div id="view"></div>');
     bindApp(app);
@@ -3275,4 +3825,21 @@ function init(){
 if(typeof document !== 'undefined'){
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
+}
+
+/* Test hooks: expose the editor helpers to node. No-op in the browser. */
+if(typeof module !== 'undefined' && module.exports){
+  module.exports.validateSiteCode = validateSiteCode;
+  module.exports.editorFilterLeads = editorFilterLeads;
+  module.exports.canInbox = canInbox;
+  module.exports.isManager = isManager;
+  module.exports.tabDefs = tabDefs;
+  module.exports.setStateUser = function(u){ state.user = u; };
+  module.exports.getState = function(){ return state; };
+  module.exports.saveEditorDraft = saveEditorDraft;
+  module.exports.publishEditorCode = publishEditorCode;
+  module.exports.openEditorSlug = openEditorSlug;
+  module.exports.paintEditorPanel = paintEditorPanel;
+  module.exports.editorIntakeHtml = editorIntakeHtml;
+  module.exports.shell = shell;
 }
