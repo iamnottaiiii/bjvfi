@@ -3391,9 +3391,52 @@ function wireAdminTools(el){
 
 /* ================= alerts / profile ================= */
 
+function notifyComposerHtml(){
+  const users = state.users || {};
+  const names = Object.keys(users).sort();
+  let opts = '<option value="all">Everyone</option><option value="staff">Staff only</option>';
+  names.forEach(function(u){
+    const nm = (users[u] && users[u].name) || u;
+    opts += '<option value="' + esc(u) + '">@' + esc(u) + ' (' + esc(nm) + ')</option>';
+  });
+  return '<div class="card"><h2>Send notification</h2>' +
+    '<p class="muted" style="font-size:12px;margin-bottom:12px;line-height:1.55">Custom push notification plus bell alert. Pick who gets it.</p>' +
+    '<div class="field"><label>To</label><select id="nc-aud">' + opts + '</select></div>' +
+    '<div class="field"><label>Title *</label><input id="nc-title" placeholder="e.g. Payouts go out Friday"/></div>' +
+    '<div class="field"><label>Message *</label><textarea id="nc-body" placeholder="What should they know?"></textarea></div>' +
+    '<button class="btn block" id="nc-go" type="button">Send notification</button>' +
+    '<div class="err" id="nc-err"></div></div>';
+}
+
+function wireNotifyComposer(el){
+  const go = el.querySelector('#nc-go');
+  if(!go) return;
+  go.addEventListener('click', async function(){
+    const err = el.querySelector('#nc-err');
+    err.textContent = '';
+    const aud = el.querySelector('#nc-aud').value;
+    const title = (el.querySelector('#nc-title').value || '').trim();
+    const body = (el.querySelector('#nc-body').value || '').trim();
+    if(!title || !body){ err.textContent = 'Title and message are required.'; return; }
+    go.disabled = true;
+    const ok = await postEvent(aud, title, body, '');
+    go.disabled = false;
+    if(ok){
+      el.querySelector('#nc-title').value = '';
+      el.querySelector('#nc-body').value = '';
+      toast('Notification sent');
+      renderApp();
+    }
+  });
+}
+
 function renderAlertsInto(el){
   const list = state.feed.filter(feedItemVisible).filter(function(n){ return !isDismissed(n.id); });
-  let html = '<div class="card"><div class="row" style="justify-content:space-between;margin-bottom:12px">' +
+  let html = '';
+  /* Managers get the custom notification composer right in the app, above
+     their own alerts. Audience can be everyone, staff only, or one person. */
+  if(isManager()) html += notifyComposerHtml();
+  html += '<div class="card"><div class="row" style="justify-content:space-between;margin-bottom:12px">' +
     '<h2 style="margin:0">Alerts</h2>' +
     '<button class="btn ghost sm" id="btn-feed-refresh" type="button">Refresh</button></div>';
   if(!list.length){
@@ -3418,6 +3461,7 @@ function renderAlertsInto(el){
     '<button class="btn ghost block" id="mark-read" style="flex:1;margin-top:0" type="button">Mark all read</button>' +
     '<button class="btn ghost block" id="clear-notifs" style="flex:1;margin-top:0" type="button">Clear all</button></div></div>';
   el.innerHTML = html;
+  wireNotifyComposer(el);
   el.querySelectorAll('[data-alink]').forEach(function(b){
     b.addEventListener('click', function(){ goAlertLink(b.getAttribute('data-alink')); });
   });
@@ -3777,7 +3821,9 @@ function renderApp(){
   } else if(state.tab === 'notifs'){
     app.innerHTML = shell('<div id="view"></div>');
     bindApp(app);
-    fetchFeed(false).then(function(){
+    /* Managers need the user list for the notification composer. */
+    const prep = (isManager() && !state.users) ? loadUsers().catch(function(){}) : Promise.resolve();
+    Promise.all([fetchFeed(false), prep]).then(function(){
       renderAlertsInto(app.querySelector('#view'));
       /* Viewing the alerts clears the unread/gold state. */
       setLastRead(Date.now());
