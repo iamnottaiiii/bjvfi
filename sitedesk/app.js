@@ -734,16 +734,24 @@ async function savePushSub(sj){
    page through them; nothing else is ever fetched. */
 var QUEUE_URL = 'https://bjvfi.com/sitedesk/data/queue.json';
 
+/* The gross catalog total lives in sitedesk/data/total.json, rewritten by the
+   sites.json rebuild workflow on every push, so it can never drift stale.
+   Fetched fresh and cache-busted on every queue visit, ahead of the 10-minute
+   catalog cache, so the "of N open leads" count is always accurate. */
+async function fetchCatalogTotal(){
+  try{
+    const r = await fetch('https://bjvfi.com/sitedesk/data/total.json?t=' + Date.now(), {cache: 'no-store'});
+    const j = r.ok ? await r.json() : null;
+    if(j && j.total) state.catalogTotal = j.total;
+  }catch(e){}
+}
+
 async function fetchCatalog(){
+  await fetchCatalogTotal();
   if(state.catalog.length && Date.now() - state.catalogAt < 10*60*1000) return state.catalog;
   state.catalog = [];
   state.boardOrder = [];
   state.boardPage = 0;
-  fetch('https://bjvfi.com/sitedesk/data/total.json').then(function(r){
-    return r.ok ? r.json() : null;
-  }).then(function(j){
-    if(j && j.total) state.catalogTotal = j.total;
-  }).catch(function(){});
   const r = await fetch(QUEUE_URL);
   if(!r.ok) throw new Error('Could not load leads.');
   const arr = await r.json();

@@ -96,6 +96,16 @@ def main() -> None:
     sites.sort(key=lambda x: (x["n"] or x["s"]).lower())
     new_text = json.dumps(sites, separators=(",", ":"), ensure_ascii=False) + "\n"
     old_text = OUT.read_text(encoding="utf-8") if OUT.exists() else None
+    # Keep the SiteDesk open-leads total in sync. The app shows
+    # "of N open leads" as this total minus actively claimed leads, so a
+    # stale total would display wrong data. The rebuild workflow runs on
+    # every push, so this stays accurate automatically.
+    total_path = ROOT / "sitedesk" / "data" / "total.json"
+    if total_path.parent.is_dir():
+        total_text = json.dumps({"total": len(sites)}) + "\n"
+        if not total_path.is_file() or total_path.read_text(encoding="utf-8") != total_text:
+            total_path.write_text(total_text, encoding="utf-8")
+            print(f"wrote sitedesk/data/total.json with total {len(sites)}")
     if old_text == new_text:
         print(f"sites.json unchanged ({len(sites)} sites)")
         return
