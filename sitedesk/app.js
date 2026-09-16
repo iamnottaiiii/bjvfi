@@ -806,6 +806,26 @@ function indexTaken(entry, nowMs){
   return (nowMs == null ? Date.now() : nowMs) < Number(entry.e);
 }
 
+/* Live open-lead count for the whole catalog: the gross catalog total minus
+   every currently active claim in the claim index (claimed and unexpired, or
+   build/sold which never expire back). The index is already loaded in the
+   background on the queue screen, so this costs no extra fetch. Expired
+   claims drop out of the count, which puts the lead back in the open pool. */
+function activeTakenCount(nowMs){
+  if(!claimIndexCache) return 0;
+  var n = 0;
+  for(var k in claimIndexCache){
+    if(indexTaken(claimIndexCache[k], nowMs)) n++;
+  }
+  return n;
+}
+
+function liveOpenTotal(fallbackList){
+  if(!state.catalogTotal) return fallbackList ? fallbackList.length : 0;
+  var open = state.catalogTotal - activeTakenCount();
+  return open < 0 ? 0 : open;
+}
+
 /* Apply a mutation to the index with conflict retry. Uses the in-memory copy
    when fresh, refetches when stale or on conflict. Never throws. */
 async function updateClaimIndex(mutator){
@@ -1229,7 +1249,7 @@ function paintQueue(el, openTaken, syncing){
     const nextAtEnd = (state.boardPage + 1) * 20 >= state.boardOrder.length;
     if(shown.length){
       html += '<div class="open-board">' + shown.map(leadRowHtml).join('') + '</div>' +
-        '<p class="muted" style="font-size:11px;margin:10px 0">Showing ' + fmtNum(shown.length) + ' of ' + fmtNum(state.catalogTotal || list.length) + ' open leads</p>' +
+        '<p class="muted" style="font-size:11px;margin:10px 0">Showing ' + fmtNum(shown.length) + ' of ' + fmtNum(liveOpenTotal(list)) + ' open leads</p>' +
         '<div class="board-actions">' +
         '<button class="btn ghost block" id="btn-next-batch" type="button"' + (nextAtEnd ? ' disabled' : '') + '>Next 20</button></div>';
     } else {
