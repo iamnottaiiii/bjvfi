@@ -1,595 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ACA General Construction, Inc. | General Contractor in Agua Dulce, CA</title>
-<meta name="description" content="ACA General Construction, Inc. is a licensed general contractor based in Agua Dulce, CA serving the San Fernando Valley and Santa Clarita Valley. Remodels, additions, concrete, fences, and decks.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,600;9..144,900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ACA General Construction, Inc. | General contractor</title>
+<meta name="description" content="ACA General Construction, Inc., General contractor located at ACA General Construction, Inc., 35303 Mills Ave, Agua Dulce, CA 91390. Call (818) 326-5592.">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=Karla:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --ink:#1b1712;
-    --paper:#f4efe6;
-    --paper2:#ece4d4;
-    --dark:#211c15;
-    --dark2:#2b251c;
-    --accent:#d97a1f;
-    --accent2:#f0a83e;
-    --line:rgba(27,23,18,.14);
-    --lineD:rgba(244,239,230,.16);
-    --max:1180px;
-  }
-  *{margin:0;padding:0;box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{font-family:"Inter",system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
-  .serif{font-family:"Fraunces",Georgia,serif}
-  a{color:inherit}
-  img{max-width:100%}
-  .wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
-
-  /* ---------- top bar ---------- */
-  .topbar{position:fixed;inset:0 0 auto 0;z-index:60;display:flex;align-items:center;justify-content:space-between;
-    padding:14px 22px;background:rgba(27,23,18,.92);color:var(--paper);backdrop-filter:blur(8px);border-bottom:1px solid rgba(244,239,230,.12)}
-  .brand{display:flex;align-items:center;gap:12px;text-decoration:none}
-  .brandMark{width:40px;height:40px;flex:none;display:grid;place-items:center;background:var(--accent);color:#1b1712;font-weight:900;font-family:"Fraunces",serif;font-size:20px;border-radius:8px}
-  .brandName{font-weight:700;letter-spacing:.02em;font-size:15px;line-height:1.25}
-  .brandName small{display:block;font-weight:500;font-size:11px;letter-spacing:.18em;text-transform:uppercase;opacity:.7}
-  .topbarActions{display:flex;align-items:center;gap:10px}
-  .callBtn{display:inline-block;padding:10px 18px;border-radius:999px;background:var(--paper);color:var(--ink);font-weight:700;font-size:14px;text-decoration:none}
-  .callBtn:hover{background:var(--accent2)}
-  #burger{display:grid;place-items:center;width:46px;height:46px;border:1px solid rgba(244,239,230,.35);border-radius:10px;background:transparent;color:var(--paper);cursor:pointer}
-  #burger span{display:block;width:20px;height:2px;background:currentColor;margin:2.5px 0;transition:transform .25s,opacity .25s}
-  #burger[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg)}
-  #burger[aria-expanded="true"] span:nth-child(2){opacity:0}
-  #burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
-
-  /* ---------- side drawer ---------- */
-  .scrim{position:fixed;inset:0;background:rgba(20,15,10,.55);opacity:0;pointer-events:none;transition:opacity .3s;z-index:70}
-  nav.main{position:fixed;top:0;left:0;bottom:0;width:min(360px,86vw);z-index:80;background:var(--dark);color:var(--paper);
-    transform:translateX(-102%);transition:transform .34s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;padding:26px 28px;overflow:auto}
-  nav.main.open{transform:none}
-  nav.main.open ~ .scrim, body.navOpen .scrim{opacity:1;pointer-events:auto}
-  .drawerHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-  .drawerHead .brandName{font-size:14px}
-  .drawerClose{background:none;border:1px solid rgba(244,239,230,.3);color:var(--paper);width:40px;height:40px;border-radius:10px;font-size:18px;cursor:pointer}
-  nav.main .kicker{font-size:11px;letter-spacing:.22em;text-transform:uppercase;opacity:.55;margin:18px 0 6px}
-  nav.main a[data-page]{display:block;padding:13px 6px;font-family:"Fraunces",serif;font-size:30px;font-weight:600;text-decoration:none;border-bottom:1px solid var(--lineD);color:var(--paper)}
-  nav.main a[data-page]:hover, nav.main a[data-page].active{color:var(--accent2)}
-  .drawerFoot{margin-top:auto;padding-top:24px;font-size:14px;opacity:.85}
-  .drawerFoot a{text-decoration:none;font-weight:700}
-
-  main{padding-top:74px}
-  .page{display:none}
-  .page.active{display:block;animation:fadeIn .45s ease}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-
-  /* ---------- hero ---------- */
-  .hero{position:relative;overflow:hidden;background:var(--dark);color:var(--paper);padding:88px 0 96px}
-  .hero::before{content:"";position:absolute;inset:0;
-    background-image:linear-gradient(rgba(244,239,230,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(244,239,230,.05) 1px,transparent 1px);
-    background-size:44px 44px;mask-image:linear-gradient(to bottom,#000 40%,transparent)}
-  .heroKicker{font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--accent2);font-weight:700;margin-bottom:18px}
-  .heroTitle{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(52px,11vw,148px);line-height:.94;letter-spacing:-.015em}
-  .heroTitle .outline{color:transparent;-webkit-text-stroke:2px var(--paper)}
-  .heroSub{max-width:560px;margin-top:22px;font-size:17px;opacity:.88}
-  .heroCtas{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
-  .btn{display:inline-block;padding:14px 28px;border-radius:999px;font-weight:700;font-size:15px;text-decoration:none;cursor:pointer;border:2px solid transparent}
-  .btn.primary{background:var(--accent);color:#1b1712}
-  .btn.primary:hover{background:var(--accent2)}
-  .btn.ghost{border-color:rgba(244,239,230,.5);color:var(--paper)}
-  .btn.ghost:hover{border-color:var(--paper)}
-  .heroStats{display:flex;flex-wrap:wrap;gap:34px;margin-top:52px;padding-top:28px;border-top:1px solid var(--lineD)}
-  .heroStats .stat b{font-family:"Fraunces",serif;font-size:34px;display:block;color:var(--accent2)}
-  .heroStats .stat span{font-size:13px;opacity:.75}
-
-  /* ---------- alternating bands ---------- */
-  .band{padding:78px 0}
-  .band.light{background:var(--paper)}
-  .band.paper2{background:var(--paper2)}
-  .band.dark{background:var(--dark);color:var(--paper)}
-  .band.dark2{background:var(--dark2);color:var(--paper)}
-  .bandTitle{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(34px,5.4vw,62px);line-height:1.02;letter-spacing:-.01em;margin-bottom:14px}
-  .bandLead{max-width:640px;font-size:17px;opacity:.9;margin-bottom:36px}
-  .kicker{font-size:12px;letter-spacing:.26em;text-transform:uppercase;font-weight:700;color:var(--accent);margin-bottom:12px}
-  .band.dark .kicker,.band.dark2 .kicker{color:var(--accent2)}
-
-  .split{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:start}
-  @media(max-width:820px){.split{grid-template-columns:1fr}}
-  .checkList{list-style:none;margin-top:6px}
-  .checkList li{padding:12px 0 12px 34px;position:relative;border-bottom:1px solid var(--line);font-size:16px}
-  .band.dark .checkList li{border-color:var(--lineD)}
-  .checkList li::before{content:"";position:absolute;left:0;top:17px;width:18px;height:18px;border-radius:50%;
-    background:var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231b1712' stroke-width='3.4'%3E%3Cpath d='M4 12l6 6L20 6'/%3E%3C/svg%3E") center/12px no-repeat}
-
-  .numGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:8px}
-  @media(max-width:820px){.numGrid{grid-template-columns:1fr}}
-  .numCard{background:rgba(244,239,230,.06);border:1px solid var(--lineD);border-radius:16px;padding:26px}
-  .numCard .n{font-family:"Fraunces",serif;font-size:44px;font-weight:900;color:var(--accent2)}
-  .numCard h3{font-size:17px;margin:8px 0 6px}
-  .numCard p{font-size:14.5px;opacity:.8}
-
-  .quoteBand{border-left:6px solid var(--accent);padding:8px 0 8px 30px;margin:8px 0}
-  .quoteBand blockquote{font-family:"Fraunces",serif;font-size:clamp(22px,3.4vw,32px);font-weight:600;line-height:1.35}
-  .quoteBand .src{margin-top:14px;font-size:14px;opacity:.75}
-  .badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:5px 11px;border-radius:999px;background:#1b1712;color:#f4efe6;vertical-align:middle}
-  .band.dark .badge{background:var(--accent2);color:#1b1712}
-
-  /* ---------- price table ---------- */
-  .tableWrap{overflow-x:auto;border:1px solid var(--line);border-radius:18px;background:#fffdf8}
-  table.price{width:100%;border-collapse:collapse;min-width:640px}
-  table.price th{font-size:12px;letter-spacing:.18em;text-transform:uppercase;text-align:left;padding:16px 20px;background:var(--dark);color:var(--paper)}
-  table.price td{padding:18px 20px;border-top:1px solid var(--line);font-size:15px;vertical-align:top}
-  table.price tr:hover td{background:#faf5ea}
-  table.price .svc{font-weight:700;font-size:16px}
-  table.price .rng{font-weight:700;white-space:nowrap}
-  .note{margin-top:18px;font-size:14px;opacity:.8}
-
-  /* ---------- tabs (story page extra) ---------- */
-  .svcChips{display:flex;flex-wrap:wrap;gap:10px;margin:26px 0 8px}
-  .chip{padding:10px 18px;border-radius:999px;border:1px solid var(--line);font-size:14px;font-weight:600;background:#fffdf8}
-
-  /* ---------- masonry gallery ---------- */
-  .masonry{columns:3 280px;column-gap:18px}
-  .tile{break-inside:avoid;margin:0 0 18px;border-radius:16px;overflow:hidden;position:relative;border:1px solid var(--line);background:#e7dcc6}
-  .tile svg{display:block;width:100%;height:auto}
-  .tile .tag{position:absolute;top:12px;left:12px}
-  .tile .cap{position:absolute;left:0;right:0;bottom:0;padding:34px 16px 14px;background:linear-gradient(transparent,rgba(20,15,10,.82));color:#f4efe6;font-size:14px;font-weight:600}
-
-  /* ---------- reviews ---------- */
-  .ratingRow{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:18px 0 34px}
-  .stars{font-size:30px;letter-spacing:4px;color:var(--accent)}
-  .revGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-  @media(max-width:900px){.revGrid{grid-template-columns:1fr}}
-  .revCard{background:#fffdf8;border:1px solid var(--line);border-radius:16px;padding:26px;display:flex;flex-direction:column;gap:12px}
-  .revCard .q{font-family:"Fraunces",serif;font-size:19px;font-weight:600;line-height:1.4}
-  .revCard .w{margin-top:auto;font-size:13.5px;opacity:.7}
-  .linkBtn{display:inline-block;margin-top:8px;padding:13px 26px;border-radius:999px;background:var(--ink);color:var(--paper);font-weight:700;font-size:15px;text-decoration:none}
-  .linkBtn:hover{background:var(--accent);color:#1b1712}
-
-  /* ---------- visit ---------- */
-  .visitGrid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:8px}
-  @media(max-width:820px){.visitGrid{grid-template-columns:1fr}}
-  .visitCard{background:#fffdf8;border:1px solid var(--line);border-radius:18px;padding:30px}
-  .visitCard h3{font-family:"Fraunces",serif;font-size:24px;margin-bottom:12px}
-  .visitCard p{font-size:15.5px}
-  .visitCard a.big{font-size:20px;font-weight:700;text-decoration:none}
-  .visitCard a.big:hover{color:var(--accent)}
-  .hoursTable{width:100%;border-collapse:collapse;font-size:15px}
-  .hoursTable td{padding:9px 0;border-bottom:1px solid var(--line)}
-  .hoursTable td:last-child{text-align:right;font-weight:600}
-  .hoursTable tr.today td{color:var(--accent);font-weight:700}
-
-  /* ---------- big type footer ---------- */
-  footer{background:#141009;color:var(--paper);padding:70px 0 0;margin-top:0}
-  .footBig{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(40px,8.5vw,110px);line-height:.95;letter-spacing:-.01em;margin-bottom:34px}
-  .footBig em{font-style:normal;color:var(--accent2)}
-  .footGrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:30px;padding-bottom:44px;border-bottom:1px solid var(--lineD)}
-  @media(max-width:820px){.footGrid{grid-template-columns:1fr}}
-  .footGrid h4{font-size:12px;letter-spacing:.22em;text-transform:uppercase;opacity:.6;margin-bottom:14px}
-  .footGrid a{color:var(--paper);text-decoration:none;display:block;padding:5px 0;font-size:15px}
-  .footGrid a:hover{color:var(--accent2)}
-  .footGrid p{font-size:15px;opacity:.85}
-  .copyLine{text-align:center;padding:22px 16px;font-size:14px;opacity:.9}
-
-  .reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
-  .reveal.in{opacity:1;transform:none}
-  @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Karla',sans-serif;background:#eef1f4;color:#101820;line-height:1.65}
+h1,h2,h3,.brand{font-family:'Fraunces',serif;font-weight:700}
+.wrap{max-width:760px;margin:0 auto;padding:0 20px}
+.pad{padding-top:40px;padding-bottom:60px}
+.sitehead{border-bottom:2px solid #3a7ac8;padding:20px 0;position:sticky;top:0;background:#eef1f4;z-index:50}
+.brandbar{display:flex;justify-content:space-between;align-items:center}
+.brand{font-size:1.35rem;letter-spacing:0.05em}
+.center{text-align:center}
+.nav{display:flex;gap:20px;flex-wrap:wrap}
+.nav.stackednav{flex-direction:column;align-items:center;margin-top:20px}
+.nav.pills{justify-content:center;margin-top:20px}
+.nlink{text-decoration:none;color:#101820;font-size:.85rem;letter-spacing:0.05em;padding:6px 10px;border-radius:4px}
+.nlink:hover,.nlink.active{color:#3a7ac8}
+.nav.pills .nlink{border:1px solid #3a7ac8}
+.nav.pills .nlink.active{background:#3a7ac8;color:#eef1f4}
+.sidenav{display:flex;flex-direction:column;gap:6px;padding:20px;background:#101820}
+.sidenav .nlink{color:#eef1f4}
+.sidenav .nlink.active{color:#3a7ac8}
+.burger{display:none;background:none;border:1px solid #101820;border-radius:4px;font-size:1.2rem;padding:4px 10px;cursor:pointer;color:#101820}
+.page{display:none}
+.page.visible{display:block}
+.hero.banner{text-align:center;padding:80px 20px;background:#101820;color:#eef1f4}
+.hero.banner .btn.ghost{border-color:#eef1f4;color:#eef1f4}
+.hero.framed{text-align:center;padding:60px 20px}
+.hero.framed .frame{border:3px double #3a7ac8;border-radius:4px;padding:60px;max-width:680px;margin:0 auto}
+.hero.stackrule{text-align:center;padding:60px 20px}
+.hero.stackrule h1{font-size:2.6rem;margin:20px 0}
+.rule{border:none;border-top:2px solid #3a7ac8;width:120px;margin:20px auto}
+.kicker{text-transform:uppercase;letter-spacing:0.05em;color:#3a7ac8;font-size:.85rem}
+.hero.cardhero{padding:60px 20px}
+.hcard{max-width:660px;margin:0 auto;text-align:center;border:1px solid #7f8fa0;border-radius:4px;padding:60px;background:#eef1f4}
+h1{font-size:2.2rem;margin-bottom:20px}
+h2.secttl,h1.pagetitle{text-align:center;margin-bottom:40px}
+.lede{font-size:1.1rem;color:#7f8fa0;margin-bottom:20px}
+.heromenu{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+.btn{display:inline-block;background:#3a7ac8;color:#eef1f4;padding:12px 26px;border-radius:4px;text-decoration:none;font-weight:600;border:1px solid #3a7ac8}
+.btn.ghost{background:transparent;color:#3a7ac8}
+.btn.ghost.light{color:#eef1f4;border-color:#eef1f4}
+.btn.big{font-size:1.2rem;padding:16px 40px;margin:20px auto;display:block;width:fit-content}
+.addrline{color:#7f8fa0}
+.quickgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:20px;margin-top:40px}
+.qcard{border:1px solid #7f8fa0;border-radius:4px;padding:20px;text-align:center}
+.snum{display:flex;gap:20px;align-items:flex-start;padding:20px 0;border-bottom:1px solid #7f8fa0}
+.snum .num{font-family:'Fraunces',serif;font-size:1.8rem;color:#3a7ac8}
+.scards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px}
+.scard{border:1px solid #3a7ac8;border-radius:4px;padding:40px;text-align:center}
+.sstripe{padding:20px;border-left:4px solid #3a7ac8;margin-bottom:20px;background:#eef1f4}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:40px}
+.tcell h3{margin-bottom:6px}
+.aboutquote{font-family:'Fraunces',serif;font-size:1.5rem;text-align:center;border-left:none;padding:40px;color:#101820}
+.aboutbanner{background:#101820;color:#eef1f4;border-radius:4px;padding:60px;text-align:center}
+.aboutbanner h3{color:#3a7ac8}
+.aboutframe{border:2px solid #3a7ac8;border-radius:4px;padding:40px;text-align:left}
+.muted{color:#7f8fa0;font-size:.9rem}
+.ctabar{display:flex;justify-content:space-between;align-items:center;background:#101820;color:#eef1f4;border-radius:4px;padding:40px;margin-bottom:40px;flex-wrap:wrap;gap:20px}
+.ctacard{border:2px solid #3a7ac8;border-radius:4px;padding:40px;text-align:center;margin-bottom:40px}
+.ctabanner{background:#3a7ac8;color:#eef1f4;border-radius:4px;padding:60px;text-align:center;margin-bottom:40px}
+.contactgrid{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin:40px 0}
+.cform{border:1px solid #7f8fa0;border-radius:4px;padding:40px;max-width:520px;margin:0 auto}
+.cform label{display:block;margin-bottom:20px}
+.cform input,.cform textarea{width:100%;padding:10px;border:1px solid #7f8fa0;border-radius:4px;font-family:'Karla',sans-serif;margin-top:6px}
+.honest{background:#eef1f4;border:1px dashed #3a7ac8;border-radius:4px;padding:20px;margin-bottom:20px;font-size:.9rem}
+footer{text-align:center;padding:40px;border-top:1px solid #7f8fa0;margin-top:60px;color:#7f8fa0}
+@media(max-width:700px){.nav{display:none;flex-direction:column;width:100%;margin-top:20px}.nav.open{display:flex}.burger{display:block}.twocol,.contactgrid{grid-template-columns:1fr}.ctabar{flex-direction:column}}
 </style>
-</head>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "ACA General Construction, Inc.",
+  "address": "ACA General Construction, Inc., 35303 Mills Ave, Agua Dulce, CA 91390",
+  "telephone": "(818) 326-5592",
+  "url": "https://aca-general-construction-inc.bjvfi.com"
+}</script>
+<style>html{height:100%}body{min-height:100vh}</style></head>
 <body>
-<div class="scrim" id="scrim"></div>
-<header class="topbar">
-  <a class="brand" href="#home" data-page="home">
-    <span class="brandMark">A</span>
-    <span class="brandName">ACA General Construction, Inc.<small>Licensed General Contractor</small></span>
-  </a>
-  <div class="topbarActions">
-    <a class="callBtn" href="tel:+18183265592">(818) 326-5592</a>
-    <button id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="mainNav"><span></span><span></span><span></span></button>
-  </div>
-</header>
-
-<nav class="main" id="mainNav" aria-label="Main navigation">
-  <div class="drawerHead">
-    <span class="brandName">ACA General Construction, Inc.</span>
-    <button class="drawerClose" id="drawerClose" aria-label="Close menu">&#215;</button>
-  </div>
-  <p class="kicker">Menu</p>
-  <a href="#home" data-page="home">Home</a>
-  <a href="#offerings" data-page="offerings">Offerings</a>
-  <a href="#story" data-page="story">Our Story</a>
-  <a href="#gallery" data-page="gallery">Gallery</a>
-  <a href="#reviews" data-page="reviews">Reviews</a>
-  <a href="#visit" data-page="visit">Visit Us</a>
-  <div class="drawerFoot">
-    <p class="kicker">Get a quote</p>
-    <p><a href="tel:+18183265592">(818) 326-5592</a></p>
-    <p>35303 Mills Ave<br>Agua Dulce, CA 91390</p>
-  </div>
-</nav>
-
+<header class="sitehead stacked"><div class="wrap center"><div class="brand big">ACA General Construction, Inc.</div><div class="catsub">General contractor</div><button class="burger" aria-label="Menu" onclick="toggleMenu()">&#9776;</button><nav class="nav stackednav" id="mainnav"><a href="#home" data-nav="home" class="nlink">Home</a><a href="#services" data-nav="services" class="nlink">Services</a><a href="#about" data-nav="about" class="nlink">About</a><a href="#reviews" data-nav="reviews" class="nlink">Reviews</a><a href="#contact" data-nav="contact" class="nlink">Contact</a></nav></div></header>
 <main>
-<section class="page" id="page-home">
-  <div class="hero">
-    <div class="wrap">
-      <p class="heroKicker reveal">Licensed General Contractor &#183; CSLB 1057000</p>
-      <h1 class="heroTitle reveal">Built<br><span class="outline">to last.</span><br>Priced fair.</h1>
-      <p class="heroSub reveal">ACA General Construction, Inc. handles remodels, additions, concrete, masonry, fences, and decks across Agua Dulce, the San Fernando Valley, and the Santa Clarita Valley. One crew, one point of contact, work we stand behind.</p>
-      <div class="heroCtas reveal">
-        <a class="btn primary" href="#offerings" data-page="offerings">See Services and Pricing</a>
-        <a class="btn ghost" href="#visit" data-page="visit">Get a Free Estimate</a>
-      </div>
-      <div class="heroStats reveal">
-        <div class="stat"><b>5.0</b><span>Average rating, 17 reviews</span></div>
-        <div class="stat"><b>2019</b><span>CA licensed since</span></div>
-        <div class="stat"><b>25K</b><span>Contractor surety bond</span></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="band light">
-    <div class="wrap">
-      <p class="kicker reveal">What we do</p>
-      <h2 class="bandTitle reveal">One contractor for the whole project.</h2>
-      <p class="bandLead reveal">Hiring five trades for one remodel is how budgets and timelines fall apart. ACA General Construction, Inc. keeps demolition, framing, concrete, masonry, and finish work under one roof.</p>
-      <div class="split">
-        <ul class="checkList reveal">
-          <li>Kitchen and bathroom remodels, start to finish</li>
-          <li>Room additions and garage conversions</li>
-          <li>Concrete flatwork, block walls, and masonry</li>
-          <li>Fences, gates, decks, and railings</li>
-        </ul>
-        <ul class="checkList reveal">
-          <li>Demolition and structural repairs</li>
-          <li>Exterior upgrades and curb appeal projects</li>
-          <li>Clear written scopes before work begins</li>
-          <li>Licensed, bonded, and workers comp insured</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <div class="band dark">
-    <div class="wrap">
-      <p class="kicker reveal">How we work</p>
-      <h2 class="bandTitle reveal">Straightforward, in three steps.</h2>
-      <div class="numGrid">
-        <div class="numCard reveal"><div class="n">01</div><h3>Walk the job</h3><p>We visit the site, listen to what you want, and measure everything. No guesswork quotes over the phone.</p></div>
-        <div class="numCard reveal"><div class="n">02</div><h3>Written scope</h3><p>You get a line by line scope of work with a firm price before anyone swings a hammer.</p></div>
-        <div class="numCard reveal"><div class="n">03</div><h3>Build and clean up</h3><p>Our crew shows up on time, keeps the site tidy, and does not leave until you are happy with the result.</p></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="band paper2">
-    <div class="wrap">
-      <div class="quoteBand reveal">
-        <blockquote>They just do really great work. I hired ACA again because the first job was that good.</blockquote>
-        <p class="src">Paraphrased from customer feedback <span class="badge">Based on 17 reviews</span></p>
-      </div>
-      <p style="margin-top:22px"><a class="linkBtn reveal" href="#reviews" data-page="reviews">Read more reviews</a></p>
-    </div>
-  </div>
-
-  <div class="band dark2">
-    <div class="wrap split">
-      <div class="reveal">
-        <p class="kicker">Service area</p>
-        <h2 class="bandTitle">Agua Dulce based.<br>Valley wide.</h2>
-        <p class="bandLead">Our shop sits at 35303 Mills Ave in Agua Dulce, and our crews run jobs through San Fernando, Sylmar, Pacoima, Santa Clarita, Canyon Country, and the surrounding valley communities.</p>
-      </div>
-      <div class="reveal">
-        <p class="kicker">Ready when you are</p>
-        <h2 class="bandTitle" style="font-size:clamp(28px,4vw,44px)">Free estimates.<br>No pressure.</h2>
-        <p class="bandLead">Call <a href="tel:+18183265592" style="font-weight:700;color:var(--accent2)">(818) 326-5592</a> and tell us about your project. We will schedule a walkthrough and put a number on it in writing.</p>
-        <p><a class="btn primary" href="#visit" data-page="visit">Plan your visit</a></p>
-      </div>
-    </div>
-  </div>
+<section class="page" data-page="home"><div class="hero stackrule"><p class="kicker">General contractor</p><hr class="rule"><h1>ACA General Construction, Inc.</h1><hr class="rule"><p class="lede">ACA General Construction, Inc., 35303 Mills Ave, Agua Dulce, CA 91390</p><a class="btn" href="tel:8183265592">Call (818) 326-5592</a></div>
+<div class="wrap pad"><h2 class="secttl">Welcome</h2><p>ACA General Construction, Inc. provides general contractor services. Call to confirm details and to schedule.</p><div class="quickgrid"><div class="qcard"><h3>Home remodeling</h3><p class="muted">Call to confirm availability and details.</p></div><div class="qcard"><h3>Additions and renovations</h3><p class="muted">Call to confirm availability and details.</p></div><div class="qcard"><h3>General contracting</h3><p class="muted">Call to confirm availability and details.</p></div></div></div>
 </section>
-
-<section class="page" id="page-offerings">
-  <div class="band light" style="padding-top:64px">
-    <div class="wrap">
-      <p class="kicker reveal">Offerings</p>
-      <h2 class="bandTitle reveal">Services and typical ranges.</h2>
-      <p class="bandLead reveal">Every project is different, so these are starting ranges to help you plan. Your written quote is firm before work begins. Prices below are marked <span class="badge">Sample</span> because final pricing depends on scope, materials, and site conditions.</p>
-      <div class="tableWrap reveal">
-        <table class="price">
-          <thead><tr><th>Service</th><th>What is included</th><th>Typical range</th></tr></thead>
-          <tbody>
-            <tr><td class="svc">Kitchen remodel</td><td>Cabinets, counters, flooring, lighting, plumbing and appliance hookups</td><td class="rng">$18,000 and up <span class="badge">Sample</span></td></tr>
-            <tr><td class="svc">Bathroom remodel</td><td>Tile, fixtures, vanity, shower or tub, ventilation and waterproofing</td><td class="rng">$9,500 and up <span class="badge">Sample</span></td></tr>
-            <tr><td class="svc">Room addition</td><td>Framing, roofing tie in, electrical, drywall, flooring, permits coordinated</td><td class="rng">$45,000 and up <span class="badge">Sample</span></td></tr>
-            <tr><td class="svc">Concrete and masonry</td><td>Driveways, patios, walkways, block walls, stucco repair</td><td class="rng">$12 to $28 / sq ft <span class="badge">Sample</span></td></tr>
-            <tr><td class="svc">Fences and gates</td><td>Wood, vinyl, and ornamental iron fences with matching gates</td><td class="rng">$45 to $95 / lin ft <span class="badge">Sample</span></td></tr>
-            <tr><td class="svc">Decks and railings</td><td>New decks, resurfacing, code compliant railings and stairs</td><td class="rng">$55 to $110 / sq ft <span class="badge">Sample</span></td></tr>
-            <tr><td class="svc">Demolition and structural repair</td><td>Interior demo, load bearing corrections, step and entry rebuilds</td><td class="rng">Quoted per job <span class="badge">Sample</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-      <p class="note reveal">Ranges are planning estimates only and marked <span class="badge">Sample</span>. Call <a href="tel:+18183265592" style="font-weight:700">(818) 326-5592</a> for a firm written quote on your project.</p>
-      <div class="svcChips reveal">
-        <span class="chip">Free on site estimates</span>
-        <span class="chip">Written scopes</span>
-        <span class="chip">Licensed and bonded</span>
-        <span class="chip">Residential and light commercial</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="page" id="page-story">
-  <div class="band light" style="padding-top:64px">
-    <div class="wrap split">
-      <div class="reveal">
-        <p class="kicker">Our story</p>
-        <h2 class="bandTitle">A contractor you can actually reach.</h2>
-        <p style="margin-bottom:16px">ACA General Construction, Inc. was built on a simple idea: show up, do the work right, and answer the phone. Based in Agua Dulce at 35303 Mills Ave, we are a California licensed general contractor (CSLB License 1057000, licensed August 2019) serving homeowners across the San Fernando and Santa Clarita valleys.</p>
-        <p style="margin-bottom:16px">We stay intentionally hands on. The person who walks your job is involved in your job, which is why so many of our customers call us back for a second and third project.</p>
-        <p>We carry workers compensation insurance and a $25,000 contractor surety bond, so your project and your property are protected from day one.</p>
-      </div>
-      <div class="reveal">
-        <p class="kicker">License snapshot</p>
-        <div class="visitCard">
-          <h3>ACA General Construction, Inc.</h3>
-          <p><strong>CSLB License:</strong> 1057000<br>
-          <strong>Licensed since:</strong> August 2019<br>
-          <strong>License expires:</strong> January 31, 2027<br>
-          <strong>Surety bond:</strong> $25,000<br>
-          <strong>Workers comp:</strong> Insured<br>
-          <strong>Base:</strong> 35303 Mills Ave, Agua Dulce, CA 91390</p>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="band dark">
-    <div class="wrap">
-      <p class="kicker reveal">What we believe</p>
-      <h2 class="bandTitle reveal">No surprises. No shortcuts.</h2>
-      <div class="numGrid">
-        <div class="numCard reveal"><div class="n">&#167;</div><h3>Written scopes</h3><p>If it is not in the scope, we do not charge for it. Change orders are documented and approved by you first.</p></div>
-        <div class="numCard reveal"><div class="n">&#10003;</div><h3>Code correct</h3><p>Permits, inspections, and code compliant work on every structural, electrical, and plumbing touchpoint.</p></div>
-        <div class="numCard reveal"><div class="n">&#9733;</div><h3>Repeat business</h3><p>Our best marketing is a customer who hires us again. We earn that on every single job.</p></div>
-      </div>
-    </div>
-  </div>
-</section>
-<section class="page" id="page-gallery">
-  <div class="band light" style="padding-top:64px">
-    <div class="wrap">
-      <p class="kicker reveal">Gallery</p>
-      <h2 class="bandTitle reveal">Recent work.</h2>
-      <p class="bandLead reveal">A look at the kinds of projects we take on. Photos shown are <span class="badge">Placeholder</span> illustrations until our job site photography is added.</p>
-      <div class="masonry reveal">
-        <div class="tile">
-          <span class="tag badge">Placeholder</span>
-          <svg viewBox="0 0 400 300" role="img" aria-label="Kitchen remodel illustration"><rect width="400" height="300" fill="#d9c9a8"/><rect x="40" y="120" width="120" height="150" fill="#8a6f4d"/><rect x="180" y="100" width="180" height="170" fill="#a5855c"/><rect x="60" y="60" width="80" height="40" fill="#5b4630"/><rect x="200" y="40" width="140" height="40" fill="#5b4630"/><rect x="0" y="270" width="400" height="30" fill="#6e5a40"/></svg>
-          <div class="cap">Kitchen remodel, San Fernando</div>
-        </div>
-        <div class="tile">
-          <span class="tag badge">Placeholder</span>
-          <svg viewBox="0 0 400 460" role="img" aria-label="Block wall illustration"><rect width="400" height="460" fill="#c9bfae"/><g fill="#a89a83"><rect x="20" y="40" width="170" height="60"/><rect x="210" y="40" width="170" height="60"/><rect x="20" y="120" width="170" height="60"/><rect x="210" y="120" width="170" height="60"/><rect x="20" y="200" width="170" height="60"/><rect x="210" y="200" width="170" height="60"/><rect x="20" y="280" width="170" height="60"/><rect x="210" y="280" width="170" height="60"/></g><rect x="0" y="400" width="400" height="60" fill="#8a6f4d"/></svg>
-          <div class="cap">Block wall and masonry, Agua Dulce</div>
-        </div>
-        <div class="tile">
-          <span class="tag badge">Placeholder</span>
-          <svg viewBox="0 0 400 260" role="img" aria-label="Deck illustration"><rect width="400" height="260" fill="#7ba05b"/><rect x="30" y="140" width="340" height="20" fill="#8a6f4d"/><g fill="#6e5a40"><rect x="30" y="160" width="340" height="14"/><rect x="30" y="176" width="340" height="14"/><rect x="30" y="192" width="340" height="14"/></g><g stroke="#4a3a28" stroke-width="8"><line x1="40" y1="140" x2="40" y2="60"/><line x1="130" y1="140" x2="130" y2="60"/><line x1="220" y1="140" x2="220" y2="60"/><line x1="310" y1="140" x2="310" y2="60"/></g><line x1="30" y1="70" x2="330" y2="70" stroke="#4a3a28" stroke-width="10"/></svg>
-          <div class="cap">Deck and railing rebuild</div>
-        </div>
-        <div class="tile">
-          <span class="tag badge">Placeholder</span>
-          <svg viewBox="0 0 400 420" role="img" aria-label="Bathroom remodel illustration"><rect width="400" height="420" fill="#b8cfd4"/><rect x="60" y="180" width="120" height="200" fill="#e8ecef"/><rect x="230" y="200" width="110" height="90" rx="8" fill="#ffffff" stroke="#8aa0a8" stroke-width="6"/><rect x="230" y="150" width="110" height="40" fill="#8aa0a8"/><g fill="#9fb8c0"><rect x="60" y="60" width="60" height="60"/><rect x="130" y="60" width="60" height="60"/><rect x="200" y="60" width="60" height="60"/><rect x="270" y="60" width="60" height="60"/></g></svg>
-          <div class="cap">Bathroom remodel, Santa Clarita</div>
-        </div>
-        <div class="tile">
-          <span class="tag badge">Placeholder</span>
-          <svg viewBox="0 0 400 280" role="img" aria-label="Fence illustration"><rect width="400" height="280" fill="#9dbb8a"/><g fill="#7a5c3d"><rect x="20" y="90" width="24" height="150"/><rect x="70" y="90" width="24" height="150"/><rect x="120" y="90" width="24" height="150"/><rect x="170" y="90" width="24" height="150"/><rect x="220" y="90" width="24" height="150"/><rect x="270" y="90" width="24" height="150"/><rect x="320" y="90" width="24" height="150"/><rect x="10" y="110" width="380" height="16"/><rect x="10" y="190" width="380" height="16"/></g></svg>
-          <div class="cap">Wood fence and gate, Sylmar</div>
-        </div>
-        <div class="tile">
-          <span class="tag badge">Placeholder</span>
-          <svg viewBox="0 0 400 340" role="img" aria-label="Concrete driveway illustration"><rect width="400" height="340" fill="#cfc8bb"/><g stroke="#a89a83" stroke-width="6"><line x1="0" y1="120" x2="400" y2="120"/><line x1="0" y1="230" x2="400" y2="230"/><line x1="130" y1="0" x2="130" y2="340"/><line x1="270" y1="0" x2="270" y2="340"/></g><rect x="140" y="40" width="120" height="60" fill="#8a6f4d"/></svg>
-          <div class="cap">Concrete driveway replacement</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="page" id="page-reviews">
-  <div class="band light" style="padding-top:64px">
-    <div class="wrap">
-      <p class="kicker reveal">Reviews</p>
-      <h2 class="bandTitle reveal">Word on the street.</h2>
-      <div class="ratingRow reveal">
-        <span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-        <div><strong style="font-size:20px">5.0 out of 5</strong><br><span style="opacity:.75">Based on 17 reviews collected across public listings.</span></div>
-        <a class="linkBtn" href="https://www.google.com/maps/place/?q=place_id:ChIJy62HNSuVwoARDYU6Kca7AfU" target="_blank" rel="noopener">See reviews on Google</a>
-      </div>
-      <p class="bandLead reveal">Common themes customers mention: quality workmanship, fair pricing, crews that show up when promised, and repeat hires for second projects.</p>
-      <div class="revGrid">
-        <div class="revCard reveal">
-          <span class="badge">Sample</span>
-          <p class="q">They demoed the old steps to our house and rebuilt everything better than it was. Crew was on time every day and left the place clean.</p>
-          <p class="w">Sample review for illustration. Read verified reviews on our Google listing.</p>
-        </div>
-        <div class="revCard reveal">
-          <span class="badge">Sample</span>
-          <p class="q">Hired ACA twice now. First the fence, then the kitchen. Both times the written quote matched the final bill. That is rare.</p>
-          <p class="w">Sample review for illustration. Read verified reviews on our Google listing.</p>
-        </div>
-        <div class="revCard reveal">
-          <span class="badge">Sample</span>
-          <p class="q">They handled our block wall and concrete patio. Solid work, fair price, and they picked up the phone every time I called.</p>
-          <p class="w">Sample review for illustration. Read verified reviews on our Google listing.</p>
-        </div>
-      </div>
-      <p class="note reveal" style="margin-top:26px">Have we done work for you? We would appreciate an honest review: <a href="https://www.google.com/maps/place/?q=place_id:ChIJy62HNSuVwoARDYU6Kca7AfU" target="_blank" rel="noopener" style="font-weight:700">See reviews on Google</a></p>
-    </div>
-  </div>
-</section>
-
-<section class="page" id="page-visit">
-  <div class="band light" style="padding-top:64px">
-    <div class="wrap">
-      <p class="kicker reveal">Visit us</p>
-      <h2 class="bandTitle reveal">Get your free estimate.</h2>
-      <p class="bandLead reveal">Call, stop by, or reach out through our map listing. We serve Agua Dulce and the surrounding San Fernando and Santa Clarita valleys.</p>
-      <div class="visitGrid">
-        <div class="visitCard reveal">
-          <h3>Contact</h3>
-          <p><strong>ACA General Construction, Inc.</strong><br>
-          35303 Mills Ave<br>
-          Agua Dulce, CA 91390</p>
-          <p style="margin-top:12px"><a class="big" href="tel:+18183265592">(818) 326-5592</a></p>
-          <p style="margin-top:12px"><a class="linkBtn" href="https://www.google.com/maps/place/?q=place_id:ChIJy62HNSuVwoARDYU6Kca7AfU" target="_blank" rel="noopener">Open in Google Maps</a></p>
-        </div>
-        <div class="visitCard reveal">
-          <h3>Hours</h3>
-          <table class="hoursTable" id="hoursTable">
-            <tr><td>Monday</td><td>8:30 AM to 4:30 PM</td></tr>
-            <tr><td>Tuesday</td><td>8:30 AM to 4:30 PM</td></tr>
-            <tr><td>Wednesday</td><td>8:30 AM to 4:30 PM</td></tr>
-            <tr><td>Thursday</td><td>8:30 AM to 4:30 PM</td></tr>
-            <tr><td>Friday</td><td>8:30 AM to 4:30 PM</td></tr>
-            <tr><td>Saturday</td><td>8:30 AM to 2:30 PM</td></tr>
-            <tr><td>Sunday</td><td>Closed</td></tr>
-          </table>
-          <p class="note">Job site visits by appointment. Hours may vary on holidays, call ahead.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+<section class="page" data-page="services"><div class="wrap pad"><h1 class="pagetitle">Services</h1><p class="lede">ACA General Construction, Inc. offers the following general contractor services. All details are sample, call to confirm.</p><div class="scards"><div class="scard"><h3>Home remodeling</h3><p class="muted">Call to confirm pricing and scheduling.</p></div><div class="scard"><h3>Additions and renovations</h3><p class="muted">Call to confirm pricing and scheduling.</p></div><div class="scard"><h3>General contracting</h3><p class="muted">Call to confirm pricing and scheduling.</p></div></div></div></section>
+<section class="page" data-page="about"><div class="wrap pad"><h1 class="pagetitle">About</h1><div class="twocol"><div class="tcell"><h3>Who We Are</h3><p>ACA General Construction, Inc. provides general contractor services. Company history details are sample, call to confirm.</p></div><div class="tcell"><h3>What We Do</h3><p>We focus on straightforward, reliable service. Service specifics are sample, call to confirm.</p></div></div></div></section>
+<section class="page" data-page="reviews"><div class="wrap pad"><h1 class="pagetitle">Reviews</h1><p>We have not collected reviews on this site. See real customer reviews for ACA General Construction, Inc. on Google Maps.</p><a class="btn" href="https://www.google.com/maps/place/?q=place_id:ChIJy62HNSuVwoARDYU6Kca7AfU" target="_blank" rel="noopener">See reviews on Google Maps</a></div></section>
+<section class="page" data-page="contact"><div class="wrap pad"><h1 class="pagetitle">Contact</h1><div class="ctabar"><span>Ready to talk?</span><a class="btn" href="tel:8183265592">Call (818) 326-5592</a></div><div class="contactgrid"><div><h3>Phone</h3><p><a href="tel:8183265592">(818) 326-5592</a></p></div><div><h3>Address</h3><a class="addr" href="https://www.google.com/maps/place/?q=place_id:ChIJy62HNSuVwoARDYU6Kca7AfU" target="_blank" rel="noopener">ACA General Construction, Inc., 35303 Mills Ave, Agua Dulce, CA 91390</a><p class="muted">Tap the address for directions.</p></div></div><form class="cform" onsubmit="return fakeSubmit(event)"><h3>Send a message</h3><p class="honest">This form does not send online. To reach us, please call <a href="tel:8183265592">(818) 326-5592</a>.</p><label>Name<input type="text" name="name"></label><label>Message<textarea name="msg" rows="4"></textarea></label><button class="btn" type="submit">Submit</button></form></div></section>
 </main>
-
-<footer>
-  <div class="wrap">
-    <p class="footBig">ACA General<br>Construction, <em>Inc.</em></p>
-    <div class="footGrid">
-      <div>
-        <h4>Contact</h4>
-        <p>35303 Mills Ave<br>Agua Dulce, CA 91390<br><a href="tel:+18183265592" style="display:inline;font-weight:700">(818) 326-5592</a></p>
-      </div>
-      <div>
-        <h4>Explore</h4>
-        <a href="#home" data-page="home">Home</a>
-        <a href="#offerings" data-page="offerings">Offerings</a>
-        <a href="#story" data-page="story">Our Story</a>
-        <a href="#gallery" data-page="gallery">Gallery</a>
-        <a href="#reviews" data-page="reviews">Reviews</a>
-        <a href="#visit" data-page="visit">Visit Us</a>
-      </div>
-      <div>
-        <h4>Credentials</h4>
-        <p>CA CSLB License 1057000<br>$25,000 surety bond<br>Workers comp insured</p>
-      </div>
-    </div>
-    <p class="copyLine">© ACA General Construction, Inc.</p>
-  </div>
-</footer>
-
+<footer>© ACA General Construction, Inc.</footer>
 <script>
-(function(){
-  "use strict";
-
-  var PAGES = ["home", "offerings", "story", "gallery", "reviews", "visit"];
-  var nav = document.getElementById("mainNav");
-  var burger = document.getElementById("burger");
-
-  function cleanHash(){
-    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
-  }
-
-  function closeMenu(){
-    document.body.classList.remove("navOpen");
-    if(nav){ nav.classList.remove("open"); }
-    if(burger){ burger.setAttribute("aria-expanded", "false"); }
-  }
-
-  function navigateTo(page, updateHash){
-    if(PAGES.indexOf(page) === -1){ page = "home"; }
-
-    var sections = document.querySelectorAll(".page");
-    for(var i = 0; i < sections.length; i++){
-      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
-    }
-
-    var links = document.querySelectorAll("nav.main a[data-page]");
-    for(var j = 0; j < links.length; j++){
-      var on = links[j].getAttribute("data-page") === page;
-      links[j].classList.toggle("active", on);
-      if(on){ links[j].setAttribute("aria-current", "page"); }
-      else { links[j].removeAttribute("aria-current"); }
-    }
-
-    if(updateHash !== false && location.hash !== "#" + page){
-      location.hash = "#" + page;
-    }
-
-    closeMenu();
-    window.scrollTo(0, 0);
-    observeReveals();
-  }
-
-  document.addEventListener("click", function(e){
-    var el = e.target.closest("a[data-page], button[data-page]");
-    if(!el) return;
+function navigateTo(page){
+  document.querySelectorAll('.page').forEach(function(s){s.classList.remove('visible')});
+  var t=document.querySelector('.page[data-page="'+page+'"]');
+  if(t){t.classList.add('visible')}
+  document.querySelectorAll('[data-nav]').forEach(function(a){a.classList.toggle('active',a.getAttribute('data-nav')===page)});
+  var nav=document.getElementById('mainnav');if(nav){nav.classList.remove('open')}
+  window.scrollTo(0,0);
+}
+function toggleMenu(){
+  var nav=document.getElementById('mainnav');if(nav){nav.classList.toggle('open')}
+}
+function fakeSubmit(e){e.preventDefault();alert('This form does not send online. Please call us instead.');return false}
+document.querySelectorAll('[data-nav]').forEach(function(a){
+  a.addEventListener('click',function(e){
     e.preventDefault();
-    navigateTo(el.getAttribute("data-page"));
+    var p=a.getAttribute('data-nav');
+    history.pushState({page:p},'', '#'+p);
+    navigateTo(p);
   });
-
-  window.addEventListener("hashchange", function(){
-    navigateTo(cleanHash() || "home");
-  });
-
-  if(burger && nav){
-    burger.addEventListener("click", function(){
-      var open = nav.classList.toggle("open");
-      document.body.classList.toggle("navOpen", open);
-      burger.setAttribute("aria-expanded", open ? "true" : "false");
-    });
-  }
-  var drawerClose = document.getElementById("drawerClose");
-  if(drawerClose){
-    drawerClose.addEventListener("click", function(){ closeMenu(); });
-  }
-  var scrim = document.getElementById("scrim");
-  if(scrim){
-    scrim.addEventListener("click", function(){ closeMenu(); });
-  }
-
-  var io = null;
-  if("IntersectionObserver" in window){
-    io = new IntersectionObserver(function(entries){
-      entries.forEach(function(en){
-        if(en.isIntersecting){
-          en.target.classList.add("in");
-          io.unobserve(en.target);
-        }
-      });
-    }, {threshold:.12});
-  }
-  function observeReveals(){
-    if(!io){ return; }
-    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
-    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
-  }
-
-  try{
-    var parts = new Intl.DateTimeFormat("en-US",{timeZone:"America/Los_Angeles",weekday:"short"}).formatToParts(new Date());
-    var wd = "Mon";
-    parts.forEach(function(p){ if(p.type === "weekday"){ wd = p.value; } });
-    var rows = document.querySelectorAll("#hoursTable tr");
-    var idx = {"Mon":0,"Tue":1,"Wed":2,"Thu":3,"Fri":4,"Sat":5,"Sun":6}[wd];
-    if(rows[idx]){ rows[idx].classList.add("today"); }
-  }catch(e){}
-
-  navigateTo(cleanHash() || "home", false);
+});
+window.addEventListener('popstate',function(e){
+  var p=(e.state&&e.state.page)||location.hash.replace('#','')||'home';
+  navigateTo(p);
+});
+(function(){
+  var p=location.hash.replace('#','')||'home';
+  history.replaceState({page:p},'','#'+p);
+  navigateTo(p);
 })();
 </script>
-</body>
+<script>
+/* sticky-footer-fix-v1 */
+(function(){function s(){var f=document.querySelector('footer');if(!f||f.getBoundingClientRect().bottom>=window.innerHeight-2)return;var b=document.body;b.style.minHeight='100vh';b.style.display='flex';b.style.flexDirection='column';var e=f;while(e&&e!==b){if(e===f){e.style.marginTop='auto';}else{e.style.display='flex';e.style.flexDirection='column';e.style.flex='1 0 auto';}e=e.parentElement;}}
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',s);}else{s();}
+window.addEventListener('hashchange',function(){setTimeout(s,60);});
+window.addEventListener('popstate',function(){setTimeout(s,60);});
+var _n=window.navigateTo;if(typeof _n==='function'){window.navigateTo=function(){var r=_n.apply(this,arguments);setTimeout(s,60);return r;};}})();
+</script></body>
 </html>
