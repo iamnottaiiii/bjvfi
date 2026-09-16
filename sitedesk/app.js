@@ -587,16 +587,29 @@ function notifyUser(title, body){
 }
 
 async function postEvent(audience, title, body, link){
-  let rec = null;
-  try{ rec = await ghGetJson('feed.json'); }catch(e){ toast(e.message); return false; }
-  const items = capFeed(rec && rec.data ? rec.data : [], FEED_CAP);
-  items.unshift({ id: uid('ev'), audience: audience, title: title, body: body || '',
-    link: link || '', created_at: nowISO() });
-  try{
-    await ghPutJson('feed.json', capFeed(items, FEED_CAP), rec ? rec.sha : null, 'sitedesk: feed event');
-  }catch(e){ toast(e.message); return false; }
-  await fetchFeed(true);
-  return true;
+  /* A unique id per event: retries after a 409 keep the same id, so a
+     successful conflicting write that already included it never duplicates. */
+  const item = { id: uid('ev'), audience: audience, title: title, body: body || '',
+    link: link || '', created_at: nowISO() };
+  let lastErr = null;
+  /* Retry on conflict: someone else saved the feed between our read and
+     write, so re-read the fresh file and try again instead of failing. */
+  for(let attempt = 0; attempt < 3; attempt++){
+    let rec = null;
+    try{ rec = await ghGetJson('feed.json'); }catch(e){ toast(e.message); return false; }
+    const items = capFeed(rec && rec.data ? rec.data : [], FEED_CAP);
+    if(!items.some(function(n){ return n.id === item.id; })) items.unshift(item);
+    try{
+      await ghPutJson('feed.json', capFeed(items, FEED_CAP), rec ? rec.sha : null, 'sitedesk: feed event');
+      await fetchFeed(true);
+      return true;
+    }catch(e){
+      lastErr = e;
+      if(!isConflictError(e)) break;
+    }
+  }
+  toast(lastErr ? lastErr.message : 'Could not save.');
+  return false;
 }
 
 /* True when a save failed only because someone (or a double tap) already
