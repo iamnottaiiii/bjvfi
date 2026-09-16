@@ -588,8 +588,11 @@ function notifyUser(title, body){
 
 async function postEvent(audience, title, body, link){
   /* A unique id per event: retries after a 409 keep the same id, so a
-     successful conflicting write that already included it never duplicates. */
-  const item = { id: uid('ev'), audience: audience, title: title, body: body || '',
+     successful conflicting write that already included it never duplicates.
+     `from` is the sender, so recipients can reply straight back. */
+  const item = { id: uid('ev'), audience: audience,
+    from: state.user ? state.user.username : '',
+    title: title, body: body || '',
     link: link || '', created_at: nowISO() };
   let lastErr = null;
   /* Retry on conflict: someone else saved the feed between our read and
@@ -3024,28 +3027,43 @@ function adminUsersHtml(){
   else html += list.map(function(r){
     const u = r.u;
     return '<div class="card" style="margin-bottom:10px;padding:14px">' +
-      '<div class="row" style="justify-content:space-between;margin-bottom:8px"><div>' +
+      '<div class="row" style="justify-content:space-between;align-items:flex-start;margin-bottom:8px"><div>' +
       '<div style="font-weight:600">' + esc(u.name || r.username) + '</div>' +
       '<div class="muted" style="font-size:12px">@' + esc(r.username) + '</div>' +
       '<div class="muted" style="font-size:12px">' + esc(u.phone || 'no phone') + '</div></div>' +
-      badge(u.status) + '</div>' +
-      '<div class="row" style="margin-bottom:8px">' + badge(u.role) + '</div>' +
-      '<div class="row">' +
-      '<button class="btn ghost sm" data-udash="' + esc(r.username) + '" type="button">Dashboard</button>' +
-      (u.role === 'head' ? '' :
-        (u.status === 'pending' ? '<button class="btn sm" data-uact="approve" data-u="' + esc(r.username) + '" type="button">Approve</button>' +
-          '<button class="btn ghost sm" data-uact="reject" data-u="' + esc(r.username) + '" type="button">Reject</button>' : '') +
-        (u.status !== 'disabled' ? '<button class="btn danger sm" data-uact="disable" data-u="' + esc(r.username) + '" type="button">Disable</button>' :
-          '<button class="btn ghost sm" data-uact="approve" data-u="' + esc(r.username) + '" type="button">Re-enable</button>') +
-        '<button class="btn ghost sm" data-uact="resetpw" data-u="' + esc(r.username) + '" type="button">Reset password</button>' +
-        (r.username !== state.user.username ? '<button class="btn danger sm" data-uact="delete" data-u="' + esc(r.username) + '" type="button">Delete</button>' : '') +
-        (state.user.role === 'head' ? '<select data-urole="' + esc(r.username) + '" style="min-height:42px;width:auto">' +
-          ['caller','builder','admin'].map(function(ro){
-            return '<option value="' + ro + '"' + (u.role === ro ? ' selected' : '') + '>' + ro + '</option>';
-          }).join('') + '</select>' : '')) +
-      '</div></div>';
+      '<div class="umenu-wrap"><button class="btn ghost sm" data-umenu="' + esc(r.username) + '" type="button" aria-label="Actions for @' + esc(r.username) + '">⋯</button>' +
+      '<div class="umenu" hidden>' + umenuItems(r, u) + '</div></div></div>' +
+      '<div class="row" style="gap:6px">' + badge(u.status) + badge(u.role) + '</div></div>';
   }).join('');
   return html + '</div>';
+}
+
+/* The three-dot menu on an admin user card: everything that can be done to
+   that user lives here instead of a crowded row of buttons. */
+function umenuItems(r, u){
+  let items = '<button type="button" class="umenu-item" data-udash="' + esc(r.username) + '">Dashboard</button>';
+  if(u.role !== 'head'){
+    if(u.status === 'pending'){
+      items += '<button type="button" class="umenu-item" data-uact="approve" data-u="' + esc(r.username) + '">Approve</button>' +
+        '<button type="button" class="umenu-item" data-uact="reject" data-u="' + esc(r.username) + '">Reject</button>';
+    }
+    items += u.status !== 'disabled'
+      ? '<button type="button" class="umenu-item" data-uact="disable" data-u="' + esc(r.username) + '">Disable</button>'
+      : '<button type="button" class="umenu-item" data-uact="approve" data-u="' + esc(r.username) + '">Re-enable</button>';
+    items += '<button type="button" class="umenu-item" data-uact="resetpw" data-u="' + esc(r.username) + '">Reset password</button>';
+    if(r.username !== state.user.username){
+      items += '<button type="button" class="umenu-item danger" data-uact="delete" data-u="' + esc(r.username) + '">Delete</button>';
+    }
+    if(state.user.role === 'head'){
+      items += '<div class="umenu-sep"></div><div class="umenu-label">Set role</div>' +
+        ['caller','builder','admin'].map(function(ro){
+          const label = ro.charAt(0).toUpperCase() + ro.slice(1);
+          return '<button type="button" class="umenu-item" data-uact="role:' + ro + '" data-u="' + esc(r.username) + '">' +
+            (u.role === ro ? '✓ ' : '') + label + '</button>';
+        }).join('');
+    }
+  }
+  return items;
 }
 
 function wireAdminUsers(el){
@@ -3076,9 +3094,23 @@ function wireAdminUsers(el){
   el.querySelectorAll('[data-udash]').forEach(function(b){
     b.addEventListener('click', function(){ state.adminUser = b.getAttribute('data-udash'); renderAdminInto(el); });
   });
-  el.querySelectorAll('[data-urole]').forEach(function(sel){
-    sel.addEventListener('change', function(){
-      userAction(sel.getAttribute('data-urole'), 'role:' + sel.value, el);
+  /* Three-dot menus: one open at a time, tap outside to close. */
+  el.querySelectorAll('[data-umenu]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      const menu = btn.parentElement.querySelector('.umenu');
+      if(!menu) return;
+      const wasHidden = menu.hidden;
+      el.querySelectorAll('.umenu').forEach(function(m){ m.hidden = true; });
+      if(wasHidden){
+        menu.hidden = false;
+        document.addEventListener('click', function closer(ev){
+          if(!menu.contains(ev.target)){
+            menu.hidden = true;
+            document.removeEventListener('click', closer);
+          }
+        });
+      }
     });
   });
 }
@@ -3402,10 +3434,86 @@ function adminToolsHtml(){
     '<div class="field"><label>Lead slug</label><input id="tool-slug" placeholder="e.g. acme-plumbing"/></div>' +
     '<button class="btn ghost block" id="tool-lookup" type="button">Look up claim</button>' +
     '<div class="err" id="tool-err"></div>' +
-    '<div id="tool-result" style="margin-top:12px"></div></div>';
+    '<div id="tool-result" style="margin-top:12px"></div></div>' +
+  '<div class="card"><h2>Overall dashboard</h2>' +
+  '<p class="muted" style="font-size:12px;margin-bottom:12px;line-height:1.55">Whole-system stats: leads, users, claims, and activity.</p>' +
+  '<button class="btn ghost block" id="tool-stats" type="button">Load stats</button>' +
+  '<div id="tool-stats-out" style="margin-top:4px"></div></div>';
+}
+
+/* Overall dashboard: aggregate stats across the whole system. Lives in
+   Admin > Tools, loaded on demand so it never slows the admin panel. */
+async function loadOverallStats(el){
+  const out = el.querySelector('#tool-stats-out');
+  out.innerHTML = '<p class="muted">Loading stats...</p>';
+  const tile = function(v, l){ return '<div class="stat"><b>' + v + '</b><span>' + l + '</span></div>'; };
+  const sec = function(t){ return '<div class="statsec">' + t + '</div>'; };
+  try{
+    await loadUsers();
+    await fetchCatalogTotal();
+    const idx = await getClaimIndex(true);
+    const idxKeys = Object.keys(idx);
+    const byStatus = {};
+    idxKeys.forEach(function(k){
+      const stt = (idx[k] && idx[k].s) || 'unknown';
+      byStatus[stt] = (byStatus[stt] || 0) + 1;
+    });
+    let intakes = 0;
+    try{
+      const t = await ghFetch('/git/trees/main:intakes', { action: 'count intakes' });
+      intakes = (t.tree || []).filter(function(n){ return n.type === 'blob'; }).length;
+    }catch(e){}
+    let devices = 0;
+    try{
+      const pr = await ghGetJson('push_subs.json');
+      const d = (pr && pr.data) || {};
+      Object.keys(d).forEach(function(k){ devices += ((d[k] || []).length); });
+    }catch(e){}
+    const users = state.users || {};
+    const unames = Object.keys(users);
+    const uStatus = {}, uRole = {};
+    unames.forEach(function(n){
+      const u = users[n];
+      const stt = u.status || 'none'; uStatus[stt] = (uStatus[stt] || 0) + 1;
+      const ro = u.role || 'none'; uRole[ro] = (uRole[ro] || 0) + 1;
+    });
+    const today = new Date().toDateString();
+    const feedToday = (state.feed || []).filter(function(n){
+      try{ return new Date(n.created_at).toDateString() === today; }catch(e){ return false; }
+    }).length;
+    let html = sec('Leads') + '<div class="statgrid">' +
+      tile(fmtNum(state.catalogTotal || 0), 'total leads') +
+      tile(fmtNum(idxKeys.length), 'claimed') +
+      tile(fmtNum(intakes), 'intakes') + '</div>' +
+      sec('Claims by status') + '<div class="statgrid">' +
+      ['claimed','interested','build','sold'].map(function(stt){
+        return tile(fmtNum(byStatus[stt] || 0), stt);
+      }).join('') + '</div>' +
+      sec('Users') + '<div class="statgrid">' +
+      tile(fmtNum(unames.length), 'total') +
+      tile(fmtNum(uStatus.pending || 0), 'pending') +
+      tile(fmtNum(uStatus.approved || 0), 'approved') + '</div>' +
+      '<div class="statgrid">' +
+      tile(fmtNum(uRole.caller || 0), 'callers') +
+      tile(fmtNum(uRole.builder || 0), 'builders') +
+      tile(fmtNum((uRole.admin || 0) + (uRole.head || 0)), 'admins') + '</div>' +
+      sec('Activity') + '<div class="statgrid">' +
+      tile(fmtNum(feedToday), 'alerts today') +
+      tile(fmtNum(devices), 'push devices') +
+      tile(fmtNum((state.feed || []).length), 'alerts stored') + '</div>';
+    out.innerHTML = html;
+  }catch(e){
+    out.innerHTML = '<div class="err">' + esc(e.message) + '</div>';
+  }
+}
+
+function fmtNum(n){
+  try{ return Number(n).toLocaleString('en-US'); }catch(e){ return String(n); }
 }
 
 function wireAdminTools(el){
+  const st = el.querySelector('#tool-stats');
+  if(st) st.addEventListener('click', function(){ loadOverallStats(el); });
   el.querySelector('#tool-lookup').addEventListener('click', async function(){
     const err = el.querySelector('#tool-err');
     const res = el.querySelector('#tool-result');
@@ -3500,6 +3608,7 @@ function renderAlertsInto(el){
         : '<div class="alert-item-static">' + inner + '</div>';
       return '<div class="alert-row" style="display:flex;gap:8px;align-items:flex-start;background-image:var(--sep);background-size:100% 1px;background-repeat:no-repeat;background-position:bottom">' +
         '<div style="flex:1;min-width:0">' + wrap + '</div>' +
+        '<button type="button" class="btn ghost sm alert-reply" data-reply="' + esc(n.id || '') + '" style="flex:none;margin-top:6px">Reply</button>' +
         '<button type="button" class="btn ghost sm alert-dismiss" data-dismiss="' + esc(n.id || '') + '" aria-label="Delete notification" style="flex:none;margin-top:6px">\u00D7</button></div>';
     }).join('');
   }
@@ -3519,6 +3628,15 @@ function renderAlertsInto(el){
       renderApp();
     });
   });
+  el.querySelectorAll('[data-reply]').forEach(function(b){
+    b.addEventListener('click', function(e){
+      e.stopPropagation();
+      const id = b.getAttribute('data-reply');
+      const item = (state.feed || []).find(function(n){ return n.id === id; });
+      if(!item || !item.from){ toast('Notification not found.'); return; }
+      openReplyModal(item);
+    });
+  });
   el.querySelector('#mark-read').addEventListener('click', function(){
     setLastRead(Date.now());
     state.unread = 0;
@@ -3533,6 +3651,31 @@ function renderAlertsInto(el){
   el.querySelector('#btn-feed-refresh').addEventListener('click', async function(){
     await fetchFeed(true);
     renderApp();
+  });
+}
+
+/* Reply to a notification: sends a new feed event addressed to the sender,
+   which also reaches their devices as a real push. */
+function openReplyModal(item){
+  const to = item.from;
+  showModal('<div style="text-align:right;margin-bottom:8px"><button class="btn ghost sm" id="modal-close" type="button">Close</button></div>' +
+    '<h2>Reply to @' + esc(to) + '</h2>' +
+    '<div class="muted" style="font-size:12px;margin-bottom:8px">Re: ' + esc(item.title || '') + '</div>' +
+    (item.body ? '<div class="card" style="padding:12px;margin-bottom:12px;font-size:12px">' + esc(item.body) + '</div>' : '') +
+    '<div class="field"><label>Message *</label><textarea id="reply-body" rows="4" placeholder="Type your reply"></textarea></div>' +
+    '<button class="btn block" id="reply-send" type="button">Send reply</button>' +
+    '<div class="err" id="reply-err"></div>');
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+  const send = document.getElementById('reply-send');
+  send.addEventListener('click', async function(){
+    const err = document.getElementById('reply-err');
+    err.textContent = '';
+    const body = (document.getElementById('reply-body').value || '').trim();
+    if(!body){ err.textContent = 'Type a message first.'; return; }
+    send.disabled = true;
+    const ok = await postEvent(to, 'Re: ' + (item.title || 'notification'), body, '');
+    send.disabled = false;
+    if(ok){ closeModal(); toast('Reply sent'); }
   });
 }
 
