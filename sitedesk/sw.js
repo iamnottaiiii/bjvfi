@@ -1,4 +1,4 @@
-var CACHE = 'sitedesk-v6';
+var CACHE = 'sitedesk-v7';
 var CORE = ['index.html', 'styles.css', 'app.js', 'config.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon.svg'];
 
 self.addEventListener('install', function(e){
@@ -18,6 +18,14 @@ self.addEventListener('activate', function(e){
 self.addEventListener('fetch', function(e){
   if(e.request.method !== 'GET') return;
   var url = new URL(e.request.url);
+  /* Never intercept cross-origin traffic (api.github.com and friends). Letting
+     the browser handle it natively means a network failure comes back as a
+     proper error the app can report and retry, instead of a null response from
+     a cache fallback that never had the URL. */
+  if(url.origin !== self.location.origin) return;
+  function offline(){
+    return new Response('offline', { status: 503, statusText: 'Service Unavailable' });
+  }
   /* Lead catalog + queue chunks: serve the cached copy instantly, refresh it
      quietly in the background. This is what makes repeat visits paint with
      no spinner. */
@@ -31,7 +39,7 @@ self.addEventListener('fetch', function(e){
             caches.open(CACHE).then(function(c){ c.put(e.request, copy); });
           }
           return resp;
-        }).catch(function(){ return cached; });
+        }).catch(function(){ return cached || offline(); });
         return cached || net;
       })
     );
@@ -42,7 +50,9 @@ self.addEventListener('fetch', function(e){
       var copy = resp.clone();
       caches.open(CACHE).then(function(c){ c.put(e.request, copy); });
       return resp;
-    }).catch(function(){ return caches.match(e.request); })
+    }).catch(function(){
+      return caches.match(e.request).then(function(cached){ return cached || offline(); });
+    })
   );
 });
 

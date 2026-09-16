@@ -1074,21 +1074,26 @@ async function doSignup(){
   try{
     const pass = await pbkdf2Hash(pw1);
     const record = { name: name, role: 'caller', status: 'pending', phone: phone, pass: pass };
-    /* Retry the write on 409/422: another signup or an admin action may have
-       changed users.json between our read and our write. Re-read fresh and
-       re-apply our record up to 3 times before giving up. */
+    /* Retry the read+write. On 409/422 another writer changed users.json
+       between our read and our write, so re-read fresh and re-apply. On a
+       network failure, wait a moment and retry the attempt. */
     let saved = false;
-    for(let attempt = 1; attempt <= 3 && !saved; attempt++){
-      await loadUsers();
-      const existing = state.users[username];
-      if(existing && existing.pass === pass){ saved = true; break; } /* our earlier attempt landed */
-      if(existing){ err.textContent = 'That username is taken.'; return; }
-      state.users[username] = record;
+    for(let attempt = 1; attempt <= 4 && !saved; attempt++){
       try{
+        await loadUsers();
+        const existing = state.users[username];
+        if(existing && existing.pass === pass){ saved = true; break; } /* our earlier attempt landed */
+        if(existing){ err.textContent = 'That username is taken.'; return; }
+        state.users[username] = record;
         await ghPutJson('users.json', state.users, state.usersSha, 'sitedesk: signup @' + username);
         saved = true;
       }catch(e){
-        if((e.status === 409 || e.status === 422) && attempt < 3) continue;
+        const conflict = (e.status === 409 || e.status === 422);
+        const netdown = !e.status;
+        if((conflict || netdown) && attempt < 4){
+          await new Promise(function(r){ setTimeout(r, 1500); });
+          continue;
+        }
         throw e;
       }
     }
