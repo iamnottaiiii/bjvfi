@@ -649,8 +649,8 @@ function renderBell(){
   const b = document.getElementById('btn-bell');
   if(!b) return;
   b.className = 'bell' + (state.unread ? ' has-unread' : '');
-  /* The bell only shows when there is something to notify about. */
-  b.style.display = state.unread ? '' : 'none';
+  /* The bell always shows so alerts are one tap away, even with nothing new. */
+  b.style.display = '';
   b.innerHTML = (state.unread ? '<span class="dot"></span>' : '') + (state.unread ? state.unread : 'Alerts');
 }
 
@@ -1170,15 +1170,15 @@ function shell(content){
   return '<header class="top">' +
     '<div class="brand">sitedesk<div class="brand-sub">bjvfi</div></div>' +
     '<div class="row">' +
-      '<button class="bell' + (state.unread ? ' has-unread' : '') + '" id="btn-bell" type="button" aria-label="Notifications"' + (state.unread ? '' : ' style="display:none"') + '>' +
+      '<button class="bell' + (state.unread ? ' has-unread' : '') + '" id="btn-bell" type="button" aria-label="Notifications">' +
       (state.unread ? '<span class="dot"></span>' : '') + (state.unread ? state.unread : 'Alerts') + '</button>' +
-      '<div class="nav-desktop">' + tabs.filter(function(t){ return t[0] !== 'notifs'; }).map(function(t){
+      '<div class="nav-desktop">' + tabs.map(function(t){
         return '<button class="tab' + (state.tab === t[0] ? ' active' : '') +
           (t[0] === 'notifs' && state.unread ? ' unread-alert' : '') + '" data-tab="' + t[0] + '" type="button">' + t[1] + '</button>';
       }).join('') + '</div>' +
     '</div></header>' +
     '<main class="main">' + notifBannerHtml() + content + '</main>' +
-    '<nav class="bottom-nav">' + tabs.filter(function(t){ return t[0] !== 'notifs'; }).map(function(t){
+    '<nav class="bottom-nav">' + tabs.map(function(t){
       return '<button class="' + (state.tab === t[0] ? 'active' : '') + '" data-tab="' + t[0] + '" type="button">' +
         '<span class="ico">' + esc(t[2]) + '</span><span>' + esc(t[1]) + '</span></button>';
     }).join('') + '</nav>';
@@ -2232,12 +2232,45 @@ function paintEditor(el){
     '<p class="muted" style="font-size:12px;margin-bottom:12px;line-height:1.55">Search a business by name, open its site, edit the code with a live preview, then save a draft or publish. Publishing joins a queue and goes live one at a time.</p>' +
     '<div class="filters"><input id="editor-q" value="' + esc(state.editorQ) + '" placeholder="Search business name"/>' +
     '</div><div id="editor-results"></div></div>';
+  html += '<div class="card" style="margin-top:14px"><h2>Confirmed leads</h2>' +
+    '<p class="muted" style="font-size:12px;margin-bottom:10px;line-height:1.55">Leads other people already confirmed. Tap Open to load the lead\'s site in the editor.</p>' +
+    '<div id="editor-confirmed"><div class="empty">Loading...</div></div></div>';
   html += '<div class="card" style="margin-top:14px"><h2>My drafts</h2><div id="editor-drafts"><div class="empty">Loading...</div></div></div>';
   html += '<div class="card" style="margin-top:14px"><h2>Publish queue</h2><div id="editor-jobs"><div class="empty">Loading...</div></div></div>';
   el.innerHTML = html;
   wireEditorSearch(el);
   loadEditorDrafts(el);
   loadEditorJobs(el);
+  loadEditorConfirmed(el);
+}
+
+/* Every intake in the data repo: the confirmed leads, no matter who the
+   caller was. Builders use this to see what other people already confirmed. */
+function loadEditorConfirmed(el){
+  const box = el.querySelector('#editor-confirmed');
+  if(!box) return;
+  loadIntakes('all').then(function(intakes){
+    if(!el.isConnected) return;
+    const b2 = el.querySelector('#editor-confirmed');
+    if(!b2) return;
+    if(!intakes.length){
+      b2.innerHTML = '<div class="empty">No confirmed leads yet. They show up here once a caller submits build details.</div>';
+      return;
+    }
+    b2.innerHTML = '<div class="open-board">' + intakes.map(function(i){
+      return '<div class="lead-row"><div><div class="lead-row-name">' + esc(i.business || i.slug || '') + '</div>' +
+        '<div class="muted" style="font-size:11px">' + esc(i.claimer_name || i.claimer || '') +
+        ' · ' + esc((i.created_at || '').slice(0, 10)) + '</div></div>' +
+        '<div class="row" style="align-items:center">' + badge(i.status || 'open') +
+        '<button class="btn sm" data-edit-slug="' + esc(i.slug || '') + '" type="button">Open</button></div></div>';
+    }).join('') + '</div>';
+    b2.querySelectorAll('[data-edit-slug]').forEach(function(b){
+      b.addEventListener('click', function(){ openEditorSlug(b.getAttribute('data-edit-slug'), el); });
+    });
+  }).catch(function(e){
+    const b2 = el.querySelector('#editor-confirmed');
+    if(b2) b2.innerHTML = '<div class="empty">' + esc(e.message) + '</div>';
+  });
 }
 
 /* Leave the dedicated edit page and return to the search list. Unsaved
