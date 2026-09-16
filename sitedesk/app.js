@@ -1072,14 +1072,30 @@ async function doSignup(){
   const btn = document.getElementById('su-go');
   btn.disabled = true; btn.textContent = 'Creating...';
   try{
-    await loadUsers();
-    if(state.users[username]){ err.textContent = 'That username is taken.'; return; }
     const pass = await pbkdf2Hash(pw1);
-    state.users[username] = { name: name, role: 'caller', status: 'pending', phone: phone, pass: pass };
-    await ghPutJson('users.json', state.users, state.usersSha, 'sitedesk: signup @' + username);
-    /* Staff alert: a new caller requested an account. Goes to admins, heads
-       and builders as a push notification plus a bell item. */
-    await postEvent('staff', 'New account request: @' + username, name + ' requested a caller account. Tap to review.', 'tab:users');
+    const record = { name: name, role: 'caller', status: 'pending', phone: phone, pass: pass };
+    /* Retry the write on 409/422: another signup or an admin action may have
+       changed users.json between our read and our write. Re-read fresh and
+       re-apply our record up to 3 times before giving up. */
+    let saved = false;
+    for(let attempt = 1; attempt <= 3 && !saved; attempt++){
+      await loadUsers();
+      const existing = state.users[username];
+      if(existing && existing.pass === pass){ saved = true; break; } /* our earlier attempt landed */
+      if(existing){ err.textContent = 'That username is taken.'; return; }
+      state.users[username] = record;
+      try{
+        await ghPutJson('users.json', state.users, state.usersSha, 'sitedesk: signup @' + username);
+        saved = true;
+      }catch(e){
+        if((e.status === 409 || e.status === 422) && attempt < 3) continue;
+        throw e;
+      }
+    }
+    /* Staff alert is best-effort: it must never fail a signup that already saved. */
+    try{
+      await postEvent('staff', 'New account request: @' + username, name + ' requested a caller account. Tap to review.', 'tab:users');
+    }catch(e){ try{ console.warn('signup staff alert failed', e); }catch(_){} }
     document.getElementById('app').innerHTML =
       '<header class="top"><div class="brand">sitedesk<div class="brand-sub">bjvfi</div></div></header>' +
       '<div class="main auth-main"><div class="card"><h2>Request sent</h2>' +
@@ -1088,7 +1104,8 @@ async function doSignup(){
       '</div></div>';
     document.getElementById('su-done').addEventListener('click', renderLogin);
   }catch(e){
-    err.textContent = 'Could not create the account. Please try again.';
+    /* Show the real reason so the next failure is diagnosable. */
+    err.textContent = 'Could not create the account: ' + (e && e.message ? e.message : 'please try again.');
   }finally{
     btn.disabled = false; btn.textContent = 'Create account';
   }
@@ -3223,7 +3240,7 @@ async function saveUsers(){  const rec = await ghGetJson('users.json');
   try{
     await ghPutJson('users.json', state.users, rec ? rec.sha : null, 'sitedesk: users update');
   }catch(e){
-    if(e.status !== 409) throw e;
+    if(e.status !== 409 && e.status !== 422) throw e;
     /* Someone else saved between our read and write: re-read fresh and retry once. */
     const fresh = await ghGetJson('users.json');
     await ghPutJson('users.json', state.users, fresh ? fresh.sha : null, 'sitedesk: users update (retry)');
