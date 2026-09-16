@@ -615,7 +615,7 @@ function openLeadModal(slug){
   if(mc) mc.addEventListener('click', closeModal);
 }
 
-/* Jump straight to whatever an alert points at: lead:<slug>, intake:<id>, tab:profile. */
+/* Jump straight to whatever an alert points at: lead:<slug>, intake:<id>, tab:profile, tab:users. */
 function goAlertLink(link){
   if(!link) return;
   closeModal();
@@ -637,6 +637,10 @@ function goAlertLink(link){
     return;
   } else if(link === 'tab:profile'){
     state.tab = 'profile';
+    renderApp();
+  } else if(link === 'tab:users'){
+    if(!isManager()){ toast('You do not have admin access.'); return; }
+    state.tab = 'admin'; state.adminSec = 'users'; state.adminUser = null;
     renderApp();
   }
 }
@@ -1057,6 +1061,9 @@ async function doSignup(){
     const pass = await pbkdf2Hash(pw1);
     state.users[username] = { name: name, role: 'caller', status: 'pending', phone: phone, pass: pass };
     await ghPutJson('users.json', state.users, state.usersSha, 'sitedesk: signup @' + username);
+    /* Staff alert: a new caller requested an account. Goes to admins, heads
+       and builders as a push notification plus a bell item. */
+    await postEvent('staff', 'New account request: @' + username, name + ' requested a caller account. Tap to review.', 'tab:users');
     document.getElementById('app').innerHTML =
       '<header class="top"><div class="brand">sitedesk<div class="brand-sub">bjvfi</div></div></header>' +
       '<div class="main auth-main"><div class="card"><h2>Request sent</h2>' +
