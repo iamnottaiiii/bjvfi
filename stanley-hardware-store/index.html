@@ -1,568 +1,73 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stanley Hardware Store · Neighborhood Hardware in Ridgewood, NY</title>
-<meta name="description" content="Stanley Hardware Store at 17-11 Bleecker St, Ridgewood, NY 11385. Tools, fasteners, plumbing supplies and home improvement essentials. Call (718) 821-3468.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-:root{
-  --ivory:#FAF5EC; --ivory-2:#F3EAD8; --paper:#FFFDF7;
-  --ink:#2B2118; --ink-soft:#6E5D4A;
-  --rust:#B23E1C; --rust-deep:#7E2A10; --rust-soft:#F6DAC8;
-  --denim:#33506B; --denim-deep:#21374C; --denim-soft:#DCE6F0;
-  --line:#E4D8C2;
-  --radius:16px;
-  --shadow:0 18px 40px -18px rgba(43,33,24,.28);
-  --shadow-sm:0 8px 22px -10px rgba(43,33,24,.22);
-}
-*{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{font-family:"Public Sans",system-ui,sans-serif;background:var(--ivory);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased}
-a{color:var(--rust)}
-::selection{background:var(--rust-soft);color:var(--ink)}
-.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
-
-/* ---------- topbar nav ---------- */
-header.site{position:sticky;top:0;z-index:50;background:rgba(250,245,236,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:3px solid var(--rust)}
-.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0}
-.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
-.brand svg{width:46px;height:46px;flex:none}
-.brand-name{font-family:"Fraunces",serif;font-weight:900;font-size:1.24rem;line-height:1.05;letter-spacing:.2px}
-.brand-name small{display:block;font-family:"Public Sans",sans-serif;font-weight:700;font-size:.6rem;letter-spacing:3.5px;text-transform:uppercase;color:var(--rust)}
-nav.main{display:flex;align-items:center;gap:4px}
-nav.main a{text-decoration:none;color:var(--ink);font-weight:600;font-size:.94rem;padding:9px 14px;border-radius:999px;transition:background .2s,color .2s;white-space:nowrap}
-nav.main a:hover{background:var(--rust-soft)}
-nav.main a.active{background:var(--denim-deep);color:#fff}
-.call-btn{display:inline-flex;align-items:center;gap:8px;background:var(--rust);color:#fff;text-decoration:none;font-weight:700;padding:11px 20px;border-radius:999px;box-shadow:var(--shadow-sm);transition:transform .18s,background .18s;white-space:nowrap}
-.call-btn:hover{background:var(--rust-deep);transform:translateY(-2px)}
-.burger{display:none;background:none;border:0;cursor:pointer;padding:10px}
-.burger span{display:block;width:26px;height:3px;border-radius:3px;background:var(--ink);margin:5px 0;transition:.25s}
-
-/* ---------- pages / router ---------- */
-.page{display:none}
-.page.active{display:block;animation:fadeIn .3s ease}
-@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-
-/* ---------- full-bleed hero ---------- */
-.hero{background:var(--rust);color:#fff;position:relative;overflow:hidden}
-.hero .wrap{padding-top:72px;padding-bottom:72px;position:relative;z-index:1}
-.hero::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 20%,rgba(255,255,255,.14),transparent 45%),radial-gradient(circle at 10% 90%,rgba(0,0,0,.18),transparent 50%);pointer-events:none}
-.kicker{display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.35);padding:8px 18px;border-radius:999px;font-size:.82rem;font-weight:700;letter-spacing:2px;text-transform:uppercase}
-.hero h1{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(2.6rem,6vw,4.6rem);line-height:1.02;margin:22px 0 18px;max-width:14ch}
-.hero p.lede{font-size:1.2rem;max-width:44ch;color:#FBEEDF}
-.hero-cta{display:flex;flex-wrap:wrap;gap:14px;margin-top:30px}
-.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;padding:14px 28px;border-radius:999px;transition:transform .18s,background .18s}
-.btn-light{background:#fff;color:var(--rust-deep)}
-.btn-light:hover{transform:translateY(-2px);background:var(--ivory)}
-.btn-dark{background:var(--denim-deep);color:#fff}
-.btn-dark:hover{transform:translateY(-2px);background:#16283a}
-.hero-art{position:absolute;right:-40px;top:50%;transform:translateY(-50%);opacity:.22;pointer-events:none}
-.strip{background:var(--denim-deep);color:#EAF0F7}
-.strip .wrap{display:flex;flex-wrap:wrap;gap:10px 34px;padding-top:14px;padding-bottom:14px;font-size:.95rem;font-weight:600}
-.strip span{display:inline-flex;align-items:center;gap:9px}
-
-/* ---------- sections ---------- */
-.section{padding:64px 0}
-.sec-title{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(1.8rem,3.6vw,2.6rem);line-height:1.1;margin-bottom:10px}
-.sec-sub{color:var(--ink-soft);max-width:60ch;margin-bottom:32px}
-.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
-.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:26px 22px;box-shadow:var(--shadow-sm);transition:transform .2s}
-.card:hover{transform:translateY(-4px)}
-.card .ico{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:var(--rust-soft);margin-bottom:16px}
-.card .ico.blue{background:var(--denim-soft)}
-.card h3{font-family:"Fraunces",serif;font-size:1.18rem;margin-bottom:8px}
-.card p{font-size:.95rem;color:var(--ink-soft)}
-.card a.more{display:inline-block;margin-top:12px;font-weight:700;font-size:.92rem}
-
-/* ---------- tabs ---------- */
-.tabs{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:26px}
-.tab-btn{border:2px solid var(--line);background:var(--paper);color:var(--ink);font-weight:700;font-size:.95rem;padding:11px 22px;border-radius:999px;cursor:pointer;transition:all .2s;font-family:inherit}
-.tab-btn:hover{border-color:var(--rust)}
-.tab-btn.active{background:var(--rust);border-color:var(--rust);color:#fff}
-.tab-panel{display:none;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:34px;box-shadow:var(--shadow-sm)}
-.tab-panel.active{display:block;animation:fadeIn .25s ease}
-.tab-panel h3{font-family:"Fraunces",serif;font-size:1.5rem;margin-bottom:6px}
-.tab-panel .note{color:var(--ink-soft);font-size:.95rem;margin-bottom:20px}
-.item-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.item{background:var(--ivory);border:1px dashed var(--line);border-radius:12px;padding:13px 16px;font-size:.95rem;font-weight:600}
-.stock-note{margin-top:22px;background:var(--denim-soft);border-radius:12px;padding:16px 20px;font-size:.95rem}
-
-/* ---------- story ---------- */
-.story-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
-.story-art{background:var(--denim-deep);border-radius:var(--radius);min-height:340px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
-.story-art svg{width:64%;height:auto;opacity:.9}
-.fact-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:28px}
-.fact{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center}
-.fact b{display:block;font-family:"Fraunces",serif;font-size:1.3rem;color:var(--rust-deep)}
-
-/* ---------- masonry gallery ---------- */
-.masonry{columns:3;column-gap:18px}
-.tile{break-inside:avoid;margin-bottom:18px;border-radius:var(--radius);overflow:hidden;position:relative;border:1px solid var(--line);box-shadow:var(--shadow-sm)}
-.tile .ph{display:flex;align-items:center;justify-content:center;min-height:200px;color:#fff;font-weight:700}
-.tile.t1 .ph{background:linear-gradient(135deg,#B23E1C,#7E2A10)}
-.tile.t2 .ph{background:linear-gradient(135deg,#33506B,#21374C);min-height:280px}
-.tile.t3 .ph{background:linear-gradient(135deg,#8a5a2b,#5e3c18);min-height:240px}
-.tile.t4 .ph{background:linear-gradient(135deg,#4a5d23,#2e3a15);min-height:200px}
-.tile.t5 .ph{background:linear-gradient(135deg,#6b6b72,#3d3d44);min-height:300px}
-.tile.t6 .ph{background:linear-gradient(135deg,#9c4a1a,#6e300c);min-height:220px}
-.badge{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.55);color:#fff;font-size:.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:6px 12px;border-radius:999px}
-.tile figcaption{padding:14px 18px;font-size:.92rem;background:var(--paper)}
-
-/* ---------- reviews ---------- */
-.rev-summary{background:var(--denim-deep);color:#fff;border-radius:var(--radius);padding:38px;display:flex;flex-wrap:wrap;gap:28px;align-items:center;justify-content:space-between;margin-bottom:34px}
-.rev-summary .score{font-family:"Fraunces",serif;font-size:3.4rem;font-weight:900;line-height:1}
-.stars{color:#F2B33D;font-size:1.3rem;letter-spacing:4px}
-.rev-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.rev{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow-sm);position:relative}
-.rev .who{font-weight:700;margin-top:14px}
-.rev .when{font-size:.82rem;color:var(--ink-soft)}
-.sample-tag{display:inline-block;background:var(--rust-soft);color:var(--rust-deep);font-size:.7rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 12px;border-radius:999px;margin-bottom:12px}
-.themes{display:flex;flex-wrap:wrap;gap:10px;margin:26px 0}
-.themes span{background:var(--ivory-2);border:1px solid var(--line);border-radius:999px;padding:8px 16px;font-size:.88rem;font-weight:600}
-
-/* ---------- visit ---------- */
-.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:start}
-.vcard{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm)}
-.vcard h3{font-family:"Fraunces",serif;font-size:1.35rem;margin-bottom:14px}
-.hours-table{width:100%;border-collapse:collapse;font-size:.95rem}
-.hours-table td{padding:9px 4px;border-bottom:1px dashed var(--line)}
-.hours-table td:last-child{text-align:right;font-weight:600}
-.map-ph{background:var(--denim-soft);border:2px dashed var(--denim);border-radius:var(--radius);min-height:300px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--denim-deep);font-weight:700;text-align:center;padding:24px}
-.addr{font-size:1.1rem;font-weight:600;line-height:1.7}
-.big-tel{font-family:"Fraunces",serif;font-size:1.9rem;font-weight:900;color:var(--rust-deep);text-decoration:none;display:inline-block;margin:8px 0}
-
-/* ---------- big-type footer ---------- */
-footer.site{background:var(--denim-deep);color:#EAF0F7;margin-top:0}
-footer .giant{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(2.4rem,7vw,5rem);line-height:1;padding:56px 0 8px;letter-spacing:.5px}
-footer .cols{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;padding:30px 0 40px}
-footer .cols h4{font-size:.78rem;letter-spacing:2.5px;text-transform:uppercase;color:#A9BDD2;margin-bottom:14px}
-footer .cols a{color:#EAF0F7;text-decoration:none;display:block;padding:5px 0;font-size:.95rem}
-footer .cols a:hover{text-decoration:underline}
-footer .fine{border-top:1px solid rgba(255,255,255,.16);padding:22px 0;text-align:center;font-size:.92rem;color:#C6D4E2}
-
-.reveal{opacity:0;transform:translateY(18px);transition:opacity .5s ease,transform .5s ease}
-.reveal.in{opacity:1;transform:none}
-
-@media(max-width:900px){
-  .cards{grid-template-columns:repeat(2,1fr)}
-  .item-grid{grid-template-columns:repeat(2,1fr)}
-  .story-grid,.visit-grid{grid-template-columns:1fr}
-  .rev-cards{grid-template-columns:1fr}
-  .masonry{columns:2}
-  footer .cols{grid-template-columns:1fr}
-  .hero-art{display:none}
-}
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Stanley Hardware Store | Plumber</title><style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{height:100%}
+body{min-height:100vh;background:#faf8f2;color:#141210;font-family:Verdana, Geneva, sans-serif;display:flex;flex-direction:column;line-height:1.5}
+main{flex:1 0 auto}
+a{color:#6d28d9}
+section.page{display:none}
+section.page.active{display:block}
+.mono{font-family:"Lucida Console", Monaco, monospace}
+.burger{display:none;background:#141210;color:#faf8f2;border:5px solid #141210;padding:8px 12px;font-family:"Lucida Console", Monaco, monospace;font-weight:bold;cursor:pointer;font-size:16px}
+.btn{display:inline-block;border:5px solid #141210;background:#6d28d9;color:#fff;padding:12px 20px;font-weight:bold;text-decoration:none;border-radius:0px;cursor:pointer;font-family:Verdana, Geneva, sans-serif}
+.btn.ghost{background:#faf8f2;color:#141210}
+.tag{display:inline-block;border:2px solid #141210;padding:2px 8px;font-family:"Lucida Console", Monaco, monospace;font-size:12px;background:#fff;border-radius:0px}
+.card{background:#fff;border:5px solid #141210;border-radius:0px;padding:16px}
+.hero{border:5px solid #141210;border-radius:0px}
+footer{margin-top:auto;background:#141210;color:#faf8f2;padding:18px;text-align:center;font-family:"Lucida Console", Monaco, monospace;font-weight:bold}
+input,textarea{width:100%;border:5px solid #141210;border-radius:0px;padding:10px;font-family:Verdana, Geneva, sans-serif;font-size:15px;background:#fff}
+label{font-family:"Lucida Console", Monaco, monospace;font-weight:bold;display:block;margin:12px 0 4px}
+.formnote{display:none;border:5px solid #6d28d9;background:#fff;padding:14px;margin-top:14px;border-radius:0px}
+.svc{border:5px solid #141210;background:#fff;border-radius:0px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px}
 @media(max-width:760px){
-  nav.main{display:none;position:absolute;top:100%;left:0;right:0;background:var(--paper);flex-direction:column;align-items:stretch;padding:14px;border-bottom:3px solid var(--rust);box-shadow:var(--shadow)}
-  nav.main.open{display:flex}
-  nav.main a{padding:13px 18px}
-  .burger{display:block}
-  .bar .call-btn{display:none}
+  .burger{display:inline-block}
+  .navlinks{display:none;width:100%}
+  body.menu-open .navlinks{display:block}
 }
-</style>
-</head>
-<body>
 
-<header class="site">
-  <div class="wrap bar">
-    <a class="brand" href="#home" data-page="home" aria-label="Stanley Hardware Store home">
-      <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="4" y="4" width="40" height="40" rx="10" fill="#B23E1C"/><path d="M32 12a8 8 0 0 0-10.5 7.6L13 28l7 7 8.5-8.5A8 8 0 0 0 36 16l-5 5-4-4 5-5z" fill="#fff" transform="rotate(8 24 24)"/></svg>
-      <span class="brand-name">Stanley Hardware<small>Ridgewood · NY</small></span>
-    </a>
-    <nav class="main" id="mainNav" aria-label="Primary">
-      <a href="#home" data-page="home">Home</a>
-      <a href="#services" data-page="services">Departments</a>
-      <a href="#story" data-page="story">Our Story</a>
-      <a href="#gallery" data-page="gallery">Gallery</a>
-      <a href="#reviews" data-page="reviews">Reviews</a>
-      <a href="#visit" data-page="visit">Visit Us</a>
-    </nav>
-    <a class="call-btn" href="tel:+17188213468">(718) 821-3468</a>
-    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
-  </div>
-</header>
-
-<main>
-
-<section class="page" id="page-home">
-  <div class="hero">
-    <div class="wrap">
-      <span class="kicker">Neighborhood hardware · Ridgewood, Queens</span>
-      <h1>The little store that has the fix.</h1>
-      <p class="lede">Stanley Hardware Store stocks the tools, fasteners, plumbing supplies and home improvement essentials Ridgewood reaches for first. Small shop, deep shelves, and owners who will help you figure out the job.</p>
-      <div class="hero-cta">
-        <a class="btn btn-light" href="#services" data-page="services">Browse departments</a>
-        <a class="btn btn-dark" href="tel:+17188213468">Call (718) 821-3468</a>
-      </div>
-    </div>
-    <svg class="hero-art" width="420" height="420" viewBox="0 0 420 420" aria-hidden="true"><g fill="none" stroke="#fff" stroke-width="10"><circle cx="210" cy="210" r="180"/><path d="M120 290 L260 150 M260 150 l-24 -6 M260 150 l6 -24"/><circle cx="150" cy="140" r="34"/></g></svg>
-  </div>
-  <div class="strip"><div class="wrap">
-    <span>Open 6 days a week</span><span>Tools and fasteners</span><span>Plumbing supplies</span><span>All major credit cards accepted</span>
-  </div></div>
-
-  <div class="section"><div class="wrap">
-    <h2 class="sec-title reveal">What the shelves hold</h2>
-    <p class="sec-sub reveal">Six departments covering the everyday repairs, projects and quick fixes of apartment and house life in Ridgewood.</p>
-    <div class="cards">
-      <div class="card reveal"><div class="ico"><svg width="30" height="30" viewBox="0 0 30 30"><path d="M20 4a7 7 0 0 0-9 8.5L4 19.5 10.5 26l7-7A7 7 0 0 0 26 10l-4 4-3-3 4-4z" fill="#B23E1C"/></svg></div><h3>Plumbing and Pipe</h3><p>Fittings, faucets, supply lines, valves, drain care and the parts that stop a drip.</p><a class="more" href="#services" data-page="services">See plumbing aisle</a></div>
-      <div class="card reveal"><div class="ico blue"><svg width="30" height="30" viewBox="0 0 30 30"><rect x="12" y="3" width="6" height="14" rx="3" fill="#33506B"/><rect x="5" y="17" width="20" height="4" rx="2" fill="#33506B"/></svg></div><h3>Tools</h3><p>Hand tools and the basics for electrical projects, assembly and repairs.</p><a class="more" href="#services" data-page="services">See tools</a></div>
-      <div class="card reveal"><div class="ico"><svg width="30" height="30" viewBox="0 0 30 30"><path d="M15 3v24M3 15h24" stroke="#B23E1C" stroke-width="4" stroke-linecap="round"/></svg></div><h3>Fasteners</h3><p>Screws, bolts, anchors and nails in the sizes home projects actually need.</p><a class="more" href="#services" data-page="services">See fasteners</a></div>
-      <div class="card reveal"><div class="ico blue"><svg width="30" height="30" viewBox="0 0 30 30"><rect x="6" y="6" width="18" height="18" rx="3" fill="none" stroke="#33506B" stroke-width="3"/><path d="M6 12h18" stroke="#33506B" stroke-width="3"/></svg></div><h3>Paint and Patch</h3><p>Paint, spackle, sandpaper and supplies for touch-ups and full repaints.</p><a class="more" href="#services" data-page="services">See paint aisle</a></div>
-    </div>
-  </div></div>
-
-  <div class="section" style="background:var(--ivory-2)"><div class="wrap">
-    <h2 class="sec-title reveal">A neighborhood favorite</h2>
-    <p class="sec-sub reveal">Based on 12 Google reviews, shoppers keep coming back for the helpful owners, fair prices and a store that punches above its size.</p>
-    <div class="hero-cta" style="margin-top:6px">
-      <a class="btn btn-dark" href="#reviews" data-page="reviews">Read what neighbors say</a>
-      <a class="btn btn-light" href="#visit" data-page="visit">Plan your visit</a>
-    </div>
-  </div></div>
-</section>
-
-<section class="page" id="page-services">
-  <div class="section"><div class="wrap">
-    <h2 class="sec-title">Shop by department</h2>
-    <p class="sec-sub">Tap a department to see what the aisle typically carries. Stock turns fast, so call ahead if you are coming for one specific part.</p>
-    <div class="tabs" role="tablist" aria-label="Store departments">
-      <button class="tab-btn active" data-tab="plumbing" role="tab" aria-selected="true">Plumbing and Pipe</button>
-      <button class="tab-btn" data-tab="tools" role="tab" aria-selected="false">Tools</button>
-      <button class="tab-btn" data-tab="electrical" role="tab" aria-selected="false">Electrical</button>
-      <button class="tab-btn" data-tab="paint" role="tab" aria-selected="false">Paint and Patch</button>
-      <button class="tab-btn" data-tab="locks" role="tab" aria-selected="false">Locks and Keys</button>
-      <button class="tab-btn" data-tab="fasteners" role="tab" aria-selected="false">Fasteners and Fittings</button>
-    </div>
-
-    <div class="tab-panel active" data-panel="plumbing">
-      <h3>Plumbing and Pipe</h3>
-      <p class="note">Everything for leaks, drips, clogs and fixture swaps in older Queens buildings.</p>
-      <div class="item-grid">
-        <div class="item">Faucet repair kits and cartridges</div>
-        <div class="item">Toilet flappers, fill valves and wax rings</div>
-        <div class="item">Supply lines and shut-off valves</div>
-        <div class="item">Pipe fittings, elbows and couplings</div>
-        <div class="item">Plungers and drain snakes</div>
-        <div class="item">Drain cleaners and strainers</div>
-        <div class="item">Thread seal tape and pipe dope</div>
-        <div class="item">Pipe wrenches and basin wrenches</div>
-        <div class="item">Shower heads and aerators</div>
-      </div>
-      <div class="stock-note">Not sure which part fits your pipe? Bring the old one in, or snap a photo and call <a href="tel:+17188213468">(718) 821-3468</a> before you come.</div>
-    </div>
-
-    <div class="tab-panel" data-panel="tools">
-      <h3>Tools</h3>
-      <p class="note">Hand tools and job-site basics for repairs, assembly and projects.</p>
-      <div class="item-grid">
-        <div class="item">Hammers and mallets</div>
-        <div class="item">Screwdriver sets</div>
-        <div class="item">Adjustable wrenches and pliers</div>
-        <div class="item">Tape measures and levels</div>
-        <div class="item">Utility knives and blades</div>
-        <div class="item">Hex key sets</div>
-        <div class="item">Drill bits and drivers</div>
-        <div class="item">Saws and blades</div>
-        <div class="item">Tool boxes and organizers</div>
-      </div>
-      <div class="stock-note">Stock rotates with the seasons. Call <a href="tel:+17188213468">(718) 821-3468</a> to confirm a specific tool is on the shelf.</div>
-    </div>
-
-    <div class="tab-panel" data-panel="electrical">
-      <h3>Electrical</h3>
-      <p class="note">Everyday electrical project parts for switches, outlets and lighting.</p>
-      <div class="item-grid">
-        <div class="item">Light switches and dimmers</div>
-        <div class="item">Outlets and cover plates</div>
-        <div class="item">Wire nuts and electrical tape</div>
-        <div class="item">Extension cords and power strips</div>
-        <div class="item">Light bulbs and batteries</div>
-        <div class="item">Cable staples and ties</div>
-        <div class="item">Flashlights and lanterns</div>
-        <div class="item">Circuit testers</div>
-        <div class="item">Fuses and breakers</div>
-      </div>
-      <div class="stock-note">For anything beyond a basic swap, we will point you to the right part. Call <a href="tel:+17188213468">(718) 821-3468</a>.</div>
-    </div>
-
-    <div class="tab-panel" data-panel="paint">
-      <h3>Paint and Patch</h3>
-      <p class="note">Touch-up and repaint supplies for apartments and houses.</p>
-      <div class="item-grid">
-        <div class="item">Interior paint and primers</div>
-        <div class="item">Brushes, rollers and trays</div>
-        <div class="item">Painter's tape and drop cloths</div>
-        <div class="item">Spackle and putty knives</div>
-        <div class="item">Sandpaper and sanding blocks</div>
-        <div class="item">Caulk and caulk guns</div>
-        <div class="item">Wood filler and stain</div>
-        <div class="item">Spray paint</div>
-        <div class="item">Cleaning solvents</div>
-      </div>
-      <div class="stock-note">Ask at the counter for help matching a wall color for a rental touch-up.</div>
-    </div>
-
-    <div class="tab-panel" data-panel="locks">
-      <h3>Locks and Keys</h3>
-      <p class="note">Home security and access basics.</p>
-      <div class="item-grid">
-        <div class="item">Deadbolts and door knobs</div>
-        <div class="item">Padlocks and combination locks</div>
-        <div class="item">Door hinges and strikes</div>
-        <div class="item">Chain locks and viewers</div>
-        <div class="item">Cabinet locks and latches</div>
-        <div class="item">Sliding door hardware</div>
-        <div class="item">Door stops and closers</div>
-        <div class="item">Mailbox locks</div>
-        <div class="item">Window locks</div>
-      </div>
-      <div class="stock-note">Call <a href="tel:+17188213468">(718) 821-3468</a> to check availability before making a special trip.</div>
-    </div>
-
-    <div class="tab-panel" data-panel="fasteners">
-      <h3>Fasteners and Fittings</h3>
-      <p class="note">The small stuff that holds everything together.</p>
-      <div class="item-grid">
-        <div class="item">Wood and machine screws</div>
-        <div class="item">Bolts, nuts and washers</div>
-        <div class="item">Wall anchors and toggles</div>
-        <div class="item">Nails and brads</div>
-        <div class="item">Hooks, eyes and hangers</div>
-        <div class="item">Brackets and braces</div>
-        <div class="item">Hose clamps and ties</div>
-        <div class="item">Adhesives and epoxies</div>
-        <div class="item">Chain and rope</div>
-      </div>
-      <div class="stock-note">Buy one or buy a box. We sell fasteners in the quantities a real project needs.</div>
-    </div>
-  </div></div>
-</section>
-
-<section class="page" id="page-story">
-  <div class="section"><div class="wrap">
-    <h2 class="sec-title">Our story</h2>
-    <p class="sec-sub">A corner of Bleecker Street where Ridgewood comes to fix things.</p>
-    <div class="story-grid">
-      <div>
-        <p style="margin-bottom:16px">Stanley Hardware Store is an independent, neighborhood-run hardware store at 17-11 Bleecker St in Ridgewood, Queens. Walk in and you get what the big-box stores cannot give you: somebody who knows the stock, knows the building stock of this neighborhood, and will talk through the repair with you.</p>
-        <p style="margin-bottom:16px">Reviewers keep mentioning the same things: friendly and helpful owners, fair prices, and a small shop that somehow has exactly what the project needs, from an electrical fix to a home renovation. That is the whole business model. Keep the shelves deep, the advice free, and the door open six days a week.</p>
-        <p>Ridgewood is a neighborhood of prewar buildings, garden apartments and fixer-uppers, and this store exists to keep them running: plumbing parts for old pipes, fasteners by the box, paint for the move-out touch-up, and tools for everything in between.</p>
-        <div class="fact-row">
-          <div class="fact"><b>6</b>days open weekly</div>
-          <div class="fact"><b>6</b>departments</div>
-          <div class="fact"><b>1</b>neighborhood served</div>
-        </div>
-      </div>
-      <div class="story-art">
-        <svg viewBox="0 0 300 220" aria-hidden="true"><g fill="none" stroke="#F6DAC8" stroke-width="8"><rect x="60" y="60" width="180" height="120" rx="8"/><path d="M60 100h180M100 60v120M140 60v120M180 60v120"/><path d="M230 40h40M230 40v40M270 40v40" stroke-width="10"/></g></svg>
-      </div>
-    </div>
-  </div></div>
-</section>
-
-<section class="page" id="page-gallery">
-  <div class="section"><div class="wrap">
-    <h2 class="sec-title">Inside the store</h2>
-    <p class="sec-sub">A look at the aisles. Photos are coming soon, and each tile marks where a real photo will go.</p>
-    <div class="masonry">
-      <figure class="tile t1"><div class="ph">Plumbing aisle<span class="badge">Photo soon</span></div><figcaption>Pipe fittings, valves and faucet parts.</figcaption></figure>
-      <figure class="tile t2"><div class="ph">Tool wall<span class="badge">Photo soon</span></div><figcaption>Hand tools within easy reach.</figcaption></figure>
-      <figure class="tile t3"><div class="ph">Fastener bins<span class="badge">Photo soon</span></div><figcaption>Screws, bolts and anchors by the box.</figcaption></figure>
-      <figure class="tile t4"><div class="ph">Paint corner<span class="badge">Photo soon</span></div><figcaption>Paint, rollers and patch supplies.</figcaption></figure>
-      <figure class="tile t5"><div class="ph">Front counter<span class="badge">Photo soon</span></div><figcaption>Where the free advice happens.</figcaption></figure>
-      <figure class="tile t6"><div class="ph">Storefront<span class="badge">Photo soon</span></div><figcaption>17-11 Bleecker St, Ridgewood.</figcaption></figure>
-    </div>
-  </div></div>
-</section>
-
-<section class="page" id="page-reviews">
-  <div class="section"><div class="wrap">
-    <h2 class="sec-title">What neighbors say</h2>
-    <p class="sec-sub">Real review themes from shoppers. Names and cards below are samples that paraphrase common sentiments.</p>
-    <div class="rev-summary">
-      <div>
-        <div class="score">3.0</div>
-        <div class="stars" aria-label="3 out of 5 stars">★★★☆☆</div>
-        <p style="margin-top:8px;color:#C6D4E2">Based on 12 Google reviews</p>
-      </div>
-      <a class="btn btn-light" href="https://www.google.com/maps/place/?q=place_id:ChIJP0Mxih9cwokRXkUws3Z5_GA" target="_blank" rel="noopener">See reviews on Google</a>
-    </div>
-    <div class="themes">
-      <span>Friendly, helpful owners</span><span>Well stocked for its size</span><span>Fair prices</span><span>Open late enough</span><span>Great for renovation advice</span>
-    </div>
-    <div class="rev-cards">
-      <div class="rev"><span class="sample-tag">Sample</span><p>"They were open late enough for me to make it, they had what I needed, and the price was great. Do not let the small size fool you."</p><div class="who">Neighbor shopper</div><div class="when">Paraphrased from a Google review</div></div>
-      <div class="rev"><span class="sample-tag">Sample</span><p>"The owner gave me excellent suggestions for my home renovation. You can tell they actually know the stock."</p><div class="who">Ridgewood homeowner</div><div class="when">Paraphrased from a Google review</div></div>
-      <div class="rev"><span class="sample-tag">Sample</span><p>"Friendly and helpful every time. Had everything I needed for my electrical project in one trip."</p><div class="who">DIY regular</div><div class="when">Paraphrased from a Google review</div></div>
-    </div>
-  </div></div>
-</section>
-
-<section class="page" id="page-visit">
-  <div class="section"><div class="wrap">
-    <h2 class="sec-title">Visit us</h2>
-    <p class="sec-sub">On Bleecker Street in Ridgewood, Queens. Street parking nearby.</p>
-    <div class="visit-grid">
-      <div class="vcard">
-        <h3>Find us</h3>
-        <p class="addr">Stanley Hardware Store<br>17-11 Bleecker St<br>Ridgewood, NY 11385</p>
-        <a class="big-tel" href="tel:+17188213468">(718) 821-3468</a>
-        <div class="hero-cta" style="margin-top:10px">
-          <a class="btn btn-dark" href="https://www.google.com/maps/place/?q=place_id:ChIJP0Mxih9cwokRXkUws3Z5_GA" target="_blank" rel="noopener">Get directions</a>
-        </div>
-      </div>
-      <div class="vcard">
-        <h3>Store hours</h3>
-        <table class="hours-table">
-          <tr><td>Monday</td><td>9:00 AM - 7:00 PM</td></tr>
-          <tr><td>Tuesday</td><td>9:00 AM - 7:00 PM</td></tr>
-          <tr><td>Wednesday</td><td>9:00 AM - 7:00 PM</td></tr>
-          <tr><td>Thursday</td><td>9:00 AM - 7:00 PM</td></tr>
-          <tr><td>Friday</td><td>9:30 AM - 7:00 PM</td></tr>
-          <tr><td>Saturday</td><td>10:00 AM - 6:00 PM</td></tr>
-          <tr><td>Sunday</td><td>11:00 AM - 3:00 PM</td></tr>
-        </table>
-      </div>
-    </div>
-    <div class="map-ph" style="margin-top:26px">
-      <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><path d="M22 4a12 12 0 0 0-12 12c0 9 12 24 12 24s12-15 12-24A12 12 0 0 0 22 4zm0 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8z" fill="#33506B"/></svg>
-      <span>Map photo soon</span>
-      <span style="font-weight:400;font-size:.9rem">Tap Get directions above for the live map.</span>
-    </div>
-  </div></div>
-</section>
-
-</main>
-
-<footer class="site">
-  <div class="wrap">
-    <div class="giant">Stanley Hardware Store</div>
-    <div class="cols">
-      <div>
-        <h4>Pages</h4>
-        <a href="#home" data-page="home">Home</a>
-        <a href="#services" data-page="services">Departments</a>
-        <a href="#story" data-page="story">Our Story</a>
-        <a href="#gallery" data-page="gallery">Gallery</a>
-        <a href="#reviews" data-page="reviews">Reviews</a>
-        <a href="#visit" data-page="visit">Visit Us</a>
-      </div>
-      <div>
-        <h4>Departments</h4>
-        <a href="#services" data-page="services">Plumbing and Pipe</a>
-        <a href="#services" data-page="services">Tools</a>
-        <a href="#services" data-page="services">Electrical</a>
-        <a href="#services" data-page="services">Paint and Patch</a>
-        <a href="#services" data-page="services">Locks and Keys</a>
-      </div>
-      <div>
-        <h4>Contact</h4>
-        <a href="tel:+17188213468">(718) 821-3468</a>
-        <a href="https://www.google.com/maps/place/?q=place_id:ChIJP0Mxih9cwokRXkUws3Z5_GA" target="_blank" rel="noopener">17-11 Bleecker St, Ridgewood, NY 11385</a>
-        <a href="https://www.google.com/maps/place/?q=place_id:ChIJP0Mxih9cwokRXkUws3Z5_GA" target="_blank" rel="noopener">See reviews on Google</a>
-      </div>
-    </div>
-    <div class="fine">© Stanley Hardware Store</div>
-  </div>
-</footer>
-
-<script>
-(function(){
-  "use strict";
-
-  var PAGES = ["home", "services", "story", "gallery", "reviews", "visit"];
-  var nav = document.getElementById("mainNav");
-  var burger = document.getElementById("burger");
-
-  function cleanHash(){
-    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+.topbar{display:flex;align-items:center;gap:16px;border-bottom:5px solid #141210;padding:14px 20px;background:#fff;position:sticky;top:0;z-index:10}.brand{font-weight:bold;font-size:20px}.navlinks{display:flex;gap:4px;margin-left:auto}.navlinks a{padding:8px 12px;text-decoration:none;color:#141210;font-weight:bold;border:2px solid transparent}.navlinks a.current{border-color:#141210;background:#6d28d9;color:#fff}.wrap{max-width:1100px;margin:0 auto;padding:24px 20px}.grid2{display:grid;grid-template-columns:1.2fr .8fr;gap:20px;padding:28px}.hero h1{font-size:40px;line-height:1.1;margin:10px 0}.btnrow{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}.big{font-size:20px;font-weight:bold}.small{font-size:12px;letter-spacing:1px}.homecards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:20px}</style><script type="application/ld+json">{"@context": "https://schema.org", "@type": "LocalBusiness", "name": "Stanley Hardware Store", "telephone": "(718) 821-3468", "address": {"@type": "PostalAddress", "streetAddress": "Stanley Hardware Store, 17-11 Bleecker St, Ridgewood, NY 11385"}}</script><style>html{height:100%}body{min-height:100vh}</style></head><body class="a0"><header class="topbar"><div class="brand mono">Stanley Hardware Store</div><nav class="navlinks"><a href="#home" data-nav="home" onclick="navigateTo('home');return false;">Home</a>
+<a href="#services" data-nav="services" onclick="navigateTo('services');return false;">Services</a>
+<a href="#about" data-nav="about" onclick="navigateTo('about');return false;">About</a>
+<a href="#reviews" data-nav="reviews" onclick="navigateTo('reviews');return false;">Reviews</a>
+<a href="#contact" data-nav="contact" onclick="navigateTo('contact');return false;">Contact</a></nav><button class="burger" onclick="toggleMenu()" aria-label="Menu">MENU</button></header><main><div class="wrap"><section class="page" data-page="home"><div class="hero grid2"><div><div class="tag mono">Plumber</div><h1>Stanley Hardware Store</h1><p>Stanley Hardware Store, 17-11 Bleecker St, Ridgewood, NY 11385</p><div class="btnrow"><a class="btn" href="tel:+17188213468">Call (718) 821-3468</a> <a class="btn ghost" href="#services" onclick="navigateTo('services');return false;">View services</a></div></div><div class="card infocard"><div class="mono small">PHONE</div><div class="big mono"><a href="tel:+17188213468">(718) 821-3468</a></div><div class="mono small" style="margin-top:10px">ADDRESS</div><div><a href="https://www.google.com/maps/place/?q=place_id:ChIJP0Mxih9cwokRXkUws3Z5_GA" target="_blank" rel="noopener">Stanley Hardware Store, 17-11 Bleecker St, Ridgewood, NY 11385</a></div></div></div><div class="homecards"><div class="card"><div class="mono small">TRADE</div><p>Plumber</p><p><a href="#services" onclick="navigateTo('services');return false;">See example services</a></p></div><div class="card"><div class="mono small">VISIT</div><p>Stanley Hardware Store, 17-11 Bleecker St, Ridgewood, NY 11385</p><p><a href="https://www.google.com/maps/place/?q=place_id:ChIJP0Mxih9cwokRXkUws3Z5_GA" target="_blank" rel="noopener">Get directions</a></p></div><div class="card"><div class="mono small">CALL</div><p><a href="tel:+17188213468">(718) 821-3468</a></p><p>Call to confirm services and availability.</p></div></div></section><section class="page" data-page="services"><div class="card"><div class="tag mono">SERVICES</div><h1>Services</h1><p>Example services for a Plumber. Call Stanley Hardware Store at <a href="tel:+17188213468">(718) 821-3468</a> to confirm what is offered.</p></div><div style="display:grid;gap:12px;margin-top:16px"><div class="svc"><span><strong>Drain cleaning</strong></span><span class="tag mono">sample</span></div><div class="svc"><span><strong>Faucet and fixture repair</strong></span><span class="tag mono">sample</span></div><div class="svc"><span><strong>Water heater service</strong></span><span class="tag mono">sample</span></div><div class="svc"><span><strong>Leak detection and repair</strong></span><span class="tag mono">sample</span></div><div class="svc"><span><strong>Toilet repair and installation</strong></span><span class="tag mono">sample</span></div><div class="svc"><span><strong>Sewer line service</strong></span><span class="tag mono">sample</span></div></div></section><section class="page" data-page="about"><div class="card"><div class="tag mono">ABOUT</div><h1>About Stanley Hardware Store</h1><p>Stanley Hardware Store is listed as a Plumber located at Stanley Hardware Store, 17-11 Bleecker St, Ridgewood, NY 11385.</p><p>For current information about services, hours, and availability, call <a href="tel:+17188213468">(718) 821-3468</a>.</p></div></section><section class="page" data-page="reviews"><div class="card"><div class="tag mono">REVIEWS</div><h1>Reviews</h1><p>See reviews for Stanley Hardware Store on Google Maps.</p><p><a class="btn" href="https://www.google.com/maps/place/?q=place_id:ChIJP0Mxih9cwokRXkUws3Z5_GA" target="_blank" rel="noopener">See reviews on Google Maps</a></p><p class="mono small">Review text is hosted on Google Maps and is not republished here.</p></div></section><section class="page" data-page="contact"><div class="card"><div class="tag mono">CONTACT</div><h1>Contact</h1><p><strong>Stanley Hardware Store</strong></p><p>Address: <a href="https://www.google.com/maps/place/?q=place_id:ChIJP0Mxih9cwokRXkUws3Z5_GA" target="_blank" rel="noopener">Stanley Hardware Store, 17-11 Bleecker St, Ridgewood, NY 11385</a> (<a href="https://www.google.com/maps/place/?q=place_id:ChIJP0Mxih9cwokRXkUws3Z5_GA" target="_blank" rel="noopener">Get directions</a>)</p><p>Phone: <a href="tel:+17188213468">(718) 821-3468</a></p></div><div class="card" style="margin-top:16px"><h2 class="mono">Send a message</h2><form onsubmit="return fakeSubmit(event)"><label for="fname">Name</label><input id="fname" name="name" type="text"><label for="fphone">Phone</label><input id="fphone" name="phone" type="tel"><label for="fmsg">Message</label><textarea id="fmsg" name="message" rows="4"></textarea><div style="margin-top:12px"><button class="btn" type="submit">Submit</button></div><div id="form-note" class="formnote"><strong>Please call instead.</strong> This form does not submit online. To reach Stanley Hardware Store, call <a href="tel:+17188213468">(718) 821-3468</a>.</div></form></div></section></div></main><footer>© Stanley Hardware Store</footer><script>var SITE_NAME="Stanley Hardware Store";var PAGES = ['home','services','about','reviews','contact'];
+var TITLES = {home:'Home',services:'Services',about:'About',reviews:'Reviews',contact:'Contact'};
+function navigateTo(page) {
+  if (PAGES.indexOf(page) < 0) { page = 'home'; }
+  var secs = document.querySelectorAll('section.page');
+  for (var i = 0; i < secs.length; i++) {
+    secs[i].classList.toggle('active', secs[i].getAttribute('data-page') === page);
   }
-
-  function closeMenu(){
-    if(nav){ nav.classList.remove("open"); }
-    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  var links = document.querySelectorAll('[data-nav]');
+  for (var j = 0; j < links.length; j++) {
+    links[j].classList.toggle('current', links[j].getAttribute('data-nav') === page);
   }
-
-  function navigateTo(page, updateHash){
-    if(PAGES.indexOf(page) === -1){ page = "home"; }
-
-    var sections = document.querySelectorAll(".page");
-    for(var i = 0; i < sections.length; i++){
-      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
-    }
-
-    var links = document.querySelectorAll("nav.main a[data-page]");
-    for(var j = 0; j < links.length; j++){
-      var on = links[j].getAttribute("data-page") === page;
-      links[j].classList.toggle("active", on);
-      if(on){ links[j].setAttribute("aria-current", "page"); }
-      else { links[j].removeAttribute("aria-current"); }
-    }
-
-    if(updateHash !== false && location.hash !== "#" + page){
-      location.hash = "#" + page;
-    }
-
-    closeMenu();
-    window.scrollTo(0, 0);
-    observeReveals();
+  if (('#' + page) !== location.hash) {
+    history.pushState({page: page}, '', '#' + page);
   }
-
-  document.addEventListener("click", function(e){
-    var el = e.target.closest("a[data-page], button[data-page]");
-    if(!el) return;
-    e.preventDefault();
-    navigateTo(el.getAttribute("data-page"));
-  });
-
-  window.addEventListener("hashchange", function(){
-    navigateTo(cleanHash() || "home");
-  });
-
-  if(burger && nav){
-    burger.addEventListener("click", function(){
-      var open = nav.classList.toggle("open");
-      burger.setAttribute("aria-expanded", open ? "true" : "false");
-    });
-  }
-
-  var tabBtns = document.querySelectorAll(".tab-btn");
-  var tabPanels = document.querySelectorAll(".tab-panel");
-  for(var t = 0; t < tabBtns.length; t++){
-    tabBtns[t].addEventListener("click", function(){
-      var key = this.getAttribute("data-tab");
-      for(var a = 0; a < tabBtns.length; a++){
-        var on = tabBtns[a].getAttribute("data-tab") === key;
-        tabBtns[a].classList.toggle("active", on);
-        tabBtns[a].setAttribute("aria-selected", on ? "true" : "false");
-      }
-      for(var b = 0; b < tabPanels.length; b++){
-        tabPanels[b].classList.toggle("active", tabPanels[b].getAttribute("data-panel") === key);
-      }
-    });
-  }
-
-  var io = null;
-  if("IntersectionObserver" in window){
-    io = new IntersectionObserver(function(entries){
-      entries.forEach(function(en){
-        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
-      });
-    }, {threshold:.12});
-  }
-  function observeReveals(){
-    if(!io){ return; }
-    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
-    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
-  }
-
-  navigateTo(cleanHash() || "home", false);
-})();
-</script>
-</body>
-</html>
+  document.body.classList.remove('menu-open');
+  window.scrollTo(0, 0);
+  document.title = TITLES[page] + ' | ' + SITE_NAME;
+}
+window.addEventListener('popstate', function () {
+  var p = (location.hash || '#home').slice(1);
+  navigateTo(p);
+});
+function toggleMenu() {
+  document.body.classList.toggle('menu-open');
+}
+function fakeSubmit(ev) {
+  ev.preventDefault();
+  var n = document.getElementById('form-note');
+  if (n) { n.style.display = 'block'; }
+  return false;
+}
+document.addEventListener('DOMContentLoaded', function () {
+  var p = (location.hash || '#home').slice(1);
+  navigateTo(p);
+});</script><script>
+/* sticky-footer-fix-v1 */
+(function(){function s(){var f=document.querySelector('footer');if(!f||f.getBoundingClientRect().bottom>=window.innerHeight-2)return;var b=document.body;b.style.minHeight='100vh';b.style.display='flex';b.style.flexDirection='column';var e=f;while(e&&e!==b){if(e===f){e.style.marginTop='auto';}else{e.style.display='flex';e.style.flexDirection='column';e.style.flex='1 0 auto';}e=e.parentElement;}}
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',s);}else{s();}
+window.addEventListener('hashchange',function(){setTimeout(s,60);});
+window.addEventListener('popstate',function(){setTimeout(s,60);});
+var _n=window.navigateTo;if(typeof _n==='function'){window.navigateTo=function(){var r=_n.apply(this,arguments);setTimeout(s,60);return r;};}})();
+</script></body></html>
