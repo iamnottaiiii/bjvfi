@@ -645,6 +645,8 @@ function renderBell(){
   const b = document.getElementById('btn-bell');
   if(!b) return;
   b.className = 'bell' + (state.unread ? ' has-unread' : '');
+  /* The bell only shows when there is something to notify about. */
+  b.style.display = state.unread ? '' : 'none';
   b.innerHTML = (state.unread ? '<span class="dot"></span>' : '') + (state.unread ? state.unread : 'Alerts');
 }
 
@@ -1133,7 +1135,7 @@ function shell(content){
   return '<header class="top">' +
     '<div class="brand">sitedesk<div class="brand-sub">bjvfi</div></div>' +
     '<div class="row">' +
-      '<button class="bell' + (state.unread ? ' has-unread' : '') + '" id="btn-bell" type="button" aria-label="Notifications">' +
+      '<button class="bell' + (state.unread ? ' has-unread' : '') + '" id="btn-bell" type="button" aria-label="Notifications"' + (state.unread ? '' : ' style="display:none"') + '>' +
       (state.unread ? '<span class="dot"></span>' : '') + (state.unread ? state.unread : 'Alerts') + '</button>' +
       '<div class="nav-desktop">' + tabs.filter(function(t){ return t[0] !== 'notifs'; }).map(function(t){
         return '<button class="tab' + (state.tab === t[0] ? ' active' : '') +
@@ -2180,7 +2182,7 @@ async function renderEditorInto(el){
 
 function paintEditor(el){
   let html = '<div class="card"><h2>Site editor</h2>' +
-    '<p class="muted" style="font-size:12px;margin-bottom:12px;line-height:1.55">Search a business by name, open its live site code, paste your new code, save a draft or publish. Publishing joins a queue and goes live one at a time.</p>' +
+    '<p class="muted" style="font-size:12px;margin-bottom:12px;line-height:1.55">Search a business by name, open its site, edit the code with a live preview, then save a draft or publish. Publishing joins a queue and goes live one at a time.</p>' +
     '<div class="filters"><input id="editor-q" value="' + esc(state.editorQ) + '" placeholder="Search business name"/>' +
     '</div><div id="editor-results"></div></div>';
   html += '<div class="card" style="margin-top:14px"><h2>My drafts</h2><div id="editor-drafts"><div class="empty">Loading...</div></div></div>';
@@ -2297,17 +2299,14 @@ function paintEditorPanel(el){
 
   html += editorIntakeHtml(lead);
 
-  html += '<h3 style="margin:14px 0 8px">Current live code</h3>';
+  /* One code area: the editor, prefilled with the draft or the live code.
+     Below it a live preview renders whatever is typed. */
+  html += '<h3 style="margin:14px 0 8px">Site code</h3>';
   if(state.editorLiveLoading){
-    html += '<div class="empty">Loading live code...</div>';
+    html += '<div class="empty">Loading site code...</div>';
   } else if(state.editorNotFound){
     html += '<p class="muted" style="font-size:12px;line-height:1.55">No live site exists for this slug yet. Paste the full site code below and publish to create it.</p>';
-  } else if(state.editorLiveCode != null){
-    html += '<pre class="codebox" id="editor-live-code">' + esc(state.editorLiveCode) + '</pre>' +
-      '<div class="row" style="margin:8px 0 4px"><button class="btn ghost sm" id="btn-code-select" type="button">Select all</button>' +
-      '<button class="btn ghost sm" id="btn-code-copy" type="button">Copy</button>' +
-      '<button class="btn ghost sm" id="btn-code-refresh" type="button">Refresh</button></div>';
-  } else {
+  } else if(state.editorLiveErr || state.editorLiveCode == null){
     html += '<p class="err">' + esc(state.editorLiveErr || 'Could not load the live code.') + '</p>' +
       '<div class="row"><button class="btn ghost sm" id="btn-code-refresh" type="button">Retry</button></div>';
   }
@@ -2324,9 +2323,13 @@ function paintEditorPanel(el){
         (state.editorLiveCode != null ? state.editorLiveCode : ''));
       state._editorPrefillSlug = slug;
     }
-    html += '<h3 style="margin:14px 0 8px">New site code</h3>' +
-      '<p class="muted" style="font-size:12px;margin-bottom:8px;line-height:1.55">Paste the full site HTML here. It is checked automatically, then queued to publish one at a time.</p>' +
+    html += '<p class="muted" style="font-size:12px;margin-bottom:8px;line-height:1.55">Edit the code below. The preview underneath shows what the site looks like as you type. Save a draft to keep working later, or publish to queue it live.</p>' +
       '<textarea id="editor-new-code" class="editor-area" spellcheck="false">' + esc(prefill) + '</textarea>' +
+      '<div class="row" style="margin:8px 0 4px"><button class="btn ghost sm" id="btn-code-select" type="button">Select all</button>' +
+      '<button class="btn ghost sm" id="btn-code-copy" type="button">Copy</button>' +
+      (state.editorLiveCode != null ? '<button class="btn ghost sm" id="btn-code-refresh" type="button">Reload live code</button>' : '') + '</div>' +
+      '<h3 style="margin:14px 0 8px">Preview</h3>' +
+      '<iframe id="editor-preview" class="editor-preview" sandbox="allow-scripts" title="Site preview"></iframe>' +
       '<div class="row" style="margin-top:10px"><button class="btn ghost" id="btn-save-draft" type="button" style="flex:1">Save draft</button>' +
       '<button class="btn" id="btn-publish" type="button" style="flex:2">Publish</button></div>' +
       '<div class="err" id="editor-err"></div>';
@@ -2379,18 +2382,32 @@ function wireEditorPanel(el){
   if(!panel) return;
   const sel = document.getElementById('btn-code-select');
   if(sel) sel.addEventListener('click', function(){
-    const pre = document.getElementById('editor-live-code');
-    if(!pre || !window.getSelection) return;
-    const range = document.createRange();
-    range.selectNodeContents(pre);
-    const s = window.getSelection();
-    s.removeAllRanges();
-    s.addRange(range);
+    const ta = document.getElementById('editor-new-code');
+    if(!ta) return;
+    ta.focus();
+    ta.select();
+    try{ ta.setSelectionRange(0, ta.value.length); }catch(e){}
   });
   const cp = document.getElementById('btn-code-copy');
   if(cp) cp.addEventListener('click', function(){
-    if(state.editorLiveCode != null) copyText(state.editorLiveCode, 'Live code');
+    const ta = document.getElementById('editor-new-code');
+    if(ta) copyText(ta.value, 'Site code');
   });
+  /* Live preview: render whatever is in the code box into the sandboxed
+     iframe, debounced so typing stays smooth. */
+  const taPrev = document.getElementById('editor-new-code');
+  const pvFrame = document.getElementById('editor-preview');
+  function refreshPreview(){
+    if(taPrev && pvFrame){ try{ pvFrame.srcdoc = taPrev.value; }catch(e){} }
+  }
+  if(taPrev && pvFrame){
+    let pdeb = null;
+    taPrev.addEventListener('input', function(){
+      if(pdeb) clearTimeout(pdeb);
+      pdeb = setTimeout(refreshPreview, 600);
+    });
+    refreshPreview();
+  }
   const rf = document.getElementById('btn-code-refresh');
   if(rf) rf.addEventListener('click', function(){ openEditorSlug(state.editorSlug, el); });
   const sd = document.getElementById('btn-save-draft');
