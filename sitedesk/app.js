@@ -2181,17 +2181,49 @@ async function renderEditorInto(el){
 }
 
 function paintEditor(el){
+  /* Dedicated edit page: once a site is opened, the editor gets the whole
+     page to itself, with a back button returning to the search list. */
+  if(state.editorSlug){
+    el.innerHTML = '<div class="row" style="margin-bottom:12px">' +
+      '<button class="btn ghost sm" id="btn-editor-back" type="button">\u2190 Back</button></div>' +
+      '<div id="editor-panel"></div>';
+    paintEditorPanel(el);
+    const back = document.getElementById('btn-editor-back');
+    if(back) back.addEventListener('click', function(){ closeEditorSlug(el); });
+    try{ window.scrollTo(0, 0); }catch(e){}
+    return;
+  }
   let html = '<div class="card"><h2>Site editor</h2>' +
     '<p class="muted" style="font-size:12px;margin-bottom:12px;line-height:1.55">Search a business by name, open its site, edit the code with a live preview, then save a draft or publish. Publishing joins a queue and goes live one at a time.</p>' +
     '<div class="filters"><input id="editor-q" value="' + esc(state.editorQ) + '" placeholder="Search business name"/>' +
     '</div><div id="editor-results"></div></div>';
   html += '<div class="card" style="margin-top:14px"><h2>My drafts</h2><div id="editor-drafts"><div class="empty">Loading...</div></div></div>';
   html += '<div class="card" style="margin-top:14px"><h2>Publish queue</h2><div id="editor-jobs"><div class="empty">Loading...</div></div></div>';
-  html += '<div id="editor-panel"></div>';
   el.innerHTML = html;
   wireEditorSearch(el);
   loadEditorDrafts(el);
   loadEditorJobs(el);
+}
+
+/* Leave the dedicated edit page and return to the search list. Unsaved
+   edits are guarded so they are not lost by an accidental tap. */
+function closeEditorSlug(el){
+  if(state._editorDirty){
+    try{
+      if(!window.confirm('Go back without saving? Edits not saved as a draft will be lost.')) return;
+    }catch(e){}
+  }
+  state.editorSlug = null;
+  state.editorLiveCode = null;
+  state.editorLiveErr = '';
+  state.editorNotFound = false;
+  state.editorLiveLoading = false;
+  state.editorDraft = null;
+  state.editorJobs = [];
+  state.editorIntake = null;
+  state._editorPrefillSlug = null;
+  state._editorDirty = false;
+  paintEditor(el);
 }
 
 function wireEditorSearch(el){
@@ -2249,7 +2281,11 @@ async function openEditorSlug(slug, el){
   state.editorJobs = [];
   state.editorIntake = null;
   state._editorPrefillSlug = null;
-  paintEditorPanel(el);
+  state._editorDirty = false;
+  state._editorBizName = null;
+  state._editorSlugTarget = null;
+  state._editorNameShown = null;
+  paintEditor(el);
   /* Live code, straight from the repo that serves the sites. */
   try{
     const r = await fetch(liveCodeUrl(slug), { cache: 'no-store' });
@@ -2270,14 +2306,16 @@ async function openEditorSlug(slug, el){
     const rec = await ghGetJson('site-drafts/' + slug + '.json');
     if(rec){ state.editorDraft = rec.data; state.editorDraft._sha = rec.sha; }
   }catch(e){}
+  /* Restore a renamed URL target saved with the draft. */
+  if(state.editorDraft && state.editorDraft.target_slug){
+    state._editorSlugTarget = state.editorDraft.target_slug;
+  }
   try{ state.editorJobs = await loadJobsForSlug(slug); }catch(e){}
   try{
     const rec = await ghGetJson('intakes/intake-' + slug + '.json');
     if(rec){ state.editorIntake = rec.data; state.editorIntake._sha = rec.sha; }
   }catch(e){}
-  paintEditorPanel(el);
-  const panel = el.querySelector('#editor-panel');
-  if(panel && panel.scrollIntoView) panel.scrollIntoView({ block: 'start' });
+  paintEditor(el);
 }
 
 function editorLead(){
@@ -2296,6 +2334,20 @@ function paintEditorPanel(el){
     '<div><h2 style="margin:0">' + esc(lead.name) + '</h2>' +
     '<div class="muted" style="font-size:11px">' + esc(slug) + '</div></div>' +
     '<a class="btn ghost sm" href="' + esc(siteUrlFor(lead)) + '" target="_blank" rel="noopener">Open live site</a></div>';
+
+  /* Site identity: editable business name and URL name. The name field
+     rewrites the name through the code live (preview included); the URL
+     name takes effect when the publish goes live. */
+  const initBizName = (state.editorDraft && state.editorDraft.business_name) || lead.name || '';
+  const bizName = state._editorBizName != null ? state._editorBizName : initBizName;
+  const slugTarget = state._editorSlugTarget != null ? state._editorSlugTarget : slug;
+  html += '<div class="card" style="margin:10px 0;padding:14px"><h3 style="margin:0 0 8px">Site identity</h3>' +
+    '<div class="field"><label>Business name</label>' +
+    '<input id="editor-bizname" value="' + esc(bizName) + '" spellcheck="false" autocomplete="off"/></div>' +
+    '<div class="field" style="margin-top:8px"><label>Site URL name</label>' +
+    '<div class="row"><input id="editor-slug" value="' + esc(slugTarget) + '" spellcheck="false" autocomplete="off" autocapitalize="off" style="flex:1"/>' +
+    '<span class="muted" style="font-size:11px;align-self:center">.bjvfi.com</span></div>' +
+    '<p class="muted" style="font-size:11px;margin:6px 0 0;line-height:1.5">Changing the URL name moves the site there. The old address stops working once the publish goes live.</p></div></div>';
 
   html += editorIntakeHtml(lead);
 
@@ -2322,6 +2374,9 @@ function paintEditorPanel(el){
       prefill = (state.editorDraft && state.editorDraft.code != null ? state.editorDraft.code :
         (state.editorLiveCode != null ? state.editorLiveCode : ''));
       state._editorPrefillSlug = slug;
+      /* The business name currently reflected through the code. The name
+         field rewrites this value live, so track it for the next edit. */
+      state._editorNameShown = initBizName;
     }
     html += '<p class="muted" style="font-size:12px;margin-bottom:8px;line-height:1.55">Edit the code below. The preview underneath shows what the site looks like as you type. Save a draft to keep working later, or publish to queue it live.</p>' +
       '<textarea id="editor-new-code" class="editor-area" spellcheck="false">' + esc(prefill) + '</textarea>' +
@@ -2377,6 +2432,24 @@ function editorIntakeHtml(lead){
   return html;
 }
 
+/* Live business-name rewrite: replace the name currently shown through the
+   code with the new value, so the preview updates as the name is edited.
+   Pure string replacement, guarded against empty values. */
+function onEditorBizName(value){
+  state._editorBizName = value;
+  state._editorDirty = true;
+  const shown = state._editorNameShown;
+  if(shown != null && shown !== '' && value !== '' && shown !== value){
+    const ta = document.getElementById('editor-new-code');
+    if(ta && ta.value.indexOf(shown) !== -1){
+      ta.value = ta.value.split(shown).join(value);
+      const pv = document.getElementById('editor-preview');
+      if(pv){ try{ pv.srcdoc = ta.value; }catch(e){} }
+    }
+  }
+  if(value !== '') state._editorNameShown = value;
+}
+
 function wireEditorPanel(el){
   const panel = el.querySelector('#editor-panel');
   if(!panel) return;
@@ -2403,10 +2476,28 @@ function wireEditorPanel(el){
   if(taPrev && pvFrame){
     let pdeb = null;
     taPrev.addEventListener('input', function(){
+      state._editorDirty = true;
       if(pdeb) clearTimeout(pdeb);
       pdeb = setTimeout(refreshPreview, 600);
     });
     refreshPreview();
+  }
+  /* Site identity fields. The business name rewrites through the code live
+     (preview included); the URL name applies when the publish goes live. */
+  const bnInput = document.getElementById('editor-bizname');
+  if(bnInput){
+    let ndeb = null;
+    bnInput.addEventListener('input', function(){
+      if(ndeb) clearTimeout(ndeb);
+      ndeb = setTimeout(function(){ onEditorBizName(bnInput.value); }, 500);
+    });
+  }
+  const slInput = document.getElementById('editor-slug');
+  if(slInput){
+    slInput.addEventListener('input', function(){
+      state._editorSlugTarget = slInput.value;
+      state._editorDirty = true;
+    });
   }
   const rf = document.getElementById('btn-code-refresh');
   if(rf) rf.addEventListener('click', function(){ openEditorSlug(state.editorSlug, el); });
@@ -2466,7 +2557,10 @@ async function saveEditorDraft(el){
       const rec = await ghGetJson('site-drafts/' + slug + '.json').catch(function(){ return null; });
       if(rec) sha = rec.sha;
     }
-    const draft = { slug: slug, business_name: lead.name || slug, code: code,
+    const bizName = state._editorBizName != null ? state._editorBizName : (lead.name || slug);
+    const slugTarget = state._editorSlugTarget != null ? state._editorSlugTarget : slug;
+    const draft = { slug: slug, business_name: bizName,
+      target_slug: (slugTarget !== slug ? slugTarget : null), code: code,
       author: state.user.username, author_name: state.user.name, updated_at: nowISO() };
     try{
       await ghPutJson('site-drafts/' + slug + '.json', draft, sha, 'sitedesk: draft ' + slug);
@@ -2480,6 +2574,7 @@ async function saveEditorDraft(el){
     const rec3 = await ghGetJson('site-drafts/' + slug + '.json').catch(function(){ return null; });
     state.editorDraft = draft;
     if(rec3) state.editorDraft._sha = rec3.sha;
+    state._editorDirty = false;
     toast('Draft saved');
     loadEditorDrafts(el);
   }catch(e){
@@ -2497,7 +2592,20 @@ async function publishEditorCode(el){
   const err = document.getElementById('editor-err');
   if(err) err.textContent = '';
   const lead = editorLead();
-  const v = validateSiteCode(code, lead.name);
+  const bizName = String(state._editorBizName != null ? state._editorBizName : (lead.name || '')).trim();
+  if(!bizName){
+    if(err) err.textContent = 'Enter a business name first.';
+    else toast('Enter a business name first.');
+    return;
+  }
+  let targetSlug = String(state._editorSlugTarget != null ? state._editorSlugTarget : slug).trim().toLowerCase();
+  if(!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(targetSlug)){
+    if(err) err.textContent = 'The site URL name must be lowercase letters, numbers, and hyphens only.';
+    else toast('The site URL name must be lowercase letters, numbers, and hyphens only.');
+    return;
+  }
+  const renaming = targetSlug !== slug;
+  const v = validateSiteCode(code, bizName);
   if(!v.ok){
     if(err) err.textContent = v.reason;
     else toast(v.reason);
@@ -2506,14 +2614,27 @@ async function publishEditorCode(el){
   const btn = document.getElementById('btn-publish');
   if(btn){ btn.disabled = true; btn.textContent = 'Queueing...'; }
   try{
+    if(renaming){
+      /* The new URL name must not already belong to another site. The
+         worker checks again at publish time; this is the early warning. */
+      const taken = await ghGetJson(targetSlug + '/index.html').catch(function(){ return null; });
+      if(taken){
+        if(err) err.textContent = 'That URL name is already taken by another site.';
+        else toast('That URL name is already taken by another site.');
+        if(btn){ btn.disabled = false; btn.textContent = 'Publish'; }
+        return;
+      }
+    }
     const jobid = uid('job');
-    const job = { jobid: jobid, slug: slug, business_name: lead.name || slug, code: code,
+    const job = { jobid: jobid, slug: targetSlug, rename_from: renaming ? slug : null,
+      business_name: bizName, code: code,
       author: state.user.username, author_name: state.user.name,
       created_at: nowISO(), status: 'queued',
       previous_code: null, commit_sha: null, reason: '', revert_of: null };
     await ghPutJson('site-publish-queue/pending/' + jobid + '.json', job, null,
-      'sitedesk: queue publish ' + slug);
-    toast('Queued for publish');
+      'sitedesk: queue publish ' + targetSlug);
+    toast(renaming ? 'Queued: the site will move to ' + targetSlug + '.bjvfi.com' : 'Queued for publish');
+    state._editorDirty = false;
     try{ state.editorJobs = await loadJobsForSlug(slug); }catch(e){}
     paintEditorPanel(el);
     loadEditorJobs(el);
@@ -2538,20 +2659,21 @@ function jobPaths(kind){
 async function loadJobsForSlug(slug){
   await refreshEditorTree();
   const out = [];
+  const matchSlug = function(j){ return j && (j.slug === slug || j.rename_from === slug); };
   const pending = jobPaths('pending');
   for(const p of pending){
     const j = await readJobFile(p);
-    if(j && j.slug === slug) out.push(j);
+    if(matchSlug(j)) out.push(j);
   }
   const live = jobPaths('live').slice(-40);
   for(const p of live){
     const j = await readJobFile(p);
-    if(j && j.slug === slug) out.push(j);
+    if(matchSlug(j)) out.push(j);
   }
   const failed = jobPaths('failed').slice(-40);
   for(const p of failed){
     const j = await readJobFile(p);
-    if(j && j.slug === slug) out.push(j);
+    if(matchSlug(j)) out.push(j);
   }
   out.sort(function(a, b){ return String(b.created_at || '').localeCompare(String(a.created_at || '')); });
   return out;
@@ -2648,15 +2770,19 @@ async function revertJob(jobid, el){
   if(!v.ok){ toast('The previous version fails the checks: ' + v.reason); return; }
   try{
     const nid = uid('job');
-    const rej = { jobid: nid, slug: job.slug, business_name: job.business_name, code: job.previous_code,
+    /* Reverting a rename moves the site back: publish the previous code to
+       the original slug and remove the renamed one. */
+    const rej = { jobid: nid, slug: job.rename_from || job.slug,
+      rename_from: job.rename_from ? job.slug : null,
+      business_name: job.business_name, code: job.previous_code,
       author: state.user.username, author_name: state.user.name, created_at: nowISO(),
       status: 'queued', previous_code: null, commit_sha: null, reason: '', revert_of: jobid };
     await ghPutJson('site-publish-queue/pending/' + nid + '.json', rej, null,
       'sitedesk: revert publish ' + job.slug);
     toast('Revert queued');
     loadEditorJobs(el);
-    if(state.editorSlug === job.slug){
-      try{ state.editorJobs = await loadJobsForSlug(job.slug); }catch(e){}
+    if(state.editorSlug === job.slug || state.editorSlug === job.rename_from){
+      try{ state.editorJobs = await loadJobsForSlug(state.editorSlug); }catch(e){}
       paintEditorPanel(el);
     }
   }catch(e){ toast(e.message); }
