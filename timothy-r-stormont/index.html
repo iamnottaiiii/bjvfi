@@ -1,567 +1,89 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Timothy R. Stormont, Architect | Residential and Commercial Design</title>
-<meta name="description" content="Timothy R. Stormont, AIA: architectural design services. Call (661) 619-0170 to discuss your project.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --ink:#1c2430;
-    --blue:#27436b;
-    --blueprint:#2f5d96;
-    --paper:#fbfaf6;
-    --wash:#eef1f5;
-    --copper:#b4653a;
-    --muted:#5c6672;
-    --line:#d9dee4;
-    --gridline:rgba(47,93,150,.10);
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:"Inter",system-ui,sans-serif;color:var(--ink);background:var(--paper);line-height:1.65;-webkit-font-smoothing:antialiased}
-  h1,h2,h3,.serif{font-family:"Newsreader",Georgia,serif;line-height:1.1;letter-spacing:-.01em;font-weight:500}
-  .mono{font-family:"IBM Plex Mono",monospace}
-  a{color:inherit}
-  .wrap{max-width:1200px;margin:0 auto;padding:0 28px}
-  .page{display:none}
-  .page.active{display:block;animation:fadeIn .45s ease}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-
-  /* ---------- minimal top bar ---------- */
-  header.topbar{position:fixed;top:0;left:0;right:0;z-index:60;background:rgba(251,250,246,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
-  .topbar-inner{max-width:1200px;margin:0 auto;padding:0 28px;height:64px;display:flex;align-items:center;justify-content:space-between;gap:16px}
-  .brand{display:flex;align-items:center;gap:12px;text-decoration:none}
-  .brand .mark{width:34px;height:34px;border:2px solid var(--blue);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:"Newsreader",serif;font-weight:700;color:var(--blue);font-size:1.05rem}
-  .brand .bt{line-height:1.2}
-  .brand .bt b{font-family:"Newsreader",serif;font-size:1.02rem;font-weight:700;display:block}
-  .brand .bt span{font-size:.7rem;letter-spacing:.24em;text-transform:uppercase;color:var(--muted)}
-  nav.main{display:flex;align-items:center;gap:4px}
-  nav.main a{text-decoration:none;font-size:.86rem;font-weight:600;color:var(--ink);padding:10px 13px;border-radius:8px}
-  nav.main a:hover{background:var(--wash)}
-  nav.main a.active{color:var(--blueprint);box-shadow:inset 0 -2px 0 var(--copper)}
-  #burger{display:none;background:none;border:1px solid var(--line);border-radius:8px;font-size:1.2rem;padding:7px 11px;cursor:pointer;color:var(--ink)}
-  @media(max-width:920px){
-    #burger{display:block}
-    nav.main{position:absolute;top:64px;left:0;right:0;background:var(--paper);border-bottom:1px solid var(--line);flex-direction:column;align-items:stretch;padding:10px 20px 16px;display:none}
-    nav.main.open{display:flex}
-    nav.main a{padding:13px 8px}
-    .topbar .callbtn{display:none}
-  }
-  .topbar .callbtn{font-size:.82rem;font-weight:700;text-decoration:none;border:1.5px solid var(--blue);color:var(--blue);border-radius:999px;padding:9px 18px;white-space:nowrap}
-  .topbar .callbtn:hover{background:var(--blue);color:#fff}
-
-  /* ---------- editorial type hero ---------- */
-  .hero{padding:150px 0 80px;position:relative;overflow:hidden;
-    background:
-      linear-gradient(var(--gridline) 1px, transparent 1px),
-      linear-gradient(90deg, var(--gridline) 1px, transparent 1px);
-    background-size:44px 44px;}
-  .hero .sheet{position:relative}
-  .hero .no{font-family:"IBM Plex Mono",monospace;font-size:.8rem;letter-spacing:.2em;color:var(--copper);text-transform:uppercase}
-  .hero h1{font-size:clamp(3rem,8.5vw,6.6rem);font-weight:500;margin:18px 0 6px;max-width:12ch}
-  .hero h1 .thin{font-weight:400;font-style:italic;color:var(--blueprint)}
-  .hero .rule{height:3px;background:var(--ink);margin:26px 0;max-width:120px}
-  .hero p.lede{font-size:1.12rem;color:var(--muted);max-width:60ch}
-  .hero p.lede strong{color:var(--ink)}
-  .hero-cta{margin-top:30px;display:flex;gap:14px;flex-wrap:wrap}
-  .btn{display:inline-block;text-decoration:none;font-weight:700;font-size:.95rem;border-radius:4px;padding:14px 28px;transition:transform .15s}
-  .btn:hover{transform:translateY(-2px)}
-  .btn-solid{background:var(--blue);color:#fff}
-  .btn-line{border:2px solid var(--ink);color:var(--ink)}
-  .hero-foot{margin-top:56px;display:flex;gap:40px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:24px}
-  .hero-foot div{font-size:.88rem;color:var(--muted)}
-  .hero-foot b{display:block;color:var(--ink);font-size:1rem}
-  .draft{position:absolute;right:-40px;top:40px;opacity:.14;pointer-events:none}
-
-  /* ---------- asymmetric grid rhythm ---------- */
-  .agrid{display:grid;grid-template-columns:repeat(12,1fr);gap:24px}
-  .span7{grid-column:span 7}.span5{grid-column:span 5}.span6{grid-column:span 6}
-  .span4{grid-column:span 4}.span8{grid-column:span 8}.span12{grid-column:span 12}
-  .off5{grid-column:6 / span 7}.off7{grid-column:8 / span 5}
-  @media(max-width:860px){.span7,.span5,.span6,.span4,.span8,.off5,.off7{grid-column:span 12}}
-  .band{padding:90px 0}
-  .band.wash{background:var(--wash)}
-  .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:.75rem;letter-spacing:.24em;text-transform:uppercase;color:var(--copper);margin-bottom:14px}
-  .band h2{font-size:clamp(1.9rem,3.8vw,2.9rem);margin-bottom:14px;max-width:24ch}
-  .lede{color:var(--muted);max-width:62ch}
-  .fig{background:#fff;border:1px solid var(--line);border-radius:6px;padding:10px;box-shadow:0 14px 34px rgba(28,36,48,.08)}
-  .fig .ph{aspect-ratio:4/3;border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#fff;position:relative;overflow:hidden;
-    background:linear-gradient(135deg,var(--blue) 0%,var(--blueprint) 60%,#1c2430 100%)}
-  .fig .ph svg{opacity:.5}
-  .fig .ph .tag{font-family:"IBM Plex Mono",monospace;font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;border:1px solid rgba(255,255,255,.5);border-radius:999px;padding:5px 14px}
-  .fig figcaption{padding:12px 6px 4px;font-size:.88rem;color:var(--muted)}
-  .fig figcaption b{color:var(--ink);display:block;font-size:.95rem}
-  .pull{border-left:4px solid var(--copper);padding:6px 0 6px 26px;font-family:"Newsreader",serif;font-size:1.5rem;font-style:italic;color:var(--blue);line-height:1.4}
-  .num{font-family:"IBM Plex Mono",monospace;color:var(--copper);font-size:.85rem;letter-spacing:.1em}
-  ol.steps{list-style:none;display:grid;gap:0;margin-top:26px;border-top:1px solid var(--line)}
-  ol.steps li{display:grid;grid-template-columns:64px 1fr;gap:18px;padding:22px 0;border-bottom:1px solid var(--line)}
-  ol.steps h3{font-size:1.25rem;margin-bottom:4px}
-  ol.steps p{color:var(--muted);font-size:.96rem}
-
-  /* ---------- tabbed services ---------- */
-  .tabs{margin-top:34px}
-  .tablist{display:flex;gap:8px;flex-wrap:wrap;border-bottom:2px solid var(--line);padding-bottom:0}
-  .tablist button{background:none;border:0;font-family:"Inter",sans-serif;font-size:.95rem;font-weight:600;color:var(--muted);padding:14px 18px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px}
-  .tablist button[aria-selected="true"]{color:var(--blue);border-bottom-color:var(--copper)}
-  .tablist button:hover{color:var(--ink)}
-  .tabpanel{display:none;padding:30px 4px;max-width:70ch}
-  .tabpanel.active{display:block;animation:fadeIn .3s ease}
-  .tabpanel h3{font-size:1.5rem;margin-bottom:10px}
-  .tabpanel p{color:var(--muted)}
-  .tabpanel ul{margin-top:14px;list-style:none;display:grid;gap:8px}
-  .tabpanel ul li{padding-left:24px;position:relative;font-size:.96rem}
-  .tabpanel ul li::before{content:"+";position:absolute;left:2px;color:var(--copper);font-weight:700}
-  .sample{display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#7a5c22;background:#f7e8c4;border:1px solid #e8cf94;border-radius:999px;padding:4px 12px;margin-top:16px}
-
-  /* ---------- masonry gallery ---------- */
-  .masonry{columns:3;column-gap:22px;margin-top:40px}
-  @media(max-width:900px){.masonry{columns:2}}
-  @media(max-width:560px){.masonry{columns:1}}
-  .mitem{break-inside:avoid;margin-bottom:22px;background:#fff;border:1px solid var(--line);border-radius:6px;overflow:hidden;box-shadow:0 8px 22px rgba(28,36,48,.06)}
-  .mitem .ph{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#fff;padding:44px 20px;
-    background:linear-gradient(160deg,var(--blueprint),var(--ink))}
-  .mitem .ph.tall{padding:80px 20px}
-  .mitem .ph svg{opacity:.5}
-  .mitem .cap{padding:14px 18px;font-size:.88rem;color:var(--muted)}
-  .mitem .cap b{color:var(--ink);display:block;font-size:.95rem}
-  .mitem .tag{display:inline-block;margin-top:8px;font-family:"IBM Plex Mono",monospace;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--copper)}
-
-  /* ---------- reviews ---------- */
-  .review{border:1px solid var(--line);border-radius:6px;padding:26px;background:#fff}
-  .stars{color:var(--copper);letter-spacing:2px}
-  .note{font-size:.86rem;color:var(--muted);margin-top:18px;max-width:72ch}
-  .source-link{margin-top:30px;display:flex;gap:14px;flex-wrap:wrap}
-
-  /* ---------- contact ---------- */
-  .cgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:22px;margin-top:36px}
-  @media(max-width:800px){.cgrid{grid-template-columns:1fr}}
-  .ccard{border:2px solid var(--ink);border-radius:6px;padding:28px;text-decoration:none;display:block;background:#fff;transition:transform .15s}
-  .ccard:hover{transform:translateY(-4px)}
-  .ccard h3{font-size:1.05rem;margin-bottom:8px;font-family:"IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;font-size:.8rem;color:var(--copper)}
-  .ccard p{font-family:"Newsreader",serif;font-size:1.35rem}
-  .ccard small{color:var(--muted);display:block;margin-top:8px;font-size:.86rem}
-  .hours{width:100%;border-collapse:collapse;margin-top:30px;background:#fff;border:1px solid var(--line);border-radius:6px;overflow:hidden}
-  .hours td,.hours th{padding:13px 20px;text-align:left;font-size:.95rem;border-bottom:1px solid var(--line)}
-  .hours tr:last-child td{border-bottom:0}
-
-  /* ---------- big-type footer ---------- */
-  footer{background:var(--ink);color:#cfd6de;padding:70px 0 0;overflow:hidden}
-  .foot-big{font-family:"Newsreader",serif;font-size:clamp(2.6rem,9vw,7.5rem);color:#fff;line-height:1;letter-spacing:-.02em;white-space:nowrap}
-  .foot-big .thin{font-style:italic;color:var(--copper)}
-  .foot-mid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px;margin:44px 0;padding:34px 0;border-top:1px solid rgba(255,255,255,.14)}
-  @media(max-width:760px){.foot-mid{grid-template-columns:1fr}}
-  .foot-mid h4{font-family:"IBM Plex Mono",monospace;font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--copper);margin-bottom:14px}
-  .foot-mid a{display:block;text-decoration:none;padding:4px 0;font-size:.93rem;color:#cfd6de}
-  .foot-mid a:hover{color:#fff}
-  .foot-legal{border-top:1px solid rgba(255,255,255,.14);padding:20px 0;text-align:center;font-size:.9rem;color:#9aa4ae}
-  .reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
-  .reveal.in{opacity:1;transform:none}
-</style>
-</head>
-<body>
-
-<header class="topbar">
-  <div class="topbar-inner">
-    <a class="brand" href="#home" data-page="home" aria-label="Timothy R. Stormont, Architect, home">
-      <span class="mark">TS</span>
-      <span class="bt"><b>Timothy R. Stormont</b><span>Architect · AIA</span></span>
-    </a>
-    <nav class="main" id="mainNav" aria-label="Primary">
-      <a href="#home" data-page="home" class="active" aria-current="page">Home</a>
-      <a href="#services" data-page="services">Services</a>
-      <a href="#about" data-page="about">About</a>
-      <a href="#projects" data-page="projects">Projects</a>
-      <a href="#reviews" data-page="reviews">Reviews</a>
-      <a href="#contact" data-page="contact">Contact</a>
-    </nav>
-    <a class="callbtn" href="tel:+16616190170">(661) 619-0170</a>
-    <button id="burger" aria-label="Open menu" aria-expanded="false">☰</button>
-  </div>
-</header>
-
-<main>
-<!-- ================= HOME ================= -->
-<section class="page" id="page-home">
-  <div class="hero">
-    <svg class="draft" width="420" height="420" viewBox="0 0 420 420" fill="none" aria-hidden="true">
-      <rect x="40" y="60" width="340" height="240" stroke="#27436b" stroke-width="2"/>
-      <line x1="40" y1="140" x2="380" y2="140" stroke="#27436b" stroke-width="1"/>
-      <line x1="40" y1="220" x2="380" y2="220" stroke="#27436b" stroke-width="1"/>
-      <rect x="70" y="160" width="60" height="40" stroke="#27436b" stroke-width="1.5"/>
-      <rect x="160" y="160" width="60" height="40" stroke="#27436b" stroke-width="1.5"/>
-      <circle cx="320" cy="260" r="24" stroke="#27436b" stroke-width="1.5"/>
-      <line x1="40" y1="330" x2="380" y2="330" stroke="#27436b" stroke-width="2"/>
-      <path d="M60 360 L120 360 M60 372 L100 372" stroke="#27436b" stroke-width="1.5"/>
-    </svg>
-    <div class="wrap sheet">
-      <p class="no">Architectural practice · California</p>
-      <h1>Drawn with <span class="thin">intention,</span> built to last.</h1>
-      <div class="rule"></div>
-      <p class="lede"><strong>Timothy R. Stormont, AIA</strong> is a licensed architect serving Southern California. From first sketch through construction documents, every project gets the same care: clear drawings, honest counsel, and designs that respect budget and site.</p>
-      <div class="hero-cta">
-        <a class="btn btn-solid" href="tel:+16616190170">Call (661) 619-0170</a>
-        <a class="btn btn-line" href="#services" data-page="services">Explore services →</a>
-      </div>
-      <div class="hero-foot">
-        <div><b>Licensed Architect, AIA</b>Member, American Institute of Architects</div>
-        <div><b>Residential + Commercial</b>New builds, additions, remodels</div>
-        <div><b>By appointment</b>Call for hours and availability</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="band">
-    <div class="wrap agrid">
-      <div class="span5 reveal">
-        <p class="eyebrow">The practice</p>
-        <h2>Architecture is problem-solving you can live in.</h2>
-        <p class="lede">Good design starts with listening: how you live, how you work, what the site allows. Timothy R. Stormont brings a licensed architect's rigor to projects of every scale, translating needs into drawings a builder can price and a city can permit.</p>
-        <div class="source-link">
-          <a class="btn btn-line" href="#about" data-page="about">About the architect →</a>
-        </div>
-      </div>
-      <div class="off5 reveal">
-        <figure class="fig">
-          <div class="ph">
-            <svg width="120" height="120" viewBox="0 0 120 120" fill="none" aria-hidden="true"><path d="M20 100V50l40-28 40 28v50" stroke="#fff" stroke-width="3" stroke-linejoin="round"/><rect x="48" y="70" width="24" height="30" stroke="#fff" stroke-width="3"/><path d="M20 50l40 26 40-26" stroke="#fff" stroke-width="2" opacity=".6"/></svg>
-            <span class="tag">Photo soon</span>
-          </div>
-          <figcaption><b>Project photography coming soon</b>Completed work will be shown here as it becomes available.</figcaption>
-        </figure>
-      </div>
-    </div>
-  </div>
-
-  <div class="band wash">
-    <div class="wrap">
-      <p class="eyebrow">How engagements work</p>
-      <h2>A clear path from idea to keys</h2>
-      <ol class="steps">
-        <li class="reveal"><span class="num">01</span><div><h3>Consultation</h3><p>Walk the site, talk goals and budget, and decide together whether the project is a fit. Call (661) 619-0170 to start.</p></div></li>
-        <li class="reveal"><span class="num">02</span><div><h3>Schematic design</h3><p>Sketches and plans that test the big moves: layout, massing, light, and how the building sits on its lot.</p></div></li>
-        <li class="reveal"><span class="num">03</span><div><h3>Design development and documents</h3><p>Refined drawings and specifications detailed enough for accurate pricing and permit submittal.</p></div></li>
-        <li class="reveal"><span class="num">04</span><div><h3>Construction support</h3><p>Submittal review, site visits, and answers when the builder has questions, so the design survives contact with reality.</p></div></li>
-      </ol>
-    </div>
-  </div>
-
-  <div class="band">
-    <div class="wrap agrid">
-      <div class="span7 reveal">
-        <p class="pull">"The best buildings come from the clearest drawings. Measure twice applies to architecture, too."</p>
-      </div>
-      <div class="span5 reveal">
-        <p class="eyebrow">Start the conversation</p>
-        <h2 style="font-size:1.8rem">Every project begins with a phone call.</h2>
-        <p class="lede">Describe your site and your goals. You will get a straight answer about scope, process, and next steps.</p>
-        <div class="source-link">
-          <a class="btn btn-solid" href="tel:+16616190170">Call (661) 619-0170</a>
-          <a class="btn btn-line" href="#contact" data-page="contact">Contact details →</a>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ================= SERVICES ================= -->
-<section class="page" id="page-services">
-  <div class="band" style="padding-top:150px">
-    <div class="wrap">
-      <p class="eyebrow">Services</p>
-      <h2>Full-scope architectural services</h2>
-      <p class="lede">The services below reflect the typical scope of a licensed architecture practice. Specific offerings and fees are confirmed in consultation. All items are illustrative samples.</p>
-      <div class="tabs">
-        <div class="tablist" role="tablist" aria-label="Service categories">
-          <button role="tab" aria-selected="true" data-tab="t-res">Residential</button>
-          <button role="tab" aria-selected="false" data-tab="t-com">Commercial</button>
-          <button role="tab" aria-selected="false" data-tab="t-doc">Drawings and permits</button>
-          <button role="tab" aria-selected="false" data-tab="t-con">Consulting</button>
-        </div>
-        <div class="tabpanel active" id="t-res" role="tabpanel">
-          <h3>Residential design</h3>
-          <p>Custom homes, additions, and remodels designed around how your household actually lives.</p>
-          <ul>
-            <li>Custom single-family home design</li>
-            <li>Room additions and second stories</li>
-            <li>Kitchen and whole-home remodels</li>
-            <li>Accessory dwelling units (ADUs)</li>
-          </ul>
-          <span class="sample">Sample</span>
-        </div>
-        <div class="tabpanel" id="t-com" role="tabpanel">
-          <h3>Commercial and institutional</h3>
-          <p>Functional, code-conscious design for workplaces, retail, and community buildings.</p>
-          <ul>
-            <li>Tenant improvements and interiors</li>
-            <li>New commercial buildings</li>
-            <li>Accessibility and code upgrades</li>
-            <li>Feasibility and test-fit studies</li>
-          </ul>
-          <span class="sample">Sample</span>
-        </div>
-        <div class="tabpanel" id="t-doc" role="tabpanel">
-          <h3>Drawings, permits, and documents</h3>
-          <p>The technical backbone every project needs before a shovel hits dirt.</p>
-          <ul>
-            <li>Schematic and design development drawings</li>
-            <li>Construction documents and specifications</li>
-            <li>Permit submittal packages and agency coordination</li>
-            <li>As-built documentation of existing buildings</li>
-          </ul>
-          <span class="sample">Sample</span>
-        </div>
-        <div class="tabpanel" id="t-con" role="tabpanel">
-          <h3>Consulting and construction support</h3>
-          <p>An architect's eye on your project, even when someone else drew the first plans.</p>
-          <ul>
-            <li>Pre-purchase site and feasibility review</li>
-            <li>Plan check and peer review</li>
-            <li>Construction administration and site visits</li>
-            <li>Contractor bid evaluation support</li>
-          </ul>
-          <span class="sample">Sample</span>
-        </div>
-      </div>
-      <p class="note">Fees for architectural services are project-specific and quoted after an initial consultation. Call (661) 619-0170 to discuss your project.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ================= ABOUT ================= -->
-<section class="page" id="page-about">
-  <div class="band" style="padding-top:150px">
-    <div class="wrap agrid">
-      <div class="span7 reveal">
-        <p class="eyebrow">About</p>
-        <h2>Timothy R. Stormont, Architect, AIA</h2>
-        <p class="lede">Timothy R. Stormont is a licensed architect and member of the American Institute of Architects (AIA). Public records associate his practice with the Bakersfield area of Kern County, where he appears on school-district approved vendor lists and has participated in AIA Golden Empire Chapter civic efforts.</p>
-        <p class="lede" style="margin-top:14px">His approach is practical and client-first: understand the site, respect the budget, and produce drawings that builders can actually build from. Whether the project is a family home or a commercial space, the goal is the same, a building that works as good as it looks.</p>
-        <p class="lede" style="margin-top:14px">To discuss a project, call <a href="tel:+16616190170" style="font-weight:700;color:var(--blue)">(661) 619-0170</a>.</p>
-      </div>
-      <div class="span5 reveal">
-        <figure class="fig">
-          <div class="ph" style="aspect-ratio:1/1">
-            <svg width="110" height="110" viewBox="0 0 110 110" fill="none" aria-hidden="true"><circle cx="55" cy="38" r="16" stroke="#fff" stroke-width="3"/><path d="M25 92c4-20 16-30 30-30s26 10 30 30" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>
-            <span class="tag">Photo soon</span>
-          </div>
-          <figcaption><b>Portrait coming soon</b>Professional photo to be added.</figcaption>
-        </figure>
-      </div>
-    </div>
-  </div>
-  <div class="band wash">
-    <div class="wrap agrid">
-      <div class="span4 reveal"><p class="num">AIA</p><h3 style="font-size:1.3rem;margin:8px 0">Licensed architect</h3><p class="lede" style="font-size:.95rem">Member of the American Institute of Architects, bound by its professional standards.</p></div>
-      <div class="span4 reveal"><p class="num">DOC</p><h3 style="font-size:1.3rem;margin:8px 0">Permit-ready drawings</h3><p class="lede" style="font-size:.95rem">Construction documents prepared for accurate pricing and smooth agency review.</p></div>
-      <div class="span4 reveal"><p class="num">SITE</p><h3 style="font-size:1.3rem;margin:8px 0">Local knowledge</h3><p class="lede" style="font-size:.95rem">Familiarity with Southern California jurisdictions, codes, and building culture.</p></div>
-    </div>
-  </div>
-</section>
-
-<!-- ================= PROJECTS ================= -->
-<section class="page" id="page-projects">
-  <div class="band" style="padding-top:150px">
-    <div class="wrap">
-      <p class="eyebrow">Selected work</p>
-      <h2>Projects</h2>
-      <p class="lede">A portfolio of completed work is being assembled. The categories below show the kinds of commissions an architecture practice like this typically undertakes. All images are placeholders.</p>
-      <div class="masonry">
-        <div class="mitem reveal"><div class="ph tall"><svg width="90" height="90" viewBox="0 0 90 90" fill="none"><path d="M15 75V38l30-22 30 22v37" stroke="#fff" stroke-width="3" stroke-linejoin="round"/><rect x="36" y="52" width="18" height="23" stroke="#fff" stroke-width="3"/></svg><span class="tag">Photo soon</span></div><div class="cap"><b>Custom residence</b>New single-family home<span class="tag">Placeholder</span></div></div>
-        <div class="mitem reveal"><div class="ph"><svg width="90" height="90" viewBox="0 0 90 90" fill="none"><rect x="18" y="30" width="54" height="36" stroke="#fff" stroke-width="3"/><path d="M18 30l27-14 27 14" stroke="#fff" stroke-width="3" stroke-linejoin="round"/></svg><span class="tag">Photo soon</span></div><div class="cap"><b>Home addition</b>Second-story expansion<span class="tag">Placeholder</span></div></div>
-        <div class="mitem reveal"><div class="ph tall"><svg width="90" height="90" viewBox="0 0 90 90" fill="none"><rect x="20" y="20" width="50" height="50" stroke="#fff" stroke-width="3"/><line x1="20" y1="45" x2="70" y2="45" stroke="#fff" stroke-width="2"/><line x1="45" y1="20" x2="45" y2="70" stroke="#fff" stroke-width="2"/></svg><span class="tag">Photo soon</span></div><div class="cap"><b>Commercial interior</b>Tenant improvement<span class="tag">Placeholder</span></div></div>
-        <div class="mitem reveal"><div class="ph"><svg width="90" height="90" viewBox="0 0 90 90" fill="none"><path d="M15 60h60M25 60V35h40v25" stroke="#fff" stroke-width="3" stroke-linejoin="round"/></svg><span class="tag">Photo soon</span></div><div class="cap"><b>ADU</b>Detached accessory dwelling<span class="tag">Placeholder</span></div></div>
-        <div class="mitem reveal"><div class="ph tall"><svg width="90" height="90" viewBox="0 0 90 90" fill="none"><circle cx="45" cy="45" r="26" stroke="#fff" stroke-width="3"/><path d="M45 19v52M19 45h52" stroke="#fff" stroke-width="2"/></svg><span class="tag">Photo soon</span></div><div class="cap"><b>Feasibility study</b>Site test-fit and massing<span class="tag">Placeholder</span></div></div>
-        <div class="mitem reveal"><div class="ph"><svg width="90" height="90" viewBox="0 0 90 90" fill="none"><rect x="22" y="26" width="46" height="40" stroke="#fff" stroke-width="3"/><path d="M32 66v-12h26v12" stroke="#fff" stroke-width="3"/></svg><span class="tag">Photo soon</span></div><div class="cap"><b>Remodel</b>Whole-home renovation<span class="tag">Placeholder</span></div></div>
-      </div>
-      <p class="note">All project tiles are placeholders. Real project photography and descriptions will replace them as they become available.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ================= REVIEWS ================= -->
-<section class="page" id="page-reviews">
-  <div class="band" style="padding-top:150px">
-    <div class="wrap">
-      <p class="eyebrow">Reviews</p>
-      <h2>Client feedback</h2>
-      <p class="lede">No public reviews for Timothy R. Stormont were found in research at the time this page was built. The sample card below shows the format client feedback will take here.</p>
-      <div class="agrid" style="margin-top:36px">
-        <div class="span6 reveal">
-          <div class="review">
-            <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
-            <p style="margin-top:12px">A sample review showing the format client feedback takes here: stars, a sentence or two about the project, and the project type.</p>
-            <p class="note">Illustrative example only, not a real client review.</p>
-            <span class="sample">Sample</span>
-          </div>
-        </div>
-        <div class="span6 reveal">
-          <div class="review" style="background:var(--wash)">
-            <h3 style="font-size:1.3rem;margin-bottom:8px">Worked with Timothy R. Stormont?</h3>
-            <p class="lede" style="font-size:.96rem">Your review helps future clients choose with confidence. Reviews can be left on the Google business listing.</p>
-            <div class="source-link">
-              <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJ4Zw0FUdp6oARY3FXhBlzQCs" target="_blank" rel="noopener">See reviews on Google</a>
-            </div>
-          </div>
-        </div>
-      </div>
-      <p class="note">No Yelp, Facebook, or Tripadvisor review pages for this business were found in research.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ================= CONTACT ================= -->
-<section class="page" id="page-contact">
-  <div class="band" style="padding-top:150px">
-    <div class="wrap">
-      <p class="eyebrow">Contact</p>
-      <h2>Start with a conversation</h2>
-      <p class="lede">Call to discuss your project, check availability, and confirm hours. Consultations are by appointment.</p>
-      <div class="cgrid">
-        <a class="ccard reveal" href="tel:+16616190170">
-          <h3>Phone</h3><p>(661) 619-0170</p><small>Tap to call</small>
-        </a>
-        <a class="ccard reveal" href="https://www.google.com/maps/place/?q=place_id:ChIJ4Zw0FUdp6oARY3FXhBlzQCs" target="_blank" rel="noopener">
-          <h3>Address</h3><p>5148 Bleecker St, Baldwin Park, CA 91706</p><small>Open in Google Maps for directions</small>
-        </a>
-        <div class="ccard reveal">
-          <h3>Hours</h3><p>Call for hours</p><small>Available by appointment</small>
-        </div>
-      </div>
-      <table class="hours reveal" aria-label="Office hours">
-        <tr><th scope="row">Monday to Friday</th><td>Call for hours</td></tr>
-        <tr><th scope="row">Saturday to Sunday</th><td>Call for hours</td></tr>
-      </table>
-      <p class="note">Office hours are not published. Call (661) 619-0170 for availability.</p>
-      <div class="source-link">
-        <a class="btn btn-solid" href="https://www.google.com/maps/place/?q=place_id:ChIJ4Zw0FUdp6oARY3FXhBlzQCs" target="_blank" rel="noopener">Get directions</a>
-      </div>
-    </div>
-  </div>
-</section>
-</main>
-
-<footer>
-  <div class="wrap">
-    <div class="foot-big">Timothy R. Stormont, <span class="thin">Architect</span></div>
-    <div class="foot-mid">
-      <div>
-        <h4>Practice</h4>
-        <a href="#services" data-page="services">Services</a>
-        <a href="#about" data-page="about">About</a>
-        <a href="#projects" data-page="projects">Projects</a>
-        <a href="#reviews" data-page="reviews">Reviews</a>
-      </div>
-      <div>
-        <h4>Contact</h4>
-        <a href="tel:+16616190170">(661) 619-0170</a>
-        <a href="https://www.google.com/maps/place/?q=place_id:ChIJ4Zw0FUdp6oARY3FXhBlzQCs" target="_blank" rel="noopener">5148 Bleecker St, Baldwin Park, CA 91706</a>
-        <a href="https://www.google.com/maps/place/?q=place_id:ChIJ4Zw0FUdp6oARY3FXhBlzQCs" target="_blank" rel="noopener">See reviews on Google</a>
-      </div>
-      <div>
-        <h4>Note</h4>
-        <p style="font-size:.9rem;color:#9aa4ae">Licensed architect, AIA. Project inquiries by phone. Hours by appointment.</p>
-      </div>
-    </div>
-    <div class="foot-legal">© Timothy R Stormont</div>
-  </div>
-</footer>
-
-<script>
-(function(){
-  "use strict";
-
-  var PAGES = ["home", "services", "about", "projects", "reviews", "contact"];
-  var nav = document.getElementById("mainNav");
-  var burger = document.getElementById("burger");
-
-  function cleanHash(){
-    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
-  }
-
-  function closeMenu(){
-    if(nav){ nav.classList.remove("open"); }
-    if(burger){ burger.setAttribute("aria-expanded", "false"); }
-  }
-
-  function navigateTo(page, updateHash){
-    if(PAGES.indexOf(page) === -1){ page = "home"; }
-
-    var sections = document.querySelectorAll(".page");
-    for(var i = 0; i < sections.length; i++){
-      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
-    }
-
-    var links = document.querySelectorAll("nav.main a[data-page]");
-    for(var j = 0; j < links.length; j++){
-      var on = links[j].getAttribute("data-page") === page;
-      links[j].classList.toggle("active", on);
-      if(on){ links[j].setAttribute("aria-current", "page"); }
-      else { links[j].removeAttribute("aria-current"); }
-    }
-
-    if(updateHash !== false && location.hash !== "#" + page){
-      location.hash = "#" + page;
-    }
-
-    closeMenu();
-    window.scrollTo(0, 0);
-    observeReveals();
-  }
-
-  document.addEventListener("click", function(e){
-    var el = e.target.closest("a[data-page], button[data-page]");
-    if(!el) return;
-    e.preventDefault();
-    navigateTo(el.getAttribute("data-page"));
-  });
-
-  window.addEventListener("hashchange", function(){
-    navigateTo(cleanHash() || "home");
-  });
-
-  if(burger && nav){
-    burger.addEventListener("click", function(){
-      var open = nav.classList.toggle("open");
-      burger.setAttribute("aria-expanded", open ? "true" : "false");
-    });
-  }
-
-  /* ---------- service tabs ---------- */
-  var tabBtns = document.querySelectorAll(".tablist button[data-tab]");
-  for(var t = 0; t < tabBtns.length; t++){
-    tabBtns[t].addEventListener("click", function(){
-      var id = this.getAttribute("data-tab");
-      for(var i = 0; i < tabBtns.length; i++){
-        tabBtns[i].setAttribute("aria-selected", tabBtns[i] === this ? "true" : "false");
-      }
-      var panels = document.querySelectorAll(".tabpanel");
-      for(var p = 0; p < panels.length; p++){
-        panels[p].classList.toggle("active", panels[p].id === id);
-      }
-    });
-  }
-
-  /* ---------- reveal on scroll ---------- */
-  var io = null;
-  if("IntersectionObserver" in window){
-    io = new IntersectionObserver(function(entries){
-      entries.forEach(function(en){
-        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
-      });
-    }, {threshold:.12});
-  }
-  function observeReveals(){
-    if(!io){ return; }
-    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
-    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
-  }
-
-  /* ---------- boot ---------- */
-  navigateTo(cleanHash() || "home", false);
-})();
-</script>
-</body>
-</html>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Timothy R Stormont</title><meta name="description" content="Timothy R Stormont is a Architect in Baldwin Park."><link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"><style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Cormorant Garamond',serif;background:#faf6ee;color:#2a2118;line-height:1.7;font-size:17px}
+h1,h2,h3{font-family:'Lora',serif;text-transform:uppercase;letter-spacing:.14em;font-weight:600;;line-height:1.25;margin-bottom:.6em}
+h1{font-size:2.4em}h2{font-size:1.6em}h3{font-size:1.2em}
+a{color:#a05c2c}a:hover{opacity:.8}
+.wrap{max-width:760px;margin:0 auto;padding:0 1.2em}
+main{padding:2.5em 0 4em}
+.page{display:none}.page.active{display:block}
+.kicker{text-transform:uppercase;letter-spacing:.14em;font-weight:600;;color:#a05c2c;font-size:.85em;margin-bottom:1em}
+.lede{font-size:1.15em;color:#7d7466;margin-bottom:1.2em}
+.meta{color:#7d7466;font-size:.95em}
+.thinrule{height:1px;background:#e6dcc8;margin:1.4em 0;max-width:120px}
+.mod{margin:2.2em 0}.cta{background:#fffdf8;border:1px solid #e6dcc8;padding:1.8em;border-radius:8px}
+.badge{display:inline-block;font-size:.72em;border:1px solid #e6dcc8;border-radius:999px;padding:.15em .7em;color:#7d7466;text-transform:uppercase;letter-spacing:.14em;font-weight:600;}
+.svclist{list-style:none}.svclist li{padding:.7em 0;border-bottom:1px solid #e6dcc8}
+.svclist.big li{font-size:1.15em}
+.svcn .srow{display:flex;gap:1.2em;padding:1em 0;border-bottom:1px solid #e6dcc8}
+.svcn .num{font-family:'Lora',serif;color:#a05c2c;font-size:1.4em}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1.2em}
+.card{background:#fffdf8;border:1px solid #e6dcc8;border-radius:8px;padding:1.4em}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:2em}
+.infocard{background:#fffdf8;border:1px solid #e6dcc8;border-radius:8px;padding:1.4em}
+.frame{border:1px solid #e6dcc8;border-radius:8px;padding:2em;background:#fffdf8}
+.quiet{max-width:560px}.about-c{max-width:620px;margin:0 auto;text-align:center}
+.dropcap::first-letter{font-family:'Lora',serif;font-size:3.2em;float:left;line-height:1;padding-right:.12em;color:#a05c2c}
+.hero{padding:3em 0 2em}.hero-center{text-align:center}.hero-center .thinrule{margin-left:auto;margin-right:auto}
+.hero-left{max-width:640px}.hero-ed .ital{font-style:italic}
+.hero-split{display:grid;grid-template-columns:1.4fr 1fr;gap:2em;align-items:start}
+.hero-off .ord{font-family:'Lora',serif;font-size:1em;color:#a05c2c;text-transform:uppercase;letter-spacing:.14em;font-weight:600;}
+.hero-plain{text-align:center;padding:4em 0}
+footer{border-top:1px solid #e6dcc8;padding:2em 1.2em;text-align:center;color:#7d7466;font-size:.95em}
+form label{display:block;margin:1em 0}form input,form textarea{width:100%;padding:.7em;border:1px solid #e6dcc8;border-radius:8px;background:#faf6ee;color:#2a2118;font-family:'Cormorant Garamond',serif;font-size:1em}
+.fine{font-size:.9em;color:#7d7466}.formnote{color:#a05c2c;margin-top:1em}
+.brand{font-family:'Lora',serif;font-size:1.5em;text-transform:uppercase;letter-spacing:.14em;font-weight:600;}
+.brand.small{font-size:1.15em}
+.burger{display:none;background:none;border:0;font-size:1.6em;color:#2a2118;cursor:pointer}
+.hdr-centered{text-align:center;padding:1.6em 1.2em 0}.hdr-centered .navrow{display:flex;gap:1.6em;justify-content:center;flex-wrap:wrap;border-top:1px solid #e6dcc8;border-bottom:1px solid #e6dcc8;padding:.9em;margin-top:1.2em}
+.hdr-split{display:flex;align-items:center;justify-content:space-between;padding:1.2em;border-bottom:1px solid #e6dcc8;flex-wrap:wrap}
+.hdr-split .navrow{display:flex;gap:1.4em;flex-wrap:wrap}
+.hdr-min{display:flex;align-items:center;justify-content:space-between;padding:1em 1.2em;border-bottom:1px solid #e6dcc8}
+.hdr-min .navdrop{display:none;position:absolute;top:100%;right:0;background:#faf6ee;border:1px solid #e6dcc8;padding:1em;flex-direction:column;gap:.8em;z-index:10}
+.hdr-min{position:relative}
+.hdr-dr{text-align:center;padding:1.4em 1.2em 0}.hdr-dr .navrow{display:flex;gap:1.6em;justify-content:center;flex-wrap:wrap;border-top:3px double #e6dcc8;border-bottom:3px double #e6dcc8;padding:.8em;margin-top:1.1em}
+.hdr-box{padding:1.4em 1.2em;text-align:center}.hdr-box .navbox{display:inline-flex;gap:.4em;flex-wrap:wrap;border:1px solid #e6dcc8;border-radius:8px;padding:.5em .8em;margin-top:1em}
+.hdr-box .navbox a{padding:.3em .8em}
+header nav a{text-decoration:none;color:#2a2118;font-family:'Lora',serif;text-transform:uppercase;letter-spacing:.14em;font-weight:600;;font-size:.95em}
+header nav a.active{color:#a05c2c;text-decoration:underline;text-underline-offset:.3em}
+.hdr-rail{position:fixed;left:0;top:0;bottom:0;width:230px;border-right:1px solid #e6dcc8;padding:2em 1.4em;background:#faf6ee;z-index:20}
+.hdr-rail .navcol{display:flex;flex-direction:column;gap:1em;margin-top:2em}
+.railb{position:fixed;top:1em;left:1em;z-index:30}
+body.rail{margin-left:230px}
+@media(max-width:760px){
+.hdr-rail{display:none}body.rail{margin-left:0}.railb{display:block}
+.hdr-centered .navrow,.hdr-split .navrow,.hdr-dr .navrow,.hdr-box .navbox{display:none;flex-direction:column;position:absolute;left:0;right:0;top:100%;background:#faf6ee;border-bottom:1px solid #e6dcc8;z-index:10;padding:1em}
+.hdr-centered,.hdr-split,.hdr-dr,.hdr-box{position:relative}
+.navrow.open,.navbox.open{display:flex!important}
+.hdr-min .navdrop.open{display:flex}
+.burger{display:block}
+.hero-split,.twocol{grid-template-columns:1fr}
+}
+</style><script type="application/ld+json">{"@context": "https://schema.org", "@type": "LocalBusiness", "name": "Timothy R Stormont", "description": "Timothy R Stormont is a Architect.", "telephone": "(661) 619-0170", "address": {"@type": "PostalAddress", "streetAddress": "5148 Bleecker St", "addressLocality": "Baldwin Park", "addressRegion": "CA", "postalCode": "91706"}}</script><style>html{height:100%}body{min-height:100vh}</style></head><body><header class="hdr-box"><div class="brand">Timothy R Stormont</div><button class="burger" onclick="toggleMenu()" aria-label="Menu">&#9776;</button><nav id="navMenu" class="navbox"><a href="#home" data-nav="home" onclick="return navigateTo('home')">Home</a><a href="#services" data-nav="services" onclick="return navigateTo('services')">Services</a><a href="#about" data-nav="about" onclick="return navigateTo('about')">About</a><a href="#reviews" data-nav="reviews" onclick="return navigateTo('reviews')">Reviews</a><a href="#contact" data-nav="contact" onclick="return navigateTo('contact')">Contact</a></nav></header><main><div class="wrap"><section class="page" data-page="home"><div class="hero hero-ed"><p class="kicker">Architect</p><h1 class="ital">Timothy R Stormont</h1><p class="meta">5148 Bleecker St, Baldwin Park, CA 91706 &middot; (661) 619-0170</p><p><a style="display:inline-block;background:#a05c2c;color:#faf6ee;text-decoration:none;padding:.8em 1.6em;border-radius:8px;font-family:'Lora',serif;text-transform:uppercase;letter-spacing:.14em;font-weight:600;" href="#about" onclick="return navigateTo('about')">About us</a></p></div><hr style="border:0;border-top:1px solid #e6dcc8;margin:2.40em 0;"><div class="mod"><h2>Welcome</h2><p>Timothy R Stormont is a architect in Baldwin Park. For questions about services, pricing, or scheduling, please call <a href="tel:+16616190170">(661) 619-0170</a>.</p></div><hr style="border:0;border-top:1px solid #e6dcc8;margin:2.40em 0;"><div class="mod cta"><h2>Get in touch</h2><p>Ready to talk? Call us at <a href="tel:+16616190170">(661) 619-0170</a>.</p><p><a style="display:inline-block;background:#a05c2c;color:#faf6ee;text-decoration:none;padding:.8em 1.6em;border-radius:8px;font-family:'Lora',serif;text-transform:uppercase;letter-spacing:.14em;font-weight:600;" href="#contact" onclick="return navigateTo('contact')">Contact page</a></p></div><hr style="border:0;border-top:1px solid #e6dcc8;margin:2.40em 0;"><div class="mod"><h2>Reviews</h2><p>See what customers say about us on Google Maps.</p><p><a style="display:inline-block;background:#a05c2c;color:#faf6ee;text-decoration:none;padding:.8em 1.6em;border-radius:8px;font-family:'Lora',serif;text-transform:uppercase;letter-spacing:.14em;font-weight:600;" href="https://www.google.com/maps/place/?q=place_id:ChIJ4Zw0FUdp6oARY3FXhBlzQCs">Read reviews</a></p></div><hr style="border:0;border-top:1px solid #e6dcc8;margin:2.40em 0;"><div class="mod"><h2>Services</h2><ul class="svclist"><li>General services <span class="badge">call to confirm</span></li><li>Estimates <span class="badge">call to confirm</span></li><li>Consultations <span class="badge">call to confirm</span></li></ul><p><a style="display:inline-block;background:#a05c2c;color:#faf6ee;text-decoration:none;padding:.8em 1.6em;border-radius:8px;font-family:'Lora',serif;text-transform:uppercase;letter-spacing:.14em;font-weight:600;" href="#services" onclick="return navigateTo('services')">All services</a></p></div></section><section class="page" data-page="services"><h1>Services</h1><p class="lede">Service details change, so please <a href="tel:+16616190170">call (661) 619-0170</a> to confirm availability and pricing.</p><div class="grid"><div class="card"><h3>General services</h3><p><span class="badge">call to confirm</span></p></div><div class="card"><h3>Estimates</h3><p><span class="badge">call to confirm</span></p></div><div class="card"><h3>Consultations</h3><p><span class="badge">call to confirm</span></p></div><div class="card"><h3>Call to ask about availability</h3><p><span class="badge">call to confirm</span></p></div></div></section><section class="page" data-page="about"><h1>About</h1><div class="twocol"><div><p>Timothy R Stormont is a architect located at 5148 Bleecker St, Baldwin Park, CA 91706.</p><p>We keep this page simple: for the most current information about what we offer, please call <a href="tel:+16616190170">(661) 619-0170</a>.</p></div><aside class="infocard"><p><strong>Category</strong><br>Architect</p><p><strong>Phone</strong><br><a href="tel:+16616190170">(661) 619-0170</a></p></aside></div></section><section class="page" data-page="reviews"><h1>Reviews</h1><div class="frame"><p>We do not collect or display reviews on this site. To read genuine customer reviews, please visit our Google Maps listing.</p><p><a style="display:inline-block;background:#a05c2c;color:#faf6ee;text-decoration:none;padding:.8em 1.6em;border-radius:8px;font-family:'Lora',serif;text-transform:uppercase;letter-spacing:.14em;font-weight:600;" href="https://www.google.com/maps/place/?q=place_id:ChIJ4Zw0FUdp6oARY3FXhBlzQCs">See reviews on Google Maps</a></p></div></section><section class="page" data-page="contact"><h1>Contact</h1><div class="twocol"><div><p><strong>Phone</strong><br><a href="tel:+16616190170">(661) 619-0170</a></p><p><strong>Address</strong><br><a href="https://www.google.com/maps/place/?q=place_id:ChIJ4Zw0FUdp6oARY3FXhBlzQCs">5148 Bleecker St, Baldwin Park, CA 91706</a></p><p class="fine">Tap the address for directions.</p></div><div><form onsubmit="return fakeSubmit(event)"><label>Name<br><input type="text" name="n"></label><label>Phone<br><input type="tel" name="p"></label><label>Message<br><textarea name="m" rows="4"></textarea></label><p class="fine">This form does not send online. To reach us, please call <a href="tel:+16616190170">(661) 619-0170</a>.</p><button type="submit" style="display:inline-block;background:#a05c2c;color:#faf6ee;text-decoration:none;padding:.8em 1.6em;border-radius:8px;font-family:'Lora',serif;text-transform:uppercase;letter-spacing:.14em;font-weight:600;">Send message</button><p class="formnote" id="formnote"></p></form></div></div></section></div></main><footer>© Timothy R Stormont</footer><script>
+var PAGES=['home','services','about','reviews','contact'];
+function showPage(name){
+ if(PAGES.indexOf(name)<0){name='home';}
+ var secs=document.querySelectorAll('.page'),i;
+ for(i=0;i<secs.length;i++){secs[i].classList.toggle('active',secs[i].getAttribute('data-page')===name);}
+ var links=document.querySelectorAll('[data-nav]'),j;
+ for(j=0;j<links.length;j++){links[j].classList.toggle('active',links[j].getAttribute('data-nav')===name);}
+ var m=document.getElementById('navMenu');if(m){m.classList.remove('open');}
+ window.scrollTo(0,0);
+}
+function navigateTo(name){
+ if(('#'+name)!==location.hash){history.pushState({page:name},'', '#'+name);}
+ showPage(name);return false;
+}
+function toggleMenu(){var m=document.getElementById('navMenu');if(m){m.classList.toggle('open');}return false;}
+function fakeSubmit(e){e.preventDefault();var n=document.getElementById('formnote');
+ if(n){n.textContent='Thanks. This form does not send online, please call us instead.';}return false;}
+window.addEventListener('popstate',function(){var h=location.hash.replace('#','');showPage(h||'home');});
+document.addEventListener('DOMContentLoaded',function(){showPage(location.hash.replace('#','')||'home');});
+</script><script>
+/* sticky-footer-fix-v1 */
+(function(){function s(){var f=document.querySelector('footer');if(!f||f.getBoundingClientRect().bottom>=window.innerHeight-2)return;var b=document.body;b.style.minHeight='100vh';b.style.display='flex';b.style.flexDirection='column';var e=f;while(e&&e!==b){if(e===f){e.style.marginTop='auto';}else{e.style.display='flex';e.style.flexDirection='column';e.style.flex='1 0 auto';}e=e.parentElement;}}
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',s);}else{s();}
+window.addEventListener('hashchange',function(){setTimeout(s,60);});
+window.addEventListener('popstate',function(){setTimeout(s,60);});
+var _n=window.navigateTo;if(typeof _n==='function'){window.navigateTo=function(){var r=_n.apply(this,arguments);setTimeout(s,60);return r;};}})();
+</script></body></html>

@@ -1,675 +1,148 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mega Electric Inc | Licensed Electrician in Duarte, CA</title>
-<meta name="description" content="Mega Electric Inc is an electrician in Duarte, CA offering panel upgrades, lighting, rewiring, troubleshooting and more. Mon to Fri, 9 AM to 5 PM. Call (626) 340-9323.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-:root{
-  --bg:#0a0e13; --bg2:#0d1219; --panel:#101826; --panel2:#131c2b;
-  --line:#1f2a3c; --line2:#2a3a52;
-  --ink:#eef3f8; --mut:#9fb0c6; --dim:#6b7d95;
-  --volt:#ffd23f; --volt-d:#eab308; --cyan:#3ae2ff; --ok:#3ddc84; --bad:#ff6b6b;
-  --rad:14px;
-}
-*{box-sizing:border-box; margin:0; padding:0}
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mega Electric Inc | Electrician in Duarte</title><meta name="description" content="Mega Electric Inc, Electrician serving Duarte. Call (626) 340-9323."><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet"><style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#F4F2ED;--card:#FFFFFF;--ink:#2B2B28;--muted:#6B6B64;--accent:#6E6252;--accent2:#9C7B3C;--line:#DED9CE;--r:18px;--sec:64px;--gap:20px;--cpad:24px;--fh:'Playfair Display';--fb:'Source Sans 3'}
 html{scroll-behavior:smooth}
-body{background:var(--bg); color:var(--ink); font-family:Inter,system-ui,sans-serif; line-height:1.65; font-size:16px}
-h1,h2,h3,.disp{font-family:"Space Grotesk",Inter,sans-serif; line-height:1.12; letter-spacing:-.01em}
-.mono{font-family:"IBM Plex Mono",monospace}
-a{color:inherit; text-decoration:none}
-img{max-width:100%}
-.wrap{max-width:1140px; margin:0 auto; padding:0 22px}
-.page{display:none}
-.page.active{display:block; animation:fadeIn .45s ease}
-@keyframes fadeIn{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:none}}
-.reveal{opacity:0; transform:translateY(18px); transition:opacity .6s ease, transform .6s ease}
-.reveal.in{opacity:1; transform:none}
-
-/* utility strip + topbar */
-.strip{background:#070b10; border-bottom:1px solid var(--line); font-size:12.5px; color:var(--mut)}
-.strip .wrap{display:flex; justify-content:space-between; align-items:center; gap:12px; padding-top:8px; padding-bottom:8px; flex-wrap:wrap}
-.strip .dot{display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--ok); margin-right:7px; box-shadow:0 0 8px var(--ok)}
-.strip .dot.closed{background:var(--bad); box-shadow:0 0 8px var(--bad)}
-.strip a.tel{color:var(--volt); font-weight:600}
-.topbar{position:sticky; top:0; z-index:60; background:rgba(10,14,19,.9); backdrop-filter:blur(10px); border-bottom:1px solid var(--line)}
-.topbar .wrap{display:flex; align-items:center; justify-content:space-between; gap:16px; padding-top:13px; padding-bottom:13px}
-.brand{display:flex; align-items:center; gap:11px}
-.brand .bolt{width:40px; height:40px; border-radius:11px; background:linear-gradient(135deg,var(--volt),#ff9d2e); display:flex; align-items:center; justify-content:center; box-shadow:0 0 22px rgba(255,210,63,.35)}
-.brand .bt{font-family:"Space Grotesk"; font-weight:700; font-size:18px; letter-spacing:.02em; line-height:1.05}
-.brand .bs{font-family:"IBM Plex Mono"; font-size:10.5px; color:var(--mut); letter-spacing:.22em}
-nav.main{display:flex; align-items:center; gap:4px}
-nav.main a{padding:9px 14px; border-radius:9px; font-weight:500; font-size:14.5px; color:var(--mut)}
-nav.main a:hover{color:var(--ink); background:#16203200; background:var(--panel)}
-nav.main a.active{color:var(--volt); background:rgba(255,210,63,.09)}
-.btn{display:inline-flex; align-items:center; gap:9px; padding:13px 24px; border-radius:12px; font-weight:600; font-size:15px; border:1px solid transparent; cursor:pointer; transition:transform .15s ease, box-shadow .15s ease}
-.btn:hover{transform:translateY(-2px)}
-.btn-volt{background:var(--volt); color:#141005; box-shadow:0 8px 26px rgba(255,210,63,.25)}
-.btn-ghost{border-color:var(--line2); color:var(--ink); background:rgba(255,255,255,.02)}
-.btn-ghost:hover{border-color:var(--volt)}
-.btn-sm{padding:10px 18px; font-size:14px}
-#burger{display:none; background:none; border:1px solid var(--line2); border-radius:10px; width:44px; height:44px; cursor:pointer}
-#burger span{display:block; width:20px; height:2px; background:var(--ink); margin:4.5px auto; border-radius:2px}
-
-/* hero */
-.hero{position:relative; overflow:hidden; border-bottom:1px solid var(--line)}
-.hero .circuit{position:absolute; inset:0; opacity:.5; pointer-events:none}
-.hero .wrap{position:relative; display:grid; grid-template-columns:1.05fr .95fr; gap:44px; padding-top:74px; padding-bottom:74px; align-items:center}
-.eyebrow{display:inline-flex; align-items:center; gap:9px; font-family:"IBM Plex Mono"; font-size:12px; letter-spacing:.2em; color:var(--cyan); text-transform:uppercase; margin-bottom:18px}
-.eyebrow::before{content:""; width:26px; height:2px; background:var(--cyan)}
-.hero h1{font-size:clamp(38px,5.4vw,62px); font-weight:700; margin-bottom:18px}
-.hero h1 .hl{color:var(--volt)}
-.hero p.lead{color:var(--mut); font-size:17.5px; max-width:52ch; margin-bottom:30px}
-.cta-row{display:flex; gap:14px; flex-wrap:wrap; margin-bottom:34px}
-.trust{display:flex; gap:10px; flex-wrap:wrap}
-.chip{font-family:"IBM Plex Mono"; font-size:12px; color:var(--mut); border:1px solid var(--line); background:var(--panel); padding:8px 13px; border-radius:999px}
-.chip b{color:var(--ok); font-weight:600}
-.console{background:linear-gradient(180deg,var(--panel2),var(--panel)); border:1px solid var(--line2); border-radius:18px; padding:26px; box-shadow:0 30px 80px rgba(0,0,0,.5); position:relative}
-.console .chead{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-family:"IBM Plex Mono"; font-size:11.5px; color:var(--dim); letter-spacing:.14em}
-.console .live{color:var(--ok)}
-.console .live::before{content:""; display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--ok); margin-right:7px; animation:blink 1.6s infinite}
-@keyframes blink{0%,100%{opacity:1} 50%{opacity:.25}}
-.needle{transform-origin:110px 115px; animation:sweep 5.5s ease-in-out infinite}
-@keyframes sweep{0%,100%{transform:rotate(-52deg)} 50%{transform:rotate(52deg)}}
-.pulse{stroke-dasharray:10 26; animation:flow 2.4s linear infinite}
-@keyframes flow{to{stroke-dashoffset:-36}}
-.readouts{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:14px}
-.ro{background:#0b1119; border:1px solid var(--line); border-radius:10px; padding:11px 12px; font-family:"IBM Plex Mono"; font-size:11px; color:var(--dim)}
-.ro b{display:block; font-size:15px; color:var(--ink); margin-top:3px}
-.ro b.cy{color:var(--cyan)} .ro b.vt{color:var(--volt)}
-
-/* panel bands */
-.band{padding:74px 0; border-bottom:1px solid var(--line)}
-.band.alt{background:var(--bg2)}
-.sec-head{max-width:720px; margin-bottom:40px}
-.sec-head h2{font-size:clamp(28px,3.6vw,40px); margin:12px 0 14px}
-.sec-head p{color:var(--mut)}
-.panels{display:grid; grid-template-columns:repeat(4,1fr); gap:16px}
-.panel{background:var(--panel); border:1px solid var(--line); border-radius:var(--rad); padding:26px 22px; position:relative}
-.panel:hover{border-color:var(--line2)}
-.panel .num{font-family:"IBM Plex Mono"; color:var(--volt); font-size:13px; letter-spacing:.18em; margin-bottom:14px}
-.panel h3{font-size:18px; margin-bottom:10px}
-.panel p{color:var(--mut); font-size:14.5px}
-.ctaband{background:linear-gradient(120deg,#ffd23f,#ffb02e); color:#171204; border-radius:20px; padding:44px 46px; display:flex; justify-content:space-between; align-items:center; gap:26px; flex-wrap:wrap; box-shadow:0 24px 60px rgba(255,178,46,.18)}
-.ctaband h2{font-size:clamp(24px,3.2vw,34px); margin-bottom:8px}
-.ctaband p{font-weight:500; opacity:.85}
-.ctaband .btn{background:#141005; color:var(--volt)}
-
-/* work order cards */
-.orders{display:grid; grid-template-columns:repeat(3,1fr); gap:18px}
-.order{background:var(--panel); border:1px solid var(--line); border-radius:var(--rad); overflow:hidden; transition:border-color .2s, transform .2s}
-.order:hover{border-color:var(--volt); transform:translateY(-4px)}
-.order .ohead{background:#0b1119; border-bottom:1px dashed var(--line2); padding:12px 20px; display:flex; justify-content:space-between; font-family:"IBM Plex Mono"; font-size:11.5px; color:var(--dim); letter-spacing:.12em}
-.order .ohead .st{color:var(--ok)}
-.order .obody{padding:24px 22px 26px}
-.order h3{font-size:19px; margin-bottom:6px}
-.order .osub{color:var(--mut); font-size:14px; margin-bottom:16px}
-.check{list-style:none}
-.check li{position:relative; padding:7px 0 7px 34px; font-size:14.5px; color:#c9d5e4}
-.check li::before{content:""; position:absolute; left:0; top:9px; width:17px; height:17px; border-radius:5px; border:1.5px solid var(--line2); background:#0b1119}
-.check li::after{content:""; position:absolute; left:6px; top:13px; width:5px; height:9px; border:solid var(--volt); border-width:0 2.5px 2.5px 0; transform:rotate(42deg)}
-
-/* gallery */
-.gal{display:grid; grid-template-columns:repeat(3,1fr); gap:18px}
-.tile{position:relative; border-radius:var(--rad); overflow:hidden; border:1px solid var(--line); background:var(--panel); aspect-ratio:4/3}
-.tile:nth-child(2){transform:translateY(22px)}
-.tile:nth-child(5){transform:translateY(22px)}
-.tile svg{position:absolute; inset:0; width:100%; height:100%}
-.tile .badge{position:absolute; top:12px; left:12px; font-family:"IBM Plex Mono"; font-size:10.5px; letter-spacing:.1em; background:rgba(7,11,16,.82); border:1px solid var(--line2); color:var(--cyan); padding:6px 11px; border-radius:999px; text-transform:uppercase}
-.tile .cap{position:absolute; left:0; right:0; bottom:0; padding:34px 16px 14px; background:linear-gradient(transparent,rgba(5,8,12,.92)); font-weight:600; font-size:14.5px}
-.tile .cap small{display:block; font-weight:400; color:var(--mut); font-size:12.5px; margin-top:2px}
-
-/* reviews */
-.rev-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:8px}
-.rev{background:var(--panel); border:1px solid var(--line); border-radius:var(--rad); padding:26px 24px; display:flex; flex-direction:column; gap:14px}
-.rev .stars{color:var(--volt); letter-spacing:3px; font-size:17px}
-.rev p{color:#c9d5e4; font-size:15px; flex:1}
-.rev .who{font-family:"IBM Plex Mono"; font-size:12px; color:var(--dim)}
-.rev.real{border-color:rgba(255,210,63,.45)}
-.rev .sample-tag{align-self:flex-start; font-family:"IBM Plex Mono"; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--cyan); border:1px solid var(--cyan); padding:5px 11px; border-radius:999px}
-.src-row{display:flex; gap:14px; flex-wrap:wrap; margin:34px 0 8px}
-.src-note{color:var(--dim); font-size:13.5px; margin-top:18px; max-width:70ch}
-
-/* contact / about */
-.split{display:grid; grid-template-columns:1fr 1fr; gap:26px}
-.card{background:var(--panel); border:1px solid var(--line); border-radius:var(--rad); padding:30px 28px}
-.card h3{font-size:19px; margin-bottom:12px}
-.hours{width:100%; border-collapse:collapse; font-size:14.5px}
-.hours td{padding:10px 4px; border-bottom:1px solid var(--line); color:var(--mut)}
-.hours td:last-child{text-align:right; color:var(--ink)}
-.hours tr.today td{color:var(--volt); font-weight:600}
-.bigcall{display:flex; align-items:center; gap:18px; background:linear-gradient(120deg,#ffd23f,#ffb02e); color:#171204; border-radius:var(--rad); padding:26px 28px; margin-top:26px}
-.bigcall .n{font-family:"Space Grotesk"; font-size:clamp(22px,3vw,30px); font-weight:700}
-.stat-row{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:34px}
-.stat{background:var(--panel); border:1px solid var(--line); border-radius:var(--rad); padding:24px; text-align:center}
-.stat .v{font-family:"Space Grotesk"; font-size:30px; font-weight:700; color:var(--volt)}
-.stat .l{color:var(--mut); font-size:13.5px; margin-top:6px}
-.prose{color:var(--mut); font-size:16px; max-width:64ch}
-.prose p{margin-bottom:16px}
-.prose strong{color:var(--ink)}
-
-/* footer */
-footer{background:#070b10; border-top:1px solid var(--line); margin-top:0}
-.fgrid{display:grid; grid-template-columns:1.3fr 1fr 1fr 1.2fr; gap:30px; padding:54px 0 40px}
-.fgrid h4{font-family:"IBM Plex Mono"; font-size:12px; letter-spacing:.2em; text-transform:uppercase; color:var(--dim); margin-bottom:16px}
-.fgrid ul{list-style:none}
-.fgrid li{margin-bottom:9px; font-size:14.5px}
-.fgrid a{color:var(--mut)} .fgrid a:hover{color:var(--volt)}
-.fbrand p{color:var(--mut); font-size:14.5px; margin-top:12px; max-width:32ch}
-.foot-bottom{border-top:1px solid var(--line); padding:20px 0 26px; text-align:center; color:var(--dim); font-size:14px}
-
-@media(max-width:960px){
-  .hero .wrap{grid-template-columns:1fr; padding-top:54px; padding-bottom:54px}
-  .panels{grid-template-columns:1fr 1fr}
-  .orders{grid-template-columns:1fr 1fr}
-  .gal{grid-template-columns:1fr 1fr}
-  .tile:nth-child(2),.tile:nth-child(5){transform:none}
-  .rev-grid{grid-template-columns:1fr}
-  .split{grid-template-columns:1fr}
-  .fgrid{grid-template-columns:1fr 1fr}
-  .stat-row{grid-template-columns:1fr 1fr}
+body{background:var(--bg);color:var(--ink);font-family:var(--fb),system-ui,sans-serif;line-height:1.6}
+h1,h2,h3{font-family:var(--fh),Georgia,serif;line-height:1.2;font-weight:700}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+section.page{display:none}
+section.page.active{display:block;animation:fade .35s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.sec{padding:var(--sec) 0}
+.kicker{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:10px}
+.btn{display:inline-block;background:var(--accent);color:#fff;text-decoration:none;padding:13px 26px;border-radius:var(--r);font-weight:600;border:none;cursor:pointer;font-size:15px}
+.btn.ghost{background:transparent;color:var(--accent);border:2px solid var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:var(--cpad)}
+.muted{color:var(--muted)}
+.badge{display:inline-block;font-size:11px;letter-spacing:1px;text-transform:uppercase;background:var(--accent2);color:#fff;padding:4px 10px;border-radius:999px;margin-bottom:8px}
+/* nav variants */
+.nav-0 .bar{display:flex;align-items:center;justify-content:space-between;padding:16px 0}
+.nav-1 .bar{display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px 0}
+.nav-2 .bar{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:var(--card);border:1px solid var(--line);border-radius:999px;margin:14px auto;max-width:1080px}
+.nav-3 .bar{display:flex;align-items:center;justify-content:space-between;padding:16px 0}
+.brand{font-family:var(--fh),Georgia,serif;font-weight:700;font-size:22px;color:var(--ink);text-decoration:none}
+.links{display:flex;gap:6px;align-items:center}
+.links a{color:var(--ink);text-decoration:none;padding:9px 14px;border-radius:var(--r);font-weight:500}
+.links a:hover{background:var(--card)}
+.links a.on{background:var(--accent);color:#fff}
+.burger{display:none;background:none;border:1px solid var(--line);border-radius:8px;padding:9px 12px;cursor:pointer;color:var(--ink);font-size:18px}
+@media(max-width:760px){.links{display:none;flex-direction:column;align-items:stretch;position:absolute;top:100%;left:0;right:0;background:var(--card);border-bottom:1px solid var(--line);padding:12px 20px;z-index:50}.links.open{display:flex}.burger{display:block}.navwrap{position:relative}}
+/* hero variants */
+.hero-0{background:var(--accent);color:#fff;padding:72px 0}
+.hero-0 .kicker{color:#fff;opacity:.85}
+.hero-0 h1{font-size:clamp(30px,5vw,52px);margin-bottom:14px}
+.hero-0 p{opacity:.92;max-width:640px;margin-bottom:24px}
+.hero-1{padding:64px 0}
+.hero-1 .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:var(--gap);align-items:center}
+.hero-1 h1{font-size:clamp(30px,4.6vw,48px);margin-bottom:14px}
+.hero-2{padding:88px 0;text-align:center}
+.hero-2 h1{font-size:clamp(32px,5.4vw,56px);margin:12px 0 16px}
+.hero-2 p{max-width:620px;margin:0 auto 26px}
+.hero-3{padding:64px 0 0}
+.hero-3 .band{background:var(--accent2);color:#fff;padding:56px 0 90px;border-radius:var(--r) var(--r) 0 0}
+.hero-3 h1{font-size:clamp(30px,4.8vw,50px)}
+.hero-3 .overlap{margin-top:-56px}
+.hero-4{padding:56px 0}
+.hero-4 .frame{border:2px solid var(--accent);border-radius:var(--r);padding:56px 40px;background:var(--card)}
+.hero-4 h1{font-size:clamp(30px,4.8vw,50px);margin-bottom:14px}
+@media(max-width:760px){.hero-1 .grid{grid-template-columns:1fr}}
+/* arch variants */
+.arch-1 .sec:nth-of-type(even){background:var(--card);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.arch-2 .alt{margin-left:6%;margin-right:0}
+.arch-2 .alt2{margin-right:6%;margin-left:0}
+.arch-5 .narrow{max-width:680px;margin:0 auto;text-align:center}
+.arch-5 h2{font-size:clamp(26px,4vw,40px)}
+.arch-6 .hscroll{display:flex;gap:var(--gap);overflow-x:auto;padding-bottom:10px}
+.arch-6 .hscroll .card{min-width:260px}
+.arch-7 .framepage{border:3px solid var(--accent);border-radius:calc(var(--r) + 8px);margin:18px;padding:6px}
+/* services variants */
+.svc-0 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap)}
+.svc-1 .rows{display:flex;flex-direction:column;gap:var(--gap)}
+.svc-1 .row{display:flex;gap:18px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:var(--cpad)}
+.svc-1 .num{background:var(--accent);color:#fff;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex:none}
+.svc-2 details{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px var(--cpad);margin-bottom:12px}
+.svc-2 summary{cursor:pointer;font-weight:700;font-size:18px;font-family:var(--fh),Georgia,serif}
+.svc-3 .zig{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap);align-items:center;margin-bottom:var(--gap)}
+.svc-3 .zig:nth-child(even) .zt{order:2}
+@media(max-width:760px){.svc-0 .grid{grid-template-columns:1fr}.svc-3 .zig{grid-template-columns:1fr}.svc-3 .zig:nth-child(even) .zt{order:0}}
+/* about variants */
+.about-0 .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:var(--gap);align-items:start}
+.about-1{text-align:center;max-width:720px;margin:0 auto}
+.about-2 .drop::first-letter{font-family:var(--fh),Georgia,serif;font-size:52px;float:left;line-height:1;margin:4px 10px 0 0;color:var(--accent)}
+.about-3 .stack{display:flex;flex-direction:column;gap:var(--gap);max-width:760px}
+@media(max-width:760px){.about-0 .grid{grid-template-columns:1fr}}
+/* reviews variants */
+.rev-0{text-align:center;max-width:640px;margin:0 auto}
+.rev-1{background:var(--accent);color:#fff;border-radius:var(--r);padding:56px 40px;text-align:center}
+.rev-1 .btn{background:#fff;color:var(--ink)}
+.rev-2{border:2px dashed var(--accent);border-radius:var(--r);padding:var(--cpad)}
+/* contact variants */
+.cont-0 .grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:var(--gap);align-items:start}
+.cont-1 .stack{display:flex;flex-direction:column;gap:var(--gap);max-width:720px;margin:0 auto}
+.cont-2{max-width:620px;margin:0 auto}
+.cont-3 .bands{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap);margin-bottom:var(--gap)}
+@media(max-width:760px){.cont-0 .grid{grid-template-columns:1fr}.cont-3 .bands{grid-template-columns:1fr}}
+form .fld{margin-bottom:14px}
+form label{display:block;font-weight:600;margin-bottom:6px}
+form input,form textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:var(--r);background:var(--bg);color:var(--ink);font:inherit}
+form textarea{min-height:120px}
+.notice{background:var(--card);border-left:4px solid var(--accent);padding:14px 18px;border-radius:0 var(--r) var(--r) 0;margin-bottom:20px}
+footer{border-top:1px solid var(--line);padding:26px 0;text-align:center;color:var(--muted);font-size:14px}
+ul.tick{list-style:none}
+ul.tick li{padding:8px 0 8px 28px;position:relative}
+ul.tick li::before{content:"✓";position:absolute;left:0;color:var(--accent);font-weight:700}
+</style><style>html{height:100%}body{min-height:100vh}</style></head><body class="arch-6"><header class="navwrap"><div class="wrap nav-2"><div class="bar"><a class="brand" href="#/home" onclick="navigateTo('home');return false;">Mega Electric Inc</a><button class="burger" onclick="toggleMenu()" aria-label="Menu">☰</button><nav class="links" id="navlinks"><a href="#/home" data-nav="home" onclick="navigateTo('home');return false;">Home</a><a href="#/services" data-nav="services" onclick="navigateTo('services');return false;">Services</a><a href="#/about" data-nav="about" onclick="navigateTo('about');return false;">About</a><a href="#/reviews" data-nav="reviews" onclick="navigateTo('reviews');return false;">Reviews</a><a href="#/contact" data-nav="contact" onclick="navigateTo('contact');return false;">Contact</a></nav></div></div></header><section class="page arch-6" data-page="home" data-title="Mega Electric Inc | Electrician"><div class="sec"><div class="wrap"><div class="hero-1"><div class="wrap"><div class="grid"><div><div class="kicker">Electrician</div><h1>Mega Electric Inc</h1><p class="muted">Electrician based in Duarte. Straightforward work, honest communication.</p><p style="margin-top:26px"><a class="btn" href="tel:+16263409323">Call (626) 340-9323</a> <a class="btn ghost" href="#/contact" onclick="navigateTo('contact');return false;" style="margin-left:10px">Contact Us</a></p></div><div class="card"><span class="badge">Get in touch</span><h3>Call Mega Electric Inc</h3><p class="muted">Mega Electric Inc, 1191 Huntington Dr #169, Duarte, CA 91010</p><p style="margin-top:14px"><a class="btn" href="tel:+16263409323">Call Now</a></p></div></div></div></div><div class="sec"><div class="wrap"><div class="kicker">Welcome</div><h2>How we can help</h2><p class="muted" style="margin:10px 0 22px">A quick look at what Mega Electric Inc does.</p><div class="svc-0"><div class="grid"><div class="card"><h3>Troubleshooting and repair</h3><p class="muted">Diagnose and fix electrical problems.</p></div><div class="card"><h3>Panel upgrades</h3><p class="muted">Service panel replacement and upgrades.</p></div><div class="card"><h3>Lighting installation</h3><p class="muted">Indoor and outdoor lighting work.</p></div></div></div><p style="margin-top:26px"><a class="btn ghost" href="#/services" onclick="navigateTo('services');return false;">All Services</a></p></div></div></div></div></section><section class="page arch-6" data-page="services" data-title="Services | Mega Electric Inc"><div class="sec"><div class="wrap"><div class="kicker">Services</div><h2 style="margin-bottom:18px">What we do</h2><div class="svc-2"><p class="muted" style="margin-bottom:22px">Typical services for a Electrician. <span class="badge">sample</span> Call to confirm what is offered.</p><details><summary>Troubleshooting and repair</summary><p class="muted" style="margin-top:10px">Diagnose and fix electrical problems.</p><p style="margin-top:10px"><a class="btn ghost" href="tel:+16263409323">Call about this</a></p></details><details><summary>Panel upgrades</summary><p class="muted" style="margin-top:10px">Service panel replacement and upgrades.</p><p style="margin-top:10px"><a class="btn ghost" href="tel:+16263409323">Call about this</a></p></details><details><summary>Lighting installation</summary><p class="muted" style="margin-top:10px">Indoor and outdoor lighting work.</p><p style="margin-top:10px"><a class="btn ghost" href="tel:+16263409323">Call about this</a></p></details><details><summary>Outlet and switch work</summary><p class="muted" style="margin-top:10px">Add or replace outlets and switches.</p><p style="margin-top:10px"><a class="btn ghost" href="tel:+16263409323">Call about this</a></p></details><details><summary>Ceiling fan installation</summary><p class="muted" style="margin-top:10px">Fans installed and wired safely.</p><p style="margin-top:10px"><a class="btn ghost" href="tel:+16263409323">Call about this</a></p></details></div></div></div></section><section class="page arch-6" data-page="about" data-title="About | Mega Electric Inc"><div class="sec"><div class="wrap"><div class="about-2"><div class="kicker">About us</div><h2>Mega Electric Inc</h2><p class="drop" style="margin-top:14px">Mega Electric Inc is a Electrician serving Duarte. Every project starts with a conversation: what you need, what it will take, and a straight answer about timing. No pressure, no runaround.</p></div></div></div></section><section class="page arch-6" data-page="reviews" data-title="Reviews | Mega Electric Inc"><div class="sec"><div class="wrap"><div class="rev-1"><div class="kicker">Reviews</div><h2>What customers say</h2><p class="muted" style="margin:14px 0 22px">We do not publish reviews on this site. Read real customer reviews for Mega Electric Inc on Google Maps:</p><p><a class="btn" href="https://www.google.com/maps/place/?q=place_id:ChIJ__YdRgTZwoARNUvbGorxqJo" target="_blank" rel="noopener">See reviews on Google Maps</a></p></div></div></div></section><section class="page arch-6" data-page="contact" data-title="Contact | Mega Electric Inc"><div class="sec"><div class="wrap"><div class="kicker">Contact</div><h2 style="margin-bottom:18px">Get in touch</h2><div class="cont-2"><div class="card"><span class="badge">Contact</span><h3>Mega Electric Inc</h3><p style="margin:10px 0"><strong>Phone:</strong> <a href="tel:+16263409323">(626) 340-9323</a></p><p style="margin:10px 0"><strong>Address:</strong> <a href="https://www.google.com/maps/place/?q=place_id:ChIJ__YdRgTZwoARNUvbGorxqJo" target="_blank" rel="noopener">Mega Electric Inc, 1191 Huntington Dr #169, Duarte, CA 91010</a></p><p class="muted">Tap the address for directions.</p></div><div style="margin-top:var(--gap)"><div class="card"><h3>Send a message</h3><div class="notice"><strong>Please note:</strong> this form does not send online. To reach us, please <a href="tel:+16263409323">call (626) 340-9323</a>.</div><form id="cform" onsubmit="return formNote(event)"><div class="fld"><label for="fn">Name</label><input id="fn" name="name" required></div><div class="fld"><label for="fp">Phone</label><input id="fp" name="phone" type="tel" required></div><div class="fld"><label for="fm">Message</label><textarea id="fm" name="message" required></textarea></div><button class="btn" type="submit">Submit</button></form><div id="formsent" style="display:none"><p><strong>Thanks.</strong> This form does not send online, so please <a href="tel:+16263409323">call (626) 340-9323</a> to reach us directly.</p></div></div></div></div></div></div></section><footer>© Mega Electric Inc</footer><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "Mega Electric Inc",
+  "telephone": "(626) 340-9323",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "1191 Huntington Dr #169",
+    "addressLocality": "Duarte",
+    "addressRegion": "CA",
+    "postalCode": "91010"
+  }
+}</script><script>
+var PAGES=["home","services","about","reviews","contact"];
+function navigateTo(page){
+  if(PAGES.indexOf(page)<0)page="home";
+  history.pushState({page:page},"","#/"+page);
+  render();
+  var l=document.getElementById("navlinks");if(l)l.classList.remove("open");
+  window.scrollTo(0,0);
 }
-@media(max-width:760px){
-  nav.main{position:fixed; top:0; right:-100%; width:min(320px,84vw); height:100dvh; background:#0c121b; flex-direction:column; align-items:stretch; padding:90px 26px 30px; gap:6px; transition:right .3s ease; border-left:1px solid var(--line); z-index:70}
-  nav.main.open{right:0}
-  nav.main a{padding:14px 16px; font-size:16px}
-  #burger{display:block}
-  .topbar .btn{display:none}
-  .panels,.orders,.gal{grid-template-columns:1fr}
-  .ctaband{padding:34px 28px}
-  .fgrid{grid-template-columns:1fr}
+function currentPage(){
+  var h=(location.hash||"").replace(/^#\/?/,"").split("?")[0].split("/")[0];
+  return PAGES.indexOf(h)>=0?h:"home";
 }
-</style>
-</head>
-<body>
-<div class="strip">
-  <div class="wrap">
-    <span><span class="dot" id="hoursDot"></span><span id="hoursText">Mon to Fri · 9:00 AM - 5:00 PM</span></span>
-    <span>Serving Duarte, CA 91010 · <a class="tel" href="tel:+16263409323">(626) 340-9323</a></span>
-  </div>
-</div>
-<header class="topbar">
-  <div class="wrap">
-    <a class="brand" href="#home" data-page="home" aria-label="Mega Electric Inc home">
-      <span class="bolt" aria-hidden="true">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z" fill="#141005"/></svg>
-      </span>
-      <span><span class="bt">MEGA ELECTRIC</span><br><span class="bs">INC · DUARTE CA</span></span>
-    </a>
-    <nav class="main" id="mainNav" aria-label="Main navigation">
-      <a href="#home" data-page="home">Home</a>
-      <a href="#services" data-page="services">Services</a>
-      <a href="#about" data-page="about">About</a>
-      <a href="#gallery" data-page="gallery">Gallery</a>
-      <a href="#reviews" data-page="reviews">Reviews</a>
-      <a href="#contact" data-page="contact">Contact</a>
-    </nav>
-    <a class="btn btn-volt btn-sm" href="tel:+16263409323">Call (626) 340-9323</a>
-    <button id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
-  </div>
-</header>
-
-<main>
-<!-- ================= HOME ================= -->
-<section class="page" id="page-home">
-  <div class="hero">
-    <svg class="circuit" width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 1200 600" aria-hidden="true">
-      <path class="pulse" d="M-20 120 H320 L360 80 H700 L740 120 H1220" stroke="#1f2a3c" stroke-width="2" fill="none"/>
-      <path class="pulse" d="M-20 300 H240 L300 240 H640 L700 300 H1220" stroke="#24344c" stroke-width="2" fill="none"/>
-      <path class="pulse" d="M-20 480 H420 L470 430 H860 L910 480 H1220" stroke="#1f2a3c" stroke-width="2" fill="none"/>
-      <circle cx="320" cy="120" r="5" fill="#3ae2ff" opacity=".5"/>
-      <circle cx="640" cy="300" r="5" fill="#ffd23f" opacity=".5"/>
-      <circle cx="860" cy="480" r="5" fill="#3ae2ff" opacity=".5"/>
-    </svg>
-    <div class="wrap">
-      <div>
-        <span class="eyebrow">Electrician · Duarte, California</span>
-        <h1>Power you can trust. <span class="hl">Work you can see.</span></h1>
-        <p class="lead">Mega Electric Inc handles residential and commercial electrical work across Duarte and the San Gabriel Valley. Clean installs, honest troubleshooting, and every job finished tidy.</p>
-        <div class="cta-row">
-          <a class="btn btn-volt" href="tel:+16263409323">Call (626) 340-9323</a>
-          <a class="btn btn-ghost" href="#services" data-page="services">See services</a>
-        </div>
-        <div class="trust">
-          <span class="chip"><b>●</b> Residential + commercial</span>
-          <span class="chip">Mon to Fri · 9 AM - 5 PM</span>
-          <span class="chip">Duarte, CA 91010</span>
-        </div>
-      </div>
-      <div class="console" aria-label="Electrical system status panel">
-        <div class="chead"><span>PANEL / SYSTEM STATUS</span><span class="live">LIVE</span></div>
-        <svg viewBox="0 0 220 135" width="100%" role="img" aria-label="Animated voltage gauge">
-          <path d="M20 115 A90 90 0 0 1 200 115" fill="none" stroke="#1c2739" stroke-width="16" stroke-linecap="round"/>
-          <path d="M20 115 A90 90 0 0 1 200 115" fill="none" stroke="#ffd23f" stroke-width="16" stroke-linecap="round" stroke-dasharray="150 400" opacity=".9"/>
-          <g stroke="#5b6f8c" stroke-width="2">
-            <line x1="34" y1="101" x2="44" y2="94"/><line x1="60" y1="66" x2="68" y2="61"/>
-            <line x1="110" y1="45" x2="110" y2="55"/><line x1="160" y1="66" x2="152" y2="61"/>
-            <line x1="186" y1="101" x2="176" y2="94"/>
-          </g>
-          <g class="needle"><line x1="110" y1="115" x2="110" y2="48" stroke="#3ae2ff" stroke-width="4" stroke-linecap="round"/></g>
-          <circle cx="110" cy="115" r="9" fill="#0b1119" stroke="#3ae2ff" stroke-width="3"/>
-          <text x="110" y="132" text-anchor="middle" fill="#6b7d95" font-family="IBM Plex Mono" font-size="10">VOLTS</text>
-        </svg>
-        <div class="readouts">
-          <div class="ro">LINE A<b class="cy">120.4 V</b></div>
-          <div class="ro">LINE B<b class="cy">119.8 V</b></div>
-          <div class="ro">LOAD<b class="vt">NOMINAL</b></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="band">
-    <div class="wrap">
-      <div class="sec-head reveal">
-        <span class="eyebrow">How we work</span>
-        <h2>Every job runs like a work order</h2>
-        <p>No mystery pricing, no mess left behind. You always know what happens next.</p>
-      </div>
-      <div class="panels">
-        <div class="panel reveal"><div class="num">01</div><h3>Call or message</h3><p>Tell us what is happening. We schedule a visit that fits your week.</p></div>
-        <div class="panel reveal"><div class="num">02</div><h3>On-site check</h3><p>We inspect the panel, circuits, and fixtures, then explain the fix in plain language.</p></div>
-        <div class="panel reveal"><div class="num">03</div><h3>Straightforward quote</h3><p>You approve the scope before any work starts. No surprises on the invoice.</p></div>
-        <div class="panel reveal"><div class="num">04</div><h3>Done and tidy</h3><p>We complete the work, test everything, and leave the space cleaner than we found it.</p></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="band alt">
-    <div class="wrap">
-      <div class="sec-head reveal">
-        <span class="eyebrow">Services</span>
-        <h2>Full-service electrical, one call away</h2>
-        <p>From a single dead outlet to a full panel upgrade, we cover the jobs homes and businesses call about most.</p>
-      </div>
-      <div class="orders">
-        <div class="order reveal">
-          <div class="ohead"><span>WORK ORDER · 01</span><span class="st">OPEN</span></div>
-          <div class="obody"><h3>Panel Upgrades</h3><p class="osub">More capacity, safer breakers.</p>
-            <ul class="check"><li>Breaker panel replacement</li><li>Subpanel installation</li><li>Whole-panel safety inspection</li></ul>
-          </div>
-        </div>
-        <div class="order reveal">
-          <div class="ohead"><span>WORK ORDER · 02</span><span class="st">OPEN</span></div>
-          <div class="obody"><h3>Lighting</h3><p class="osub">Brighter rooms, lower bills.</p>
-            <ul class="check"><li>Recessed and LED lighting</li><li>Fixture replacement</li><li>Energy-efficient upgrades</li></ul>
-          </div>
-        </div>
-        <div class="order reveal">
-          <div class="ohead"><span>WORK ORDER · 03</span><span class="st">OPEN</span></div>
-          <div class="obody"><h3>Troubleshooting + Repair</h3><p class="osub">Find the fault, fix it right.</p>
-            <ul class="check"><li>Dead outlets and circuits</li><li>Flickering lights</li><li>Breaker trips and faults</li></ul>
-          </div>
-        </div>
-      </div>
-      <div style="margin-top:26px" class="reveal"><a class="btn btn-ghost" href="#services" data-page="services">View all services</a></div>
-    </div>
-  </div>
-
-  <div class="band">
-    <div class="wrap">
-      <div class="ctaband reveal">
-        <div>
-          <h2>Outlets sparking? Lights flickering? Breaker tripping?</h2>
-          <p>Small electrical issues turn into big ones. Call today and we will take a look this week.</p>
-        </div>
-        <a class="btn" href="tel:+16263409323">Call (626) 340-9323</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ================= SERVICES ================= -->
-<section class="page" id="page-services">
-  <div class="band" style="padding-top:64px">
-    <div class="wrap">
-      <div class="sec-head reveal">
-        <span class="eyebrow">Services</span>
-        <h2>Electrical services, filed by work order</h2>
-        <p>Every service below is performed by the Mega Electric Inc crew in Duarte and surrounding San Gabriel Valley cities. Call <a href="tel:+16263409323" style="color:var(--volt); font-weight:600">(626) 340-9323</a> to schedule.</p>
-      </div>
-      <div class="orders">
-        <div class="order reveal"><div class="ohead"><span>WORK ORDER · 01</span><span class="st">OPEN</span></div><div class="obody"><h3>Panel Upgrades</h3><p class="osub">Capacity and safety for modern loads.</p><ul class="check"><li>Breaker panel replacement</li><li>Subpanel installation</li><li>Panel safety inspection</li><li>Labeling and organization</li></ul></div></div>
-        <div class="order reveal"><div class="ohead"><span>WORK ORDER · 02</span><span class="st">OPEN</span></div><div class="obody"><h3>Lighting Design + Install</h3><p class="osub">Indoor, outdoor, and accent.</p><ul class="check"><li>Recessed lighting</li><li>LED retrofits and upgrades</li><li>Fixture replacement</li><li>Landscape and security lighting</li></ul></div></div>
-        <div class="order reveal"><div class="ohead"><span>WORK ORDER · 03</span><span class="st">OPEN</span></div><div class="obody"><h3>Rewiring</h3><p class="osub">Old wiring brought up to date.</p><ul class="check"><li>Whole-room and whole-home rewiring</li><li>Knob-and-tube replacement</li><li>New circuits for remodels</li><li>Dedicated appliance circuits</li></ul></div></div>
-        <div class="order reveal"><div class="ohead"><span>WORK ORDER · 04</span><span class="st">OPEN</span></div><div class="obody"><h3>Troubleshooting + Repair</h3><p class="osub">Fast diagnosis, lasting fixes.</p><ul class="check"><li>Dead outlets and switches</li><li>Flickering or dimming lights</li><li>Breaker trips and overloads</li><li>Fault tracing and repair</li></ul></div></div>
-        <div class="order reveal"><div class="ohead"><span>WORK ORDER · 05</span><span class="st">OPEN</span></div><div class="obody"><h3>Fans + Fixtures</h3><p class="osub">Comfort and style upgrades.</p><ul class="check"><li>Ceiling fan installation</li><li>Chandeliers and pendants</li><li>Dimmer switch installation</li><li>Smart switch upgrades</li></ul></div></div>
-        <div class="order reveal"><div class="ohead"><span>WORK ORDER · 06</span><span class="st">OPEN</span></div><div class="obody"><h3>Commercial Electrical</h3><p class="osub">Keep your business running.</p><ul class="check"><li>Office and retail wiring</li><li>Lighting for workspaces</li><li>Code compliance corrections</li><li>Scheduled maintenance</li></ul></div></div>
-      </div>
-      <div class="ctaband reveal" style="margin-top:44px">
-        <div><h2>Not sure what you need?</h2><p>Describe the problem and we will diagnose it on site.</p></div>
-        <a class="btn" href="tel:+16263409323">Call (626) 340-9323</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ================= ABOUT ================= -->
-<section class="page" id="page-about">
-  <div class="band" style="padding-top:64px">
-    <div class="wrap">
-      <div class="sec-head reveal">
-        <span class="eyebrow">About</span>
-        <h2>Duarte's detail-obsessed electricians</h2>
-      </div>
-      <div class="split">
-        <div class="prose reveal">
-          <p><strong>Mega Electric Inc</strong> is an electrical contractor based at 1191 Huntington Dr in Duarte, California, serving homes and businesses across the San Gabriel Valley.</p>
-          <p>Customers describe the crew as <strong>detail-oriented, kind, fast, and professional</strong>, with a habit of leaving every job site clean and getting businesses back up and running quickly. Recent work includes full lighting and wiring updates that made commercial spaces more energy efficient.</p>
-          <p>Whether it is a flickering light, an aging panel, or a full remodel rough-in, you get straight answers, tidy workmanship, and power you can trust.</p>
-        </div>
-        <div>
-          <div class="console reveal" aria-label="Company facts panel">
-            <div class="chead"><span>COMPANY FILE</span><span class="live">VERIFIED LISTING</span></div>
-            <table class="hours">
-              <tr><td>Business</td><td>Mega Electric Inc</td></tr>
-              <tr><td>Trade</td><td>Electrician</td></tr>
-              <tr><td>Address</td><td>1191 Huntington Dr #169, Duarte, CA 91010</td></tr>
-              <tr><td>Phone</td><td><a href="tel:+16263409323" style="color:var(--volt)">(626) 340-9323</a></td></tr>
-              <tr><td>Hours</td><td>Mon to Fri · 9 AM - 5 PM</td></tr>
-            </table>
-          </div>
-        </div>
-      </div>
-      <div class="stat-row">
-        <div class="stat reveal"><div class="v">9-5</div><div class="l">Weekday hours, Mon to Fri</div></div>
-        <div class="stat reveal"><div class="v">100%</div><div class="l">Jobs left clean and tested</div></div>
-        <div class="stat reveal"><div class="v">1 call</div><div class="l">Residential + commercial service</div></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ================= GALLERY ================= -->
-<section class="page" id="page-gallery">
-  <div class="band" style="padding-top:64px">
-    <div class="wrap">
-      <div class="sec-head reveal">
-        <span class="eyebrow">Gallery</span>
-        <h2>Recent work, on the board</h2>
-        <p>Illustrated previews of the jobs we do most. Real project photos coming soon.</p>
-      </div>
-      <div class="gal">
-        <div class="tile reveal"><span class="badge">Photo placeholder</span>
-          <svg viewBox="0 0 400 300" aria-hidden="true"><rect width="400" height="300" fill="#131c2b"/><rect x="130" y="40" width="140" height="220" rx="10" fill="#0b1119" stroke="#2a3a52" stroke-width="3"/><g fill="#ffd23f"><rect x="148" y="62" width="24" height="40" rx="4"/><rect x="180" y="62" width="24" height="40" rx="4"/><rect x="212" y="62" width="24" height="40" rx="4"/><rect x="148" y="112" width="24" height="40" rx="4"/><rect x="180" y="112" width="24" height="40" rx="4"/><rect x="212" y="112" width="24" height="40" rx="4"/></g><rect x="148" y="200" width="104" height="14" rx="7" fill="#3ae2ff" opacity=".7"/></svg>
-          <div class="cap">Panel upgrades<small>Breaker panels and subpanels</small></div>
-        </div>
-        <div class="tile reveal"><span class="badge">Photo placeholder</span>
-          <svg viewBox="0 0 400 300" aria-hidden="true"><rect width="400" height="300" fill="#0d1420"/><g stroke="#3ae2ff" stroke-width="4" fill="none"><circle cx="200" cy="150" r="60"/><circle cx="200" cy="150" r="38"/></g><g fill="#ffd23f"><circle cx="200" cy="90" r="10"/><circle cx="260" cy="150" r="10"/><circle cx="200" cy="210" r="10"/><circle cx="140" cy="150" r="10"/></g><line x1="200" y1="0" x2="200" y2="88" stroke="#2a3a52" stroke-width="6"/></svg>
-          <div class="cap">Recessed lighting<small>LED retrofits and layouts</small></div>
-        </div>
-        <div class="tile reveal"><span class="badge">Photo placeholder</span>
-          <svg viewBox="0 0 400 300" aria-hidden="true"><rect width="400" height="300" fill="#131c2b"/><line x1="200" y1="0" x2="200" y2="70" stroke="#2a3a52" stroke-width="8"/><ellipse cx="200" cy="150" rx="110" ry="26" fill="#0b1119" stroke="#ffd23f" stroke-width="4"/><g stroke="#ffd23f" stroke-width="5"><line x1="200" y1="120" x2="120" y2="96"/><line x1="200" y1="120" x2="280" y2="96"/><line x1="200" y1="180" x2="120" y2="204"/><line x1="200" y1="180" x2="280" y2="204"/></g><circle cx="200" cy="150" r="14" fill="#3ae2ff"/></svg>
-          <div class="cap">Ceiling fans<small>Installs and balancing</small></div>
-        </div>
-        <div class="tile reveal"><span class="badge">Photo placeholder</span>
-          <svg viewBox="0 0 400 300" aria-hidden="true"><rect width="400" height="300" fill="#0d1420"/><rect x="150" y="70" width="100" height="150" rx="12" fill="#0b1119" stroke="#3ae2ff" stroke-width="4"/><rect x="168" y="95" width="64" height="40" rx="6" fill="#3ae2ff" opacity=".35"/><circle cx="200" cy="180" r="10" fill="#ffd23f"/><rect x="120" y="230" width="160" height="12" rx="6" fill="#2a3a52"/><path d="M60 250 h280" stroke="#ffd23f" stroke-width="3" stroke-dasharray="12 10"/></svg>
-          <div class="cap">EV charger installs<small>Home charging circuits</small></div>
-        </div>
-        <div class="tile reveal"><span class="badge">Photo placeholder</span>
-          <svg viewBox="0 0 400 300" aria-hidden="true"><rect width="400" height="300" fill="#131c2b"/><g fill="#0b1119" stroke="#2a3a52" stroke-width="3"><rect x="90" y="100" width="90" height="110" rx="8"/><rect x="220" y="100" width="90" height="110" rx="8"/></g><circle cx="135" cy="155" r="9" fill="#ffd23f"/><circle cx="265" cy="155" r="9" fill="#ffd23f"/><path d="M180 120 q10 35 0 70 M220 120 q-10 35 0 70" stroke="#3ae2ff" stroke-width="4" fill="none"/></svg>
-          <div class="cap">Outlets + switches<small>Repairs and smart upgrades</small></div>
-        </div>
-        <div class="tile reveal"><span class="badge">Photo placeholder</span>
-          <svg viewBox="0 0 400 300" aria-hidden="true"><rect width="400" height="300" fill="#0d1420"/><rect x="60" y="60" width="280" height="180" rx="10" fill="#0b1119" stroke="#2a3a52" stroke-width="3"/><g stroke="#ffd23f" stroke-width="3"><line x1="90" y1="90" x2="310" y2="90"/><line x1="90" y1="130" x2="310" y2="130"/><line x1="90" y1="170" x2="310" y2="170"/><line x1="90" y1="210" x2="310" y2="210"/></g><g fill="#3ae2ff"><rect x="110" y="100" width="40" height="18" rx="4"/><rect x="250" y="140" width="40" height="18" rx="4"/><rect x="160" y="180" width="40" height="18" rx="4"/></g></svg>
-          <div class="cap">Commercial lighting<small>Offices and retail spaces</small></div>
-        </div>
-      </div>
-      <p class="src-note">Illustrated previews shown. Ask us about recent projects when you call.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ================= REVIEWS ================= -->
-<section class="page" id="page-reviews">
-  <div class="band" style="padding-top:64px">
-    <div class="wrap">
-      <div class="sec-head reveal">
-        <span class="eyebrow">Reviews</span>
-        <h2>What customers say</h2>
-        <p>Based on published reviews for Mega Electric Inc. Review themes: energy-efficient lighting and wiring upgrades, detail-oriented and professional crew, fast work, and thorough cleanup.</p>
-      </div>
-      <div class="src-row reveal">
-        <a class="btn btn-volt" href="https://www.google.com/maps/place/?q=place_id:ChIJ__YdRgTZwoARNUvbGorxqJo" target="_blank" rel="noopener">See reviews on Google</a>
-        <a class="btn btn-ghost" href="https://www.bestprosintown.com/ca/duarte/mega-electric-inc-/" target="_blank" rel="noopener">See reviews on BestProsInTown</a>
-      </div>
-      <div class="rev-grid">
-        <div class="rev real reveal">
-          <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
-          <p>Did an outstanding job updating all the old lighting and wiring in a business suite. Everything is now energy efficient, the space looks and feels better, and the team was detail-oriented, kind, fast, and professional. They cleaned up after themselves and got the business running again in no time. Would hire again in a heartbeat.</p>
-          <div class="who">Paraphrased from a published review · BestProsInTown · Sep 2025</div>
-        </div>
-        <div class="rev reveal">
-          <span class="sample-tag">Sample</span>
-          <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
-          <p>Panel upgrade done in one visit. The electrician explained every breaker, labeled everything, and walked me through the whole panel before leaving.</p>
-          <div class="who">Sample review for illustration</div>
-        </div>
-        <div class="rev reveal">
-          <span class="sample-tag">Sample</span>
-          <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
-          <p>Tracked down a flickering-light issue two other companies missed. Fair price, showed up on time, and left the rooms spotless.</p>
-          <div class="who">Sample review for illustration</div>
-        </div>
-      </div>
-      <p class="src-note">Had work done by Mega Electric Inc? Leave a review through the links above and tell Duarte about your experience.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ================= CONTACT ================= -->
-<section class="page" id="page-contact">
-  <div class="band" style="padding-top:64px">
-    <div class="wrap">
-      <div class="sec-head reveal">
-        <span class="eyebrow">Contact</span>
-        <h2>Get your work order started</h2>
-        <p>Call during business hours for the fastest response. We serve Duarte and the surrounding San Gabriel Valley.</p>
-      </div>
-      <div class="split">
-        <div class="card reveal">
-          <h3>Call or visit</h3>
-          <table class="hours">
-            <tr><td>Phone</td><td><a href="tel:+16263409323" style="color:var(--volt); font-weight:600">(626) 340-9323</a></td></tr>
-            <tr><td>Address</td><td>Mega Electric Inc, 1191 Huntington Dr #169, Duarte, CA 91010</td></tr>
-            <tr><td>Area</td><td>Duarte, 91010, US</td></tr>
-          </table>
-          <div style="margin-top:20px; display:flex; gap:12px; flex-wrap:wrap">
-            <a class="btn btn-volt btn-sm" href="tel:+16263409323">Call now</a>
-            <a class="btn btn-ghost btn-sm" href="https://www.google.com/maps/place/?q=place_id:ChIJ__YdRgTZwoARNUvbGorxqJo" target="_blank" rel="noopener">Get directions</a>
-          </div>
-        </div>
-        <div class="card reveal">
-          <h3>Hours</h3>
-          <table class="hours" id="hoursTable">
-            <tr><td>Monday</td><td>9:00 AM - 5:00 PM</td></tr>
-            <tr><td>Tuesday</td><td>9:00 AM - 5:00 PM</td></tr>
-            <tr><td>Wednesday</td><td>9:00 AM - 5:00 PM</td></tr>
-            <tr><td>Thursday</td><td>9:00 AM - 5:00 PM</td></tr>
-            <tr><td>Friday</td><td>9:00 AM - 5:00 PM</td></tr>
-            <tr><td>Saturday</td><td>Closed</td></tr>
-            <tr><td>Sunday</td><td>Closed</td></tr>
-          </table>
-        </div>
-      </div>
-      <div class="bigcall reveal">
-        <div style="flex:1">
-          <div class="mono" style="font-size:12px; letter-spacing:.18em; opacity:.7">READY TO SCHEDULE?</div>
-          <div class="n"><a href="tel:+16263409323">(626) 340-9323</a></div>
-        </div>
-        <a class="btn" href="tel:+16263409323" style="background:#141005; color:var(--volt)">Call Mega Electric</a>
-      </div>
-    </div>
-  </div>
-</section>
-</main>
-
-<footer>
-  <div class="wrap">
-    <div class="fgrid">
-      <div class="fbrand">
-        <a class="brand" href="#home" data-page="home" aria-label="Mega Electric Inc home">
-          <span class="bolt" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z" fill="#141005"/></svg></span>
-          <span><span class="bt">MEGA ELECTRIC</span><br><span class="bs">INC · DUARTE CA</span></span>
-        </a>
-        <p>Residential and commercial electrical work in Duarte, CA. Clean installs, honest troubleshooting.</p>
-      </div>
-      <div>
-        <h4>Pages</h4>
-        <ul>
-          <li><a href="#home" data-page="home">Home</a></li>
-          <li><a href="#services" data-page="services">Services</a></li>
-          <li><a href="#about" data-page="about">About</a></li>
-          <li><a href="#gallery" data-page="gallery">Gallery</a></li>
-          <li><a href="#reviews" data-page="reviews">Reviews</a></li>
-          <li><a href="#contact" data-page="contact">Contact</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>Services</h4>
-        <ul>
-          <li><a href="#services" data-page="services">Panel upgrades</a></li>
-          <li><a href="#services" data-page="services">Lighting</a></li>
-          <li><a href="#services" data-page="services">Rewiring</a></li>
-          <li><a href="#services" data-page="services">Troubleshooting</a></li>
-          <li><a href="#services" data-page="services">Commercial electrical</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>Contact</h4>
-        <ul>
-          <li><a href="tel:+16263409323">(626) 340-9323</a></li>
-          <li>1191 Huntington Dr #169<br>Duarte, CA 91010</li>
-          <li>Mon to Fri · 9 AM - 5 PM</li>
-          <li><a href="https://www.google.com/maps/place/?q=place_id:ChIJ__YdRgTZwoARNUvbGorxqJo" target="_blank" rel="noopener">Get directions</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="foot-bottom"><span>© Mega Electric Inc</span></div>
-  </div>
-</footer>
-
-<script>
-(function(){
-  "use strict";
-
-  var PAGES = ["home", "services", "about", "gallery", "reviews", "contact"];
-  var nav = document.getElementById("mainNav");
-  var burger = document.getElementById("burger");
-
-  function cleanHash(){
-    return (location.hash || "").replace(/^#\/?/, "").split("?")[0];
+function render(){
+  var p=currentPage();
+  var secs=document.querySelectorAll("section.page");
+  for(var i=0;i<secs.length;i++){
+    secs[i].classList.toggle("active",secs[i].getAttribute("data-page")===p);
   }
-
-  function closeMenu(){
-    if(nav){ nav.classList.remove("open"); }
-    if(burger){ burger.setAttribute("aria-expanded", "false"); }
+  var links=document.querySelectorAll("[data-nav]");
+  for(var j=0;j<links.length;j++){
+    links[j].classList.toggle("on",links[j].getAttribute("data-nav")===p);
   }
-
-  function navigateTo(page, updateHash){
-    if(PAGES.indexOf(page) === -1){ page = "home"; }
-
-    var sections = document.querySelectorAll(".page");
-    for(var i = 0; i < sections.length; i++){
-      sections[i].classList.toggle("active", sections[i].id === "page-" + page);
-    }
-
-    var links = document.querySelectorAll("nav.main a[data-page]");
-    for(var j = 0; j < links.length; j++){
-      var on = links[j].getAttribute("data-page") === page;
-      links[j].classList.toggle("active", on);
-      if(on){ links[j].setAttribute("aria-current", "page"); }
-      else { links[j].removeAttribute("aria-current"); }
-    }
-
-    if(updateHash !== false && location.hash !== "#" + page){
-      location.hash = "#" + page;
-    }
-
-    closeMenu();
-    window.scrollTo(0, 0);
-    observeReveals();
-  }
-
-  document.addEventListener("click", function(e){
-    var el = e.target.closest("a[data-page], button[data-page]");
-    if(!el) return;
-    e.preventDefault();
-    navigateTo(el.getAttribute("data-page"));
-  });
-
-  window.addEventListener("hashchange", function(){
-    navigateTo(cleanHash() || "home");
-  });
-
-  if(burger && nav){
-    burger.addEventListener("click", function(){
-      var open = nav.classList.toggle("open");
-      burger.setAttribute("aria-expanded", open ? "true" : "false");
-    });
-  }
-
-  /* ---------- live hours pill (America/Los_Angeles) ---------- */
-  var HOURS = {0:null, 1:[9,17], 2:[9,17], 3:[9,17], 4:[9,17], 5:[9,17], 6:null};
-  var DOW = {"Sun":0,"Mon":1,"Tue":2,"Wed":3,"Thu":4,"Fri":5,"Sat":6};
-  var DAYNAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-  function fmtH(h){
-    var ap = h < 12 ? "AM" : "PM";
-    var hh = h % 12;
-    if(hh === 0){ hh = 12; }
-    return hh + ":00 " + ap;
-  }
-  try{
-    var parts = new Intl.DateTimeFormat("en-US",{timeZone:"America/Los_Angeles",weekday:"short",hour:"numeric",hour12:false}).formatToParts(new Date());
-    var wd = "Mon", hr = 12;
-    parts.forEach(function(p){
-      if(p.type === "weekday"){ wd = p.value; }
-      if(p.type === "hour"){ hr = parseInt(p.value, 10) % 24; }
-    });
-    var day = DOW[wd] !== undefined ? DOW[wd] : 1;
-    var rng = HOURS[day];
-    var txt = document.getElementById("hoursText");
-    var dot = document.getElementById("hoursDot");
-    if(txt){
-      if(rng && hr >= rng[0] && hr < rng[1]){
-        txt.textContent = "Open now · closes " + fmtH(rng[1]) + " today";
-      } else {
-        if(dot){ dot.classList.add("closed"); }
-        var nd = day, label = "", k;
-        for(k = 0; k < 8; k++){
-          nd = (day + k) % 7;
-          if(HOURS[nd]){ label = k === 0 ? "today" : (k === 1 ? "tomorrow" : DAYNAMES[nd]); break; }
-        }
-        txt.textContent = "Closed · opens " + label + " " + fmtH(HOURS[nd][0]);
-      }
-    }
-    var rows = document.querySelectorAll("#hoursTable tr");
-    var idx = (day + 6) % 7; /* rows run Mon..Sun */
-    if(rows[idx]){ rows[idx].classList.add("today"); }
-  }catch(e){ /* leave default pill text */ }
-
-  /* ---------- reveal on scroll ---------- */
-  var io = null;
-  if("IntersectionObserver" in window){
-    io = new IntersectionObserver(function(entries){
-      entries.forEach(function(en){
-        if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
-      });
-    }, {threshold:.12});
-  }
-  function observeReveals(){
-    if(!io){ return; }
-    var els = document.querySelectorAll(".page.active .reveal:not(.in)");
-    for(var m = 0; m < els.length; m++){ io.observe(els[m]); }
-  }
-
-  /* ---------- boot ---------- */
-  navigateTo(cleanHash() || "home", false);
-})();
-</script>
-</body>
-</html>
+  document.title=document.querySelector('section.page[data-page="'+p+'"]').getAttribute("data-title");
+}
+function toggleMenu(){document.getElementById("navlinks").classList.toggle("open");}
+function formNote(ev){
+  ev.preventDefault();
+  document.getElementById("cform").style.display="none";
+  document.getElementById("formsent").style.display="block";
+  return false;
+}
+window.addEventListener("popstate",render);
+window.addEventListener("hashchange",render);
+document.addEventListener("DOMContentLoaded",render);
+</script><script>
+/* sticky-footer-fix-v1 */
+(function(){function s(){var f=document.querySelector('footer');if(!f||f.getBoundingClientRect().bottom>=window.innerHeight-2)return;var b=document.body;b.style.minHeight='100vh';b.style.display='flex';b.style.flexDirection='column';var e=f;while(e&&e!==b){if(e===f){e.style.marginTop='auto';}else{e.style.display='flex';e.style.flexDirection='column';e.style.flex='1 0 auto';}e=e.parentElement;}}
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',s);}else{s();}
+window.addEventListener('hashchange',function(){setTimeout(s,60);});
+window.addEventListener('popstate',function(){setTimeout(s,60);});
+var _n=window.navigateTo;if(typeof _n==='function'){window.navigateTo=function(){var r=_n.apply(this,arguments);setTimeout(s,60);return r;};}})();
+</script></body></html>
