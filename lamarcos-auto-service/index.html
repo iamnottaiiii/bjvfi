@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LaMarco&#x27;s Auto Service - Auto repair shop</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{display:flex;flex-direction:column;min-height:100vh;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;color:#1a1a1a;background:#ffffff;line-height:1.6}
+main{flex:1}
+a{color:inherit}
+.page{display:none}
+.page.active{display:block}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+
+.nv{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:#ffffff;border-bottom:1px solid #eee;position:sticky;top:0;z-index:50}
+.logo{font-weight:800;font-size:1.15rem;text-decoration:none;letter-spacing:-.01em}
+.links{display:flex;gap:22px}
+.links a{text-decoration:none;font-weight:600;font-size:.95rem;padding:8px 12px;border-radius:14px;color:#333}
+.links a.current,.links a:hover{color:#ff7b00}
+.burger{display:none;background:none;border:1px solid #ddd;border-radius:8px;font-size:1.3rem;padding:6px 12px;cursor:pointer}
+.nv-2 .links.pills a{border:1px solid #eee}.nv-2 .links.pills a.current{background:#ff7b00;color:#fff;border-color:#ff7b00}
+
+.kicker{text-transform:uppercase;letter-spacing:.14em;font-size:.78rem;font-weight:700;color:#ff7b00;margin-bottom:12px}
+h1{font-size:3.2rem;line-height:1.12;letter-spacing:-.02em;margin-bottom:14px}
+h2{font-size:1.9rem;margin-bottom:10px;letter-spacing:-.01em}
+.lede{font-size:1.08rem;color:#555;max-width:620px;margin-bottom:24px}
+.ctas{display:flex;gap:12px;flex-wrap:wrap}
+.btn{display:inline-block;background:#ff7b00;color:#fff;text-decoration:none;font-weight:700;padding:12px 26px;border-radius:14px;border:2px solid #ff7b00;cursor:pointer}
+.btn.ghost{background:#fff;color:#ff7b00}
+.btn.outline{background:#fff;color:#ff7b00;border:2px solid #ff7b00}
+.note,.sample{color:#888;font-size:.9rem}
+.hero{padding:100px 20px;max-width:1080px;margin:0 auto}
+.hero-center{text-align:center}.hero-center .lede{margin-left:auto;margin-right:auto}.hero-center .ctas{justify-content:center}
+.hero-split{display:grid;grid-template-columns:1.4fr 1fr;gap:36px;align-items:center}
+.hero-card{background:#f7f7f8;border:1px solid #eee;border-radius:18px;padding:28px;text-align:center}
+.hc-label{font-size:.8rem;text-transform:uppercase;letter-spacing:.12em;color:#888}
+.hc-phone{display:block;font-size:1.5rem;font-weight:800;color:#ff7b00;text-decoration:none;margin:8px 0}
+.hc-note{font-size:.88rem;color:#777}
+.hero-left{max-width:1080px}
+.hero-band{max-width:none;background:#ff7b00;color:#fff}.hero-band .kicker{color:#fff;opacity:.85}.hero-band .lede{color:#f5f5f5}.hero-band .btn{background:#fff;color:#ff7b00;border-color:#fff}.hero-band .btn.ghost{background:transparent;color:#fff;border-color:#fff}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px}
+.chip{background:#f1f1f3;border-radius:999px;padding:8px 16px;font-size:.9rem;font-weight:600}
+.hero-overlay{max-width:none;background:#f4f4f6;padding:100px 20px}
+.overlay-card{max-width:720px;margin:0 auto;background:#fff;border-radius:20px;padding:44px;box-shadow:0 12px 40px rgba(0,0,0,.08);text-align:center}
+.overlay-card .ctas{justify-content:center}
+.hero-preview{display:grid;grid-template-columns:1.4fr 1fr;gap:36px;align-items:start}
+.preview-list{list-style:none;background:#f7f7f8;border-radius:14px;padding:24px}
+.preview-list li{padding:10px 0;border-bottom:1px solid #e6e6e9;font-weight:600}.preview-list li:last-child{border:none}
+.giant{font-size:clamp(2.6rem,7vw,4.6rem)}
+.hero-stripe .stripe{height:8px;width:120px;background:#ff7b00;border-radius:4px;margin-bottom:20px}
+.hero-min{text-align:center;max-width:720px}
+section.page>div.wrap,section.page>.hero{padding-top:56px;padding-bottom:56px}
+.svc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:24px}
+.svc{background:#fff;border:1px solid #ececf0;border-radius:14px;padding:24px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+.svc h3{font-size:1.05rem;margin-bottom:6px}
+.svc-list{margin-top:24px;display:flex;flex-direction:column;gap:14px}
+.svc-row{display:flex;gap:16px;align-items:flex-start;background:#fafafb;border-radius:14px;padding:18px 20px}
+.svc-row .num{font-weight:800;color:#ff7b00;font-size:1.2rem}
+.svc-stack{margin-top:24px;display:flex;flex-direction:column;gap:14px}
+.svc-stack .svc{border-left:5px solid #ff7b00}
+.svc-trio{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:24px}
+.svc-trio .svc{text-align:center;background:#fafafb}
+.svc-divided{margin-top:24px;border-top:2px solid #f0f0f2}
+.sd-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 4px;border-bottom:2px solid #f0f0f2}
+.sd-row h3{font-size:1.02rem}
+.about-card{background:#fafafb;border-radius:16px;padding:32px;margin-top:24px}
+.about-card p{margin-bottom:12px;color:#444}
+.reviews-box{text-align:center;padding:56px 20px;background:#fafafb;border-radius:18px;margin-top:24px}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:24px}
+.info-card{background:#fafafb;border-radius:14px;padding:28px}
+.info-card p{margin-bottom:10px}
+.info-card a.tel{font-size:1.3rem;font-weight:800;color:#ff7b00;text-decoration:none}
+form.contact-form{background:#fff;border:1px solid #ececf0;border-radius:14px;padding:28px}
+form.contact-form label{display:block;font-weight:600;margin:12px 0 6px}
+form.contact-form input,form.contact-form textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font:inherit}
+form.contact-form button{margin-top:18px}
+.form-note{background:#fff8e1;border:1px solid #f0e0a0;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:.95rem}
+#formMsg{margin-top:14px;font-weight:700;color:#ff7b00;display:none}
+footer{text-align:center;padding:22px 16px;border-top:1px solid #eee;color:#666;font-size:.95rem;background:#fff}
+@media(max-width:860px){.links{display:none;position:absolute;top:100%;left:0;right:0;background:#fff;flex-direction:column;padding:12px 20px;border-bottom:1px solid #eee}.links.open{display:flex}.burger{display:block}.hero-split,.hero-preview,.contact-grid{grid-template-columns:1fr}.nv-3{position:sticky}}
+</style>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "LocalBusiness", "name": "LaMarco's Auto Service", "address": "LaMarco's Auto Service, 3059 Lakeview Rd, Hamburg, NY 14075", "telephone": "(716) 648-5503"}</script>
+<style>html{height:100%}body{min-height:100vh}</style></head>
+<body class="">
+<header class="nv nv-2"><a class="logo" href="#home" onclick="navigateTo('home');return false;">LaMarco&#x27;s Auto Service</a><button class="burger" aria-label="Menu" onclick="toggleMenu()">&#9776;</button><nav class="links pills" id="mainnav"><a href="#home" data-nav="home" onclick="navigateTo('home');return false;">Home</a><a href="#services" data-nav="services" onclick="navigateTo('services');return false;">Services</a><a href="#about" data-nav="about" onclick="navigateTo('about');return false;">About</a><a href="#reviews" data-nav="reviews" onclick="navigateTo('reviews');return false;">Reviews</a><a href="#contact" data-nav="contact" onclick="navigateTo('contact');return false;">Contact</a></nav></header>
+<main>
+<section class="page" data-page="home"><div class="hero hero-band"><p class="kicker">Auto repair shop</p><h1>LaMarco&#x27;s Auto Service</h1><p class="lede">LaMarco&#x27;s Auto Service, 3059 Lakeview Rd, Hamburg, NY 14075</p><div class="ctas"><a class="btn" href="#contact" data-navgo="contact" onclick="navigateTo('contact');return false;">Contact Us</a><a class="btn ghost" href="tel:+17166485503">Call (716) 648-5503</a></div></div></section>
+<section class="page" data-page="services" hidden><div class="wrap"><h2>Our Services</h2><p class="note">Services below are samples. Call to confirm what is offered.</p><div class="svc-grid"><div class="svc"><h3>Diagnostics</h3><p class="sample">Sample listing. Call to confirm.</p></div><div class="svc"><h3>Brake service</h3><p class="sample">Sample listing. Call to confirm.</p></div><div class="svc"><h3>Oil changes</h3><p class="sample">Sample listing. Call to confirm.</p></div><div class="svc"><h3>Engine repair</h3><p class="sample">Sample listing. Call to confirm.</p></div></div></div></section>
+<section class="page" data-page="about" hidden><div class="wrap"><h2>About Us</h2>
+<div class="about-card"><p><strong>LaMarco&#x27;s Auto Service</strong> is a auto repair shop located at LaMarco&#x27;s Auto Service, 3059 Lakeview Rd, Hamburg, NY 14075.</p>
+<p>For details about services, pricing, and hours, please call <a href="tel:+17166485503">(716) 648-5503</a>. Details on this page marked sample should be confirmed by phone.</p></div></div></section>
+<section class="page" data-page="reviews" hidden><div class="wrap"><h2>Reviews</h2>
+<div class="reviews-box"><p>See what customers are saying about LaMarco&#x27;s Auto Service.</p>
+<p style="margin-top:16px"><a class="btn" href="https://www.google.com/maps/place/?q=place_id:ChIJVYWK334b04kRrLuSN14Yvrc" target="_blank" rel="noopener">See our reviews on Google Maps</a></p></div></div></section>
+<section class="page" data-page="contact" hidden><div class="wrap"><h2>Contact Us</h2><p class="note">Reach out by phone for the fastest response.</p>
+<div class="contact-grid"><div class="info-card">
+<p><strong>Address</strong><br>LaMarco&#x27;s Auto Service, 3059 Lakeview Rd, Hamburg, NY 14075</p>
+<p><strong>Phone</strong><br><a class="tel" href="tel:+17166485503">(716) 648-5503</a></p>
+<p><a href="https://www.google.com/maps/place/?q=place_id:ChIJVYWK334b04kRrLuSN14Yvrc" target="_blank" rel="noopener">Get directions on Google Maps</a></p>
+</div>
+<form class="contact-form" onsubmit="return handleSubmit(event)">
+<div class="form-note">This form does not send online. Please call us at (716) 648-5503 and we will help you right away.</div>
+<label for="cf-name">Name</label><input id="cf-name" name="name" type="text" required>
+<label for="cf-phone">Phone</label><input id="cf-phone" name="phone" type="tel">
+<label for="cf-msg">Message</label><textarea id="cf-msg" name="message" rows="4" required></textarea>
+<button class="btn" type="submit">Send Message</button>
+<p id="formMsg"></p>
+</form></div></div></section>
+</main>
+<footer>© LaMarco's Auto Service</footer>
+<script>
+function navigateTo(page,push){
+  if(push===undefined)push=true;
+  var valid=['home','services','about','reviews','contact'];
+  if(valid.indexOf(page)<0)page='home';
+  document.querySelectorAll('.page').forEach(function(p){
+    var on=p.dataset.page===page;
+    p.classList.toggle('active',on);
+    if(on)p.removeAttribute('hidden');else p.setAttribute('hidden','');
+  });
+  document.querySelectorAll('[data-nav]').forEach(function(a){
+    a.classList.toggle('current',a.dataset.nav===page);
+  });
+  if(push&&history.pushState){history.pushState({page:page},'', '#'+page);}
+  var nav=document.getElementById('mainnav');
+  if(nav)nav.classList.remove('open');
+  window.scrollTo(0,0);
+}
+function toggleMenu(){
+  var nav=document.getElementById('mainnav');
+  if(nav)nav.classList.toggle('open');
+}
+window.addEventListener('popstate',function(e){
+  var page=(e.state&&e.state.page)||location.hash.replace('#','')||'home';
+  navigateTo(page,false);
+});
+document.addEventListener('DOMContentLoaded',function(){
+  var start=location.hash.replace('#','')||'home';
+  navigateTo(start,false);
+});
+function handleSubmit(e){
+  e.preventDefault();
+  var m=document.getElementById('formMsg');
+  m.style.display='block';
+  m.textContent='Thanks for reaching out. This form does not send online, please call us directly and we will be happy to help.';
+  return false;
+}
+</script>
+<script>
+/* sticky-footer-fix-v1 */
+(function(){function s(){var f=document.querySelector('footer');if(!f||f.getBoundingClientRect().bottom>=window.innerHeight-2)return;var b=document.body;b.style.minHeight='100vh';b.style.display='flex';b.style.flexDirection='column';var e=f;while(e&&e!==b){if(e===f){e.style.marginTop='auto';}else{e.style.display='flex';e.style.flexDirection='column';e.style.flex='1 0 auto';}e=e.parentElement;}}
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',s);}else{s();}
+window.addEventListener('hashchange',function(){setTimeout(s,60);});
+window.addEventListener('popstate',function(){setTimeout(s,60);});
+var _n=window.navigateTo;if(typeof _n==='function'){window.navigateTo=function(){var r=_n.apply(this,arguments);setTimeout(s,60);return r;};}})();
+</script></body>
+</html>
