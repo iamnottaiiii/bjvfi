@@ -1433,7 +1433,6 @@ function wireQueue(el){
 
 /* Pre-grab preview: caller must open the business site, then wait 2 minutes, before grabbing. */
 function showGrabPreview(slug){
-  if(grabNeedsInstall()) return;
   const bySlug = catalogBySlug();
   const l = bySlug[slug] || normalizeLead({ s: slug, n: slug, p: '' });
   const url = siteUrlFor(l);
@@ -1485,7 +1484,6 @@ function showGrabPreview(slug){
 }
 
 async function grabLead(slug){
-  if(grabNeedsInstall()) return;
   if(activeClaimCount() >= MAX_ACTIVE_CLAIMS){ toast('Claim cap reached. Release a lead first.'); return; }
   const lead = state.catalog.find(function(l){ return l.slug === slug; });
   if(!lead){ toast('Lead not found in catalog.'); return; }
@@ -1515,7 +1513,6 @@ async function grabLead(slug){
 }
 
 async function grabRandom(){
-  if(grabNeedsInstall()) return;
   if(activeClaimCount() >= MAX_ACTIVE_CLAIMS){ toast('Claim cap reached. Release a lead first.'); return; }
   toast('Finding a lead...');
   try{
@@ -4279,11 +4276,16 @@ function renderInstallGate(reason){
   var ios = isIOS();
   var gate = document.createElement('div');
   gate.id = 'install-gate';
+  if(reason === 'nag') gate.className = 'nag';
   var heading = 'Install SiteDesk to continue';
   var body = 'SiteDesk must be installed on your home screen before you can use it. As an installed app your call and payout notifications will pop up properly. In a normal browser tab they will not.';
   if(reason === 'grab'){
     heading = 'Install SiteDesk to grab this lead';
     body = 'You can browse leads right here in your browser, but grabbing a lead needs the installed app. As an installed app your call and payout notifications will pop up properly. In a normal browser tab they will not.';
+  }
+  if(reason === 'nag'){
+    heading = 'Install SiteDesk on your phone';
+    body = 'You can work right here in your browser, nothing is blocked. But your call and payout notifications only pop up properly from the installed app. In a normal tab they will not. Install it once and this reminder goes away for good.';
   }
   var inner = '<div class="gate-card">' +
     '<div class="gate-logo">sitedesk</div>' +
@@ -4319,19 +4321,30 @@ function renderInstallGate(reason){
   action.appendChild(note);
   var later = document.createElement('button');
   later.className = 'btn ghost block';
-  later.textContent = 'Not now';
+  later.textContent = reason === 'nag' ? 'Remind me in 20 minutes' : 'Not now';
   later.style.marginTop = '8px';
   later.addEventListener('click', closeInstallGate);
   action.appendChild(later);
   updateGateNote();
 }
 
-/* The install gate only appears when someone tries to grab a lead while not
-   running the installed app. Browsing and login work in a regular tab. */
-function grabNeedsInstall(){
-  if(isStandalone()) return false;
-  renderInstallGate('grab');
-  return true;
+/* Install nag (2026-09-17 per user): nothing is blocked for non-installed
+   users anymore, so devices that cannot install still work fine. Instead, every
+   20 minutes a nag pop-up asks them to install until they do. The nag sells the
+   notification benefit, which is the one thing that truly needs the installed
+   app. */
+var nagTimer = null;
+var NAG_MS = 20 * 60 * 1000;
+function startInstallNag(){
+  if(nagTimer || isStandalone()) return;
+  nagTimer = setInterval(function(){
+    if(isStandalone()){ stopInstallNag(); return; }
+    if(!state.user) return;
+    renderInstallGate('nag');
+  }, NAG_MS);
+}
+function stopInstallNag(){
+  if(nagTimer){ clearInterval(nagTimer); nagTimer = null; }
 }
 
 function bootMain(){
@@ -4344,12 +4357,14 @@ function bootMain(){
     renderApp();
     startFeedPoll();
     ensurePushSubscribed();
+    startInstallNag();
     bootData(false).then(function(){ renderApp(); }).catch(function(e){ toast(e.message); });
   } else {
     if(s && (!SITEDESK_DATA_TOKEN || SITEDESK_DATA_TOKEN === 'PUT_TOKEN_HERE')){
       clearSession();
       state.user = null;
     }
+    stopInstallNag();
     renderHome();
   }
 }
@@ -4367,18 +4382,21 @@ function init(){
   });
   window.addEventListener('appinstalled', function(){
     deferredInstallPrompt = null;
+    stopInstallNag();
     closeInstallGate();
     bootMain();
     setTimeout(function(){ toast('Installed. Open SiteDesk from your home screen so notifications pop up.'); }, 400);
   });
   document.addEventListener('visibilitychange', function(){
     if(!document.hidden && isStandalone() && document.getElementById('install-gate')){
+      stopInstallNag();
       closeInstallGate();
       bootMain();
     }
   });
-  /* No startup install gate (2026-09-15 per user). Login and browsing work in a
-     regular browser tab; the install gate only appears when grabbing a lead. */
+  /* No startup install gate (2026-09-15 per user). Nothing is install-gated at
+     all anymore (2026-09-17 per user); a nag pop-up every 20 minutes asks
+     non-installed users to install until they do. */
   bootMain();
 }
 
