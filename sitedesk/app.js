@@ -385,6 +385,9 @@ var state = {
   mineQ: '', mineStatus: 'all', meSlug: null,
   userQ: '', userStatus: '',
   adminSec: 'users',
+  /* Which admin user cards have their action panel toggled open. The three-dot
+     button on a card toggles its panel; panels are always closed by default. */
+  adminOpen: {},
   intakeStatusFilter: 'all',
   users: null, usersSha: null,
   booted: false,
@@ -3048,43 +3051,53 @@ function adminUsersHtml(){
   if(!list.length) html += '<div class="empty">No users match.</div>';
   else html += list.map(function(r){
     const u = r.u;
+    const open = !!state.adminOpen[r.username];
     return '<div class="card" style="margin-bottom:10px;padding:14px">' +
       '<div class="row" style="justify-content:space-between;align-items:flex-start;margin-bottom:8px"><div>' +
       '<div style="font-weight:600">' + esc(u.name || r.username) + '</div>' +
       '<div class="muted" style="font-size:12px">@' + esc(r.username) + '</div>' +
       '<div class="muted" style="font-size:12px">' + esc(u.phone || 'no phone') + '</div></div>' +
-      '<div class="uact-wrap"><select class="uact-sel" data-username="' + esc(r.username) + '" aria-label="Actions for @' + esc(r.username) + '">' +
-      '<option value="">Actions</option>' + uactOptions(r, u) + '</select></div></div>' +
+      '<button class="uact-dots' + (open ? ' on' : '') + '" data-username="' + esc(r.username) + '" ' +
+      'aria-label="Actions for @' + esc(r.username) + '" aria-expanded="' + (open ? 'true' : 'false') + '" type="button">' +
+      '&#8942;</button></div>' +
+      (open ? uactPanelHtml(r, u) : '') +
       '<div class="row" style="gap:6px">' + badge(u.status) + badge(u.role) + '</div></div>';
   }).join('');
   return html + '</div>';
 }
 
-/* The Actions dropdown on an admin user card: everything that can be done to
-   that user lives in one plain select. */
-function uactOptions(r, u){
-  let items = '<option value="dash">Dashboard</option>';
+/* The action panel behind the three-dot toggle on an admin user card: the
+   original action buttons, hidden until the toggle is tapped. Panels are
+   always closed by default. */
+function uactPanelHtml(r, u){
+  const un = r.username;
+  function b(act, label, cls, disabled){
+    return '<button class="btn sm' + (cls ? ' ' + cls : '') + '" data-uact="' + act + '" data-username="' + esc(un) + '"' +
+      (disabled ? ' disabled' : '') + ' type="button">' + label + '</button>';
+  }
+  let h = '<div class="uact-panel"><div class="uact-title">Actions for @' + esc(un) + '</div><div class="uact-btns">';
+  h += b('dash', 'Dashboard');
   if(u.role !== 'head'){
     if(u.status === 'pending'){
-      items += '<option value="approve">Approve</option>' +
-        '<option value="reject">Reject</option>';
+      h += b('approve', 'Approve') + b('reject', 'Reject', 'danger');
     }
-    items += u.status !== 'disabled'
-      ? '<option value="disable">Disable</option>'
-      : '<option value="approve">Re-enable</option>';
-    items += '<option value="resetpw">Reset password</option>';
-    if(r.username !== state.user.username){
-      items += '<option value="delete">Delete</option>';
+    h += b('disable', u.status === 'disabled' ? 'Re-enable' : 'Disable', 'ghost');
+    h += b('resetpw', 'Reset password', 'ghost');
+    if(un !== state.user.username){
+      /* Two-tap confirm: first tap arms the button, second tap within 6s deletes. */
+      const armed = !!deleteArmed[un];
+      h += b('delete', armed ? 'Confirm delete?' : 'Delete', 'danger' + (armed ? '' : ' ghost'));
     }
     if(state.user.role === 'head'){
       ['caller','builder','admin'].forEach(function(ro){
         const label = ro.charAt(0).toUpperCase() + ro.slice(1);
-        items += '<option value="role:' + ro + '"' + (u.role === ro ? ' disabled' : '') + '>' +
-          (u.role === ro ? 'Role: ' + label + ' (current)' : 'Set role: ' + label) + '</option>';
+        h += u.role === ro
+          ? b('role:' + ro, 'Role: ' + label + ' (current)', 'ghost', true)
+          : b('role:' + ro, 'Set role: ' + label, 'ghost');
       });
     }
   }
-  return items;
+  return h + '</div></div>';
 }
 
 function wireAdminUsers(el){
@@ -3100,13 +3113,23 @@ function wireAdminUsers(el){
   });
   const nu = el.querySelector('#btn-new-user');
   if(nu) nu.addEventListener('click', function(){ newUserModal(el); });
-  /* Admin user Actions dropdowns: pick an action, it runs, the select resets. */
-  el.querySelectorAll('.uact-sel').forEach(function(sel){
-    sel.addEventListener('change', function(){
-      const v = sel.value;
+  /* Three-dot toggles: tap to open or close the action panel on a card.
+     Panels start closed; the toggle button shows its on/off state. */
+  el.querySelectorAll('.uact-dots').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      const username = btn.getAttribute('data-username');
+      if(state.adminOpen[username]) delete state.adminOpen[username];
+      else state.adminOpen[username] = true;
+      renderAdminInto(el);
+    });
+  });
+  /* Action panel buttons: run the same actions the dropdown used to run. */
+  el.querySelectorAll('[data-uact]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(btn.disabled) return;
+      const v = btn.getAttribute('data-uact');
+      const username = btn.getAttribute('data-username');
       if(!v) return;
-      sel.value = '';
-      const username = sel.getAttribute('data-username');
       if(v === 'dash'){
         state.adminUser = username;
         renderAdminInto(el);
@@ -3253,7 +3276,7 @@ async function saveUsers(){  const rec = await ghGetJson('users.json');
   await loadUsers();
 }
 
-/* Armed delete confirmations for the admin Actions dropdowns. */
+/* Armed delete confirmations for the admin action panels. */
 const deleteArmed = {};
 async function userAction(username, act, el){
   const u = state.users[username];
@@ -3293,11 +3316,20 @@ async function userAction(username, act, el){
       toast('Role updated');
     } else if(act === 'delete'){
       if(username === state.user.username){ toast('Delete your own account from Profile.'); return; }
-      /* Two-tap confirm: pick Delete, get warned, pick Delete again within 6s. */
+      /* Two-tap confirm: the first tap arms the button (it turns solid red
+         and reads "Confirm delete?"), the second tap within 6s deletes. */
       if(!deleteArmed[username]){
         deleteArmed[username] = true;
-        toast('Pick Delete again to delete @' + username);
-        setTimeout(function(){ delete deleteArmed[username]; }, 6000);
+        toast('Tap Delete again to delete @' + username);
+        setTimeout(function(){
+          if(!deleteArmed[username]) return;
+          delete deleteArmed[username];
+          if(state.tab === 'admin' && !state.adminUser){
+            const v = document.querySelector('#view');
+            if(v) renderAdminInto(v);
+          }
+        }, 6000);
+        renderAdminInto(el);
         return;
       }
       delete deleteArmed[username];
@@ -3502,9 +3534,123 @@ async function loadOverallStats(el){
       tile(fmtNum(feedToday), 'alerts today') +
       tile(fmtNum(devices), 'push devices') +
       tile(fmtNum((state.feed || []).length), 'alerts stored') + '</div>';
-    out.innerHTML = html;
+    out.innerHTML = html +
+      '<div class="statsec">Live board</div><div id="live-board"></div>';
+    loadLiveBoard(el);
   }catch(e){
     out.innerHTML = '<div class="err">' + esc(e.message) + '</div>';
+  }
+}
+
+/* Claim files store business names with HTML entities (e.g. Matia&#x27;s).
+   Decode them before esc() so the board shows the real name. */
+function decodeHtml(s){
+  return String(s || '')
+    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"').replace(/&#x27;/g, "'").replace(/&#39;/g, "'")
+    .replace(/&#x2F;/g, '/');
+}
+
+function relTime(iso){
+  let t = 0;
+  try{ t = new Date(iso).getTime(); }catch(e){ return ''; }
+  if(!t) return '';
+  const d = Date.now() - t;
+  if(d < 0) return 'just now';
+  const m = Math.floor(d / 60000);
+  if(m < 1) return 'just now';
+  if(m < 60) return m + 'm ago';
+  const h = Math.floor(m / 60);
+  if(h < 24) return h + 'h ago';
+  return Math.floor(h / 24) + 'd ago';
+}
+
+function claimerDisplay(c){
+  const tag = '@' + (c.claimer || 'unknown');
+  if(c.claimer_name) return c.claimer_name + ' (' + tag + ')';
+  const u = state.users && state.users[c.claimer];
+  if(u && u.name) return u.name + ' (' + tag + ')';
+  return tag;
+}
+
+/* Live lead board for the overall dashboard: every lead currently in motion
+   (taken and unexpired, or in build/sold which never expire back), who is on
+   each lead, the current lead called out at the top, and the top 3 callers. */
+async function loadLiveBoard(el){
+  const box = el.querySelector('#live-board');
+  if(!box) return;
+  box.innerHTML = '<p class="muted">Loading live leads...</p>';
+  try{
+    const idx = await getClaimIndex(true);
+    const claims = await loadAllClaims();
+    const nowMs = Date.now();
+    const active = claims.filter(function(c){
+      if(!c || !c.slug) return false;
+      const e = idx[c.slug];
+      if(e) return indexTaken(e, nowMs);
+      return c.status === 'claimed' || c.status === 'interested';
+    });
+    active.sort(function(a, b){
+      return String(b.claimed_at || '').localeCompare(String(a.claimed_at || ''));
+    });
+    const calling = active.filter(function(c){
+      const e = idx[c.slug];
+      return ((e && e.s) || c.status) === 'claimed';
+    });
+    let h = '<div class="statsec">Live leads: ' + active.length + ' in motion</div>';
+    if(calling.length){
+      const c = calling[0];
+      h += '<div class="card" style="margin:8px 0 4px;padding:12px;border:1px solid color-mix(in srgb, var(--amber) 45%, transparent)">' +
+        '<div class="uact-title">Current lead: being called right now</div>' +
+        '<div style="font-weight:700;font-size:15px">' + esc(decodeHtml(c.business_name || c.slug)) + '</div>' +
+        '<div class="muted" style="font-size:12px;margin-top:4px">on it: ' + esc(claimerDisplay(c)) + ' \xB7 ' + esc(relTime(c.claimed_at)) + '</div></div>';
+    } else {
+      h += '<div class="empty">No one is calling right now.</div>';
+    }
+    if(active.length){
+      h += active.map(function(c){
+        return '<div class="row" style="justify-content:space-between;padding:10px 0;align-items:flex-start">' +
+          '<div><div style="font-weight:600;font-size:13px">' + esc(decodeHtml(c.business_name || c.slug)) + '</div>' +
+          '<div class="muted" style="font-size:11px">on it: ' + esc(claimerDisplay(c)) + ' \xB7 ' + esc(relTime(c.claimed_at)) + '</div></div>' +
+          badge(c.status) + '</div>';
+      }).join('');
+    } else {
+      h += '<div class="empty">No leads in motion.</div>';
+    }
+    /* Top 3 callers this week. */
+    const weekAgo = nowMs - 7 * 24 * 3600 * 1000;
+    const per = {};
+    claims.forEach(function(c){
+      if(!c) return;
+      const k = c.claimer || 'unknown';
+      if(!per[k]) per[k] = { n: 0, week: 0, interested: 0, sold: 0, name: '' };
+      const p = per[k];
+      p.n++;
+      if(c.claimer_name) p.name = c.claimer_name;
+      let t = 0;
+      try{ t = new Date(c.claimed_at).getTime(); }catch(e){}
+      if(t >= weekAgo) p.week++;
+      if(c.status === 'interested') p.interested++;
+      if(c.status === 'sold') p.sold++;
+    });
+    const ranked = Object.keys(per).map(function(k){ return { k: k, p: per[k] }; })
+      .sort(function(a, b){ return (b.p.week - a.p.week) || (b.p.n - a.p.n); })
+      .slice(0, 3);
+    h += '<div class="statsec">Top callers this week</div>';
+    if(!ranked.length || !ranked[0].p.week) h += '<div class="empty">No calls this week yet.</div>';
+    else h += ranked.map(function(r, i){
+      const u = state.users && state.users[r.k];
+      const nm = r.p.name || (u && u.name) || r.k;
+      return '<div class="row" style="justify-content:space-between;padding:10px 0;align-items:center">' +
+        '<div class="row" style="gap:10px"><div class="toprank' + (i > 0 ? ' dim' : '') + '">' + (i + 1) + '</div>' +
+        '<div><div style="font-weight:600;font-size:13px">' + esc(nm) + '</div>' +
+        '<div class="muted" style="font-size:11px">@' + esc(r.k) + '</div></div></div>' +
+        '<div class="muted" style="font-size:11px;text-align:right">' + r.p.week + ' calls this week<br/>' +
+        r.p.n + ' total \xB7 ' + r.p.interested + ' interested \xB7 ' + r.p.sold + ' sold</div></div>';
+    }).join('');
+    box.innerHTML = h;
+  }catch(e){
+    box.innerHTML = '<div class="empty">' + esc(e.message) + '</div>';
   }
 }
 
@@ -4256,4 +4402,8 @@ if(typeof module !== 'undefined' && module.exports){
   module.exports.paintEditorPanel = paintEditorPanel;
   module.exports.editorIntakeHtml = editorIntakeHtml;
   module.exports.shell = shell;
+  module.exports.uactPanelHtml = uactPanelHtml;
+  module.exports.decodeHtml = decodeHtml;
+  module.exports.relTime = relTime;
+  module.exports.claimerDisplay = claimerDisplay;
 }
