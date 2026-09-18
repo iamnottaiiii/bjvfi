@@ -3004,6 +3004,10 @@ async function renderAdminInto(el){
     return;
   }
   if(state.adminUser){ renderUserDashboardInto(el); return; }
+  /* Re-renders in the users section (chips, search, approve/delete, etc.)
+     keep the scroll position, so the page never jumps back to the top. */
+  const keepScroll = state.adminSec === 'users';
+  const sy = keepScroll ? (window.scrollY || document.documentElement.scrollTop || 0) : 0;
   let html = '<div class="chiprow" style="margin-bottom:14px">' +
     [['users','Users'],['announce','Announcements'],['tools','Tools']].map(function(p){
       return '<button type="button" class="chip' + (state.adminSec === p[0] ? ' on' : '') + '" data-admin-sec="' + p[0] + '">' + p[1] + '</button>';
@@ -3022,6 +3026,7 @@ async function renderAdminInto(el){
   if(state.adminSec === 'users') wireAdminUsers(el);
   else if(state.adminSec === 'announce') wireAdminAnnounce(el);
   else wireAdminTools(el);
+  if(keepScroll && sy) window.scrollTo(0, sy);
 }
 
 function adminUsersHtml(){
@@ -3054,10 +3059,14 @@ function adminUsersHtml(){
       '<div style="font-weight:600">' + esc(u.name || r.username) + '</div>' +
       '<div class="muted" style="font-size:12px">@' + esc(r.username) + '</div>' +
       '<div class="muted" style="font-size:12px">' + esc(u.phone || 'no phone') + '</div></div>' +
-      '<button class="uact-dots' + (open ? ' on' : '') + '" data-username="' + esc(r.username) + '" ' +
+      '<button class="uact-dots" data-username="' + esc(r.username) + '" ' +
       'aria-label="Actions for @' + esc(r.username) + '" aria-expanded="' + (open ? 'true' : 'false') + '" type="button">' +
       '&#8942;</button></div>' +
-      (open ? uactPanelHtml(r, u) : '') +
+      /* The action panel is always in the DOM and just hidden when closed, so
+         the three-dot toggle can drop it down in place without re-rendering
+         the page (no refresh, no scroll jump). */
+      '<div data-uact-holder="' + esc(r.username) + '"' + (open ? '' : ' style="display:none"') + '>' +
+      uactPanelHtml(r, u) + '</div>' +
       '<div class="row" style="gap:6px">' + badge(u.status) + badge(u.role) + '</div></div>';
   }).join('');
   return html + '</div>';
@@ -3110,14 +3119,19 @@ function wireAdminUsers(el){
   });
   const nu = el.querySelector('#btn-new-user');
   if(nu) nu.addEventListener('click', function(){ newUserModal(el); });
-  /* Three-dot toggles: tap to open or close the action panel on a card.
-     Panels start closed; the toggle button shows its on/off state. */
+  /* Three-dot toggles: tap to open or close the action panel on a card, in
+     place. No re-render, so the page does not refresh and does not jump back
+     to the top; the panel just drops down under the card header. */
   el.querySelectorAll('.uact-dots').forEach(function(btn){
     btn.addEventListener('click', function(){
       const username = btn.getAttribute('data-username');
-      if(state.adminOpen[username]) delete state.adminOpen[username];
+      const card = btn.closest('.card');
+      const holder = card ? card.querySelector('[data-uact-holder="' + username + '"]') : null;
+      const isOpen = !!state.adminOpen[username];
+      if(isOpen) delete state.adminOpen[username];
       else state.adminOpen[username] = true;
-      renderAdminInto(el);
+      if(holder) holder.style.display = isOpen ? 'none' : '';
+      btn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
     });
   });
   /* Action panel buttons: run the same actions the dropdown used to run. */
