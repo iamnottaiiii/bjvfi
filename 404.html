@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>bjvfi</title>
+<script>
+(function () {
+  try {
+    var host = location.hostname.toLowerCase();
+    if (!host.endsWith(".bjvfi.com")) {
+      // unknown path on apex: go home, breaking out of the subdomain iframe if framed
+      try { top.location.replace("https://bjvfi.com/"); }
+      catch (e) { location.replace("https://bjvfi.com/"); }
+      return;
+    }
+    var sub = host.slice(0, -".bjvfi.com".length);
+    if (!sub || sub === "www" || sub === "sitedesk") {
+      location.replace("https://bjvfi.com/");
+      return;
+    }
+    var slug = sub;
+    var src = "https://bjvfi.com/" + encodeURIComponent(slug) + "/";
+    var path = location.pathname || "/";
+    if (path !== "/" && path !== "") return;
+
+    document.documentElement.innerHTML = "<head><meta charset=UTF-8><meta name=viewport content=\"width=device-width,initial-scale=1\"><title>Loading…</title><style>html,body{margin:0;height:100%;background:#000;color:#eee;font:14px system-ui}#bjvfi-boot{display:grid;place-items:center;height:100%}</style></head><body><div id=bjvfi-boot>Loading " + slug.replace(/[<>]/g,"") + "…</div></body>";
+
+    fetch(src, { credentials: "omit", cache: "no-store" })
+      .then(function (r) {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.text();
+      })
+      .then(function (html) {
+        if (!/<base\s/i.test(html)) {
+          html = html.replace(/<head([^>]*)>/i, '<head$1><base href="' + src + '">');
+        }
+        document.open();
+        document.write(html);
+        document.close();
+      })
+      .catch(function () {
+        document.documentElement.innerHTML =
+          "<head><meta charset=UTF-8><meta name=viewport content=\"width=device-width,initial-scale=1\"><title>" +
+          slug +
+          '</title><style>html,body,iframe{margin:0;border:0;height:100%;width:100%;background:#000}iframe{display:block}</style></head><body><iframe src="' +
+          src +
+          '" title="' +
+          slug.replace(/"/g, "") +
+          '"></iframe></body>';
+      });
+  } catch (e) {}
+})();
+</script>
+</head>
+<body></body>
+</html>
