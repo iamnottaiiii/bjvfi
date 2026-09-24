@@ -1,0 +1,30 @@
+name: Rebuild sites.json
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */6 * * *'
+  repository_dispatch:
+    types: [sites-updated]
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Rebuild sites.json (add missing slugs)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 .github/scripts/rebuild_sites_json.py
+      - name: Commit and push if changed
+        run: |
+          git config user.name "Not Ai"
+          git config user.email "iamnottaiii@gmail.com"
+          git add sites.json
+          git diff --cached --quiet && echo "No changes" || (git commit -m "Rebuild sites.json: add missing slugs" && git push)
