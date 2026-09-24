@@ -261,7 +261,15 @@ body {
       });
     }));
     const data = [];
-    results.forEach(function(arr){ (Array.isArray(arr) ? arr : []).forEach(function(i){ data.push(i); }); });
+    results.forEach(function(obj){
+      if (Array.isArray(obj)) { obj.forEach(function(i){ data.push(i); }); }
+      else if (obj && typeof obj === 'object') {
+        Object.keys(obj).forEach(function(repo){
+          const slugs = obj[repo];
+          if (Array.isArray(slugs)) slugs.forEach(function(s){ data.push({s:s, r:repo}); });
+        });
+      }
+    });
     return data
       .map(item => ({
         title: item.n || item.s,
