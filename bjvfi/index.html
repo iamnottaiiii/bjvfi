@@ -156,7 +156,15 @@ body{min-height:100vh;background:#000;color:#F2F2F5;font-family:"JetBrains Mono"
   ].map(u=>fetch(u, {cache:'no-store'}).then(r=>{ if(!r.ok) throw new Error('Could not load '+u+' ('+r.status+')'); return r.json(); })))
     .then(parts=>{
       all = [];
-      parts.forEach(arr=>{ (Array.isArray(arr) ? arr : []).forEach(i=>all.push(i)); });
+      parts.forEach(obj=>{
+        if (Array.isArray(obj)) { obj.forEach(i=>all.push(i)); }
+        else if (obj && typeof obj === 'object') {
+          Object.keys(obj).forEach(repo=>{
+            const slugs = obj[repo];
+            if (Array.isArray(slugs)) slugs.forEach(s=>all.push({s:s, r:repo}));
+          });
+        }
+      });
       all.sort((a,b)=>String(a.n||a.s).localeCompare(String(b.n||b.s)));
       applyFilter();
     })
