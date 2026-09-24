@@ -1,79 +1,59 @@
 #!/usr/bin/env python3
 """Rebuild sites.json by checking all bjvfi sub-repos and adding missing slugs.
 
+Fast path: a shallow blob-less git clone plus `git ls-tree HEAD` lists every
+top-level directory in one shot. No thousands of paginated API calls, no
+rate-limit crawl.
+
 Keeps the auto-rebuild ON: merges (never deletes), so existing entries are
 preserved and only slugs found in the repos but missing from sites.json get
 added. Run on a schedule plus manual dispatch.
 """
 import json
 import os
+import shutil
+import subprocess
 import sys
-import time
-import urllib.request
-import urllib.error
 
 OWNER = "iamnottaiiii"
 SUB_REPOS = [f"bjvfi{i}" for i in range(1, 10)]
 TOKEN = os.environ.get("GH_TOKEN", "")
 SITES_JSON_PATH = os.environ.get("SITES_JSON_PATH", "sites.json")
-
-
-def api(url):
-    req = urllib.request.Request(url)
-    if TOKEN:
-        req.add_header("Authorization", f"Bearer {TOKEN}")
-    req.add_header("Accept", "application/vnd.github+json")
-    req.add_header("User-Agent", "bjvfi-sitesjson-rebuild")
-    try:
-        with urllib.request.urlopen(req, timeout=60) as r:
-            return json.load(r), dict(r.headers)
-    except urllib.error.HTTPError as e:
-        if e.code == 403:
-            # Rate limit: wait and retry once
-            reset = e.headers.get("X-RateLimit-Reset")
-            if reset:
-                wait = max(int(reset) - int(time.time()) + 5, 5)
-                print(f"  rate limited, waiting {wait}s...", file=sys.stderr)
-                time.sleep(wait)
-                with urllib.request.urlopen(req, timeout=60) as r:
-                    return json.load(r), dict(r.headers)
-        print(f"HTTP {e.code} for {url}", file=sys.stderr)
-        raise
+WORKDIR_BASE = os.environ.get("REBUILD_WORKDIR", "/tmp/sitesjson-rebuild")
 
 
 def get_top_level_dirs(repo):
     """Return the set of top-level directory names (site slugs) in a repo."""
-    repo_info, _ = api(f"https://api.github.com/repos/{OWNER}/{repo}")
-    sha = repo_info["default_branch"]
-    tree, _ = api(
-        f"https://api.github.com/repos/{OWNER}/{repo}/git/trees/{sha}")
-    if not tree.get("truncated"):
-        dirs = {e["path"] for e in tree.get("tree", [])
-                if e.get("type") == "tree"}
-        return {d for d in dirs if not d.startswith(".")}, False
-
-    # Truncated: fall back to paginated root contents listing
-    print(f"  tree truncated for {repo}, using paginated listing...",
-          file=sys.stderr)
+    workdir = os.path.join(WORKDIR_BASE, repo)
+    shutil.rmtree(workdir, ignore_errors=True)
+    os.makedirs(WORKDIR_BASE, exist_ok=True)
+    if TOKEN:
+        url = f"https://x-access-token:{TOKEN}@github.com/{OWNER}/{repo}.git"
+    else:
+        url = f"https://github.com/{OWNER}/{repo}.git"
+    clone = subprocess.run(
+        ["git", "clone", "--depth", "1", "--filter=blob:none",
+         "--no-checkout", url, workdir],
+        capture_output=True, text=True, timeout=1200)
+    if clone.returncode != 0:
+        raise RuntimeError(
+            f"git clone failed for {repo}: {clone.stderr[-500:]}")
+    try:
+        ls = subprocess.run(
+            ["git", "-C", workdir, "ls-tree", "HEAD"],
+            capture_output=True, text=True, timeout=600, check=True)
+    finally:
+        shutil.rmtree(workdir, ignore_errors=True)
     dirs = set()
-    page = 1
-    while True:
-        items, headers = api(
-            f"https://api.github.com/repos/{OWNER}/{repo}/contents/"
-            f"?per_page=100&page={page}")
-        if not items:
-            break
-        for it in items:
-            if it.get("type") == "dir" and not it["name"].startswith("."):
-                dirs.add(it["name"])
-        # Last page has fewer than 100 items
-        if len(items) < 100:
-            break
-        page += 1
-        if page % 50 == 0:
-            print(f"  ...page {page} ({len(dirs):,} so far)",
-                  file=sys.stderr)
-    return dirs, True
+    for line in ls.stdout.splitlines():
+        if "\t" not in line:
+            continue
+        meta, name = line.split("\t", 1)
+        parts = meta.split()
+        if (len(parts) >= 2 and parts[1] == "tree"
+                and name and not name.startswith(".")):
+            dirs.add(name)
+    return dirs
 
 
 def main():
@@ -84,7 +64,7 @@ def main():
     for repo in SUB_REPOS:
         print(f"Checking {repo}...", flush=True)
         try:
-            live_dirs, paginated = get_top_level_dirs(repo)
+            live_dirs = get_top_level_dirs(repo)
         except Exception as e:
             print(f"  ERROR reading {repo}: {e} (keeping existing entries)",
                   file=sys.stderr)
@@ -96,9 +76,11 @@ def main():
             catalog[repo] = merged
             total_added += len(missing)
             print(f"  added {len(missing):,} missing slugs "
-                  f"({len(live_dirs):,} in repo, {len(existing):,} were listed)")
+                  f"({len(live_dirs):,} in repo, {len(existing):,} listed)",
+                  flush=True)
         else:
-            print(f"  OK: {len(existing):,} slugs, nothing missing")
+            print(f"  OK: {len(existing):,} slugs, nothing missing",
+                  flush=True)
 
     with open(SITES_JSON_PATH, "w") as f:
         json.dump(catalog, f, separators=(",", ":"))
