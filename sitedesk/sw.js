@@ -1,4 +1,4 @@
-var CACHE = 'sitedesk-v7';
+var CACHE = 'sitedesk-v8';
 var CORE = ['index.html', 'styles.css', 'app.js', 'config.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon.svg'];
 
 self.addEventListener('install', function(e){
