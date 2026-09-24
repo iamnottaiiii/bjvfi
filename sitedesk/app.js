@@ -56,7 +56,7 @@ function normalizeLead(e){
 
 function siteUrlFor(lead){
   if(lead.url) return lead.url;
-  return 'https://bjvfi.com/' + lead.slug + '/';
+  return 'https://' + lead.slug + '.bjvfi.com/';
 }
 
 function telHref(phone){ return 'tel:+' + digitsOnly(phone); }
@@ -2393,10 +2393,8 @@ var INTAKE_STATUSES = [['open','Open'],['building','Building'],['ready','Ready']
    queue in the data repo that a server worker drains one job at a time, so
    two publishes can never overlap and wipe each other's work. */
 
-var RAW_SITE_URL = 'https://raw.githubusercontent.com/iamnottaiiii/bjvfi/main/';
-
 function liveCodeUrl(slug){
-  return RAW_SITE_URL + encodeURIComponent(slug) + '/index.html';
+  return 'https://' + encodeURIComponent(slug) + '.bjvfi.com/';
 }
 
 /* Pure: filter leads by business name, the same UX pattern as the queue
