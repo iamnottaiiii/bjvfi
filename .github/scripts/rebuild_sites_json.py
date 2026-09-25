@@ -16,7 +16,8 @@ import subprocess
 import sys
 
 OWNER = "iamnottaiiii"
-SUB_REPOS = [f"bjvfi{i}" for i in range(1, 10)]
+# bjvfi1-8 only: bjvfi9 was deleted 2026-09-25 (its sites moved to bjvfi7)
+SUB_REPOS = [f"bjvfi{i}" for i in range(1, 9)]
 TOKEN = os.environ.get("GH_TOKEN", "")
 SITES_JSON_PATH = os.environ.get("SITES_JSON_PATH", "sites.json")
 WORKDIR_BASE = os.environ.get("REBUILD_WORKDIR", "/tmp/sitesjson-rebuild")
