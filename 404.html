@@ -4,52 +4,78 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>bjvfi</title>
+<meta name="robots" content="noindex, nofollow">
 <script>
 (function () {
+  var HOME = "https://bjvfi.com/";
+  function goHome() {
+    if ((location.pathname || "/") === "/") return;
+    try { top.location.replace(HOME); }
+    catch (e) { location.replace(HOME); }
+  }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function showLoading(slug) {
+    document.title = slug;
+    document.documentElement.innerHTML =
+      '<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
+      '<title>' + esc(slug) + '</title>' +
+      '<style>html,body{margin:0;height:100%;background:#fff;color:#333;font:15px system-ui,sans-serif}' +
+      '#l{display:grid;place-items:center;height:100vh;text-align:center;padding:20px}' +
+      '.s{width:34px;height:34px;border:3px solid #ddd;border-top-color:#666;border-radius:50%;margin:0 auto 14px;animation:sp 0.8s linear infinite}' +
+      '@keyframes sp{to{transform:rotate(360deg)}}</style></head>' +
+      '<body><div id="l"><div><div class="s"></div><div>Loading ' + esc(slug) + '</div></div></div></body>';
+  }
+  function iframePage(slug, src) {
+    return '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
+      '<title>' + esc(slug) + '</title>' +
+      '<style>html,body,iframe{margin:0;padding:0;border:0;height:100%;width:100%}iframe{display:block}</style></head>' +
+      '<body><iframe src="' + esc(src) + '" title="' + esc(slug) + '"></iframe></body></html>';
+  }
   try {
     var host = location.hostname.toLowerCase();
-    if (!host.endsWith(".bjvfi.com")) {
-      // unknown path on apex: go home, breaking out of the subdomain iframe if framed
-      try { top.location.replace("https://bjvfi.com/"); }
-      catch (e) { location.replace("https://bjvfi.com/"); }
-      return;
-    }
-    var sub = host.slice(0, -".bjvfi.com".length);
-    if (!sub || sub === "www" || sub === "sitedesk") {
-      location.replace("https://bjvfi.com/");
-      return;
-    }
-    var slug = sub;
-    var src = "https://bjvfi.com/" + encodeURIComponent(slug) + "/";
     var path = location.pathname || "/";
-    if (path !== "/" && path !== "") return;
-
-    document.documentElement.innerHTML = "<head><meta charset=UTF-8><meta name=viewport content=\"width=device-width,initial-scale=1\"><title>Loading…</title><style>html,body{margin:0;height:100%;background:#000;color:#eee;font:14px system-ui}#bjvfi-boot{display:grid;place-items:center;height:100%}</style></head><body><div id=bjvfi-boot>Loading " + slug.replace(/[<>]/g,"") + "…</div></body>";
-
-    fetch(src, { credentials: "omit", cache: "no-store" })
-      .then(function (r) {
-        if (!r.ok) throw new Error("HTTP " + r.status);
+    if (host.length > 10 && host.slice(-10) === ".bjvfi.com") {
+      var sub = host.slice(0, -10);
+      if (sub && sub !== "www" && /^[a-z0-9][a-z0-9-]*$/.test(sub)) {
+        location.replace(HOME + sub + "/");
+      } else {
+        goHome();
+      }
+      return;
+    }
+    var seg = path.replace(/^\/+|\/+$/g, "").replace(/\.bjvfi\.com$/i, "");
+    if (!/^[a-z0-9][a-z0-9-]*$/.test(seg)) { goHome(); return; }
+    var slug = seg;
+    showLoading(slug);
+    var shard = slug.slice(0, 2);
+    fetch("/map/" + shard + ".json", { cache: "force-cache" }).then(function (r) {
+      if (!r.ok) throw new Error("map");
+      return r.json();
+    }).then(function (map) {
+      var repo = map[slug];
+      if (!repo) { goHome(); return; }
+      var src = "https://iamnottaiiii.github.io/" + repo + "/" + slug + "/";
+      fetch(src, { cache: "force-cache" }).then(function (r) {
+        if (!r.ok) throw new Error("site");
         return r.text();
-      })
-      .then(function (html) {
+      }).then(function (html) {
         if (!/<base\s/i.test(html)) {
           html = html.replace(/<head([^>]*)>/i, '<head$1><base href="' + src + '">');
         }
         document.open();
         document.write(html);
         document.close();
-      })
-      .catch(function () {
-        document.documentElement.innerHTML =
-          "<head><meta charset=UTF-8><meta name=viewport content=\"width=device-width,initial-scale=1\"><title>" +
-          slug +
-          '</title><style>html,body,iframe{margin:0;border:0;height:100%;width:100%;background:#000}iframe{display:block}</style></head><body><iframe src="' +
-          src +
-          '" title="' +
-          slug.replace(/"/g, "") +
-          '"></iframe></body>';
+      }).catch(function () {
+        document.open();
+        document.write(iframePage(slug, src));
+        document.close();
       });
-  } catch (e) {}
+    }).catch(function () { goHome(); });
+  } catch (e) { goHome(); }
 })();
 </script>
 </head>
