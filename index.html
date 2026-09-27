@@ -252,30 +252,56 @@ body {
   let sites = null;
   let loading = null;
 
+  function prettySlug(s) {
+    return s.split("-").map(function(w){
+      return w ? w.charAt(0).toUpperCase() + w.slice(1) : w;
+    }).join(" ");
+  }
+
   async function fetchAllSites() {
-    const urls = ["/sites.json"];
+    const shardFiles = [];
+    "0123456789abcdefghijklmnopqrstuvwxyz".split("").forEach(function(c){
+      shardFiles.push("/site-names/" + c + ".json");
+    });
+    const urls = ["/sites.json"].concat(shardFiles);
     const results = await Promise.all(urls.map(function(u){
       return fetch(u, { cache: "no-store" }).then(function(r){
         if (!r.ok) throw new Error("Could not load " + u + " (" + r.status + ")");
         return r.json();
       });
     }));
-    const data = [];
-    results.forEach(function(obj){
-      if (Array.isArray(obj)) { obj.forEach(function(i){ data.push(i); }); }
-      else if (obj && typeof obj === 'object') {
-        Object.keys(obj).forEach(function(repo){
-          const slugs = obj[repo];
-          if (Array.isArray(slugs)) slugs.forEach(function(s){ data.push({s:s, r:repo}); });
-        });
+    const siteNames = {};
+    for (let i = 1; i < results.length; i++) {
+      const obj = results[i];
+      if (obj && typeof obj === "object" && !Array.isArray(obj)) {
+        Object.keys(obj).forEach(function(k){ siteNames[k] = obj[k]; });
       }
-    });
-    return data
-      .map(item => ({
-        title: item.n || item.s,
-        slug: item.s,
-        link: "https://" + encodeURIComponent(item.s) + ".bjvfi.com/"
-      }))
+    }
+    const seen = new Set();
+    const slugs = [];
+    function addSlug(s) {
+      if (!s || seen.has(s)) return;
+      seen.add(s);
+      slugs.push(s);
+    }
+    const catalog = results[0];
+    if (Array.isArray(catalog)) {
+      catalog.forEach(function(i){ addSlug(typeof i === "string" ? i : i.s); });
+    } else if (catalog && typeof catalog === "object") {
+      Object.keys(catalog).forEach(function(repo){
+        const arr = catalog[repo];
+        if (Array.isArray(arr)) arr.forEach(addSlug);
+      });
+    }
+    Object.keys(siteNames).forEach(addSlug);
+    return slugs
+      .map(function(s) {
+        return {
+          title: siteNames[s] || prettySlug(s),
+          slug: s,
+          link: "https://" + encodeURIComponent(s) + ".bjvfi.com/"
+        };
+      })
       .sort((a, b) => a.title.localeCompare(b.title));
   }
 
