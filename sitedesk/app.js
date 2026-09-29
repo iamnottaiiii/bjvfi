@@ -56,7 +56,7 @@ function normalizeLead(e){
 
 function siteUrlFor(lead){
   if(lead.url) return lead.url;
-  return 'https://' + lead.slug + '.bjvfi.com/';
+  return 'https://bjvfi.com/' + lead.slug + '/';
 }
 
 function telHref(phone){ return 'tel:+' + digitsOnly(phone); }
@@ -1610,18 +1610,13 @@ function wireQueue(el){
   if(sa) sa.addEventListener('click', function(){ runSearchAll(el); });
 }
 
-/* Pre-grab preview: caller must open the business site, then wait 2 minutes, before grabbing. */
+/* Pre-grab preview: quick review before grabbing. No timer; one click grabs. */
 function showGrabPreview(slug){
   const bySlug = catalogBySlug();
   const l = bySlug[slug] || normalizeLead({ s: slug, n: slug, p: '' });
   const url = siteUrlFor(l);
-  const WAIT_MS = 120000;
-  let siteOpened = false;
-  let deadline = 0;
-  let iv = null;
-  function fmt(s){ return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
-  let html = '<h2>Review before you grab</h2>' +
-    '<p class="muted" style="font-size:13px;line-height:1.55;margin-bottom:14px">Study their site first: what they do, their services, their vibe, so you sound like you know them on the call. The timer gives you <strong>2 minutes</strong> to look, then the grab unlocks.</p>' +
+  const html = '<h2>Review before you grab</h2>' +
+    '<p class="muted" style="font-size:13px;line-height:1.55;margin-bottom:14px">Take a quick look at their site if you want: what they do, their services, their vibe, so you sound like you know them on the call. Ready? Hit the button and the lead is yours.</p>' +
     '<div style="font-size:15px;font-weight:600;margin-bottom:4px">' + esc(l.name) + '</div>' +
     (l.category ? '<div class="muted" style="font-size:12px;margin-bottom:2px">' + esc(l.category) + '</div>' : '') +
     (!hasPhone(l.phone) ? '<p class="muted" style="font-size:12px;margin-bottom:10px;line-height:1.55">No number on this lead? Open their site, it is usually listed there.</p>' : '') +
@@ -1629,37 +1624,17 @@ function showGrabPreview(slug){
     '<button class="btn block" id="grab-site-open" type="button" style="margin-bottom:10px">Open their site</button>' +
     '<div class="row" style="margin-top:14px">' +
     '<button class="btn ghost" id="grab-preview-cancel" type="button" style="flex:1">Cancel</button>' +
-    '<button class="btn" id="grab-preview-confirm" type="button" style="flex:2" disabled>Open the site first</button>' +
+    '<button class="btn" id="grab-preview-confirm" type="button" style="flex:2">Grab this lead</button>' +
     '</div>';
   showModal(html);
-  const confirmBtn = document.getElementById('grab-preview-confirm');
-  const openBtn = document.getElementById('grab-site-open');
-  function stopTimer(){ if(iv){ clearInterval(iv); iv = null; } }
-  function refresh(){
-    if(!document.body.contains(confirmBtn)){ stopTimer(); return; }
-    if(!siteOpened){ confirmBtn.disabled = true; confirmBtn.textContent = 'Open the site first'; return; }
-    const left = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
-    if(left > 0){ confirmBtn.disabled = true; confirmBtn.textContent = 'Grab in ' + fmt(left); return; }
-    stopTimer();
-    confirmBtn.disabled = false; confirmBtn.textContent = 'Grab this lead';
-  }
-  openBtn.addEventListener('click', function(){
+  document.getElementById('grab-site-open').addEventListener('click', function(){
     window.open(url, '_blank', 'noopener');
-    if(!siteOpened){
-      siteOpened = true;
-      deadline = Date.now() + WAIT_MS;
-      openBtn.textContent = 'Site opened \u2713 Reopen';
-      iv = setInterval(refresh, 1000);
-    }
-    refresh();
   });
-  document.getElementById('grab-preview-cancel').addEventListener('click', function(){ stopTimer(); closeModal(); });
-  confirmBtn.addEventListener('click', function(){
-    stopTimer();
+  document.getElementById('grab-preview-cancel').addEventListener('click', function(){ closeModal(); });
+  document.getElementById('grab-preview-confirm').addEventListener('click', function(){
     closeModal();
     grabLead(slug);
   });
-  refresh();
 }
 
 async function grabLead(slug){
@@ -2393,8 +2368,10 @@ var INTAKE_STATUSES = [['open','Open'],['building','Building'],['ready','Ready']
    queue in the data repo that a server worker drains one job at a time, so
    two publishes can never overlap and wipe each other's work. */
 
+var RAW_SITE_URL = 'https://raw.githubusercontent.com/iamnottaiiii/bjvfi/main/';
+
 function liveCodeUrl(slug){
-  return 'https://' + encodeURIComponent(slug) + '.bjvfi.com/';
+  return RAW_SITE_URL + encodeURIComponent(slug) + '/index.html';
 }
 
 /* Pure: filter leads by business name, the same UX pattern as the queue
@@ -4326,7 +4303,7 @@ function helpHtml(){
   if(caller){
     h += '<h3 style="margin:14px 0 8px">Getting leads</h3>' +
     '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">The <strong>Queue</strong> shows available leads. Tap <strong>Grab</strong> on one to claim it. You can hold up to 5 leads at a time.</p>' +
-    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">Before you grab, a review pops up. You <strong>must open the business site</strong> and study it: what they do, their services, their vibe, so you sound like you know them on the call. A <strong>2-minute timer</strong> runs while you look, then the grab unlocks. Cancel anytime to back out with no claim.</p>' +
+    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">Before you grab, a review pops up. Open the business site to study it if you like: what they do, their services, their vibe, so you sound like you know them on the call. Hit <strong>Grab this lead</strong> and it is yours. Cancel anytime to back out with no claim.</p>' +
     '<h3 style="margin:14px 0 8px">Your leads and the timer</h3>' +
     '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">Every lead you grab gets its <strong>own 45-minute timer</strong>, counting down every second. Under 5 minutes it turns urgent. At zero the claim expires and the lead goes back to the queue.</p>' +
     '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">Tap a lead in <strong>My leads</strong> to open it: call and text buttons, the message draft, the call script, and outcome logging.</p>' +
