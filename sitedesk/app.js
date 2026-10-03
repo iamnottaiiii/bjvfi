@@ -1610,13 +1610,14 @@ function wireQueue(el){
   if(sa) sa.addEventListener('click', function(){ runSearchAll(el); });
 }
 
-/* Pre-grab preview: quick review before grabbing. No timer; one click grabs. */
+/* Pre-grab preview: quick review before grabbing. No timer; the caller must
+   open the business site before the Grab button becomes clickable. */
 function showGrabPreview(slug){
   const bySlug = catalogBySlug();
   const l = bySlug[slug] || normalizeLead({ s: slug, n: slug, p: '' });
   const url = siteUrlFor(l);
   const html = '<h2>Review before you grab</h2>' +
-    '<p class="muted" style="font-size:13px;line-height:1.55;margin-bottom:14px">Take a quick look at their site if you want: what they do, their services, their vibe, so you sound like you know them on the call. Ready? Hit the button and the lead is yours.</p>' +
+    '<p class="muted" style="font-size:13px;line-height:1.55;margin-bottom:14px">Open their site and take a quick look: what they do, their services, their vibe, so you sound like you know them on the call. The grab button unlocks after you open it.</p>' +
     '<div style="font-size:15px;font-weight:600;margin-bottom:4px">' + esc(l.name) + '</div>' +
     (l.category ? '<div class="muted" style="font-size:12px;margin-bottom:2px">' + esc(l.category) + '</div>' : '') +
     (!hasPhone(l.phone) ? '<p class="muted" style="font-size:12px;margin-bottom:10px;line-height:1.55">No number on this lead? Open their site, it is usually listed there.</p>' : '') +
@@ -1624,11 +1625,13 @@ function showGrabPreview(slug){
     '<button class="btn block" id="grab-site-open" type="button" style="margin-bottom:10px">Open their site</button>' +
     '<div class="row" style="margin-top:14px">' +
     '<button class="btn ghost" id="grab-preview-cancel" type="button" style="flex:1">Cancel</button>' +
-    '<button class="btn" id="grab-preview-confirm" type="button" style="flex:2">Grab this lead</button>' +
+    '<button class="btn" id="grab-preview-confirm" type="button" style="flex:2" disabled>Grab this lead</button>' +
     '</div>';
   showModal(html);
   document.getElementById('grab-site-open').addEventListener('click', function(){
     window.open(url, '_blank', 'noopener');
+    const confirm = document.getElementById('grab-preview-confirm');
+    if(confirm) confirm.disabled = false;
   });
   document.getElementById('grab-preview-cancel').addEventListener('click', function(){ closeModal(); });
   document.getElementById('grab-preview-confirm').addEventListener('click', function(){
@@ -1685,7 +1688,7 @@ async function grabRandom(){
     const taken = await resolveOpenSet(state.catalog.map(function(l){ return l.slug; }));
     const open = filteredOpen(taken);
     if(!open.length){ toast('No open leads match your filters.'); return; }
-    await grabLead(open[Math.floor(Math.random()*open.length)].slug);
+    showGrabPreview(open[Math.floor(Math.random()*open.length)].slug);
   }catch(e){ toast(e.message); }
 }
 
@@ -1771,6 +1774,19 @@ function leadCard(claim){
     html += '<p class="review-note"><strong>Know them first.</strong> Open their site and learn who they are before you call or text.</p>';
   }
 
+  if(claim.status === 'claimed'){
+    html += '<div class="card" style="margin:14px 0"><h2>Log outcome</h2>' +
+      precallNoteHtml() +
+      '<p class="muted" style="font-size:12px;margin-bottom:12px;line-height:1.55">When they are <strong>interested</strong>, save that, then you get the <strong>Add build details</strong> form.</p>' +
+      '<div class="field"><label>Outcome</label><div class="pick compact" id="outcome-pick">' +
+      OUTCOMES.map(function(o){
+        return '<button type="button" data-outcome="' + o[0] + '">' + o[1] + '</button>';
+      }).join('') + '</div></div>' +
+      '<div class="field"><label>Note</label><textarea id="outcome-note" placeholder="What did they say?"></textarea></div>' +
+      '<button class="btn block" id="btn-outcome" type="button">Save outcome</button>' +
+      '<div class="err" id="outcome-err"></div></div>';
+  }
+
   html += '<div class="card" style="margin:14px 0"><h2>Know them first</h2>' +
     '<p class="muted" style="font-size:12px;margin-bottom:10px;line-height:1.55">Everything you need before the call.</p>' +
     (lead.category ? '<div style="font-size:13px;margin-bottom:6px"><strong>Category:</strong> ' + esc(lead.category) + '</div>' : '') +
@@ -1799,19 +1815,6 @@ function leadCard(claim){
       '<div class="copybox" id="call-script-text">' + esc(script) + '</div>' +
       '<div class="row" style="margin-top:8px"><button class="btn ghost sm" id="btn-copy-script" type="button">Copy call script</button></div>' +
       '<p class="muted" style="font-size:12px;margin-top:10px;line-height:1.55">' + esc(salesLine()) + '</p></div>';
-  }
-
-  if(claim.status === 'claimed'){
-    html += '<div class="card" style="margin:18px 0"><h2>Log outcome</h2>' +
-      precallNoteHtml() +
-      '<p class="muted" style="font-size:12px;margin-bottom:12px;line-height:1.55">When they are <strong>interested</strong>, save that, then you get the <strong>Add build details</strong> form.</p>' +
-      '<div class="field"><label>Outcome</label><div class="pick compact" id="outcome-pick">' +
-      OUTCOMES.map(function(o, i){
-        return '<button type="button" class="' + (i === 0 ? 'on' : '') + '" data-outcome="' + o[0] + '">' + o[1] + '</button>';
-      }).join('') + '</div></div>' +
-      '<div class="field"><label>Note</label><textarea id="outcome-note" placeholder="What did they say?"></textarea></div>' +
-      '<button class="btn block" id="btn-outcome" type="button">Save outcome</button>' +
-      '<div class="err" id="outcome-err"></div></div>';
   }
 
 /* Red pre-call checklist: what to ask for on the call, entered after hanging up. */
@@ -2034,7 +2037,8 @@ async function saveOutcome(claim){
   const err = document.getElementById('outcome-err');
   err.textContent = '';
   const pick = document.querySelector('#outcome-pick .on');
-  const outcome = pick ? pick.getAttribute('data-outcome') : 'interested';
+  if(!pick){ fail('Pick an outcome first.'); return; }
+  const outcome = pick.getAttribute('data-outcome');
   const note = (document.getElementById('outcome-note').value || '').trim();
   claim.status = outcome;
   claim.note = note;
