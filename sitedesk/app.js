@@ -1678,25 +1678,36 @@ function showGrabPreview(slug){
   const gq = encodeURIComponent(((l.name || '') + ' ' + (l.address || '')).trim());
   const gurl = 'https://www.google.com/search?q=' + gq;
   const html = '<h2>Review before you grab</h2>' +
-    '<p class="muted" style="font-size:13px;line-height:1.55;margin-bottom:14px">Open their site and take a quick look: what they do, their services, their vibe, so you sound like you know them on the call. The grab button unlocks after you open it.</p>' +
+    '<p class="muted" style="font-size:13px;line-height:1.55;margin-bottom:14px">Research this business before you grab it. Open their site <strong>and</strong> run the Google search: what they do, their services, their vibe, so you sound like you know them on the call. The grab button unlocks after you do both.</p>' +
     '<div style="font-size:15px;font-weight:600;margin-bottom:4px">' + esc(l.name) + '</div>' +
     (l.category ? '<div class="muted" style="font-size:12px;margin-bottom:2px">' + esc(l.category) + '</div>' : '') +
     (!hasPhone(l.phone) ? '<p class="muted" style="font-size:12px;margin-bottom:10px;line-height:1.55">No number on this lead? Open their site, it is usually listed there.</p>' : '') +
     (l.address ? '<div class="muted" style="font-size:12px;margin-bottom:10px">' + esc(l.address) + '</div>' : '<div style="margin-bottom:10px"></div>') +
-    '<button class="btn block" id="grab-site-open" type="button" style="margin-bottom:10px">Open their site</button>' +
-    '<button class="btn ghost block" id="grab-google" type="button" style="margin-bottom:10px">Search Google: name + address</button>' +
+    '<button class="btn block" id="grab-site-open" type="button" style="margin-bottom:10px">Open their site <span class="grab-check" id="grab-check-site" style="display:none">&#10003;</span></button>' +
+    '<button class="btn block" id="grab-google" type="button" style="margin-bottom:10px">Search Google: name + address <span class="grab-check" id="grab-check-google" style="display:none">&#10003;</span></button>' +
     '<div class="row" style="margin-top:14px">' +
     '<button class="btn ghost" id="grab-preview-cancel" type="button" style="flex:1">Cancel</button>' +
     '<button class="btn" id="grab-preview-confirm" type="button" style="flex:2" disabled>Grab this lead</button>' +
     '</div>';
   showModal(html);
+  let siteOpened = false, googleSearched = false;
+  const maybeUnlock = function(){
+    const confirm = document.getElementById('grab-preview-confirm');
+    if(confirm && siteOpened && googleSearched) confirm.disabled = false;
+  };
   document.getElementById('grab-site-open').addEventListener('click', function(){
     window.open(url, '_blank', 'noopener');
-    const confirm = document.getElementById('grab-preview-confirm');
-    if(confirm) confirm.disabled = false;
+    siteOpened = true;
+    const chk = document.getElementById('grab-check-site');
+    if(chk) chk.style.display = '';
+    maybeUnlock();
   });
   document.getElementById('grab-google').addEventListener('click', function(){
     window.open(gurl, '_blank', 'noopener');
+    googleSearched = true;
+    const chk = document.getElementById('grab-check-google');
+    if(chk) chk.style.display = '';
+    maybeUnlock();
   });
   document.getElementById('grab-preview-cancel').addEventListener('click', function(){ closeModal(); });
   document.getElementById('grab-preview-confirm').addEventListener('click', function(){
