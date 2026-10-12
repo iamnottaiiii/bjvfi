@@ -41,6 +41,13 @@ function b64decodeToBytes(b64){
    format: {"s": slug, "n": name, "c": category, "p": phone, "a": address}.
    Long keys are kept only as fallbacks. */
 function normalizeLead(e){
+  /* Compact array format from chunk files: [slug, name, category, phone?] */
+  if(Array.isArray(e)){
+    return {
+      slug: String(e[0] || ''), name: String(e[1] || ''), phone: String(e[3] || ''),
+      category: String(e[2] || ''), address: '', url: '',
+    };
+  }
   e = e || {};
   const slug = e.s || e.slug || e.id || '';
   const name = e.n || e.name || e.business_name || '';
@@ -386,6 +393,10 @@ var state = {
   tab: 'queue',
   catalog: [],
   catalogAt: 0,
+  /* 1.4M queue: manifest + chunk loading. */
+  qmanifest: null,
+  qchunksLoaded: 0,
+  qcatFile: null,
   claimsBySlug: {},
   treeSlugs: null,
   myClaims: [],
@@ -804,6 +815,8 @@ async function savePushSub(sj){
    scattered leads (100 pages). That is the entire download. Previous/Next
    page through them; nothing else is ever fetched. */
 var QUEUE_URL = 'https://bjvfi.com/sitedesk/data/queue.json';
+var QUEUE_MANIFEST_URL = 'https://bjvfi.com/sitedesk/data/queue/manifest.json';
+var QUEUE_BASE_URL = 'https://bjvfi.com/sitedesk/data/queue/';
 
 /* The gross catalog total lives in sitedesk/data/total.json, rewritten by the
    sites.json rebuild workflow on every push, so it can never drift stale.
@@ -817,23 +830,70 @@ async function fetchCatalogTotal(){
   }catch(e){}
 }
 
-async function fetchCatalog(){
-  /* Total count and the queue chunk are independent fetches; run them together.
-     fetchCatalogTotal never throws, so this promise is safe to float. */
-  const totalP = fetchCatalogTotal();
-  if(state.catalog.length && Date.now() - state.catalogAt < 10*60*1000){ await totalP; return state.catalog; }
-  state.catalog = [];
-  state.boardOrder = [];
-  state.boardPage = 0;
-  const r = await fetchWithTimeout(QUEUE_URL, null, 25000);
+async function ensureManifest(){
+  if(state.qmanifest) return state.qmanifest;
+  const r = await fetchWithTimeout(QUEUE_MANIFEST_URL, null, 15000);
+  if(!r.ok) throw new Error('Could not load lead index.');
+  state.qmanifest = await r.json();
+  return state.qmanifest;
+}
+
+async function loadChunk(i){
+  const m = await ensureManifest();
+  if(!m.chunks || i >= m.chunks.length) return false;
+  const r = await fetchWithTimeout(QUEUE_BASE_URL + m.chunks[i], null, 30000);
   if(!r.ok) throw new Error('Could not load leads.');
   const arr = await r.json();
   (Array.isArray(arr) ? arr : []).forEach(function(e){
     const l = normalizeLead(e);
     if(l.slug) state.catalog.push(l);
   });
+  state.qchunksLoaded = i + 1;
   state.catalogAt = Date.now();
-  await totalP;
+  return true;
+}
+
+async function loadCategoryFile(cat){
+  const m = await ensureManifest();
+  const info = m.cats && m.cats[cat];
+  if(!info) return false;
+  const files = info.files || (info.file ? [info.file] : []);
+  if(!files.length) return false;
+  state.catalog = [];
+  for(var i = 0; i < files.length; i++){
+    const r = await fetchWithTimeout(QUEUE_BASE_URL + files[i], null, 60000);
+    if(!r.ok) throw new Error('Could not load leads.');
+    const arr = await r.json();
+    (Array.isArray(arr) ? arr : []).forEach(function(e){
+      const l = normalizeLead(e);
+      if(l.slug) state.catalog.push(l);
+    });
+  }
+  state.boardOrder = [];
+  state.boardPage = 0;
+  state.catalogAt = Date.now();
+  state.qcatFile = cat;
+  return true;
+}
+
+async function fetchCatalog(){
+  const m = await ensureManifest();
+  /* Category filter: load the whole category file. */
+  if(state.cat){
+    if(state.qcatFile !== state.cat){
+      state.qcatFile = null;
+      await loadCategoryFile(state.cat);
+    }
+    return state.catalog;
+  }
+  /* All leads: chunks load on demand, 20 at a time from what is loaded. */
+  state.qcatFile = null;
+  if(state.qchunksLoaded === 0){
+    state.catalog = [];
+    state.boardOrder = [];
+    state.boardPage = 0;
+    await loadChunk(0);
+  }
   return state.catalog;
 }
 
@@ -903,9 +963,17 @@ function activeTakenCount(nowMs){
 }
 
 function liveOpenTotal(fallbackList){
+  /* 1.4M queue: total from manifest. Category filter: count from manifest. */
+  if(state.cat && state.qmanifest && state.qmanifest.cats && state.qmanifest.cats[state.cat]){
+    return state.qmanifest.cats[state.cat].count;
+  }
+  if(state.qmanifest && state.qmanifest.total){
+    var open = state.qmanifest.total - activeTakenCount();
+    return open < 0 ? 0 : open;
+  }
   if(!state.catalogTotal) return fallbackList ? fallbackList.length : 0;
-  var open = state.catalogTotal - activeTakenCount();
-  return open < 0 ? 0 : open;
+  var open2 = state.catalogTotal - activeTakenCount();
+  return open2 < 0 ? 0 : open2;
 }
 
 /* Apply a mutation to the index with conflict retry. Uses the in-memory copy
@@ -1293,6 +1361,8 @@ function statsRow(){
 /* ================= queue ================= */
 
 function allCategories(){
+  /* 1.4M queue: categories from manifest. */
+  if(state.qmanifest && state.qmanifest.cats) return Object.keys(state.qmanifest.cats).sort();
   const set = {};
   state.catalog.forEach(function(l){ if(l.category) set[l.category] = true; });
   return Object.keys(set).sort();
@@ -1587,8 +1657,23 @@ function wireQueue(el){
     renderQueueInto(el);
   });
   const nb = el.querySelector('#btn-next-batch');
-  if(nb) nb.addEventListener('click', function(){
+  if(nb) nb.addEventListener('click', async function(){
     state.boardPage++;
+    /* 1.4M queue: if we are at the end of loaded chunks, load the next. */
+    if(!state.cat && state.qmanifest){
+      const order = state.boardOrder && state.boardOrder.length ? state.boardOrder : state.catalog;
+      const nextStart = (state.boardPage + 1) * 20;
+      if(nextStart >= order.length && state.qchunksLoaded < state.qmanifest.chunks.length){
+        nb.disabled = true;
+        nb.textContent = 'Loading more...';
+        try {
+          await loadChunk(state.qchunksLoaded);
+          state.boardOrder = [];
+        } catch(e){
+          state.boardPage--;
+        }
+      }
+    }
     const qEl = el.querySelector('#queue-q');
     if(qEl) state.q = qEl.value;
     paintQueue(el, state._lastTaken || {}, false);
@@ -1614,19 +1699,29 @@ function wireQueue(el){
   if(sa) sa.addEventListener('click', function(){ runSearchAll(el); });
 }
 
-/* Lead-type filter: counts of open leads per category, from the last known
-   claim set so the menu paints instantly. */
+/* Lead-type filter: counts of open leads per category, from the manifest
+   so the menu shows the full 1.4M, not just what is loaded. */
 function catCounts(){
+  if(state.qmanifest && state.qmanifest.cats){
+    const counts = {};
+    let total = 0;
+    for(var cat in state.qmanifest.cats){
+      var c = state.qmanifest.cats[cat].count;
+      counts[cat] = c;
+      total += c;
+    }
+    return { counts: counts, total: total };
+  }
   const taken = state._lastTaken || {};
-  const counts = {};
-  let total = 0;
+  const counts2 = {};
+  let total2 = 0;
   state.catalog.forEach(function(l){
     if(taken[l.slug]) return;
-    const c = l.category || 'Other';
-    counts[c] = (counts[c] || 0) + 1;
-    total++;
+    const c2 = l.category || 'Other';
+    counts2[c2] = (counts2[c2] || 0) + 1;
+    total2++;
   });
-  return { counts: counts, total: total };
+  return { counts: counts2, total: total2 };
 }
 
 function catItemHtml(val, label, n){
