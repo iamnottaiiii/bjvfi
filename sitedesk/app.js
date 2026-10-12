@@ -1675,6 +1675,8 @@ function showGrabPreview(slug){
   const bySlug = catalogBySlug();
   const l = bySlug[slug] || normalizeLead({ s: slug, n: slug, p: '' });
   const url = siteUrlFor(l);
+  const gq = encodeURIComponent(((l.name || '') + ' ' + (l.address || '')).trim());
+  const gurl = 'https://www.google.com/search?q=' + gq;
   const html = '<h2>Review before you grab</h2>' +
     '<p class="muted" style="font-size:13px;line-height:1.55;margin-bottom:14px">Open their site and take a quick look: what they do, their services, their vibe, so you sound like you know them on the call. The grab button unlocks after you open it.</p>' +
     '<div style="font-size:15px;font-weight:600;margin-bottom:4px">' + esc(l.name) + '</div>' +
@@ -1682,6 +1684,7 @@ function showGrabPreview(slug){
     (!hasPhone(l.phone) ? '<p class="muted" style="font-size:12px;margin-bottom:10px;line-height:1.55">No number on this lead? Open their site, it is usually listed there.</p>' : '') +
     (l.address ? '<div class="muted" style="font-size:12px;margin-bottom:10px">' + esc(l.address) + '</div>' : '<div style="margin-bottom:10px"></div>') +
     '<button class="btn block" id="grab-site-open" type="button" style="margin-bottom:10px">Open their site</button>' +
+    '<button class="btn ghost block" id="grab-google" type="button" style="margin-bottom:10px">Search Google: name + address</button>' +
     '<div class="row" style="margin-top:14px">' +
     '<button class="btn ghost" id="grab-preview-cancel" type="button" style="flex:1">Cancel</button>' +
     '<button class="btn" id="grab-preview-confirm" type="button" style="flex:2" disabled>Grab this lead</button>' +
@@ -1691,6 +1694,9 @@ function showGrabPreview(slug){
     window.open(url, '_blank', 'noopener');
     const confirm = document.getElementById('grab-preview-confirm');
     if(confirm) confirm.disabled = false;
+  });
+  document.getElementById('grab-google').addEventListener('click', function(){
+    window.open(gurl, '_blank', 'noopener');
   });
   document.getElementById('grab-preview-cancel').addEventListener('click', function(){ closeModal(); });
   document.getElementById('grab-preview-confirm').addEventListener('click', function(){
@@ -3412,10 +3418,11 @@ async function loadAllClaims(){
 async function renderUserDashboardInto(el){
   const username = state.adminUser;
   el.innerHTML = '<div class="card"><div class="empty">Loading dashboard...</div></div>';
-  let claims = [], intakes = [];
+  let intakes = [];
+  let idx = {};
   try{
     await loadUsers();
-    claims = await loadAllClaims();
+    idx = await getClaimIndex(true);
     intakes = await loadIntakes('all');
   }catch(e){
     el.innerHTML = '<div class="card"><button class="btn ghost sm" id="ud-back" type="button">Back to users</button>' +
@@ -3430,35 +3437,45 @@ async function renderUserDashboardInto(el){
     el.querySelector('#ud-back').addEventListener('click', function(){ state.adminUser = null; renderAdminInto(el); });
     return;
   }
-  const myClaims = claims.filter(function(c){ return c.claimer === username; })
-    .sort(function(a, b){ return String(b.claimed_at || '').localeCompare(String(a.claimed_at || '')); });
+  /* Stats from the claim index: one fast read, always the true totals. */
+  const mySlugs = Object.keys(idx).filter(function(slug){ return idx[slug] && idx[slug].c === username; });
+  const myStatus = function(st){ return mySlugs.filter(function(slug){ return idx[slug].s === st; }).length; };
   const myIntakes = intakes.filter(function(i){ return i.claimer === username; })
     .sort(function(a, b){ return String(b.created_at || '').localeCompare(String(a.created_at || '')); });
-  const n = function(list, st){ return list.filter(function(c){ return c.status === st; }).length; };
   const stat = function(label, val){
     return '<div style="flex:1;min-width:70px;text-align:center;padding:10px 4px">' +
       '<div style="font-size:20px;font-weight:700">' + val + '</div>' +
       '<div class="muted" style="font-size:11px">' + label + '</div></div>';
+  };
+  /* Lead rows render instantly from the index (slug + status). Full details
+     (business name, call time) load one at a time underneath; a slow or
+     failed fetch is skipped, never blocking the rest. */
+  const leadRowHtml = function(slug, detail){
+    const st = (idx[slug] && idx[slug].s) || 'claimed';
+    const name = detail ? (detail.business_name || slug) : slug;
+    const when = detail ? fmtTime(detail.claimed_at) : 'loading...';
+    return '<button type="button" class="mine-row" data-open-alead="' + esc(slug) + '">' +
+      '<span><span class="mine-row-name">' + esc(decodeHtml(name)) + '</span>' +
+      '<span class="muted" style="display:block;font-size:11px">' + esc(when) + '</span></span>' +
+      outcomeBadge(st) + '</button>';
   };
   let html = '<div class="card"><button class="btn ghost sm" id="ud-back" type="button">Back to users</button>' +
     '<div style="margin-top:12px"><div style="font-size:18px;font-weight:700">' + esc(u.name || username) + '</div>' +
     '<div class="muted" style="font-size:12px">@' + esc(username) + ' \xB7 ' + esc(u.phone || 'no phone') + '</div>' +
     '<div class="row" style="margin-top:8px">' + badge(u.role) + ' ' + badge(u.status) + '</div></div>' +
     '<div class="row" style="margin-top:12px">' +
-    stat('Claimed', n(myClaims, 'claimed') + n(myClaims, 'interested')) + stat('Interested', n(myClaims, 'interested')) +
-    stat('Sold', n(myClaims, 'sold')) + stat('Sites done', n(myIntakes, 'done')) + '</div></div>' +
+    stat('Claimed', myStatus('claimed') + myStatus('interested')) + stat('Interested', myStatus('interested')) +
+    stat('Sold', myStatus('sold')) + stat('Sites done', myIntakes.filter(function(i){ return i.status === 'done'; }).length) + '</div></div>' +
     '<div class="card" style="margin-top:14px"><h2>Payment method</h2>' +
     '<p style="font-size:14px">' + esc(u.payment_method || 'Not set') + '</p></div>' +
     '<div class="card" style="margin-top:14px"><h2>Payments</h2>' +
     '<div id="ud-pays">' + udPaysHtml(u) + '</div>' +
     '<button class="btn sm" id="ud-logpay" type="button" style="margin-top:10px">Log payment</button></div>' +
-    '<div class="card" style="margin-top:14px"><h2>Leads (' + myClaims.length + ')</h2>' +
-    (myClaims.length ? myClaims.map(function(c){
-      return '<button type="button" class="mine-row" data-open-alead="' + esc(c.slug) + '">' +
-        '<span><span class="mine-row-name">' + esc(decodeHtml(c.business_name || c.slug || c.id)) + '</span>' +
-        '<span class="muted" style="display:block;font-size:11px">' + esc(fmtTime(c.claimed_at)) + '</span></span>' +
-        outcomeBadge(c.status) + '</button>';
-    }).join('') + '<p class="muted" style="font-size:11px;margin-top:8px">Tap a lead to see its outcome.</p>' : '<div class="empty">No leads claimed yet.</div>') + '</div>' +
+    '<div class="card" style="margin-top:14px"><h2>Leads (' + mySlugs.length + ')</h2>' +
+    '<div id="ud-leads">' +
+    (mySlugs.length ? mySlugs.map(function(slug){ return leadRowHtml(slug, null); }).join('') +
+      '<p class="muted" style="font-size:11px;margin-top:8px">Tap a lead to see its outcome.</p>' : '<div class="empty">No leads claimed yet.</div>') +
+    '</div></div>' +
     '<div class="card" style="margin-top:14px"><h2>Intakes (' + myIntakes.length + ')</h2>' +
     (myIntakes.length ? myIntakes.map(function(i){
       return '<div class="row" style="justify-content:space-between;padding:10px 0">' +
@@ -3469,13 +3486,50 @@ async function renderUserDashboardInto(el){
   el.innerHTML = html;
   el.querySelector('#ud-back').addEventListener('click', function(){ state.adminUser = null; renderAdminInto(el); });
   el.querySelector('#ud-logpay').addEventListener('click', function(){ logPaymentModal(username, el); });
-  el.querySelectorAll('[data-open-alead]').forEach(function(b){
-    b.addEventListener('click', function(){
-      const slug = b.getAttribute('data-open-alead');
-      const claim = claims.find(function(c){ return c.slug === slug; });
-      if(claim) adminLeadModal(claim);
+  const detailCache = {};
+  const wireLeadRows = function(){
+    el.querySelectorAll('[data-open-alead]').forEach(function(b){
+      b.addEventListener('click', function(){
+        const slug = b.getAttribute('data-open-alead');
+        const d = detailCache[slug];
+        if(d) adminLeadModal(d);
+        else ghGetJson('claims/' + slug + '.json').then(function(rec){
+          if(rec && rec.data) adminLeadModal(rec.data);
+          else toast('Could not load that lead.');
+        }).catch(function(){ toast('Could not load that lead.'); });
+      });
     });
-  });
+  };
+  wireLeadRows();
+  /* Progressive detail load: one claim file at a time, 8s cap each. A stall
+     is skipped, the row keeps its index data, and the next one loads. */
+  (async function(){
+    for(let i = 0; i < mySlugs.length; i++){
+      const slug = mySlugs[i];
+      if(!el.isConnected) return;
+      try{
+        const rec = await Promise.race([
+          ghGetJson('claims/' + slug + '.json'),
+          new Promise(function(_, rej){ setTimeout(function(){ rej(new Error('timeout')); }, 8000); })
+        ]);
+        if(rec && rec.data){
+          detailCache[slug] = rec.data;
+          const box = el.querySelector('#ud-leads');
+          const btn = box ? box.querySelector('[data-open-alead="' + slug.replace(/"/g, '') + '"]') : null;
+          if(btn){
+            const tmp = document.createElement('div');
+            tmp.innerHTML = leadRowHtml(slug, rec.data);
+            const fresh = tmp.firstChild;
+            /* Re-wire the tap handler on the replaced row. */
+            fresh.addEventListener('click', function(){
+              adminLeadModal(rec.data);
+            });
+            btn.replaceWith(fresh);
+          }
+        }
+      }catch(e){ /* skip stalled/failed, keep going */ }
+    }
+  })();
 }
 
 function udPaysHtml(u){
