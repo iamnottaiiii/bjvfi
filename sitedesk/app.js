@@ -1361,8 +1361,11 @@ function paintQueue(el, openTaken, syncing){
       '<button class="btn sm" id="btn-grab-random" type="button"' + (atCap ? ' disabled' : '') + '>Grab random</button></div></div>';
     if(atCap) html += '<p class="err" style="margin-bottom:12px">Claim cap reached (' + active + '/' + MAX_ACTIVE_CLAIMS + '). Release or finish an active lead first.</p>';
     html += '<div class="card"><h2>Board</h2><div class="filters">' +
-      '<input id="queue-q" value="' + esc(state.q) + '" placeholder="Name or slug"/>' +
-      '</div>' +
+      '<div class="row" style="gap:8px;align-items:center">' +
+      '<input id="queue-q" value="' + esc(state.q) + '" placeholder="Name or slug" style="flex:1"/>' +
+      '<button class="uact-dots" id="btn-cat-menu" type="button" aria-label="Filter by lead type" title="Filter by lead type">&#8942;</button>' +
+      '</div></div>' +
+      (state.cat ? '<div class="row" style="margin:10px 0 0"><button class="chip on" id="chip-cat-clear" type="button">' + esc(state.cat) + ' &times;</button></div>' : '') +
       '<div class="row" style="margin-top:10px;justify-content:space-between">' +
       '<span class="muted" style="font-size:11px">Board searches the loaded leads only.</span>' +
       '<button class="btn ghost sm" id="btn-search-all" type="button">Search all leads</button></div>' +
@@ -1568,13 +1571,14 @@ function wireQueue(el){
       }, 350);
     });
   }
-  el.querySelectorAll('[data-cat]').forEach(function(chip){
-    chip.addEventListener('click', function(){
-      state.cat = chip.getAttribute('data-cat');
-      state.boardPage = 0;
-      state.boardOrder = [];
-      renderQueueInto(el);
-    });
+  const cm = el.querySelector('#btn-cat-menu');
+  if(cm) cm.addEventListener('click', function(){ openCatMenu(); });
+  const cc = el.querySelector('#chip-cat-clear');
+  if(cc) cc.addEventListener('click', function(){
+    state.cat = '';
+    state.boardPage = 0;
+    state.boardOrder = [];
+    renderQueueInto(el);
   });
   const hp = el.querySelector('#chip-phone');
   if(hp) hp.addEventListener('click', function(){
@@ -1608,6 +1612,61 @@ function wireQueue(el){
      20-at-a-time loading are untouched; this only fills #search-all-results. */
   const sa = el.querySelector('#btn-search-all');
   if(sa) sa.addEventListener('click', function(){ runSearchAll(el); });
+}
+
+/* Lead-type filter: counts of open leads per category, from the last known
+   claim set so the menu paints instantly. */
+function catCounts(){
+  const taken = state._lastTaken || {};
+  const counts = {};
+  let total = 0;
+  state.catalog.forEach(function(l){
+    if(taken[l.slug]) return;
+    const c = l.category || 'Other';
+    counts[c] = (counts[c] || 0) + 1;
+    total++;
+  });
+  return { counts: counts, total: total };
+}
+
+function catItemHtml(val, label, n){
+  return '<button type="button" class="cat-item' + (state.cat === val ? ' on' : '') + '"' +
+    ' data-catpick="' + esc(val) + '"><span>' + (state.cat === val ? '&#10003; ' : '') + esc(label) + '</span>' +
+    '<span class="muted">' + fmtNum(n) + '</span></button>';
+}
+
+/* Three-dots lead-type menu: pick "All leads" or one category. The existing
+   state.cat filter (filteredOpen + boardKey) does the actual filtering. */
+function openCatMenu(){
+  const cc = catCounts();
+  const cats = Object.keys(cc.counts).sort(function(a, b){
+    return (cc.counts[b] - cc.counts[a]) || (a < b ? -1 : 1);
+  });
+  showModal('<h2>Lead type</h2>' +
+    '<p class="muted" style="font-size:12px;margin-bottom:12px;line-height:1.55">Show only one type of lead, or all of them.</p>' +
+    '<div class="filters" style="margin-bottom:8px"><input id="cat-q" placeholder="Search types"/></div>' +
+    '<div id="cat-list">' +
+    catItemHtml('', 'All leads', cc.total) +
+    cats.map(function(c){ return catItemHtml(c, c, cc.counts[c]); }).join('') +
+    '</div>');
+  document.querySelectorAll('#cat-list [data-catpick]').forEach(function(b){
+    b.addEventListener('click', function(){
+      state.cat = b.getAttribute('data-catpick');
+      state.boardPage = 0;
+      state.boardOrder = [];
+      closeModal();
+      const v = document.querySelector('#view');
+      if(v) renderQueueInto(v);
+    });
+  });
+  const q = document.getElementById('cat-q');
+  if(q) q.addEventListener('input', function(){
+    const term = q.value.trim().toLowerCase();
+    document.querySelectorAll('#cat-list [data-catpick]').forEach(function(b){
+      const label = b.querySelector('span').textContent.toLowerCase();
+      b.style.display = (!term || label.indexOf(term) !== -1) ? '' : 'none';
+    });
+  });
 }
 
 /* Pre-grab preview: quick review before grabbing. No timer; the caller must
@@ -4307,6 +4366,7 @@ function helpHtml(){
   if(caller){
     h += '<h3 style="margin:14px 0 8px">Getting leads</h3>' +
     '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">The <strong>Queue</strong> shows available leads. Tap <strong>Grab</strong> on one to claim it. You can hold up to 5 leads at a time.</p>' +
+    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">Tap the <strong>three dots</strong> next to the search box to show only one type of lead (dentists, roofers, and so on), or all of them.</p>' +
     '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">Before you grab, a review pops up. Open the business site to study it if you like: what they do, their services, their vibe, so you sound like you know them on the call. Hit <strong>Grab this lead</strong> and it is yours. Cancel anytime to back out with no claim.</p>' +
     '<h3 style="margin:14px 0 8px">Your leads and the timer</h3>' +
     '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">Every lead you grab gets its <strong>own 45-minute timer</strong>, counting down every second. Under 5 minutes it turns urgent. At zero the claim expires and the lead goes back to the queue.</p>' +
