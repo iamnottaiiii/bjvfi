@@ -855,21 +855,33 @@ async function loadChunk(i){
 }
 
 async function loadCategoryFile(cat){
+  /* Cache: if we already loaded this category, reuse it instead of re-fetching. */
+  if(state.qcatCache && state.qcatCache[cat]){
+    state.catalog = state.qcatCache[cat];
+    state.boardOrder = [];
+    state.boardPage = 0;
+    state.catalogAt = Date.now();
+    state.qcatFile = cat;
+    return true;
+  }
   const m = await ensureManifest();
   const info = m.cats && m.cats[cat];
   if(!info) return false;
   const files = info.files || (info.file ? [info.file] : []);
   if(!files.length) return false;
-  state.catalog = [];
+  var loaded = [];
   for(var i = 0; i < files.length; i++){
     const r = await fetchWithTimeout(QUEUE_BASE_URL + files[i], null, 60000);
     if(!r.ok) throw new Error('Could not load leads.');
     const arr = await r.json();
     (Array.isArray(arr) ? arr : []).forEach(function(e){
       const l = normalizeLead(e);
-      if(l.slug) state.catalog.push(l);
+      if(l.slug) loaded.push(l);
     });
   }
+  if(!state.qcatCache) state.qcatCache = {};
+  state.qcatCache[cat] = loaded;
+  state.catalog = loaded;
   state.boardOrder = [];
   state.boardPage = 0;
   state.catalogAt = Date.now();
@@ -882,13 +894,29 @@ async function fetchCatalog(){
   /* Category filter: load the whole category file. */
   if(state.cat){
     if(state.qcatFile !== state.cat){
+      /* Save the All-leads chunk catalog before switching, so we can restore it. */
+      if(state.qchunksLoaded > 0 && !state.qcatFile){
+        state.qchunkCatalog = state.catalog;
+        state.qchunkOrder = state.boardOrder;
+        state.qchunkPage = state.boardPage;
+      }
       state.qcatFile = null;
       await loadCategoryFile(state.cat);
     }
     return state.catalog;
   }
   /* All leads: chunks load on demand, 20 at a time from what is loaded. */
-  state.qcatFile = null;
+  if(state.qcatFile){
+    /* Switching back from a category: restore the chunk catalog if we have it. */
+    state.qcatFile = null;
+    if(state.qchunkCatalog && state.qchunksLoaded > 0){
+      state.catalog = state.qchunkCatalog;
+      state.boardOrder = state.qchunkOrder || [];
+      state.boardPage = state.qchunkPage || 0;
+      state.catalogAt = Date.now();
+      return state.catalog;
+    }
+  }
   if(state.qchunksLoaded === 0){
     state.catalog = [];
     state.boardOrder = [];
