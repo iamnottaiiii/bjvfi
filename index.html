@@ -236,21 +236,16 @@ body {
 
 <script>
 (function () {
-  const GITHUB_USER = "iamnottaiiii";
-  const GITHUB_REPO = "bjvfi";
-
-  const IGNORE = new Set([
-    ".github", ".git", "assets", "images", "img",
-    "css", "js", "scripts", "node_modules", "favicon"
-  ]);
-
   const input = document.getElementById("bjvfi-search");
   const results = document.getElementById("bjvfi-results");
   const statusEl = document.getElementById("bjvfi-status");
   if (!input || !results) return;
 
-  let sites = null;
-  let loading = null;
+  /* Nothing loads until the user types. On search, fetch only the single
+     site-names shard matching the query's first letter/number
+     (/site-names/p.json etc.), then filter it locally. Shards are cached,
+     so repeat searches are instant. */
+  const shardCache = {};
 
   function prettySlug(s) {
     return s.split("-").map(function(w){
@@ -258,71 +253,25 @@ body {
     }).join(" ");
   }
 
-  async function fetchAllSites() {
-    const shardFiles = [];
-    "0123456789abcdefghijklmnopqrstuvwxyz".split("").forEach(function(c){
-      shardFiles.push("/site-names/" + c + ".json");
-    });
-    const urls = ["/sites.json"].concat(shardFiles);
-    const results = await Promise.all(urls.map(function(u){
-      return fetch(u, { cache: "no-store" }).then(function(r){
-        if (!r.ok) throw new Error("Could not load " + u + " (" + r.status + ")");
-        return r.json();
-      });
-    }));
-    const siteNames = {};
-    for (let i = 1; i < results.length; i++) {
-      const obj = results[i];
-      if (obj && typeof obj === "object" && !Array.isArray(obj)) {
-        Object.keys(obj).forEach(function(k){ siteNames[k] = obj[k]; });
-      }
-    }
-    const seen = new Set();
-    const slugs = [];
-    function addSlug(s) {
-      if (!s || seen.has(s)) return;
-      seen.add(s);
-      slugs.push(s);
-    }
-    const catalog = results[0];
-    if (Array.isArray(catalog)) {
-      catalog.forEach(function(i){ addSlug(typeof i === "string" ? i : i.s); });
-    } else if (catalog && typeof catalog === "object") {
-      Object.keys(catalog).forEach(function(repo){
-        const arr = catalog[repo];
-        if (Array.isArray(arr)) arr.forEach(addSlug);
-      });
-    }
-    Object.keys(siteNames).forEach(addSlug);
-    return slugs
-      .map(function(s) {
-        return {
-          title: siteNames[s] || prettySlug(s),
-          slug: s,
-          link: "https://" + encodeURIComponent(s) + ".bjvfi.com/"
-        };
-      })
-      .sort((a, b) => a.title.localeCompare(b.title));
+  function shardFor(q) {
+    const m = q.toLowerCase().match(/[0-9a-z]/);
+    return m ? m[0] : null;
   }
 
-  function ensureLoaded() {
-    if (sites) return Promise.resolve(sites);
-    if (loading) return loading;
-    statusEl.textContent = "Loading sites...";
-    statusEl.classList.remove("error");
-    loading = fetchAllSites()
-      .then(list => {
-        sites = list;
-        statusEl.textContent = "";
-        return sites;
-      })
-      .catch(err => {
-        loading = null;
-        statusEl.textContent = err?.message || "Load failed";
-        statusEl.classList.add("error");
-        throw err;
-      });
-    return loading;
+  async function getShard(ch) {
+    if (shardCache[ch]) return shardCache[ch];
+    const r = await fetch("/site-names/" + ch + ".json", { cache: "force-cache" });
+    if (!r.ok) throw new Error("Search is unavailable right now.");
+    const obj = await r.json();
+    const list = Object.keys(obj).map(function(slug){
+      return {
+        title: obj[slug] || prettySlug(slug),
+        slug: slug,
+        link: "https://" + encodeURIComponent(slug) + ".bjvfi.com/"
+      };
+    });
+    shardCache[ch] = list;
+    return list;
   }
 
   function render(matches) {
@@ -353,36 +302,47 @@ body {
     results.classList.add("open");
   }
 
-  function runSearch() {
-    const q = input.value.trim().toLowerCase();
-    if (!q) {
-      results.classList.remove("open");
-      results.innerHTML = "";
-      statusEl.textContent = "";
-      return;
-    }
-    ensureLoaded().then(list => {
-      const matches = list.filter(s =>
-        s.title.toLowerCase().includes(q) || s.slug.toLowerCase().includes(q)
-      );
-      render(matches);
-    }).catch(() => {});
-  }
-
   let timer = null;
+  let searchId = 0;
   input.addEventListener("input", () => {
     clearTimeout(timer);
-    timer = setTimeout(runSearch, 100);
-  });
-  input.addEventListener("focus", () => {
-    ensureLoaded().catch(() => {});
-    if (input.value.trim()) runSearch();
+    timer = setTimeout(async () => {
+      const q = input.value.trim().toLowerCase();
+      if (!q) {
+        results.classList.remove("open");
+        results.innerHTML = "";
+        statusEl.textContent = "";
+        return;
+      }
+      const ch = shardFor(q);
+      if (!ch) {
+        results.classList.remove("open");
+        results.innerHTML = "";
+        statusEl.textContent = "Type a letter or number to search.";
+        return;
+      }
+      const myId = ++searchId;
+      statusEl.textContent = "Searching...";
+      statusEl.classList.remove("error");
+      try {
+        const list = await getShard(ch);
+        if (myId !== searchId) return;
+        const matches = list.filter(s =>
+          s.title.toLowerCase().includes(q) || s.slug.toLowerCase().includes(q)
+        );
+        render(matches);
+      } catch (err) {
+        if (myId !== searchId) return;
+        results.classList.remove("open");
+        results.innerHTML = "";
+        statusEl.textContent = "Search is unavailable right now.";
+        statusEl.classList.add("error");
+      }
+    }, 150);
   });
   document.addEventListener("click", e => {
     if (!e.target.closest(".bjvfi-search-wrap")) results.classList.remove("open");
   });
-
-  ensureLoaded().catch(() => {});
 })();
 </script>
 </body>
