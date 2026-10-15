@@ -3434,7 +3434,7 @@ function adminUsersHtml(){
   else html += list.map(function(r){
     const u = r.u;
     const open = !!state.adminOpen[r.username];
-    return '<div class="card" style="margin-bottom:10px;padding:14px">' +
+    return '<div class="card" data-usercard="' + esc(r.username) + '" style="margin-bottom:10px;padding:14px">' +
       '<div class="row" style="justify-content:space-between;align-items:flex-start;margin-bottom:8px"><div>' +
       '<div style="font-weight:600">' + esc(u.name || r.username) + '</div>' +
       '<div class="muted" style="font-size:12px">@' + esc(r.username) + '</div>' +
@@ -3447,7 +3447,7 @@ function adminUsersHtml(){
          the page (no refresh, no scroll jump). */
       '<div data-uact-holder="' + esc(r.username) + '"' + (open ? '' : ' style="display:none"') + '>' +
       uactPanelHtml(r, u) + '</div>' +
-      '<div class="row" style="gap:6px">' + badge(u.status) + badge(u.role) + '</div></div>';
+      '<div class="row" data-ubadges style="gap:6px">' + badge(u.status) + badge(u.role) + '</div></div>';
   }).join('');
   return html + '</div>';
 }
@@ -3515,7 +3515,15 @@ function wireAdminUsers(el){
     });
   });
   /* Action panel buttons: run the same actions the dropdown used to run. */
-  el.querySelectorAll('[data-uact]').forEach(function(btn){
+  wireUactButtons(el, el);
+}
+
+/* Wire the three-dot action buttons inside a scope element. Extracted so a
+   single re-rendered card can re-wire its own panel without touching the
+   rest of the page. rootEl is the admin container passed through for actions
+   that genuinely navigate (dashboard). */
+function wireUactButtons(scope, rootEl){
+  scope.querySelectorAll('[data-uact]').forEach(function(btn){
     btn.addEventListener('click', function(){
       if(btn.disabled) return;
       const v = btn.getAttribute('data-uact');
@@ -3523,15 +3531,42 @@ function wireAdminUsers(el){
       if(!v) return;
       if(v === 'dash'){
         state.adminUser = username;
-        renderAdminInto(el);
+        renderAdminInto(rootEl);
         return;
       }
       try{
-        const r = userAction(username, v, el);
+        const r = userAction(username, v, rootEl);
         if(r && r.then) r.then(function(){}, function(){});
       }catch(e){}
     });
   });
+}
+
+/* Re-render a single user card in place after an action (approve, disable,
+   role change, ...): the badges and the action panel update without
+   rebuilding the whole list, so there is no page refresh and no scroll jump.
+   The panel stays exactly as it was (open or closed). */
+function refreshUserCard(username){
+  const u = state.users[username];
+  const card = document.querySelector('[data-usercard="' + CSS.escape(username) + '"]');
+  if(!u || !card) return;
+  const badges = card.querySelector('[data-ubadges]');
+  if(badges) badges.innerHTML = badge(u.status) + badge(u.role);
+  const holder = card.querySelector('[data-uact-holder]');
+  if(holder){
+    const wasOpen = holder.style.display !== 'none';
+    holder.innerHTML = uactPanelHtml({ username: username }, u);
+    holder.style.display = wasOpen ? '' : 'none';
+    wireUactButtons(card, document.getElementById('view'));
+  }
+}
+
+/* Remove a single user card from the list in place (after delete). No
+   re-render, no scroll jump; the card just disappears. */
+function removeUserCard(username){
+  const card = document.querySelector('[data-usercard="' + CSS.escape(username) + '"]');
+  if(card) card.remove();
+  delete state.adminOpen[username];
 }
 
 /* Admin-only: every claim in the repo, for the per-user dashboard. */
@@ -3731,7 +3766,6 @@ async function userAction(username, act, el){
      The head changes their own password from Profile. */
   if(u.role === 'head'){
     toast('The head account cannot be changed.');
-    renderAdminInto(el);
     return;
   }
   try{
@@ -3756,7 +3790,7 @@ async function userAction(username, act, el){
       const newRole = act.slice(5);
       /* There can only ever be one head. The role picker no longer offers
          'head', and this guard blocks any forged request too. */
-      if(newRole === 'head'){ toast('There can only be one head.'); renderAdminInto(el); return; }
+      if(newRole === 'head'){ toast('There can only be one head.'); return; }
       u.role = newRole;
       await saveUsers();
       toast('Role updated');
@@ -3767,22 +3801,23 @@ async function userAction(username, act, el){
       if(!deleteArmed[username]){
         deleteArmed[username] = true;
         toast('Tap Delete again to delete @' + username);
+        /* Arm in place: flip just the delete button to its confirm state
+           instead of re-rendering the whole list. */
+        const dbtn = document.querySelector('[data-uact="delete"][data-username="' + CSS.escape(username) + '"]');
+        if(dbtn){ dbtn.textContent = 'Confirm delete?'; dbtn.classList.remove('ghost'); }
         setTimeout(function(){
           if(!deleteArmed[username]) return;
           delete deleteArmed[username];
-          if(state.tab === 'admin' && !state.adminUser){
-            const v = document.querySelector('#view');
-            if(v) renderAdminInto(v);
-          }
+          const b2 = document.querySelector('[data-uact="delete"][data-username="' + CSS.escape(username) + '"]');
+          if(b2 && state.tab === 'admin' && !state.adminUser){ b2.textContent = 'Delete'; b2.classList.add('ghost'); }
         }, 6000);
-        renderAdminInto(el);
         return;
       }
       delete deleteArmed[username];
       await loadUsers();
       const target = state.users[username];
-      if(!target){ toast('User not found.'); renderAdminInto(el); return; }
-      if(target.role === 'head'){ toast('The head account cannot be deleted.'); renderAdminInto(el); return; }
+      if(!target){ toast('User not found.'); return; }
+      if(target.role === 'head'){ toast('The head account cannot be deleted.'); return; }
       /* Release their active claims so the leads go back to the queue. */
       try{
         const all = await loadAllClaims();
@@ -3814,7 +3849,8 @@ async function userAction(username, act, el){
       delete state.users[username];
       await saveUsers();
       toast('Deleted @' + username);
-      renderAdminInto(el);
+      /* Drop the card in place: no full re-render, list and scroll stay put. */
+      removeUserCard(username);
       return;
     } else if(act === 'resetpw'){
       /* Admin/head resets a user's password when the user asks (e.g. by email).
@@ -3829,7 +3865,9 @@ async function userAction(username, act, el){
       document.getElementById('rp-copy').addEventListener('click', function(){ copyText(password, 'Password'); });
       toast('Password reset for @' + username);
     }
-    renderAdminInto(el);
+    /* Update just this card in place: badges and panel refresh, no page
+       rebuild, no scroll jump, the menu stays open where it was. */
+    refreshUserCard(username);
   }catch(e){ toast(e.message); }
 }
 
