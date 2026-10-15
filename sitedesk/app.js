@@ -3452,38 +3452,38 @@ function adminUsersHtml(){
   return html + '</div>';
 }
 
-/* The action panel behind the three-dot toggle on an admin user card: the
-   original action buttons, hidden until the toggle is tapped. Panels are
-   always closed by default. */
+/* The action menu behind the three-dot toggle on an admin user card: a clean
+   vertical dropdown list, actions in a sensible order, destructive ones
+   separated at the bottom. */
 function uactPanelHtml(r, u){
   const un = r.username;
-  function b(act, label, cls, disabled){
-    return '<button class="btn sm' + (cls ? ' ' + cls : '') + '" data-uact="' + act + '" data-username="' + esc(un) + '"' +
+  function item(act, label, cls, disabled){
+    return '<button class="uact-item' + (cls ? ' ' + cls : '') + '" data-uact="' + act + '" data-username="' + esc(un) + '"' +
       (disabled ? ' disabled' : '') + ' type="button">' + label + '</button>';
   }
-  let h = '<div class="uact-panel"><div class="uact-title">Actions for @' + esc(un) + '</div><div class="uact-btns">';
-  h += b('dash', 'Dashboard');
+  let h = '<div class="uact-panel">';
+  h += item('dash', 'View dashboard');
   if(u.role !== 'head'){
     if(u.status === 'pending'){
-      h += b('approve', 'Approve') + b('reject', 'Reject', 'danger');
+      h += item('approve', 'Approve') + item('reject', 'Reject', 'danger-text');
     }
-    h += b('disable', u.status === 'disabled' ? 'Re-enable' : 'Disable', 'ghost');
-    h += b('resetpw', 'Reset password', 'ghost');
-    if(un !== state.user.username){
-      /* Two-tap confirm: first tap arms the button, second tap within 6s deletes. */
-      const armed = !!deleteArmed[un];
-      h += b('delete', armed ? 'Confirm delete?' : 'Delete', 'danger' + (armed ? '' : ' ghost'));
-    }
+    h += item('disable', u.status === 'disabled' ? 'Re-enable user' : 'Disable user');
+    h += item('resetpw', 'Reset password');
     if(state.user.role === 'head'){
+      h += '<div class="uact-sep"></div>';
       ['caller','builder','admin'].forEach(function(ro){
         const label = ro.charAt(0).toUpperCase() + ro.slice(1);
         h += u.role === ro
-          ? b('role:' + ro, 'Role: ' + label + ' (current)', 'ghost', true)
-          : b('role:' + ro, 'Set role: ' + label, 'ghost');
+          ? item('role:' + ro, label + ' (current role)', '', true)
+          : item('role:' + ro, 'Make ' + label);
       });
     }
+    if(un !== state.user.username){
+      h += '<div class="uact-sep"></div>';
+      h += item('delete', 'Delete user', 'danger');
+    }
   }
-  return h + '</div></div>';
+  return h + '</div>';
 }
 
 function wireAdminUsers(el){
@@ -3499,19 +3499,30 @@ function wireAdminUsers(el){
   });
   const nu = el.querySelector('#btn-new-user');
   if(nu) nu.addEventListener('click', function(){ newUserModal(el); });
-  /* Three-dot toggles: tap to open or close the action panel on a card, in
-     place. No re-render, so the page does not refresh and does not jump back
-     to the top; the panel just drops down under the card header. */
+  /* Three-dot toggles: tap to open or close the action menu on a card, in
+     place. Only one menu is ever open at a time: opening one closes any
+     other that was open. No re-render, so the page does not refresh and
+     does not jump back to the top. */
   el.querySelectorAll('.uact-dots').forEach(function(btn){
     btn.addEventListener('click', function(){
       const username = btn.getAttribute('data-username');
-      const card = btn.closest('.card');
-      const holder = card ? card.querySelector('[data-uact-holder="' + username + '"]') : null;
       const isOpen = !!state.adminOpen[username];
-      if(isOpen) delete state.adminOpen[username];
-      else state.adminOpen[username] = true;
-      if(holder) holder.style.display = isOpen ? 'none' : '';
-      btn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+      /* Close everything first. */
+      Object.keys(state.adminOpen).forEach(function(u){ delete state.adminOpen[u]; });
+      el.querySelectorAll('[data-uact-holder]').forEach(function(h){ h.style.display = 'none'; });
+      el.querySelectorAll('.uact-dots').forEach(function(b){
+        b.setAttribute('aria-expanded', 'false');
+        b.classList.remove('open');
+      });
+      /* Then open just this one, unless it was the one already open. */
+      if(!isOpen){
+        state.adminOpen[username] = true;
+        const card = btn.closest('.card');
+        const holder = card ? card.querySelector('[data-uact-holder="' + username + '"]') : null;
+        if(holder) holder.style.display = '';
+        btn.setAttribute('aria-expanded', 'true');
+        btn.classList.add('open');
+      }
     });
   });
   /* Action panel buttons: run the same actions the dropdown used to run. */
@@ -3757,8 +3768,6 @@ async function saveUsers(){  const rec = await ghGetJson('users.json');
   await loadUsers();
 }
 
-/* Armed delete confirmations for the admin action panels. */
-const deleteArmed = {};
 async function userAction(username, act, el){
   const u = state.users[username];
   if(!u){ toast('User not found.'); return; }
@@ -3796,24 +3805,7 @@ async function userAction(username, act, el){
       toast('Role updated');
     } else if(act === 'delete'){
       if(username === state.user.username){ toast('Delete your own account from Profile.'); return; }
-      /* Two-tap confirm: the first tap arms the button (it turns solid red
-         and reads "Confirm delete?"), the second tap within 6s deletes. */
-      if(!deleteArmed[username]){
-        deleteArmed[username] = true;
-        toast('Tap Delete again to delete @' + username);
-        /* Arm in place: flip just the delete button to its confirm state
-           instead of re-rendering the whole list. */
-        const dbtn = document.querySelector('[data-uact="delete"][data-username="' + CSS.escape(username) + '"]');
-        if(dbtn){ dbtn.textContent = 'Confirm delete?'; dbtn.classList.remove('ghost'); }
-        setTimeout(function(){
-          if(!deleteArmed[username]) return;
-          delete deleteArmed[username];
-          const b2 = document.querySelector('[data-uact="delete"][data-username="' + CSS.escape(username) + '"]');
-          if(b2 && state.tab === 'admin' && !state.adminUser){ b2.textContent = 'Delete'; b2.classList.add('ghost'); }
-        }, 6000);
-        return;
-      }
-      delete deleteArmed[username];
+      /* Single tap, immediate: the user is gone and the card disappears. */
       await loadUsers();
       const target = state.users[username];
       if(!target){ toast('User not found.'); return; }
@@ -3949,12 +3941,6 @@ function adminToolsHtml(){
   /* Send-notification composer lives here (Admin > Tools), not in the
      Alerts tab. Audience can be everyone, staff only, or one person. */
   return notifyComposerHtml() +
-  '<div class="card"><h2>Tools</h2>' +
-    '<p class="muted" style="font-size:12px;margin-bottom:12px;line-height:1.55">Look up a claim by slug and unlock it (deletes the claim file).</p>' +
-    '<div class="field"><label>Lead slug</label><input id="tool-slug" placeholder="e.g. acme-plumbing"/></div>' +
-    '<button class="btn ghost block" id="tool-lookup" type="button">Look up claim</button>' +
-    '<div class="err" id="tool-err"></div>' +
-    '<div id="tool-result" style="margin-top:12px"></div></div>' +
   '<div class="card"><h2>Overall dashboard</h2>' +
   '<p class="muted" style="font-size:12px;margin-bottom:12px;line-height:1.55">Whole-system stats: leads, users, claims, and activity.</p>' +
   '<button class="btn ghost block" id="tool-stats" type="button">Load stats</button>' +
@@ -4149,33 +4135,6 @@ function wireAdminTools(el){
   wireNotifyComposer(el);
   const st = el.querySelector('#tool-stats');
   if(st) st.addEventListener('click', function(){ loadOverallStats(el); });
-  el.querySelector('#tool-lookup').addEventListener('click', async function(){
-    const err = el.querySelector('#tool-err');
-    const res = el.querySelector('#tool-result');
-    err.textContent = ''; res.innerHTML = '';
-    const slug = (el.querySelector('#tool-slug').value || '').trim();
-    if(!slug){ err.textContent = 'Enter a slug.'; return; }
-    try{
-      const rec = await ghGetJson('claims/' + slug + '.json');
-      if(!rec){ res.innerHTML = '<p class="muted">No active claim for ' + esc(slug) + '.</p>'; return; }
-      const c = rec.data;
-      res.innerHTML = '<div class="card" style="padding:14px"><div style="font-weight:600">' + esc(c.business_name || slug) + '</div>' +
-        '<div class="muted" style="font-size:12px">claimer: ' + esc(c.claimer_name || c.claimer || '') +
-        ' \xB7 status: ' + esc(c.status || '') + '</div>' +
-        '<div class="muted" style="font-size:12px">expires: ' + esc(fmtTime(c.claim_expires_at)) + '</div>' +
-        '<div class="row" style="margin-top:10px"><button class="btn danger sm" id="tool-unlock" type="button">Unlock (delete claim)</button></div></div>';
-      res.querySelector('#tool-unlock').addEventListener('click', async function(){
-        try{
-          await ghDeleteFile('claims/' + slug + '.json', rec.sha);
-          clearTreeCache();
-          updateClaimIndex(function(idx){ delete idx[slug]; });
-          delete state.claimsBySlug[slug];
-          toast('Claim unlocked');
-          res.innerHTML = '<p class="muted">Claim deleted. The lead is open again.</p>';
-        }catch(e){ err.textContent = e.message; }
-      });
-    }catch(e){ err.textContent = e.message; }
-  });
 }
 
 /* ================= alerts / profile ================= */
