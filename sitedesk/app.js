@@ -3805,44 +3805,50 @@ async function userAction(username, act, el){
       toast('Role updated');
     } else if(act === 'delete'){
       if(username === state.user.username){ toast('Delete your own account from Profile.'); return; }
-      /* Single tap, immediate: the user is gone and the card disappears. */
-      await loadUsers();
-      const target = state.users[username];
-      if(!target){ toast('User not found.'); return; }
-      if(target.role === 'head'){ toast('The head account cannot be deleted.'); return; }
-      /* Release their active claims so the leads go back to the queue. */
-      try{
-        const all = await loadAllClaims();
-        const mine = all.filter(function(c){
-          return c && c.claimer === username && (c.status === 'claimed' || c.status === 'interested');
-        });
-        for(const c of mine){
-          try{
-            const rec = await ghGetJson('claims/' + c.slug + '.json');
-            if(rec) await ghDeleteFile('claims/' + c.slug + '.json', rec.sha);
-          }catch(e){}
-        }
-        updateClaimIndex(function(idx){ mine.forEach(function(c){ delete idx[c.slug]; }); });
-      }catch(e){}
-      /* Drop their push subscriptions so no pushes go to a deleted account. */
-      try{
-        const prec = await ghGetJson('push_subs.json').catch(function(){ return null; });
-        if(prec && prec.data && prec.data[username]){
-          delete prec.data[username];
-          await ghPutJson('push_subs.json', prec.data, prec.sha, 'sitedesk: drop push subs @' + username);
-        }
-      }catch(e){}
-      /* Drop their server-side dismissed notifications too. */
-      try{
-        const drec = await ghGetJson('dismissed/' + username + '.json').catch(function(){ return null; });
-        if(drec) await ghDeleteFile('dismissed/' + username + '.json', drec.sha);
-      }catch(e){}
-      await loadUsers();
-      delete state.users[username];
-      await saveUsers();
-      toast('Deleted @' + username);
-      /* Drop the card in place: no full re-render, list and scroll stay put. */
+      /* Optimistic: the card vanishes the instant you tap. All the slow
+         server cleanup (claims, push subs, user record) runs in the
+         background so the screen never waits on it. */
       removeUserCard(username);
+      toast('Deleting @' + username + '...');
+      (async function(){
+        try{
+          await loadUsers();
+          const target = state.users[username];
+          if(!target) return;
+          if(target.role === 'head'){ toast('The head account cannot be deleted.'); return; }
+          /* Release their active claims so the leads go back to the queue. */
+          try{
+            const all = await loadAllClaims();
+            const mine = all.filter(function(c){
+              return c && c.claimer === username && (c.status === 'claimed' || c.status === 'interested');
+            });
+            for(const c of mine){
+              try{
+                const rec = await ghGetJson('claims/' + c.slug + '.json');
+                if(rec) await ghDeleteFile('claims/' + c.slug + '.json', rec.sha);
+              }catch(e){}
+            }
+            updateClaimIndex(function(idx){ mine.forEach(function(c){ delete idx[c.slug]; }); });
+          }catch(e){}
+          /* Drop their push subscriptions so no pushes go to a deleted account. */
+          try{
+            const prec = await ghGetJson('push_subs.json').catch(function(){ return null; });
+            if(prec && prec.data && prec.data[username]){
+              delete prec.data[username];
+              await ghPutJson('push_subs.json', prec.data, prec.sha, 'sitedesk: drop push subs @' + username);
+            }
+          }catch(e){}
+          /* Drop their server-side dismissed notifications too. */
+          try{
+            const drec = await ghGetJson('dismissed/' + username + '.json').catch(function(){ return null; });
+            if(drec) await ghDeleteFile('dismissed/' + username + '.json', drec.sha);
+          }catch(e){}
+          await loadUsers();
+          delete state.users[username];
+          await saveUsers();
+          toast('Deleted @' + username);
+        }catch(e){ toast('Delete failed: ' + e.message); }
+      })();
       return;
     } else if(act === 'resetpw'){
       /* Admin/head resets a user's password when the user asks (e.g. by email).
