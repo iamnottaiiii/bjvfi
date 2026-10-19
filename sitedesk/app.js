@@ -2835,6 +2835,27 @@ function paintEditorPanel(el){
     '<span class="muted" style="font-size:11px;align-self:center">.bjvfi.com</span></div>' +
     '<p class="muted" style="font-size:11px;margin:6px 0 0;line-height:1.5">Changing the URL name moves the site there. The old address stops working once the publish goes live.</p></div></div>';
 
+  /* Site branding: favicon and logo uploads with instant preview. */
+  const existingTa = document.getElementById('editor-new-code');
+  const brandCode = existingTa ? existingTa.value :
+    (state.editorDraft && state.editorDraft.code != null ? state.editorDraft.code :
+    (state.editorLiveCode != null ? state.editorLiveCode : ''));
+  const branding = brandingFromCode(brandCode);
+  html += '<div class="card" style="margin:10px 0;padding:14px"><h3 style="margin:0 0 8px">Site branding</h3>' +
+    '<p class="muted" style="font-size:11px;margin:0 0 10px;line-height:1.5">Upload a browser tab icon and a logo. They show in the preview right away and go live when you publish.</p>' +
+    '<div class="row" style="align-items:center;gap:10px;margin-bottom:10px">' +
+      '<img id="branding-favicon-prev" alt="" style="width:32px;height:32px;object-fit:contain;background:#fff;border:1px solid #ddd;border-radius:6px;flex:none;' + (branding.favicon ? '' : 'display:none') + '"' + (branding.favicon ? ' src="' + esc(branding.favicon) + '"' : '') + '/>' +
+      '<div class="field" style="flex:1;margin:0"><label>Tab icon (favicon)</label>' +
+      '<input type="file" id="branding-favicon-file" accept="image/*"/></div>' +
+      '<button class="btn ghost sm" id="branding-favicon-remove" type="button" style="flex:none;' + (branding.favicon ? '' : 'display:none') + '">Remove</button>' +
+    '</div>' +
+    '<div class="row" style="align-items:center;gap:10px">' +
+      '<img id="branding-logo-prev" alt="" style="height:40px;width:auto;max-width:160px;object-fit:contain;background:#fff;border:1px solid #ddd;border-radius:6px;flex:none;' + (branding.logo ? '' : 'display:none') + '"' + (branding.logo ? ' src="' + esc(branding.logo) + '"' : '') + '/>' +
+      '<div class="field" style="flex:1;margin:0"><label>Logo</label>' +
+      '<input type="file" id="branding-logo-file" accept="image/*"/></div>' +
+      '<button class="btn ghost sm" id="branding-logo-remove" type="button" style="flex:none;' + (branding.logo ? '' : 'display:none') + '">Remove</button>' +
+    '</div></div>';
+
   html += editorIntakeHtml(lead);
 
   /* One code area: the editor, prefilled with the draft or the live code.
@@ -2936,6 +2957,152 @@ function onEditorBizName(value){
   if(value !== '') state._editorNameShown = value;
 }
 
+/* Site branding: favicon and logo uploads. Images are resized on the
+   client with canvas and stored as data URLs straight in the site code,
+   so they flow through the existing draft and publish queue untouched. */
+function resizeImageToDataUrl(file, maxW, maxH, cb){
+  try{
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = function(){
+      try{
+        let w = img.width || 0, h = img.height || 0;
+        if(!w || !h){ URL.revokeObjectURL(url); cb(null); return; }
+        const scale = Math.min(1, maxW / w, maxH / h);
+        w = Math.max(1, Math.round(w * scale));
+        h = Math.max(1, Math.round(h * scale));
+        const c = document.createElement('canvas');
+        c.width = w; c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        URL.revokeObjectURL(url);
+        cb(c.toDataURL('image/png'));
+      }catch(e){ try{ URL.revokeObjectURL(url); }catch(_){} cb(null); }
+    };
+    img.onerror = function(){ try{ URL.revokeObjectURL(url); }catch(_){} cb(null); };
+    img.src = url;
+  }catch(e){ cb(null); }
+}
+
+/* Read the favicon and logo currently in the code, if any. */
+function brandingFromCode(code){
+  code = String(code || '');
+  const out = { favicon: null, logo: null };
+  let m = /<link[^>]*rel=["']icon["'][^>]*>/i.exec(code);
+  if(m){
+    const h = /href=["']([^"']+)["']/i.exec(m[0]);
+    if(h) out.favicon = h[1];
+  }
+  m = /<img[^>]*site-logo[^>]*>/i.exec(code);
+  if(m){
+    const s = /src=["']([^"']+)["']/i.exec(m[0]);
+    if(s) out.logo = s[1];
+  }
+  return out;
+}
+
+function setFaviconInCode(code, dataUrl){
+  code = String(code || '');
+  const tag = '<link rel="icon" type="image/png" href="' + dataUrl + '">';
+  if(/<link[^>]*rel=["']icon["'][^>]*>/i.test(code)){
+    return code.replace(/<link[^>]*rel=["']icon["'][^>]*>/i, tag);
+  }
+  if(/<head[^>]*>/i.test(code)){
+    return code.replace(/<head[^>]*>/i, function(m){ return m + tag; });
+  }
+  return tag + code;
+}
+
+function removeFaviconFromCode(code){
+  return String(code || '').replace(/<link[^>]*rel=["']icon["'][^>]*>\s*/i, '');
+}
+
+function ensureLogoCss(code){
+  if(/\.site-logo\s*\{/.test(code)) return code;
+  const rule = '.site-logo{height:1.7em;width:auto;vertical-align:-0.4em;margin-right:.45em;border-radius:6px}';
+  if(/<\/style>/i.test(code)){
+    return code.replace(/<\/style>/i, rule + '</style>');
+  }
+  if(/<head[^>]*>/i.test(code)){
+    return code.replace(/<head[^>]*>/i, function(m){ return m + '<style>' + rule + '</style>'; });
+  }
+  return code;
+}
+
+function setLogoInCode(code, dataUrl, bizName){
+  code = String(code || '');
+  const alt = esc(bizName || 'Business') + ' logo';
+  const tag = '<img class="site-logo" src="' + dataUrl + '" alt="' + alt + '">';
+  if(/<img[^>]*site-logo[^>]*>/i.test(code)){
+    code = code.replace(/<img[^>]*site-logo[^>]*>/i, tag);
+  } else if(/(<div class="brand">)/i.test(code)){
+    code = code.replace(/(<div class="brand">)/i, '$1' + tag);
+  } else if(/(<header[^>]*>)/i.test(code)){
+    code = code.replace(/(<header[^>]*>)/i, '$1' + tag);
+  } else {
+    return code;
+  }
+  return ensureLogoCss(code);
+}
+
+function removeLogoFromCode(code){
+  return String(code || '').replace(/\s*<img[^>]*site-logo[^>]*>/i, '');
+}
+
+/* Push the textarea code into the preview iframe and mark dirty. */
+function brandingCodeUpdated(){
+  const ta = document.getElementById('editor-new-code');
+  if(!ta) return;
+  state._editorDirty = true;
+  const pv = document.getElementById('editor-preview');
+  if(pv){ try{ pv.srcdoc = ta.value; }catch(e){} }
+}
+
+function applyBrandingFavicon(dataUrl){
+  const ta = document.getElementById('editor-new-code');
+  if(!ta){ toast('Open a site first.'); return; }
+  ta.value = setFaviconInCode(ta.value, dataUrl);
+  brandingCodeUpdated();
+  const img = document.getElementById('branding-favicon-prev');
+  if(img){ img.src = dataUrl; img.style.display = ''; }
+  const rm = document.getElementById('branding-favicon-remove');
+  if(rm) rm.style.display = '';
+  toast('Tab icon added. It shows in the preview and goes live on publish.');
+}
+
+function applyBrandingLogo(dataUrl){
+  const ta = document.getElementById('editor-new-code');
+  if(!ta){ toast('Open a site first.'); return; }
+  const lead = editorLead();
+  const bizName = state._editorBizName != null ? state._editorBizName : (lead.name || '');
+  const next = setLogoInCode(ta.value, dataUrl, bizName);
+  if(next === ta.value){ toast('Could not find the site header to place the logo.'); return; }
+  ta.value = next;
+  brandingCodeUpdated();
+  const img = document.getElementById('branding-logo-prev');
+  if(img){ img.src = dataUrl; img.style.display = ''; }
+  const rm = document.getElementById('branding-logo-remove');
+  if(rm) rm.style.display = '';
+  toast('Logo added. It shows in the preview and goes live on publish.');
+}
+
+function clearBrandingFavicon(){
+  const ta = document.getElementById('editor-new-code');
+  if(ta){ ta.value = removeFaviconFromCode(ta.value); brandingCodeUpdated(); }
+  const img = document.getElementById('branding-favicon-prev');
+  if(img){ img.removeAttribute('src'); img.style.display = 'none'; }
+  const rm = document.getElementById('branding-favicon-remove');
+  if(rm) rm.style.display = 'none';
+}
+
+function clearBrandingLogo(){
+  const ta = document.getElementById('editor-new-code');
+  if(ta){ ta.value = removeLogoFromCode(ta.value); brandingCodeUpdated(); }
+  const img = document.getElementById('branding-logo-prev');
+  if(img){ img.removeAttribute('src'); img.style.display = 'none'; }
+  const rm = document.getElementById('branding-logo-remove');
+  if(rm) rm.style.display = 'none';
+}
+
 function wireEditorPanel(el){
   const panel = el.querySelector('#editor-panel');
   if(!panel) return;
@@ -2985,6 +3152,33 @@ function wireEditorPanel(el){
       state._editorDirty = true;
     });
   }
+  /* Site branding uploads. */
+  const favFile = document.getElementById('branding-favicon-file');
+  if(favFile) favFile.addEventListener('change', function(){
+    const f = favFile.files && favFile.files[0];
+    if(!f) return;
+    if(f.size > 8 * 1024 * 1024){ toast('That image is very large. Try one under 8 MB.'); favFile.value = ''; return; }
+    resizeImageToDataUrl(f, 64, 64, function(du){
+      favFile.value = '';
+      if(!du){ toast('Could not read that image. Try a PNG or JPG.'); return; }
+      applyBrandingFavicon(du);
+    });
+  });
+  const logoFile = document.getElementById('branding-logo-file');
+  if(logoFile) logoFile.addEventListener('change', function(){
+    const f = logoFile.files && logoFile.files[0];
+    if(!f) return;
+    if(f.size > 8 * 1024 * 1024){ toast('That image is very large. Try one under 8 MB.'); logoFile.value = ''; return; }
+    resizeImageToDataUrl(f, 480, 160, function(du){
+      logoFile.value = '';
+      if(!du){ toast('Could not read that image. Try a PNG or JPG.'); return; }
+      applyBrandingLogo(du);
+    });
+  });
+  const favRm = document.getElementById('branding-favicon-remove');
+  if(favRm) favRm.addEventListener('click', clearBrandingFavicon);
+  const logoRm = document.getElementById('branding-logo-remove');
+  if(logoRm) logoRm.addEventListener('click', clearBrandingLogo);
   const rf = document.getElementById('btn-code-refresh');
   if(rf) rf.addEventListener('click', function(){ openEditorSlug(state.editorSlug, el); });
   const sd = document.getElementById('btn-save-draft');
