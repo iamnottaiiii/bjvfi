@@ -12,6 +12,15 @@ function esc(s){
     .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
+/* The site-names shards store names with HTML entities already baked in
+   (e.g. "P J&#x27;s Pizza &amp; Pasta"). Decode once at the source so esc()
+   below does not double-escape them into literal visible entities. */
+function decEnt(s){
+  var t = document.createElement('textarea');
+  t.innerHTML = String(s == null ? '' : s);
+  return t.value;
+}
+
 let _toastT = null;
 function toast(msg){
   const t = document.getElementById('toast');
@@ -196,7 +205,7 @@ async function searchSites(q){
   for(const slug in shard){
     const name = String(shard[slug] || '');
     if(name.toLowerCase().indexOf(q) !== -1 || slug.indexOf(q) !== -1){
-      out.push({ slug: slug, name: name });
+      out.push({ slug: slug, name: decEnt(name) });
       if(out.length >= 30) break;
     }
   }
@@ -532,8 +541,9 @@ async function peLoadAccounts(){
 }
 
 async function peSaveAccount(username, password, slugs, existing){
-  username = String(username || '').trim().toLowerCase().replace(/[^a-z0-9._-]/g, '');
-  if(username.length < 3) throw new Error('Username needs at least 3 characters (letters, numbers, dot, dash).');
+  username = String(username || '').trim().toLowerCase();
+  if(!/^[a-z0-9._-]+$/.test(username)) throw new Error('Username can only use lowercase letters, numbers, dot, dash, underscore. "@" and spaces are not allowed.');
+  if(username.length < 3) throw new Error('Username needs at least 3 characters.');
   if(!password || String(password).length < 6) throw new Error('Password needs at least 6 characters.');
   slugs = (slugs || []).filter(Boolean);
   if(!slugs.length) throw new Error('Assign at least one website to the account.');
@@ -787,7 +797,7 @@ async function showOwnerDash(){
         const r = await fetch('https://bjvfi.com/site-names/' + key + '.json', { cache: 'force-cache' });
         if(r.ok) _shardCache[key] = await r.json();
       }
-      if(_shardCache[key] && _shardCache[key][slug]) name = _shardCache[key][slug];
+      if(_shardCache[key] && _shardCache[key][slug]) name = decEnt(_shardCache[key][slug]);
     }catch(e){ /* keep slug */ }
     items.push({ slug: slug, name: name });
   }

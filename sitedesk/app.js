@@ -1212,11 +1212,12 @@ async function doSignup(){
   const err = document.getElementById('su-err');
   err.textContent = '';
   const name = (document.getElementById('su-name').value || '').trim();
-  const username = (document.getElementById('su-user').value || '').trim().toLowerCase().replace(/[^a-z0-9._-]/g,'');
+  const username = (document.getElementById('su-user').value || '').trim().toLowerCase();
   const phone = (document.getElementById('su-phone').value || '').trim();
   const pw1 = document.getElementById('su-pass').value || '';
   const pw2 = document.getElementById('su-pass2').value || '';
   if(!name || !username){ err.textContent = 'Name and username are required.'; return; }
+  if(!/^[a-z0-9._-]+$/.test(username)){ err.textContent = 'Username can only use lowercase letters, numbers, dot, dash, underscore. "@" and spaces are not allowed.'; return; }
   if(username.length < 3){ err.textContent = 'Username must be at least 3 characters.'; return; }
   if(pw1.length < 8){ err.textContent = 'Password must be at least 8 characters.'; return; }
   if(pw1 !== pw2){ err.textContent = 'Passwords do not match.'; return; }
@@ -4205,9 +4206,10 @@ function newUserModal(el){
     const err = document.getElementById('nu-err');
     err.textContent = '';
     const name = (document.getElementById('nu-name').value || '').trim();
-    const username = (document.getElementById('nu-user').value || '').trim().toLowerCase().replace(/[^a-z0-9._-]/g,'');
+    const username = (document.getElementById('nu-user').value || '').trim().toLowerCase();
     const phone = (document.getElementById('nu-phone').value || '').trim();
     if(!name || !username){ err.textContent = 'Name and username are required.'; return; }
+    if(!/^[a-z0-9._-]+$/.test(username)){ err.textContent = 'Username can only use lowercase letters, numbers, dot, dash, underscore. "@" and spaces are not allowed.'; return; }
     if(state.users[username]){ err.textContent = 'Username already exists.'; return; }
     const btn = document.getElementById('nu-go');
     btn.disabled = true; btn.textContent = 'Hashing password...';
