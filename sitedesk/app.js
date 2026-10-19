@@ -2582,6 +2582,20 @@ function siteRawUrl(repo, slug){
     encodeURIComponent(slug) + '/index.html';
 }
 
+/* The 1.4M prebuilt sites were generated without the sticky-footer-fix-v1
+   marker that publish validation requires, even though they already use
+   the flexbox sticky footer pattern. Add the marker on load so existing
+   sites publish without a spurious error. Idempotent. */
+function ensureStickyFooterMarker(code){
+  code = String(code || '');
+  if(code.indexOf('sticky-footer-fix-v1') !== -1) return code;
+  const tag = '<!--sticky-footer-fix-v1-->';
+  if(/<body[^>]*>/i.test(code)){
+    return code.replace(/<body[^>]*>/i, function(m){ return m + tag; });
+  }
+  return tag + code;
+}
+
 /* Fetch a site's live code, trying every site repo in parallel and using
    the first one that has it. */
 async function fetchLiveSiteCode(slug){
@@ -2827,6 +2841,12 @@ async function openEditorSlug(slug, el){
     const rec = await ghGetJson('intakes/intake-' + slug + '.json');
     if(rec){ state.editorIntake = rec.data; state.editorIntake._sha = rec.sha; }
   }catch(e){}
+  /* Normalize the marker publish validation requires, so existing sites
+     (generated without it) publish cleanly. */
+  if(state.editorLiveCode != null) state.editorLiveCode = ensureStickyFooterMarker(state.editorLiveCode);
+  if(state.editorDraft && state.editorDraft.code != null){
+    state.editorDraft.code = ensureStickyFooterMarker(state.editorDraft.code);
+  }
   paintEditor(el);
 }
 
