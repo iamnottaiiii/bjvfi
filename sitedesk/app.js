@@ -2746,6 +2746,7 @@ function closeEditorSlug(el){
   state._editorPrefillSlug = null;
   state._editorDirty = false;
   state._editorSiteRepo = null;
+  stopEditorJobPoll();
   paintEditor(el);
 }
 
@@ -2846,6 +2847,10 @@ async function openEditorSlug(slug, el){
   if(state.editorLiveCode != null) state.editorLiveCode = ensureStickyFooterMarker(state.editorLiveCode);
   if(state.editorDraft && state.editorDraft.code != null){
     state.editorDraft.code = ensureStickyFooterMarker(state.editorDraft.code);
+  }
+  /* If a publish is already in flight, keep the history fresh. */
+  if((state.editorJobs || []).some(function(j){ return j.status === 'queued' || j.status === 'publishing'; })){
+    pollEditorJobStatus(el, slug);
   }
   paintEditor(el);
 }
@@ -3364,6 +3369,7 @@ async function publishEditorCode(el){
     try{ state.editorJobs = await loadJobsForSlug(slug); }catch(e){}
     paintEditorPanel(el);
     loadEditorJobs(el);
+    pollEditorJobStatus(el, slug);
   }catch(e){
     if(err) err.textContent = e.message;
     else toast(e.message);
@@ -3410,14 +3416,81 @@ function editorJobRowsHtml(jobs, showRevert){
   return jobs.map(function(j){
     let extra = '';
     if(j.status === 'failed' && j.reason) extra = '<div class="err" style="margin-top:4px">' + esc(j.reason) + '</div>';
-    if(j.status === 'live' && j.commit_sha) extra = '<div class="muted" style="font-size:11px;margin-top:4px">commit ' + esc(String(j.commit_sha).slice(0, 12)) + '</div>';
+    if(j.status === 'live' && j.commit_sha){
+      const pubT = j.published_at || j.updated_at;
+      extra = '<div class="muted" style="font-size:11px;margin-top:4px">commit ' + esc(String(j.commit_sha).slice(0, 12)) +
+        (pubT ? ' \xB7 published ' + esc(fmtTime(pubT)) : '') + '</div>';
+    }
     const rev = (showRevert && j.status === 'live' && isManager() && j.previous_code)
       ? '<button class="btn ghost sm" data-revert-job="' + esc(j.jobid) + '" type="button">Revert</button>' : '';
     return '<div class="job-row"><div style="min-width:0"><div style="font-weight:600;font-size:13px">' + esc(j.business_name || j.slug) + '</div>' +
       '<div class="muted" style="font-size:11px">' + esc(j.slug) + ' \xB7 by ' + esc(j.author_name || j.author || '') +
       ' \xB7 ' + esc(fmtTime(j.created_at)) + '</div>' + extra + '</div>' +
-      '<div class="row" style="flex:none">' + badge(j.status) + rev + '</div></div>';
+      '<div class="row" style="flex:none">' + publishBadge(j.status) + rev + '</div></div>';
   }).join('');
+}
+
+/* Human-readable publish statuses: "queued" on its own says nothing about
+   what is happening, so the badge spells it out. */
+function publishStatusLabel(s){
+  switch(s){
+    case 'queued': return 'Waiting to publish';
+    case 'publishing': return 'Publishing...';
+    case 'live': return 'Published';
+    case 'failed': return 'Failed';
+    default: return s || 'none';
+  }
+}
+
+function publishBadge(status){
+  const spin = status === 'publishing' ? '<span class="spin"></span>' : '';
+  return '<span class="badge ' + esc(status || '') + '">' + spin + esc(publishStatusLabel(status)) + '</span>';
+}
+
+/* Keep the publish history fresh: poll the queue and update just the
+   history section, so the user watches Waiting -> Publishing -> Published
+   live instead of wondering. Stops when nothing is active. */
+function pollEditorJobStatus(el, slug){
+  if(state._editorJobPoll){ clearInterval(state._editorJobPoll); state._editorJobPoll = null; }
+  const seenLive = {};
+  (state.editorJobs || []).forEach(function(j){ if(j.status === 'live' && j.jobid) seenLive[j.jobid] = true; });
+  let ticks = 0;
+  state._editorJobPoll = setInterval(function(){
+    ticks++;
+    if(!el.isConnected || !state.editorSlug || state.editorSlug !== slug){
+      clearInterval(state._editorJobPoll); state._editorJobPoll = null;
+      return;
+    }
+    loadJobsForSlug(slug).then(function(jobs){
+      if(!el.isConnected || state.editorSlug !== slug) return;
+      state.editorJobs = jobs;
+      const box = document.getElementById('editor-job-history');
+      if(box){
+        box.innerHTML = editorJobRowsHtml(jobs, true);
+        box.querySelectorAll('[data-revert-job]').forEach(function(b){
+          b.addEventListener('click', function(){ revertJob(b.getAttribute('data-revert-job'), el); });
+        });
+      }
+      jobs.forEach(function(j){
+        if(j.status === 'live' && j.jobid && !seenLive[j.jobid]){
+          seenLive[j.jobid] = true;
+          toast('Published: ' + (j.business_name || j.slug) + ' is live.');
+        }
+        if(j.status === 'failed' && j.jobid && !seenLive[j.jobid]){
+          seenLive[j.jobid] = true;
+          toast('Publish failed for ' + (j.business_name || j.slug) + '.');
+        }
+      });
+      const active = jobs.some(function(j){ return j.status === 'queued' || j.status === 'publishing'; });
+      if(!active || ticks > 90){
+        clearInterval(state._editorJobPoll); state._editorJobPoll = null;
+      }
+    }).catch(function(){});
+  }, 10000);
+}
+
+function stopEditorJobPoll(){
+  if(state._editorJobPoll){ clearInterval(state._editorJobPoll); state._editorJobPoll = null; }
 }
 
 async function loadEditorDrafts(el){
