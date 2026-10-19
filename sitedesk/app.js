@@ -2573,10 +2573,32 @@ var INTAKE_STATUSES = [['open','Open'],['building','Building'],['ready','Ready']
    queue in the data repo that a server worker drains one job at a time, so
    two publishes can never overlap and wipe each other's work. */
 
-var RAW_SITE_URL = 'https://raw.githubusercontent.com/iamnottaiiii/bjvfi/main/';
+/* The prebuilt sites live across the bjvfi1..bjvfi9 repos (see sites.json
+   at the repo root), not in the main repo. */
+var SITE_REPOS = ['bjvfi1','bjvfi2','bjvfi3','bjvfi4','bjvfi5','bjvfi6','bjvfi7','bjvfi8','bjvfi9'];
 
-function liveCodeUrl(slug){
-  return RAW_SITE_URL + encodeURIComponent(slug) + '/index.html';
+function siteRawUrl(repo, slug){
+  return 'https://raw.githubusercontent.com/iamnottaiiii/' + repo + '/main/' +
+    encodeURIComponent(slug) + '/index.html';
+}
+
+/* Fetch a site's live code, trying every site repo in parallel and using
+   the first one that has it. */
+async function fetchLiveSiteCode(slug){
+  const urls = SITE_REPOS.map(function(repo){ return siteRawUrl(repo, slug); });
+  const results = await Promise.all(urls.map(function(u){
+    return fetch(u, { cache: 'no-store' }).then(function(r){
+      return { ok: r.ok, status: r.status, text: r.ok ? r.text() : null };
+    }).catch(function(){ return { ok: false, status: 0, text: null }; });
+  }));
+  for(let i = 0; i < results.length; i++){
+    if(results[i].ok){
+      const code = await results[i].text;
+      return { code: code, repo: SITE_REPOS[i], notFound: false };
+    }
+  }
+  const anyErr = results.some(function(x){ return x.status !== 404 && x.status !== 0; });
+  return { code: null, repo: null, notFound: !anyErr };
 }
 
 /* Pure: filter leads by business name, the same UX pattern as the queue
@@ -2709,6 +2731,7 @@ function closeEditorSlug(el){
   state.editorIntake = null;
   state._editorPrefillSlug = null;
   state._editorDirty = false;
+  state._editorSiteRepo = null;
   paintEditor(el);
 }
 
@@ -2771,16 +2794,19 @@ async function openEditorSlug(slug, el){
   state._editorBizName = null;
   state._editorSlugTarget = null;
   state._editorNameShown = null;
+  state._editorSiteRepo = null;
   paintEditor(el);
-  /* Live code, straight from the repo that serves the sites. */
+  /* Live code, straight from the repo that serves the sites. The sites
+     live across the bjvfi1..9 repos, so all of them are checked. */
   try{
-    const r = await fetch(liveCodeUrl(slug), { cache: 'no-store' });
-    if(r.status === 404){
+    const found = await fetchLiveSiteCode(slug);
+    if(found.code != null){
+      state.editorLiveCode = found.code;
+      state._editorSiteRepo = found.repo;
+    } else if(found.notFound){
       state.editorNotFound = true;
-    } else if(!r.ok){
-      throw new Error('Could not load the live site (HTTP ' + r.status + ').');
     } else {
-      state.editorLiveCode = await r.text();
+      throw new Error('Could not load the live site.');
     }
   }catch(e){
     state.editorLiveCode = null;
