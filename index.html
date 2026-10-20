@@ -192,6 +192,8 @@ body {
   max-height: min(52vh, 420px);
   overflow-y: auto;
   overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   padding: 0;
   box-shadow: none;
   scrollbar-width: none;
@@ -223,6 +225,7 @@ body {
 
 @media (max-height: 620px) {
   .bjvfi-stage{ top:calc(50% + 70px); }
+  .bjvfi-results{ max-height:min(38vh, 300px); }
 }
 
 @media (prefers-color-scheme: light){
@@ -296,21 +299,27 @@ body {
     return m ? m[0] : null;
   }
 
+  const shardPromise = {};
   async function getShard(ch) {
     if (shardCache[ch]) return shardCache[ch];
-    const r = await fetch("/site-names/" + ch + ".json", { cache: "force-cache" });
-    if (!r.ok) throw new Error("Search is unavailable right now.");
-    const obj = await r.json();
-    const keys = Object.keys(obj);
-    const list = new Array(keys.length);
-    for (let i = 0; i < keys.length; i++) {
-      const slug = keys[i];
-      const title = obj[slug] || prettySlug(slug);
-      /* lowercase once here, so the per-keystroke filter does no string allocs */
-      list[i] = { title: title, slug: slug, _t: title.toLowerCase(), _s: slug.toLowerCase() };
-    }
-    shardCache[ch] = list;
-    return list;
+    if (shardPromise[ch]) return shardPromise[ch];
+    const p = (async () => {
+      const r = await fetch("/site-names/" + ch + ".json", { cache: "force-cache" });
+      if (!r.ok) throw new Error("Search is unavailable right now.");
+      const obj = await r.json();
+      const keys = Object.keys(obj);
+      const list = new Array(keys.length);
+      for (let i = 0; i < keys.length; i++) {
+        const slug = keys[i];
+        const title = obj[slug] || prettySlug(slug);
+        /* lowercase once here, so the per-keystroke filter does no string allocs */
+        list[i] = { title: title, slug: slug, _t: title.toLowerCase(), _s: slug.toLowerCase() };
+      }
+      shardCache[ch] = list;
+      return list;
+    })();
+    shardPromise[ch] = p;
+    try { return await p; } finally { delete shardPromise[ch]; }
   }
 
   function render(matches) {
@@ -343,12 +352,9 @@ body {
 
   /* Prefetch: start downloading the letter's shard the instant it is
      typed, so it is ready by the time the debounced search runs. */
-  const shardPromise = {};
   input.addEventListener("input", () => {
     const ch0 = shardFor(input.value.trim().toLowerCase());
-    if (ch0 && !shardCache[ch0] && !shardPromise[ch0]) {
-      shardPromise[ch0] = getShard(ch0).catch(() => { delete shardPromise[ch0]; });
-    }
+    if (ch0) getShard(ch0).catch(() => {});
   });
 
   let timer = null;
