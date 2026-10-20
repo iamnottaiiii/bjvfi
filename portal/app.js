@@ -815,6 +815,30 @@ async function showOwnerDash(){
 
 /* ================= init ================= */
 
+/* The homepage void: the background center drifts after the mouse. */
+(function(){
+  var v = document.getElementById('voidbg');
+  if(!v) return;
+  var tx=50, ty=50, cx=50, cy=50;
+  function point(x, y){
+    var r = v.getBoundingClientRect();
+    tx = ((x - r.left) / r.width) * 100;
+    ty = ((y - r.top) / r.height) * 100;
+  }
+  document.addEventListener('mousemove', function(e){ point(e.clientX, e.clientY); }, {passive:true});
+  document.addEventListener('touchmove', function(e){
+    if(e.touches && e.touches[0]) point(e.touches[0].clientX, e.touches[0].clientY);
+  }, {passive:true});
+  document.addEventListener('mouseleave', function(){ tx=50; ty=50; });
+  (function tick(){
+    cx += (tx - cx) * 0.055;
+    cy += (ty - cy) * 0.055;
+    v.style.setProperty('--cx', cx + '%');
+    v.style.setProperty('--cy', cy + '%');
+    requestAnimationFrame(tick);
+  })();
+})();
+
 document.addEventListener('DOMContentLoaded', function(){
   showLogin();
 });
