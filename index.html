@@ -14,7 +14,7 @@
       return;
     }
 
-    // Stay on https://sub.bjvfi.com/ — load that business page in place (no redirect)
+    // Stay on https://sub.bjvfi.com/, load that business page in place (no redirect)
     var slug = sub;
     var src = "https://bjvfi.com/" + encodeURIComponent(slug) + "/";
 
@@ -83,7 +83,7 @@ body {
 }
 
 .bjvfi-void{
-  --ink:#F2F2F5; --muted:#6B7080;
+  --ink:#F2F2F5; --muted:#6B7080; --cx:50%; --cy:50%;
   min-height:100vh; background:#000; color:var(--ink);
   position:relative; overflow:hidden;
   display:block;
@@ -93,13 +93,13 @@ body {
 .bjvfi-void::before{
   content:""; position:absolute; inset:0;
   background:
-    repeating-conic-gradient(from 0deg at 50% 50%,
+    repeating-conic-gradient(from 0deg at var(--cx) var(--cy),
       rgba(255,255,255,.012) 0deg 1deg,
       transparent 1deg 2deg),
-    repeating-radial-gradient(circle at 50% 50%,
+    repeating-radial-gradient(circle at var(--cx) var(--cy),
       rgba(255,255,255,.010) 0px 1px,
       transparent 1px 4px),
-    radial-gradient(circle at 50% 50%,
+    radial-gradient(circle at var(--cx) var(--cy),
       #000 0%,
       #000 6%,
       #010101 11%,
@@ -117,7 +117,7 @@ body {
 .bjvfi-void::after{
   content:""; position:absolute; inset:0;
   background:
-    radial-gradient(circle at 50% 50%,
+    radial-gradient(circle at var(--cx) var(--cy),
       transparent 0%,
       transparent 40%,
       rgba(0,0,0,.35) 75%,
@@ -134,6 +134,7 @@ body {
   font-weight: 400;
   font-size:clamp(3rem,10vw,5.2rem);
   letter-spacing:-.09em;
+  padding-left:.09em;
   margin:0; line-height:1;
   color:var(--ink);
   text-shadow:0 0 30px rgba(0,0,0,.9), 0 0 60px rgba(0,0,0,.7);
@@ -152,7 +153,7 @@ body {
 .bjvfi-search-wrap{width:100%; position:relative;}
 
 .bjvfi-search{
-  width:100%;
+  display:block; width:100%; margin:0 auto;
   background: transparent;
   border: 0;
   outline: none;
@@ -222,6 +223,39 @@ body {
 
 @media (max-height: 620px) {
   .bjvfi-stage{ top:calc(50% + 70px); }
+}
+
+@media (prefers-color-scheme: light){
+  html, body{ background:#fff; }
+  body{ background:#fff; color:#111114; }
+  .bjvfi-void{ --ink:#111114; --muted:#8a8a90; background:#fff; color:var(--ink); }
+  .bjvfi-void::before{
+    background:
+      repeating-conic-gradient(from 0deg at var(--cx) var(--cy),
+        rgba(0,0,0,.035) 0deg 1deg,
+        transparent 1deg 2deg),
+      repeating-radial-gradient(circle at var(--cx) var(--cy),
+        rgba(0,0,0,.03) 0px 1px,
+        transparent 1px 4px),
+      radial-gradient(circle at var(--cx) var(--cy),
+        #ffffff 0%, #ffffff 6%, #fbfbfb 11%, #f2f2f2 18%, #e4e4e4 26%,
+        #d2d2d2 36%, #bcbcbc 48%, #aaaaaa 62%, #bcbcbc 78%,
+        #e4e4e4 92%, #f2f2f2 100%);
+  }
+  .bjvfi-void::after{
+    background:
+      radial-gradient(circle at var(--cx) var(--cy),
+        transparent 0%, transparent 45%,
+        rgba(255,255,255,.35) 78%, rgba(255,255,255,.85) 100%);
+  }
+  .bjvfi-mark{ text-shadow:0 0 30px rgba(255,255,255,.9), 0 0 60px rgba(255,255,255,.7); }
+  .bjvfi-search::placeholder{ color:#9a9aa0; }
+  .bjvfi-hit:hover,
+  .bjvfi-hit:focus,
+  .bjvfi-hit:focus-visible{ background:rgba(0,0,0,.05); }
+  .bjvfi-hit-slug{ color:#8a8a90; }
+  .bjvfi-status{ color:#8a8a90; }
+  .bjvfi-status.error{ color:#a06060; }
 }
 </style>
 </head>
@@ -347,6 +381,30 @@ body {
   document.addEventListener("click", e => {
     if (!e.target.closest(".bjvfi-search-wrap")) results.classList.remove("open");
   });
+})();
+</script>
+<script>
+(function(){
+  var v = document.querySelector('.bjvfi-void');
+  if(!v) return;
+  var tx=50, ty=50, cx=50, cy=50;
+  function point(x, y){
+    var r = v.getBoundingClientRect();
+    tx = ((x - r.left) / r.width) * 100;
+    ty = ((y - r.top) / r.height) * 100;
+  }
+  document.addEventListener('mousemove', function(e){ point(e.clientX, e.clientY); }, {passive:true});
+  document.addEventListener('touchmove', function(e){
+    if(e.touches && e.touches[0]) point(e.touches[0].clientX, e.touches[0].clientY);
+  }, {passive:true});
+  document.addEventListener('mouseleave', function(){ tx=50; ty=50; });
+  (function tick(){
+    cx += (tx - cx) * 0.055;
+    cy += (ty - cy) * 0.055;
+    v.style.setProperty('--cx', cx + '%');
+    v.style.setProperty('--cy', cy + '%');
+    requestAnimationFrame(tick);
+  })();
 })();
 </script>
 </body>
