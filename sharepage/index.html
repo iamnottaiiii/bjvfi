@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>share</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #000; color: #F2F2F5; }
+  body {
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    min-height: 100dvh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; padding: 24px;
+  }
+  .word { font-size: 2rem; letter-spacing: -.05em; margin-bottom: 28px; }
+  .box { width: min(560px, 100%); }
+  .drop {
+    border: 1px dashed rgba(255,255,255,.35); border-radius: 14px;
+    padding: 44px 20px; text-align: center; cursor: pointer; color: #c9ccd4;
+  }
+  .drop:hover, .drop.over { border-color: #fff; color: #fff; }
+  .files { margin-top: 20px; display: grid; gap: 8px; }
+  .file {
+    display: flex; justify-content: space-between; gap: 12px;
+    border: 1px solid rgba(255,255,255,.14); border-radius: 10px; padding: 10px 14px;
+    font-size: .85rem;
+  }
+  .file .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .file .s { color: #8a8f9c; flex: none; }
+  .linkbox { margin-top: 22px; display: none; }
+  .linkbox.show { display: block; }
+  .linkrow { display: flex; gap: 8px; }
+  .linkrow input {
+    flex: 1; background: #0a0a0c; border: 1px solid rgba(255,255,255,.18);
+    color: #F2F2F5; border-radius: 10px; padding: 11px 12px; font: inherit; font-size: .8rem;
+    min-width: 0;
+  }
+  .btn {
+    background: #F2F2F5; color: #000; border: 0; border-radius: 10px;
+    padding: 11px 18px; font: inherit; font-size: .85rem; cursor: pointer; flex: none;
+  }
+  .btn.ghost { background: transparent; color: #F2F2F5; border: 1px solid rgba(255,255,255,.3); }
+  .status { margin-top: 18px; color: #8a8f9c; font-size: .85rem; min-height: 1.2em; text-align: center; }
+  .bar { height: 4px; background: rgba(255,255,255,.12); border-radius: 99px; margin-top: 14px; overflow: hidden; display: none; }
+  .bar.show { display: block; }
+  .bar i { display: block; height: 100%; width: 0%; background: #7ee2a0; }
+  .save { color: #7ee2a0; text-decoration: none; flex: none; }
+  input[type=file] { display: none; }
+</style>
+</head>
+<body>
+  <div class="word">share</div>
+  <div class="box">
+    <div class="drop" id="drop">drop files, or click to choose</div>
+    <input type="file" id="picker" multiple>
+    <div class="files" id="files"></div>
+    <div class="linkbox" id="linkbox">
+      <div class="linkrow">
+        <input id="link" readonly value="">
+        <button class="btn" id="copy">copy</button>
+      </div>
+    </div>
+    <div class="bar" id="bar"><i id="barfill"></i></div>
+    <div class="status" id="status"></div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script>
+(function () {
+  var CHUNK = 64 * 1024;
+  var drop = document.getElementById('drop');
+  var picker = document.getElementById('picker');
+  var filesEl = document.getElementById('files');
+  var linkbox = document.getElementById('linkbox');
+  var linkInput = document.getElementById('link');
+  var copyBtn = document.getElementById('copy');
+  var statusEl = document.getElementById('status');
+  var bar = document.getElementById('bar');
+  var barfill = document.getElementById('barfill');
+
+  function setStatus(t) { statusEl.textContent = t; }
+  function human(n) {
+    if (n < 1024) return n + ' B';
+    if (n < 1024 * 1024) return (n / 1024).toFixed(1) + ' KB';
+    if (n < 1024 * 1024 * 1024) return (n / (1024 * 1024)).toFixed(1) + ' MB';
+    return (n / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+  }
+  function progress(done, total) {
+    if (total > 0) { bar.classList.add('show'); barfill.style.width = Math.round(done / total * 100) + '%'; }
+  }
+
+  var code = (location.hash || '').replace('#', '').trim();
+  if (code) receiverMode(code); else senderMode();
+
+  /* ---------------- sender ---------------- */
+  function senderMode() {
+    var myFiles = [];
+    var conn = null;
+    var sending = false;
+
+    var alphabet = 'abcdefghjkmnpqrstuvwxyz23456789';
+    var myCode = '';
+    for (var i = 0; i < 6; i++) myCode += alphabet[Math.floor(Math.random() * alphabet.length)];
+
+    var peer = new Peer('shr-' + myCode);
+    peer.on('open', function () {
+      linkInput.value = location.origin + location.pathname + '#' + myCode;
+      linkbox.classList.add('show');
+      setStatus('waiting for the other side');
+    });
+    peer.on('error', function (err) {
+      if (err && err.type === 'unavailable-id') location.reload();
+      else setStatus('connection problem, refresh to try again');
+    });
+    peer.on('connection', function (c) {
+      conn = c;
+      conn.on('open', function () { setStatus('connected'); });
+      conn.on('data', function (msg) {
+        if (!msg || typeof msg !== 'object') return;
+        if (msg.t === 'hello') {
+          conn.send({ t: 'meta', files: myFiles.map(function (f) { return { name: f.name, size: f.size, type: f.type }; }) });
+        }
+        if (msg.t === 'ready' && !sending) { sending = true; sendAll(); }
+      });
+      conn.on('close', function () { setStatus('the other side left'); });
+    });
+
+    function sendAll() {
+      var total = myFiles.reduce(function (a, f) { return a + f.size; }, 0);
+      var sentAll = 0;
+      var idx = 0;
+      function next() {
+        if (idx >= myFiles.length) { conn.send({ t: 'done' }); setStatus('sent'); return; }
+        sendFile(myFiles[idx], function (sentBytes) {
+          sentAll += sentBytes; idx++; next();
+        }, function (fileSent) { progress(sentAll + fileSent, total); });
+      }
+      function sendFile(file, done, tick) {
+        var offset = 0;
+        conn.send({ t: 'start', name: file.name, size: file.size, type: file.type });
+        function pump() {
+          if (offset >= file.size) { conn.send({ t: 'end' }); done(file.size); return; }
+          if (conn.bufferSize > 8 * 1024 * 1024) { setTimeout(pump, 60); return; }
+          var slice = file.slice(offset, Math.min(offset + CHUNK, file.size));
+          var reader = new FileReader();
+          reader.onload = function () {
+            conn.send(reader.result);
+            offset += slice.size;
+            tick(offset);
+            pump();
+          };
+          reader.readAsArrayBuffer(slice);
+        }
+        if (file.size === 0) { conn.send({ t: 'end' }); done(0); return; }
+        pump();
+      }
+      next();
+    }
+
+    drop.addEventListener('click', function () { picker.click(); });
+    picker.addEventListener('change', function () { addFiles(picker.files); });
+    ['dragover', 'dragenter'].forEach(function (ev) {
+      drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add('over'); });
+    });
+    ['dragleave', 'drop'].forEach(function (ev) {
+      drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove('over'); });
+    });
+    drop.addEventListener('drop', function (e) { addFiles(e.dataTransfer.files); });
+
+    function addFiles(list) {
+      for (var i = 0; i < list.length; i++) {
+        myFiles.push(list[i]);
+        var row = document.createElement('div');
+        row.className = 'file';
+        var n = document.createElement('span'); n.className = 'n'; n.textContent = list[i].name;
+        var s = document.createElement('span'); s.className = 's'; s.textContent = human(list[i].size);
+        row.appendChild(n); row.appendChild(s);
+        filesEl.appendChild(row);
+      }
+      if (conn && conn.open) {
+        conn.send({ t: 'meta', files: myFiles.map(function (f) { return { name: f.name, size: f.size, type: f.type }; }) });
+      }
+    }
+
+    copyBtn.addEventListener('click', function () {
+      linkInput.select();
+      if (navigator.clipboard) navigator.clipboard.writeText(linkInput.value);
+      copyBtn.textContent = 'copied';
+      setTimeout(function () { copyBtn.textContent = 'copy'; }, 1200);
+    });
+  }
+
+  /* ---------------- receiver ---------------- */
+  function receiverMode(theCode) {
+    drop.style.display = 'none';
+    setStatus('connecting');
+    var peer = new Peer();
+    var totalBytes = 0, gotBytes = 0;
+    var cur = null;
+
+    peer.on('open', function () {
+      var conn = peer.connect('shr-' + theCode, { reliable: true });
+      conn.on('open', function () { setStatus('connected'); conn.send({ t: 'hello' }); });
+      conn.on('data', function (msg) {
+        if (msg instanceof ArrayBuffer || (msg && msg.byteLength !== undefined && typeof msg !== 'object')) {
+          if (cur) { cur.parts.push(msg); cur.got += msg.byteLength; gotBytes += msg.byteLength; progress(gotBytes, totalBytes); }
+          return;
+        }
+        if (!msg || typeof msg !== 'object') return;
+        if (msg.t === 'meta') {
+          totalBytes = msg.files.reduce(function (a, f) { return a + f.size; }, 0);
+          setStatus(msg.files.length ? 'receiving' : 'waiting for files');
+          conn.send({ t: 'ready' });
+        }
+        if (msg.t === 'start') {
+          cur = { name: msg.name, size: msg.size, type: msg.type, parts: [], got: 0 };
+        }
+        if (msg.t === 'end' && cur) {
+          var blob = new Blob(cur.parts, { type: cur.type || 'application/octet-stream' });
+          var url = URL.createObjectURL(blob);
+          var row = document.createElement('div');
+          row.className = 'file';
+          var n = document.createElement('span'); n.className = 'n'; n.textContent = cur.name;
+          var a = document.createElement('a');
+          a.className = 'save'; a.href = url; a.download = cur.name; a.textContent = 'save · ' + human(cur.size);
+          row.appendChild(n); row.appendChild(a);
+          filesEl.appendChild(row);
+          a.click();
+          cur = null;
+        }
+        if (msg.t === 'done') setStatus('done');
+      });
+      conn.on('close', function () { setStatus('the other side left'); });
+    });
+    peer.on('error', function (err) {
+      if (err && err.type === 'peer-unavailable') setStatus('that link is dead, the sender closed it');
+      else setStatus('connection problem, refresh to try again');
+    });
+  }
+})();
+</script>
+</body>
+</html>
