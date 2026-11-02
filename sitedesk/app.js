@@ -4138,7 +4138,7 @@ async function saveUsers(){  const rec = await ghGetJson('users.json');
 }
 
 async function userAction(username, act, el){
-  const u = state.users[username];
+  let u = state.users[username];
   if(!u){ toast('User not found.'); return; }
   /* The head is untouchable: no one can disable, edit, delete, or change the role of a head account.
      The head changes their own password from Profile. */
@@ -4147,6 +4147,13 @@ async function userAction(username, act, el){
     return;
   }
   try{
+    /* Always act on the fresh server copy, never the copy loaded earlier.
+       Writing a stale full users list back is how edits vanished and
+       deleted users came back. */
+    await loadUsers();
+    u = state.users[username];
+    if(!u){ toast('User not found.'); return; }
+    if(u.role === 'head'){ toast('The head account cannot be changed.'); return; }
     if(act === 'approve'){
       u.status = 'approved';
       await saveUsers();
@@ -4174,49 +4181,45 @@ async function userAction(username, act, el){
       toast('Role updated');
     } else if(act === 'delete'){
       if(username === state.user.username){ toast('Delete your own account from Profile.'); return; }
-      /* Optimistic: the card vanishes the instant you tap. All the slow
-         server cleanup (claims, push subs, user record) runs in the
-         background so the screen never waits on it. */
+      /* Delete the account record FIRST, awaited, and only say it is done
+         once the write has landed. The old flow removed the card instantly
+         and ran minutes of cleanup (it loaded every claim file in the
+         repo) before the actual delete, so closing or backgrounding the
+         tab killed the delete half done and the user came back on
+         refresh. Cleanup now runs after, and can never undo the delete. */
+      delete state.users[username];
+      await saveUsers();
       removeUserCard(username);
-      toast('Deleting @' + username + '...');
+      toast('Deleted @' + username);
       (async function(){
         try{
-          await loadUsers();
-          const target = state.users[username];
-          if(!target) return;
-          if(target.role === 'head'){ toast('The head account cannot be deleted.'); return; }
-          /* Release their active claims so the leads go back to the queue. */
-          try{
-            const all = await loadAllClaims();
-            const mine = all.filter(function(c){
-              return c && c.claimer === username && (c.status === 'claimed' || c.status === 'interested');
-            });
-            for(const c of mine){
-              try{
-                const rec = await ghGetJson('claims/' + c.slug + '.json');
-                if(rec) await ghDeleteFile('claims/' + c.slug + '.json', rec.sha);
-              }catch(e){}
-            }
-            updateClaimIndex(function(idx){ mine.forEach(function(c){ delete idx[c.slug]; }); });
-          }catch(e){}
-          /* Drop their push subscriptions so no pushes go to a deleted account. */
-          try{
-            const prec = await ghGetJson('push_subs.json').catch(function(){ return null; });
-            if(prec && prec.data && prec.data[username]){
-              delete prec.data[username];
-              await ghPutJson('push_subs.json', prec.data, prec.sha, 'sitedesk: drop push subs @' + username);
-            }
-          }catch(e){}
-          /* Drop their server-side dismissed notifications too. */
-          try{
-            const drec = await ghGetJson('dismissed/' + username + '.json').catch(function(){ return null; });
-            if(drec) await ghDeleteFile('dismissed/' + username + '.json', drec.sha);
-          }catch(e){}
-          await loadUsers();
-          delete state.users[username];
-          await saveUsers();
-          toast('Deleted @' + username);
-        }catch(e){ toast('Delete failed: ' + e.message); }
+          /* Release their active claims using the claim index (one read),
+             so the leads go back to the queue. */
+          const idx = await getClaimIndex(true);
+          const mine = Object.keys(idx).filter(function(s){
+            return idx[s] && idx[s].c === username && (idx[s].s === 'claimed' || idx[s].s === 'interested');
+          });
+          for(const slug of mine){
+            try{
+              const rec = await ghGetJson('claims/' + slug + '.json');
+              if(rec) await ghDeleteFile('claims/' + slug + '.json', rec.sha);
+            }catch(e){}
+          }
+          if(mine.length) await updateClaimIndex(function(ix){ mine.forEach(function(s){ delete ix[s]; }); });
+        }catch(e){}
+        /* Drop their push subscriptions so no pushes go to a deleted account. */
+        try{
+          const prec = await ghGetJson('push_subs.json').catch(function(){ return null; });
+          if(prec && prec.data && prec.data[username]){
+            delete prec.data[username];
+            await ghPutJson('push_subs.json', prec.data, prec.sha, 'sitedesk: drop push subs @' + username);
+          }
+        }catch(e){}
+        /* Drop their server-side dismissed notifications too. */
+        try{
+          const drec = await ghGetJson('dismissed/' + username + '.json').catch(function(){ return null; });
+          if(drec) await ghDeleteFile('dismissed/' + username + '.json', drec.sha);
+        }catch(e){}
       })();
       return;
     } else if(act === 'resetpw'){
@@ -4265,6 +4268,7 @@ function newUserModal(el){
     const phone = (document.getElementById('nu-phone').value || '').trim();
     if(!name || !username){ err.textContent = 'Name and username are required.'; return; }
     if(!/^[a-z0-9._-]+$/.test(username)){ err.textContent = 'Username can only use lowercase letters, numbers, dot, dash, underscore. "@" and spaces are not allowed.'; return; }
+    await loadUsers();
     if(state.users[username]){ err.textContent = 'Username already exists.'; return; }
     const btn = document.getElementById('nu-go');
     btn.disabled = true; btn.textContent = 'Hashing password...';
