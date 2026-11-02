@@ -2038,11 +2038,11 @@ function precallNoteHtml(){
       precallNoteHtml() +
       '<p class="muted" style="font-size:12px;margin-bottom:14px;line-height:1.55">They are interested. Capture everything the builder needs.</p>' +
       '<div class="field"><label>Business *</label><input id="in-business" value="' + esc(lead.name) + '"/></div>' +
-      '<div class="grid2"><div class="field"><label>Contact name *</label><input id="in-contact" placeholder="Who you spoke with"/></div>' +
-      '<div class="field"><label>Phone *</label><input id="in-phone" type="tel" value="' + esc(lead.phone) + '"/></div></div>' +
+      '<div class="grid2"><div class="field"><label>Contact name</label><input id="in-contact" placeholder="Who you spoke with"/></div>' +
+      '<div class="field"><label>Phone</label><input id="in-phone" type="tel" value="' + esc(lead.phone) + '"/></div></div>' +
       '<div class="field"><label>Email</label><input id="in-email" type="email" inputmode="email" placeholder="owner@business.com"/></div>' +
       '<div class="field"><label>Brand colors</label><input id="in-colors" placeholder="e.g. navy blue + gold"/></div>' +
-      '<div class="field"><label>What they want *</label><textarea id="in-wants" placeholder="Pages, features, vibe, must-haves"></textarea></div>' +
+      '<div class="field"><label>What they want</label><textarea id="in-wants" placeholder="Pages, features, vibe, must-haves"></textarea></div>' +
       '<div class="field"><label>Notes</label><textarea id="in-notes" placeholder="Anything else for the builder"></textarea></div>' +
       '<div class="field"><label>Photos & files</label>' +
       '<input id="in-files" type="file" multiple accept="image/*,.pdf,.doc,.docx,.txt"/>' +
@@ -2313,10 +2313,15 @@ async function submitIntake(claim){
   const err = document.getElementById('intake-err');
   err.textContent = '';
   const v = function(id){ return (document.getElementById(id).value || '').trim(); };
-  const business = v('in-business'), contact = v('in-contact'), phone = v('in-phone');
+  const business = v('in-business'), contact = v('in-contact');
+  let phone = v('in-phone');
   const email = v('in-email'), wants = v('in-wants'), notes = v('in-notes');
   const brandColors = v('in-colors');
-  if(!business || !contact || !phone || !wants){ err.textContent = 'Business, contact, phone, and what they want are required.'; return; }
+  /* Only the business name is required. Whatever details the caller did
+     get go to the builders right away, even a partial set, instead of the
+     submit being blocked until every field is filled. */
+  if(!business){ err.textContent = 'Business is required.'; return; }
+  if(!phone) phone = claim.phone || '';
   const btn = document.getElementById('btn-intake');
   if(btn){ btn.disabled = true; btn.textContent = 'Submitting...'; }
   /* One intake per lead: a double tap reuses the same record instead of
@@ -2551,6 +2556,9 @@ async function renderMineInto(el){
 /* ================= intakes (builder / admin) ================= */
 
 async function loadIntakes(scope){
+  /* Always read a fresh tree, so a builder sees an intake the moment a
+     caller submits it, without restarting the app. */
+  try{ await refreshTree(); }catch(e){}
   const paths = treePaths('intakes/').filter(function(p){ return p.slice(-5) === '.json'; });
   const items = [];
   for(const p of paths){
@@ -2683,17 +2691,32 @@ function paintEditor(el){
     try{ window.scrollTo(0, 0); }catch(e){}
     return;
   }
-  let html = '<div class="card"><h2>Site editor</h2>' +
+  const hv = state.editorHomeView || null;
+  const hsec = function(k){ return hv === k ? '' : 'display:none'; };
+  const homeTitles = { search: 'Search sites', confirmed: 'Confirmed leads', drafts: 'My drafts', queue: 'Publish queue' };
+  let html = '<div id="editor-home-menu"' + (hv ? ' style="display:none"' : '') + '>' +
+    [['search','Search sites'],['confirmed','Confirmed leads'],['drafts','My drafts'],['queue','Publish queue']].map(function(m){
+      return '<button class="btn ghost block" data-open-home="' + m[0] + '" type="button" style="text-align:left;margin-bottom:8px">' + m[1] + ' ›</button>';
+    }).join('') + '</div>' +
+    '<div id="editor-home-secbar" class="row" style="margin-bottom:10px;' + (hv ? '' : 'display:none') + '">' +
+    '<button class="btn ghost sm" id="editor-home-back" type="button">← Back</button>' +
+    '<h3 style="margin:0">' + esc(hv ? (homeTitles[hv] || '') : '') + '</h3></div>';
+  html += '<div class="card" data-sec="search" style="' + hsec('search') + '"><h2>Site editor</h2>' +
     '<p class="muted" style="font-size:12px;margin-bottom:12px;line-height:1.55">Search a business by name, open its site, edit the code with a live preview, then save a draft or publish. Publishing joins a queue and goes live one at a time.</p>' +
     '<div class="filters"><input id="editor-q" value="' + esc(state.editorQ) + '" placeholder="Search business name"/>' +
     '</div><div id="editor-results"></div></div>';
-  html += '<div class="card" style="margin-top:14px"><h2>Confirmed leads</h2>' +
+  html += '<div class="card" data-sec="confirmed" style="margin-top:14px;' + hsec('confirmed') + '"><h2>Confirmed leads</h2>' +
     '<p class="muted" style="font-size:12px;margin-bottom:10px;line-height:1.55">Leads other people already confirmed. Tap Open to load the lead\'s site in the editor.</p>' +
     '<div id="editor-confirmed"><div class="empty">Loading...</div></div></div>';
-  html += '<div class="card" style="margin-top:14px"><h2>My drafts</h2><div id="editor-drafts"><div class="empty">Loading...</div></div></div>';
-  html += '<div class="card" style="margin-top:14px"><h2>Publish queue</h2><div id="editor-jobs"><div class="empty">Loading...</div></div></div>';
+  html += '<div class="card" data-sec="drafts" style="margin-top:14px;' + hsec('drafts') + '"><h2>My drafts</h2><div id="editor-drafts"><div class="empty">Loading...</div></div></div>';
+  html += '<div class="card" data-sec="queue" style="margin-top:14px;' + hsec('queue') + '"><h2>Publish queue</h2><div id="editor-jobs"><div class="empty">Loading...</div></div></div>';
   el.innerHTML = html;
   wireEditorSearch(el);
+  el.querySelectorAll('[data-open-home]').forEach(function(b){
+    b.addEventListener('click', function(){ state.editorHomeView = b.getAttribute('data-open-home'); paintEditor(el); });
+  });
+  const homeBack = document.getElementById('editor-home-back');
+  if(homeBack) homeBack.addEventListener('click', function(){ state.editorHomeView = null; paintEditor(el); });
   loadEditorDrafts(el);
   loadEditorJobs(el);
   loadEditorConfirmed(el);
@@ -2798,6 +2821,7 @@ function paintEditorResults(el){
 
 async function openEditorSlug(slug, el){
   state.editorSlug = slug;
+  state.editorView = null;
   state.editorLiveCode = null;
   state.editorLiveErr = '';
   state.editorNotFound = false;
@@ -2867,11 +2891,25 @@ function paintEditorPanel(el){
   const slug = state.editorSlug;
   if(!slug){ host.innerHTML = ''; return; }
   const lead = editorLead();
+  /* The site page is split into sections, one open at a time: a menu of
+     buttons opens each section, and a Back button returns to the menu.
+     Which section is open lives in state, so repaints keep the place. */
+  const view = state.editorView || null;
+  const secStyle = function(k){ return view === k ? '' : 'display:none'; };
+  const secTitles = { code: 'Site code', history: 'Publish history', build: 'Build record', branding: 'Branding', identity: 'Name and URL' };
 
   let html = '<div class="card" style="margin-top:14px"><div class="row" style="justify-content:space-between;margin-bottom:10px">' +
     '<div><h2 style="margin:0">' + esc(lead.name) + '</h2>' +
     '<div class="muted" style="font-size:11px">' + esc(slug) + '</div></div>' +
     '<a class="btn ghost sm" href="' + esc(siteUrlFor(lead)) + '" target="_blank" rel="noopener">Open live site</a></div>';
+
+  html += '<div id="editor-menu"' + (view ? ' style="display:none"' : '') + '>' +
+    [['code','Site code'],['history','Publish history'],['build','Build record'],['branding','Branding'],['identity','Name and URL']].map(function(m){
+      return '<button class="btn ghost block" data-open-sec="' + m[0] + '" type="button" style="text-align:left;margin-bottom:8px">' + m[1] + ' ›</button>';
+    }).join('') + '</div>';
+  html += '<div id="editor-secbar" class="row" style="margin:12px 0 4px;' + (view ? '' : 'display:none') + '">' +
+    '<button class="btn ghost sm" id="editor-sec-back" type="button">← Back</button>' +
+    '<h3 style="margin:0">' + esc(view ? (secTitles[view] || '') : '') + '</h3></div>';
 
   /* Site identity: editable business name and URL name. The name field
      rewrites the name through the code live (preview included); the URL
@@ -2879,7 +2917,7 @@ function paintEditorPanel(el){
   const initBizName = (state.editorDraft && state.editorDraft.business_name) || lead.name || '';
   const bizName = state._editorBizName != null ? state._editorBizName : initBizName;
   const slugTarget = state._editorSlugTarget != null ? state._editorSlugTarget : slug;
-  html += '<div class="card" style="margin:10px 0;padding:14px"><h3 style="margin:0 0 8px">Site identity</h3>' +
+  html += '<div class="card" data-sec="identity" style="margin:10px 0;padding:14px;' + secStyle('identity') + '"><h3 style="margin:0 0 8px">Site identity</h3>' +
     '<div class="field"><label>Business name</label>' +
     '<input id="editor-bizname" value="' + esc(bizName) + '" spellcheck="false" autocomplete="off"/></div>' +
     '<div class="field" style="margin-top:8px"><label>Site URL name</label>' +
@@ -2893,7 +2931,7 @@ function paintEditorPanel(el){
     (state.editorDraft && state.editorDraft.code != null ? state.editorDraft.code :
     (state.editorLiveCode != null ? state.editorLiveCode : ''));
   const branding = brandingFromCode(brandCode);
-  html += '<div class="card" style="margin:10px 0;padding:14px"><h3 style="margin:0 0 8px">Site branding</h3>' +
+  html += '<div class="card" data-sec="branding" style="margin:10px 0;padding:14px;' + secStyle('branding') + '"><h3 style="margin:0 0 8px">Site branding</h3>' +
     '<p class="muted" style="font-size:11px;margin:0 0 10px;line-height:1.5">Upload a browser tab icon and a logo. They show in the preview right away and go live when you publish.</p>' +
     '<div class="row" style="align-items:center;gap:10px;margin-bottom:10px">' +
       '<img id="branding-favicon-prev" alt="" style="width:32px;height:32px;object-fit:contain;background:#fff;border:1px solid #ddd;border-radius:6px;flex:none;' + (branding.favicon ? '' : 'display:none') + '"' + (branding.favicon ? ' src="' + esc(branding.favicon) + '"' : '') + '/>' +
@@ -2908,11 +2946,11 @@ function paintEditorPanel(el){
       '<button class="btn ghost sm" id="branding-logo-remove" type="button" style="flex:none;' + (branding.logo ? '' : 'display:none') + '">Remove</button>' +
     '</div></div>';
 
-  html += editorIntakeHtml(lead);
+  html += '<div data-sec="build" style="' + secStyle('build') + '">' + editorIntakeHtml(lead) + '</div>';
 
   /* One code area: the editor, prefilled with the draft or the live code.
      Below it a live preview renders whatever is typed. */
-  html += '<h3 style="margin:14px 0 8px">Site code</h3>';
+  html += '<div data-sec="code" style="' + secStyle('code') + '"><h3 style="margin:14px 0 8px">Site code</h3>';
   if(state.editorLiveLoading){
     html += '<div class="empty">Loading site code...</div>';
   } else if(state.editorNotFound){
@@ -2949,8 +2987,9 @@ function paintEditorPanel(el){
       '<div class="err" id="editor-err"></div>';
   }
 
-  html += '<h3 style="margin:16px 0 8px">Publish history</h3><div id="editor-job-history">' +
-    editorJobRowsHtml(state.editorJobs, true) + '</div>';
+  html += '</div>' +
+    '<div data-sec="history" style="' + secStyle('history') + '"><h3 style="margin:16px 0 8px">Publish history</h3><div id="editor-job-history">' +
+    editorJobRowsHtml(state.editorJobs, true) + '</div></div>';
 
   html += '</div>';
   host.innerHTML = html;
@@ -3158,6 +3197,11 @@ function clearBrandingLogo(){
 function wireEditorPanel(el){
   const panel = el.querySelector('#editor-panel');
   if(!panel) return;
+  panel.querySelectorAll('[data-open-sec]').forEach(function(b){
+    b.addEventListener('click', function(){ state.editorView = b.getAttribute('data-open-sec'); paintEditorPanel(el); });
+  });
+  const secBack = document.getElementById('editor-sec-back');
+  if(secBack) secBack.addEventListener('click', function(){ state.editorView = null; paintEditorPanel(el); });
   const sel = document.getElementById('btn-code-select');
   if(sel) sel.addEventListener('click', function(){
     const ta = document.getElementById('editor-new-code');
@@ -3362,12 +3406,13 @@ async function publishEditorCode(el){
       business_name: bizName, code: code,
       author: state.user.username, author_name: state.user.name,
       created_at: nowISO(), status: 'queued',
-      previous_code: null, commit_sha: null, reason: '', revert_of: null };
+      previous_code: (state.editorLiveCode != null ? state.editorLiveCode : null), commit_sha: null, reason: '', revert_of: null };
     await ghPutJson('site-publish-queue/pending/' + jobid + '.json', job, null,
       'sitedesk: queue publish ' + targetSlug);
     toast(renaming ? 'Queued: the site will move to ' + targetSlug + '.bjvfi.com' : 'Queued for publish');
     state._editorDirty = false;
     try{ state.editorJobs = await loadJobsForSlug(slug); }catch(e){}
+    state.editorView = 'history';
     paintEditorPanel(el);
     loadEditorJobs(el);
     pollEditorJobStatus(el, slug);
