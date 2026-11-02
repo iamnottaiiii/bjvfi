@@ -3410,6 +3410,16 @@ async function publishEditorCode(el){
     await ghPutJson('site-publish-queue/pending/' + jobid + '.json', job, null,
       'sitedesk: queue publish ' + targetSlug);
     toast(renaming ? 'Queued: the site will move to ' + targetSlug + '.bjvfi.com' : 'Queued for publish');
+    /* Tell the caller who brought this lead in that work is moving. The
+       publisher adds a second alert when the site actually goes live. */
+    try{
+      let recip = (state.editorIntake && state.editorIntake.claimer) || '';
+      if(!recip){ const c = await getClaim(slug, true); if(c) recip = c.claimer || c.username || ''; }
+      if(recip && recip !== state.user.username){
+        await postEvent(recip, 'Publishing: ' + bizName,
+          state.user.name + ' queued the ' + bizName + ' site for publish.', 'lead:' + targetSlug);
+      }
+    }catch(e){}
     state._editorDirty = false;
     try{ state.editorJobs = await loadJobsForSlug(slug); }catch(e){}
     state.editorView = 'history';
