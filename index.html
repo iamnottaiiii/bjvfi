@@ -14,42 +14,132 @@
       return;
     }
 
-    // Stay on https://sub.bjvfi.com/, load that business page in place (no redirect)
-    var slug = sub;
-    var src = "https://bjvfi.com/" + encodeURIComponent(slug) + "/";
-
-    // Avoid loops if someone already put a path on the subdomain
+    // Only the root of a business subdomain is the business site.
     var path = location.pathname || "/";
     if (path !== "/" && path !== "") return;
 
-    document.documentElement.innerHTML = "<head><meta charset=UTF-8><meta name=viewport content=\"width=device-width,initial-scale=1\"><title>Loading…</title><style>html,body{margin:0;height:100%;background:#000;color:#eee;font:14px system-ui}#bjvfi-boot{display:grid;place-items:center;height:100%}</style></head><body><div id=bjvfi-boot>Loading " + slug.replace(/[<>]/g,"") + "…</div></body>";
+    /* Load the business page in place on its own subdomain: the address
+       stays {slug}.bjvfi.com, the tab takes the site's own title and icon,
+       and relative page links are rewritten to the business's bjvfi
+       address so moving around never lands on the GitHub name. */
+    var seg = sub.toLowerCase();
+    document.documentElement.innerHTML = "<head><meta charset=UTF-8><meta name=viewport content=\"width=device-width,initial-scale=1\"><title>Loading " + seg + "</title><style>html,body{margin:0;height:100%;background:#000;color:#eee;font:15px system-ui}#bjvfi-boot{display:grid;place-items:center;height:100%}</style></head><body><div id=bjvfi-boot>Loading " + seg.replace(/</g, "") + "</div></body>";
 
-    fetch(src, { credentials: "omit", cache: "no-store" })
-      .then(function (r) {
-        if (!r.ok) throw new Error("HTTP " + r.status);
-        return r.text();
+    function isAbs(u) { return /^(?:[a-z][a-z0-9+.-]*:|\/\/|#)/i.test(u); }
+    function resolveRel(rel) {
+      var bits = rel.split("/");
+      var out = [];
+      for (var i = 0; i < bits.length; i++) {
+        var p = bits[i];
+        if (p === "" || p === ".") continue;
+        if (p === "..") { out.pop(); continue; }
+        out.push(p);
+      }
+      return out.join("/");
+    }
+    var folder = null;
+    function absAsset(u) {
+      if (!u || isAbs(u) || u.charAt(0) === "/") return u;
+      return folder + resolveRel(u);
+    }
+    function canonPage(u) {
+      if (!u || isAbs(u)) return u;
+      if (u.charAt(0) === "/") return u;
+      var r = resolveRel(u);
+      if (r === "index.html") r = "";
+      else if (r.slice(-11) === "/index.html") r = r.slice(0, -10);
+      return "https://bjvfi.com/" + seg + "/" + r;
+    }
+    function rewriteAttr(tag, attr, fn) {
+      var re = new RegExp("(\\b" + attr + "\\s*=\\s*)(\"([^\"]*)\"|'([^']*)')", "i");
+      return tag.replace(re, function (m, pre, q, dq, sq) {
+        var v = dq !== undefined ? dq : sq;
+        var quote = q.charAt(0);
+        return pre + quote + fn(v) + quote;
+      });
+    }
+    function rewriteHtml(html) {
+      html = html.replace(/<(img|script|source|video|audio|embed|track|input|link)\b[^>]*>/gi, function (tag, name) {
+        var out = rewriteAttr(tag, "src", absAsset);
+        out = rewriteAttr(out, "poster", absAsset);
+        if (name.toLowerCase() === "link") out = rewriteAttr(out, "href", absAsset);
+        out = out.replace(/\bsrcset\s*=\s*("([^"]*)"|'([^']*)')/i, function (m, q, dq, sq) {
+          var v = dq !== undefined ? dq : sq;
+          var fixed = v.split(",").map(function (cand) {
+            var bits = cand.trim().split(/\s+/);
+            if (bits[0]) bits[0] = absAsset(bits[0]);
+            return bits.join(" ");
+          }).join(", ");
+          return "srcset=" + q.charAt(0) + fixed + q.charAt(0);
+        });
+        return out;
+      });
+      html = html.replace(/<(a|form)\b[^>]*>/gi, function (tag, name) {
+        return rewriteAttr(tag, name.toLowerCase() === "a" ? "href" : "action", canonPage);
+      });
+      html = html.replace(/url\(\s*(['"]?)([^)'"]+)\1\s*\)/gi, function (m, q, u) {
+        if (!u || isAbs(u) || u.charAt(0) === "/") return m;
+        return "url(" + q + absAsset(u) + q + ")";
+      });
+      return html;
+    }
+    function extractIcon(html) {
+      var tags = html.match(/<link\b[^>]*>/gi) || [];
+      var fallback = null;
+      for (var i = 0; i < tags.length; i++) {
+        var rel = (tags[i].match(/\brel\s*=\s*("([^"]*)"|'([^']*)')/i) || []);
+        var relVal = (rel[2] !== undefined ? rel[2] : rel[3] || "").toLowerCase();
+        if (relVal.indexOf("icon") === -1) continue;
+        var hrefM = tags[i].match(/\bhref\s*=\s*("([^"]*)"|'([^']*)')/i) || [];
+        var href = hrefM[2] !== undefined ? hrefM[2] : hrefM[3];
+        if (!href) continue;
+        if (relVal === "icon" || relVal === "shortcut icon") return absAsset(href);
+        if (!fallback) fallback = absAsset(href);
+      }
+      return fallback;
+    }
+    function applyIcon(href) {
+      if (!href || !document.head) return;
+      var old = document.querySelectorAll('link[rel="icon"], link[rel="shortcut icon"]');
+      for (var i = 0; i < old.length; i++) old[i].parentNode.removeChild(old[i]);
+      var link = document.createElement("link");
+      link.rel = "icon";
+      link.href = href;
+      document.head.appendChild(link);
+    }
+
+    fetch("/map/" + seg.slice(0, 2) + ".json", { cache: "force-cache" })
+      .then(function (r) { if (!r.ok) throw new Error("map"); return r.json(); })
+      .then(function (m) {
+        var repo = m[seg];
+        if (!repo) throw new Error("unknown");
+        folder = "https://iamnottaiiii.github.io/" + repo + "/" + seg + "/";
+        return fetch(folder, { credentials: "omit" }).then(function (r) {
+          if (!r.ok) throw new Error("HTTP " + r.status);
+          return r.text();
+        });
       })
       .then(function (html) {
-        // Ensure relative assets resolve against the business folder
-        if (!/<base\s/i.test(html)) {
-          html = html.replace(
-            /<head([^>]*)>/i,
-            '<head$1><base href="' + src + '">'
-          );
-        }
+        var titleM = html.match(/<title[^>]*>([^<]*)<\/title>/i);
+        var title = titleM && titleM[1].trim() ? titleM[1].trim() : seg;
+        var icon = extractIcon(html);
         document.open();
-        document.write(html);
+        document.write(rewriteHtml(html));
         document.close();
+        setTimeout(function () {
+          try { document.title = title; } catch (e) {}
+          applyIcon(icon);
+        }, 0);
       })
       .catch(function () {
-        // Fallback: embed so the subdomain URL still stays put
+        var src = folder || ("https://bjvfi.com/" + seg + "/");
         document.documentElement.innerHTML =
           "<head><meta charset=UTF-8><meta name=viewport content=\"width=device-width,initial-scale=1\"><title>" +
-          slug +
+          seg +
           '</title><style>html,body,iframe{margin:0;border:0;height:100%;width:100%}iframe{display:block}</style></head><body><iframe src="' +
           src +
           '" title="' +
-          slug.replace(/"/g, "") +
+          seg.replace(/"/g, "") +
           '"></iframe></body>';
       });
   } catch (e) {}
@@ -282,10 +372,10 @@ body {
   const statusEl = document.getElementById("bjvfi-status");
   if (!input || !results) return;
 
-  /* Nothing loads until the user types. On search, fetch only the single
-     site-names shard matching the query's first letter/number
-     (/site-names/p.json etc.), then filter it locally. Shards are cached,
-     so repeat searches are instant. */
+  /* Name data lives in one shard per first letter/number
+     (/site-names/p.json etc.). Shards download in the background from
+     page load (see preload below) and are cached, so searches filter a
+     ready local list and answer instantly. */
   const shardCache = {};
 
   function prettySlug(s) {
@@ -321,6 +411,29 @@ body {
     shardPromise[ch] = p;
     try { return await p; } finally { delete shardPromise[ch]; }
   }
+
+  /* Background preload: the moment the page opens, start downloading the
+     name shards (most common first letters first, a few at a time) and
+     hold them parsed and ready. Nothing is shown while this runs; the
+     data just sits ready, so a search answers instantly instead of
+     waiting on a multi megabyte download. A search typed before its
+     letter has landed joins the same in-flight download. */
+  (function preload() {
+    const order = "seacmrtbpdhlfgwnojikuvqxyz0123456789";
+    const letters = order.split("");
+    let i = 0;
+    function next() {
+      if (i >= letters.length) return;
+      const ch = letters[i++];
+      getShard(ch).catch(() => {}).then(() => setTimeout(next, 30));
+    }
+    function start() {
+      let n = 3;
+      while (n-- > 0) next();
+    }
+    if ("requestIdleCallback" in window) requestIdleCallback(start, { timeout: 1200 });
+    else setTimeout(start, 400);
+  })();
 
   function render(matches) {
     results.innerHTML = "";

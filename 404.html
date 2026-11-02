@@ -4,78 +4,164 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>bjvfi</title>
-<meta name="robots" content="noindex, nofollow">
 <script>
 (function () {
-  var HOME = "https://bjvfi.com/";
-  function goHome() {
-    if ((location.pathname || "/") === "/") return;
-    try { top.location.replace(HOME); }
-    catch (e) { location.replace(HOME); }
+  var path = location.pathname || "/";
+  // Home and well-known app paths are real pages/folders (or their own 404s);
+  // only /{slug}/ and /{slug}/{page...} are business-site routes.
+  var RESERVED = ["portal", "sitedesk", "map", "site-names", "eez", "bjvfi", "scripts", "sharepage", "favicon"];
+  var parts = path.split("/").filter(function (s) { return s !== ""; });
+  var slug = (parts[0] || "").toLowerCase();
+  var seg = decodeURIComponent(slug || "");
+  function goHome(){ location.replace("https://bjvfi.com/"); }
+  if (!/^[a-z0-9][a-z0-9-]*$/.test(seg) || RESERVED.indexOf(seg) !== -1) { goHome(); return; }
+  var rest = parts.slice(1).join("/");
+
+  function showLoading() {
+    document.documentElement.innerHTML =
+      "<head><meta charset=UTF-8><meta name=viewport content=\"width=device-width,initial-scale=1\"><title>Loading " +
+      seg + "</title><style>html,body{margin:0;height:100%;background:#000;color:#eee;font:15px system-ui}#bjvfi-boot{display:grid;place-items:center;height:100%}</style></head>" +
+      "<body><div id=bjvfi-boot>Loading " + seg.replace(/</g, "") + "</div></body>";
   }
-  function esc(s) {
-    return String(s).replace(/[&<>"']/g, function (c) {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+  showLoading();
+
+  /* The current folder inside the business site ("" at its root), used to
+     resolve the page's relative links against the page being viewed. */
+  var curDir = "";
+  if (rest) {
+    var slash = rest.lastIndexOf("/");
+    curDir = slash === -1 ? "" : rest.slice(0, slash + 1);
+  }
+  function isAbs(u) { return /^(?:[a-z][a-z0-9+.-]*:|\/\/|#)/i.test(u); }
+  function resolveRel(rel) {
+    var parts2 = (curDir + rel).split("/");
+    var out = [];
+    for (var i = 0; i < parts2.length; i++) {
+      var p = parts2[i];
+      if (p === "" || p === ".") continue;
+      if (p === "..") { out.pop(); continue; }
+      out.push(p);
+    }
+    return out.join("/");
+  }
+
+  var folder = null; /* https://iamnottaiiii.github.io/{repo}/{slug}/ once known */
+  function absAsset(u) {
+    if (!u || isAbs(u) || u.charAt(0) === "/") return u;
+    return folder + resolveRel(u);
+  }
+  /* A relative page link becomes the same page on the business's own bjvfi
+     address, so moving around the site never lands on the GitHub name. */
+  function canonPage(u) {
+    if (!u || isAbs(u)) return u;
+    if (u.charAt(0) === "/") return u;
+    var r = resolveRel(u);
+    if (r === "index.html") r = "";
+    else if (r.slice(-11) === "/index.html") r = r.slice(0, -10);
+    return "https://bjvfi.com/" + seg + "/" + r;
+  }
+  function rewriteAttr(tag, attr, fn) {
+    var re = new RegExp("(\\b" + attr + "\\s*=\\s*)(\"([^\"]*)\"|'([^']*)')", "i");
+    return tag.replace(re, function (m, pre, q, dq, sq) {
+      var v = dq !== undefined ? dq : sq;
+      var quote = q.charAt(0);
+      return pre + quote + fn(v) + quote;
     });
   }
-  function showLoading(slug) {
-    document.title = slug;
-    document.documentElement.innerHTML =
-      '<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
-      '<title>' + esc(slug) + '</title>' +
-      '<style>html,body{margin:0;height:100%;background:#fff;color:#333;font:15px system-ui,sans-serif}' +
-      '#l{display:grid;place-items:center;height:100vh;text-align:center;padding:20px}' +
-      '.s{width:34px;height:34px;border:3px solid #ddd;border-top-color:#666;border-radius:50%;margin:0 auto 14px;animation:sp 0.8s linear infinite}' +
-      '@keyframes sp{to{transform:rotate(360deg)}}</style></head>' +
-      '<body><div id="l"><div><div class="s"></div><div>Loading ' + esc(slug) + '</div></div></div></body>';
-  }
-  function iframePage(slug, src) {
-    return '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
-      '<title>' + esc(slug) + '</title>' +
-      '<style>html,body,iframe{margin:0;padding:0;border:0;height:100%;width:100%}iframe{display:block}</style></head>' +
-      '<body><iframe src="' + esc(src) + '" title="' + esc(slug) + '"></iframe></body></html>';
-  }
-  try {
-    var host = location.hostname.toLowerCase();
-    var path = location.pathname || "/";
-    if (host.length > 10 && host.slice(-10) === ".bjvfi.com") {
-      var sub = host.slice(0, -10);
-      if (sub && sub !== "www" && /^[a-z0-9][a-z0-9-]*$/.test(sub)) {
-        location.replace(HOME + sub + "/");
-      } else {
-        goHome();
-      }
-      return;
-    }
-    var seg = path.replace(/^\/+|\/+$/g, "").replace(/\.bjvfi\.com$/i, "");
-    if (!/^[a-z0-9][a-z0-9-]*$/.test(seg)) { goHome(); return; }
-    var slug = seg;
-    showLoading(slug);
-    var shard = slug.slice(0, 2);
-    fetch("/map/" + shard + ".json", { cache: "force-cache" }).then(function (r) {
-      if (!r.ok) throw new Error("map");
-      return r.json();
-    }).then(function (map) {
-      var repo = map[slug];
-      if (!repo) { goHome(); return; }
-      var src = "https://iamnottaiiii.github.io/" + repo + "/" + slug + "/";
-      fetch(src, { cache: "force-cache" }).then(function (r) {
-        if (!r.ok) throw new Error("site");
-        return r.text();
-      }).then(function (html) {
-        if (!/<base\s/i.test(html)) {
-          html = html.replace(/<head([^>]*)>/i, '<head$1><base href="' + src + '">');
-        }
-        document.open();
-        document.write(html);
-        document.close();
-      }).catch(function () {
-        document.open();
-        document.write(iframePage(slug, src));
-        document.close();
+  function rewriteHtml(html) {
+    /* Asset tags: point relative files at the site's real folder so images,
+       styles and scripts load, without a base tag hijacking page links. */
+    html = html.replace(/<(img|script|source|video|audio|embed|track|input|link)\b[^>]*>/gi, function (tag, name) {
+      var out = rewriteAttr(tag, "src", absAsset);
+      out = rewriteAttr(out, "poster", absAsset);
+      if (name.toLowerCase() === "link") out = rewriteAttr(out, "href", absAsset);
+      out = out.replace(/\bsrcset\s*=\s*("([^"]*)"|'([^']*)')/i, function (m, q, dq, sq) {
+        var v = dq !== undefined ? dq : sq;
+        var fixed = v.split(",").map(function (cand) {
+          var bits = cand.trim().split(/\s+/);
+          if (bits[0]) bits[0] = absAsset(bits[0]);
+          return bits.join(" ");
+        }).join(", ");
+        return "srcset=" + q.charAt(0) + fixed + q.charAt(0);
       });
-    }).catch(function () { goHome(); });
-  } catch (e) { goHome(); }
+      return out;
+    });
+    /* Page links and form actions stay on the bjvfi address. */
+    html = html.replace(/<(a|form)\b[^>]*>/gi, function (tag, name) {
+      return rewriteAttr(tag, name.toLowerCase() === "a" ? "href" : "action", canonPage);
+    });
+    /* Inline CSS relative urls point at the site folder too. */
+    html = html.replace(/url\(\s*(['"]?)([^)'"]+)\1\s*\)/gi, function (m, q, u) {
+      if (!u || isAbs(u) || u.charAt(0) === "/") return m;
+      return "url(" + q + absAsset(u) + q + ")";
+    });
+    return html;
+  }
+  function extractIcon(html) {
+    var tags = html.match(/<link\b[^>]*>/gi) || [];
+    var fallback = null;
+    for (var i = 0; i < tags.length; i++) {
+      var rel = (tags[i].match(/\brel\s*=\s*("([^"]*)"|'([^']*)')/i) || []);
+      var relVal = (rel[2] !== undefined ? rel[2] : rel[3] || "").toLowerCase();
+      if (relVal.indexOf("icon") === -1) continue;
+      var hrefM = tags[i].match(/\bhref\s*=\s*("([^"]*)"|'([^']*)')/i) || [];
+      var href = hrefM[2] !== undefined ? hrefM[2] : hrefM[3];
+      if (!href) continue;
+      if (relVal === "icon" || relVal === "shortcut icon") return absAsset(href);
+      if (!fallback) fallback = absAsset(href);
+    }
+    return fallback;
+  }
+  function applyIcon(href) {
+    if (!href || !document.head) return;
+    var old = document.querySelectorAll('link[rel="icon"], link[rel="shortcut icon"]');
+    for (var i = 0; i < old.length; i++) old[i].parentNode.removeChild(old[i]);
+    var link = document.createElement("link");
+    link.rel = "icon";
+    link.href = href;
+    document.head.appendChild(link);
+  }
+
+  fetch("/map/" + seg.slice(0, 2) + ".json", { cache: "force-cache" })
+    .then(function (r) { if (!r.ok) throw new Error("map"); return r.json(); })
+    .then(function (m) {
+      var repo = m[seg];
+      if (!repo) throw new Error("unknown");
+      folder = "https://iamnottaiiii.github.io/" + repo + "/" + seg + "/";
+      var src = folder + rest;
+      return fetch(src, { credentials: "omit" }).then(function (r) {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.text();
+      }).then(function (html) { return { html: html, src: src }; });
+    })
+    .then(function (res) {
+      var titleM = res.html.match(/<title[^>]*>([^<]*)<\/title>/i);
+      var title = titleM && titleM[1].trim() ? titleM[1].trim() : seg;
+      var icon = extractIcon(res.html);
+      var html = rewriteHtml(res.html);
+      document.open();
+      document.write(html);
+      document.close();
+      /* The written page carries the site's own title and icon; re-apply both
+         on the live document so the tab shows the business's name and icon,
+         not bjvfi's. */
+      setTimeout(function () {
+        try { document.title = title; } catch (e) {}
+        applyIcon(icon);
+      }, 0);
+    })
+    .catch(function () {
+      /* Fallback: embed the real page so the bjvfi address still stays put. */
+      var src = folder ? folder + rest : "https://bjvfi.com/";
+      document.documentElement.innerHTML =
+        "<head><meta charset=UTF-8><meta name=viewport content=\"width=device-width,initial-scale=1\"><title>" +
+        seg +
+        '</title><style>html,body,iframe{margin:0;border:0;height:100%;width:100%}iframe{display:block}</style></head><body><iframe src="' +
+        src +
+        '" title="' +
+        seg.replace(/"/g, "") +
+        '"></iframe></body>';
+    });
 })();
 </script>
 </head>
