@@ -297,8 +297,27 @@ function ghHeaders(){
   };
 }
 
+/* ETag cache for GitHub reads (rate limit fix, GitHub only, approved by Mba
+   2026-11-02). The first read of a file stores its ETag (GitHub's version
+   sticker for that exact file content) alongside the raw response. Later
+   reads send If-None-Match with that sticker. When the file has not changed,
+   GitHub answers 304 Not Modified with no body, and an authorized 304 does
+   NOT count against the shared 5,000 requests per hour rate limit, so the
+   30 second feed poll and other repeated reads become free unless something
+   actually changed. When it has changed, GitHub sends the fresh file (that
+   one counts, fairly) and we store its new sticker. Any write through this
+   same layer drops the stored sticker for that file, so the next read after
+   our own save is always a full fresh read. */
+var ghEtagCache = {};
+function ghCacheKey(path){ return String(path).split('?')[0]; }
+
 async function ghFetch(path, opts){
   opts = opts || {};
+  const method = opts.method || 'GET';
+  const cacheKey = ghCacheKey(path);
+  const cached = (method === 'GET') ? ghEtagCache[cacheKey] : null;
+  const reqHeaders = ghHeaders();
+  if(cached && cached.etag) reqHeaders['If-None-Match'] = cached.etag;
   const ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
   const timeoutMs = opts.timeout || 30000;
   let timer = null;
@@ -306,9 +325,9 @@ async function ghFetch(path, opts){
   let res;
   try{
     res = await fetch(GH_API + path, {
-      method: opts.method || 'GET',
+      method: method,
       cache: 'no-store',
-      headers: ghHeaders(),
+      headers: reqHeaders,
       body: opts.body ? JSON.stringify(opts.body) : undefined,
       signal: ctrl ? ctrl.signal : undefined
     });
@@ -320,7 +339,20 @@ async function ghFetch(path, opts){
     throw e;
   }
   if(timer) clearTimeout(timer);
+  if(method !== 'GET') delete ghEtagCache[cacheKey];
+  if(res.status === 304){
+    if(cached && cached.text != null){
+      try{ return JSON.parse(cached.text); }catch(e){}
+    }
+    const err304 = new Error('GitHub reported no change for ' + path + ' but no cached copy exists.');
+    err304.status = 304;
+    throw err304;
+  }
   const text = await res.text();
+  if(method === 'GET' && res.ok && res.headers && typeof res.headers.get === 'function'){
+    const etag = res.headers.get('etag');
+    if(etag) ghEtagCache[cacheKey] = { etag: etag, text: text };
+  }
   let json = null;
   try{ json = text ? JSON.parse(text) : null; }catch(e){ json = null; }
   if(!res.ok){
@@ -5317,6 +5349,8 @@ if(typeof module !== 'undefined' && module.exports){
   module.exports.shell = shell;
   module.exports.uactPanelHtml = uactPanelHtml;
   module.exports.decodeHtml = decodeHtml;
+  module.exports.ghGetJson = ghGetJson;
+  module.exports.ghFetch = ghFetch;
   module.exports.relTime = relTime;
   module.exports.claimerDisplay = claimerDisplay;
 }
