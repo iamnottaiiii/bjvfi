@@ -674,10 +674,46 @@ function isConflictError(e){
 function openLeadModal(slug){
   const claim = (state.myClaims || []).find(function(c){ return c.slug === slug; });
   if(!claim){ toast('Lead not found.'); return; }
+  state.leadSlug = slug;
+  state.leadView = null;
+  state.leadForm = null;
+  paintLeadModal();
+}
+
+/* Keep whatever the caller typed (outcome note, build details) when moving
+   between lead sections, so checking the call script never wipes the form.
+   File picks cannot be kept; the browser owns those. */
+function harvestLeadForm(){
+  const f = {};
+  ['outcome-note','in-business','in-contact','in-phone','in-email','in-colors','in-wants','in-notes'].forEach(function(id){
+    const e = document.getElementById(id);
+    if(e) f[id] = e.value;
+  });
+  const on = document.querySelector('#outcome-pick .on');
+  f._outcome = on ? on.getAttribute('data-outcome') : null;
+  state.leadForm = f;
+}
+
+function paintLeadModal(){
+  const claim = (state.myClaims || []).find(function(c){ return c.slug === state.leadSlug; });
+  if(!claim){ closeModal(); return; }
   showModal('<div style="text-align:right;margin-bottom:8px"><button class="btn ghost sm" id="modal-close" type="button">Close</button></div>' + leadCard(claim));
   wireLeadCard(claim);
   const mc = document.getElementById('modal-close');
   if(mc) mc.addEventListener('click', closeModal);
+  document.querySelectorAll('[data-lead-sec]').forEach(function(b){
+    b.addEventListener('click', function(){
+      harvestLeadForm();
+      state.leadView = b.getAttribute('data-lead-sec');
+      paintLeadModal();
+    });
+  });
+  const back = document.getElementById('lead-sec-back');
+  if(back) back.addEventListener('click', function(){
+    harvestLeadForm();
+    state.leadView = null;
+    paintLeadModal();
+  });
 }
 
 /* Read-only lead detail for the admin user view: tap a lead, see the outcome,
@@ -1921,104 +1957,6 @@ var OUTCOMES = [
   ['has_website','Already have a website'],
 ];
 
-function leadCard(claim){
-  const bySlug = catalogBySlug();
-  const lead = bySlug[claim.slug] || normalizeLead({ s: claim.slug, n: claim.business_name || claim.slug, p: claim.phone || '' });
-  const url = siteUrlFor(lead);
-  const phoneOk = hasPhone(lead.phone);
-  const draft = smsDraft(lead.name, state.user.name, url);
-  const script = callScriptText(lead.name, state.user.name, url);
-  const canRelease = ['claimed','interested'].indexOf(claim.status) !== -1;
-
-  let html = '<div class="lead-title">' + esc(lead.name) + '</div>' +
-    '<div class="row" style="margin:8px 0 10px">' + badge(claim.status) + '</div>' +
-    ((claim.status === 'claimed' || claim.status === 'interested') ? claimTimerHtml(claim) : '');
-
-  if(claim.status === 'build'){
-    const intake = ((state.myIntakes || []).filter(function(x){ return x.slug === claim.slug; })[0]) || null;
-    html += '<div class="card" style="margin:14px 0"><h2>Build status</h2>';
-    if(intake){
-      html += '<div class="row" style="margin:8px 0 10px">' + badge(intake.status) + '</div>';
-      if(intake.builder_name){
-        html += '<div style="font-size:13px;margin-bottom:6px"><strong>Builder:</strong> ' + esc(intake.builder_name) + '</div>';
-        if(intake.builder_phone){
-          const bt = 'Hi ' + intake.builder_name + ', checking on the ' + (intake.business || lead.name) + ' site build.';
-          html += '<div class="phone-line"><span class="num">' + esc(intake.builder_phone) + '</span>' +
-            '<a class="btn call sm" href="' + esc(telHref(intake.builder_phone)) + '">Call</a>' +
-            '<a class="btn sms sm" href="' + esc(smsHref(intake.builder_phone, bt)) + '">Text</a></div>';
-        }
-      } else {
-        html += '<p class="muted" style="font-size:12px;line-height:1.55">Sent to builders. A builder will pick it up soon.</p>';
-      }
-      if(intake.site_url){
-        html += '<div class="row" style="margin:10px 0"><a class="btn sm" href="' + esc(intake.site_url) + '" target="_blank" rel="noopener">View built site</a></div>';
-      }
-      if(canInbox()){
-        html += '<div class="row" style="margin:10px 0"><button class="btn ghost sm" id="btn-open-editor" type="button">Open in site editor</button></div>';
-      }
-      if(intake.status === 'ready' && intake.pay_link){
-        html += '<div class="field"><label>Client payment link</label>' +
-          '<div class="copybox" id="pay-link-text">' + esc(intake.pay_link) + '</div>' +
-          '<div class="row" style="margin-top:8px"><button class="btn ghost sm" id="btn-copy-paylink" type="button">Copy link</button></div></div>' +
-          '<p class="muted" style="font-size:12px;line-height:1.55">The site is built and the payment link is ready. Send it to the client, then mark this sold once they pay.</p>' +
-          '<button class="btn block" id="btn-mark-sold" type="button">Mark sold</button>' +
-          '<div class="err" id="sold-err"></div>';
-      } else {
-        html += '<p class="muted" style="font-size:12px;line-height:1.55">You can mark this sold once the builder submits the finished site and the client payment link.</p>';
-      }
-    } else {
-      html += '<p class="muted" style="font-size:12px;line-height:1.55">Build details sent to builders.</p>';
-    }
-    html += '</div>';
-  }
-
-  if(claim.status === 'claimed'){
-    html += '<p class="review-note"><strong>Know them first.</strong> Open their site and learn who they are before you call or text.</p>';
-  }
-
-  if(claim.status === 'claimed'){
-    html += '<div class="card" style="margin:14px 0"><h2>Log outcome</h2>' +
-      precallNoteHtml() +
-      '<p class="muted" style="font-size:12px;margin-bottom:12px;line-height:1.55">When they are <strong>interested</strong>, save that, then you get the <strong>Add build details</strong> form.</p>' +
-      '<div class="field"><label>Outcome</label><div class="pick compact" id="outcome-pick">' +
-      OUTCOMES.map(function(o){
-        return '<button type="button" data-outcome="' + o[0] + '">' + o[1] + '</button>';
-      }).join('') + '</div></div>' +
-      '<div class="field"><label>Note</label><textarea id="outcome-note" placeholder="What did they say?"></textarea></div>' +
-      '<button class="btn block" id="btn-outcome" type="button">Save outcome</button>' +
-      '<div class="err" id="outcome-err"></div></div>';
-  }
-
-  html += '<div class="card" style="margin:14px 0"><h2>Know them first</h2>' +
-    '<p class="muted" style="font-size:12px;margin-bottom:10px;line-height:1.55">Everything you need before the call.</p>' +
-    (lead.category ? '<div style="font-size:13px;margin-bottom:6px"><strong>Category:</strong> ' + esc(lead.category) + '</div>' : '') +
-    (lead.address ? '<div style="font-size:13px;margin-bottom:6px"><strong>Address:</strong> ' + esc(lead.address) +
-      ' <a href="' + esc(directionsHref(lead.address)) + '" target="_blank" rel="noopener">Directions</a></div>' : '') +
-    '<div class="row" style="margin:8px 0">' +
-      '<a class="btn sm" href="' + esc(url) + '" target="_blank" rel="noopener">Open site</a>' +
-      '<button class="btn ghost sm" id="btn-copy-link" type="button">Copy site link</button></div>' +
-    '<h3 style="margin-top:14px">Business phone</h3>' +
-    '<div class="phone-line"><span class="num">' + (phoneOk ? esc(lead.phone) : 'No phone on file') + '</span>' +
-    (phoneOk ? '<button class="btn ghost sm" id="btn-copy-phone" type="button">Copy phone</button>' : '') +
-    (phoneOk && claim.status === 'claimed' ? '<a class="btn call sm" href="' + esc(telHref(lead.phone)) + '">Call</a>' : '') +
-    '</div>' +
-    (phoneOk ? '' : '<p class="muted" style="font-size:12px;margin-top:8px;line-height:1.55">No number on this lead? Open their site above, it is usually listed there.</p>') + '</div>';
-
-  if(claim.status === 'claimed'){
-    html += '<div class="card msg-card" style="margin:14px 0"><h2>Text / SMS</h2>' +
-      '<p class="muted" style="font-size:12px;margin-bottom:10px;line-height:1.55">Guide only, adapt in your own words.</p>' +
-      '<div class="copybox tall" id="draft-text">' + esc(draft) + '</div>' +
-      '<div class="row" style="margin-top:12px">' +
-      '<button class="btn" id="btn-copy-draft" type="button">Copy message</button>' +
-      (phoneOk ? '<a class="btn sms" href="' + esc(smsHref(lead.phone, draft)) + '">Open SMS</a>' : '') +
-      '</div></div>';
-    html += '<div class="card script-card" style="margin:14px 0"><h2>Call script</h2>' +
-      '<p class="muted" style="font-size:12px;margin-bottom:8px;line-height:1.55">Guide only, do not read it rigidly.</p>' +
-      '<div class="copybox" id="call-script-text">' + esc(script) + '</div>' +
-      '<div class="row" style="margin-top:8px"><button class="btn ghost sm" id="btn-copy-script" type="button">Copy call script</button></div>' +
-      '<p class="muted" style="font-size:12px;margin-top:10px;line-height:1.55">' + esc(salesLine()) + '</p></div>';
-  }
-
 /* Red pre-call checklist: what to ask for on the call, entered after hanging up. */
 function precallNoteHtml(){
   return '<div class="precall-note"><strong>BEFORE THE CALL, READ THIS.</strong><br/>' +
@@ -2033,17 +1971,119 @@ function precallNoteHtml(){
     '<li>Best contact info and social media links</li></ul></div>';
 }
 
+function leadCard(claim){
+  const bySlug = catalogBySlug();
+  const lead = bySlug[claim.slug] || normalizeLead({ s: claim.slug, n: claim.business_name || claim.slug, p: claim.phone || '' });
+  const url = siteUrlFor(lead);
+  const phoneOk = hasPhone(lead.phone);
+  const draft = smsDraft(lead.name, state.user.name, url);
+  const script = callScriptText(lead.name, state.user.name, url);
+  const canRelease = ['claimed','interested'].indexOf(claim.status) !== -1;
+  /* Unsaved form values survive moving between sections (see harvestLeadForm). */
+  const lf = (state.leadSlug === claim.slug && state.leadForm) ? state.leadForm : {};
+  const fv = function(id, dflt){ return lf[id] != null ? lf[id] : dflt; };
+
+  let head = '<div class="lead-title">' + esc(lead.name) + '</div>' +
+    '<div class="row" style="margin:8px 0 10px">' + badge(claim.status) + '</div>' +
+    ((claim.status === 'claimed' || claim.status === 'interested') ? claimTimerHtml(claim) : '');
+
+  /* ---- section bodies, built exactly as the stacked page built them ---- */
+  let secBuild = '';
+  if(claim.status === 'build'){
+    const intake = ((state.myIntakes || []).filter(function(x){ return x.slug === claim.slug; })[0]) || null;
+    secBuild += '<div class="card" style="margin:14px 0"><h2>Build status</h2>';
+    if(intake){
+      secBuild += '<div class="row" style="margin:8px 0 10px">' + badge(intake.status) + '</div>';
+      if(intake.builder_name){
+        secBuild += '<div style="font-size:13px;margin-bottom:6px"><strong>Builder:</strong> ' + esc(intake.builder_name) + '</div>';
+        if(intake.builder_phone){
+          const bt = 'Hi ' + intake.builder_name + ', checking on the ' + (intake.business || lead.name) + ' site build.';
+          secBuild += '<div class="phone-line"><span class="num">' + esc(intake.builder_phone) + '</span>' +
+            '<a class="btn call sm" href="' + esc(telHref(intake.builder_phone)) + '">Call</a>' +
+            '<a class="btn sms sm" href="' + esc(smsHref(intake.builder_phone, bt)) + '">Text</a></div>';
+        }
+      } else {
+        secBuild += '<p class="muted" style="font-size:12px;line-height:1.55">Sent to builders. A builder will pick it up soon.</p>';
+      }
+      if(intake.site_url){
+        secBuild += '<div class="row" style="margin:10px 0"><a class="btn sm" href="' + esc(intake.site_url) + '" target="_blank" rel="noopener">View built site</a></div>';
+      }
+      if(canInbox()){
+        secBuild += '<div class="row" style="margin:10px 0"><button class="btn ghost sm" id="btn-open-editor" type="button">Open in site editor</button></div>';
+      }
+      if(intake.status === 'ready' && intake.pay_link){
+        secBuild += '<div class="field"><label>Client payment link</label>' +
+          '<div class="copybox" id="pay-link-text">' + esc(intake.pay_link) + '</div>' +
+          '<div class="row" style="margin-top:8px"><button class="btn ghost sm" id="btn-copy-paylink" type="button">Copy link</button></div></div>' +
+          '<p class="muted" style="font-size:12px;line-height:1.55">The site is built and the payment link is ready. Send it to the client, then mark this sold once they pay.</p>' +
+          '<button class="btn block" id="btn-mark-sold" type="button">Mark sold</button>' +
+          '<div class="err" id="sold-err"></div>';
+      } else {
+        secBuild += '<p class="muted" style="font-size:12px;line-height:1.55">You can mark this sold once the builder submits the finished site and the client payment link.</p>';
+      }
+    } else {
+      secBuild += '<p class="muted" style="font-size:12px;line-height:1.55">Build details sent to builders.</p>';
+    }
+    secBuild += '</div>';
+  }
+
+  let secOutcome = '';
+  if(claim.status === 'claimed'){
+    secOutcome += '<div class="card" style="margin:14px 0"><h2>Log outcome</h2>' +
+      precallNoteHtml() +
+      '<p class="muted" style="font-size:12px;margin-bottom:12px;line-height:1.55">When they are <strong>interested</strong>, save that, then you get the <strong>Add build details</strong> form.</p>' +
+      '<div class="field"><label>Outcome</label><div class="pick compact" id="outcome-pick">' +
+      OUTCOMES.map(function(o){
+        return '<button type="button" data-outcome="' + o[0] + '"' + (lf._outcome === o[0] ? ' class="on"' : '') + '>' + o[1] + '</button>';
+      }).join('') + '</div></div>' +
+      '<div class="field"><label>Note</label><textarea id="outcome-note" placeholder="What did they say?">' + esc(fv('outcome-note', '')) + '</textarea></div>' +
+      '<button class="btn block" id="btn-outcome" type="button">Save outcome</button>' +
+      '<div class="err" id="outcome-err"></div></div>';
+  }
+
+  let secDetails = '<div class="card" style="margin:14px 0"><h2>Know them first</h2>' +
+    '<p class="muted" style="font-size:12px;margin-bottom:10px;line-height:1.55">Everything you need before the call.</p>' +
+    (lead.category ? '<div style="font-size:13px;margin-bottom:6px"><strong>Category:</strong> ' + esc(lead.category) + '</div>' : '') +
+    (lead.address ? '<div style="font-size:13px;margin-bottom:6px"><strong>Address:</strong> ' + esc(lead.address) +
+      ' <a href="' + esc(directionsHref(lead.address)) + '" target="_blank" rel="noopener">Directions</a></div>' : '') +
+    '<div class="row" style="margin:8px 0">' +
+      '<a class="btn sm" href="' + esc(url) + '" target="_blank" rel="noopener">Open site</a>' +
+      '<button class="btn ghost sm" id="btn-copy-link" type="button">Copy site link</button></div>' +
+    '<h3 style="margin-top:14px">Business phone</h3>' +
+    '<div class="phone-line"><span class="num">' + (phoneOk ? esc(lead.phone) : 'No phone on file') + '</span>' +
+    (phoneOk ? '<button class="btn ghost sm" id="btn-copy-phone" type="button">Copy phone</button>' : '') +
+    (phoneOk && claim.status === 'claimed' ? '<a class="btn call sm" href="' + esc(telHref(lead.phone)) + '">Call</a>' : '') +
+    '</div>' +
+    (phoneOk ? '' : '<p class="muted" style="font-size:12px;margin-top:8px;line-height:1.55">No number on this lead? Open their site above, it is usually listed there.</p>') + '</div>';
+
+  let secSms = '', secScript = '';
+  if(claim.status === 'claimed'){
+    secSms = '<div class="card msg-card" style="margin:14px 0"><h2>Text / SMS</h2>' +
+      '<p class="muted" style="font-size:12px;margin-bottom:10px;line-height:1.55">Guide only, adapt in your own words.</p>' +
+      '<div class="copybox tall" id="draft-text">' + esc(draft) + '</div>' +
+      '<div class="row" style="margin-top:12px">' +
+      '<button class="btn" id="btn-copy-draft" type="button">Copy message</button>' +
+      (phoneOk ? '<a class="btn sms" href="' + esc(smsHref(lead.phone, draft)) + '">Open SMS</a>' : '') +
+      '</div></div>';
+    secScript = '<div class="card script-card" style="margin:14px 0"><h2>Call script</h2>' +
+      '<p class="muted" style="font-size:12px;margin-bottom:8px;line-height:1.55">Guide only, do not read it rigidly.</p>' +
+      '<div class="copybox" id="call-script-text">' + esc(script) + '</div>' +
+      '<div class="row" style="margin-top:8px"><button class="btn ghost sm" id="btn-copy-script" type="button">Copy call script</button></div>' +
+      '<p class="muted" style="font-size:12px;margin-top:10px;line-height:1.55">' + esc(salesLine()) + '</p></div>';
+  }
+
+  let secIntake = '';
   if(claim.status === 'interested'){
-    html += '<div class="card" id="intake-panel" style="margin:18px 0"><h2>Add build details</h2>' +
+    secIntake = '<div class="card" id="intake-panel" style="margin:18px 0"><h2>Add build details</h2>' +
       precallNoteHtml() +
       '<p class="muted" style="font-size:12px;margin-bottom:14px;line-height:1.55">They are interested. Capture everything the builder needs.</p>' +
-      '<div class="field"><label>Business *</label><input id="in-business" value="' + esc(lead.name) + '"/></div>' +
-      '<div class="grid2"><div class="field"><label>Contact name</label><input id="in-contact" placeholder="Who you spoke with"/></div>' +
-      '<div class="field"><label>Phone</label><input id="in-phone" type="tel" value="' + esc(lead.phone) + '"/></div></div>' +
-      '<div class="field"><label>Email</label><input id="in-email" type="email" inputmode="email" placeholder="owner@business.com"/></div>' +
-      '<div class="field"><label>Brand colors</label><input id="in-colors" placeholder="e.g. navy blue + gold"/></div>' +
-      '<div class="field"><label>What they want</label><textarea id="in-wants" placeholder="Pages, features, vibe, must-haves"></textarea></div>' +
-      '<div class="field"><label>Notes</label><textarea id="in-notes" placeholder="Anything else for the builder"></textarea></div>' +
+      '<div class="field"><label>Business *</label><input id="in-business" value="' + esc(fv('in-business', lead.name)) + '"/></div>' +
+      '<div class="grid2"><div class="field"><label>Contact name</label><input id="in-contact" placeholder="Who you spoke with" value="' + esc(fv('in-contact', '')) + '"/></div>' +
+      '<div class="field"><label>Phone</label><input id="in-phone" type="tel" value="' + esc(fv('in-phone', lead.phone || '')) + '"/></div></div>' +
+      '<div class="field"><label>Email</label><input id="in-email" type="email" inputmode="email" placeholder="owner@business.com" value="' + esc(fv('in-email', '')) + '"/></div>' +
+      '<div class="field"><label>Brand colors</label><input id="in-colors" placeholder="e.g. navy blue + gold" value="' + esc(fv('in-colors', '')) + '"/></div>' +
+      '<div class="field"><label>What they want</label><textarea id="in-wants" placeholder="Pages, features, vibe, must-haves">' + esc(fv('in-wants', '')) + '</textarea></div>' +
+      '<div class="field"><label>Notes</label><textarea id="in-notes" placeholder="Anything else for the builder">' + esc(fv('in-notes', '')) + '</textarea></div>' +
       '<div class="field"><label>Photos & files</label>' +
       '<input id="in-files" type="file" multiple accept="image/*,.pdf,.doc,.docx,.txt"/>' +
       '<div class="file-previews" id="in-files-preview"></div>' +
@@ -2052,12 +2092,40 @@ function precallNoteHtml(){
       '<div class="err" id="intake-err"></div></div>';
   }
 
-  html += '<div class="row" style="margin-top:8px">' +
-    (canRelease ? '<button class="btn danger sm" id="btn-release" type="button">Release lead</button>' : '') +
-    '</div>';
+  const secHistory = '<h3>History</h3>' + timelineHtml(claim);
 
-  html += '<div style="margin:20px 0;height:1px;background:var(--sep)"></div>' +
-    '<h3>History</h3>' + timelineHtml(claim);
+  /* ---- sections menu, same pattern as the site editor ---- */
+  const secs = [];
+  if(secBuild) secs.push(['build', 'Build status', secBuild]);
+  if(secOutcome) secs.push(['outcome', 'Log outcome', secOutcome]);
+  secs.push(['details', 'Business details', secDetails]);
+  if(secSms) secs.push(['sms', 'Text / SMS', secSms]);
+  if(secScript) secs.push(['script', 'Call script', secScript]);
+  if(secIntake) secs.push(['intake', 'Add build details', secIntake]);
+  secs.push(['history', 'History', secHistory]);
+
+  let view = state.leadView || null;
+  if(view && !secs.some(function(s){ return s[0] === view; })) view = null;
+  const titles = {};
+  secs.forEach(function(s){ titles[s[0]] = s[1]; });
+  const secStyle = function(k){ return view === k ? '' : 'display:none'; };
+
+  let html = head;
+  if(claim.status === 'claimed' && !view){
+    html += '<p class="review-note"><strong>Know them first.</strong> Open their site and learn who they are before you call or text.</p>';
+  }
+  html += '<div id="lead-menu"' + (view ? ' style="display:none"' : '') + '>' +
+    secs.map(function(s){
+      return '<button class="btn ghost block" data-lead-sec="' + s[0] + '" type="button" style="text-align:left;margin-bottom:8px">' + s[1] + ' ›</button>';
+    }).join('') +
+    (canRelease ? '<div class="row" style="margin-top:8px"><button class="btn danger sm" id="btn-release" type="button">Release lead</button></div>' : '') +
+    '</div>';
+  html += '<div id="lead-secbar" class="row" style="margin:12px 0 4px;' + (view ? '' : 'display:none') + '">' +
+    '<button class="btn ghost sm" id="lead-sec-back" type="button">← Back</button>' +
+    '<h3 style="margin:0">' + esc(view ? (titles[view] || '') : '') + '</h3></div>';
+  secs.forEach(function(s){
+    html += '<div data-lead-secbody="' + s[0] + '" style="' + secStyle(s[0]) + '">' + s[2] + '</div>';
+  });
   return html;
 }
 
@@ -2284,10 +2352,8 @@ async function saveOutcome(claim){
   state.meSlug = claim.slug;
   /* Advance straight to the build-details form instead of leaving the caller waiting. */
   openLeadModal(claim.slug);
-  setTimeout(function(){
-    const p = document.getElementById('intake-panel');
-    if(p && p.scrollIntoView) p.scrollIntoView({ block: 'start' });
-  }, 80);
+  state.leadView = 'intake';
+  paintLeadModal();
 }
 
 async function releaseLead(claim, silent){
