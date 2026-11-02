@@ -1199,6 +1199,9 @@ async function loadUsers(){
   try{ rec = await ghGetJson('users.json'); }catch(e){ throw e; }
   state.users = rec && rec.data ? rec.data : {};
   state.usersSha = rec ? rec.sha : null;
+  /* The copy every later change is measured against, so saveUsers can
+     re-apply just that change onto a fresher file after a conflict. */
+  state.usersBase = JSON.parse(JSON.stringify(state.users));
 }
 
 function renderHome(){
@@ -4223,16 +4226,40 @@ function logPaymentModal(username, el){
   });
 }
 
-async function saveUsers(){  const rec = await ghGetJson('users.json');
-  try{
-    await ghPutJson('users.json', state.users, rec ? rec.sha : null, 'sitedesk: users update');
-  }catch(e){
-    if(e.status !== 409 && e.status !== 422) throw e;
-    /* Someone else saved between our read and write: re-read fresh and retry once. */
-    const fresh = await ghGetJson('users.json');
-    await ghPutJson('users.json', state.users, fresh ? fresh.sha : null, 'sitedesk: users update (retry)');
+async function saveUsers(){
+  /* Work out what the caller actually changed against the copy they
+     loaded, then write that change onto the freshest file, retrying on
+     conflicts. Rapid back to back admin actions used to kill each other
+     with 409 errors: the whole list was written from one held copy, and
+     the single retry wrote the same stale copy again, so a second save
+     landing in between failed the whole action. */
+  const base = state.usersBase || {};
+  const keys = {};
+  Object.keys(base).forEach(function(k){ keys[k] = 1; });
+  Object.keys(state.users || {}).forEach(function(k){ keys[k] = 1; });
+  const changes = Object.keys(keys).filter(function(k){
+    const before = base[k] ? JSON.stringify(base[k]) : null;
+    const after = state.users[k] ? JSON.stringify(state.users[k]) : null;
+    return before !== after;
+  });
+  for(let attempt = 0; attempt < 5; attempt++){
+    const rec = await ghGetJson('users.json');
+    const users = rec && rec.data ? rec.data : {};
+    changes.forEach(function(k){
+      if(state.users[k]) users[k] = state.users[k];
+      else delete users[k];
+    });
+    try{
+      await ghPutJson('users.json', users, rec ? rec.sha : null, 'sitedesk: users update');
+      state.users = users;
+      state.usersBase = JSON.parse(JSON.stringify(users));
+      state.usersSha = null;
+      return;
+    }catch(e){
+      if(e.status !== 409 && e.status !== 422) throw e;
+    }
   }
-  await loadUsers();
+  throw new Error('The user list kept changing while saving. Give it a moment and try again.');
 }
 
 async function userAction(username, act, el){
@@ -4811,7 +4838,7 @@ function payHistoryHtml(u){
 
 /* Targeted write to one user record with a 409 retry. fn mutates the user object. */
 async function updateUserRecord(username, fn, message){
-  for(let attempt = 0; attempt < 2; attempt++){
+  for(let attempt = 0; attempt < 5; attempt++){
     const rec = await ghGetJson('users.json');
     const users = rec && rec.data ? rec.data : {};
     if(!users[username]) throw new Error('User not found.');
