@@ -1,0 +1,48 @@
+name: Release ingest
+# Bulk-loads site files into the repo tree with a plain git push
+# (no Git Data API, no per-file REST calls).
+# Convention: publishing release <tag> with body "drive:<fileid>" downloads
+# that Drive file (a zip of <slug>/index.html paths shared anyone-with-link),
+# unzips it, commits, and pushes. Serialized via concurrency group.
+on:
+  release:
+    types: [published]
+concurrency:
+  group: release-ingest
+  cancel-in-progress: false
+permissions:
+  contents: write
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download payload from Drive
+        run: |
+          BODY="${{ github.event.release.body }}"
+          case "$BODY" in
+            drive:*) ID="${BODY#drive:}" ;;
+            *) echo "release body must be drive:<fileid>, got: $BODY"; exit 1 ;;
+          esac
+          pip install -q gdown
+          gdown "$ID" -O /tmp/payload.zip
+          ls -la /tmp/payload.zip
+      - name: Unzip payload
+        run: |
+          unzip -q -o /tmp/payload.zip -d "$GITHUB_WORKSPACE"
+          echo "payload entries: $(unzip -l /tmp/payload.zip | tail -1)"
+      - name: Commit and push
+        run: |
+          TAG="${{ github.event.release.tag_name }}"
+          git config user.name "Not Ai"
+          git config user.email "iamnottaiii@gmail.com"
+          git add -A
+          N=$(git diff --cached --name-only | wc -l)
+          if [ "$N" -eq 0 ]; then echo "nothing to ingest"; exit 0; fi
+          git commit -qm "ingest $TAG: $N files"
+          git push origin HEAD:main
+      - name: Delete ingested release
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release delete "${{ github.event.release.tag_name }}" --yes --cleanup-tag --repo "${{ github.repository }}"
