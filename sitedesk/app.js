@@ -442,6 +442,8 @@ var state = {
   mineQ: '', mineStatus: 'all', meSlug: null,
   userQ: '', userStatus: '',
   adminSec: 'users',
+  adminUserView: null, _udFor: null,
+  profileView: null, profileForm: {},
   /* Which admin user cards have their action panel toggled open. The three-dot
      button on a card toggles its panel; panels are always closed by default. */
   adminOpen: {},
@@ -4069,6 +4071,7 @@ async function loadAllClaims(){
 
 async function renderUserDashboardInto(el){
   const username = state.adminUser;
+  if(state._udFor !== username){ state._udFor = username; state.adminUserView = null; }
   el.innerHTML = '<div class="card"><div class="empty">Loading dashboard...</div></div>';
   let intakes = [];
   let idx = {};
@@ -4111,6 +4114,9 @@ async function renderUserDashboardInto(el){
       '<span class="muted" style="display:block;font-size:11px">' + esc(when) + '</span></span>' +
       outcomeBadge(st) + '</button>';
   };
+  const uv = state.adminUserView || null;
+  const usec = function(key){ return uv === key ? '' : 'display:none'; };
+  const udTitles = { paymethod: 'Payment method', payments: 'Payments', leads: 'Leads', intakes: 'Intakes' };
   let html = '<div class="card"><button class="btn ghost sm" id="ud-back" type="button">Back to users</button>' +
     '<div style="margin-top:12px"><div style="font-size:18px;font-weight:700">' + esc(u.name || username) + '</div>' +
     '<div class="muted" style="font-size:12px">@' + esc(username) + ' \xB7 ' + esc(u.phone || 'no phone') + '</div>' +
@@ -4118,17 +4124,24 @@ async function renderUserDashboardInto(el){
     '<div class="row" style="margin-top:12px">' +
     stat('Claimed', myStatus('claimed') + myStatus('interested')) + stat('Interested', myStatus('interested')) +
     stat('Sold', myStatus('sold')) + stat('Sites done', myIntakes.filter(function(i){ return i.status === 'done'; }).length) + '</div></div>' +
-    '<div class="card" style="margin-top:14px"><h2>Payment method</h2>' +
+    '<div id="ud-menu" style="margin-top:14px;' + (uv ? 'display:none' : '') + '">' +
+    [['paymethod', 'Payment method'], ['payments', 'Payments'], ['leads', 'Leads (' + mySlugs.length + ')'], ['intakes', 'Intakes (' + myIntakes.length + ')']].map(function(m){
+      return '<button class="btn ghost block" data-open-ud="' + m[0] + '" type="button" style="text-align:left;margin-bottom:8px">' + m[1] + ' \u203A</button>';
+    }).join('') + '</div>' +
+    '<div id="ud-secbar" class="row" style="margin:14px 0 10px;' + (uv ? '' : 'display:none') + '">' +
+    '<button class="btn ghost sm" id="ud-secback" type="button">\u2190 Back</button>' +
+    '<h3 style="margin:0">' + esc(uv ? (udTitles[uv] || '') : '') + '</h3></div>' +
+    '<div class="card" data-usec="paymethod" style="margin-top:14px;' + usec('paymethod') + '"><h2>Payment method</h2>' +
     '<p style="font-size:14px">' + esc(u.payment_method || 'Not set') + '</p></div>' +
-    '<div class="card" style="margin-top:14px"><h2>Payments</h2>' +
+    '<div class="card" data-usec="payments" style="margin-top:14px;' + usec('payments') + '"><h2>Payments</h2>' +
     '<div id="ud-pays">' + udPaysHtml(u) + '</div>' +
     '<button class="btn sm" id="ud-logpay" type="button" style="margin-top:10px">Log payment</button></div>' +
-    '<div class="card" style="margin-top:14px"><h2>Leads (' + mySlugs.length + ')</h2>' +
+    '<div class="card" data-usec="leads" style="margin-top:14px;' + usec('leads') + '"><h2>Leads (' + mySlugs.length + ')</h2>' +
     '<div id="ud-leads">' +
     (mySlugs.length ? mySlugs.map(function(slug){ return leadRowHtml(slug, null); }).join('') +
       '<p class="muted" style="font-size:11px;margin-top:8px">Tap a lead to see its outcome.</p>' : '<div class="empty">No leads claimed yet.</div>') +
     '</div></div>' +
-    '<div class="card" style="margin-top:14px"><h2>Intakes (' + myIntakes.length + ')</h2>' +
+    '<div class="card" data-usec="intakes" style="margin-top:14px;' + usec('intakes') + '"><h2>Intakes (' + myIntakes.length + ')</h2>' +
     (myIntakes.length ? myIntakes.map(function(i){
       return '<div class="row" style="justify-content:space-between;padding:10px 0">' +
         '<div><div style="font-weight:600;font-size:13px">' + esc(i.business || i.slug || i.id) + '</div>' +
@@ -4137,6 +4150,11 @@ async function renderUserDashboardInto(el){
     }).join('') : '<div class="empty">No intakes yet.</div>') + '</div>';
   el.innerHTML = html;
   el.querySelector('#ud-back').addEventListener('click', function(){ state.adminUser = null; renderAdminInto(el); });
+  el.querySelectorAll('[data-open-ud]').forEach(function(b){
+    b.addEventListener('click', function(){ state.adminUserView = b.getAttribute('data-open-ud'); renderUserDashboardInto(el); });
+  });
+  const udSecBack = document.getElementById('ud-secback');
+  if(udSecBack) udSecBack.addEventListener('click', function(){ state.adminUserView = null; renderUserDashboardInto(el); });
   el.querySelector('#ud-logpay').addEventListener('click', function(){ logPaymentModal(username, el); });
   const detailCache = {};
   const wireLeadRows = function(){
@@ -4779,6 +4797,10 @@ function openReplyModal(item){
 
 function renderProfileInto(el){
   const u = (state.users && state.users[state.user.username]) || state.user;
+  const pv = state.profileView || null;
+  const psec = function(key){ return pv === key ? '' : 'display:none'; };
+  const pfTitles = { pay: 'Payment method', password: 'Change password', history: 'Payments received', docs: 'Help and documents', danger: 'Delete account' };
+  const pfForm = state.profileForm || {};
   el.innerHTML = '<div class="card"><h2>Profile</h2>' +
     '<dl class="profile-dl">' +
     '<div><dt>Name</dt><dd>' + esc(u.name) + '</dd></div>' +
@@ -4788,23 +4810,40 @@ function renderProfileInto(el){
     '</dl>' +
     '<div class="row" style="margin-top:16px">' +
     '<button class="btn ghost block" id="btn-logout" type="button">Log out</button></div></div>' +
-    '<div class="card" style="margin-top:14px"><h2>Payment method</h2>' +
+    '<div id="pf-menu" style="margin-top:14px;' + (pv ? 'display:none' : '') + '">' +
+    [['pay', 'Payment method'], ['password', 'Change password'], ['history', 'Payments received'], ['docs', 'Help and documents'], ['danger', 'Delete account']].map(function(m){
+      return '<button class="btn ghost block" data-open-pf="' + m[0] + '" type="button" style="text-align:left;margin-bottom:8px">' + m[1] + ' \u203A</button>';
+    }).join('') + '</div>' +
+    '<div id="pf-secbar" class="row" style="margin:14px 0 10px;' + (pv ? '' : 'display:none') + '">' +
+    '<button class="btn ghost sm" id="pf-secback" type="button">\u2190 Back</button>' +
+    '<h3 style="margin:0">' + esc(pv ? (pfTitles[pv] || '') : '') + '</h3></div>' +
+    '<div class="card" data-psec="pay" style="margin-top:14px;' + psec('pay') + '"><h2>Payment method</h2>' +
     '<p class="muted" style="font-size:12px;margin-bottom:10px;line-height:1.55">How should we pay you? Put a payment handle (e.g. Cash App tag, Zelle), not full bank numbers.</p>' +
-    '<div class="field"><input id="pay-method" value="' + esc(u.payment_method || '') + '" placeholder="e.g. Cash App $yourtag" autocapitalize="none"/></div>' +
+    '<div class="field"><input id="pay-method" value="' + esc(pfForm.payMethod !== undefined ? pfForm.payMethod : (u.payment_method || '')) + '" placeholder="e.g. Cash App $yourtag" autocapitalize="none"/></div>' +
     '<button class="btn sm" id="btn-save-pay" type="button">Save payment method</button>' +
     '<div class="err" id="pay-err"></div></div>' +
-    '<div class="card" style="margin-top:14px"><h2>Change password</h2>' +
+    '<div class="card" data-psec="password" style="margin-top:14px;' + psec('password') + '"><h2>Change password</h2>' +
     '<div class="field"><label>Current password</label><input id="pw-cur" type="password" autocomplete="current-password"/></div>' +
     '<div class="field"><label>New password <span class="muted">(8+ characters)</span></label><input id="pw-new" type="password" autocomplete="new-password"/></div>' +
     '<button class="btn sm" id="btn-change-pw" type="button">Change password</button>' +
     '<div class="err" id="pw-err"></div></div>' +
-    '<div class="card" style="margin-top:14px"><h2>Payments received</h2>' +
+    '<div class="card" data-psec="history" style="margin-top:14px;' + psec('history') + '"><h2>Payments received</h2>' +
     '<div id="pay-history">' + payHistoryHtml(u) + '</div></div>' +
-    '<div class="card" style="margin-top:14px">' +
+    '<div class="card" data-psec="docs" style="margin-top:14px;' + psec('docs') + '">' +
     '<button class="btn ghost block" id="btn-howto" type="button">How to use SiteDesk</button>' +
     '<button class="btn ghost block" id="btn-terms" type="button" style="margin-top:10px">Terms</button>' +
     '<button class="btn ghost block" id="btn-policy" type="button" style="margin-top:10px">Policy</button></div>' +
-    '<div class="card" style="margin-top:14px"><button class="btn ghost block" id="btn-delete-acct" type="button" style="color:#ff7b7b">Delete my account</button></div>';
+    '<div class="card" data-psec="danger" style="margin-top:14px;' + psec('danger') + '"><button class="btn ghost block" id="btn-delete-acct" type="button" style="color:#ff7b7b">Delete my account</button></div>';
+  const harvestPf = function(){
+    state.profileForm = state.profileForm || {};
+    const pm = document.getElementById('pay-method');
+    if(pm) state.profileForm.payMethod = pm.value;
+  };
+  el.querySelectorAll('[data-open-pf]').forEach(function(b){
+    b.addEventListener('click', function(){ harvestPf(); state.profileView = b.getAttribute('data-open-pf'); renderProfileInto(el); });
+  });
+  const pfSecBack = document.getElementById('pf-secback');
+  if(pfSecBack) pfSecBack.addEventListener('click', function(){ harvestPf(); state.profileView = null; renderProfileInto(el); });
   el.querySelector('#btn-logout').addEventListener('click', logout);
   el.querySelector('#btn-save-pay').addEventListener('click', saveOwnPaymentMethod);
   el.querySelector('#btn-change-pw').addEventListener('click', changeOwnPassword);
