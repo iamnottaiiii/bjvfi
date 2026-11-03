@@ -2887,14 +2887,31 @@ function loadEditorConfirmed(el){
       return;
     }
     b2.innerHTML = '<div class="open-board">' + intakes.map(function(i){
+      /* On the other side of the row, next to the status: an open build
+         can be grabbed right here, a build you hold can be released
+         right here, and a build someone else holds shows their name. */
+      let side = '';
+      if(!i.builder){
+        side = '<button class="btn sm" data-grab-intake="' + esc(i.id || '') + '" data-accept-intake="' + esc(i.id || '') + '" type="button">Grab</button>';
+      } else if(i.builder === (state.user && state.user.username) && i.status === 'building'){
+        side = '<button class="btn ghost sm" data-release-intake="' + esc(i.id || '') + '" type="button">Release</button>';
+      } else {
+        side = '<span class="muted" style="font-size:11px">' + esc(i.builder_name || i.builder) + '</span>';
+      }
       return '<div class="lead-row"><div><div class="lead-row-name">' + esc(i.business || i.slug || '') + '</div>' +
         '<div class="muted" style="font-size:11px">' + esc(i.claimer_name || i.claimer || '') +
         ' · ' + esc((i.created_at || '').slice(0, 10)) + '</div></div>' +
-        '<div class="row" style="align-items:center">' + badge(i.status || 'open') +
+        '<div class="row" style="align-items:center">' + badge(i.status || 'open') + side +
         '<button class="btn sm" data-edit-slug="' + esc(i.slug || '') + '" type="button">Open</button></div></div>';
     }).join('') + '</div>';
     b2.querySelectorAll('[data-edit-slug]').forEach(function(b){
       b.addEventListener('click', function(){ openEditorSlug(b.getAttribute('data-edit-slug'), el); });
+    });
+    b2.querySelectorAll('[data-grab-intake]').forEach(function(b){
+      b.addEventListener('click', function(){ acceptIntake(b, el); });
+    });
+    b2.querySelectorAll('[data-release-intake]').forEach(function(b){
+      b.addEventListener('click', function(){ releaseIntake(b, el); });
     });
   }).catch(function(e){
     const b2 = el.querySelector('#editor-confirmed');
@@ -3047,7 +3064,7 @@ function paintEditorPanel(el){
      Which section is open lives in state, so repaints keep the place. */
   const view = state.editorView || null;
   const secStyle = function(k){ return view === k ? '' : 'display:none'; };
-  const secTitles = { code: 'Site code', history: 'Publish history', build: 'Build record', branding: 'Branding', identity: 'Name and URL' };
+  const secTitles = { code: 'Site code', history: 'Publish history', build: 'Build record', answers: 'Questions and answers', branding: 'Branding', identity: 'Name and URL' };
 
   let html = '<div class="card" style="margin-top:14px"><div class="row" style="justify-content:space-between;margin-bottom:10px">' +
     '<div><h2 style="margin:0">' + esc(lead.name) + '</h2>' +
@@ -3055,7 +3072,7 @@ function paintEditorPanel(el){
     '<a class="btn ghost sm" href="' + esc(siteUrlFor(lead)) + '" target="_blank" rel="noopener">Open live site</a></div>';
 
   html += '<div id="editor-menu"' + (view ? ' style="display:none"' : '') + '>' +
-    [['code','Site code'],['history','Publish history'],['build','Build record'],['branding','Branding'],['identity','Name and URL']].map(function(m){
+    [['code','Site code'],['history','Publish history'],['build','Build record'],['answers','Questions and answers'],['branding','Branding'],['identity','Name and URL']].map(function(m){
       return '<button class="btn ghost block" data-open-sec="' + m[0] + '" type="button" style="text-align:left;margin-bottom:8px">' + m[1] + ' ›</button>';
     }).join('') + '</div>';
   html += '<div id="editor-secbar" class="row" style="margin:12px 0 4px;' + (view ? '' : 'display:none') + '">' +
@@ -3098,6 +3115,8 @@ function paintEditorPanel(el){
     '</div></div>';
 
   html += '<div data-sec="build" style="' + secStyle('build') + '">' + editorIntakeHtml(lead) + '</div>';
+
+  html += '<div data-sec="answers" style="' + secStyle('answers') + '">' + editorAnswersHtml(lead) + '</div>';
 
   /* One code area: the editor, prefilled with the draft or the live code.
      Below it a live preview renders whatever is typed. */
@@ -3151,14 +3170,15 @@ function paintEditorPanel(el){
    submitted, so the builder sees all of it in one place. A question the
    caller left blank still gets a row, marked Not given, so the builder
    can see what is missing instead of guessing. */
-function intakeDetailsHtml(i){
+function intakeDetailsHtml(i, hideTitle){
   if(!i) return '';
   const row = function(label, value){
     const has = value != null && String(value).trim() !== '';
     return '<div style="font-size:13px;margin-bottom:8px"><strong>' + esc(label) + ':</strong> ' +
       (has ? esc(value) : '<span class="muted">Not given</span>') + '</div>';
   };
-  let html = '<div style="margin-top:12px"><h3 style="margin:0 0 8px">Questions and answers from the caller</h3>';
+  let html = '<div style="margin-top:' + (hideTitle ? '4px' : '12px') + '">' +
+    (hideTitle ? '' : '<h3 style="margin:0 0 8px">Questions and answers from the caller</h3>');
   html += row('Business', i.business);
   html += row('Contact name', i.contact_name);
   if(i.phone && hasPhone(i.phone)){
@@ -3220,6 +3240,18 @@ function intakeAcceptedByOther(i){
   return !!(i && i.builder && state.user && i.builder !== state.user.username && !isManager());
 }
 
+/* The Questions and answers section of the opened site page: its own
+   menu option, next to Site code, Build record, Branding and Name and
+   URL, so the builder does not have to dig for the caller's answers
+   inside another section. */
+function editorAnswersHtml(lead){
+  const i = state.editorIntake;
+  if(!i) return '<div class="card" style="margin:10px 0;padding:14px"><h3 style="margin:0 0 8px">Questions and answers</h3>' +
+    '<p class="muted" style="font-size:12px;line-height:1.55">No build details have been submitted for this lead yet. Once a caller submits them, every question and answer shows up here.</p></div>';
+  return '<div class="card" style="margin:10px 0;padding:14px"><h3 style="margin:0 0 8px">Questions and answers</h3>' +
+    intakeDetailsHtml(i, true) + '</div>';
+}
+
 /* The build record for this lead: status badge, builder name and phone,
    built site URL, payment link, plus the builder status controls. This is
    the intake info that used to live on the old listing page. */
@@ -3240,7 +3272,7 @@ function editorIntakeHtml(lead){
     }
     if(i.accepted_at) html += '<div class="muted" style="font-size:11px;margin-bottom:6px">Accepted ' + esc(fmtTime(i.accepted_at)) + '</div>';
   }
-  html += intakeDetailsHtml(i);
+  html += '<div class="row" style="margin-top:10px"><button type="button" class="btn ghost sm" data-open-sec="answers">Questions and answers ›</button></div>';
   if(i.site_url) html += '<div style="margin-top:8px;font-size:13px"><strong>Built site:</strong> <a href="' + esc(i.site_url) + '" target="_blank" rel="noopener">Open</a></div>';
   if(i.pay_link) html += '<div style="margin-top:4px;font-size:13px"><strong>Payment link:</strong> <a href="' + esc(i.pay_link) + '" target="_blank" rel="noopener">Open</a></div>';
   if(!accepted){
@@ -3271,6 +3303,10 @@ function editorIntakeHtml(lead){
       '<input id="bs-pay-' + esc(i.id) + '" placeholder="https://..." value="' + esc(buildDraft(i.id, 'pay') || i.pay_link || '') + '"/>' +
       '<div class="row" style="margin-top:8px"><button type="button" class="btn sm" data-submit-build="' + esc(i.id) + '">Submit built site</button></div>' +
       '<div class="err" id="bs-err-' + esc(i.id) + '"></div></div>';
+    if(i.status === 'building'){
+      html += '<div class="row" style="margin-top:10px"><button type="button" class="btn danger sm" data-release-intake="' + esc(i.id) + '">Release build</button></div>' +
+        '<p class="muted" style="font-size:11px;margin-top:6px;line-height:1.5">Releasing gives the build back. It goes to Open for another builder to grab.</p>';
+    }
   }
   html += intakeProgressHtml(i);
   html += '</div>';
@@ -3539,6 +3575,9 @@ function wireEditorPanel(el){
   });
   panel.querySelectorAll('[data-accept-intake]').forEach(function(b){
     b.addEventListener('click', function(){ acceptIntake(b, el); });
+  });
+  panel.querySelectorAll('[data-release-intake]').forEach(function(b){
+    b.addEventListener('click', function(){ releaseIntake(b, el); });
   });
   panel.querySelectorAll('[data-log-progress]').forEach(function(b){
     b.addEventListener('click', function(){ logBuilderProgress(b.getAttribute('data-log-progress'), el); });
@@ -3961,6 +4000,56 @@ async function acceptIntake(btn, el){
     toast('Build accepted. It is yours now.');
     refreshIntakeView(el);
   }catch(e){ toast(e.message); btn.disabled = false; btn.textContent = 'Accept this build'; }
+}
+
+/* The builder gives a build back. Releasing clears the builder off the
+   record, puts the status back to Open so another builder can grab it,
+   logs the release on the build log, and tells the caller. Only the
+   builder who accepted it can release it; admins and head can too. */
+async function releaseIntake(btn, el){
+  const id = btn.getAttribute('data-release-intake');
+  try{ if(!window.confirm('Release this build back to open?')) return; }catch(e){}
+  btn.disabled = true; btn.textContent = 'Releasing...';
+  function refresh(){
+    if(state.editorSlug) refreshIntakeView(el);
+    else if(el && el.querySelector && el.querySelector('#editor-confirmed')) loadEditorConfirmed(el);
+    else renderApp();
+  }
+  function restore(){ btn.disabled = false; btn.textContent = 'Release'; }
+  try{
+    const rec = await ghGetJson('intakes/' + id + '.json');
+    if(!rec){ toast('Intake not found.'); refresh(); return; }
+    const intake = rec.data;
+    if(!intake.builder){ toast('This build is already open.'); refresh(); return; }
+    if(intakeAcceptedByOther(intake)){
+      toast('Only the builder who accepted this build can release it.');
+      restore();
+      return;
+    }
+    const holder = intake.builder_name || intake.builder;
+    delete intake.builder; delete intake.builder_name;
+    delete intake.builder_phone; delete intake.accepted_at;
+    intake.status = 'open';
+    intake.progress = Array.isArray(intake.progress) ? intake.progress : [];
+    intake.progress.push({ t: nowISO(), by: state.user.username, by_name: state.user.name,
+      k: 'released', note: 'Build released back to open by ' + state.user.name });
+    try{
+      await ghPutJson('intakes/' + id + '.json', intake, rec.sha, 'sitedesk: intake ' + id + ' released');
+    }catch(e){
+      if(isConflictError(e)){
+        const rec2 = await ghGetJson('intakes/' + id + '.json');
+        if(rec2 && rec2.data && !rec2.data.builder){
+          /* Already released (double tap): nothing more to do. */
+        } else { throw e; }
+      } else { throw e; }
+    }
+    if(intake.claimer){
+      await postEvent(intake.claimer, 'Build released: ' + (intake.business || intake.slug),
+        holder + ' released the build. It is open for another builder.', 'lead:' + intake.slug);
+    }
+    toast('Build released. It is open again.');
+    refresh();
+  }catch(e){ toast(e.message); restore(); }
 }
 
 /* The builder logs progress on the site, the same way a caller logs an
@@ -5717,6 +5806,8 @@ if(typeof module !== 'undefined' && module.exports){
   module.exports.intakeProgressHtml = intakeProgressHtml;
   module.exports.leadCard = leadCard;
   module.exports.acceptIntake = acceptIntake;
+  module.exports.releaseIntake = releaseIntake;
+  module.exports.editorAnswersHtml = editorAnswersHtml;
   module.exports.logBuilderProgress = logBuilderProgress;
   module.exports.setIntakeStatus = setIntakeStatus;
   module.exports.submitBuiltSite = submitBuiltSite;
