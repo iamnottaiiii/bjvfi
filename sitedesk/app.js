@@ -560,15 +560,51 @@ function toast(msg){
 /* Generic modal. showModal(html) renders content, closeModal() dismisses. */
 function showModal(html){ openModal(html); }
 
+/* While a modal is open it is the front layer: the page behind it is
+   locked in place, so scrolling and taps act on the modal, never on
+   what sits behind it. The lock is taken once, however many times the
+   modal repaints itself, and released when the modal closes. */
+var modalScrollLock = null;
+function lockPageBehindModal(){
+  if(modalScrollLock) return;
+  try{
+    modalScrollLock = {
+      body: document.body.style.overflow,
+      html: document.documentElement.style.overflow
+    };
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+  }catch(e){}
+}
+function unlockPageBehindModal(){
+  if(!modalScrollLock) return;
+  try{
+    document.body.style.overflow = modalScrollLock.body;
+    document.documentElement.style.overflow = modalScrollLock.html;
+  }catch(e){}
+  modalScrollLock = null;
+}
+
 function openModal(html){
   const root = document.getElementById('modal-root');
-  root.innerHTML = '<div class="modal-back" id="modal-back"><div class="modal" role="dialog" aria-modal="true">' +
+  root.innerHTML = '<div class="modal-back" id="modal-back"><div class="modal" role="dialog" aria-modal="true" tabindex="-1">' +
     html + '</div></div>';
+  lockPageBehindModal();
   document.getElementById('modal-back').addEventListener('click', function(e){
     if(e.target.id === 'modal-back') closeModal();
   });
+  /* Pull the front layer to the front: focus lands on the modal itself
+     and it starts at the top, every time it opens or repaints. */
+  const modal = root.querySelector('.modal');
+  if(modal){
+    try{ modal.scrollTop = 0; }catch(e){}
+    try{ modal.focus({ preventScroll: true }); }catch(e){}
+  }
 }
-function closeModal(){ document.getElementById('modal-root').innerHTML = ''; }
+function closeModal(){
+  document.getElementById('modal-root').innerHTML = '';
+  unlockPageBehindModal();
+}
 
 async function copyText(text, label){
   try{
@@ -719,7 +755,7 @@ function openLeadModal(slug){
    File picks cannot be kept; the browser owns those. */
 function harvestLeadForm(){
   const f = {};
-  ['outcome-note','in-business','in-contact','in-phone','in-email','in-colors','in-wants','in-notes'].forEach(function(id){
+  ['outcome-note','in-business','in-contact','in-phone','in-email','in-colors','in-services','in-wants','in-hours','in-social','in-notes'].forEach(function(id){
     const e = document.getElementById(id);
     if(e) f[id] = e.value;
   });
@@ -2042,6 +2078,8 @@ function leadCard(claim){
       } else {
         secBuild += '<p class="muted" style="font-size:12px;line-height:1.55">Sent to builders. A builder will pick it up soon.</p>';
       }
+      secBuild += intakeDetailsHtml(intake);
+      secBuild += intakeProgressHtml(intake);
       if(intake.site_url){
         secBuild += '<div class="row" style="margin:10px 0"><a class="btn sm" href="' + esc(intake.site_url) + '" target="_blank" rel="noopener">View built site</a></div>';
       }
@@ -2119,7 +2157,10 @@ function leadCard(claim){
       '<div class="field"><label>Phone</label><input id="in-phone" type="tel" value="' + esc(fv('in-phone', lead.phone || '')) + '"/></div></div>' +
       '<div class="field"><label>Email</label><input id="in-email" type="email" inputmode="email" placeholder="owner@business.com" value="' + esc(fv('in-email', '')) + '"/></div>' +
       '<div class="field"><label>Brand colors</label><input id="in-colors" placeholder="e.g. navy blue + gold" value="' + esc(fv('in-colors', '')) + '"/></div>' +
+      '<div class="field"><label>Services</label><textarea id="in-services" placeholder="Full list of services">' + esc(fv('in-services', '')) + '</textarea></div>' +
       '<div class="field"><label>What they want</label><textarea id="in-wants" placeholder="Pages, features, vibe, must-haves">' + esc(fv('in-wants', '')) + '</textarea></div>' +
+      '<div class="field"><label>Business hours</label><input id="in-hours" placeholder="e.g. Mon to Fri, 9 to 5" value="' + esc(fv('in-hours', '')) + '"/></div>' +
+      '<div class="field"><label>Social media links</label><input id="in-social" placeholder="Instagram, Facebook, etc." value="' + esc(fv('in-social', '')) + '"/></div>' +
       '<div class="field"><label>Notes</label><textarea id="in-notes" placeholder="Anything else for the builder">' + esc(fv('in-notes', '')) + '</textarea></div>' +
       '<div class="field"><label>Photos & files</label>' +
       '<input id="in-files" type="file" multiple accept="image/*,.pdf,.doc,.docx,.txt"/>' +
@@ -2208,6 +2249,9 @@ function wireLeadCard(claim){
   });
   const fi = document.getElementById('in-files');
   if(fi) fi.addEventListener('change', function(){ previewIntakeFiles(fi); });
+  document.querySelectorAll('[data-view-file]').forEach(function(b){
+    b.addEventListener('click', function(){ viewIntakeFile(b.getAttribute('data-view-file'), b.getAttribute('data-file-name')); });
+  });
 }
 
 /* Thumbnails for the intake file picker. */
@@ -2420,6 +2464,7 @@ async function submitIntake(claim){
   let phone = v('in-phone');
   const email = v('in-email'), wants = v('in-wants'), notes = v('in-notes');
   const brandColors = v('in-colors');
+  const services = v('in-services'), hours = v('in-hours'), social = v('in-social');
   /* Only the business name is required. Whatever details the caller did
      get go to the builders right away, even a partial set, instead of the
      submit being blocked until every field is filled. */
@@ -2433,8 +2478,11 @@ async function submitIntake(claim){
   const intake = {
     id: intakeId, slug: claim.slug, business: business, contact_name: contact,
     phone: phone, email: email, wants: wants, notes: notes, brand_colors: brandColors,
+    services: services, hours: hours, social: social,
     claimer: state.user.username, claimer_name: state.user.name,
-    status: 'open', created_at: nowISO(), files: []
+    status: 'open', created_at: nowISO(), files: [],
+    progress: [{ t: nowISO(), by: state.user.username, by_name: state.user.name,
+      k: 'submitted', note: 'Build details submitted to builders' }]
   };
   const fileInput = document.getElementById('in-files');
   const nFiles = fileInput && fileInput.files ? Math.min(fileInput.files.length, 12) : 0;
@@ -3099,12 +3147,87 @@ function paintEditorPanel(el){
   wireEditorPanel(el);
 }
 
+/* Every question on the build details form, with the answer the caller
+   submitted, so the builder sees all of it in one place. A question the
+   caller left blank still gets a row, marked Not given, so the builder
+   can see what is missing instead of guessing. */
+function intakeDetailsHtml(i){
+  if(!i) return '';
+  const row = function(label, value){
+    const has = value != null && String(value).trim() !== '';
+    return '<div style="font-size:13px;margin-bottom:8px"><strong>' + esc(label) + ':</strong> ' +
+      (has ? esc(value) : '<span class="muted">Not given</span>') + '</div>';
+  };
+  let html = '<div style="margin-top:12px"><h3 style="margin:0 0 8px">Questions and answers from the caller</h3>';
+  html += row('Business', i.business);
+  html += row('Contact name', i.contact_name);
+  if(i.phone && hasPhone(i.phone)){
+    const ct = 'Hi ' + (i.contact_name || i.business || '') + ', this is about your website build.';
+    html += '<div style="font-size:13px;margin-bottom:8px"><strong>Phone:</strong></div>' +
+      '<div class="phone-line"><span class="num">' + esc(i.phone) + '</span>' +
+      '<a class="btn call sm" href="' + esc(telHref(i.phone)) + '">Call</a>' +
+      '<a class="btn sms sm" href="' + esc(smsHref(i.phone, ct)) + '">Text</a></div>';
+  } else {
+    html += row('Phone', i.phone);
+  }
+  if(i.email){
+    html += '<div style="font-size:13px;margin-bottom:8px"><strong>Email:</strong> <a href="mailto:' + esc(i.email) + '">' + esc(i.email) + '</a></div>';
+  } else {
+    html += row('Email', i.email);
+  }
+  html += row('Brand colors', i.brand_colors);
+  html += row('Services', i.services);
+  html += row('What they want', i.wants);
+  html += row('Business hours', i.hours);
+  html += row('Social media links', i.social);
+  html += row('Notes', i.notes);
+  html += row('Submitted by', i.claimer_name || i.claimer);
+  if(i.created_at) html += row('Submitted', fmtTime(i.created_at));
+  const files = Array.isArray(i.files) ? i.files : [];
+  if(files.length){
+    html += '<div style="font-size:13px;margin-bottom:6px"><strong>Photos and files:</strong></div>' +
+      '<div class="row">' + files.map(function(f){
+        return '<button type="button" class="btn ghost sm" data-view-file="' + esc(f.path || '') +
+          '" data-file-name="' + esc(f.name || 'file') + '">' + esc(f.name || 'file') + '</button>';
+      }).join('') + '</div>';
+  } else {
+    html += row('Photos and files', '');
+  }
+  html += '</div>';
+  return html;
+}
+
+/* The builder progress log on an intake: accepted, started, updates and
+   the finished site, newest first, the same shape as a lead timeline. */
+function intakeProgressHtml(i){
+  const entries = (i && Array.isArray(i.progress)) ? i.progress : [];
+  let html = '<div style="margin-top:12px"><h3 style="margin:0 0 4px">Build log</h3>';
+  if(!entries.length){
+    html += '<p class="muted" style="font-size:12px;line-height:1.55">No builder updates logged yet.</p>';
+  } else {
+    html += '<ul class="timeline">' + entries.slice().reverse().map(function(ev){
+      return '<li><div class="k">' + esc(ev.k || 'update') + '</div>' +
+        (ev.note ? '<div>' + esc(ev.note) + '</div>' : '') +
+        '<div class="t">' + esc(fmtTime(ev.t)) +
+        (ev.by_name ? ' · ' + esc(ev.by_name) : '') + '</div></li>';
+    }).join('') + '</ul>';
+  }
+  html += '</div>';
+  return html;
+}
+
+function intakeAcceptedByOther(i){
+  return !!(i && i.builder && state.user && i.builder !== state.user.username && !isManager());
+}
+
 /* The build record for this lead: status badge, builder name and phone,
    built site URL, payment link, plus the builder status controls. This is
    the intake info that used to live on the old listing page. */
 function editorIntakeHtml(lead){
   const i = state.editorIntake;
   if(!i) return '<p class="muted" style="font-size:12px;margin-bottom:10px;line-height:1.55">No build record for this lead yet. One appears here once a caller submits build details.</p>';
+  const accepted = !!i.builder;
+  const other = intakeAcceptedByOther(i);
   let html = '<div class="card" style="margin:10px 0;padding:14px"><h3 style="margin:0 0 8px">Build record</h3>' +
     '<div class="row" style="margin-bottom:8px">' + badge(i.status) + '</div>';
   if(i.builder_name){
@@ -3115,23 +3238,47 @@ function editorIntakeHtml(lead){
         '<a class="btn call sm" href="' + esc(telHref(i.builder_phone)) + '">Call</a>' +
         '<a class="btn sms sm" href="' + esc(smsHref(i.builder_phone, bt)) + '">Text</a></div>';
     }
+    if(i.accepted_at) html += '<div class="muted" style="font-size:11px;margin-bottom:6px">Accepted ' + esc(fmtTime(i.accepted_at)) + '</div>';
   }
+  html += intakeDetailsHtml(i);
   if(i.site_url) html += '<div style="margin-top:8px;font-size:13px"><strong>Built site:</strong> <a href="' + esc(i.site_url) + '" target="_blank" rel="noopener">Open</a></div>';
   if(i.pay_link) html += '<div style="margin-top:4px;font-size:13px"><strong>Payment link:</strong> <a href="' + esc(i.pay_link) + '" target="_blank" rel="noopener">Open</a></div>';
-  html += '<div class="field" style="margin-top:10px"><label>Build status</label><div class="chiprow">' +
-    INTAKE_STATUSES.map(function(p){
-      return '<button type="button" class="chip' + (i.status === p[0] ? ' on' : '') +
-        '" data-intake="' + esc(i.id) + '" data-inewstatus="' + p[0] + '">' + p[1] + '</button>';
-    }).join('') + '</div></div>' +
-    '<div class="field" style="margin-top:10px"><label>Built site URL</label>' +
-    '<input id="bs-site-' + esc(i.id) + '" placeholder="https://..." value="' + esc(buildDraft(i.id, 'site') || i.site_url || '') + '"/>' +
-    '<label style="margin-top:8px">Client payment link</label>' +
-    '<input id="bs-pay-' + esc(i.id) + '" placeholder="https://..." value="' + esc(buildDraft(i.id, 'pay') || i.pay_link || '') + '"/>' +
-    '<div class="row" style="margin-top:8px"><button type="button" class="btn sm" data-submit-build="' + esc(i.id) + '">Submit built site</button></div>' +
-    '<div class="err" id="bs-err-' + esc(i.id) + '"></div></div>';
+  if(!accepted){
+    /* A build sits at Open until a builder accepts it. Accepting claims
+       it, names the builder on the record and starts the build log. */
+    html += '<div style="margin-top:14px"><p class="muted" style="font-size:12px;line-height:1.55;margin-bottom:10px">This build is open. Accept it to claim it and start working on it.</p>' +
+      '<button type="button" class="btn block" data-accept-intake="' + esc(i.id) + '">Accept this build</button>' +
+      '<div class="err" id="bs-err-' + esc(i.id) + '"></div></div>';
+  } else if(other){
+    html += '<p class="muted" style="font-size:12px;line-height:1.55;margin-top:12px">Accepted by ' + esc(i.builder_name || i.builder) + '. Only that builder can update this build.</p>';
+  } else {
+    html += '<div class="field" style="margin-top:12px"><label>Log progress</label>' +
+      '<div class="pick compact" id="blog-pick-' + esc(i.id) + '">' +
+      BUILDER_STAGES.map(function(s){
+        return '<button type="button" data-bstage="' + s[0] + '">' + s[1] + '</button>';
+      }).join('') + '</div>' +
+      '<textarea id="blog-note-' + esc(i.id) + '" placeholder="What is the progress on this site?" style="margin-top:8px">' + esc(buildDraft(i.id, 'log') || '') + '</textarea>' +
+      '<div class="row" style="margin-top:8px"><button type="button" class="btn sm" data-log-progress="' + esc(i.id) + '">Log progress</button></div>' +
+      '<div class="err" id="blog-err-' + esc(i.id) + '"></div></div>';
+    html += '<div class="field" style="margin-top:10px"><label>Build status</label><div class="chiprow">' +
+      INTAKE_STATUSES.filter(function(p){ return p[0] !== 'open'; }).map(function(p){
+        return '<button type="button" class="chip' + (i.status === p[0] ? ' on' : '') +
+          '" data-intake="' + esc(i.id) + '" data-inewstatus="' + p[0] + '">' + p[1] + '</button>';
+      }).join('') + '</div></div>' +
+      '<div class="field" style="margin-top:10px"><label>Built site URL</label>' +
+      '<input id="bs-site-' + esc(i.id) + '" placeholder="https://..." value="' + esc(buildDraft(i.id, 'site') || i.site_url || '') + '"/>' +
+      '<label style="margin-top:8px">Client payment link</label>' +
+      '<input id="bs-pay-' + esc(i.id) + '" placeholder="https://..." value="' + esc(buildDraft(i.id, 'pay') || i.pay_link || '') + '"/>' +
+      '<div class="row" style="margin-top:8px"><button type="button" class="btn sm" data-submit-build="' + esc(i.id) + '">Submit built site</button></div>' +
+      '<div class="err" id="bs-err-' + esc(i.id) + '"></div></div>';
+  }
+  html += intakeProgressHtml(i);
   html += '</div>';
   return html;
 }
+
+var BUILDER_STAGES = [['started','Started'],['in_progress','In progress'],['waiting','Waiting on info'],['almost_done','Almost done']];
+var BUILDER_STAGE_LABELS = { started: 'Started', in_progress: 'In progress', waiting: 'Waiting on info', almost_done: 'Almost done' };
 
 /* Live business-name rewrite: replace the name currently shown through the
    code with the new value, so the preview updates as the name is edited.
@@ -3389,6 +3536,28 @@ function wireEditorPanel(el){
   });
   panel.querySelectorAll('[data-submit-build]').forEach(function(b){
     b.addEventListener('click', function(){ submitBuiltSite(b.getAttribute('data-submit-build'), el); });
+  });
+  panel.querySelectorAll('[data-accept-intake]').forEach(function(b){
+    b.addEventListener('click', function(){ acceptIntake(b, el); });
+  });
+  panel.querySelectorAll('[data-log-progress]').forEach(function(b){
+    b.addEventListener('click', function(){ logBuilderProgress(b.getAttribute('data-log-progress'), el); });
+  });
+  panel.querySelectorAll('[data-view-file]').forEach(function(b){
+    b.addEventListener('click', function(){ viewIntakeFile(b.getAttribute('data-view-file'), b.getAttribute('data-file-name')); });
+  });
+  panel.querySelectorAll('[id^="blog-pick-"]').forEach(function(pick){
+    const id = pick.id.slice(10);
+    pick.querySelectorAll('[data-bstage]').forEach(function(b){
+      if(buildDraft(id, 'stage') === b.getAttribute('data-bstage')) b.classList.add('on');
+      b.addEventListener('click', function(){
+        buildDraft(id, 'stage', b.getAttribute('data-bstage'));
+        pick.querySelectorAll('[data-bstage]').forEach(function(x){ x.classList.toggle('on', x === b); });
+      });
+    });
+  });
+  panel.querySelectorAll('[id^="blog-note-"]').forEach(function(inp){
+    inp.addEventListener('input', function(){ buildDraft(inp.id.slice(10), 'log', inp.value); });
   });
   panel.querySelectorAll('[id^="bs-site-"]').forEach(function(inp){
     inp.addEventListener('input', function(){ buildDraft(inp.id.slice(8), 'site', inp.value); });
@@ -3746,6 +3915,118 @@ async function revertJob(jobid, el){
   }catch(e){ toast(e.message); }
 }
 
+/* A builder accepts an open build before any work starts. Accepting
+   claims it: the builder is named on the record, the status moves off
+   Open to Building, the acceptance opens the build log, and the caller
+   is told who picked it up. */
+async function acceptIntake(btn, el){
+  const id = btn.getAttribute('data-accept-intake');
+  btn.disabled = true; btn.textContent = 'Accepting...';
+  try{
+    const rec = await ghGetJson('intakes/' + id + '.json');
+    if(!rec){ toast('Intake not found.'); refreshIntakeView(el); return; }
+    const intake = rec.data;
+    if(intake.builder){
+      toast('Already accepted by ' + (intake.builder_name || intake.builder) + '.');
+      refreshIntakeView(el);
+      return;
+    }
+    intake.builder = state.user.username;
+    intake.builder_name = state.user.name;
+    const u = (state.users || {})[state.user.username];
+    if(u && u.phone) intake.builder_phone = u.phone;
+    intake.status = 'building';
+    intake.accepted_at = nowISO();
+    intake.progress = Array.isArray(intake.progress) ? intake.progress : [];
+    intake.progress.push({ t: nowISO(), by: state.user.username, by_name: state.user.name,
+      k: 'accepted', note: 'Build accepted by ' + state.user.name });
+    try{
+      await ghPutJson('intakes/' + id + '.json', intake, rec.sha, 'sitedesk: intake ' + id + ' accepted');
+    }catch(e){
+      if(isConflictError(e)){
+        const rec2 = await ghGetJson('intakes/' + id + '.json');
+        if(rec2 && rec2.data && rec2.data.builder === state.user.username){
+          /* Double tap: the first tap already accepted it. */
+        } else if(rec2 && rec2.data && rec2.data.builder){
+          toast('Already accepted by ' + (rec2.data.builder_name || rec2.data.builder) + '.');
+          refreshIntakeView(el);
+          return;
+        } else { throw e; }
+      } else { throw e; }
+    }
+    if(intake.claimer){
+      await postEvent(intake.claimer, 'Build accepted: ' + (intake.business || intake.slug),
+        state.user.name + ' accepted the build and started work.', 'lead:' + intake.slug);
+    }
+    toast('Build accepted. It is yours now.');
+    refreshIntakeView(el);
+  }catch(e){ toast(e.message); btn.disabled = false; btn.textContent = 'Accept this build'; }
+}
+
+/* The builder logs progress on the site, the same way a caller logs an
+   outcome: pick where the build stands, write what happened, and the
+   entry lands on the build log where the caller and admins can see it.
+   The caller is notified on every entry. */
+async function logBuilderProgress(id, el){
+  const btn = el ? el.querySelector('[data-log-progress="' + id + '"]') : null;
+  const err = document.getElementById('blog-err-' + id);
+  const noteEl = document.getElementById('blog-note-' + id);
+  const note = ((noteEl ? noteEl.value : '') || buildDraft(id, 'log') || '').trim();
+  const stage = buildDraft(id, 'stage') || '';
+  if(err) err.textContent = '';
+  if(!stage && !note){
+    if(err) err.textContent = 'Pick where the build stands or write a progress note first.';
+    return;
+  }
+  if(btn){ btn.disabled = true; btn.textContent = 'Logging...'; }
+  try{
+    const rec = await ghGetJson('intakes/' + id + '.json');
+    if(!rec){ if(err) err.textContent = 'Intake not found.'; if(btn){ btn.disabled = false; btn.textContent = 'Log progress'; } return; }
+    const intake = rec.data;
+    if(!intake.builder){
+      if(err) err.textContent = 'Accept the build first.';
+      if(btn){ btn.disabled = false; btn.textContent = 'Log progress'; }
+      return;
+    }
+    if(intakeAcceptedByOther(intake)){
+      if(err) err.textContent = 'Only the builder who accepted this build can log progress on it.';
+      if(btn){ btn.disabled = false; btn.textContent = 'Log progress'; }
+      return;
+    }
+    const label = stage ? (BUILDER_STAGE_LABELS[stage] || stage) : 'Update';
+    intake.progress = Array.isArray(intake.progress) ? intake.progress : [];
+    intake.progress.push({ t: nowISO(), by: state.user.username, by_name: state.user.name,
+      k: 'progress: ' + label.toLowerCase(), note: note });
+    if(stage === 'started' || stage === 'in_progress' || stage === 'almost_done'){
+      if(intake.status === 'open') intake.status = 'building';
+    }
+    try{
+      await ghPutJson('intakes/' + id + '.json', intake, rec.sha, 'sitedesk: intake ' + id + ' progress');
+    }catch(e){
+      if(isConflictError(e)){
+        const rec2 = await ghGetJson('intakes/' + id + '.json');
+        if(rec2){
+          const fresh = rec2.data;
+          fresh.progress = Array.isArray(fresh.progress) ? fresh.progress : [];
+          fresh.progress.push({ t: nowISO(), by: state.user.username, by_name: state.user.name,
+            k: 'progress: ' + label.toLowerCase(), note: note });
+          await ghPutJson('intakes/' + id + '.json', fresh, rec2.sha, 'sitedesk: intake ' + id + ' progress (retry)');
+        } else { throw e; }
+      } else { throw e; }
+    }
+    delete state.draftBuild[id];
+    if(intake.claimer){
+      await postEvent(intake.claimer, 'Build update: ' + (intake.business || intake.slug),
+        state.user.name + ' logged progress: ' + label + (note ? '. ' + note : ''), 'lead:' + intake.slug);
+    }
+    toast('Progress logged');
+    refreshIntakeView(el);
+  }catch(e){
+    if(err) err.textContent = e.message; else toast(e.message);
+    if(btn){ btn.disabled = false; btn.textContent = 'Log progress'; }
+  }
+}
+
 async function setIntakeStatus(chip, el){
   const id = chip.getAttribute('data-intake');
   const ns = chip.getAttribute('data-inewstatus');
@@ -3755,13 +4036,20 @@ async function setIntakeStatus(chip, el){
     if(!rec){ toast('Intake not found.'); return; }
     const intake = rec.data;
     const old = intake.status;
-    intake.status = ns;
-    if(ns === 'building'){
-      intake.builder = state.user.username;
-      intake.builder_name = state.user.name;
-      const u = (state.users || {})[state.user.username];
-      if(u && u.phone) intake.builder_phone = u.phone;
+    if(!intake.builder){
+      toast('Accept the build first.');
+      chip.disabled = false;
+      return;
     }
+    if(intakeAcceptedByOther(intake)){
+      toast('Only the builder who accepted this build can change its status.');
+      chip.disabled = false;
+      return;
+    }
+    intake.status = ns;
+    intake.progress = Array.isArray(intake.progress) ? intake.progress : [];
+    intake.progress.push({ t: nowISO(), by: state.user.username, by_name: state.user.name,
+      k: 'status: ' + ns, note: 'Build status changed from ' + (old || 'open') + ' to ' + ns });
     await ghPutJson('intakes/' + id + '.json', intake, rec.sha, 'sitedesk: intake ' + id + ' -> ' + ns);
     if(intake.claimer && old !== ns){
       await postEvent(intake.claimer, 'Intake update: ' + (intake.business || intake.slug),
@@ -3810,9 +4098,22 @@ async function submitBuiltSite(id, el){
       refreshIntakeView(el);
       return;
     }
+    if(!intake.builder){
+      if(err) err.textContent = 'Accept the build first.';
+      restore();
+      return;
+    }
+    if(intakeAcceptedByOther(intake)){
+      if(err) err.textContent = 'Only the builder who accepted this build can submit the finished site.';
+      restore();
+      return;
+    }
     intake.site_url = siteUrl;
     intake.pay_link = payLink;
     intake.status = 'ready';
+    intake.progress = Array.isArray(intake.progress) ? intake.progress : [];
+    intake.progress.push({ t: nowISO(), by: state.user.username, by_name: state.user.name,
+      k: 'ready', note: 'Finished site and client payment link submitted' });
     intake.ready_at = nowISO();
     intake.ready_by = state.user.username;
     intake.builder = intake.builder || state.user.username;
@@ -5109,7 +5410,7 @@ function helpHtml(){
   }
   if(builder){
     h += '<h3 style="margin:14px 0 8px">Site editor</h3>' +
-    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">The <strong>Editor</strong> tab is where sites get built and updated. Search a business by name, open its live site code, paste your new code over it, then <strong>Save draft</strong> to finish later or <strong>Publish</strong> to queue it. Publishing goes one at a time through a queue, so two publishes can never overlap and wipe each other out. Every publish keeps the previous version, and admins can revert a bad publish in one tap.</p>';
+    '<p class="muted" style="font-size:12px;line-height:1.65;margin-bottom:8px">The <strong>Editor</strong> tab is where sites get built and updated. Search a business by name, open its live site code, paste your new code over it, then <strong>Save draft</strong> to finish later or <strong>Publish</strong> to queue it. Publishing goes one at a time through a queue, so two publishes can never overlap and wipe each other out. Every publish keeps the previous version, and admins can revert a bad publish in one tap. When a caller sends you a build, its record shows every question and answer the caller submitted. <strong>Accept the build</strong> first to claim it, then <strong>log your progress</strong> on it as you work, so the caller can follow the site without chasing you.</p>';
   }
   if(admin){
     h += '<h3 style="margin:14px 0 8px">Admin</h3>' +
@@ -5412,6 +5713,13 @@ if(typeof module !== 'undefined' && module.exports){
   module.exports.openEditorSlug = openEditorSlug;
   module.exports.paintEditorPanel = paintEditorPanel;
   module.exports.editorIntakeHtml = editorIntakeHtml;
+  module.exports.intakeDetailsHtml = intakeDetailsHtml;
+  module.exports.intakeProgressHtml = intakeProgressHtml;
+  module.exports.leadCard = leadCard;
+  module.exports.acceptIntake = acceptIntake;
+  module.exports.logBuilderProgress = logBuilderProgress;
+  module.exports.setIntakeStatus = setIntakeStatus;
+  module.exports.submitBuiltSite = submitBuiltSite;
   module.exports.shell = shell;
   module.exports.uactPanelHtml = uactPanelHtml;
   module.exports.decodeHtml = decodeHtml;
