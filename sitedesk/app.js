@@ -3327,6 +3327,7 @@ function onEditorBizName(value){
     const ta = document.getElementById('editor-new-code');
     if(ta && ta.value.indexOf(shown) !== -1){
       ta.value = ta.value.split(shown).join(value);
+      fitEditorCode();
       const pv = document.getElementById('editor-preview');
       if(pv){ try{ pv.srcdoc = ta.value; }catch(e){} }
     }
@@ -3425,11 +3426,28 @@ function removeLogoFromCode(code){
   return String(code || '').replace(/\s*<img[^>]*site-logo[^>]*>/i, '');
 }
 
+/* The code box is not a scroll box: it grows to fit everything inside
+   it, so the page is the only thing that scrolls while editing, the
+   same one-scroll rule as the rest of the app. Called whenever the code
+   changes, typed or programmatic. */
+function fitEditorCode(){
+  const ta = document.getElementById('editor-new-code');
+  if(!ta) return;
+  try{
+    ta.style.height = 'auto';
+    const sh = ta.scrollHeight;
+    if(typeof sh === 'number' && isFinite(sh) && sh > 0){
+      ta.style.height = Math.max(280, sh + 4) + 'px';
+    }
+  }catch(e){}
+}
+
 /* Push the textarea code into the preview iframe and mark dirty. */
 function brandingCodeUpdated(){
   const ta = document.getElementById('editor-new-code');
   if(!ta) return;
   state._editorDirty = true;
+  fitEditorCode();
   const pv = document.getElementById('editor-preview');
   if(pv){ try{ pv.srcdoc = ta.value; }catch(e){} }
 }
@@ -3512,9 +3530,11 @@ function wireEditorPanel(el){
     let pdeb = null;
     taPrev.addEventListener('input', function(){
       state._editorDirty = true;
+      fitEditorCode();
       if(pdeb) clearTimeout(pdeb);
       pdeb = setTimeout(refreshPreview, 600);
     });
+    fitEditorCode();
     refreshPreview();
   }
   /* Site identity fields. The business name rewrites through the code live
@@ -5808,6 +5828,7 @@ if(typeof module !== 'undefined' && module.exports){
   module.exports.acceptIntake = acceptIntake;
   module.exports.releaseIntake = releaseIntake;
   module.exports.editorAnswersHtml = editorAnswersHtml;
+  module.exports.fitEditorCode = fitEditorCode;
   module.exports.logBuilderProgress = logBuilderProgress;
   module.exports.setIntakeStatus = setIntakeStatus;
   module.exports.submitBuiltSite = submitBuiltSite;
