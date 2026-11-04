@@ -443,6 +443,10 @@ var state = {
   userQ: '', userStatus: '',
   adminSec: 'users',
   adminUserView: null, _udFor: null,
+  notifQ: '', overallView: null, overallData: null,
+  /* Armed destructive admin actions (delete user, restart user): the first
+     tap arms, a second tap within a few seconds runs it. */
+  armAction: null,
   profileView: null, profileForm: {},
   /* Which admin user cards have their action panel toggled open. The three-dot
      button on a card toggles its panel; panels are always closed by default. */
@@ -795,9 +799,94 @@ function adminLeadModal(claim){
     (claim.claimer_name || claim.claimer ? ' by ' + esc(claim.claimer_name || claim.claimer) : '') + '</div>' +
     '<div class="row" style="justify-content:space-between;margin-bottom:14px"><span class="muted" style="font-size:12px">Outcome</span>' + outcomeBadge(claim.status) + '</div>' +
     (claim.note ? '<div class="card" style="margin:0 0 14px"><h3>Caller note</h3><p style="font-size:13px;line-height:1.5">' + esc(claim.note) + '</p></div>' : '') +
-    '<h3>History</h3>' + timelineHtml(claim));
+    '<h3>History</h3>' + timelineHtml(claim) +
+    /* Reset lead: the admin fix-it tool. Wipes the claim (and any build
+       intake for this lead) completely, so the lead goes back to the
+       queue fresh, no outcome, no history, instead of the admin having
+       to ask for records to be deleted by hand. */
+    '<button class="btn ghost block" id="btn-reset-lead" type="button" style="margin-top:16px;color:#ff6b6b">Reset lead</button>' +
+    '<p class="muted" style="font-size:11px;margin-top:6px;line-height:1.55">Reset wipes this claim and any build details submitted for it. The lead goes back to the queue fresh.</p>');
   const mc = document.getElementById('modal-close');
   if(mc) mc.addEventListener('click', closeModal);
+  const rs = document.getElementById('btn-reset-lead');
+  if(rs) rs.addEventListener('click', async function(){
+    if(!window.confirm('Reset this lead? The claim and any build details for it are wiped, and the lead goes back to the queue fresh.')) return;
+    rs.disabled = true;
+    try{
+      await adminResetLead(claim.slug);
+      closeModal();
+      toast('Lead reset: back in the queue, fresh.');
+      renderApp();
+    }catch(e){ toast(e.message); rs.disabled = false; }
+  });
+}
+
+/* Wipe one lead completely: claim file, claim index entry, and any
+   intake (build details) submitted for it. The lead returns to the
+   queue as if it was never touched. Returns what was removed. */
+async function adminResetLead(slug){
+  let hadClaim = false, hadIntake = false;
+  try{
+    const rec = await ghGetJson('claims/' + slug + '.json');
+    if(rec){ await ghDeleteFile('claims/' + slug + '.json', rec.sha); hadClaim = true; }
+  }catch(e){ if(!e || e.status !== 404) throw e; }
+  try{
+    const irec = await ghGetJson('intakes/intake-' + slug + '.json');
+    if(irec){ await ghDeleteFile('intakes/intake-' + slug + '.json', irec.sha); hadIntake = true; }
+  }catch(e){ if(!e || e.status !== 404) throw e; }
+  await updateClaimIndex(function(ix){ delete ix[slug]; });
+  delete state.claimsBySlug[slug];
+  if(state.editorIntake && state.editorIntake.slug === slug) state.editorIntake = null;
+  clearTreeCache();
+  return { claim: hadClaim, intake: hadIntake };
+}
+
+/* Restart a user: wipe everything that user did, so their work can be
+   fixed or started over without deleting the account. Claims are
+   released back to the queue (files deleted), build details they
+   submitted are deleted, builds they hold as a builder go back to Open,
+   and their dismissed notifications reset. The account itself, its role
+   and status, its payment method and the payments log all stay. */
+async function restartUserActivity(username){
+  const idx = await getClaimIndex(true);
+  const myClaims = Object.keys(idx).filter(function(s){ return idx[s] && idx[s].c === username; });
+  for(const slug of myClaims){
+    try{
+      const rec = await ghGetJson('claims/' + slug + '.json');
+      if(rec) await ghDeleteFile('claims/' + slug + '.json', rec.sha);
+    }catch(e){}
+    delete state.claimsBySlug[slug];
+  }
+  if(myClaims.length) await updateClaimIndex(function(ix){ myClaims.forEach(function(s){ delete ix[s]; }); });
+  let intakes = [];
+  try{ intakes = await loadIntakes('all'); }catch(e){}
+  const submitted = intakes.filter(function(i){ return i.claimer === username; });
+  for(const i of submitted){
+    try{
+      const rec = await ghGetJson('intakes/' + i.id + '.json');
+      if(rec) await ghDeleteFile('intakes/' + i.id + '.json', rec.sha);
+    }catch(e){}
+  }
+  const held = intakes.filter(function(i){ return i.builder === username; });
+  for(const i of held){
+    try{
+      const rec = await ghGetJson('intakes/' + i.id + '.json');
+      if(rec){
+        const it = rec.data;
+        delete it.builder; delete it.builder_name; delete it.builder_phone; delete it.accepted_at;
+        it.status = 'open';
+        it.progress = Array.isArray(it.progress) ? it.progress : [];
+        it.progress.push({ t: nowISO(), by: state.user.username, by_name: state.user.name, k: 'released', note: 'Build released (account restarted)' });
+        await ghPutJson('intakes/' + i.id + '.json', it, rec.sha, 'sitedesk: intake ' + i.id + ' released (restart)');
+      }
+    }catch(e){}
+  }
+  try{
+    const drec = await ghGetJson('dismissed/' + username + '.json').catch(function(){ return null; });
+    if(drec) await ghDeleteFile('dismissed/' + username + '.json', drec.sha);
+  }catch(e){}
+  clearTreeCache();
+  return { claims: myClaims.length, intakes: submitted.length, builds: held.length };
 }
 
 /* Jump straight to whatever an alert points at: lead:<slug>, intake:<id>, tab:profile, tab:users. */
@@ -1987,6 +2076,11 @@ async function grabLead(slug){
   state.meSlug = slug;
   state.tab = 'mine';
   renderApp();
+  /* Seamless: grabbing a lead opens the lead itself right away. Landing on
+     the My Leads list and tapping the lead a second time was an extra step
+     the user called out as complexity. The list is still behind the lead,
+     so closing the lead lands back on My Leads. */
+  openLeadModal(slug);
 }
 
 async function grabRandom(){
@@ -4266,16 +4360,19 @@ async function renderAdminInto(el){
     return;
   }
   if(state.adminUser){ renderUserDashboardInto(el); return; }
+  /* Announcements and notifications are one thing now: the old separate
+     Announcements section is gone, everything sends from Notifications. */
+  if(state.adminSec === 'announce') state.adminSec = 'notify';
   /* Re-renders in the users section (chips, search, approve/delete, etc.)
      keep the scroll position, so the page never jumps back to the top. */
   const keepScroll = state.adminSec === 'users';
   const sy = keepScroll ? (window.scrollY || document.documentElement.scrollTop || 0) : 0;
   let html = '<div class="chiprow" style="margin-bottom:14px">' +
-    [['users','Users'],['announce','Announcements'],['tools','Tools']].map(function(p){
+    [['users','Users'],['notify','Notifications'],['tools','Tools']].map(function(p){
       return '<button type="button" class="chip' + (state.adminSec === p[0] ? ' on' : '') + '" data-admin-sec="' + p[0] + '">' + p[1] + '</button>';
     }).join('') + '</div>';
   if(state.adminSec === 'users') html += adminUsersHtml();
-  else if(state.adminSec === 'announce') html += adminAnnounceHtml();
+  else if(state.adminSec === 'notify') html += adminNotifyHtml();
   else html += adminToolsHtml();
   el.innerHTML = html;
   el.querySelectorAll('[data-admin-sec]').forEach(function(chip){
@@ -4286,7 +4383,7 @@ async function renderAdminInto(el){
     });
   });
   if(state.adminSec === 'users') wireAdminUsers(el);
-  else if(state.adminSec === 'announce') wireAdminAnnounce(el);
+  else if(state.adminSec === 'notify') wireAdminNotify(el);
   else wireAdminTools(el);
   if(keepScroll && sy) window.scrollTo(0, sy);
 }
@@ -4351,6 +4448,7 @@ function uactPanelHtml(r, u){
     }
     h += item('disable', u.status === 'disabled' ? 'Re-enable user' : 'Disable user');
     h += item('resetpw', 'Reset password');
+    h += item('restart', 'Restart user');
     if(state.user.role === 'head'){
       h += '<div class="uact-sep"></div>';
       ['caller','builder','admin'].forEach(function(ro){
@@ -4415,6 +4513,31 @@ function wireAdminUsers(el){
    single re-rendered card can re-wire its own panel without touching the
    rest of the page. rootEl is the admin container passed through for actions
    that genuinely navigate (dashboard). */
+/* Destructive admin actions (delete user, restart user) are double tap:
+   the first tap arms the button (it turns into "Tap again to ..." and
+   stays armed for a few seconds), only the second tap runs it. One stray
+   tap can no longer delete an account. */
+function armOrRun(btn, act, username){
+  const key = act + ':' + username;
+  const now = Date.now();
+  if(state.armAction && state.armAction.key === key && state.armAction.until > now){
+    state.armAction = null;
+    return true;
+  }
+  state.armAction = { key: key, until: now + 4000 };
+  const label = act === 'delete' ? 'Tap again to delete' : 'Tap again to restart';
+  btn.textContent = label;
+  btn.classList.add('armed');
+  setTimeout(function(){
+    if(state.armAction && state.armAction.key === key){
+      state.armAction = null;
+      try{ btn.textContent = act === 'delete' ? 'Delete user' : 'Restart user'; btn.classList.remove('armed'); }catch(e){}
+    }
+  }, 4200);
+  toast('Tap again to confirm.');
+  return false;
+}
+
 function wireUactButtons(scope, rootEl){
   scope.querySelectorAll('[data-uact]').forEach(function(btn){
     btn.addEventListener('click', function(){
@@ -4427,6 +4550,7 @@ function wireUactButtons(scope, rootEl){
         renderAdminInto(rootEl);
         return;
       }
+      if((v === 'delete' || v === 'restart') && !armOrRun(btn, v, username)) return;
       try{
         const r = userAction(username, v, rootEl);
         if(r && r.then) r.then(function(){}, function(){});
@@ -4438,7 +4562,8 @@ function wireUactButtons(scope, rootEl){
 /* Re-render a single user card in place after an action (approve, disable,
    role change, ...): the badges and the action panel update without
    rebuilding the whole list, so there is no page refresh and no scroll jump.
-   The panel stays exactly as it was (open or closed). */
+   Once an action has run, the panel closes: the user asked for actions to
+   finish and close, not stay hanging open. */
 function refreshUserCard(username){
   const u = state.users[username];
   const card = document.querySelector('[data-usercard="' + CSS.escape(username) + '"]');
@@ -4447,11 +4572,13 @@ function refreshUserCard(username){
   if(badges) badges.innerHTML = badge(u.status) + badge(u.role);
   const holder = card.querySelector('[data-uact-holder]');
   if(holder){
-    const wasOpen = holder.style.display !== 'none';
     holder.innerHTML = uactPanelHtml({ username: username }, u);
-    holder.style.display = wasOpen ? '' : 'none';
+    holder.style.display = 'none';
     wireUactButtons(card, document.getElementById('view'));
   }
+  delete state.adminOpen[username];
+  const dots = card.querySelector('.uact-dots');
+  if(dots){ dots.setAttribute('aria-expanded', 'false'); dots.classList.remove('open'); }
 }
 
 /* Remove a single user card from the list in place (after delete). No
@@ -4537,7 +4664,13 @@ async function renderUserDashboardInto(el){
     '<div id="ud-menu" style="margin-top:14px;' + (uv ? 'display:none' : '') + '">' +
     [['paymethod', 'Payment method'], ['payments', 'Payments'], ['leads', 'Leads (' + mySlugs.length + ')'], ['intakes', 'Intakes (' + myIntakes.length + ')']].map(function(m){
       return '<button class="btn ghost block" data-open-ud="' + m[0] + '" type="button" style="text-align:left;margin-bottom:8px">' + m[1] + ' \u203A</button>';
-    }).join('') + '</div>' +
+    }).join('') +
+    /* Restart user sits on the dashboard menu too: same double tap rule
+       as the users list, wipes everything this user did, account stays. */
+    (username !== state.user.username && u.role !== 'head'
+      ? '<button class="btn ghost block" id="ud-restart" type="button" style="text-align:left;margin-bottom:8px;color:#ff6b6b">Restart user</button>' +
+        '<p class="muted" style="font-size:11px;line-height:1.55">Restart wipes everything this user did: their claims go back to the queue, build details they submitted are deleted, builds they hold go back to Open. The account, role, and payments stay.</p>'
+      : '') + '</div>' +
     '<div id="ud-secbar" class="row" style="margin:14px 0 10px;' + (uv ? '' : 'display:none') + '">' +
     '<button class="btn ghost sm" id="ud-secback" type="button">\u2190 Back</button>' +
     '<h3 style="margin:0">' + esc(uv ? (udTitles[uv] || '') : '') + '</h3></div>' +
@@ -4565,6 +4698,15 @@ async function renderUserDashboardInto(el){
   });
   const udSecBack = document.getElementById('ud-secback');
   if(udSecBack) udSecBack.addEventListener('click', function(){ state.adminUserView = null; renderUserDashboardInto(el); });
+  const udRestart = el.querySelector('#ud-restart');
+  if(udRestart) udRestart.addEventListener('click', async function(){
+    if(!armOrRun(udRestart, 'restart', username)) return;
+    udRestart.disabled = true;
+    try{
+      await userAction(username, 'restart', el);
+      renderUserDashboardInto(el);
+    }catch(e){ toast(e.message); udRestart.disabled = false; }
+  });
   el.querySelector('#ud-logpay').addEventListener('click', function(){ logPaymentModal(username, el); });
   const detailCache = {};
   const wireLeadRows = function(){
@@ -4775,6 +4917,13 @@ async function userAction(username, act, el){
         }catch(e){}
       })();
       return;
+    } else if(act === 'restart'){
+      /* Restart the user: wipe everything they did (claims back to the
+         queue, submitted build details deleted, held builds back to
+         Open) while the account itself stays exactly as it is. */
+      const res = await restartUserActivity(username);
+      await postEvent(username, 'Account restarted', 'Your SiteDesk activity was restarted by an admin. Leads and builds were reset.', '');
+      toast('Restarted @' + username + ': ' + res.claims + ' claims, ' + res.intakes + ' build details, ' + res.builds + ' held builds reset.');
     } else if(act === 'resetpw'){
       /* Admin/head resets a user's password when the user asks (e.g. by email).
          The new password is shown once so it can be sent to the user. */
@@ -4845,36 +4994,62 @@ function newUserModal(el){
   });
 }
 
-function adminAnnounceHtml(){
-  return '<div class="card"><h2>Announcements</h2>' +
-    '<p class="muted" style="font-size:12px;margin-bottom:12px;line-height:1.55">Posts to every user as a notification.</p>' +
-    '<div class="field"><label>Title *</label><input id="an-title" placeholder="e.g. New payout rules"/></div>' +
-    '<div class="field"><label>Message *</label><textarea id="an-body" placeholder="What should everyone know?"></textarea></div>' +
-    '<button class="btn block" id="an-go" type="button">Send to everyone</button>' +
-    '<div class="err" id="an-err"></div></div>';
+/* Admin > Notifications: the one place announcements and notifications
+   are sent from (they were split across an Announcements section and a
+   composer buried in Tools; the user asked for them as one). Below the
+   composer, everything already sent is listed and searchable. */
+function adminNotifyHtml(){
+  return notifyComposerHtml() +
+    '<div class="card"><h2>Sent notifications</h2>' +
+    '<div class="filters"><input id="nt-q" value="' + esc(state.notifQ) + '" placeholder="Search sent notifications"/></div>' +
+    '<div id="nt-list">' + sentNotifsHtml() + '</div></div>';
 }
 
-function wireAdminAnnounce(el){
-  el.querySelector('#an-go').addEventListener('click', async function(){
-    const err = el.querySelector('#an-err');
-    err.textContent = '';
-    const title = (el.querySelector('#an-title').value || '').trim();
-    const body = (el.querySelector('#an-body').value || '').trim();
-    if(!title || !body){ err.textContent = 'Title and message are required.'; return; }
-    const ok = await postEvent('all', title, body, '');
-    if(ok){
-      el.querySelector('#an-title').value = '';
-      el.querySelector('#an-body').value = '';
-      toast('Announcement sent');
+function sentNotifsHtml(){
+  const q = (state.notifQ || '').trim().toLowerCase();
+  const audLabel = function(n){
+    if(!n.audience || n.audience === 'all') return 'Everyone';
+    if(n.audience === 'staff') return 'Staff only';
+    return '@' + n.audience;
+  };
+  const list = (state.feed || []).filter(function(n){
+    if(!q) return true;
+    const hay = ((n.title || '') + ' ' + (n.body || '') + ' ' + (n.from || '') + ' ' + audLabel(n)).toLowerCase();
+    return hay.indexOf(q) !== -1;
+  });
+  if(!list.length) return '<div class="empty">' + (q ? 'No sent notifications match.' : 'Nothing sent yet.') + '</div>';
+  return list.slice(0, 50).map(function(n){
+    return '<div class="row" style="justify-content:space-between;padding:10px 0;align-items:flex-start">' +
+      '<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px">' + esc(n.title || 'Notification') + '</div>' +
+      (n.body ? '<div class="muted" style="font-size:12px;line-height:1.55">' + esc(n.body) + '</div>' : '') +
+      '<div class="muted" style="font-size:11px;margin-top:2px">To: ' + esc(audLabel(n)) +
+      (n.from ? ' \xB7 from ' + esc(n.from) : '') + ' \xB7 ' + esc(fmtTime(n.created_at)) + '</div></div></div>';
+  }).join('') +
+  (list.length > 50 ? '<p class="muted" style="font-size:11px;margin-top:6px">Showing the latest 50 of ' + list.length + '. Search to narrow it down.</p>' : '');
+}
+
+function wireAdminNotify(el){
+  wireNotifyComposer(el);
+  const q = el.querySelector('#nt-q');
+  if(q) q.addEventListener('input', function(){
+    const start = q.selectionStart, end = q.selectionEnd;
+    state.notifQ = q.value;
+    const list = el.querySelector('#nt-list');
+    if(list) list.innerHTML = sentNotifsHtml();
+    const q2 = el.querySelector('#nt-q');
+    if(q2 && document.activeElement !== q2){
+      /* List update only, the input itself is untouched, so typing keeps
+         its place. Nothing to restore. */
     }
+    try{ q.setSelectionRange(start, end); }catch(e){}
   });
 }
 
 function adminToolsHtml(){
-  /* Send-notification composer lives here (Admin > Tools), not in the
-     Alerts tab. Audience can be everyone, staff only, or one person. */
-  return notifyComposerHtml() +
-  '<div class="card"><h2>Overall dashboard</h2>' +
+  /* The Overall dashboard, in the same button-opened sections design as
+     the rest of the app: a menu of groups, one open at a time, Back to
+     return. Stats load on demand so the admin panel never slows down. */
+  return '<div class="card"><h2>Overall dashboard</h2>' +
   '<p class="muted" style="font-size:12px;margin-bottom:12px;line-height:1.55">Whole-system stats: leads, users, claims, and activity.</p>' +
   '<button class="btn ghost block" id="tool-stats" type="button">Load stats</button>' +
   '<div id="tool-stats-out" style="margin-top:4px"></div></div>';
@@ -4920,32 +5095,77 @@ async function loadOverallStats(el){
     const feedToday = (state.feed || []).filter(function(n){
       try{ return new Date(n.created_at).toDateString() === today; }catch(e){ return false; }
     }).length;
-    let html = sec('Leads') + '<div class="statgrid">' +
-      tile(fmtNum(state.catalogTotal || 0), 'total leads') +
-      tile(fmtNum(idxKeys.length), 'claimed') +
-      tile(fmtNum(intakes), 'intakes') + '</div>' +
-      sec('Claims by status') + '<div class="statgrid">' +
-      ['claimed','interested','build','sold'].map(function(stt){
+    /* The numbers are computed once and kept, then painted as the
+       button-opened sections design the user likes: a menu of groups,
+       one group open at a time, a Back button to return. */
+    state.overallData = {
+      leads: tile(fmtNum(state.catalogTotal || 0), 'total leads') +
+        tile(fmtNum(idxKeys.length), 'claimed') +
+        tile(fmtNum(intakes), 'intakes'),
+      claims: ['claimed','interested','build','sold'].map(function(stt){
         return tile(fmtNum(byStatus[stt] || 0), stt);
-      }).join('') + '</div>' +
-      sec('Users') + '<div class="statgrid">' +
-      tile(fmtNum(unames.length), 'total') +
-      tile(fmtNum(uStatus.pending || 0), 'pending') +
-      tile(fmtNum(uStatus.approved || 0), 'approved') + '</div>' +
-      '<div class="statgrid">' +
-      tile(fmtNum(uRole.caller || 0), 'callers') +
-      tile(fmtNum(uRole.builder || 0), 'builders') +
-      tile(fmtNum((uRole.admin || 0) + (uRole.head || 0)), 'admins') + '</div>' +
-      sec('Activity') + '<div class="statgrid">' +
-      tile(fmtNum(feedToday), 'alerts today') +
-      tile(fmtNum(devices), 'push devices') +
-      tile(fmtNum((state.feed || []).length), 'alerts stored') + '</div>';
-    out.innerHTML = html +
-      '<div class="statsec">Live board</div><div id="live-board"></div>';
-    loadLiveBoard(el);
+      }).join(''),
+      users: tile(fmtNum(unames.length), 'total') +
+        tile(fmtNum(uStatus.pending || 0), 'pending') +
+        tile(fmtNum(uStatus.approved || 0), 'approved') +
+        tile(fmtNum(uRole.caller || 0), 'callers') +
+        tile(fmtNum(uRole.builder || 0), 'builders') +
+        tile(fmtNum((uRole.admin || 0) + (uRole.head || 0)), 'admins'),
+      activity: tile(fmtNum(feedToday), 'alerts today') +
+        tile(fmtNum(devices), 'push devices') +
+        tile(fmtNum((state.feed || []).length), 'alerts stored')
+    };
+    paintOverall(el);
   }catch(e){
     out.innerHTML = '<div class="err">' + esc(e.message) + '</div>';
   }
+}
+
+/* Paint the Overall dashboard from state.overallData in the sections
+   design: menu of groups (with a count on each), one group open at a
+   time, Back returns to the menu. The Live board is its own group and
+   only loads when opened. */
+function overallStatsHtml(){
+  const d = state.overallData;
+  if(!d) return '';
+  const ov = state.overallView || null;
+  const titles = { leads: 'Leads', claims: 'Claims by status', users: 'Users', activity: 'Activity', live: 'Live board' };
+  const counts = {
+    leads: state.catalogTotal ? fmtNum(state.catalogTotal) + ' total' : '',
+    users: '', claims: '', activity: '', live: ''
+  };
+  let html = '<div id="ov-menu" style="margin-top:14px;' + (ov ? 'display:none' : '') + '">' +
+    Object.keys(titles).map(function(k){
+      return '<button class="btn ghost block" data-open-ov="' + k + '" type="button" style="text-align:left;margin-bottom:8px">' +
+        titles[k] + (counts[k] ? ' \xB7 ' + counts[k] : '') + ' \u203A</button>';
+    }).join('') + '</div>' +
+    '<div id="ov-secbar" class="row" style="margin:14px 0 10px;' + (ov ? '' : 'display:none') + '">' +
+    '<button class="btn ghost sm" id="ov-secback" type="button">\u2190 Back</button>' +
+    '<h3 style="margin:0">' + esc(ov ? (titles[ov] || '') : '') + '</h3></div>';
+  ['leads','claims','users','activity'].forEach(function(k){
+    html += '<div data-ovsec="' + k + '" style="' + (ov === k ? '' : 'display:none') + '"><div class="statgrid">' + d[k] + '</div></div>';
+  });
+  html += '<div data-ovsec="live" style="' + (ov === 'live' ? '' : 'display:none') + '">' +
+    (ov === 'live' ? '<div id="live-board"></div>' : '') + '</div>';
+  return html;
+}
+
+function paintOverall(el){
+  const out = el.querySelector('#tool-stats-out');
+  if(!out || !state.overallData) return;
+  out.innerHTML = overallStatsHtml();
+  out.querySelectorAll('[data-open-ov]').forEach(function(b){
+    b.addEventListener('click', function(){
+      state.overallView = b.getAttribute('data-open-ov');
+      paintOverall(el);
+    });
+  });
+  const back = out.querySelector('#ov-secback');
+  if(back) back.addEventListener('click', function(){
+    state.overallView = null;
+    paintOverall(el);
+  });
+  if(state.overallView === 'live') loadLiveBoard(el);
 }
 
 /* Claim files store business names with HTML entities (e.g. Matia&#x27;s).
@@ -5065,9 +5285,11 @@ function fmtNum(n){
 }
 
 function wireAdminTools(el){
-  wireNotifyComposer(el);
   const st = el.querySelector('#tool-stats');
   if(st) st.addEventListener('click', function(){ loadOverallStats(el); });
+  /* If stats were already loaded this session, repaint them in place so
+     coming back to Tools does not lose the dashboard. */
+  if(state.overallData) paintOverall(el);
 }
 
 /* ================= alerts / profile ================= */
@@ -5829,6 +6051,12 @@ if(typeof module !== 'undefined' && module.exports){
   module.exports.releaseIntake = releaseIntake;
   module.exports.editorAnswersHtml = editorAnswersHtml;
   module.exports.fitEditorCode = fitEditorCode;
+  module.exports.adminNotifyHtml = adminNotifyHtml;
+  module.exports.sentNotifsHtml = sentNotifsHtml;
+  module.exports.overallStatsHtml = overallStatsHtml;
+  module.exports.adminResetLead = adminResetLead;
+  module.exports.restartUserActivity = restartUserActivity;
+  module.exports.armOrRun = armOrRun;
   module.exports.logBuilderProgress = logBuilderProgress;
   module.exports.setIntakeStatus = setIntakeStatus;
   module.exports.submitBuiltSite = submitBuiltSite;
