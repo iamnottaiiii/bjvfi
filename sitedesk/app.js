@@ -5627,20 +5627,25 @@ function openReplyModal(item){
   });
 }
 
-const PAY_PLATFORMS = ['Cash App', 'Venmo', 'PayPal', 'Zelle', 'Apple Pay', 'Chime', 'Bank transfer', 'Other'];
-const PAY_HANDLE_HINTS = { 'Cash App': '$yourtag', 'Venmo': '@yourtag', 'PayPal': 'you@email.com', 'Zelle': 'you@email.com or phone number', 'Apple Pay': 'phone number or email', 'Chime': '$yourtag', 'Bank transfer': 'email or handle', 'Other': 'email or handle' };
+const PAY_PLATFORMS = ['Cash App', 'Venmo', 'PayPal', 'Zelle', 'Apple Pay', 'Chime', 'Other'];
+const PAY_HANDLE_HINTS = { 'Cash App': '$yourtag', 'Venmo': '@yourtag', 'PayPal': 'you@email.com', 'Zelle': 'you@email.com or phone number', 'Apple Pay': 'phone number or email', 'Chime': '$yourtag', 'Other': 'email or handle' };
 function payHandlePlaceholder(platform){ return PAY_HANDLE_HINTS[platform] || 'email or handle'; }
 function parsePayMethod(u){
-  if(u.payment_platform || u.payment_handle) return { platform: u.payment_platform || '', handle: u.payment_handle || '' };
+  if(u.payment_platform || u.payment_handle){
+    let p = u.payment_platform || '';
+    let n = u.payment_platform_name || '';
+    if(p && p !== 'Other' && PAY_PLATFORMS.indexOf(p) === -1){ n = p; p = 'Other'; }
+    return { platform: p, handle: u.payment_handle || '', name: n };
+  }
   const raw = (u.payment_method || '').trim();
-  if(!raw) return { platform: '', handle: '' };
+  if(!raw) return { platform: '', handle: '', name: '' };
   for(let i = 0; i < PAY_PLATFORMS.length; i++){
     const p = PAY_PLATFORMS[i];
     if(raw.toLowerCase().indexOf(p.toLowerCase()) === 0){
-      return { platform: p, handle: raw.slice(p.length).replace(/^[\s:\-]+/, '').trim() };
+      return { platform: p, handle: raw.slice(p.length).replace(/^[\s:\-]+/, '').trim(), name: '' };
     }
   }
-  return { platform: '', handle: raw };
+  return { platform: '', handle: raw, name: '' };
 }
 
 function renderProfileInto(el){
@@ -5652,6 +5657,7 @@ function renderProfileInto(el){
   const payParsed = parsePayMethod(u);
   const pfPlatform = pfForm.payPlatform !== undefined ? pfForm.payPlatform : payParsed.platform;
   const pfHandle = pfForm.payHandle !== undefined ? pfForm.payHandle : payParsed.handle;
+  const pfPlatformName = pfForm.payPlatformName !== undefined ? pfForm.payPlatformName : (payParsed.name || '');
   el.innerHTML = '<div class="card"><h2>Profile</h2>' +
     '<dl class="profile-dl">' +
     '<div><dt>Name</dt><dd>' + esc(u.name) + '</dd></div>' +
@@ -5674,6 +5680,7 @@ function renderProfileInto(el){
     '<option value=""' + (pfPlatform ? '' : ' selected') + '>Choose one</option>' +
     PAY_PLATFORMS.map(function(p){ return '<option value="' + p + '"' + (pfPlatform === p ? ' selected' : '') + '>' + p + '</option>'; }).join('') +
     '</select></div>' +
+    '<div class="field" id="pay-name-wrap" style="' + (pfPlatform === 'Other' ? '' : 'display:none') + '"><label>Platform name</label><input id="pay-platform-name" value="' + esc(pfPlatformName) + '" placeholder="e.g. Wise, Revolut, your bank app" autocapitalize="none"/></div>' +
     '<div class="field"><label>Email or handle / tag</label><input id="pay-handle" value="' + esc(pfHandle) + '" placeholder="' + esc(payHandlePlaceholder(pfPlatform)) + '" autocapitalize="none"/></div>' +
     '<button class="btn sm" id="btn-save-pay" type="button">Save payment method</button>' +
     '<div class="err" id="pay-err"></div></div>' +
@@ -5695,6 +5702,8 @@ function renderProfileInto(el){
     if(pp) state.profileForm.payPlatform = pp.value;
     const ph = document.getElementById('pay-handle');
     if(ph) state.profileForm.payHandle = ph.value;
+    const pn = document.getElementById('pay-platform-name');
+    if(pn) state.profileForm.payPlatformName = pn.value;
   };
   el.querySelectorAll('[data-open-pf]').forEach(function(b){
     b.addEventListener('click', function(){ harvestPf(); state.profileView = b.getAttribute('data-open-pf'); renderProfileInto(el); });
@@ -5707,6 +5716,8 @@ function renderProfileInto(el){
   if(payPlatformSel) payPlatformSel.addEventListener('change', function(){
     const ph = document.getElementById('pay-handle');
     if(ph) ph.placeholder = payHandlePlaceholder(payPlatformSel.value);
+    const nw = document.getElementById('pay-name-wrap');
+    if(nw) nw.style.display = payPlatformSel.value === 'Other' ? '' : 'none';
   });
   el.querySelector('#btn-change-pw').addEventListener('click', changeOwnPassword);
   el.querySelector('#btn-howto').addEventListener('click', function(){
@@ -5758,8 +5769,14 @@ async function saveOwnPaymentMethod(){
   err.textContent = '';
   const platform = (document.getElementById('pay-platform').value || '').trim();
   const handle = (document.getElementById('pay-handle').value || '').trim();
+  const nameEl = document.getElementById('pay-platform-name');
+  const platName = platform === 'Other' ? ((nameEl && nameEl.value) || '').trim() : '';
   if((platform && !handle) || (!platform && handle)){
     err.textContent = 'Pick a platform and add the email or handle for it.';
+    return;
+  }
+  if(platform === 'Other' && !platName){
+    err.textContent = 'Type the name of the platform.';
     return;
   }
   const btn = document.getElementById('btn-save-pay');
@@ -5767,10 +5784,11 @@ async function saveOwnPaymentMethod(){
   try{
     await updateUserRecord(state.user.username, function(u){
       u.payment_platform = platform;
+      u.payment_platform_name = platName;
       u.payment_handle = handle;
-      u.payment_method = platform ? (platform + ': ' + handle) : '';
+      u.payment_method = platform ? (((platform === 'Other' && platName) ? platName : platform) + ': ' + handle) : '';
     }, 'sitedesk: payment method @' + state.user.username);
-    if(state.profileForm){ state.profileForm.payPlatform = platform; state.profileForm.payHandle = handle; }
+    if(state.profileForm){ state.profileForm.payPlatform = platform; state.profileForm.payHandle = handle; state.profileForm.payPlatformName = platName; }
     toast('Payment method saved');
   }catch(e){ err.textContent = e.message; }
   btn.disabled = false;
