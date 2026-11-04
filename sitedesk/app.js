@@ -41,11 +41,14 @@ function b64decodeToBytes(b64){
    format: {"s": slug, "n": name, "c": category, "p": phone, "a": address}.
    Long keys are kept only as fallbacks. */
 function normalizeLead(e){
-  /* Compact array format from chunk files: [slug, name, category, phone?] */
+  /* Compact array format from chunk files: [slug, name, category, phone?, address?].
+     The address rides along so a business is always searched and shown
+     with the address on file, never by name alone: two businesses can
+     share a name in different places. */
   if(Array.isArray(e)){
     return {
       slug: String(e[0] || ''), name: String(e[1] || ''), phone: String(e[3] || ''),
-      category: String(e[2] || ''), address: '', url: '',
+      category: String(e[2] || ''), address: String(e[4] || ''), url: '',
     };
   }
   e = e || {};
@@ -2005,7 +2008,10 @@ function showGrabPreview(slug){
   const bySlug = catalogBySlug();
   const l = bySlug[slug] || normalizeLead({ s: slug, n: slug, p: '' });
   const url = siteUrlFor(l);
-  const gq = encodeURIComponent(((l.name || '') + ' ' + (l.address || '')).trim());
+  /* The Google search is always business name plus the address on file.
+     Name alone is not enough: the same business name can exist in
+     another town, and the caller would research the wrong business. */
+  const gq = encodeURIComponent((decodeHtml(l.name || '') + ' ' + (l.address || '')).trim());
   const gurl = 'https://www.google.com/search?q=' + gq;
   const html = '<h2>Review before you grab</h2>' +
     '<p class="muted" style="font-size:13px;line-height:1.55;margin-bottom:14px">Research this business before you grab it. Open their site <strong>and</strong> run the Google search: what they do, their services, their vibe, so you sound like you know them on the call. The grab button unlocks after you do both.</p>' +
@@ -6267,6 +6273,7 @@ if(typeof module !== 'undefined' && module.exports){
   module.exports.shell = shell;
   module.exports.uactPanelHtml = uactPanelHtml;
   module.exports.decodeHtml = decodeHtml;
+  module.exports.normalizeLead = normalizeLead;
   module.exports.ghGetJson = ghGetJson;
   module.exports.ghFetch = ghFetch;
   module.exports.relTime = relTime;
