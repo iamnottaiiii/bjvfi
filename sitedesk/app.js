@@ -444,6 +444,7 @@ var state = {
   adminSec: 'users',
   adminUserView: null, _udFor: null,
   notifQ: '', overallView: null, overallData: null,
+  scheduled: null,
   /* Armed destructive admin actions (delete user, restart user): the first
      tap arms, a second tap within a few seconds runs it. */
   armAction: null,
@@ -674,7 +675,13 @@ function startFeedPoll(){
        The next tick after the user comes back catches up. */
     if(typeof document !== 'undefined' && document.hidden) return;
     fetchFeed(true).catch(function(){});
+    /* Admin and head sessions also fire any scheduled notifications
+       whose time has come. */
+    processScheduledNotifications().catch(function(){});
   }, 30000);
+  /* And once shortly after the app opens, so a due notification does not
+     wait for the first poll tick. */
+  setTimeout(function(){ processScheduledNotifications().catch(function(){}); }, 4000);
 }
 function stopFeedPoll(){
   try{ if(state.feedPoll) clearInterval(state.feedPoll); }catch(e){}
@@ -4368,11 +4375,12 @@ async function renderAdminInto(el){
   const keepScroll = state.adminSec === 'users';
   const sy = keepScroll ? (window.scrollY || document.documentElement.scrollTop || 0) : 0;
   let html = '<div class="chiprow" style="margin-bottom:14px">' +
-    [['users','Users'],['notify','Notifications'],['tools','Tools']].map(function(p){
+    [['users','Users'],['notify','Notifications'],['payments','Payments'],['tools','Tools']].map(function(p){
       return '<button type="button" class="chip' + (state.adminSec === p[0] ? ' on' : '') + '" data-admin-sec="' + p[0] + '">' + p[1] + '</button>';
     }).join('') + '</div>';
   if(state.adminSec === 'users') html += adminUsersHtml();
   else if(state.adminSec === 'notify') html += adminNotifyHtml();
+  else if(state.adminSec === 'payments') html += adminPaymentsHtml();
   else html += adminToolsHtml();
   el.innerHTML = html;
   el.querySelectorAll('[data-admin-sec]').forEach(function(chip){
@@ -4384,6 +4392,7 @@ async function renderAdminInto(el){
   });
   if(state.adminSec === 'users') wireAdminUsers(el);
   else if(state.adminSec === 'notify') wireAdminNotify(el);
+  else if(state.adminSec === 'payments') wireAdminPayments(el);
   else wireAdminTools(el);
   if(keepScroll && sy) window.scrollTo(0, sy);
 }
@@ -4791,7 +4800,10 @@ function logPaymentModal(username, el){
       await postEvent(username, 'Payment sent', '$' + amount + (note ? ' \xB7 ' + note : ''), 'tab:profile');
       closeModal();
       toast('Payment logged');
-      renderUserDashboardInto(el);
+      /* Re-render the admin area: with a user dashboard open this lands
+         back on that dashboard, from the Payments section it lands back
+         on the payments list. */
+      renderAdminInto(el);
     }catch(e){ err.textContent = e.message; btn.disabled = false; }
   });
 }
@@ -5000,9 +5012,31 @@ function newUserModal(el){
    composer, everything already sent is listed and searchable. */
 function adminNotifyHtml(){
   return notifyComposerHtml() +
+    '<div class="card"><h2>Scheduled</h2>' +
+    '<div id="sch-list">' + scheduledNotifsHtml() + '</div></div>' +
     '<div class="card"><h2>Sent notifications</h2>' +
     '<div class="filters"><input id="nt-q" value="' + esc(state.notifQ) + '" placeholder="Search sent notifications"/></div>' +
     '<div id="nt-list">' + sentNotifsHtml() + '</div></div>';
+}
+
+function scheduledNotifsHtml(){
+  const audLabel = function(n){
+    if(!n.audience || n.audience === 'all') return 'Everyone';
+    if(n.audience === 'staff') return 'Staff only';
+    return '@' + n.audience;
+  };
+  const list = state.scheduled;
+  if(!list) return '<div class="empty">Loading...</div>';
+  if(!list.length) return '<div class="empty">Nothing scheduled.</div>';
+  return list.map(function(n){
+    let when = '';
+    try{ when = new Date(n.send_at).toLocaleString(); }catch(e){}
+    return '<div class="row" style="justify-content:space-between;padding:10px 0;align-items:flex-start">' +
+      '<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px">' + esc(n.title || 'Notification') + '</div>' +
+      (n.body ? '<div class="muted" style="font-size:12px;line-height:1.55">' + esc(n.body) + '</div>' : '') +
+      '<div class="muted" style="font-size:11px;margin-top:2px">To: ' + esc(audLabel(n)) + ' \xB7 Sends: ' + esc(when) + '</div></div>' +
+      '<button type="button" class="btn ghost sm" data-del-sch="' + esc(n.id || '') + '" style="flex:none;margin-left:8px">Delete</button></div>';
+  }).join('');
 }
 
 function sentNotifsHtml(){
@@ -5023,7 +5057,8 @@ function sentNotifsHtml(){
       '<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px">' + esc(n.title || 'Notification') + '</div>' +
       (n.body ? '<div class="muted" style="font-size:12px;line-height:1.55">' + esc(n.body) + '</div>' : '') +
       '<div class="muted" style="font-size:11px;margin-top:2px">To: ' + esc(audLabel(n)) +
-      (n.from ? ' \xB7 from ' + esc(n.from) : '') + ' \xB7 ' + esc(fmtTime(n.created_at)) + '</div></div></div>';
+      (n.from ? ' \xB7 from ' + esc(n.from) : '') + ' \xB7 ' + esc(fmtTime(n.created_at)) + '</div></div>' +
+      '<button type="button" class="btn ghost sm" data-del-notif="' + esc(n.id || '') + '" style="flex:none;margin-left:8px">Delete</button></div>';
   }).join('') +
   (list.length > 50 ? '<p class="muted" style="font-size:11px;margin-top:6px">Showing the latest 50 of ' + list.length + '. Search to narrow it down.</p>' : '');
 }
@@ -5036,12 +5071,96 @@ function wireAdminNotify(el){
     state.notifQ = q.value;
     const list = el.querySelector('#nt-list');
     if(list) list.innerHTML = sentNotifsHtml();
-    const q2 = el.querySelector('#nt-q');
-    if(q2 && document.activeElement !== q2){
-      /* List update only, the input itself is untouched, so typing keeps
-         its place. Nothing to restore. */
-    }
     try{ q.setSelectionRange(start, end); }catch(e){}
+  });
+  /* Delete from the sent history. */
+  const ntList = el.querySelector('#nt-list');
+  if(ntList) ntList.addEventListener('click', async function(ev){
+    const btn = ev.target && ev.target.closest ? ev.target.closest('[data-del-notif]') : null;
+    if(!btn) return;
+    btn.disabled = true;
+    const ok = await deleteFeedItem(btn.getAttribute('data-del-notif'));
+    if(ok){
+      toast('Notification deleted');
+      ntList.innerHTML = sentNotifsHtml();
+    } else btn.disabled = false;
+  });
+  /* Scheduled: load the list, and wire its delete buttons. */
+  const schList = el.querySelector('#sch-list');
+  if(schList){
+    loadScheduled().then(function(cur){
+      state.scheduled = cur.items;
+      if(el.isConnected) schList.innerHTML = scheduledNotifsHtml();
+    }).catch(function(){});
+    schList.addEventListener('click', async function(ev){
+      const btn = ev.target && ev.target.closest ? ev.target.closest('[data-del-sch]') : null;
+      if(!btn) return;
+      btn.disabled = true;
+      try{
+        await deleteScheduled(btn.getAttribute('data-del-sch'));
+        toast('Scheduled notification removed');
+        schList.innerHTML = scheduledNotifsHtml();
+      }catch(e){ toast(e.message); btn.disabled = false; }
+    });
+  }
+}
+
+/* Admin > Payments: every crew member in one list, like the Users list,
+   so nobody gets missed on payday. Payments run weekly: each row shows
+   what that person has been paid this week (or that they have not been
+   paid yet), their last payment ever, and a Log payment button that runs
+   the same log payment flow as the user dashboard. */
+function weekStartMs(){
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  const day = (d.getDay() + 6) % 7; /* Monday is the start of the pay week */
+  d.setDate(d.getDate() - day);
+  return d.getTime();
+}
+
+function paymentsThisWeek(u){
+  const ws = weekStartMs();
+  return ((u && u.payments) || []).filter(function(p){
+    return (new Date(p.paid_at).getTime() || 0) >= ws;
+  });
+}
+
+function adminPaymentsHtml(){
+  const users = state.users || {};
+  const names = Object.keys(users).filter(function(un){
+    return users[un].status === 'approved' && users[un].role !== 'head';
+  }).sort();
+  let totalWeek = 0, paidCount = 0;
+  const rows = names.map(function(un){
+    const u = users[un];
+    const wk = paymentsThisWeek(u);
+    const sum = wk.reduce(function(a, p){ return a + (Number(p.amount) || 0); }, 0);
+    totalWeek += sum;
+    if(wk.length) paidCount++;
+    const all = u.payments || [];
+    const last = all.length ? all[all.length - 1] : null;
+    return '<div class="row" style="justify-content:space-between;padding:12px 0;align-items:flex-start;background-image:var(--sep);background-size:100% 1px;background-repeat:no-repeat;background-position:bottom">' +
+      '<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px">' + esc(u.name || un) + '</div>' +
+      '<div class="muted" style="font-size:11px">@' + esc(un) + ' \xB7 ' + esc(u.role || '') + '</div>' +
+      '<div style="font-size:12px;margin-top:4px">' +
+      (wk.length
+        ? 'Paid this week: <strong>$' + esc(String(sum)) + '</strong> (' + wk.length + (wk.length === 1 ? ' payment' : ' payments') + ')'
+        : 'Not paid this week yet') + '</div>' +
+      (last ? '<div class="muted" style="font-size:11px;margin-top:2px">Last payment: $' + esc(String(last.amount)) + ' \xB7 ' + esc(fmtTime(last.paid_at)) + '</div>' : '') +
+      '</div>' +
+      '<button type="button" class="btn sm" data-logpay="' + esc(un) + '" style="flex:none;margin-left:8px">Log payment</button></div>';
+  }).join('');
+  return '<div class="card"><h2>Payments</h2>' +
+    '<p class="muted" style="font-size:12px;margin-bottom:6px;line-height:1.55">$' + esc(String(totalWeek)) +
+    ' logged this week \xB7 ' + paidCount + ' of ' + names.length + ' people paid this week. The pay week starts Monday.</p>' +
+    (names.length ? rows : '<div class="empty">No approved users yet.</div>') + '</div>';
+}
+
+function wireAdminPayments(el){
+  el.querySelectorAll('[data-logpay]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      logPaymentModal(btn.getAttribute('data-logpay'), el);
+    });
   });
 }
 
@@ -5077,12 +5196,6 @@ async function loadOverallStats(el){
       const t = await ghFetch('/git/trees/main:intakes', { action: 'count intakes' });
       intakes = (t.tree || []).filter(function(n){ return n.type === 'blob'; }).length;
     }catch(e){}
-    let devices = 0;
-    try{
-      const pr = await ghGetJson('push_subs.json');
-      const d = (pr && pr.data) || {};
-      Object.keys(d).forEach(function(k){ devices += ((d[k] || []).length); });
-    }catch(e){}
     const users = state.users || {};
     const unames = Object.keys(users);
     const uStatus = {}, uRole = {};
@@ -5091,13 +5204,11 @@ async function loadOverallStats(el){
       const stt = u.status || 'none'; uStatus[stt] = (uStatus[stt] || 0) + 1;
       const ro = u.role || 'none'; uRole[ro] = (uRole[ro] || 0) + 1;
     });
-    const today = new Date().toDateString();
-    const feedToday = (state.feed || []).filter(function(n){
-      try{ return new Date(n.created_at).toDateString() === today; }catch(e){ return false; }
-    }).length;
     /* The numbers are computed once and kept, then painted as the
        button-opened sections design the user likes: a menu of groups,
-       one group open at a time, a Back button to return. */
+       one group open at a time, a Back button to return. The old
+       Activity group (alerts today, push devices, alerts stored) is
+       gone at the user's word: it was noise in the Tools area. */
     state.overallData = {
       leads: tile(fmtNum(state.catalogTotal || 0), 'total leads') +
         tile(fmtNum(idxKeys.length), 'claimed') +
@@ -5110,10 +5221,7 @@ async function loadOverallStats(el){
         tile(fmtNum(uStatus.approved || 0), 'approved') +
         tile(fmtNum(uRole.caller || 0), 'callers') +
         tile(fmtNum(uRole.builder || 0), 'builders') +
-        tile(fmtNum((uRole.admin || 0) + (uRole.head || 0)), 'admins'),
-      activity: tile(fmtNum(feedToday), 'alerts today') +
-        tile(fmtNum(devices), 'push devices') +
-        tile(fmtNum((state.feed || []).length), 'alerts stored')
+        tile(fmtNum((uRole.admin || 0) + (uRole.head || 0)), 'admins')
     };
     paintOverall(el);
   }catch(e){
@@ -5129,10 +5237,10 @@ function overallStatsHtml(){
   const d = state.overallData;
   if(!d) return '';
   const ov = state.overallView || null;
-  const titles = { leads: 'Leads', claims: 'Claims by status', users: 'Users', activity: 'Activity', live: 'Live board' };
+  const titles = { leads: 'Leads', claims: 'Claims by status', users: 'Users', live: 'Live board' };
   const counts = {
     leads: state.catalogTotal ? fmtNum(state.catalogTotal) + ' total' : '',
-    users: '', claims: '', activity: '', live: ''
+    users: '', claims: '', live: ''
   };
   let html = '<div id="ov-menu" style="margin-top:14px;' + (ov ? 'display:none' : '') + '">' +
     Object.keys(titles).map(function(k){
@@ -5142,7 +5250,7 @@ function overallStatsHtml(){
     '<div id="ov-secbar" class="row" style="margin:14px 0 10px;' + (ov ? '' : 'display:none') + '">' +
     '<button class="btn ghost sm" id="ov-secback" type="button">\u2190 Back</button>' +
     '<h3 style="margin:0">' + esc(ov ? (titles[ov] || '') : '') + '</h3></div>';
-  ['leads','claims','users','activity'].forEach(function(k){
+  ['leads','claims','users'].forEach(function(k){
     html += '<div data-ovsec="' + k + '" style="' + (ov === k ? '' : 'display:none') + '"><div class="statgrid">' + d[k] + '</div></div>';
   });
   html += '<div data-ovsec="live" style="' + (ov === 'live' ? '' : 'display:none') + '">' +
@@ -5303,17 +5411,90 @@ function notifyComposerHtml(){
     opts += '<option value="' + esc(u) + '">@' + esc(u) + ' (' + esc(nm) + ')</option>';
   });
   return '<div class="card"><h2>Send notification</h2>' +
-    '<p class="muted" style="font-size:12px;margin-bottom:12px;line-height:1.55">Custom push notification plus bell alert. Pick who gets it.</p>' +
+    '<p class="muted" style="font-size:12px;margin-bottom:12px;line-height:1.55">Custom push notification plus bell alert. Pick who gets it, now or scheduled for later.</p>' +
     '<div class="field"><label>To</label><select id="nc-aud">' + opts + '</select></div>' +
     '<div class="field"><label>Title *</label><input id="nc-title" placeholder="e.g. Payouts go out Friday"/></div>' +
     '<div class="field"><label>Message *</label><textarea id="nc-body" placeholder="What should they know?"></textarea></div>' +
+    '<div class="field"><label>When</label><select id="nc-when"><option value="now">Send now</option><option value="later">Schedule for later</option></select></div>' +
+    '<div class="field" id="nc-at-wrap" style="display:none"><label>Date and time</label><input id="nc-at" type="datetime-local"/>' +
+    '<p class="muted" style="font-size:11px;margin-top:6px;line-height:1.55">A scheduled notification sends when an admin opens the app at or after that time.</p></div>' +
     '<button class="btn block" id="nc-go" type="button">Send notification</button>' +
     '<div class="err" id="nc-err"></div></div>';
+}
+
+/* Scheduled notifications live in scheduled_notifications.json in the
+   data repo. Admin and head sessions check for due ones on the feed
+   poll and post them into the feed, which is what actually delivers
+   them (bell alert plus push, same as a notification sent by hand). */
+async function loadScheduled(){
+  try{
+    const rec = await ghGetJson('scheduled_notifications.json');
+    return { items: (rec && Array.isArray(rec.data)) ? rec.data : [], sha: rec ? rec.sha : null };
+  }catch(e){ return { items: [], sha: null }; }
+}
+
+async function saveScheduled(items, sha){
+  await ghPutJson('scheduled_notifications.json', items, sha, 'sitedesk: scheduled notifications');
+}
+
+async function scheduleNotification(n){
+  const cur = await loadScheduled();
+  cur.items.push(Object.assign({ id: uid('sch'), created_at: nowISO(), from: state.user.username }, n));
+  cur.items.sort(function(a, b){ return String(a.send_at).localeCompare(String(b.send_at)); });
+  await saveScheduled(cur.items, cur.sha);
+  state.scheduled = cur.items;
+}
+
+async function deleteScheduled(id){
+  const cur = await loadScheduled();
+  const items = cur.items.filter(function(i){ return i.id !== id; });
+  await saveScheduled(items, cur.sha);
+  state.scheduled = items;
+}
+
+let schedBusy = false;
+async function processScheduledNotifications(){
+  if(schedBusy || !isManager()) return;
+  schedBusy = true;
+  try{
+    const cur = await loadScheduled();
+    const now = Date.now();
+    const due = cur.items.filter(function(i){ return new Date(i.send_at).getTime() <= now; });
+    if(due.length){
+      const rest = cur.items.filter(function(i){ return new Date(i.send_at).getTime() > now; });
+      /* Save the removal first, then post, so two open admin sessions
+         polling at once cannot send the same one twice. */
+      await saveScheduled(rest, cur.sha);
+      state.scheduled = rest;
+      for(const d of due){ await postEvent(d.audience, d.title, d.body, ''); }
+    } else {
+      state.scheduled = cur.items;
+    }
+  }catch(e){}
+  schedBusy = false;
+}
+
+/* Delete one item from the notification history (feed.json). */
+async function deleteFeedItem(id){
+  let rec = null;
+  try{ rec = await ghGetJson('feed.json'); }catch(e){ toast(e.message); return false; }
+  const items = (rec && rec.data ? rec.data : []).filter(function(n){ return n.id !== id; });
+  try{ await ghPutJson('feed.json', items, rec ? rec.sha : null, 'sitedesk: notification deleted'); }
+  catch(e){ toast(e.message); return false; }
+  state.feed = items;
+  return true;
 }
 
 function wireNotifyComposer(el){
   const go = el.querySelector('#nc-go');
   if(!go) return;
+  const when = el.querySelector('#nc-when');
+  if(when) when.addEventListener('change', function(){
+    const later = when.value === 'later';
+    const wrap = el.querySelector('#nc-at-wrap');
+    if(wrap) wrap.style.display = later ? '' : 'none';
+    go.textContent = later ? 'Schedule notification' : 'Send notification';
+  });
   go.addEventListener('click', async function(){
     const err = el.querySelector('#nc-err');
     err.textContent = '';
@@ -5321,7 +5502,20 @@ function wireNotifyComposer(el){
     const title = (el.querySelector('#nc-title').value || '').trim();
     const body = (el.querySelector('#nc-body').value || '').trim();
     if(!title || !body){ err.textContent = 'Title and message are required.'; return; }
+    const later = when && when.value === 'later';
     go.disabled = true;
+    if(later){
+      const atVal = (el.querySelector('#nc-at').value || '').trim();
+      const at = atVal ? new Date(atVal) : null;
+      if(!at || isNaN(at.getTime())){ err.textContent = 'Pick a date and time.'; go.disabled = false; return; }
+      if(at.getTime() <= Date.now()){ err.textContent = 'That time is already past. Pick a future time.'; go.disabled = false; return; }
+      try{
+        await scheduleNotification({ audience: aud, title: title, body: body, send_at: at.toISOString() });
+        toast('Notification scheduled for ' + at.toLocaleString());
+        renderApp();
+      }catch(e){ err.textContent = e.message; go.disabled = false; }
+      return;
+    }
     const ok = await postEvent(aud, title, body, '');
     go.disabled = false;
     if(ok){
@@ -6057,6 +6251,16 @@ if(typeof module !== 'undefined' && module.exports){
   module.exports.adminResetLead = adminResetLead;
   module.exports.restartUserActivity = restartUserActivity;
   module.exports.armOrRun = armOrRun;
+  module.exports.notifyComposerHtml = notifyComposerHtml;
+  module.exports.scheduledNotifsHtml = scheduledNotifsHtml;
+  module.exports.adminPaymentsHtml = adminPaymentsHtml;
+  module.exports.paymentsThisWeek = paymentsThisWeek;
+  module.exports.weekStartMs = weekStartMs;
+  module.exports.deleteFeedItem = deleteFeedItem;
+  module.exports.scheduleNotification = scheduleNotification;
+  module.exports.deleteScheduled = deleteScheduled;
+  module.exports.processScheduledNotifications = processScheduledNotifications;
+  module.exports.loadScheduled = loadScheduled;
   module.exports.logBuilderProgress = logBuilderProgress;
   module.exports.setIntakeStatus = setIntakeStatus;
   module.exports.submitBuiltSite = submitBuiltSite;
