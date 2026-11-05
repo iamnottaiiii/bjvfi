@@ -382,6 +382,7 @@
           <input class="field" id="loginPass" type="password" autocomplete="current-password" placeholder="Password">
         </label>
         <button class="go" id="signInBtn" type="button">Sign in</button>
+        <div id="loginErr" style="color:var(--red); font-size:.8rem; min-height:1em;"></div>
       </div>
     </section>
 
@@ -389,7 +390,7 @@
     <section class="app" id="appView">
       <section class="panel list-panel">
         <div class="list-head">
-          <button type="button" class="acct-line" id="acctBtn"><span class="bavatar sm" id="acctAvatar">Y</span><span class="em" id="whoAddrTop">you@bjvfi.com</span></button>
+          <button type="button" class="acct-line" id="acctBtn"><span class="bavatar sm" id="acctAvatar"></span><span class="em" id="whoAddrTop"></span></button>
           <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
             <div class="list-title" id="listTitle">Inbox</div>
             <span style="display:flex; align-items:center; gap:8px;">
@@ -526,6 +527,7 @@
           <div class="quote-head"><button class="pill" type="button" id="quoteToggle">Hide</button></div>
           <div id="quoteText"></div>
         </div>
+        <div id="cErr" style="color:var(--red); font-size:.82rem; min-height:1em;"></div>
         <div class="row">
           <button class="pill" id="cClose" type="button">Close</button>
           <button class="pill send" id="cSend" type="button">Send</button>
@@ -548,6 +550,60 @@
   var FOLDERS=['Inbox','Sent','Drafts','Archive','Junk','Trash'];
   var state={folder:'Inbox',selected:null,query:''};
 
+  var API='https://bjvfi-mail.iamnottaiii.workers.dev';
+  var COUNTS={};
+  var LISTERR='';
+  var SESSIONS={};
+  try{SESSIONS=JSON.parse(localStorage.getItem('bjvfi_mail_sessions')||'{}')||{};}catch(e){SESSIONS={};}
+  function saveSessions(){try{localStorage.setItem('bjvfi_mail_sessions',JSON.stringify(SESSIONS));}catch(e){}}
+  function curToken(){var s=SESSIONS[currentAcct]; return s?s.token:'';}
+  function api(action,body){
+    body=body||{}; body.token=curToken();
+    return fetch(API+'/'+action,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
+      .then(function(r){return r.json();})
+      .then(function(d){if(d&&d.error) throw new Error(d.error); return d;});
+  }
+  function apiLogin(email,pass){
+    return fetch(API+'/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,password:pass})})
+      .then(function(r){return r.json();})
+      .then(function(d){if(d&&d.error) throw new Error(d.error); return d;});
+  }
+  function fmtWhen(raw){
+    if(!raw) return '';
+    var d=new Date(raw); if(isNaN(d)) return raw;
+    var now=new Date();
+    var time=d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
+    if(d.toDateString()===now.toDateString()) return time;
+    var opts={month:'short',day:'numeric'};
+    if(d.getFullYear()!==now.getFullYear()) opts.year='numeric';
+    return d.toLocaleDateString([], opts)+', '+time;
+  }
+  function boxKey(){return state.folder.toLowerCase();}
+  function mapMsg(mm){
+    return {id:parseInt(mm.uid,10), uid:mm.uid, folder:state.folder,
+      from:mm.fromName||mm.fromEmail||'', addr:mm.fromEmail||'',
+      subj:mm.subject||'', prev:'', when:fmtWhen(mm.date), rawDate:mm.date,
+      body:null, unread:!!mm.unread, starred:!!mm.starred, align:'left', sigImg:''};
+  }
+  function loadCounts(){
+    return api('counts',{}).then(function(d){COUNTS=d||{}; renderFolders();});
+  }
+  function loadList(){
+    LISTERR='';
+    return api('list',{mailbox:boxKey(),limit:50}).then(function(d){
+      MAIL=(d.messages||[]).map(mapMsg); renderAll();
+    }).catch(function(e){
+      MAIL=[]; LISTERR=e.message; renderAll();
+    });
+  }
+  function refresh(){return loadCounts().then(loadList);}
+  function act(p){
+    p.then(function(){return refresh();}).catch(function(e){
+      var done=function(){LISTERR=e.message; renderList();};
+      refresh().then(done).catch(done);
+    });
+  }
+
   var loginView=document.getElementById('loginView'), appView=document.getElementById('appView');
   var foldersEl=document.getElementById('folders'), listEl=document.getElementById('msgList'),
       readerEl=document.getElementById('reader'), readerPanel=document.getElementById('readerPanel'),
@@ -555,7 +611,7 @@
       veil=document.getElementById('veil');
 
   function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
-  function unreadCount(f){return MAIL.filter(function(m){return m.folder===f&&m.unread;}).length;}
+  function unreadCount(f){var c=COUNTS[f.toLowerCase()]; return c?c.unread:0;}
 
   function renderFolders(){
     foldersEl.innerHTML=FOLDERS.map(function(f){
@@ -564,7 +620,7 @@
         +'<span>'+f+'</span>'+(n?'<span>'+n+'</span>':'')+'<span class="dot"></span></button>';
     }).join('');
     foldersEl.querySelectorAll('[data-folder]').forEach(function(b){
-      b.addEventListener('click',function(){state.folder=b.dataset.folder; state.selected=null; b.blur(); document.getElementById('dock').classList.remove('open'); renderAll();});
+      b.addEventListener('click',function(){state.folder=b.dataset.folder; state.selected=null; b.blur(); document.getElementById('dock').classList.remove('open'); renderAll(); loadList();});
     });
   }
 
@@ -584,8 +640,8 @@
   function renderList(){
     listTitle.textContent=state.folder;
     var rows=visible();
-    if(!rows.length){listEl.innerHTML='<div class="empty">Nothing here.</div>'; return;}
-    listEl.innerHTML=rows.map(function(m){
+    if(!rows.length){listEl.innerHTML='<div class="empty">'+esc(LISTERR||'Nothing here.')+'</div>'; return;}
+    listEl.innerHTML=(LISTERR?'<div class="empty">'+esc(LISTERR)+'</div>':'')+rows.map(function(m){
       return '<div class="swipe" data-swipe="'+m.id+'">'
         +'<div class="cue" data-side="left" data-a="'+PREFS.left+'">'+CUE[PREFS.left]+'</div>'
         +'<div class="cue" data-side="right" data-a="'+PREFS.right+'">'+CUE[PREFS.right]+'</div>'
@@ -639,15 +695,15 @@
     document.getElementById('dlBtn').addEventListener('click',function(){dotsMenu.classList.remove('on'); downloadMsg(m);});
     document.getElementById('archBtn').addEventListener('click',function(){
       dotsMenu.classList.remove('on');
-      if(m.folder!=='Archive') m.folder='Archive';
-      state.selected=null; renderAll();
+      var uid=m.uid; state.selected=null;
+      act(api('archive',{mailbox:boxKey(),uid:uid}));
     });
     document.getElementById('prevBtn').addEventListener('click',function(){stepMsg(-1);});
     document.getElementById('nextBtn').addEventListener('click',function(){stepMsg(1);});
     document.getElementById('backBtn').addEventListener('click',function(){state.selected=null; renderAll();});
     document.getElementById('delBtn').addEventListener('click',function(){
-      m.folder='Trash'; if(state.folder==='Trash'){MAIL=MAIL.filter(function(x){return x.id!==m.id;});}
-      state.selected=null; renderAll();
+      var uid=m.uid; state.selected=null;
+      act(api('delete',{mailbox:boxKey(),uid:uid}));
     });
   }
 
@@ -685,16 +741,14 @@
   function swipePerform(action,id){
     var m=MAIL.find(function(x){return x.id===id;}); if(!m) return;
     if(action==='delete'){
-      if(m.folder==='Trash'){MAIL=MAIL.filter(function(x){return x.id!==id;});}
-      else{m.folder='Trash';}
       if(state.selected===id) state.selected=null;
+      act(api('delete',{mailbox:boxKey(),uid:m.uid}));
     }else if(action==='junk'){
-      if(m.folder!=='Junk') m.folder='Junk';
       if(state.selected===id) state.selected=null;
+      act(api('move',{mailbox:boxKey(),uid:m.uid,to:'junk'}));
     }else if(action==='mark'){
-      m.unread=!m.unread;
+      act(api(m.unread?'mark_read':'mark_unread',{mailbox:boxKey(),uid:m.uid}));
     }
-    renderAll();
   }
 
   function renderAll(){renderFolders(); renderList(); renderReader();}
@@ -702,7 +756,17 @@
   function openMsg(id){
     var m=MAIL.find(function(x){return x.id===id;});
     if(!m) return;
-    m.unread=false; state.selected=id; renderAll();
+    state.selected=id;
+    var wasUnread=m.unread;
+    api('get',{mailbox:boxKey(),uid:m.uid}).then(function(d){
+      m.body=d.body||''; m.from=d.fromName||m.from; m.addr=d.fromEmail||m.addr;
+      m.subj=d.subject||m.subj; m.when=fmtWhen(d.date)||m.when;
+      m.unread=false; renderAll();
+      if(wasUnread){api('mark_read',{mailbox:boxKey(),uid:m.uid}).then(function(){loadCounts();}).catch(function(){});}
+    }).catch(function(e){
+      if(m.body===null) m.body='';
+      LISTERR=e.message; renderAll();
+    });
   }
 
   function initials(name){
@@ -779,16 +843,17 @@
   document.getElementById('cClose').addEventListener('click',function(){veil.classList.remove('on');});
   veil.addEventListener('click',function(e){if(e.target===veil) veil.classList.remove('on');});
   document.getElementById('cSend').addEventListener('click',function(){
-    var to=document.getElementById('cTo').value.trim();
-    var subj=document.getElementById('cSubj').value.trim()||'(no subject)';
+    var to=document.getElementById('cTo').value.split(/[,;]/).map(function(s){return s.trim();}).filter(Boolean);
+    var subj=document.getElementById('cSubj').value.trim();
     var body=document.getElementById('cBody').value;
     if(pendingQuote) body+=(body?'\n\n':'')+pendingQuote;
     if(PREFS.sig) body+=(body?'\n\n':'')+PREFS.sig;
-    var id=MAIL.reduce(function(mx,x){return Math.max(mx,x.id);},0)+1;
-    MAIL.unshift({id:id, folder:'Sent', from:'You', addr:document.getElementById('whoAddr').textContent,
-      when:'Now', subj:subj, prev:(body.split('\n')[0]||subj), body:body||subj, unread:false, align:composeAlign, sigImg:PREFS.sigImg||''});
-    veil.classList.remove('on');
-    state.folder='Sent'; state.selected=id; renderAll();
+    var errEl=document.getElementById('cErr'); errEl.textContent='';
+    if(!to.length){errEl.textContent='Add a recipient.'; return;}
+    api('send',{to:to,cc:[],subject:subj,body:body}).then(function(){
+      veil.classList.remove('on');
+      state.folder='Sent'; state.selected=null; refresh().catch(function(){});
+    }).catch(function(e){errEl.textContent=e.message;});
   });
 
   searchBox.addEventListener('input',function(){state.query=searchBox.value; renderList();});
@@ -816,7 +881,7 @@
   function openConnect(){connectVeil.classList.add('on');}
   document.getElementById('connectClose').addEventListener('click',function(){connectVeil.classList.remove('on');});
   connectVeil.addEventListener('click',function(e){if(e.target===connectVeil) connectVeil.classList.remove('on');});
-  var accounts=[];
+  var accounts=Object.keys(SESSIONS);
   var currentAcct='';
   function setAccount(addr){
     currentAcct=addr;
@@ -841,7 +906,7 @@
       return '<div class="acct-item'+(a===currentAcct?' sel':'')+'">'
         +'<button type="button" class="acct-pick" data-acct="'+esc(a)+'">'
         +'<span class="bavatar sm">'+avatarHtml(a)+'</span>'
-        +'<span><span class="em">'+esc(a)+'</span><br><span class="pv">'+esc(providerFor(a))+'</span></span></button>'
+        +'<span><span class="em">'+esc(a)+'</span><br><span class="pv">'+esc((SESSIONS[a]&&SESSIONS[a].provider)||providerFor(a))+'</span></span></button>'
         +(accounts.length>1?'<button type="button" class="acct-x" data-remove="'+esc(a)+'" aria-label="Remove account">&#10005;</button>':'')
         +'</div>';
     }).join('');
@@ -849,14 +914,15 @@
       b.addEventListener('click',function(){
         setAccount(b.dataset.acct);
         acctVeil.classList.remove('on');
-        state.folder='Inbox'; state.selected=null; renderAll();
+        state.folder='Inbox'; state.selected=null; MAIL=[]; COUNTS={}; renderAll(); refresh().catch(function(){});
       });
     });
     acctList.querySelectorAll('[data-remove]').forEach(function(b){
       b.addEventListener('click',function(){
         var gone=b.dataset.remove;
+        delete SESSIONS[gone]; saveSessions();
         accounts=accounts.filter(function(x){return x!==gone;});
-        if(gone===currentAcct && accounts.length){setAccount(accounts[0]); state.folder='Inbox'; state.selected=null; renderAll();}
+        if(gone===currentAcct && accounts.length){setAccount(accounts[0]); state.folder='Inbox'; state.selected=null; MAIL=[]; COUNTS={}; renderAll(); refresh().catch(function(){});}
         renderAccounts();
       });
     });
@@ -873,20 +939,55 @@
   document.getElementById('acctClose').addEventListener('click',function(){acctVeil.classList.remove('on');});
   acctVeil.addEventListener('click',function(e){if(e.target===acctVeil) acctVeil.classList.remove('on');});
   document.getElementById('addMailBtn').addEventListener('click',function(){acctVeil.classList.remove('on'); openConnect();});
-  setAccount('you@bjvfi.com');
+  function enterApp(){
+    loginView.style.display='none'; appView.classList.add('on'); dock.classList.add('on'); dockToggle.classList.add('on'); composeFloat.classList.add('on'); voidEl.classList.add('app-on');
+  }
+  function exitApp(){
+    appView.classList.remove('on'); appView.classList.remove('list-hidden'); showListBtn.classList.remove('on');
+    dock.classList.remove('on'); dock.classList.remove('open'); dockToggle.classList.remove('on'); composeFloat.classList.remove('on'); voidEl.classList.remove('app-on'); loginView.style.display='flex';
+  }
+  function startSession(res){
+    SESSIONS[res.email]={token:res.token, provider:res.provider||providerFor(res.email)};
+    saveSessions();
+    if(!accounts.includes(res.email)) accounts.push(res.email);
+    setAccount(res.email);
+    state.folder='Inbox'; state.selected=null; MAIL=[]; COUNTS={};
+    enterApp(); renderAll(); refresh().catch(function(e){LISTERR=e.message; renderAll();});
+  }
 
   document.getElementById('connectGo').addEventListener('click',function(){
     var em=mailAddrEl.value.trim(); if(!em) return;
-    setAccount(em);
-    connectVeil.classList.remove('on');
-    state.folder='Inbox'; state.selected=null; renderAll();
+    var pw=document.getElementById('mailPass').value;
+    apiLogin(em,pw).then(function(res){
+      document.getElementById('mailPass').value='';
+      connectVeil.classList.remove('on');
+      startSession(res);
+    }).catch(function(e){provLine.textContent=e.message;});
   });
 
   document.getElementById('signInBtn').addEventListener('click',function(){
     var em=document.getElementById('loginEmail').value.trim();
-    if(em) setAccount(em);
-    loginView.style.display='none'; appView.classList.add('on'); dock.classList.add('on'); dockToggle.classList.add('on'); composeFloat.classList.add('on'); voidEl.classList.add('app-on'); renderAll();
+    var pw=document.getElementById('loginPass').value;
+    var errEl=document.getElementById('loginErr'); errEl.textContent='';
+    apiLogin(em,pw).then(function(res){
+      document.getElementById('loginPass').value='';
+      startSession(res);
+    }).catch(function(e){errEl.textContent=e.message;});
   });
+
+  (function boot(){
+    var saved=Object.keys(SESSIONS);
+    if(!saved.length) return;
+    setAccount(saved[0]);
+    state.folder='Inbox'; state.selected=null;
+    enterApp(); renderAll();
+    refresh().catch(function(e){
+      delete SESSIONS[saved[0]]; saveSessions();
+      accounts=accounts.filter(function(x){return x!==saved[0];});
+      currentAcct=''; exitApp();
+      document.getElementById('loginErr').textContent=e.message;
+    });
+  })();
   document.getElementById('loginPass').addEventListener('keydown',function(e){if(e.key==='Enter') document.getElementById('signInBtn').click();});
   var settingsVeil=document.getElementById('settingsVeil');
   document.getElementById('settingsBtn2').addEventListener('click',function(){acctVeil.classList.remove('on'); settingsVeil.classList.add('on'); settingsVeil.querySelector('.sheet').scrollTop=0; this.blur();});
@@ -894,8 +995,15 @@
   settingsVeil.addEventListener('click',function(e){if(e.target===settingsVeil) settingsVeil.classList.remove('on');});
   document.getElementById('signOutBtn').addEventListener('click',function(){
     settingsVeil.classList.remove('on');
-    appView.classList.remove('on'); appView.classList.remove('list-hidden'); showListBtn.classList.remove('on');
-    dock.classList.remove('on'); dock.classList.remove('open'); dockToggle.classList.remove('on'); composeFloat.classList.remove('on'); voidEl.classList.remove('app-on'); loginView.style.display='flex';
+    var gone=currentAcct;
+    delete SESSIONS[gone]; saveSessions();
+    accounts=accounts.filter(function(x){return x!==gone;});
+    MAIL=[]; COUNTS={}; state.selected=null;
+    if(accounts.length){
+      setAccount(accounts[0]); state.folder='Inbox'; renderAll(); refresh().catch(function(){});
+    }else{
+      currentAcct=''; exitApp();
+    }
   });
   document.getElementById('hideListBtn').addEventListener('click',function(){appView.classList.add('list-hidden'); showListBtn.classList.add('on'); this.blur();});
   showListBtn.addEventListener('click',function(){appView.classList.remove('list-hidden'); showListBtn.classList.remove('on'); this.blur();});
