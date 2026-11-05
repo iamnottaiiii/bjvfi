@@ -434,6 +434,7 @@
             <div class="list-title" id="listTitle">Inbox</div>
             <span style="display:flex; align-items:center; gap:8px;">
               <button class="compose-float" id="composeBtn" type="button" aria-label="Compose"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></button>
+              <button class="mini" id="refreshBtn" type="button">Refresh</button>
               <button class="mini" id="hideListBtn" type="button">Hide</button>
             </span>
           </div>
@@ -621,8 +622,8 @@
     return d.toLocaleDateString([], opts)+', '+time;
   }
   function boxKey(){return state.folder.toLowerCase();}
-  function mapMsg(mm){
-    return {id:parseInt(mm.uid,10), uid:mm.uid, folder:state.folder,
+  function mapMsg(mm, folder){
+    return {id:parseInt(mm.uid,10), uid:mm.uid, folder:folder||state.folder,
       from:mm.fromName||mm.fromEmail||'', addr:mm.fromEmail||'',
       toName:mm.toName||'', toAddr:mm.toEmail||'',
       subj:mm.subject||'', prev:'', when:fmtWhen(mm.date), rawDate:mm.date,
@@ -641,15 +642,29 @@
   function loadCounts(){
     return api('counts',{}).then(function(d){COUNTS=d||{}; renderFolders();});
   }
-  function loadList(){
-    LISTERR='';
-    return api('list',{mailbox:boxKey(),limit:50}).then(function(d){
-      MAIL=(d.messages||[]).map(mapMsg); renderAll();
-    }).catch(function(e){
-      MAIL=[]; LISTERR=e.message; renderAll();
+  var LISTCACHE={};
+  function mergeBodies(oldList,newList){
+    var byUid={};
+    (oldList||[]).forEach(function(o){byUid[o.uid]=o;});
+    newList.forEach(function(n){
+      var o=byUid[n.uid];
+      if(o&&o.body!==null){n.body=o.body; n.html=o.html; n.prevSegs=o.prevSegs; n.quoteHtml=o.quoteHtml;}
     });
   }
-  function refresh(){return loadCounts().then(loadList);}
+  function loadList(){
+    LISTERR='';
+    var folder=state.folder;
+    return api('list',{mailbox:folder.toLowerCase(),limit:50}).then(function(d){
+      var fresh=(d.messages||[]).map(function(mm){return mapMsg(mm,folder);});
+      mergeBodies(LISTCACHE[folder],fresh);
+      if(d.counts) COUNTS=d.counts;
+      LISTCACHE[folder]=fresh;
+      if(state.folder===folder){MAIL=fresh; renderAll();}
+    }).catch(function(e){
+      if(state.folder===folder&&!LISTCACHE[folder]){MAIL=[]; LISTERR=e.message; renderAll();}
+    });
+  }
+  function refresh(){return loadList();}
   function paintRow(m){
     var w=listEl.querySelector('[data-swipe="'+m.id+'"]');
     if(!w) return;
@@ -701,7 +716,12 @@
         +'<span>'+f+'</span>'+(n?'<span>'+n+'</span>':'')+'<span class="dot"></span></button>';
     }).join('');
     foldersEl.querySelectorAll('[data-folder]').forEach(function(b){
-      b.addEventListener('click',function(){state.folder=b.dataset.folder; state.selected=null; b.blur(); document.getElementById('dock').classList.remove('open'); renderAll(); loadList();});
+      b.addEventListener('click',function(){
+        state.folder=b.dataset.folder; state.selected=null; b.blur();
+        document.getElementById('dock').classList.remove('open');
+        if(LISTCACHE[state.folder]) MAIL=LISTCACHE[state.folder];
+        renderAll(); loadList();
+      });
     });
   }
 
@@ -901,6 +921,12 @@
     if(!m) return;
     state.selected=id;
     var wasUnread=m.unread;
+    if(m.body!==null){
+      // Already fetched once: show it instantly, just settle the read state.
+      m.unread=false; paintRow(m); renderReader();
+      if(wasUnread){api('mark_read',{mailbox:boxKey(),uid:m.uid}).then(function(){loadCounts();}).catch(function(){});}
+      return;
+    }
     api('get',{mailbox:boxKey(),uid:m.uid}).then(function(d){
       m.body=d.body||''; m.html=d.html||''; m.prevSegs=d.prev||[]; m.quoteHtml=d.quoteHtml||''; m.from=d.fromName||m.from; m.addr=d.fromEmail||m.addr;
       m.toName=d.toName||m.toName; m.toAddr=d.toEmail||m.toAddr;
@@ -1082,6 +1108,11 @@
     openMsg(rows[n].id);
   }
   document.getElementById('composeBtn').addEventListener('click',function(){openCompose(null);});
+  document.getElementById('refreshBtn').addEventListener('click',function(){
+    var b=this; b.disabled=true;
+    refresh().then(function(){b.disabled=false;}).catch(function(){b.disabled=false;});
+    b.blur();
+  });
   document.getElementById('cClose').addEventListener('click',function(){veil.classList.remove('on');});
   veil.addEventListener('click',function(e){if(e.target===veil) veil.classList.remove('on');});
   document.getElementById('cSend').addEventListener('click',function(){
