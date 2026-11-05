@@ -265,11 +265,12 @@
   .who-line .r-when2{margin-left:auto; padding-left:12px; font-size:.72rem; white-space:nowrap; align-self:flex-start; padding-top:5px;}
   .reader .who-line .nm{white-space:normal; overflow:visible; text-overflow:clip; word-break:break-word;}
   .reader .who-line .ad{white-space:normal; overflow:visible; text-overflow:clip; word-break:break-all;}
-  .q-seg{border-top:1px solid var(--line); margin-top:24px; padding-top:12px;}
-  .q-bar{display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px;}
+  .q-seg{border-top:1px solid var(--line); margin-top:10px; padding-top:8px;}
+  .q-bar{display:flex; justify-content:space-between; align-items:center; gap:10px;}
   .q-date{font-size:.78rem;}
-  .q-bar .pill{padding:5px 13px; font-size:.78rem;}
-  .reader .r-html{width:100%; max-width:100%; border:0; background:#fff; display:block;}
+  .q-bar .pill{padding:4px 12px; font-size:.75rem;}
+  .q-body{margin-top:10px;}
+  .reader .r-html{width:100%; max-width:100%; border:0; background:transparent; display:block;}
   .r-top .who-line{flex:1; min-width:0;}
   .who-line>span{min-width:0;}
   .who-line .nm,.who-line .ad{display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
@@ -849,7 +850,7 @@
     });
   }
 
-  var PREFS={left:'delete', right:'mark', sig:'', sigImg:'', theme:null, showWhen:true, quote:true, acctPic:''};
+  var PREFS={left:'delete', right:'mark', sig:'', sigImg:'', theme:null, showWhen:true, quote:false, acctPic:''};
   function savePrefs(){}
   var CUE={delete:'Delete', mark:'Read', junk:'Junk', none:''};
   var suppressClick=false;
@@ -932,7 +933,16 @@
   }
   function fitHtml(h){
     h=h.replace(/<meta[^>]*name\s*=\s*["']viewport["'][^>]*>/gi,'');
-    var css='<style>html,body{margin:0;padding:0;max-width:100%;overflow-x:hidden;background:#fff;color-scheme:light}img,table,td,div,span,p{max-width:100%!important}img{height:auto!important}table{table-layout:auto!important}pre{white-space:pre-wrap!important}*{overflow-wrap:anywhere;box-sizing:border-box}</style>';
+    // HTML mail sits on the app background, not on a box of its own: every
+    // background in the mail is stripped and the text takes the app ink
+    // color, so dark mail text stays readable on the dark background.
+    var t=document.documentElement.getAttribute('data-theme');
+    var light=t?t==='light':(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches);
+    var ink=light?'#111114':'#F2F2F5', link=light?'#1a56db':'#6FA8FF';
+    var css='<style>html,body{margin:0;padding:0;max-width:100%;overflow-x:hidden;background:transparent!important;color:'+ink+';color-scheme:'+(light?'light':'dark')+' }'
+      +'*{background-color:transparent!important;color:'+ink+'!important}'
+      +'a,a *{color:'+link+'!important}'
+      +'img,table,td,div,span,p{max-width:100%!important}img{height:auto!important}table{table-layout:auto!important}pre{white-space:pre-wrap!important}*{overflow-wrap:anywhere;box-sizing:border-box}</style>';
     if(/<html[\s>]/i.test(h)){
       if(/<head[^>]*>/i.test(h)) return h.replace(/<head[^>]*>/i,function(m){return m+'<meta name="viewport" content="width=device-width, initial-scale=1">'+css;});
       return h.replace(/<html[^>]*>/i,function(m){return m+'<head><meta name="viewport" content="width=device-width, initial-scale=1">'+css+'</head>';});
@@ -950,6 +960,9 @@
     if(!doc||doc.__qWired) return;
     doc.__qWired=1;
     try{
+      var t=document.documentElement.getAttribute('data-theme');
+      var light=t?t==='light':(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches);
+      var ink=light?'#111114':'#F2F2F5', line=light?'rgba(17,17,20,.3)':'rgba(242,242,245,.28)';
       var guard=0;
       while(guard++<80){
         var inner=doc.querySelector('blockquote blockquote');
@@ -961,6 +974,13 @@
       }
       var container=doc.querySelector('.gmail_quote')||doc.body;
       if(!container) return;
+      // Some clients write the quote marks as literal ">" characters in the
+      // HTML text; strip them at line starts so the text reads clean.
+      var tw=doc.createTreeWalker(container, 4);
+      var tn;
+      while((tn=tw.nextNode())){
+        if(tn.nodeValue&&tn.nodeValue.indexOf('>')>-1) tn.nodeValue=tn.nodeValue.replace(/(^|\n)[ \t]*>[ \t]?/g,'$1');
+      }
       var groups=[], cur=[];
       Array.prototype.slice.call(container.childNodes).forEach(function(n){
         if(n.nodeType===1&&n.tagName==='BLOCKQUOTE'){ if(cur.length){groups.push(cur); cur=[];} groups.push([n]); }
@@ -968,27 +988,30 @@
       });
       if(cur.length) groups.push(cur);
       var dateRe=/((?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)[a-z]*,?\s+)?(?:\d{4}-\d{2}-\d{2}(?:[ T]\d{1,2}:\d{2}(?::\d{2})?)?|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{1,2},?\s+\d{4}|\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4})(?:,?\s+(?:at\s+)?\d{1,2}:\d{2}(?::\d{2})?\s*(?:AM|PM|am|pm)?)?/;
-      var wraps=[];
+      var wraps=[], pendingDate='';
       groups.forEach(function(nodes){
-        var hasText=nodes.some(function(n){return (n.textContent||'').trim().length>0;});
-        if(!hasText) return;
-        var wrap=doc.createElement('div');
-        wrap.setAttribute('style','border-top:1px solid #bbb; margin-top:16px; padding-top:8px;');
-        var bar=doc.createElement('div');
-        bar.setAttribute('style','display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-family:monospace;');
-        var ds=doc.createElement('span');
-        ds.setAttribute('style','font-size:12px; color:#111;');
         var content=doc.createElement('div');
-        nodes[0].parentNode.insertBefore(wrap, nodes[0]);
         nodes.forEach(function(n){ content.appendChild(n); });
         var dm=(content.textContent||'').match(dateRe);
-        if(dm) ds.textContent=dm[0].replace(/\s+at\s+/i,' ');
+        var ownDate=dm?dm[0].replace(/\s+at\s+/i,' '):'';
         content.querySelectorAll('div,p,span,font').forEach(function(el){
           if(/^On .{1,200} wrote:?$/.test((el.textContent||'').trim())) el.remove();
         });
+        var fc=content.firstChild;
+        if(fc&&fc.nodeType===3) fc.nodeValue=fc.nodeValue.replace(/^\s*On .{1,200}? wrote:\s*/, '');
+        // A group that was only an attribution line leaves no message behind:
+        // drop it and hand its date to the message it introduced.
+        if(!(content.textContent||'').trim()){ if(ownDate) pendingDate=ownDate; return; }
+        var wrap=doc.createElement('div');
+        wrap.setAttribute('style','border-top:1px solid '+line+'; margin-top:10px; padding-top:6px;');
+        var bar=doc.createElement('div');
+        bar.setAttribute('style','display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; font-family:monospace;');
+        var ds=doc.createElement('span');
+        ds.setAttribute('style','font-size:12px; color:'+ink+';');
+        ds.textContent=ownDate||pendingDate; pendingDate='';
         var btn=doc.createElement('button');
         btn.textContent=PREFS.quote?'Hide':'Show';
-        btn.setAttribute('style','border:1px solid #999; border-radius:999px; padding:3px 12px; font-family:monospace; font-size:12px; background:transparent; color:#111; cursor:pointer;');
+        btn.setAttribute('style','border:1px solid '+line+'; border-radius:999px; padding:3px 12px; font-family:monospace; font-size:12px; background:transparent; color:'+ink+'; cursor:pointer;');
         if(!PREFS.quote) content.style.display='none';
         btn.addEventListener('click',function(){
           var hidden=content.style.display==='none';
@@ -998,6 +1021,7 @@
         });
         bar.appendChild(ds); bar.appendChild(btn);
         wrap.appendChild(bar); wrap.appendChild(content);
+        container.appendChild(wrap);
         wraps.push(wrap);
       });
       // Quoted chains arrive newest first; a thread reads oldest first.
