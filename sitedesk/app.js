@@ -322,7 +322,7 @@ function ghCacheKey(path){ return String(path).split('?')[0]; }
    reporting never blocks the app, error-log writes are never themselves
    reported, repeats of the same failure inside 5 minutes are skipped, and
    a single session sends at most 20 reports. */
-var APP_VERSION = 'v95';
+var APP_VERSION = 'v96';
 var errLogState = { sent: 0, seen: {} };
 function reportError(rec){
   try{
@@ -348,6 +348,52 @@ function reportError(rec){
     var p = 'error-log/' + stamp + '-' + (item.user || 'anon') + '-' + rand + '.json';
     ghPutJson(p, item, null, 'sitedesk: error report').catch(function(){});
   }catch(e){}
+}
+
+/* Conflict reports are held, not sent at once (v96). A 409 or 422 usually
+   means another save landed first, and the app's own retry then succeeds
+   a second later: on 2026-11-05 a users.json conflict was logged at
+   1:15:47 PM and the retried save landed at 1:15:48 PM, so the report
+   cried wolf over an error nobody ever saw. A conflict report now waits
+   15 seconds; if a write to the same file succeeds in that window, the
+   report is cancelled. If nothing succeeds, the report goes out. Closing
+   the app flushes any held report immediately so a real one is not lost.
+   Every other error still reports at once. */
+var errConflictPending = {};
+function scheduleConflictReport(rec){
+  try{
+    var key = [rec.status || '', rec.action || '', rec.path || ''].join('|');
+    if(errConflictPending[key]) return;
+    var item2 = { rec: rec, timer: null };
+    item2.timer = setTimeout(function(){
+      delete errConflictPending[key];
+      reportError(rec);
+    }, 15000);
+    errConflictPending[key] = item2;
+  }catch(e){}
+}
+function cancelConflictReports(path){
+  try{
+    Object.keys(errConflictPending).forEach(function(key){
+      if(key.split('|')[2] === path){
+        clearTimeout(errConflictPending[key].timer);
+        delete errConflictPending[key];
+      }
+    });
+  }catch(e){}
+}
+function flushConflictReports(){
+  try{
+    Object.keys(errConflictPending).forEach(function(key){
+      clearTimeout(errConflictPending[key].timer);
+      var rec = errConflictPending[key].rec;
+      delete errConflictPending[key];
+      reportError(rec);
+    });
+  }catch(e){}
+}
+if(typeof window !== 'undefined' && window.addEventListener){
+  window.addEventListener('pagehide', flushConflictReports);
 }
 
 async function ghFetch(path, opts){
@@ -410,9 +456,14 @@ async function ghFetch(path, opts){
     if(!res.ok){
       const err = new Error(ghErrorMessage(res.status, action));
       err.status = res.status;
-      if(res.status !== 404 && !isErrLog) reportError({ kind: 'github', status: res.status, action: action, path: path, message: err.message });
+      if(res.status !== 404 && !isErrLog){
+        const rec2 = { kind: 'github', status: res.status, action: action, path: path, message: err.message };
+        if(res.status === 409 || res.status === 422) scheduleConflictReport(rec2);
+        else reportError(rec2);
+      }
       throw err;
     }
+    if(method !== 'GET') cancelConflictReports(path);
     return json;
   }
 }
@@ -5829,7 +5880,7 @@ async function updateUserRecord(username, fn, message){
       await ghPutJson('users.json', users, rec ? rec.sha : null, message || ('sitedesk: user ' + username));
       await loadUsers();
       return;
-    }catch(e){ if(e.status !== 409) throw e; }
+    }catch(e){ if(e.status !== 409 && e.status !== 422) throw e; }
   }
   throw new Error('Could not save, please try again.');
 }
@@ -6022,9 +6073,22 @@ function deleteOwnAccount(){
         }
       }
       updateClaimIndex(function(idx){ claims.forEach(function(c){ delete idx[c.slug]; }); });
-      await loadUsers();
-      delete state.users[me];
-      await ghPutJson('users.json', state.users, state.usersSha, 'sitedesk: delete account @' + me);
+      /* Retry on conflict like the other users.json writes (v96): this was
+         the last users.json write with no retry, so one save landing in
+         the same second failed the delete outright. */
+      let deleted = false;
+      for(let attempt = 0; attempt < 5 && !deleted; attempt++){
+        await loadUsers();
+        delete state.users[me];
+        try{
+          await ghPutJson('users.json', state.users, state.usersSha, 'sitedesk: delete account @' + me);
+          deleted = true;
+        }catch(e){
+          if(e.status !== 409 && e.status !== 422) throw e;
+          if(attempt < 4) await new Promise(function(r){ setTimeout(r, 400 + Math.random() * 700); });
+        }
+      }
+      if(!deleted) throw new Error('Could not delete the account. The user list is busy, try again in a moment.');
       logout();
       toast('Account deleted');
     }catch(e){
