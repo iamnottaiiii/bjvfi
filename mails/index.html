@@ -91,9 +91,10 @@
     box-shadow:0 10px 26px rgba(0,0,0,.3);
   }
   .dock button{
-    border:1px solid var(--line); background:transparent;
-    flex:1 1 0; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center;
+    border:none; background:transparent; color:var(--ink); cursor:pointer;
+    flex:1 1 0; min-width:0; display:flex; align-items:center; justify-content:center; position:relative;
   }
+  .dock .bdg{position:absolute; top:0; right:2px; background:var(--gold); color:#191408; font-size:.6rem; font-weight:800; min-width:16px; height:16px; border-radius:999px; display:flex; align-items:center; justify-content:center; padding:0 4px;}
   .compose-float{
     position:static; width:40px; height:40px; border-radius:50%; flex:0 0 auto;
     border:none; background:var(--gold); color:#111; cursor:pointer; display:none;
@@ -115,11 +116,9 @@
   .set-row select.fld{width:auto; flex:1;}
   .dock.on{display:flex;}
   .dock .who{font-size:.78rem; font-weight:700; padding:0 8px 0 12px; white-space:nowrap;}
-  .dock button{border-radius:999px; padding:10px 14px; font-size:.85rem; white-space:nowrap; display:flex; align-items:center; gap:7px;}
-  .dock button.sel{background:transparent; border-color:var(--ink); font-weight:700;}
+  .dock button{border-radius:999px; padding:10px 6px;}
+  .dock button.sel{background:transparent; color:var(--gold);}
   .dock .compose{margin:0; padding:10px 16px;}
-  .dock .dot{width:8px; height:8px; border-radius:50%; background:var(--gold); display:none;}
-  .dock .has .dot{display:block;}
   .theme-float{
     position:fixed; right:16px; bottom:16px; z-index:7;
     border-radius:999px; padding:11px 16px; font-size:.85rem;
@@ -202,7 +201,7 @@
   .reader{display:flex; flex-direction:column; height:100%;}
   .app:not(.split){justify-items:center;}
   .app:not(.split) .list-panel{width:min(880px,100%);}
-  .bavatar{width:46px; height:46px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.9rem; color:#000; background:var(--gold);}
+  .bavatar{width:46px; height:46px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.9rem; color:#000; background:var(--gold); position:relative; overflow:hidden;}
   .who-line{display:flex; align-items:center; gap:13px; background:none; border:none; padding:0; text-align:left; cursor:pointer; color:inherit; font:inherit;}
   .who-line .nm{font-size:1rem; font-weight:700;}
   .who-line .ad{font-size:.82rem;}
@@ -217,6 +216,7 @@
   #settingsVeil .sheet{background:rgba(130,130,145,.08); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);}
   #acctVeil .sheet{width:min(560px,94vw); max-height:86dvh; overflow-y:auto; background:rgba(130,130,145,.08); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);}
   .bavatar img{width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;}
+  .bavatar img.avpic{position:absolute; inset:0;}
   .acct-item{display:flex; align-items:center; gap:6px;}
   .acct-pick{flex:1; display:flex; align-items:center; gap:12px; background:none; border:none; color:var(--ink); font:inherit; text-align:left; cursor:pointer; padding:0; min-width:0;}
   .acct-x{flex:0 0 auto; width:30px; height:30px; border-radius:50%; border:1px solid var(--line); background:transparent; color:var(--ink); cursor:pointer; font-size:.8rem; line-height:1;}
@@ -328,7 +328,7 @@
     .msg .from{font-size:.92rem;}
     .msg .subj2{font-size:.88rem;}
     .dock{gap:6px; padding:8px 10px calc(8px + env(safe-area-inset-bottom));}
-    .dock button{padding:8px 13px; font-size:.82rem;}
+    .dock button{padding:9px 6px;}
     .acct-line .em{font-size:.8rem;}
   }
 
@@ -392,7 +392,7 @@
     .dock{left:14px; transform:translateY(16px); bottom:calc(16px + env(safe-area-inset-bottom)); z-index:40; width:calc(100vw - 28px); max-width:calc(100vw - 28px); overflow-x:hidden; gap:5px; padding:8px; opacity:0; pointer-events:none; transition:transform .28s ease, opacity .28s ease;}
     .dock.open{transform:translateY(0); opacity:1; pointer-events:auto;}
     .dock.open ~ #dockToggle{display:none;}
-    .dock button{flex:1 1 0; min-width:0; padding:9px 2px; font-size:.78rem; justify-content:center; gap:4px;}
+    .dock button{flex:1 1 0; min-width:0; padding:10px 2px;}
     .msgs{padding-bottom:120px;}
     .reader{padding:16px 10px;}
     #hideListBtn{display:none;}
@@ -656,12 +656,12 @@
     var folder=state.folder;
     return api('list',{mailbox:folder.toLowerCase(),limit:50}).then(function(d){
       var fresh=(d.messages||[]).map(function(mm){return mapMsg(mm,folder);});
-      mergeBodies(LISTCACHE[folder],fresh);
+      mergeBodies(LISTCACHE[currentAcct+'|'+folder],fresh);
       if(d.counts) COUNTS=d.counts;
-      LISTCACHE[folder]=fresh;
+      LISTCACHE[currentAcct+'|'+folder]=fresh;
       if(state.folder===folder){MAIL=fresh; renderAll();}
     }).catch(function(e){
-      if(state.folder===folder&&!LISTCACHE[folder]){MAIL=[]; LISTERR=e.message; renderAll();}
+      if(state.folder===folder&&!LISTCACHE[currentAcct+'|'+folder]){MAIL=[]; LISTERR=e.message; renderAll();}
     });
   }
   function refresh(){return loadList();}
@@ -673,7 +673,7 @@
     var dp=dispPerson(m);
     var f=btn.querySelector('.from'); if(f) f.textContent=dp.name;
     var a=btn.querySelector('.addr'); if(a) a.textContent=dp.addr;
-    var av=btn.querySelector('.bavatar'); if(av) av.textContent=initials(dp.name);
+    var av=btn.querySelector('.bavatar'); if(av&&!av.querySelector('img.avpic')) av.textContent=initials(dp.name);
     var s=btn.querySelector('.subj'); if(s) s.textContent=m.subj;
     var wn=btn.querySelector('.when2'); if(wn) wn.textContent=m.when;
     var r2=btn.querySelector('.row2');
@@ -709,17 +709,25 @@
   function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
   function unreadCount(f){var c=COUNTS[f.toLowerCase()]; return c?c.unread:0;}
 
+  var FOLDER_ICONS={
+    Inbox:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>',
+    Sent:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>',
+    Drafts:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>',
+    Archive:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>',
+    Junk:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg>',
+    Trash:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>'
+  };
   function renderFolders(){
     foldersEl.innerHTML=FOLDERS.map(function(f){
       var n=unreadCount(f);
-      return '<button type="button" class="'+(state.folder===f?'sel ':'')+(n?'has':'')+'" data-folder="'+f+'">'
-        +'<span>'+f+'</span>'+(n?'<span>'+n+'</span>':'')+'<span class="dot"></span></button>';
+      return '<button type="button" class="'+(state.folder===f?'sel':'')+'" data-folder="'+f+'" aria-label="'+f+'">'
+        +FOLDER_ICONS[f]+(n?'<span class="bdg">'+n+'</span>':'')+'</button>';
     }).join('');
     foldersEl.querySelectorAll('[data-folder]').forEach(function(b){
       b.addEventListener('click',function(){
         state.folder=b.dataset.folder; state.selected=null; b.blur();
         document.getElementById('dock').classList.remove('open');
-        if(LISTCACHE[state.folder]) MAIL=LISTCACHE[state.folder];
+        if(LISTCACHE[currentAcct+'|'+state.folder]) MAIL=LISTCACHE[currentAcct+'|'+state.folder];
         renderAll(); loadList();
       });
     });
@@ -734,8 +742,95 @@
     });
   }
 
+  function personEmail(m){
+    if(m.folder==='Sent'||m.folder==='Drafts') return m.toAddr||'';
+    return m.addr||'';
+  }
   function avatarHTML(m){
-    return '<span class="bavatar sm">'+esc(initials(dispPerson(m).name))+'</span>';
+    var dp=dispPerson(m);
+    return '<span class="bavatar sm"'+avAttr(personEmail(m))+'>'+esc(initials(dp.name))+'</span>';
+  }
+  function avAttr(email){
+    if(!email) return '';
+    return ' data-avemail="'+esc(email)+'"';
+  }
+
+  /* Sender pictures: the picture that belongs to a sender is resolved once
+     per address and cached on the device. Gravatar covers people (looked up
+     by a SHA-256 hash of the address), then the company logo service, then
+     the BIMI brand logo the sender's own domain publishes. When none of
+     them has a picture, the initials stay. */
+  var AVSTORE={emails:{},domains:{}};
+  try{var avs=localStorage.getItem('bjvfi_mail_avatars'); if(avs) AVSTORE=JSON.parse(avs);}catch(e){}
+  function saveAvStore(){try{localStorage.setItem('bjvfi_mail_avatars',JSON.stringify(AVSTORE));}catch(e){}}
+  var AVPENDING={};
+  function applyAvatar(email,url){
+    if(!url) return;
+    document.querySelectorAll('.bavatar[data-avemail]').forEach(function(el){
+      if(el.dataset.avemail!==email) return;
+      var img=el.querySelector('img.avpic');
+      if(!img){img=document.createElement('img'); img.className='avpic'; img.alt=''; el.appendChild(img);}
+      img.src=url;
+    });
+  }
+  function probeImg(url){
+    return new Promise(function(res,rej){
+      var i=new Image();
+      i.onload=function(){res(url);};
+      i.onerror=function(){rej(new Error('no picture'));};
+      i.src=url;
+    });
+  }
+  function sha256hex(text){
+    if(!window.crypto||!crypto.subtle) return Promise.reject(new Error('no subtle'));
+    return crypto.subtle.digest('SHA-256',new TextEncoder().encode(text)).then(function(buf){
+      return Array.prototype.map.call(new Uint8Array(buf),function(b){return ('0'+b.toString(16)).slice(-2);}).join('');
+    });
+  }
+  function resolveAvatarEmail(email){
+    if(email in AVSTORE.emails){applyAvatar(email,AVSTORE.emails[email]); return;}
+    if(AVPENDING[email]) return;
+    AVPENDING[email]=true;
+    var domain=(email.split('@')[1]||'').toLowerCase();
+    Promise.reject(new Error('start'))
+    .catch(function(){
+      return sha256hex(email.trim().toLowerCase()).then(function(h){
+        return probeImg('https://www.gravatar.com/avatar/'+h+'?s=96&d=404');
+      });
+    })
+    .catch(function(){
+      if(!domain) throw new Error('no domain');
+      return probeImg('https://logo.clearbit.com/'+domain+'?size=96');
+    })
+    .catch(function(){
+      if(!domain) throw new Error('no domain');
+      if(domain in AVSTORE.domains&&!AVSTORE.domains[domain]) throw new Error('no bimi');
+      return fetch('https://cloudflare-dns.com/dns-query?name='+encodeURIComponent('default._bimi.'+domain)+'&type=TXT',{headers:{'Accept':'application/dns-json'}})
+        .then(function(r){return r.json();})
+        .then(function(j){
+          var ans=(j&&j.Answer)||[]; var logo='';
+          for(var i=0;i<ans.length;i++){
+            var data=String(ans[i].data||'').replace(/"/g,'');
+            var mm=data.match(/l=([^;\s]+)/);
+            if(mm){logo=mm[1]; break;}
+          }
+          AVSTORE.domains[domain]=logo; saveAvStore();
+          if(!logo) throw new Error('no bimi logo');
+          return probeImg(logo);
+        });
+    })
+    .then(function(url){
+      AVSTORE.emails[email]=url; saveAvStore(); delete AVPENDING[email]; applyAvatar(email,url);
+    })
+    .catch(function(){
+      AVSTORE.emails[email]=''; saveAvStore(); delete AVPENDING[email];
+    });
+  }
+  function resolveAvatars(){
+    document.querySelectorAll('.bavatar[data-avemail]').forEach(function(el){
+      var em=el.dataset.avemail;
+      if(em) resolveAvatarEmail(em);
+    });
   }
 
   function renderList(){
@@ -789,7 +884,7 @@
       +'</div></div>'
       +'<h2>'+esc(m.subj)+'</h2>'
       +prevBlocks
-      +'<button type="button" class="who-line" id="profBtn"><span class="bavatar">'+esc(initials(dp.name))+'</span><span><span class="nm">'+esc(dp.name)+'</span><br><span class="ad">'+esc(dp.addr)+'</span></span>'
+      +'<button type="button" class="who-line" id="profBtn"><span class="bavatar"'+avAttr(personEmail(m))+'>'+esc(initials(dp.name))+'</span><span><span class="nm">'+esc(dp.name)+'</span><br><span class="ad">'+esc(dp.addr)+'</span></span>'
       +(PREFS.showWhen?'<span class="r-when2">'+esc(m.when)+'</span>':'')
       +'</button>'
       +(m.html?'<iframe class="r-html" id="htmlFrame" sandbox="allow-same-origin" title="Message content" srcdoc="'+esc(fitHtml(m.html))+'"></iframe>'
@@ -914,7 +1009,7 @@
     }
   }
 
-  function renderAll(){renderFolders(); renderList(); renderReader();}
+  function renderAll(){renderFolders(); renderList(); renderReader(); resolveAvatars();}
 
   function openMsg(id){
     var m=MAIL.find(function(x){return x.id===id;});
@@ -948,10 +1043,14 @@
   function openProfile(m){
     profMsg=m;
     var dp=dispPerson(m);
-    document.getElementById('pAvatar').textContent=initials(dp.name);
+    var pa=document.getElementById('pAvatar');
+    pa.textContent=initials(dp.name);
+    var pem=personEmail(m);
+    if(pem) pa.dataset.avemail=pem; else delete pa.dataset.avemail;
     document.getElementById('pName').textContent=dp.name;
     document.getElementById('pAddr').textContent=dp.addr;
     profVeil.classList.add('on');
+    resolveAvatars();
   }
 
   function fmtBody(t){
@@ -1158,6 +1257,7 @@
   var currentAcct='';
   function setAccount(addr){
     currentAcct=addr;
+    try{localStorage.setItem('bjvfi_mail_last',addr);}catch(e){}
     document.getElementById('whoAddr').textContent=addr;
     document.getElementById('whoAddrTop').textContent=addr;
     paintAcctAvatar(addr);
@@ -1262,14 +1362,17 @@
   (function boot(){
     var saved=Object.keys(SESSIONS);
     if(!saved.length) return;
-    setAccount(saved[0]);
+    var lastAcct='';
+    try{lastAcct=localStorage.getItem('bjvfi_mail_last')||'';}catch(e){}
+    var pick=SESSIONS[lastAcct]?lastAcct:saved[0];
+    setAccount(pick);
     state.folder='Inbox'; state.selected=null;
     enterApp(); renderAll();
     refresh().catch(function(e){
       var msg=e.message||'';
       if(msg.indexOf('AUTHENTICATIONFAILED')>-1||msg.indexOf('session expired')>-1){
-        delete SESSIONS[saved[0]]; saveSessions();
-        accounts=accounts.filter(function(x){return x!==saved[0];});
+        delete SESSIONS[pick]; saveSessions();
+        accounts=accounts.filter(function(x){return x!==pick;});
         currentAcct=''; exitApp();
         document.getElementById('loginErr').textContent=msg;
       }else{
