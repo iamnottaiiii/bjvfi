@@ -24,11 +24,14 @@
     --row:#101014;
     --cx:50%; --cy:42%;
   }
+  *,*::before,*::after{box-sizing:border-box;}
   html,body{height:100%;}
   body{
     font-family:"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     background:#000; color:var(--ink); overflow:hidden;
+    position:fixed; inset:0; width:100%; overscroll-behavior:none;
   }
+  .msgs,.reader,.sheet{overscroll-behavior:contain;}
   /* bjvfi void, copied from the homepage */
   .void{position:fixed; inset:0; overflow:hidden; background:#000; color:var(--ink);}
   .void::before{
@@ -75,6 +78,9 @@
   .dock{
     position:fixed; left:50%; transform:translateX(-50%); bottom:16px; z-index:6;
     display:none; align-items:center; gap:10px; max-width:96vw; overflow-x:hidden; padding:4px;
+    background:var(--panel-strong); border:1px solid var(--line); border-radius:999px;
+    backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+    box-shadow:0 14px 34px rgba(0,0,0,.35);
   }
   #dockToggle{
     position:fixed; left:16px; bottom:calc(16px + env(safe-area-inset-bottom)); z-index:41;
@@ -235,21 +241,33 @@
   .msg:hover{background:var(--panel-strong);}
   .msg.sel{background:transparent;}
   .msg .top{display:flex; justify-content:space-between; gap:10px; align-items:baseline;}
-  .msg .from{font-size:.9rem; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .msg .from{font-size:.88rem; font-weight:500; white-space:normal; overflow:visible; line-height:1.35; word-break:break-word;}
   .msg.unread .from{font-weight:700;}
   .msg .when{font-size:.72rem; opacity:.7; white-space:nowrap;}
-  .msg .subj{font-size:.86rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .msg .subj{font-size:.97rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .msg.unread .subj{font-weight:700;}
   .msg .prev{font-size:.8rem; opacity:.65; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .msg .row2{display:flex; align-items:center; gap:8px;}
   .msg .udot{width:8px; height:8px; border-radius:50%; background:var(--gold); flex:none;}
   .empty{padding:26px 16px; font-size:.88rem; opacity:.7; text-align:center;}
 
-  .reader{padding:26px 28px; overflow-y:auto; overflow-x:hidden;}
+  .reader{padding:20px 14px; overflow-y:auto; overflow-x:hidden;}
   .reader .r-from{font-size:.85rem; opacity:.75;}
-  .reader h2{font-size:1.35rem; font-weight:700; margin:8px 0 6px; line-height:1.3; overflow-wrap:anywhere;}
+  .reader h2{font-size:1.35rem; font-weight:700; margin:14px 0 6px; line-height:1.3; overflow-wrap:anywhere;}
   .reader .r-meta{font-size:.8rem; opacity:.7; padding-bottom:18px; margin-bottom:20px; line-height:1.7;}
-  .reader .r-body{font-size:.94rem; line-height:1.75; max-width:640px; white-space:pre-line; overflow-wrap:anywhere; word-break:break-word;}
+  .reader .r-body{font-size:.94rem; line-height:1.75; max-width:none; white-space:pre-line; overflow-wrap:anywhere; word-break:break-word;}
+  .dots.bare{border:none; background:transparent; padding:8px 10px; font-size:1.05rem;}
+  .r-tr{display:flex; flex-direction:column; align-items:flex-end; gap:3px; margin-left:auto;}
+  .r-tr .r-when{margin:0; padding:0; font-size:.72rem; white-space:nowrap;}
+  .ddots.sm{gap:3px;}
+  .ddots.sm i{width:3px; height:3px;}
+  .reader .who-line{margin:6px 0 20px;}
+  .reader .who-line .nm{white-space:normal; overflow:visible; text-overflow:clip; word-break:break-word;}
+  .reader .who-line .ad{white-space:normal; overflow:visible; text-overflow:clip; word-break:break-all;}
+  .q-seg{border-top:1px solid var(--line); margin-top:24px; padding-top:12px;}
+  .q-bar{display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px;}
+  .q-date{font-size:.78rem;}
+  .q-bar .pill{padding:5px 13px; font-size:.78rem;}
   .reader .r-html{width:100%; max-width:100%; border:0; background:#fff; display:block;}
   .r-top .who-line{flex:1; min-width:0;}
   .who-line>span{min-width:0;}
@@ -369,9 +387,14 @@
     .reading .dock, .reading .compose-float, .reading #dockToggle, .reading #dockToggle.on{display:none;}
     .reading .list-panel{display:none;}
     #dockToggle.on{display:flex;}
-    .dock{left:14px; transform:translateY(16px); bottom:calc(16px + env(safe-area-inset-bottom)); z-index:40; width:calc(100vw - 28px); max-width:calc(100vw - 28px); overflow-x:hidden; gap:8px; opacity:0; pointer-events:none; transition:transform .28s ease, opacity .28s ease;}
+    .dock{left:14px; transform:translateY(16px); bottom:calc(16px + env(safe-area-inset-bottom)); z-index:40; width:calc(100vw - 28px); max-width:calc(100vw - 28px); overflow-x:hidden; gap:5px; padding:8px; opacity:0; pointer-events:none; transition:transform .28s ease, opacity .28s ease;}
     .dock.open{transform:translateY(0); opacity:1; pointer-events:auto;}
     .dock.open ~ #dockToggle{display:none;}
+    .dock button{flex:1 1 0; min-width:0; padding:9px 2px; font-size:.78rem; justify-content:center; gap:4px;}
+    .msgs{padding-bottom:120px;}
+    .reader{padding:16px 10px;}
+    #hideListBtn{display:none;}
+    .show-list{display:none !important;}
   }
   html[data-theme="light"] .msg .when, html[data-theme="light"] .msg .when2,
   html[data-theme="light"] .msg .prev, html[data-theme="light"] .reader .r-from,
@@ -396,6 +419,7 @@
         <button class="go" id="signInBtn" type="button">Sign in</button>
         <div id="loginErr" style="color:var(--red); font-size:.8rem; min-height:1em;"></div>
         <a id="appPwLink" href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener" style="display:none; color:var(--gold); font-size:.88rem;">Create a Google app password</a>
+        <input class="field" id="appPwInput" type="text" autocomplete="off" autocapitalize="none" placeholder="App password" style="display:none;">
       </div>
     </section>
 
@@ -513,6 +537,7 @@
         <input id="mailPass" type="password" placeholder="Password" autocomplete="off">
         <div class="prov-line" id="provLine"></div>
         <a id="appPwLink2" href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener" style="display:none; color:var(--gold); font-size:.88rem;">Create a Google app password</a>
+        <input id="appPwInput2" type="text" placeholder="App password" autocomplete="off" autocapitalize="none" style="display:none;">
         <div class="row">
           <button class="pill" id="connectClose" type="button">Close</button>
           <button class="pill send" id="connectGo" type="button">Connect</button>
@@ -523,7 +548,7 @@
     <div class="veil" id="veil">
       <div class="sheet">
         <div class="c-title" id="cTitle">New message</div>
-        <input id="cTo" type="email" placeholder="To" autocomplete="off">
+        <input id="cTo" type="text" inputmode="email" placeholder="To" autocomplete="off">
         <input id="cSubj" type="text" placeholder="Subject" autocomplete="off">
         <div class="fmtbar">
           <button type="button" class="dotbtn" id="fmtBtn">&bull;&bull;</button>
@@ -556,6 +581,7 @@
 (function(){
   var voidEl=document.getElementById('void');
   document.addEventListener('pointermove',function(e){
+    if(e.pointerType&&e.pointerType!=='mouse') return;
     voidEl.style.setProperty('--cx',(e.clientX/window.innerWidth*100)+'%');
     voidEl.style.setProperty('--cy',(e.clientY/window.innerHeight*100)+'%');
   });
@@ -596,8 +622,19 @@
   function mapMsg(mm){
     return {id:parseInt(mm.uid,10), uid:mm.uid, folder:state.folder,
       from:mm.fromName||mm.fromEmail||'', addr:mm.fromEmail||'',
+      toName:mm.toName||'', toAddr:mm.toEmail||'',
       subj:mm.subject||'', prev:'', when:fmtWhen(mm.date), rawDate:mm.date,
       body:null, html:'', unread:!!mm.unread, starred:!!mm.starred, align:'left', sigImg:''};
+  }
+  // The person a row or an open mail is about: the sender, except in Sent and
+  // Drafts where the sender is always the account itself, so it is the
+  // recipient instead.
+  function dispPerson(m){
+    var name, addr;
+    if(m.folder==='Sent'||m.folder==='Drafts'){ name=m.toName||m.toAddr||m.from; addr=m.toAddr||''; }
+    else { name=m.from; addr=m.addr; }
+    if(name&&addr&&name===addr) addr='';
+    return {name:name||'', addr:addr||''};
   }
   function loadCounts(){
     return api('counts',{}).then(function(d){COUNTS=d||{}; renderFolders();});
@@ -616,8 +653,10 @@
     if(!w) return;
     var btn=w.querySelector('.msg'); if(!btn) return;
     btn.classList.toggle('unread',!!m.unread);
-    var f=btn.querySelector('.from'); if(f) f.textContent=m.from;
-    var a=btn.querySelector('.addr'); if(a) a.textContent=m.addr;
+    var dp=dispPerson(m);
+    var f=btn.querySelector('.from'); if(f) f.textContent=dp.name;
+    var a=btn.querySelector('.addr'); if(a) a.textContent=dp.addr;
+    var av=btn.querySelector('.bavatar'); if(av) av.textContent=initials(dp.name);
     var s=btn.querySelector('.subj'); if(s) s.textContent=m.subj;
     var wn=btn.querySelector('.when2'); if(wn) wn.textContent=m.when;
     var r2=btn.querySelector('.row2');
@@ -669,12 +708,12 @@
     return MAIL.filter(function(m){
       if(m.folder!==state.folder) return false;
       if(!q) return true;
-      return (m.from+' '+m.subj+' '+m.prev).toLowerCase().indexOf(q)>-1;
+      return (m.from+' '+m.toName+' '+m.toAddr+' '+m.subj).toLowerCase().indexOf(q)>-1;
     });
   }
 
   function avatarHTML(m){
-    return '<span class="bavatar sm">'+esc(initials(m.from))+'</span>';
+    return '<span class="bavatar sm">'+esc(initials(dispPerson(m).name))+'</span>';
   }
 
   function renderList(){
@@ -682,15 +721,16 @@
     var rows=visible();
     if(!rows.length){listEl.innerHTML='<div class="empty">'+esc(LISTERR||'Nothing here.')+'</div>'; return;}
     listEl.innerHTML=(LISTERR?'<div class="empty">'+esc(LISTERR)+'</div>':'')+rows.map(function(m){
+      var dp=dispPerson(m);
       return '<div class="swipe" data-swipe="'+m.id+'">'
         +'<div class="cue" data-side="left" data-a="'+PREFS.left+'">'+CUE[PREFS.left]+'</div>'
         +'<div class="cue" data-side="right" data-a="'+PREFS.right+'">'+CUE[PREFS.right]+'</div>'
         +'<button type="button" class="msg'+(m.unread?' unread':'')+(state.selected===m.id?' sel':'')+'" data-id="'+m.id+'">'
         +avatarHTML(m)
         +'<span class="lines">'
-        +'<span class="top"><span class="from">'+esc(m.from)+'</span></span>'
-        +'<span class="addr">'+esc(m.addr)+'</span>'
         +'<span class="row2">'+(m.unread?'<span class="udot"></span>':'')+'<span class="subj">'+esc(m.subj)+'</span></span>'
+        +'<span class="from">'+esc(dp.name)+'</span>'
+        +'<span class="addr">'+esc(dp.addr)+'</span>'
         +'<span class="when2">'+esc(m.when)+'</span>'
         +'</span></button></div>';
     }).join('');
@@ -704,21 +744,31 @@
     var m=MAIL.find(function(x){return x.id===state.selected;});
     if(!m){readerEl.innerHTML=''; readerPanel.classList.remove('open'); appView.classList.remove('split'); voidEl.classList.remove('reading'); return;}
     appView.classList.add('split'); voidEl.classList.add('reading');
+    var dp=dispPerson(m);
+    var quotePart='';
+    if(m.quoteHtml){
+      quotePart='<div class="q-area"><iframe class="r-html" id="qFrame" sandbox="allow-same-origin" title="Previous messages" srcdoc="'+esc(fitHtml(m.quoteHtml))+'"></iframe></div>';
+    }else if(m.prevSegs&&m.prevSegs.length){
+      quotePart=m.prevSegs.map(function(seg){
+        return '<div class="q-seg"><div class="q-bar"><span class="q-date">'+esc(fmtWhen(seg.date)||seg.date||'')+'</span>'
+          +'<button type="button" class="pill q-h">'+(PREFS.quote?'Hide':'Show')+'</button></div>'
+          +'<div class="r-body q-body"'+(PREFS.quote?'':' style="display:none;"')+'>'+fmtBody(seg.text)+'</div></div>';
+      }).join('');
+    }
     readerEl.innerHTML=
-      '<div class="r-top"><button type="button" class="dots" id="backBtn" aria-label="Back">&#8592;</button><button type="button" class="who-line" id="profBtn"><span class="bavatar">'+esc(initials(m.from))+'</span><span><span class="nm">'+esc(m.from)+'</span><br><span class="ad">'+esc(m.addr)+'</span></span></button>'
+      '<div class="r-top"><button type="button" class="dots bare" id="backBtn" aria-label="Back">&#8592;</button>'
+      +'<div class="r-tr"><button type="button" class="dots bare" id="dotsBtn" aria-label="More"><span class="ddots sm"><i></i><i></i><i></i></span></button>'
       +(PREFS.showWhen?'<span class="r-when">'+esc(m.when)+'</span>':'')
-      +'<button type="button" class="dots" id="dotsBtn">&bull;&bull;&bull;</button>'
+      +'</div>'
       +'<div class="dots-menu" id="dotsMenu">'
       +'<button type="button" id="dlBtn">Download</button>'
       +'<button type="button" id="archBtn">Archive</button>'
       +'</div></div>'
       +'<h2>'+esc(m.subj)+'</h2>'
-      +'<div class="r-meta">'+esc(m.when)+'</div>'
+      +'<button type="button" class="who-line" id="profBtn"><span class="bavatar">'+esc(initials(dp.name))+'</span><span><span class="nm">'+esc(dp.name)+'</span><br><span class="ad">'+esc(dp.addr)+'</span></span></button>'
       +(m.html?'<iframe class="r-html" id="htmlFrame" sandbox="allow-same-origin" title="Message content" srcdoc="'+esc(fitHtml(m.html))+'"></iframe>'
               :'<div class="r-body" style="text-align:'+(m.align||'left')+'">'+fmtBody(m.body)+'</div>')
-      +((m.quote||m.quoteHtml)?'<div class="q-area"><div class="quote-head"><button class="pill" type="button" id="qToggle">'+(PREFS.quote?'Hide':'Show')+'</button></div><div id="qBody"'+(PREFS.quote?'':' style="display:none;"')+'>'
-        +(m.quoteHtml?'<iframe class="r-html" id="qFrame" sandbox="allow-same-origin" title="Quoted reply" srcdoc="'+esc(fitHtml(m.quoteHtml))+'"></iframe>':'<div class="r-body">'+fmtBody(m.quote)+'</div>')
-        +'</div></div>':'')
+      +quotePart
       +(m.sigImg?'<img class="sig-img" src="'+m.sigImg+'" alt="">':'')
       +'<div class="acts">'
       +'<button type="button" class="pill blue" id="replyBtn">Reply</button>'
@@ -753,17 +803,20 @@
           if(h) qf.style.height=h+'px';
         }catch(e){}
       };
+      qf.__fit=fitQ;
       qf.addEventListener('load',function(){
-        fitQ(); setTimeout(fitQ,400);
+        fitQ(); wireHtmlQuotes(qf); fitQ(); setTimeout(fitQ,400);
         try{ if(qf.contentDocument) qf.contentDocument.addEventListener('load',fitQ,true); }catch(e){}
       });
     }
-    var qT=document.getElementById('qToggle');
-    if(qT) qT.addEventListener('click',function(){
-      var qb=document.getElementById('qBody'); if(!qb) return;
-      var hidden=qb.style.display==='none';
-      qb.style.display=hidden?'':'none';
-      qT.textContent=hidden?'Hide':'Show';
+    readerEl.querySelectorAll('.q-h').forEach(function(b){
+      b.addEventListener('click',function(){
+        var seg=b.closest('.q-seg'); if(!seg) return;
+        var body=seg.querySelector('.q-body'); if(!body) return;
+        var hidden=body.style.display==='none';
+        body.style.display=hidden?'':'none';
+        b.textContent=hidden?'Hide':'Show';
+      });
     });
     document.getElementById('replyBtn').addEventListener('click',function(){openCompose(m);});
     document.getElementById('fwdBtn').addEventListener('click',function(){openForward(m);});
@@ -837,7 +890,8 @@
     state.selected=id;
     var wasUnread=m.unread;
     api('get',{mailbox:boxKey(),uid:m.uid}).then(function(d){
-      m.body=d.body||''; m.html=d.html||''; m.quote=d.quote||''; m.quoteHtml=d.quoteHtml||''; m.from=d.fromName||m.from; m.addr=d.fromEmail||m.addr;
+      m.body=d.body||''; m.html=d.html||''; m.prevSegs=d.prev||[]; m.quoteHtml=d.quoteHtml||''; m.from=d.fromName||m.from; m.addr=d.fromEmail||m.addr;
+      m.toName=d.toName||m.toName; m.toAddr=d.toEmail||m.toAddr;
       m.subj=d.subject||m.subj; m.when=fmtWhen(d.date)||m.when;
       m.unread=false; paintRow(m); renderReader();
       if(wasUnread){api('mark_read',{mailbox:boxKey(),uid:m.uid}).then(function(){loadCounts();}).catch(function(){});}
@@ -855,9 +909,10 @@
   var profVeil=null, profMsg=null;
   function openProfile(m){
     profMsg=m;
-    document.getElementById('pAvatar').textContent=initials(m.from);
-    document.getElementById('pName').textContent=m.from;
-    document.getElementById('pAddr').textContent=m.addr;
+    var dp=dispPerson(m);
+    document.getElementById('pAvatar').textContent=initials(dp.name);
+    document.getElementById('pName').textContent=dp.name;
+    document.getElementById('pAddr').textContent=dp.addr;
     profVeil.classList.add('on');
   }
 
@@ -865,12 +920,74 @@
     return esc(t).replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/_([^_]+)_/g,'<i>$1</i>');
   }
   function fitHtml(h){
-    var css='<style>html,body{margin:0;padding:0;max-width:100%;overflow-x:hidden;background:#fff;color-scheme:light}img,table,td,div,span,p{max-width:100%!important}img{height:auto!important}table{table-layout:auto!important}*{overflow-wrap:anywhere;box-sizing:border-box}</style>';
+    h=h.replace(/<meta[^>]*name\s*=\s*["']viewport["'][^>]*>/gi,'');
+    var css='<style>html,body{margin:0;padding:0;max-width:100%;overflow-x:hidden;background:#fff;color-scheme:light}img,table,td,div,span,p{max-width:100%!important}img{height:auto!important}table{table-layout:auto!important}pre{white-space:pre-wrap!important}*{overflow-wrap:anywhere;box-sizing:border-box}</style>';
     if(/<html[\s>]/i.test(h)){
       if(/<head[^>]*>/i.test(h)) return h.replace(/<head[^>]*>/i,function(m){return m+'<meta name="viewport" content="width=device-width, initial-scale=1">'+css;});
       return h.replace(/<html[^>]*>/i,function(m){return m+'<head><meta name="viewport" content="width=device-width, initial-scale=1">'+css+'</head>';});
     }
     return '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'+css+'</head><body>'+h+'</body></html>';
+  }
+
+  // Inside the quoted history frame, split the chain into separate messages:
+  // flatten nested blockquotes into siblings, then give each message a bar
+  // with only its date and its own Hide button. Best effort on foreign HTML:
+  // any failure leaves the quoted mail exactly as it arrived.
+  function wireHtmlQuotes(frame){
+    var doc;
+    try{ doc=frame.contentDocument; }catch(e){ return; }
+    if(!doc||doc.__qWired) return;
+    doc.__qWired=1;
+    try{
+      var guard=0;
+      while(guard++<80){
+        var inner=doc.querySelector('blockquote blockquote');
+        if(!inner) break;
+        var anc=inner.parentNode;
+        while(anc&&anc.tagName!=='BLOCKQUOTE') anc=anc.parentNode;
+        if(!anc||!anc.parentNode) break;
+        anc.parentNode.insertBefore(inner, anc.nextSibling);
+      }
+      var container=doc.querySelector('.gmail_quote')||doc.body;
+      if(!container) return;
+      var groups=[], cur=[];
+      Array.prototype.slice.call(container.childNodes).forEach(function(n){
+        if(n.nodeType===1&&n.tagName==='BLOCKQUOTE'){ if(cur.length){groups.push(cur); cur=[];} groups.push([n]); }
+        else cur.push(n);
+      });
+      if(cur.length) groups.push(cur);
+      var dateRe=/((?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)[a-z]*,?\s+)?(?:\d{4}-\d{2}-\d{2}(?:[ T]\d{1,2}:\d{2}(?::\d{2})?)?|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{1,2},?\s+\d{4}|\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4})(?:,?\s+(?:at\s+)?\d{1,2}:\d{2}(?::\d{2})?\s*(?:AM|PM|am|pm)?)?/;
+      groups.forEach(function(nodes){
+        var hasText=nodes.some(function(n){return (n.textContent||'').trim().length>0;});
+        if(!hasText) return;
+        var wrap=doc.createElement('div');
+        wrap.setAttribute('style','border-top:1px solid #bbb; margin-top:16px; padding-top:8px;');
+        var bar=doc.createElement('div');
+        bar.setAttribute('style','display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-family:monospace;');
+        var ds=doc.createElement('span');
+        ds.setAttribute('style','font-size:12px; color:#111;');
+        var content=doc.createElement('div');
+        nodes[0].parentNode.insertBefore(wrap, nodes[0]);
+        nodes.forEach(function(n){ content.appendChild(n); });
+        var dm=(content.textContent||'').match(dateRe);
+        if(dm) ds.textContent=dm[0].replace(/\s+at\s+/i,' ');
+        content.querySelectorAll('div,p,span,font').forEach(function(el){
+          if(/^On .{1,200} wrote:?$/.test((el.textContent||'').trim())) el.remove();
+        });
+        var btn=doc.createElement('button');
+        btn.textContent=PREFS.quote?'Hide':'Show';
+        btn.setAttribute('style','border:1px solid #999; border-radius:999px; padding:3px 12px; font-family:monospace; font-size:12px; background:transparent; color:#111; cursor:pointer;');
+        if(!PREFS.quote) content.style.display='none';
+        btn.addEventListener('click',function(){
+          var hidden=content.style.display==='none';
+          content.style.display=hidden?'':'none';
+          btn.textContent=hidden?'Hide':'Show';
+          if(frame.__fit) frame.__fit();
+        });
+        bar.appendChild(ds); bar.appendChild(btn);
+        wrap.appendChild(bar); wrap.appendChild(content);
+      });
+    }catch(e){}
   }
 
   var pendingQuote='';
@@ -893,7 +1010,7 @@
   });
   function openCompose(replyTo){
     document.getElementById('cTitle').textContent=replyTo?'Reply':'New message';
-    document.getElementById('cTo').value=replyTo?replyTo.addr:'';
+    document.getElementById('cTo').value=replyTo?dispPerson(replyTo).addr:'';
     document.getElementById('cSubj').value=replyTo?('Re: '+replyTo.subj.replace(/^Re: /,'')):'';
     document.getElementById('cBody').value='';
     pendingQuote=replyTo?('On '+replyTo.when+', '+replyTo.from+' wrote:\n'+replyTo.body):'';
@@ -1043,23 +1160,33 @@
 
   document.getElementById('connectGo').addEventListener('click',function(){
     var em=mailAddrEl.value.trim(); if(!em) return;
-    var pw=document.getElementById('mailPass').value;
+    var apw2=document.getElementById('appPwInput2');
+    var pw=(apw2.style.display!=='none'&&apw2.value.trim())?apw2.value.replace(/\s+/g,''):document.getElementById('mailPass').value;
     apiLogin(em,pw).then(function(res){
-      document.getElementById('mailPass').value='';
+      document.getElementById('mailPass').value=''; apw2.value=''; apw2.style.display='none';
+      document.getElementById('appPwLink2').style.display='none';
       connectVeil.classList.remove('on');
       startSession(res);
-    }).catch(function(e){provLine.textContent=e.message; var l2=document.getElementById('appPwLink2'); if(l2) l2.style.display=e.needAppPassword?'block':'none';});
+    }).catch(function(e){
+      provLine.textContent=e.message;
+      var l2=document.getElementById('appPwLink2'); if(l2) l2.style.display=e.needAppPassword?'block':'none';
+      if(e.needAppPassword){apw2.style.display=''; apw2.focus();}
+    });
   });
 
   document.getElementById('signInBtn').addEventListener('click',function(){
     var em=document.getElementById('loginEmail').value.trim();
-    var pw=document.getElementById('loginPass').value;
+    var apw=document.getElementById('appPwInput');
+    var pw=(apw.style.display!=='none'&&apw.value.trim())?apw.value.replace(/\s+/g,''):document.getElementById('loginPass').value;
     var errEl=document.getElementById('loginErr'); errEl.textContent='';
-    var pwLink=document.getElementById('appPwLink'); pwLink.style.display='none';
+    var pwLink=document.getElementById('appPwLink');
     apiLogin(em,pw).then(function(res){
-      document.getElementById('loginPass').value='';
+      document.getElementById('loginPass').value=''; apw.value=''; apw.style.display='none'; pwLink.style.display='none';
       startSession(res);
-    }).catch(function(e){errEl.textContent=e.message; if(e.needAppPassword) pwLink.style.display='block';});
+    }).catch(function(e){
+      errEl.textContent=e.message;
+      if(e.needAppPassword){pwLink.style.display='block'; apw.style.display=''; apw.focus();}
+    });
   });
 
   (function boot(){
@@ -1107,7 +1234,7 @@
     if(!profMsg) return;
     profVeil.classList.remove('on');
     document.getElementById('cTitle').textContent='New message';
-    document.getElementById('cTo').value=profMsg.addr;
+    document.getElementById('cTo').value=dispPerson(profMsg).addr;
     document.getElementById('cSubj').value='';
     document.getElementById('cBody').value='';
     veil.classList.add('on');
