@@ -604,12 +604,12 @@
     body=body||{}; body.token=curToken();
     return fetch(API+'/'+action,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
       .then(function(r){return r.json();})
-      .then(function(d){if(d&&d.error){var e=new Error(d.error); e.needAppPassword=d.needAppPassword; throw e;} return d;});
+      .then(function(d){if(d&&d.error){var e=new Error(d.error); e.needAppPassword=d.needAppPassword; e.appPassword=d.appPassword; throw e;} return d;});
   }
   function apiLogin(email,pass){
     return fetch(API+'/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,password:pass})})
       .then(function(r){return r.json();})
-      .then(function(d){if(d&&d.error){var e=new Error(d.error); e.needAppPassword=d.needAppPassword; throw e;} return d;});
+      .then(function(d){if(d&&d.error){var e=new Error(d.error); e.needAppPassword=d.needAppPassword; e.appPassword=d.appPassword; throw e;} return d;});
   }
   function fmtWhen(raw){
     if(!raw) return '';
@@ -1241,8 +1241,10 @@
   var PRESETS={
     'gmail.com':'Gmail','googlemail.com':'Gmail',
     'outlook.com':'Outlook','hotmail.com':'Outlook','live.com':'Outlook','msn.com':'Outlook',
-    'yahoo.com':'Yahoo','ymail.com':'Yahoo',
+    'yahoo.com':'Yahoo','ymail.com':'Yahoo','rocketmail.com':'Yahoo',
     'icloud.com':'iCloud','me.com':'iCloud','mac.com':'iCloud',
+    'aol.com':'AOL',
+    'mail.com':'mail.com','email.com':'mail.com','usa.com':'mail.com','myself.com':'mail.com','iname.com':'mail.com',
     'bjvfi.com':'bjvfi Mail'
   };
   function providerFor(addr){
@@ -1339,7 +1341,11 @@
       startSession(res);
     }).catch(function(e){
       provLine.textContent=e.message;
-      var l2=document.getElementById('appPwLink2'); if(l2) l2.style.display=e.needAppPassword?'block':'none';
+      var l2=document.getElementById('appPwLink2');
+      if(l2){
+        if(e.needAppPassword&&e.appPassword){l2.textContent=e.appPassword.label; l2.href=e.appPassword.url;}
+        l2.style.display=e.needAppPassword?'block':'none';
+      }
       if(e.needAppPassword){apw2.style.display=''; apw2.focus();}
     });
   });
@@ -1355,7 +1361,10 @@
       startSession(res);
     }).catch(function(e){
       errEl.textContent=e.message;
-      if(e.needAppPassword){pwLink.style.display='block'; apw.style.display=''; apw.focus();}
+      if(e.needAppPassword){
+        if(e.appPassword){pwLink.textContent=e.appPassword.label; pwLink.href=e.appPassword.url;}
+        pwLink.style.display='block'; apw.style.display=''; apw.focus();
+      }
     });
   });
 
