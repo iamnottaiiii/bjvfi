@@ -9,6 +9,7 @@
 <style>
   *{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent;}
   *{-webkit-user-select:none; user-select:none; -webkit-touch-callout:none;}
+  html,body{overflow-x:hidden;}
   input,textarea,.r-body,.r-body *{-webkit-user-select:text; user-select:text; -webkit-touch-callout:default;}
   button:focus{outline:none;}
   :root{
@@ -187,7 +188,6 @@
   .fmt-pop button.sel{box-shadow:inset 0 0 0 1px var(--gold); color:var(--gold);}
   #quoteWrap{margin-top:16px;}
   .quote-head{display:flex; justify-content:flex-end;}
-  #quoteRule{border:none; border-top:3px solid var(--gold); opacity:.85; margin:8px 0 12px;}
   #quoteText{white-space:pre-wrap; font-size:.9rem; line-height:1.55;}
   .toolbar button{border:1px solid var(--line); background:transparent; border-radius:999px; padding:6px 12px; font-size:.78rem;}
   .toolbar button.sel{border-color:var(--ink); font-weight:700;}
@@ -256,7 +256,7 @@
   .reader-none{height:100%; display:flex; align-items:center; justify-content:center; font-size:.9rem; opacity:.55;}
 
   /* ---------- compose ---------- */
-  .veil{position:fixed; inset:0; z-index:5; display:none; align-items:center; justify-content:center; padding:18px; background:rgba(0,0,0,.45);}
+  .veil{position:fixed; inset:0; z-index:60; display:none; align-items:center; justify-content:center; padding:18px; background:rgba(0,0,0,.45);}
   .veil.on{display:flex;}
   .sheet{
     width:min(620px,100%); max-height:92%; overflow-y:auto; border-radius:22px; padding:22px;
@@ -267,7 +267,7 @@
   .sheet .c-title{font-size:1rem; font-weight:700; padding:0 4px 4px;}
   .sheet input,.sheet textarea{
     background:var(--field); border:1px solid var(--line); border-radius:16px;
-    padding:13px 16px; font-size:.92rem; outline:none; width:100%;
+    padding:13px 16px; font-size:1rem; outline:none; width:100%;
   }
   .sheet textarea{min-height:170px; resize:vertical; border-radius:16px; line-height:1.6;}
   .sheet input{border-radius:999px;}
@@ -279,7 +279,13 @@
     .app{grid-template-columns:1fr; padding:98px 10px 96px;}
     .dock .who{display:none;}
     .reader-panel{display:none;}
-    .reader-panel.open{display:flex; position:fixed; inset:10px; z-index:4;}
+    .reader-panel.open{display:flex; position:fixed; inset:0; z-index:4;}
+    .app{padding:0; height:100dvh;}
+    .list-panel{border-radius:0; border:none; height:100dvh; padding:calc(16px + env(safe-area-inset-top)) 16px calc(88px + env(safe-area-inset-bottom));}
+    .veil{padding:10px;}
+    .sheet{max-height:96dvh; border-radius:18px;}
+    .card input{font-size:1rem;}
+    #searchBox{font-size:1rem;}
     .list-head .title{font-size:1.12rem;}
     .list-panel{padding:16px 14px 92px;}
     .msg{padding:11px 10px;}
@@ -514,7 +520,6 @@
         <textarea id="cBody" placeholder=""></textarea>
         <div id="quoteWrap" hidden>
           <div class="quote-head"><button class="pill" type="button" id="quoteToggle">Hide</button></div>
-          <hr id="quoteRule">
           <div id="quoteText"></div>
         </div>
         <div class="row">
@@ -535,15 +540,7 @@
     voidEl.style.setProperty('--cy',(e.clientY/window.innerHeight*100)+'%');
   });
 
-  var MAIL=[
-    {id:1,folder:'Inbox',from:'Mark, Business Identity',addr:'support@businessidentity.llc',when:'9:12 AM',subj:'Your mailbox settings',prev:'Incoming is mailserver.businessidentity.llc on port 993...',body:'Your mailbox works over standard IMAP and SMTP.\n\nIncoming (IMAP): mailserver.businessidentity.llc, port 993, SSL.\nOutgoing (SMTP): mailserver.businessidentity.llc, port 465, SSL.\n\nYour username is your full email address.',unread:true},
-    {id:2,folder:'Inbox',from:'Sarah Cole',addr:'sarah@example.com',when:'Yesterday',subj:'Friday meeting',prev:'Friday at 10 works for me. I will bring the...',body:'Friday at 10 works for me.\n\nI will bring the updated numbers and we can go through them together.\n\nSarah',unread:true},
-    {id:3,folder:'Inbox',from:'Cloudflare',addr:'noreply@cloudflare.com',when:'Yesterday',subj:'DNS change confirmed',prev:'A DNS record on bjvfi.com was changed...',body:'A DNS record on bjvfi.com was changed.\n\nIf this was you, no action is needed.',unread:false},
-    {id:4,folder:'Inbox',from:'James Perry',addr:'james@example.net',when:'Tue',subj:'Invoice 1042',prev:'Attached is the invoice for this month...',body:'Attached is the invoice for this month.\n\nLet me know if you need anything else.\n\nJames',unread:false},
-    {id:5,folder:'Sent',from:'To: Sarah Cole',addr:'sarah@example.com',when:'Yesterday',subj:'Re: Friday meeting',prev:'Friday at 10 is confirmed. See you then...',body:'Friday at 10 is confirmed.\n\nSee you then.',unread:false},
-    {id:6,folder:'Drafts',from:'To: James Perry',addr:'james@example.net',when:'Mon',subj:'Re: Invoice 1042',prev:'Thanks, I received it. One question on...',body:'Thanks, I received it.\n\nOne question on the second line item.',unread:false},
-    {id:7,folder:'Junk',from:'Prize Center',addr:'win@random-offers.example',when:'Sun',subj:'You have been selected',prev:'Claim your prize before it expires...',body:'Claim your prize before it expires.',unread:false}
-  ];
+  var MAIL=[];
   var FOLDERS=['Inbox','Sent','Drafts','Archive','Junk','Trash'];
   var state={folder:'Inbox',selected:null,query:''};
 
@@ -725,20 +722,18 @@
   var pendingQuote='';
   var quoteWrap=document.getElementById('quoteWrap');
   var quoteText=document.getElementById('quoteText');
-  var quoteRule=document.getElementById('quoteRule');
   var quoteToggle=document.getElementById('quoteToggle');
   var quoteHidden=false;
   function paintQuote(){
     quoteWrap.hidden=!pendingQuote;
     quoteText.textContent=pendingQuote;
     quoteHidden=false;
-    quoteText.style.display=''; quoteRule.style.display='';
+    quoteText.style.display='';
     quoteToggle.textContent='Hide';
   }
   quoteToggle.addEventListener('click',function(){
     quoteHidden=!quoteHidden;
     quoteText.style.display=quoteHidden?'none':'';
-    quoteRule.style.display=quoteHidden?'none':'';
     quoteToggle.textContent=quoteHidden?'Show':'Hide';
     this.blur();
   });
@@ -925,6 +920,11 @@
   var composeAlign='left';
   var cBodyEl=document.getElementById('cBody');
   var fmtPop=document.getElementById('fmtPop');
+  document.addEventListener('click',function(e){
+    if(!e.target.closest('.fmtbar')) fmtPop.classList.remove('on');
+    var dk=document.getElementById('dock');
+    if(dk.classList.contains('open') && !e.target.closest('#dock') && !e.target.closest('#dockToggle')) dk.classList.remove('open');
+  });
   document.getElementById('fmtBtn').addEventListener('click',function(){fmtPop.classList.toggle('on'); this.blur();});
   document.querySelectorAll('.fmt-pop [data-fmt]').forEach(function(b){
     b.addEventListener('click',function(){
