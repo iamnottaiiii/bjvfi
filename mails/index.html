@@ -74,7 +74,7 @@
   /* floating dock, not a header */
   .dock{
     position:fixed; left:50%; transform:translateX(-50%); bottom:16px; z-index:6;
-    display:none; align-items:center; gap:10px; max-width:96vw; overflow-x:auto; padding:4px;
+    display:none; align-items:center; gap:10px; max-width:96vw; overflow-x:hidden; padding:4px;
   }
   #dockToggle{
     position:fixed; left:16px; bottom:calc(16px + env(safe-area-inset-bottom)); z-index:41;
@@ -86,6 +86,7 @@
   }
   .dock button{
     border:1px solid var(--line); background:transparent;
+    flex:1 1 0; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center;
   }
   .compose-float{
     position:static; width:40px; height:40px; border-radius:50%; flex:0 0 auto;
@@ -368,7 +369,7 @@
     .reading .dock, .reading .compose-float, .reading #dockToggle, .reading #dockToggle.on{display:none;}
     .reading .list-panel{display:none;}
     #dockToggle.on{display:flex;}
-    .dock{left:14px; transform:translateY(16px); bottom:calc(76px + env(safe-area-inset-bottom)); z-index:40; max-width:calc(100vw - 28px); gap:8px; opacity:0; pointer-events:none; transition:transform .28s ease, opacity .28s ease;}
+    .dock{left:14px; transform:translateY(16px); bottom:calc(16px + env(safe-area-inset-bottom)); z-index:40; width:calc(100vw - 28px); max-width:calc(100vw - 28px); overflow-x:hidden; gap:8px; opacity:0; pointer-events:none; transition:transform .28s ease, opacity .28s ease;}
     .dock.open{transform:translateY(0); opacity:1; pointer-events:auto;}
     .dock.open ~ #dockToggle{display:none;}
   }
@@ -459,6 +460,10 @@
         <div class="set-group opt-group">
           <div class="set-label" id="whenLabel">Date and time</div>
           <div class="opt-side"><span class="opt-wrap"><button class="opt-btn" type="button" data-opt="when" aria-label="Date and time options"><span class="ddots"><i></i><i></i></span></button><span class="opt-menu" id="menu-when"><button type="button" data-g="when" data-v="show">Show</button><button type="button" data-g="when" data-v="hide">Hide</button></span></span></div>
+        </div>
+        <div class="set-group opt-group">
+          <div class="set-label" id="quoteLabel">Quoted replies</div>
+          <div class="opt-side"><span class="opt-wrap"><button class="opt-btn" type="button" data-opt="quote" aria-label="Quoted replies options"><span class="ddots"><i></i><i></i></span></button><span class="opt-menu" id="menu-quote"><button type="button" data-g="quote" data-v="show">Show</button><button type="button" data-g="quote" data-v="hide">Hide</button></span></span></div>
         </div>
         <div class="set-group">
           <div class="set-label">Signature</div>
@@ -706,9 +711,12 @@
       +'<button type="button" id="archBtn">Archive</button>'
       +'</div></div>'
       +'<h2>'+esc(m.subj)+'</h2>'
-      +'<div class="r-meta">'+esc(m.when)+' &middot; '+esc(m.folder)+'</div>'
+      +'<div class="r-meta">'+esc(m.when)+'</div>'
       +(m.html?'<iframe class="r-html" id="htmlFrame" sandbox="allow-same-origin" title="Message content" srcdoc="'+esc(fitHtml(m.html))+'"></iframe>'
               :'<div class="r-body" style="text-align:'+(m.align||'left')+'">'+fmtBody(m.body)+'</div>')
+      +((m.quote||m.quoteHtml)?'<div class="q-area"><div class="quote-head"><button class="pill" type="button" id="qToggle">'+(PREFS.quote?'Hide':'Show')+'</button></div><div id="qBody"'+(PREFS.quote?'':' style="display:none;"')+'>'
+        +(m.quoteHtml?'<iframe class="r-html" id="qFrame" sandbox="allow-same-origin" title="Quoted reply" srcdoc="'+esc(fitHtml(m.quoteHtml))+'"></iframe>':'<div class="r-body">'+fmtBody(m.quote)+'</div>')
+        +'</div></div>':'')
       +(m.sigImg?'<img class="sig-img" src="'+m.sigImg+'" alt="">':'')
       +'<div class="acts">'
       +'<button type="button" class="pill blue" id="replyBtn">Reply</button>'
@@ -722,7 +730,7 @@
     readerPanel.classList.add('open');
     var hf=document.getElementById('htmlFrame');
     if(hf){
-      var fitHtml=function(){
+      var fitFrame=function(){
         try{
           var d=hf.contentDocument; if(!d) return;
           var h=Math.max(d.documentElement?d.documentElement.scrollHeight:0, d.body?d.body.scrollHeight:0);
@@ -730,10 +738,31 @@
         }catch(e){}
       };
       hf.addEventListener('load',function(){
-        fitHtml(); setTimeout(fitHtml,400);
-        try{ if(hf.contentDocument) hf.contentDocument.addEventListener('load',fitHtml,true); }catch(e){}
+        fitFrame(); setTimeout(fitFrame,400);
+        try{ if(hf.contentDocument) hf.contentDocument.addEventListener('load',fitFrame,true); }catch(e){}
       });
     }
+    var qf=document.getElementById('qFrame');
+    if(qf){
+      var fitQ=function(){
+        try{
+          var d=qf.contentDocument; if(!d) return;
+          var h=Math.max(d.documentElement?d.documentElement.scrollHeight:0, d.body?d.body.scrollHeight:0);
+          if(h) qf.style.height=h+'px';
+        }catch(e){}
+      };
+      qf.addEventListener('load',function(){
+        fitQ(); setTimeout(fitQ,400);
+        try{ if(qf.contentDocument) qf.contentDocument.addEventListener('load',fitQ,true); }catch(e){}
+      });
+    }
+    var qT=document.getElementById('qToggle');
+    if(qT) qT.addEventListener('click',function(){
+      var qb=document.getElementById('qBody'); if(!qb) return;
+      var hidden=qb.style.display==='none';
+      qb.style.display=hidden?'':'none';
+      qT.textContent=hidden?'Hide':'Show';
+    });
     document.getElementById('replyBtn').addEventListener('click',function(){openCompose(m);});
     document.getElementById('fwdBtn').addEventListener('click',function(){openForward(m);});
     document.getElementById('profBtn').addEventListener('click',function(){openProfile(m);});
@@ -754,7 +783,7 @@
     });
   }
 
-  var PREFS={left:'delete', right:'mark', sig:'', sigImg:'', theme:null, showWhen:true, acctPic:''};
+  var PREFS={left:'delete', right:'mark', sig:'', sigImg:'', theme:null, showWhen:true, quote:true, acctPic:''};
   function savePrefs(){}
   var CUE={delete:'Delete', mark:'Read', junk:'Junk', none:''};
   var suppressClick=false;
@@ -806,7 +835,7 @@
     state.selected=id;
     var wasUnread=m.unread;
     api('get',{mailbox:boxKey(),uid:m.uid}).then(function(d){
-      m.body=d.body||''; m.html=d.html||''; m.from=d.fromName||m.from; m.addr=d.fromEmail||m.addr;
+      m.body=d.body||''; m.html=d.html||''; m.quote=d.quote||''; m.quoteHtml=d.quoteHtml||''; m.from=d.fromName||m.from; m.addr=d.fromEmail||m.addr;
       m.subj=d.subject||m.subj; m.when=fmtWhen(d.date)||m.when;
       m.unread=false; paintRow(m); renderReader();
       if(wasUnread){api('mark_read',{mailbox:boxKey(),uid:m.uid}).then(function(){loadCounts();}).catch(function(){});}
@@ -1182,6 +1211,11 @@
     document.querySelectorAll('#menu-left button').forEach(function(b){b.classList.toggle('sel',b.dataset.v===PREFS.left);});
     document.querySelectorAll('#menu-right button').forEach(function(b){b.classList.toggle('sel',b.dataset.v===PREFS.right);});
   }
+  function paintQuotePref(){
+    var ql=document.getElementById('quoteLabel'); if(ql) ql.textContent='Quoted replies: '+(PREFS.quote?'Show':'Hide');
+    document.querySelectorAll('#menu-quote button').forEach(function(b){b.classList.toggle('sel',b.dataset.v===(PREFS.quote?'show':'hide'));});
+  }
+  paintQuotePref();
   paintSwipe();
   document.querySelectorAll('.opt-btn').forEach(function(b){
     b.addEventListener('click',function(){
@@ -1199,6 +1233,7 @@
       else if(g==='left'){PREFS.left=v; savePrefs(); paintSwipe(); renderList();}
       else if(g==='right'){PREFS.right=v; savePrefs(); paintSwipe(); renderList();}
       else if(g==='when'){PREFS.showWhen=(v==='show'); savePrefs(); paintWhen(); renderReader();}
+      else if(g==='quote'){PREFS.quote=(v==='show'); savePrefs(); paintQuotePref(); renderReader();}
       b.closest('.opt-menu').classList.remove('on'); b.blur();
     });
   });
