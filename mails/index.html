@@ -395,6 +395,7 @@
         </label>
         <button class="go" id="signInBtn" type="button">Sign in</button>
         <div id="loginErr" style="color:var(--red); font-size:.8rem; min-height:1em;"></div>
+        <a id="appPwLink" href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener" style="display:none; color:var(--gold); font-size:.88rem;">Create a Google app password</a>
       </div>
     </section>
 
@@ -511,6 +512,7 @@
         <input id="mailAddr" type="email" placeholder="Email" autocomplete="off">
         <input id="mailPass" type="password" placeholder="Password" autocomplete="off">
         <div class="prov-line" id="provLine"></div>
+        <a id="appPwLink2" href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener" style="display:none; color:var(--gold); font-size:.88rem;">Create a Google app password</a>
         <div class="row">
           <button class="pill" id="connectClose" type="button">Close</button>
           <button class="pill send" id="connectGo" type="button">Connect</button>
@@ -573,12 +575,12 @@
     body=body||{}; body.token=curToken();
     return fetch(API+'/'+action,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
       .then(function(r){return r.json();})
-      .then(function(d){if(d&&d.error) throw new Error(d.error); return d;});
+      .then(function(d){if(d&&d.error){var e=new Error(d.error); e.needAppPassword=d.needAppPassword; throw e;} return d;});
   }
   function apiLogin(email,pass){
     return fetch(API+'/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,password:pass})})
       .then(function(r){return r.json();})
-      .then(function(d){if(d&&d.error) throw new Error(d.error); return d;});
+      .then(function(d){if(d&&d.error){var e=new Error(d.error); e.needAppPassword=d.needAppPassword; throw e;} return d;});
   }
   function fmtWhen(raw){
     if(!raw) return '';
@@ -1046,17 +1048,18 @@
       document.getElementById('mailPass').value='';
       connectVeil.classList.remove('on');
       startSession(res);
-    }).catch(function(e){provLine.textContent=e.message;});
+    }).catch(function(e){provLine.textContent=e.message; var l2=document.getElementById('appPwLink2'); if(l2) l2.style.display=e.needAppPassword?'block':'none';});
   });
 
   document.getElementById('signInBtn').addEventListener('click',function(){
     var em=document.getElementById('loginEmail').value.trim();
     var pw=document.getElementById('loginPass').value;
     var errEl=document.getElementById('loginErr'); errEl.textContent='';
+    var pwLink=document.getElementById('appPwLink'); pwLink.style.display='none';
     apiLogin(em,pw).then(function(res){
       document.getElementById('loginPass').value='';
       startSession(res);
-    }).catch(function(e){errEl.textContent=e.message;});
+    }).catch(function(e){errEl.textContent=e.message; if(e.needAppPassword) pwLink.style.display='block';});
   });
 
   (function boot(){
