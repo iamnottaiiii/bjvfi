@@ -314,56 +314,107 @@ function ghHeaders(){
 var ghEtagCache = {};
 function ghCacheKey(path){ return String(path).split('?')[0]; }
 
+/* Silent error reporting (v95, at Mba's order 2026-11-04: errors report
+   themselves so nobody on the team has to). Every GitHub layer failure is
+   written as one small file per error under error-log/ in the data repo.
+   One file per error means the log itself can never hit the write
+   conflicts feed.json gets. Fire and forget: a failed report is swallowed,
+   reporting never blocks the app, error-log writes are never themselves
+   reported, repeats of the same failure inside 5 minutes are skipped, and
+   a single session sends at most 20 reports. */
+var APP_VERSION = 'v95';
+var errLogState = { sent: 0, seen: {} };
+function reportError(rec){
+  try{
+    if(errLogState.sent >= 20) return;
+    var key = [rec.kind || '', rec.status || '', rec.action || '', rec.path || ''].join('|');
+    var now = Date.now();
+    if(errLogState.seen[key] && (now - errLogState.seen[key]) < 5 * 60 * 1000) return;
+    errLogState.seen[key] = now;
+    errLogState.sent++;
+    var item = {
+      at: new Date().toISOString(),
+      user: (typeof state !== 'undefined' && state && state.user) ? state.user.username : '',
+      role: (typeof state !== 'undefined' && state && state.user) ? (state.user.role || '') : '',
+      kind: rec.kind || 'github',
+      status: rec.status || 0,
+      action: rec.action || '',
+      path: rec.path || '',
+      message: String(rec.message || '').slice(0, 300),
+      app: APP_VERSION
+    };
+    var stamp = item.at.replace(/[:.]/g, '-');
+    var rand = Math.random().toString(36).slice(2, 8);
+    var p = 'error-log/' + stamp + '-' + (item.user || 'anon') + '-' + rand + '.json';
+    ghPutJson(p, item, null, 'sitedesk: error report').catch(function(){});
+  }catch(e){}
+}
+
 async function ghFetch(path, opts){
   opts = opts || {};
   const method = opts.method || 'GET';
   const cacheKey = ghCacheKey(path);
-  const cached = (method === 'GET') ? ghEtagCache[cacheKey] : null;
-  const reqHeaders = ghHeaders();
-  if(cached && cached.etag) reqHeaders['If-None-Match'] = cached.etag;
-  const ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
-  const timeoutMs = opts.timeout || 30000;
-  let timer = null;
-  if(ctrl) timer = setTimeout(function(){ try{ ctrl.abort(); }catch(e){} }, timeoutMs);
-  let res;
-  try{
-    res = await fetch(GH_API + path, {
-      method: method,
-      cache: 'no-store',
-      headers: reqHeaders,
-      body: opts.body ? JSON.stringify(opts.body) : undefined,
-      signal: ctrl ? ctrl.signal : undefined
-    });
-  }catch(e){
+  const action = opts.action || ('GitHub ' + method + ' ' + path);
+  const isErrLog = String(path).indexOf('error-log/') !== -1;
+  /* One quiet retry on a 401 (v95): a good token can catch a passing 401
+     from GitHub, and the user should never see a token error for it. A 401
+     means the request was rejected before anything ran, so replaying it
+     once after a short pause is safe for reads and writes alike. */
+  for(let attempt = 0; attempt < 2; attempt++){
+    const cached = (method === 'GET') ? ghEtagCache[cacheKey] : null;
+    const reqHeaders = ghHeaders();
+    if(cached && cached.etag) reqHeaders['If-None-Match'] = cached.etag;
+    const ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    const timeoutMs = opts.timeout || 30000;
+    let timer = null;
+    if(ctrl) timer = setTimeout(function(){ try{ ctrl.abort(); }catch(e){} }, timeoutMs);
+    let res;
+    try{
+      res = await fetch(GH_API + path, {
+        method: method,
+        cache: 'no-store',
+        headers: reqHeaders,
+        body: opts.body ? JSON.stringify(opts.body) : undefined,
+        signal: ctrl ? ctrl.signal : undefined
+      });
+    }catch(e){
+      if(timer) clearTimeout(timer);
+      if(!isErrLog) reportError({ kind: 'network', status: 0, action: action, path: path, message: (e && e.message) || String(e) });
+      if(e && e.name === 'AbortError'){
+        throw new Error('Network timed out during ' + action + '. Check your connection and retry.');
+      }
+      throw e;
+    }
     if(timer) clearTimeout(timer);
-    if(e && e.name === 'AbortError'){
-      throw new Error('Network timed out during ' + (opts.action || ('GitHub ' + (opts.method || 'GET') + ' ' + path)) + '. Check your connection and retry.');
+    if(res.status === 401 && attempt === 0){
+      await new Promise(function(r){ setTimeout(r, 1200); });
+      continue;
     }
-    throw e;
-  }
-  if(timer) clearTimeout(timer);
-  if(method !== 'GET') delete ghEtagCache[cacheKey];
-  if(res.status === 304){
-    if(cached && cached.text != null){
-      try{ return JSON.parse(cached.text); }catch(e){}
+    if(method !== 'GET') delete ghEtagCache[cacheKey];
+    if(res.status === 304){
+      if(cached && cached.text != null){
+        try{ return JSON.parse(cached.text); }catch(e){}
+      }
+      const err304 = new Error('GitHub reported no change for ' + path + ' but no cached copy exists.');
+      err304.status = 304;
+      if(!isErrLog) reportError({ kind: 'github', status: 304, action: action, path: path, message: err304.message });
+      throw err304;
     }
-    const err304 = new Error('GitHub reported no change for ' + path + ' but no cached copy exists.');
-    err304.status = 304;
-    throw err304;
+    const text = await res.text();
+    if(method === 'GET' && res.ok && res.headers && typeof res.headers.get === 'function'){
+      const etag = res.headers.get('etag');
+      if(etag) ghEtagCache[cacheKey] = { etag: etag, text: text };
+    }
+    let json = null;
+    try{ json = text ? JSON.parse(text) : null; }catch(e){ json = null; }
+    if(!res.ok){
+      const err = new Error(ghErrorMessage(res.status, action));
+      err.status = res.status;
+      if(res.status !== 404 && !isErrLog) reportError({ kind: 'github', status: res.status, action: action, path: path, message: err.message });
+      throw err;
+    }
+    return json;
   }
-  const text = await res.text();
-  if(method === 'GET' && res.ok && res.headers && typeof res.headers.get === 'function'){
-    const etag = res.headers.get('etag');
-    if(etag) ghEtagCache[cacheKey] = { etag: etag, text: text };
-  }
-  let json = null;
-  try{ json = text ? JSON.parse(text) : null; }catch(e){ json = null; }
-  if(!res.ok){
-    const err = new Error(ghErrorMessage(res.status, opts.action || ('GitHub ' + (opts.method||'GET') + ' ' + path)));
-    err.status = res.status;
-    throw err;
-  }
-  return json;
 }
 
 /* Plain fetch with a timeout, for the non-GitHub fetches (ghFetch has its own).
@@ -729,8 +780,11 @@ async function postEvent(audience, title, body, link){
     link: link || '', created_at: nowISO() };
   let lastErr = null;
   /* Retry on conflict: someone else saved the feed between our read and
-     write, so re-read the fresh file and try again instead of failing. */
-  for(let attempt = 0; attempt < 3; attempt++){
+     write, so re-read the fresh file and try again instead of failing.
+     v95: six tries with a short uneven wait, so a busy stretch on
+     feed.json (tonight: a delete landing every second or two) no longer
+     eats all the retries at once and surfaces a 409 to the user. */
+  for(let attempt = 0; attempt < 6; attempt++){
     let rec = null;
     try{ rec = await ghGetJson('feed.json'); }catch(e){ toast(e.message); return false; }
     const items = capFeed(rec && rec.data ? rec.data : [], FEED_CAP);
@@ -742,6 +796,7 @@ async function postEvent(audience, title, body, link){
     }catch(e){
       lastErr = e;
       if(!isConflictError(e)) break;
+      if(attempt < 5) await new Promise(function(r){ setTimeout(r, 400 + Math.random() * 700); });
     }
   }
   toast(lastErr ? lastErr.message : 'Could not save.');
@@ -5480,15 +5535,30 @@ async function processScheduledNotifications(){
   schedBusy = false;
 }
 
-/* Delete one item from the notification history (feed.json). */
+/* Delete one item from the notification history (feed.json).
+   v95: retry on conflict like the other feed writes. This used to write
+   from one held copy with no retry, so any other save landing in between
+   (tonight: deletes and feed events every second or two) failed the
+   delete with a 409 the user had to look at. If a conflicting writer
+   already removed the item, that counts as done. */
 async function deleteFeedItem(id){
-  let rec = null;
-  try{ rec = await ghGetJson('feed.json'); }catch(e){ toast(e.message); return false; }
-  const items = (rec && rec.data ? rec.data : []).filter(function(n){ return n.id !== id; });
-  try{ await ghPutJson('feed.json', items, rec ? rec.sha : null, 'sitedesk: notification deleted'); }
-  catch(e){ toast(e.message); return false; }
-  state.feed = items;
-  return true;
+  for(let attempt = 0; attempt < 5; attempt++){
+    let rec = null;
+    try{ rec = await ghGetJson('feed.json'); }catch(e){ toast(e.message); return false; }
+    const before = rec && rec.data ? rec.data : [];
+    const items = before.filter(function(n){ return n.id !== id; });
+    if(items.length === before.length){ state.feed = items; return true; }
+    try{
+      await ghPutJson('feed.json', items, rec ? rec.sha : null, 'sitedesk: notification deleted');
+      state.feed = items;
+      return true;
+    }catch(e){
+      if(!isConflictError(e)){ toast(e.message); return false; }
+      if(attempt < 4) await new Promise(function(r){ setTimeout(r, 400 + Math.random() * 700); });
+    }
+  }
+  toast('Could not delete. The feed is busy, try again in a moment.');
+  return false;
 }
 
 function wireNotifyComposer(el){
