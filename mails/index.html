@@ -169,7 +169,7 @@
     padding:11px 16px; font-size:.88rem; outline:none; width:100%;
   }
   .search:focus{border-color:var(--ink);}
-  .msgs{overflow-y:auto; padding:2px 8px 10px; display:flex; flex-direction:column; gap:2px;}
+  .msgs{overflow-y:auto; overflow-x:hidden; padding:2px 8px 10px; display:flex; flex-direction:column; gap:2px;}
   .msg{padding:13px 12px; border-radius:16px; text-align:left; width:100%; display:flex; flex-direction:row; gap:12px; align-items:flex-start;}
   .sig-img{max-width:220px; margin-top:14px; border-radius:8px; display:block;}
   .toolbar{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;}
@@ -244,12 +244,17 @@
   .msg .udot{width:8px; height:8px; border-radius:50%; background:var(--gold); flex:none;}
   .empty{padding:26px 16px; font-size:.88rem; opacity:.7; text-align:center;}
 
-  .reader{padding:26px 28px; overflow-y:auto;}
+  .reader{padding:26px 28px; overflow-y:auto; overflow-x:hidden;}
   .reader .r-from{font-size:.85rem; opacity:.75;}
-  .reader h2{font-size:1.35rem; font-weight:700; margin:8px 0 6px; line-height:1.3;}
+  .reader h2{font-size:1.35rem; font-weight:700; margin:8px 0 6px; line-height:1.3; overflow-wrap:anywhere;}
   .reader .r-meta{font-size:.8rem; opacity:.7; padding-bottom:18px; margin-bottom:20px; line-height:1.7;}
-  .reader .r-body{font-size:.94rem; line-height:1.75; max-width:640px; white-space:pre-line;}
-  .reader .r-html{width:100%; border:0; background:transparent; display:block;}
+  .reader .r-body{font-size:.94rem; line-height:1.75; max-width:640px; white-space:pre-line; overflow-wrap:anywhere; word-break:break-word;}
+  .reader .r-html{width:100%; max-width:100%; border:0; background:transparent; display:block;}
+  .r-top .who-line{flex:1; min-width:0;}
+  .who-line>span{min-width:0;}
+  .who-line .nm,.who-line .ad{display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .r-top .r-when{flex:none;}
+  .dots{flex:none;}
   .reader .acts{display:flex; gap:10px; margin-top:28px; flex-wrap:wrap; justify-content:center;}
   .pill{border:1px solid var(--line); border-radius:999px; padding:10px 18px; font-size:.86rem; background:transparent;}
   .pill.blue{border-color:var(--blue); color:var(--blue);}
@@ -360,7 +365,7 @@
   @media (max-width:900px){
     .app.split .reader-panel{display:none;}
     .app.split .reader-panel.open{display:flex;}
-    .reading .dock, .reading .compose-float, .reading #dockToggle{display:none;}
+    .reading .dock, .reading .compose-float, .reading #dockToggle, .reading #dockToggle.on{display:none;}
     .reading .list-panel{display:none;}
     #dockToggle.on{display:flex;}
     .dock{left:14px; transform:translateY(16px); bottom:calc(76px + env(safe-area-inset-bottom)); z-index:40; max-width:calc(100vw - 28px); gap:8px; opacity:0; pointer-events:none; transition:transform .28s ease, opacity .28s ease;}
@@ -432,9 +437,7 @@
           <button class="del" id="acctClose" type="button">Close</button>
         </div>
         <input id="picFile" type="file" accept="image/*" style="display:none;">
-        <div style="border-top:1px solid var(--line); margin-top:6px; padding-top:14px;">
-          <button class="del" id="settingsBtn2" type="button" style="width:100%;">Settings</button>
-        </div>
+        <button class="del" id="settingsBtn2" type="button" style="width:100%;">Settings</button>
       </div>
     </div>
 
@@ -442,20 +445,20 @@
       <div class="sheet">
         <div class="sheet-title">Settings</div>
         <div class="set-group opt-group">
-          <div class="set-label">Appearance</div>
-          <div class="opt-side"><span class="opt-val" id="themeVal"></span><span class="opt-wrap"><button class="opt-btn" type="button" data-opt="theme" aria-label="Appearance options"><span class="ddots"><i></i><i></i></span></button><span class="opt-menu" id="menu-theme"><button type="button" data-g="theme" data-v="dark">Dark</button><button type="button" data-g="theme" data-v="light">Light</button></span></span></div>
+          <div class="set-label" id="themeLabel">Appearance</div>
+          <div class="opt-side"><span class="opt-wrap"><button class="opt-btn" type="button" data-opt="theme" aria-label="Appearance options"><span class="ddots"><i></i><i></i></span></button><span class="opt-menu" id="menu-theme"><button type="button" data-g="theme" data-v="dark">Dark</button><button type="button" data-g="theme" data-v="light">Light</button></span></span></div>
         </div>
         <div class="set-group opt-group">
-          <div class="set-label">Swipe left</div>
-          <div class="opt-side"><span class="opt-val" id="swLVal"></span><span class="opt-wrap"><button class="opt-btn" type="button" data-opt="left" aria-label="Swipe left options"><span class="ddots"><i></i><i></i></span></button><span class="opt-menu" id="menu-left"><button type="button" data-g="left" data-v="delete">Delete</button><button type="button" data-g="left" data-v="mark">Mark read / unread</button><button type="button" data-g="left" data-v="junk">Move to Junk</button><button type="button" data-g="left" data-v="none">Nothing</button></span></span></div>
+          <div class="set-label" id="swLLabel">Swipe left</div>
+          <div class="opt-side"><span class="opt-wrap"><button class="opt-btn" type="button" data-opt="left" aria-label="Swipe left options"><span class="ddots"><i></i><i></i></span></button><span class="opt-menu" id="menu-left"><button type="button" data-g="left" data-v="delete">Delete</button><button type="button" data-g="left" data-v="mark">Mark read / unread</button><button type="button" data-g="left" data-v="junk">Move to Junk</button><button type="button" data-g="left" data-v="none">Nothing</button></span></span></div>
         </div>
         <div class="set-group opt-group">
-          <div class="set-label">Swipe right</div>
-          <div class="opt-side"><span class="opt-val" id="swRVal"></span><span class="opt-wrap"><button class="opt-btn" type="button" data-opt="right" aria-label="Swipe right options"><span class="ddots"><i></i><i></i></span></button><span class="opt-menu" id="menu-right"><button type="button" data-g="right" data-v="delete">Delete</button><button type="button" data-g="right" data-v="mark">Mark read / unread</button><button type="button" data-g="right" data-v="junk">Move to Junk</button><button type="button" data-g="right" data-v="none">Nothing</button></span></span></div>
+          <div class="set-label" id="swRLabel">Swipe right</div>
+          <div class="opt-side"><span class="opt-wrap"><button class="opt-btn" type="button" data-opt="right" aria-label="Swipe right options"><span class="ddots"><i></i><i></i></span></button><span class="opt-menu" id="menu-right"><button type="button" data-g="right" data-v="delete">Delete</button><button type="button" data-g="right" data-v="mark">Mark read / unread</button><button type="button" data-g="right" data-v="junk">Move to Junk</button><button type="button" data-g="right" data-v="none">Nothing</button></span></span></div>
         </div>
         <div class="set-group opt-group">
-          <div class="set-label">Date and time</div>
-          <div class="opt-side"><span class="opt-val" id="whenVal"></span><span class="opt-wrap"><button class="opt-btn" type="button" data-opt="when" aria-label="Date and time options"><span class="ddots"><i></i><i></i></span></button><span class="opt-menu" id="menu-when"><button type="button" data-g="when" data-v="show">Show</button><button type="button" data-g="when" data-v="hide">Hide</button></span></span></div>
+          <div class="set-label" id="whenLabel">Date and time</div>
+          <div class="opt-side"><span class="opt-wrap"><button class="opt-btn" type="button" data-opt="when" aria-label="Date and time options"><span class="ddots"><i></i><i></i></span></button><span class="opt-menu" id="menu-when"><button type="button" data-g="when" data-v="show">Show</button><button type="button" data-g="when" data-v="hide">Hide</button></span></span></div>
         </div>
         <div class="set-group">
           <div class="set-label">Signature</div>
@@ -476,9 +479,7 @@
             </div>
           </div>
         </div>
-        <div style="margin-top:22px; border-top:1px solid var(--line); padding-top:16px;">
-          <button class="del" id="signOutBtn" type="button" style="width:100%;">Sign out</button>
-        </div>
+        <button class="del" id="signOutBtn" type="button" style="width:100%; margin-top:10px;">Sign out</button>
         <div class="sheet-acts">
           <button class="send" id="closeSettingsBtn" type="button">Close</button>
         </div>
@@ -706,7 +707,7 @@
       +'</div></div>'
       +'<h2>'+esc(m.subj)+'</h2>'
       +'<div class="r-meta">'+esc(m.when)+' &middot; '+esc(m.folder)+'</div>'
-      +(m.html?'<iframe class="r-html" id="htmlFrame" sandbox="allow-same-origin" title="Message content" srcdoc="'+esc(m.html)+'"></iframe>'
+      +(m.html?'<iframe class="r-html" id="htmlFrame" sandbox="allow-same-origin" title="Message content" srcdoc="'+esc(fitHtml(m.html))+'"></iframe>'
               :'<div class="r-body" style="text-align:'+(m.align||'left')+'">'+fmtBody(m.body)+'</div>')
       +(m.sigImg?'<img class="sig-img" src="'+m.sigImg+'" alt="">':'')
       +'<div class="acts">'
@@ -831,6 +832,14 @@
 
   function fmtBody(t){
     return esc(t).replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/_([^_]+)_/g,'<i>$1</i>');
+  }
+  function fitHtml(h){
+    var css='<style>html,body{margin:0;padding:0;max-width:100%;overflow-x:hidden;background:transparent}img,table,td,div,span,p{max-width:100%!important}img{height:auto!important}table{table-layout:auto!important}*{overflow-wrap:anywhere;box-sizing:border-box}</style>';
+    if(/<html[\s>]/i.test(h)){
+      if(/<head[^>]*>/i.test(h)) return h.replace(/<head[^>]*>/i,function(m){return m+'<meta name="viewport" content="width=device-width, initial-scale=1">'+css;});
+      return h.replace(/<html[^>]*>/i,function(m){return m+'<head><meta name="viewport" content="width=device-width, initial-scale=1">'+css+'</head>';});
+    }
+    return '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'+css+'</head><body>'+h+'</body></html>';
   }
 
   var pendingQuote='';
@@ -1075,7 +1084,7 @@
   var theme=PREFS.theme||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');
   function paintTheme(){
     document.documentElement.setAttribute('data-theme',theme);
-    var tv=document.getElementById('themeVal'); if(tv) tv.textContent=theme==='dark'?'Dark':'Light';
+    var tv=document.getElementById('themeLabel'); if(tv) tv.textContent='Appearance: '+(theme==='dark'?'Dark':'Light');
     document.querySelectorAll('#menu-theme button').forEach(function(b){b.classList.toggle('sel',b.dataset.v===theme);});
   }
   paintTheme();
@@ -1158,7 +1167,7 @@
   });
 
   function paintWhen(){
-    var wv=document.getElementById('whenVal'); if(wv) wv.textContent=PREFS.showWhen?'Show':'Hide';
+    var wv=document.getElementById('whenLabel'); if(wv) wv.textContent='Date and time: '+(PREFS.showWhen?'Show':'Hide');
     document.querySelectorAll('#menu-when button').forEach(function(b){b.classList.toggle('sel',b.dataset.v===(PREFS.showWhen?'show':'hide'));});
   }
   paintWhen();
@@ -1168,8 +1177,8 @@
   sigInput.addEventListener('change',function(){PREFS.sig=sigInput.value.trim(); savePrefs();});
   var SW_LABELS={delete:'Delete',mark:'Mark read / unread',junk:'Move to Junk',none:'Nothing'};
   function paintSwipe(){
-    var lv=document.getElementById('swLVal'); if(lv) lv.textContent=SW_LABELS[PREFS.left];
-    var rv=document.getElementById('swRVal'); if(rv) rv.textContent=SW_LABELS[PREFS.right];
+    var lv=document.getElementById('swLLabel'); if(lv) lv.textContent='Swipe left: '+SW_LABELS[PREFS.left];
+    var rv=document.getElementById('swRLabel'); if(rv) rv.textContent='Swipe right: '+SW_LABELS[PREFS.right];
     document.querySelectorAll('#menu-left button').forEach(function(b){b.classList.toggle('sel',b.dataset.v===PREFS.left);});
     document.querySelectorAll('#menu-right button').forEach(function(b){b.classList.toggle('sel',b.dataset.v===PREFS.right);});
   }
