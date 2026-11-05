@@ -261,7 +261,8 @@
   .r-tr .r-when{margin:0; padding:0; font-size:.72rem; white-space:nowrap;}
   .ddots.sm{gap:3px;}
   .ddots.sm i{width:3px; height:3px;}
-  .reader .who-line{margin:6px 0 20px;}
+  .reader .who-line{margin:6px 0 20px; width:100%;}
+  .who-line .r-when2{margin-left:auto; padding-left:12px; font-size:.72rem; white-space:nowrap; align-self:flex-start; padding-top:5px;}
   .reader .who-line .nm{white-space:normal; overflow:visible; text-overflow:clip; word-break:break-word;}
   .reader .who-line .ad{white-space:normal; overflow:visible; text-overflow:clip; word-break:break-all;}
   .q-seg{border-top:1px solid var(--line); margin-top:24px; padding-top:12px;}
@@ -274,7 +275,7 @@
   .who-line .nm,.who-line .ad{display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .r-top .r-when{flex:none;}
   .dots{flex:none;}
-  .reader .acts{display:flex; gap:10px; margin-top:28px; flex-wrap:wrap; justify-content:center;}
+  .reader .acts{display:flex; gap:10px; margin-top:28px; flex-wrap:wrap; justify-content:flex-start;}
   .pill{border:1px solid var(--line); border-radius:999px; padding:10px 18px; font-size:.86rem; background:transparent;}
   .pill.blue{border-color:var(--blue); color:var(--blue);}
   .pill.red{border-color:var(--red); color:var(--red);}
@@ -745,11 +746,14 @@
     if(!m){readerEl.innerHTML=''; readerPanel.classList.remove('open'); appView.classList.remove('split'); voidEl.classList.remove('reading'); return;}
     appView.classList.add('split'); voidEl.classList.add('reading');
     var dp=dispPerson(m);
-    var quotePart='';
+    // Gmail style thread: the subject once at the top, then every previous
+    // message as its own block in time order (oldest first), then the newest
+    // message with its sender row, and the reader opens scrolled to it.
+    var prevBlocks='';
     if(m.quoteHtml){
-      quotePart='<div class="q-area"><iframe class="r-html" id="qFrame" sandbox="allow-same-origin" title="Previous messages" srcdoc="'+esc(fitHtml(m.quoteHtml))+'"></iframe></div>';
+      prevBlocks='<div class="q-area"><iframe class="r-html" id="qFrame" sandbox="allow-same-origin" title="Previous messages" srcdoc="'+esc(fitHtml(m.quoteHtml))+'"></iframe></div>';
     }else if(m.prevSegs&&m.prevSegs.length){
-      quotePart=m.prevSegs.map(function(seg){
+      prevBlocks=m.prevSegs.slice().reverse().map(function(seg){
         return '<div class="q-seg"><div class="q-bar"><span class="q-date">'+esc(fmtWhen(seg.date)||seg.date||'')+'</span>'
           +'<button type="button" class="pill q-h">'+(PREFS.quote?'Hide':'Show')+'</button></div>'
           +'<div class="r-body q-body"'+(PREFS.quote?'':' style="display:none;"')+'>'+fmtBody(seg.text)+'</div></div>';
@@ -757,18 +761,18 @@
     }
     readerEl.innerHTML=
       '<div class="r-top"><button type="button" class="dots bare" id="backBtn" aria-label="Back">&#8592;</button>'
-      +'<div class="r-tr"><button type="button" class="dots bare" id="dotsBtn" aria-label="More"><span class="ddots sm"><i></i><i></i><i></i></span></button>'
-      +(PREFS.showWhen?'<span class="r-when">'+esc(m.when)+'</span>':'')
-      +'</div>'
+      +'<button type="button" class="dots bare" id="dotsBtn" aria-label="More"><span class="ddots sm"><i></i><i></i><i></i></span></button>'
       +'<div class="dots-menu" id="dotsMenu">'
       +'<button type="button" id="dlBtn">Download</button>'
       +'<button type="button" id="archBtn">Archive</button>'
       +'</div></div>'
       +'<h2>'+esc(m.subj)+'</h2>'
-      +'<button type="button" class="who-line" id="profBtn"><span class="bavatar">'+esc(initials(dp.name))+'</span><span><span class="nm">'+esc(dp.name)+'</span><br><span class="ad">'+esc(dp.addr)+'</span></span></button>'
+      +prevBlocks
+      +'<button type="button" class="who-line" id="profBtn"><span class="bavatar">'+esc(initials(dp.name))+'</span><span><span class="nm">'+esc(dp.name)+'</span><br><span class="ad">'+esc(dp.addr)+'</span></span>'
+      +(PREFS.showWhen?'<span class="r-when2">'+esc(m.when)+'</span>':'')
+      +'</button>'
       +(m.html?'<iframe class="r-html" id="htmlFrame" sandbox="allow-same-origin" title="Message content" srcdoc="'+esc(fitHtml(m.html))+'"></iframe>'
               :'<div class="r-body" style="text-align:'+(m.align||'left')+'">'+fmtBody(m.body)+'</div>')
-      +quotePart
       +(m.sigImg?'<img class="sig-img" src="'+m.sigImg+'" alt="">':'')
       +'<div class="acts">'
       +'<button type="button" class="pill blue" id="replyBtn">Reply</button>'
@@ -780,6 +784,13 @@
       +'<button type="button" class="pill" id="nextBtn">Next</button>'
       +'</div>';
     readerPanel.classList.add('open');
+    var profEl=document.getElementById('profBtn');
+    function scrollToMain(){
+      if(!profEl||!readerEl.contains(profEl)) return;
+      var t=profEl.getBoundingClientRect().top-readerEl.getBoundingClientRect().top;
+      readerEl.scrollTop+=t-76;
+    }
+    if(prevBlocks) setTimeout(scrollToMain,60);
     var hf=document.getElementById('htmlFrame');
     if(hf){
       var fitFrame=function(){
@@ -805,7 +816,7 @@
       };
       qf.__fit=fitQ;
       qf.addEventListener('load',function(){
-        fitQ(); wireHtmlQuotes(qf); fitQ(); setTimeout(fitQ,400);
+        fitQ(); wireHtmlQuotes(qf); fitQ(); scrollToMain(); setTimeout(fitQ,400);
         try{ if(qf.contentDocument) qf.contentDocument.addEventListener('load',fitQ,true); }catch(e){}
       });
     }
@@ -957,6 +968,7 @@
       });
       if(cur.length) groups.push(cur);
       var dateRe=/((?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)[a-z]*,?\s+)?(?:\d{4}-\d{2}-\d{2}(?:[ T]\d{1,2}:\d{2}(?::\d{2})?)?|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{1,2},?\s+\d{4}|\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4})(?:,?\s+(?:at\s+)?\d{1,2}:\d{2}(?::\d{2})?\s*(?:AM|PM|am|pm)?)?/;
+      var wraps=[];
       groups.forEach(function(nodes){
         var hasText=nodes.some(function(n){return (n.textContent||'').trim().length>0;});
         if(!hasText) return;
@@ -986,7 +998,10 @@
         });
         bar.appendChild(ds); bar.appendChild(btn);
         wrap.appendChild(bar); wrap.appendChild(content);
+        wraps.push(wrap);
       });
+      // Quoted chains arrive newest first; a thread reads oldest first.
+      wraps.reverse().forEach(function(w){ container.appendChild(w); });
     }catch(e){}
   }
 
