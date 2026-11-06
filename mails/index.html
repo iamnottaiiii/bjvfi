@@ -907,16 +907,42 @@
       readerEl.scrollTop+=t-76;
     }
     if(prevBlocks) setTimeout(scrollToMain,60);
+    // The mail carries no background of its own: sender stylesheets can beat
+    // the injected CSS with their own !important backgrounds, so every
+    // element inside the frame also gets its background and text color set
+    // inline with !important, which nothing in the mail can override.
+    function flattenPaint(doc){
+      try{
+        var t=document.documentElement.getAttribute('data-theme');
+        var light=t?t==='light':(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches);
+        var ink=light?'#111114':'#F2F2F5';
+        var els=doc.querySelectorAll('*');
+        for(var i=0;i<els.length;i++){
+          var el=els[i];
+          el.style.setProperty('background-color','transparent','important');
+          el.style.setProperty('background-image','none','important');
+          if(el.hasAttribute&&el.hasAttribute('bgcolor')) el.removeAttribute('bgcolor');
+          if(el.tagName!=='A'&&!(el.closest&&el.closest('a'))) el.style.setProperty('color',ink,'important');
+        }
+        if(doc.documentElement) doc.documentElement.style.setProperty('background-color','transparent','important');
+        if(doc.body) doc.body.style.setProperty('background-color','transparent','important');
+      }catch(e){}
+    }
     var hf=document.getElementById('htmlFrame');
     if(hf){
       var fitFrame=function(){
         try{
           var d=hf.contentDocument; if(!d) return;
+          // Measure at zero height first: mail with height:100% tables
+          // otherwise stretches to whatever height the frame already has,
+          // and every refit grows the frame again.
+          hf.style.height='0px';
           var h=Math.max(d.documentElement?d.documentElement.scrollHeight:0, d.body?d.body.scrollHeight:0);
           if(h) hf.style.height=h+'px';
         }catch(e){}
       };
       hf.addEventListener('load',function(){
+        flattenPaint(hf.contentDocument);
         fitFrame(); setTimeout(fitFrame,400);
         try{ if(hf.contentDocument) hf.contentDocument.addEventListener('load',fitFrame,true); }catch(e){}
       });
@@ -926,13 +952,15 @@
       var fitQ=function(){
         try{
           var d=qf.contentDocument; if(!d) return;
+          qf.style.height='0px';
           var h=Math.max(d.documentElement?d.documentElement.scrollHeight:0, d.body?d.body.scrollHeight:0);
           if(h) qf.style.height=h+'px';
         }catch(e){}
       };
       qf.__fit=fitQ;
       qf.addEventListener('load',function(){
-        fitQ(); wireHtmlQuotes(qf); fitQ(); scrollToMain(); setTimeout(fitQ,400);
+        flattenPaint(qf.contentDocument);
+        fitQ(); wireHtmlQuotes(qf); fitQ(); scrollToMain(); setTimeout(function(){fitQ(); scrollToMain();},450);
         try{ if(qf.contentDocument) qf.contentDocument.addEventListener('load',fitQ,true); }catch(e){}
       });
     }
@@ -1067,6 +1095,7 @@
     var css='<style>html,body{margin:0;padding:0;max-width:100%;overflow-x:hidden;background:transparent!important;color:'+ink+';color-scheme:'+(light?'light':'dark')+' }'
       +'*{background-color:transparent!important;color:'+ink+'!important}'
       +'a,a *{color:'+link+'!important}'
+      +'html,body,table,td,div{height:auto!important;min-height:0!important}'
       +'img,table,td,div,span,p{max-width:100%!important}img{height:auto!important}table{table-layout:auto!important}pre{white-space:pre-wrap!important}*{overflow-wrap:anywhere;box-sizing:border-box}</style>';
     if(/<html[\s>]/i.test(h)){
       if(/<head[^>]*>/i.test(h)) return h.replace(/<head[^>]*>/i,function(m){return m+'<meta name="viewport" content="width=device-width, initial-scale=1">'+css;});
