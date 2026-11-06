@@ -159,6 +159,9 @@
   .sent-compose .acts{margin-top:10px;}
   .manual-msg{margin-top:10px; padding:9px 12px; border-radius:12px; background:var(--gold); color:#191408; font-size:.82rem; line-height:1.45; overflow-wrap:anywhere; max-width:92%;}
   .manual-msg .bt{display:block; font-size:.66rem; margin-top:3px; opacity:.7;}
+  .manual-msg.failed{background:rgba(224,122,122,.25); color:var(--ink);}
+  .manual-msg.local{background:var(--panel-strong); color:var(--ink); box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);}
+  .attach-note{flex:1 1 100%; font-size:.72rem; opacity:.85; padding:2px 4px 0;}
   .top{padding:18px 16px 10px; display:flex; flex-direction:column; gap:12px;}
   .bar{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
   .bar .ttl{flex:1; min-width:0; font-weight:700; font-size:1rem; overflow-wrap:anywhere;}
@@ -202,6 +205,8 @@
   .bub{max-width:76%; padding:10px 14px; border-radius:16px; font-size:.88rem; line-height:1.5; overflow-wrap:anywhere;}
   .bub.in{align-self:flex-start; background:var(--panel-strong); border-bottom-left-radius:6px; box-shadow:0 6px 16px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.08);}
   .bub.out{align-self:flex-end; background:var(--gold); color:#191408; border-bottom-right-radius:6px;}
+  .bub.failed{align-self:flex-end; background:rgba(224,122,122,.25); color:var(--ink); border-bottom-right-radius:6px;}
+  .bub.localnote{align-self:flex-end; background:var(--panel-strong); color:var(--ink); border-bottom-right-radius:6px; box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);}
   .bub .bt{display:block; font-size:.68rem; margin-top:5px; opacity:.7;}
   .inrow{display:flex; gap:8px; padding:12px 16px; align-items:center; box-shadow:0 -14px 22px -16px rgba(0,0,0,.45);}
   .inrow .inp{flex:1; min-width:0;}
@@ -861,7 +866,7 @@ function buildThreads(arr){
     }
     if (!th.name) th.name = th.phone || "";
     var mine = (myMsgs[th.key] || []).map(function(m){
-      return { who: "out", text: m.text || "", t: m.t || 0, atts: m.atts || [] };
+      return { who: "out", text: m.text || "", t: m.t || 0, atts: m.atts || [], delivered: !!m.delivered, failed: !!m.failed, local: !!m.local, error: m.error || "" };
     });
     var all = th.msgs.concat(mine);
     all.sort(function(a, b){ return (a.t || 0) - (b.t || 0); });
@@ -970,6 +975,7 @@ function renderAttachTray(){
       + '<span class="meta"><span class="fname">' + esc(a.name) + '</span><span class="fsize">' + esc(fmtSize(a.size)) + '</span></span>'
       + '<button class="rm" type="button" data-rmatt="' + idx + '" aria-label="Remove ' + esc(a.name) + '">&times;</button></span>';
   });
+  if (list.length) html += '<span class="attach-note">Files are not sent by text. They stay as a note on this device only.</span>';
   tray.innerHTML = html;
   Array.prototype.forEach.call(tray.querySelectorAll("[data-rmatt]"), function(el){
     el.addEventListener("click", function(){
@@ -1026,7 +1032,12 @@ function renderThread(){
   var html = "";
   th.msgs.forEach(function(m){
     if (m.text){
-      html += '<div class="bub ' + m.who + '">' + esc(m.text) + '<span class="bt">' + esc(m.sentBubble ? "Sent" : fmtBubbleWhen(m.t)) + '</span></div>';
+      var bcls = m.who, blabel = fmtBubbleWhen(m.t);
+      if (m.sentBubble) blabel = "Sent";
+      else if (m.who === "out" && m.failed){ bcls += " failed"; blabel = "Not delivered" + (m.error ? " · " + m.error : ""); }
+      else if (m.who === "out" && m.delivered) blabel = "Sent · " + fmtBubbleWhen(m.t);
+      else if (m.who === "out") blabel = fmtBubbleWhen(m.t) + " · On this device only";
+      html += '<div class="bub ' + bcls + '">' + esc(m.text) + '<span class="bt">' + esc(blabel) + '</span></div>';
     }
     if (m.atts && m.atts.length){
       m.atts.forEach(function(a, ai){
@@ -1034,10 +1045,12 @@ function renderThread(){
         var visual = a.dataUrl
           ? '<img class="fthumb" src="' + a.dataUrl + '" alt="' + esc(a.name) + '">'
           : '<span class="ficon">' + FILE_ICON_SVG + '</span>';
-        html += '<div class="bub filebub ' + m.who + '">' + visual
+        var acls = m.who === "out" ? "out localnote" : m.who;
+        var alabel = m.who === "out" ? "Not sent by text · On this device only" : fmtBubbleWhen(m.t);
+        html += '<div class="bub filebub ' + acls + '">' + visual
           + '<span class="fmeta"><span class="fname">' + esc(a.name) + '</span>'
           + '<span class="fsize" style="display:block;">' + esc(fmtSize(a.size)) + '</span>'
-          + (isLast ? '<span class="bt">' + esc(fmtBubbleWhen(m.t)) + '</span>' : '')
+          + (isLast ? '<span class="bt">' + esc(alabel) + '</span>' : '')
           + '</span></div>';
       });
     }
@@ -1059,32 +1072,123 @@ function openThread(i){
   document.getElementById("msgWrap").classList.add("showthread");
   document.getElementById("msgView").classList.add("thread-open");
 }
+/* Custom messages: typed replies and Sent view messages go through the
+   bridge POST /send-custom, which validates each slug against its
+   category file and sends the typed body as-is from the Twilio number.
+   Only a per-slug ok from the Worker counts as delivered. Anything else
+   is recorded on the thread or row as not delivered, never as sent. */
+async function sendCustomItems(items, onProgress){
+  var total = items.length;
+  var results = {};
+  function failAll(err){
+    items.forEach(function(it){ results[it.slug] = { slug: it.slug, ok: false, error: err }; });
+    return { results: results, okCount: 0, total: total };
+  }
+  if (textConfigured !== true) return failAll("Texting not set up yet");
+  if (!textKey()) return failAll("Texting locked");
+  var okCount = 0;
+  for (var start = 0; start < items.length; start += 50){
+    var chunk = items.slice(start, start + 50);
+    var j = null, status = 0;
+    try {
+      var r = await fetch(TEXT_API + "/send-custom", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Text-Key": textKey() },
+        body: JSON.stringify({ items: chunk.map(function(it){ return { slug: it.slug, category: it.category, body: it.body }; }) })
+      });
+      status = r.status;
+      j = await r.json().catch(function(){ return null; });
+    } catch(e){ j = null; }
+    if (status === 401){
+      chunk.forEach(function(it){ results[it.slug] = { slug: it.slug, ok: false, error: "Texting locked" }; });
+    } else if (j && j.error === "not configured"){
+      chunk.forEach(function(it){ results[it.slug] = { slug: it.slug, ok: false, error: "Texting not set up yet" }; });
+    } else if (!j || !j.results){
+      chunk.forEach(function(it){ results[it.slug] = { slug: it.slug, ok: false, error: "Send failed" }; });
+    } else {
+      var seen = {};
+      j.results.forEach(function(res){
+        seen[res.slug] = true;
+        results[res.slug] = res;
+        if (res.ok) okCount++;
+      });
+      chunk.forEach(function(it){ if (!seen[it.slug]) results[it.slug] = { slug: it.slug, ok: false, error: "Send failed" }; });
+    }
+    if (onProgress) onProgress(okCount, total);
+  }
+  return { results: results, okCount: okCount, total: total };
+}
+var replySending = false;
 async function sendReply(){
   var th = THREADS[curThread];
-  if (!th) return;
+  if (!th || replySending) return;
   var inp = document.getElementById("replyInput");
   var text = inp.value.trim();
   var atts = currentPending().slice();
   if (!text && !atts.length) return;
-  var okReply = await showConfirm("Reply to " + (th.name || ""), th.phone || "", text ? text : (atts.length + (atts.length === 1 ? " attachment" : " attachments")));
+  var confirmText = text;
+  if (atts.length){
+    confirmText += (confirmText ? "\n\n" : "") + atts.length + (atts.length === 1 ? " file" : " files") + " will not be sent by text. " + (atts.length === 1 ? "It stays" : "They stay") + " as a note on this device only.";
+  }
+  var okReply = await showConfirm("Reply to " + (th.name || ""), th.phone || "", confirmText);
   if (!okReply) return;
   var now = Date.now();
   var slimAtts = atts.map(function(a){
     return { name: a.name, size: a.size, type: a.type, dataUrl: (a.dataUrl && a.size <= 300000) ? a.dataUrl : null };
   });
-  th.msgs.push({ who: "out", text: text, t: now, atts: atts });
-  th.lastT = now;
-  if (!myMsgs[th.key]) myMsgs[th.key] = [];
-  myMsgs[th.key].push({ text: text, t: now, atts: slimAtts });
-  saveMyMsgs();
-  var st = threadState[th.key] || (threadState[th.key] = {});
-  if (th.latestIn){ st.ans = th.latestIn; st.seen = th.latestIn; }
-  saveThreadState();
-  pendingMap[th.key] = [];
-  inp.value = "";
-  refreshMsgStats();
-  renderThread();
-  renderThreadList();
+  function record(entry, msgEntry){
+    th.msgs.push(msgEntry);
+    th.lastT = entry.t;
+    if (!myMsgs[th.key]) myMsgs[th.key] = [];
+    myMsgs[th.key].push(entry);
+    saveMyMsgs();
+    pendingMap[th.key] = [];
+    inp.value = "";
+    refreshMsgStats();
+    renderThread();
+    renderThreadList();
+  }
+  if (!text){
+    /* Attachment only: nothing can be delivered by text, so this is a
+       local note only and does not count as an answer. */
+    record(
+      { text: "", t: now, atts: slimAtts, local: true },
+      { who: "out", text: "", t: now, atts: atts, local: true }
+    );
+    return;
+  }
+  var slug = th.slug || "";
+  var cat = th.cat || (slug && sent[slug] ? sent[slug].c || "" : "") || (slug && bizInfo[slug] ? bizInfo[slug].c || "" : "");
+  if (!slug || !cat){
+    record(
+      { text: text, t: now, atts: slimAtts, delivered: false, failed: true, error: "Business not matched to a sent text" },
+      { who: "out", text: text, t: now, atts: atts, delivered: false, failed: true, error: "Business not matched to a sent text" }
+    );
+    return;
+  }
+  var btn = document.getElementById("replySendBtn");
+  replySending = true;
+  btn.disabled = true;
+  btn.textContent = "Sending";
+  var out = await sendCustomItems([{ slug: slug, category: cat, body: text }], null);
+  btn.disabled = false;
+  btn.textContent = "Send";
+  replySending = false;
+  var res = out.results[slug] || { ok: false, error: "Send failed" };
+  if (res.ok){
+    var st = threadState[th.key] || (threadState[th.key] = {});
+    if (th.latestIn){ st.ans = th.latestIn; st.seen = th.latestIn; }
+    saveThreadState();
+    record(
+      { text: text, t: Date.now(), atts: slimAtts, delivered: true },
+      { who: "out", text: text, t: Date.now(), atts: atts, delivered: true }
+    );
+  } else {
+    record(
+      { text: text, t: Date.now(), atts: slimAtts, delivered: false, failed: true, error: res.error || "Send failed" },
+      { who: "out", text: text, t: Date.now(), atts: atts, delivered: false, failed: true, error: res.error || "Send failed" }
+    );
+  }
 }
 document.getElementById("replySendBtn").addEventListener("click", sendReply);
 document.getElementById("replyInput").addEventListener("keydown", function(e){ if (e.key === "Enter") sendReply(); });
@@ -1518,8 +1622,10 @@ document.getElementById("sendBtn").addEventListener("click", function(){ doSend(
 
 /* Sent view: every business in the sent mirror, across all categories.
    The Message actions here write to one already sent business or to a
-   picked group; those compositions are kept on this device. The bulk
-   sender in Explore never includes a business that is already sent. */
+   picked group; those messages are delivered through the bridge
+   /send-custom from the Twilio number, and only a per-slug ok from the
+   Worker shows them as sent on the row. The bulk sender in Explore
+   never includes a business that is already sent. */
 var MANUAL_KEY = "bjvfi_database_manual_v1";
 var manualMsgs = {};
 try { manualMsgs = JSON.parse(localStorage.getItem(MANUAL_KEY) || "{}") || {}; } catch(e) { manualMsgs = {}; }
@@ -1552,7 +1658,10 @@ function renderSentView(){
       + '<button class="pill biz-select' + (sel ? " goldsel" : "") + '" type="button" data-sentsel="' + esc(e.key) + '">Select</button>'
       + '</div>';
     (manualMsgs[e.key] || []).forEach(function(m){
-      html += '<div class="manual-msg">' + esc(m.text) + '<span class="bt">' + esc(fmtBubbleWhen(m.t)) + '</span></div>';
+      var mcls = m.failed ? " failed" : (m.delivered ? "" : " local");
+      var mlab = m.failed ? ("Not delivered" + (m.error ? " · " + m.error : ""))
+        : (m.delivered ? ("Sent · " + fmtBubbleWhen(m.t)) : (fmtBubbleWhen(m.t) + " · On this device only"));
+      html += '<div class="manual-msg' + mcls + '">' + esc(m.text) + '<span class="bt">' + esc(mlab) + '</span></div>';
     });
     var whenLabel = e.t ? fmtBubbleWhen(e.t) : "";
     html += '<div class="acts biz-footer"><button class="pill" type="button" data-msgto="' + esc(e.key) + '">Message</button><span class="biz-spacer"></span><span class="status-text sent">Sent' + (whenLabel ? ' · ' + esc(whenLabel) : '') + '</span></div></div>';
@@ -1640,33 +1749,43 @@ async function sendGroupCompose(){
   btn.textContent = "Sending";
   inp.disabled = true;
   cancel.disabled = true;
-  var total = keys.length, done = 0;
+  var total = keys.length;
   st.textContent = "Sent 0 of " + fmt(total);
-  var timer = setInterval(function(){
-    var step = Math.min(6, total - done);
-    for (var k = 0; k < step; k++){
-      var key = keys[done];
-      if (!manualMsgs[key]) manualMsgs[key] = [];
-      manualMsgs[key].push({ text: text, t: Date.now() });
-      done++;
-    }
-    saveManualMsgs();
-    st.textContent = "Sent " + fmt(done) + " of " + fmt(total);
-    if (done >= total){
-      clearInterval(timer);
-      btn.textContent = "Send";
-      inp.disabled = false;
-      cancel.disabled = false;
-      groupSending = false;
-      sentSelection = {};
-      var box = document.getElementById("sentGroupCompose");
-      box.classList.add("hidden");
-      inp.value = "";
-      st.textContent = "";
-      updateSentSelBar();
-      renderSentView();
-    }
-  }, 160);
+  var byKey = {};
+  sentEntriesCache.forEach(function(e){ byKey[e.key] = e; });
+  var items = [], invalid = [];
+  keys.forEach(function(key){
+    var e = byKey[key];
+    if (e && e.cat) items.push({ slug: key, category: e.cat, body: text });
+    else invalid.push(key);
+  });
+  invalid.forEach(function(key){
+    if (!manualMsgs[key]) manualMsgs[key] = [];
+    manualMsgs[key].push({ text: text, t: Date.now(), delivered: false, failed: true, error: "Category not known for this business" });
+  });
+  if (invalid.length) saveManualMsgs();
+  var out = await sendCustomItems(items, function(okSoFar){
+    st.textContent = "Sent " + fmt(okSoFar) + " of " + fmt(total);
+  });
+  items.forEach(function(it){
+    var res = out.results[it.slug] || { ok: false, error: "Send failed" };
+    if (!manualMsgs[it.slug]) manualMsgs[it.slug] = [];
+    if (res.ok) manualMsgs[it.slug].push({ text: text, t: Date.now(), delivered: true });
+    else manualMsgs[it.slug].push({ text: text, t: Date.now(), delivered: false, failed: true, error: res.error || "Send failed" });
+  });
+  saveManualMsgs();
+  st.textContent = "Sent " + fmt(out.okCount) + " of " + fmt(total);
+  btn.textContent = "Send";
+  inp.disabled = false;
+  cancel.disabled = false;
+  groupSending = false;
+  sentSelection = {};
+  var box = document.getElementById("sentGroupCompose");
+  box.classList.add("hidden");
+  inp.value = "";
+  st.textContent = "";
+  updateSentSelBar();
+  renderSentView();
 }
 document.getElementById("sentRandGo").addEventListener("click", function(){
   var n = parseInt(document.getElementById("sentRandNum").value, 10);
@@ -1699,17 +1818,37 @@ function closeSentCompose(){
   document.getElementById("sentComposeInput").value = "";
   document.getElementById("sentComposeStatus").textContent = "";
 }
+var sentComposeSending = false;
 async function sendSentCompose(){
+  if (sentComposeSending) return;
   var inp = document.getElementById("sentComposeInput");
   var text = inp.value.trim();
   if (!composeSlug || !text) return;
+  var slug = composeSlug;
   var entry = null;
-  for (var i = 0; i < sentEntriesCache.length; i++) if (sentEntriesCache[i].key === composeSlug) entry = sentEntriesCache[i];
+  for (var i = 0; i < sentEntriesCache.length; i++) if (sentEntriesCache[i].key === slug) entry = sentEntriesCache[i];
   var okOne = await showConfirm("Message " + (entry ? entry.name : ""), entry ? (entry.phone || "") : "", text);
   if (!okOne) return;
-  if (!manualMsgs[composeSlug]) manualMsgs[composeSlug] = [];
-  manualMsgs[composeSlug].push({ text: text, t: Date.now() });
+  var st = document.getElementById("sentComposeStatus");
+  var btn = document.getElementById("sentComposeSend");
+  sentComposeSending = true;
+  btn.disabled = true;
+  btn.textContent = "Sending";
+  st.textContent = "Sent 0 of 1";
+  var res;
+  if (!entry || !entry.cat){
+    res = { ok: false, error: "Category not known for this business" };
+  } else {
+    var out = await sendCustomItems([{ slug: slug, category: entry.cat, body: text }], null);
+    res = out.results[slug] || { ok: false, error: "Send failed" };
+  }
+  if (!manualMsgs[slug]) manualMsgs[slug] = [];
+  if (res.ok) manualMsgs[slug].push({ text: text, t: Date.now(), delivered: true });
+  else manualMsgs[slug].push({ text: text, t: Date.now(), delivered: false, failed: true, error: res.error || "Send failed" });
   saveManualMsgs();
+  btn.disabled = false;
+  btn.textContent = "Send";
+  sentComposeSending = false;
   closeSentCompose();
   renderSentView();
 }
