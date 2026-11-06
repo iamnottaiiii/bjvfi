@@ -86,6 +86,11 @@
     border-radius:999px; padding:8px 16px; font-size:.82rem; display:inline-flex; align-items:center; gap:6px;
   }
   .pill.sent{background:var(--gold); color:#191408; border-color:var(--gold); font-weight:700;}
+  .pill.picked{background:var(--gold); color:#191408; border-color:var(--gold); font-weight:700;}
+  .frm{display:flex; flex-direction:column; gap:10px; padding:6px;}
+  .lab{font-size:.8rem; margin-top:8px;}
+  .bdg{color:var(--gold); font-weight:700;}
+  @media (prefers-color-scheme: light){ .bdg{color:#7a5b00;} }
   .filters{display:flex; gap:8px; flex-wrap:wrap;}
   .pill.sel{border-color:var(--ink); font-weight:700; background:var(--panel-strong);}
   .bar{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
@@ -107,6 +112,8 @@
         <span class="stat"><b id="leftCount">...</b> not sent</span>
         <span class="stat" id="syncStat">Device only</span>
         <button class="stat" id="exportBtn" type="button">Export sent list</button>
+        <button class="stat" id="repliesBtn" type="button">Replies <b class="bdg" id="replyCount"></b></button>
+        <button class="stat" id="textingBtn" type="button">Set up texting</button>
       </div>
       <input class="search" id="catSearch" type="search" placeholder="Search categories" autocomplete="off">
     </div>
@@ -126,8 +133,35 @@
         <button class="pill" id="fLeft" type="button">Not sent</button>
         <button class="pill" id="fSent" type="button">Sent</button>
       </div>
+      <div class="bar hidden" id="selBar">
+        <span class="stat" id="selCount">0 selected</span>
+        <button class="pill" id="sendBtn" type="button">Send</button>
+        <button class="pill" id="clearSelBtn" type="button">Clear</button>
+        <span id="sendStat"></span>
+      </div>
     </div>
     <div class="scroll" id="bizList"><div class="msg">Loading...</div></div>
+  </div>
+
+  <div id="textingView" class="hidden" style="display:flex; flex-direction:column; height:100%;">
+    <div class="top">
+      <div class="bar">
+        <button class="pill" id="backBtn2" type="button">Back</button>
+        <span class="ttl">Texting</span>
+      </div>
+    </div>
+    <div class="scroll" id="textingBody"><div class="msg">Loading...</div></div>
+  </div>
+
+  <div id="repliesView" class="hidden" style="display:flex; flex-direction:column; height:100%;">
+    <div class="top">
+      <div class="bar">
+        <button class="pill" id="backBtn3" type="button">Back</button>
+        <span class="ttl">Replies</span>
+        <button class="pill" id="refreshRepliesBtn" type="button">Refresh</button>
+      </div>
+    </div>
+    <div class="scroll" id="repliesList"><div class="msg">Loading...</div></div>
   </div>
 
 </div>
@@ -293,6 +327,269 @@ var WORDINGS = [
 ];
 function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
 function fmt(n){ return Number(n).toLocaleString("en-US"); }
+/* Texting: the bjvfi-text Worker is the Twilio bridge. The Twilio config
+   and the setup password live only on the Worker side. This page keeps
+   just the unlock password in local storage and sends it as X-Text-Key.
+   No Twilio value is ever in this page. */
+var TEXT_API = "https://bjvfi-text.iamnottaiii.workers.dev";
+var TKEY_LS = "bjvfi_text_key";
+var SKEY_LS = "bjvfi_database_selection_v1";
+var textConfigured = null;
+var prevView = "home";
+function textKey(){ try { return localStorage.getItem(TKEY_LS) || ""; } catch(e){ return ""; } }
+function setTextKey(v){ try { if (v) localStorage.setItem(TKEY_LS, v); else localStorage.removeItem(TKEY_LS); } catch(e){} }
+var selStore = {};
+try { selStore = JSON.parse(localStorage.getItem(SKEY_LS) || "{}") || {}; } catch(e) { selStore = {}; }
+var selSet = {};
+function selPersist(){ try { localStorage.setItem(SKEY_LS, JSON.stringify(selStore)); } catch(e){} }
+function selLoadFor(cat){
+  selSet = {};
+  var arr = selStore[cat] || [];
+  arr.forEach(function(slug){ selSet[slug] = true; });
+}
+function selSaveFor(cat){
+  var arr = Object.keys(selSet);
+  if (arr.length) selStore[cat] = arr; else delete selStore[cat];
+  selPersist();
+}
+function updateSelBar(){
+  var n = Object.keys(selSet).length;
+  document.getElementById("selBar").classList.toggle("hidden", n === 0);
+  document.getElementById("selCount").textContent = fmt(n) + " selected";
+}
+function setMarked(slug, mark){
+  var op;
+  if (!mark && sent[slug]){
+    var prev = sent[slug];
+    delete sent[slug];
+    op = { id: ++opSeq + "-" + Date.now(), slug: slug, c: curCat, mark: false, t: prev.t || 0, n: prev.n || "", p: prev.p || "" };
+  } else if (mark && !sent[slug]){
+    var row = null;
+    curRows.forEach(function(r){ if (r[0] === slug) row = r; });
+    var entry = { t: Date.now(), n: row ? (row[1]||"") : "", p: row ? (row[3]||"") : "", c: curCat };
+    sent[slug] = entry;
+    op = { id: ++opSeq + "-" + Date.now(), slug: slug, c: curCat, mark: true, t: entry.t, n: entry.n, p: entry.p };
+  } else return;
+  saveSent();
+  if (TOKEN){ pending[slug] = op; savePending(); }
+  enqueueSync(op);
+}
+function updateTextingPill(){
+  var el = document.getElementById("textingBtn");
+  if (!el) return;
+  if (textConfigured === false) el.textContent = "Set up texting";
+  else if (textConfigured === true && textKey()) el.textContent = "Texting ready";
+  else if (textConfigured === true) el.textContent = "Texting locked";
+  else el.textContent = "Set up texting";
+}
+function showView(name){
+  ["homeView","catView","textingView","repliesView"].forEach(function(id){
+    document.getElementById(id).classList.toggle("hidden", id !== name + "View");
+  });
+}
+function goBack(){
+  if (prevView === "cat" && curCat) showView("cat");
+  else { showView("home"); renderCats(); refreshStats(); }
+}
+async function checkTexting(){
+  try {
+    var r = await fetch(TEXT_API + "/health");
+    var j = await r.json();
+    textConfigured = !!j.configured;
+  } catch(e){ textConfigured = null; }
+  updateTextingPill();
+  if (textConfigured && textKey()) loadReplies(true);
+}
+function setupFormHtml(update){
+  if (update){
+    return '<div class="frm">'
+      + '<div class="lab">New setup password</div><input class="search" id="updPass" type="password" autocomplete="new-password">'
+      + '<div class="lab">Account SID</div><input class="search" id="updSid" type="text" autocomplete="off">'
+      + '<div class="lab">Auth Token</div><input class="search" id="updToken" type="password" autocomplete="off">'
+      + '<div class="lab">From number</div><input class="search" id="updFrom" type="tel" autocomplete="off">'
+      + '<div class="acts"><button class="pill" id="updSave" type="button">Save</button></div>'
+      + '<div class="msg" id="updStat"></div></div>';
+  }
+  return '<div class="frm">'
+    + '<div class="lab">Setup password</div><input class="search" id="tsPass" type="password" autocomplete="new-password">'
+    + '<div class="lab">Account SID</div><input class="search" id="tsSid" type="text" autocomplete="off">'
+    + '<div class="lab">Auth Token</div><input class="search" id="tsToken" type="password" autocomplete="off">'
+    + '<div class="lab">From number</div><input class="search" id="tsFrom" type="tel" autocomplete="off">'
+    + '<div class="acts"><button class="pill" id="tsSave" type="button">Save</button></div>'
+    + '<div class="msg" id="tsStat"></div></div>';
+}
+function wireSetupForm(update){
+  var pre = update ? "upd" : "ts";
+  document.getElementById(pre + "Save").addEventListener("click", async function(){
+    var stat = document.getElementById(pre + "Stat");
+    var payload;
+    if (update){
+      var np = document.getElementById("updPass").value;
+      payload = { password: np || textKey(), currentPassword: textKey(),
+        sid: document.getElementById("updSid").value, token: document.getElementById("updToken").value, from: document.getElementById("updFrom").value };
+    } else {
+      payload = { password: document.getElementById("tsPass").value,
+        sid: document.getElementById("tsSid").value, token: document.getElementById("tsToken").value, from: document.getElementById("tsFrom").value };
+    }
+    stat.textContent = "Saving";
+    try {
+      var r = await fetch(TEXT_API + "/setup", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+      var j = await r.json().catch(function(){ return {}; });
+      if (r.ok && j.ok){
+        setTextKey(payload.password);
+        textConfigured = true;
+        updateTextingPill();
+        renderTexting();
+      } else stat.textContent = j.error || "Save failed";
+    } catch(e){ stat.textContent = "Save failed"; }
+  });
+}
+function unlockHtml(prefix){
+  return '<div class="frm"><div class="lab">Setup password</div>'
+    + '<input class="search" id="' + prefix + 'Pass" type="password" autocomplete="current-password">'
+    + '<div class="acts"><button class="pill" id="' + prefix + 'Unlock" type="button">Unlock</button></div>'
+    + '<div class="msg" id="' + prefix + 'Stat"></div></div>';
+}
+function wireUnlock(prefix, after){
+  document.getElementById(prefix + "Unlock").addEventListener("click", async function(){
+    var stat = document.getElementById(prefix + "Stat");
+    var pw = document.getElementById(prefix + "Pass").value;
+    if (!pw){ stat.textContent = "Password required"; return; }
+    stat.textContent = "Checking";
+    try {
+      var r = await fetch(TEXT_API + "/replies", { headers: { "X-Text-Key": pw } });
+      if (r.status === 401){ stat.textContent = "Wrong password"; return; }
+      if (!r.ok){ stat.textContent = "Unlock failed"; return; }
+      setTextKey(pw);
+      updateTextingPill();
+      after();
+    } catch(e){ stat.textContent = "Unlock failed"; }
+  });
+}
+function renderTexting(){
+  var body = document.getElementById("textingBody");
+  if (textConfigured === false){
+    body.innerHTML = setupFormHtml(false);
+    wireSetupForm(false);
+  } else if (textConfigured === true && !textKey()){
+    body.innerHTML = unlockHtml("tu");
+    wireUnlock("tu", renderTexting);
+  } else if (textConfigured === true){
+    body.innerHTML = '<div class="frm"><div class="msg">Texting ready</div></div>' + setupFormHtml(true)
+      + '<div class="frm"><div class="acts"><button class="pill" id="lockBtn" type="button">Lock</button></div></div>';
+    wireSetupForm(true);
+    document.getElementById("lockBtn").addEventListener("click", function(){
+      setTextKey(""); updateTextingPill(); renderTexting();
+    });
+  } else {
+    body.innerHTML = '<div class="msg">Loading...</div>';
+    checkTexting().then(renderTexting);
+  }
+}
+function openTexting(){
+  prevView = document.getElementById("catView").classList.contains("hidden") ? "home" : "cat";
+  showView("texting");
+  renderTexting();
+}
+async function loadReplies(countOnly){
+  var key = textKey();
+  if (!key) return null;
+  try {
+    var r = await fetch(TEXT_API + "/replies", { headers: { "X-Text-Key": key } });
+    if (r.status === 401){ updateTextingPill(); return null; }
+    if (!r.ok) return null;
+    var j = await r.json();
+    var arr = j.replies || [];
+    document.getElementById("replyCount").textContent = arr.length ? fmt(arr.length) : "";
+    return arr;
+  } catch(e){ return null; }
+}
+function renderRepliesList(arr){
+  var el = document.getElementById("repliesList");
+  if (!arr || !arr.length){ el.innerHTML = '<div class="msg">No replies yet.</div>'; return; }
+  var html = "";
+  arr.forEach(function(rep){
+    var when = rep.t ? new Date(rep.t).toLocaleString("en-US") : "";
+    html += '<div class="row">'
+      + '<div class="nm">' + esc(rep.name || rep.from || "") + '</div>'
+      + (rep.from ? '<div class="dt">' + esc(rep.from) + '</div>' : '')
+      + (rep.body ? '<div class="dt">' + esc(rep.body) + '</div>' : '')
+      + (when ? '<div class="dt">' + esc(when) + '</div>' : '')
+      + (rep.slug ? '<div class="acts"><a class="pill" href="https://bjvfi.com/' + esc(rep.slug) + '/" target="_blank" rel="noopener">Site</a></div>' : '')
+      + '</div>';
+  });
+  el.innerHTML = html;
+}
+async function openReplies(){
+  prevView = "home";
+  showView("replies");
+  var el = document.getElementById("repliesList");
+  if (textConfigured === true && !textKey()){
+    el.innerHTML = unlockHtml("ru");
+    wireUnlock("ru", openReplies);
+    return;
+  }
+  el.innerHTML = '<div class="msg">Loading...</div>';
+  var arr = await loadReplies(false);
+  if (arr === null && !textKey()){
+    el.innerHTML = unlockHtml("ru");
+    wireUnlock("ru", openReplies);
+    return;
+  }
+  renderRepliesList(arr || []);
+}
+async function sendSelected(){
+  var stat = document.getElementById("sendStat");
+  var slugs = curRows.map(function(r){ return r[0]; }).filter(function(slug){ return selSet[slug]; });
+  if (!slugs.length) return;
+  if (textConfigured === false || !textKey()){
+    stat.textContent = "Set up texting";
+    openTexting();
+    return;
+  }
+  stat.textContent = "Sending";
+  document.getElementById("sendBtn").disabled = true;
+  var catFile = manifest.cats[curCat].files[0];
+  var okCount = 0, failCount = 0, sawAuthProblem = false;
+  try {
+    for (var start = 0; start < slugs.length; start += 50){
+      var chunk = slugs.slice(start, start + 50);
+      var r = await fetch(TEXT_API + "/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Text-Key": textKey() },
+        body: JSON.stringify({ catFile: catFile, slugs: chunk, catName: curCat })
+      });
+      var j = await r.json().catch(function(){ return {}; });
+      if (r.status === 401 || (j && j.error === "not configured")){
+        sawAuthProblem = true;
+        break;
+      }
+      if (!r.ok || !j.results){ failCount += chunk.length; continue; }
+      j.results.forEach(function(res){
+        if (res.ok){
+          okCount++;
+          delete selSet[res.slug];
+          setMarked(res.slug, true);
+        } else failCount++;
+      });
+    }
+  } catch(e){ failCount = slugs.length - okCount; }
+  document.getElementById("sendBtn").disabled = false;
+  if (sawAuthProblem){
+    stat.textContent = "Set up texting";
+    selSaveFor(curCat);
+    openTexting();
+    return;
+  }
+  selSaveFor(curCat);
+  refreshStats();
+  document.getElementById("catSent").textContent = fmt(catSentCount(curCat));
+  updateSelBar();
+  stat.textContent = fmt(okCount) + " sent" + (failCount ? ", " + fmt(failCount) + " failed" : "");
+  renderBiz(false);
+}
+
+
 
 function refreshStats(){
   document.getElementById("sentCount").textContent = fmt(sentTotal());
@@ -326,6 +623,8 @@ function openCat(name){
   document.getElementById("bizSearch").value = "";
   setFilter("all");
   document.getElementById("catTitle").textContent = name;
+  selLoadFor(name);
+  document.getElementById("sendStat").textContent = "";
   document.getElementById("homeView").classList.add("hidden");
   var cv = document.getElementById("catView");
   cv.classList.remove("hidden");
@@ -387,6 +686,7 @@ function renderBiz(reset){
     var slug = r[0], name = r[1] || "", phone = r[3] || "", addr = r[4] || "";
     var url = "bjvfi.com/" + slug + "/";
     var isSent = !!sent[slug];
+    var isSel = !!selSet[slug];
     var digits = phone.replace(/[^0-9+]/g, "");
     var body = WORDINGS[i % WORDINGS.length](name, url);
     html += '<div class="row">'
@@ -397,6 +697,7 @@ function renderBiz(reset){
       + '<a class="pill" href="https://' + esc(url) + '" target="_blank" rel="noopener">Site</a>'
       + (digits ? '<a class="pill" href="sms:' + esc(digits) + '?&body=' + encodeURIComponent(body) + '">Text</a>' : '')
       + '<button class="pill' + (isSent ? ' sent' : '') + '" type="button" data-sent="' + esc(slug) + '">' + (isSent ? 'Sent' : 'Not sent') + '</button>'
+      + '<button class="pill' + (isSel ? ' picked' : '') + '" type="button" data-select="' + esc(slug) + '">Select</button>'
       + '</div></div>';
   });
   if (!slice.length) html = '<div class="msg">Nothing here.</div>';
@@ -406,28 +707,23 @@ function renderBiz(reset){
   Array.prototype.forEach.call(list.querySelectorAll("[data-sent]"), function(el){
     el.addEventListener("click", function(){
       var slug = el.getAttribute("data-sent");
-      var op;
-      if (sent[slug]){
-        var prev = sent[slug];
-        delete sent[slug];
-        op = { id: ++opSeq + "-" + Date.now(), slug: slug, c: curCat, mark: false, t: prev.t || 0, n: prev.n || "", p: prev.p || "" };
-      } else {
-        var row = null;
-        curRows.forEach(function(r){ if (r[0] === slug) row = r; });
-        var entry = { t: Date.now(), n: row ? (row[1]||"") : "", p: row ? (row[3]||"") : "", c: curCat };
-        sent[slug] = entry;
-        op = { id: ++opSeq + "-" + Date.now(), slug: slug, c: curCat, mark: true, t: entry.t, n: entry.n, p: entry.p };
-      }
-      saveSent();
-      if (TOKEN){ pending[slug] = op; savePending(); }
+      setMarked(slug, !sent[slug]);
       refreshStats();
       document.getElementById("catSent").textContent = fmt(catSentCount(curCat));
       renderBiz(false);
-      enqueueSync(op);
+    });
+  });
+  Array.prototype.forEach.call(list.querySelectorAll("[data-select]"), function(el){
+    el.addEventListener("click", function(){
+      var slug = el.getAttribute("data-select");
+      if (selSet[slug]) delete selSet[slug]; else selSet[slug] = true;
+      selSaveFor(curCat);
+      renderBiz(false);
     });
   });
   var mb = document.getElementById("moreBtn");
   if (mb) mb.addEventListener("click", function(){ shown += PAGE; renderBiz(false); });
+  updateSelBar();
 }
 
 function setFilter(f){
@@ -449,6 +745,13 @@ document.getElementById("backBtn").addEventListener("click", function(){
 document.getElementById("fAll").addEventListener("click", function(){ setFilter("all"); renderBiz(true); });
 document.getElementById("fLeft").addEventListener("click", function(){ setFilter("left"); renderBiz(true); });
 document.getElementById("fSent").addEventListener("click", function(){ setFilter("sent"); renderBiz(true); });
+document.getElementById("textingBtn").addEventListener("click", openTexting);
+document.getElementById("repliesBtn").addEventListener("click", openReplies);
+document.getElementById("backBtn2").addEventListener("click", goBack);
+document.getElementById("backBtn3").addEventListener("click", goBack);
+document.getElementById("refreshRepliesBtn").addEventListener("click", function(){ openReplies(); });
+document.getElementById("sendBtn").addEventListener("click", sendSelected);
+document.getElementById("clearSelBtn").addEventListener("click", function(){ selSet = {}; selSaveFor(curCat); renderBiz(false); });
 document.getElementById("exportBtn").addEventListener("click", function(){
   var lines = ["slug,name,phone,category,sent_at"];
   Object.keys(sent).forEach(function(slug){
@@ -484,6 +787,7 @@ fetch(DATA + "manifest.json").then(function(r){ return r.json(); }).then(async f
   }
   refreshStats(); renderCats(); setSyncLabel();
   retryPending();
+  checkTexting();
 }).catch(function(){
   document.getElementById("catList").innerHTML = '<div class="msg">Could not load the database. Check your connection and reopen the page.</div>';
 });
