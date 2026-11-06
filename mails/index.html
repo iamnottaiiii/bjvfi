@@ -921,6 +921,7 @@
         var t=document.documentElement.getAttribute('data-theme');
         var light=t?t==='light':(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches);
         var ink=light?'#111114':'#F2F2F5';
+        var bg=light?'#ffffff':'#000000';
         var els=doc.querySelectorAll('*');
         for(var i=0;i<els.length;i++){
           var el=els[i];
@@ -929,8 +930,8 @@
           if(el.hasAttribute&&el.hasAttribute('bgcolor')) el.removeAttribute('bgcolor');
           if(el.tagName!=='A'&&!(el.closest&&el.closest('a'))) el.style.setProperty('color',ink,'important');
         }
-        if(doc.documentElement) doc.documentElement.style.setProperty('background-color','transparent','important');
-        if(doc.body) doc.body.style.setProperty('background-color','transparent','important');
+        if(doc.documentElement) doc.documentElement.style.setProperty('background-color',bg,'important');
+        if(doc.body) doc.body.style.setProperty('background-color',bg,'important');
       }catch(e){}
     }
     var hf=document.getElementById('htmlFrame');
@@ -944,7 +945,6 @@
           hf.style.height='0px';
           var h=Math.max(d.documentElement?d.documentElement.scrollHeight:0, d.body?d.body.scrollHeight:0);
           if(h) hf.style.height=h+'px';
-          frameBg(hf);
         }catch(e){}
       };
       hf.addEventListener('load',function(){
@@ -962,7 +962,6 @@
           qf.style.height='0px';
           var h=Math.max(d.documentElement?d.documentElement.scrollHeight:0, d.body?d.body.scrollHeight:0);
           if(h) qf.style.height=h+'px';
-          frameBg(qf);
         }catch(e){}
       };
       qf.__fit=fitQ;
@@ -991,7 +990,6 @@
           qf.style.display=open?'':'none';
           fgbtn.textContent=open?'Hide':'Show';
           if(open) fitQ();
-          repaintMailFrame();
         });
         flattenPaint(qf.contentDocument);
         wireMailLinks(qf);
@@ -999,15 +997,7 @@
         try{ if(qf.contentDocument) qf.contentDocument.addEventListener('load',fitQ,true); }catch(e){}
       });
     }
-    var bgQueued=false;
-    readerEl.addEventListener('scroll',function(){
-      if(bgQueued) return;
-      bgQueued=true;
-      requestAnimationFrame(function(){
-        bgQueued=false;
-        var f=document.getElementById('htmlFrame'); if(f) frameBg(f);
-      });
-    },{passive:true});
+
     readerEl.querySelectorAll('.q-h').forEach(function(b){
       b.addEventListener('click',function(){
         var seg=b.closest('.q-seg'); if(!seg) return;
@@ -1015,7 +1005,6 @@
         var hidden=body.style.display==='none';
         body.style.display=hidden?'':'none';
         b.textContent=hidden?'Hide':'Show';
-        repaintMailFrame();
       });
     });
     var gateBtn=readerEl.querySelector('.q-gate-h');
@@ -1024,7 +1013,6 @@
       var open=minis.style.display==='none';
       minis.style.display=open?'':'none';
       gateBtn.textContent=open?'Hide':'Show';
-      repaintMailFrame();
     });
     document.getElementById('replyBtn').addEventListener('click',function(){openCompose(m);});
     document.getElementById('fwdBtn').addEventListener('click',function(){openForward(m);});
@@ -1173,7 +1161,8 @@
     var t=document.documentElement.getAttribute('data-theme');
     var light=t?t==='light':(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches);
     var ink=light?'#111114':'#F2F2F5', link=light?'#1a56db':'#6FA8FF';
-    var css='<style>html,body{margin:0;padding:0;max-width:100%;overflow-x:hidden;background:transparent!important;color:'+ink+';color-scheme:'+(light?'light':'dark')+' }'
+    var bg=light?'#ffffff':'#000000';
+    var css='<style>html,body{margin:0;padding:0;max-width:100%;overflow-x:hidden;background:'+bg+'!important;color:'+ink+';color-scheme:'+(light?'light':'dark')+' }'
       +'*{background-color:transparent!important;color:'+ink+'!important}'
       +'a,a *{color:'+link+'!important}'
       +'html,body,table,td,div{height:auto!important;min-height:0!important}'
@@ -1189,55 +1178,6 @@
   // flatten nested blockquotes into siblings, then give each message a bar
   // with only its date and its own Hide button. Best effort on foreign HTML:
   // any failure leaves the quoted mail exactly as it arrived.
-  // A transparent mail frame still shows the phone's own black canvas
-  // behind the mail, which reads as a black box on the app background.
-  // So the frame's root is painted with the app's own background, built
-  // here from the live values, sized to the whole screen and offset by
-  // the frame's position, so the mail sits on the same background as
-  // everything around it with no rectangle edge. Anything that moves the
-  // frame (opening or closing previous messages, scrolling) has to
-  // repaint it, or the offset goes stale and the box shows again.
-  function frameBg(frame){
-    try{
-      var doc=frame.contentDocument; if(!doc||!doc.documentElement) return;
-      var rootCs=getComputedStyle(document.documentElement);
-      var cx=(rootCs.getPropertyValue('--cx')||'50%').trim()||'50%';
-      var cy=(rootCs.getPropertyValue('--cy')||'38%').trim()||'38%';
-      var t=document.documentElement.getAttribute('data-theme');
-      var light=t?t==='light':(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches);
-      var img, base;
-      if(light){
-        base='#ffffff';
-        img='radial-gradient(circle at '+cx+' '+cy+', transparent 0%, transparent 45%, rgba(255,255,255,.35) 78%, rgba(255,255,255,.85) 100%),'
-          +'repeating-conic-gradient(from 0deg at '+cx+' '+cy+', rgba(0,0,0,.035) 0deg 1deg, transparent 1deg 2deg),'
-          +'repeating-radial-gradient(circle at '+cx+' '+cy+', rgba(0,0,0,.03) 0px 1px, transparent 1px 4px),'
-          +'radial-gradient(circle at '+cx+' '+cy+', #eaeaea 0%, #e2e2e2 8%, #d3d3d3 16%, #bcbcbc 26%, #a3a3a3 38%, #8f8f8f 52%, #7d7d7d 64%, #8f8f8f 78%, #bcbcbc 90%, #d8d8d8 100%)';
-      }else{
-        base='#000000';
-        img='radial-gradient(circle at '+cx+' '+cy+', transparent 0%, transparent 45%, rgba(0,0,0,.55) 82%, rgba(0,0,0,.9) 100%),'
-          +'repeating-conic-gradient(from 0deg at '+cx+' '+cy+', rgba(255,255,255,.012) 0deg 1deg, transparent 1deg 2deg),'
-          +'repeating-radial-gradient(circle at '+cx+' '+cy+', rgba(255,255,255,.010) 0px 1px, transparent 1px 4px),'
-          +'radial-gradient(circle at '+cx+' '+cy+', #161616 0%, #0d0d0d 34%, #050505 62%, #010101 100%)';
-      }
-      var r=frame.getBoundingClientRect();
-      var root=doc.documentElement;
-      root.style.setProperty('background-image',img,'important');
-      root.style.setProperty('background-color',base,'important');
-      root.style.setProperty('background-size',window.innerWidth+'px '+window.innerHeight+'px','important');
-      root.style.setProperty('background-position',(-r.left)+'px '+(-r.top)+'px','important');
-      root.style.setProperty('background-repeat','no-repeat','important');
-    }catch(e){}
-  }
-  function repaintMailFrame(){
-    var run=function(){
-      var f=document.getElementById('htmlFrame');
-      if(f) frameBg(f);
-      var q=document.getElementById('qFrame');
-      if(q&&q.style.display!=='none') frameBg(q);
-    };
-    requestAnimationFrame(function(){ setTimeout(run,30); });
-    setTimeout(run,280);
-  }
   // Previous messages in HTML mail are lifted OUT of their frame and built
   // as normal page segments, the same as plain text threads: their Show
   // buttons are ordinary page buttons that always work, and with no frame
@@ -1348,7 +1288,6 @@
       var open=minis.style.display==='none';
       minis.style.display=open?'':'none';
       gbtn.textContent=open?'Hide':'Show';
-      repaintMailFrame();
     });
     area.appendChild(gate);
     area.appendChild(minis);
@@ -1380,12 +1319,10 @@
         var hidden=body.style.display==='none';
         body.style.display=hidden?'':'none';
         btn.textContent=hidden?'Hide':'Show';
-        repaintMailFrame();
       });
       minis.appendChild(seg);
     });
     frame.remove();
-    repaintMailFrame();
     return true;
   }
   function wireHtmlQuotes(frame){
@@ -1452,7 +1389,6 @@
           content.style.display=hidden?'':'none';
           btn.textContent=hidden?'Hide':'Show';
           if(frame.__fit) frame.__fit();
-          repaintMailFrame();
         });
         bar.appendChild(ds); bar.appendChild(btn);
         wrap.appendChild(bar); wrap.appendChild(content);
