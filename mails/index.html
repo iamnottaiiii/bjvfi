@@ -869,11 +869,15 @@
     if(m.quoteHtml){
       prevBlocks='<div class="q-area" id="qArea"><iframe class="r-html" id="qFrame" sandbox="allow-same-origin" title="Previous messages" style="display:none" srcdoc="'+esc(fitHtml(m.quoteHtml))+'"></iframe></div>';
     }else if(m.prevSegs&&m.prevSegs.length){
-      prevBlocks=m.prevSegs.slice().reverse().map(function(seg){
+      var nPrev=m.prevSegs.length;
+      var minis=m.prevSegs.slice().reverse().map(function(seg){
         return '<div class="q-seg"><div class="q-bar"><span class="q-date">'+esc(fmtWhen(seg.date)||seg.date||'')+'</span>'
           +'<button type="button" class="pill q-h">'+(PREFS.quote?'Hide':'Show')+'</button></div>'
           +'<div class="r-body q-body"'+(PREFS.quote?'':' style="display:none;"')+'>'+fmtBody(seg.text)+'</div></div>';
       }).join('');
+      prevBlocks='<div class="q-seg q-gate"><div class="q-bar"><span class="q-date">'+nPrev+(nPrev===1?' previous message':' previous messages')+'</span>'
+        +'<button type="button" class="pill q-gate-h">'+(PREFS.quote?'Hide':'Show')+'</button></div></div>'
+        +'<div class="q-minis"'+(PREFS.quote?'':' style="display:none;"')+'>'+minis+'</div>';
     }
     readerEl.innerHTML=
       '<div class="r-top"><button type="button" class="dots bare" id="backBtn" aria-label="Back">&#8592;</button>'
@@ -928,43 +932,6 @@
         if(doc.body) doc.body.style.setProperty('background-color','transparent','important');
       }catch(e){}
     }
-    // A transparent mail frame still shows the phone's own black canvas
-    // behind the mail, which reads as a black box on the app background.
-    // So the frame's root is painted with the app's own background, built
-    // here from the live values, sized to the whole screen and offset by
-    // the frame's position, so the mail sits on the same background as
-    // everything around it with no rectangle edge.
-    function frameBg(frame){
-      try{
-        var doc=frame.contentDocument; if(!doc||!doc.documentElement) return;
-        var rootCs=getComputedStyle(document.documentElement);
-        var cx=(rootCs.getPropertyValue('--cx')||'50%').trim()||'50%';
-        var cy=(rootCs.getPropertyValue('--cy')||'38%').trim()||'38%';
-        var t=document.documentElement.getAttribute('data-theme');
-        var light=t?t==='light':(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches);
-        var img, base;
-        if(light){
-          base='#ffffff';
-          img='radial-gradient(circle at '+cx+' '+cy+', transparent 0%, transparent 45%, rgba(255,255,255,.35) 78%, rgba(255,255,255,.85) 100%),'
-            +'repeating-conic-gradient(from 0deg at '+cx+' '+cy+', rgba(0,0,0,.035) 0deg 1deg, transparent 1deg 2deg),'
-            +'repeating-radial-gradient(circle at '+cx+' '+cy+', rgba(0,0,0,.03) 0px 1px, transparent 1px 4px),'
-            +'radial-gradient(circle at '+cx+' '+cy+', #eaeaea 0%, #e2e2e2 8%, #d3d3d3 16%, #bcbcbc 26%, #a3a3a3 38%, #8f8f8f 52%, #7d7d7d 64%, #8f8f8f 78%, #bcbcbc 90%, #d8d8d8 100%)';
-        }else{
-          base='#000000';
-          img='radial-gradient(circle at '+cx+' '+cy+', transparent 0%, transparent 45%, rgba(0,0,0,.55) 82%, rgba(0,0,0,.9) 100%),'
-            +'repeating-conic-gradient(from 0deg at '+cx+' '+cy+', rgba(255,255,255,.012) 0deg 1deg, transparent 1deg 2deg),'
-            +'repeating-radial-gradient(circle at '+cx+' '+cy+', rgba(255,255,255,.010) 0px 1px, transparent 1px 4px),'
-            +'radial-gradient(circle at '+cx+' '+cy+', #161616 0%, #0d0d0d 34%, #050505 62%, #010101 100%)';
-        }
-        var r=frame.getBoundingClientRect();
-        var root=doc.documentElement;
-        root.style.setProperty('background-image',img,'important');
-        root.style.setProperty('background-color',base,'important');
-        root.style.setProperty('background-size',window.innerWidth+'px '+window.innerHeight+'px','important');
-        root.style.setProperty('background-position',(-r.left)+'px '+(-r.top)+'px','important');
-        root.style.setProperty('background-repeat','no-repeat','important');
-      }catch(e){}
-    }
     var hf=document.getElementById('htmlFrame');
     if(hf){
       var fitFrame=function(){
@@ -1001,7 +968,29 @@
         var done=false;
         try{ done=extractQuotes(qf); }catch(e){}
         if(done){ scrollToMain(); setTimeout(scrollToMain,80); return; }
-        qf.style.display='';
+        qf.style.display=PREFS.quote?'':'none';
+        var fgate=document.createElement('div');
+        fgate.className='q-seg q-gate';
+        var fgbar=document.createElement('div');
+        fgbar.className='q-bar';
+        var fgl=document.createElement('span');
+        fgl.className='q-date';
+        fgl.textContent='Previous messages';
+        var fgbtn=document.createElement('button');
+        fgbtn.className='pill q-gate-h';
+        fgbtn.type='button';
+        fgbtn.textContent=PREFS.quote?'Hide':'Show';
+        fgbar.appendChild(fgl); fgbar.appendChild(fgbtn);
+        fgate.appendChild(fgbar);
+        var farea=document.getElementById('qArea');
+        if(farea) farea.insertBefore(fgate,qf);
+        fgbtn.addEventListener('click',function(){
+          var open=qf.style.display==='none';
+          qf.style.display=open?'':'none';
+          fgbtn.textContent=open?'Hide':'Show';
+          if(open) fitQ();
+          repaintMailFrame();
+        });
         flattenPaint(qf.contentDocument);
         fitQ(); wireHtmlQuotes(qf); fitQ(); scrollToMain(); setTimeout(function(){fitQ(); scrollToMain();},450);
         try{ if(qf.contentDocument) qf.contentDocument.addEventListener('load',fitQ,true); }catch(e){}
@@ -1023,7 +1012,16 @@
         var hidden=body.style.display==='none';
         body.style.display=hidden?'':'none';
         b.textContent=hidden?'Hide':'Show';
+        repaintMailFrame();
       });
+    });
+    var gateBtn=readerEl.querySelector('.q-gate-h');
+    if(gateBtn) gateBtn.addEventListener('click',function(){
+      var minis=readerEl.querySelector('.q-minis'); if(!minis) return;
+      var open=minis.style.display==='none';
+      minis.style.display=open?'':'none';
+      gateBtn.textContent=open?'Hide':'Show';
+      repaintMailFrame();
     });
     document.getElementById('replyBtn').addEventListener('click',function(){openCompose(m);});
     document.getElementById('fwdBtn').addEventListener('click',function(){openForward(m);});
@@ -1160,6 +1158,55 @@
   // flatten nested blockquotes into siblings, then give each message a bar
   // with only its date and its own Hide button. Best effort on foreign HTML:
   // any failure leaves the quoted mail exactly as it arrived.
+  // A transparent mail frame still shows the phone's own black canvas
+  // behind the mail, which reads as a black box on the app background.
+  // So the frame's root is painted with the app's own background, built
+  // here from the live values, sized to the whole screen and offset by
+  // the frame's position, so the mail sits on the same background as
+  // everything around it with no rectangle edge. Anything that moves the
+  // frame (opening or closing previous messages, scrolling) has to
+  // repaint it, or the offset goes stale and the box shows again.
+  function frameBg(frame){
+    try{
+      var doc=frame.contentDocument; if(!doc||!doc.documentElement) return;
+      var rootCs=getComputedStyle(document.documentElement);
+      var cx=(rootCs.getPropertyValue('--cx')||'50%').trim()||'50%';
+      var cy=(rootCs.getPropertyValue('--cy')||'38%').trim()||'38%';
+      var t=document.documentElement.getAttribute('data-theme');
+      var light=t?t==='light':(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches);
+      var img, base;
+      if(light){
+        base='#ffffff';
+        img='radial-gradient(circle at '+cx+' '+cy+', transparent 0%, transparent 45%, rgba(255,255,255,.35) 78%, rgba(255,255,255,.85) 100%),'
+          +'repeating-conic-gradient(from 0deg at '+cx+' '+cy+', rgba(0,0,0,.035) 0deg 1deg, transparent 1deg 2deg),'
+          +'repeating-radial-gradient(circle at '+cx+' '+cy+', rgba(0,0,0,.03) 0px 1px, transparent 1px 4px),'
+          +'radial-gradient(circle at '+cx+' '+cy+', #eaeaea 0%, #e2e2e2 8%, #d3d3d3 16%, #bcbcbc 26%, #a3a3a3 38%, #8f8f8f 52%, #7d7d7d 64%, #8f8f8f 78%, #bcbcbc 90%, #d8d8d8 100%)';
+      }else{
+        base='#000000';
+        img='radial-gradient(circle at '+cx+' '+cy+', transparent 0%, transparent 45%, rgba(0,0,0,.55) 82%, rgba(0,0,0,.9) 100%),'
+          +'repeating-conic-gradient(from 0deg at '+cx+' '+cy+', rgba(255,255,255,.012) 0deg 1deg, transparent 1deg 2deg),'
+          +'repeating-radial-gradient(circle at '+cx+' '+cy+', rgba(255,255,255,.010) 0px 1px, transparent 1px 4px),'
+          +'radial-gradient(circle at '+cx+' '+cy+', #161616 0%, #0d0d0d 34%, #050505 62%, #010101 100%)';
+      }
+      var r=frame.getBoundingClientRect();
+      var root=doc.documentElement;
+      root.style.setProperty('background-image',img,'important');
+      root.style.setProperty('background-color',base,'important');
+      root.style.setProperty('background-size',window.innerWidth+'px '+window.innerHeight+'px','important');
+      root.style.setProperty('background-position',(-r.left)+'px '+(-r.top)+'px','important');
+      root.style.setProperty('background-repeat','no-repeat','important');
+    }catch(e){}
+  }
+  function repaintMailFrame(){
+    var run=function(){
+      var f=document.getElementById('htmlFrame');
+      if(f) frameBg(f);
+      var q=document.getElementById('qFrame');
+      if(q&&q.style.display!=='none') frameBg(q);
+    };
+    requestAnimationFrame(function(){ setTimeout(run,30); });
+    setTimeout(run,280);
+  }
   // Previous messages in HTML mail are lifted OUT of their frame and built
   // as normal page segments, the same as plain text threads: their Show
   // buttons are ordinary page buttons that always work, and with no frame
@@ -1250,6 +1297,30 @@
     });
     if(!segs.length) return false;
     segs.reverse();
+    var gate=document.createElement('div');
+    gate.className='q-seg q-gate';
+    var gbar=document.createElement('div');
+    gbar.className='q-bar';
+    var gl=document.createElement('span');
+    gl.className='q-date';
+    gl.textContent=segs.length+(segs.length===1?' previous message':' previous messages');
+    var gbtn=document.createElement('button');
+    gbtn.className='pill q-gate-h';
+    gbtn.type='button';
+    gbtn.textContent=PREFS.quote?'Hide':'Show';
+    gbar.appendChild(gl); gbar.appendChild(gbtn);
+    gate.appendChild(gbar);
+    var minis=document.createElement('div');
+    minis.className='q-minis';
+    if(!PREFS.quote) minis.style.display='none';
+    gbtn.addEventListener('click',function(){
+      var open=minis.style.display==='none';
+      minis.style.display=open?'':'none';
+      gbtn.textContent=open?'Hide':'Show';
+      repaintMailFrame();
+    });
+    area.appendChild(gate);
+    area.appendChild(minis);
     segs.forEach(function(s){
       var seg=document.createElement('div');
       seg.className='q-seg';
@@ -1278,10 +1349,12 @@
         var hidden=body.style.display==='none';
         body.style.display=hidden?'':'none';
         btn.textContent=hidden?'Hide':'Show';
+        repaintMailFrame();
       });
-      area.appendChild(seg);
+      minis.appendChild(seg);
     });
     frame.remove();
+    repaintMailFrame();
     return true;
   }
   function wireHtmlQuotes(frame){
@@ -1348,6 +1421,7 @@
           content.style.display=hidden?'':'none';
           btn.textContent=hidden?'Hide':'Show';
           if(frame.__fit) frame.__fit();
+          repaintMailFrame();
         });
         bar.appendChild(ds); bar.appendChild(btn);
         wrap.appendChild(bar); wrap.appendChild(content);
