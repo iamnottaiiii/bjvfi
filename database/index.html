@@ -231,6 +231,8 @@
   .bub.filebub .bt{margin-top:2px;}
   .backpane{display:none;}
   #homeView .scroll{display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100%;}
+  #loginView .scroll{display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100%;}
+  .loginpanel{width:100%; max-width:340px; margin:0;}
   .msgfilters{padding:0 16px 12px;}
   .bigpill{position:relative;}
   .badge{
@@ -301,7 +303,20 @@
 <div class="void"></div>
 <div class="layer">
 
-  <div id="homeView" class="view">
+  <div id="loginView" class="view">
+    <div class="scroll">
+      <div class="sent-compose loginpanel">
+        <div class="nm">Database</div>
+        <input class="inp" id="loginPass" type="password" placeholder="Password" autocomplete="current-password">
+        <div class="acts">
+          <button class="pill goldsel" id="loginBtn" type="button">Sign in</button>
+          <span class="statusline" id="loginStat"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="homeView" class="view hidden">
     <div class="scroll">
       <div class="stats">
         <span class="stat"><b id="homeReplied">0</b> replied</span>
@@ -752,7 +767,7 @@ async function loadReplies(){
   if (!key) return;
   try {
     var r = await fetch(TEXT_API + "/replies", { headers: { "X-Text-Key": key } });
-    if (r.status === 401){ repliesState = "locked"; renderThreadList(); return; }
+    if (r.status === 401){ repliesState = "locked"; if (authed) signOut(); else renderThreadList(); return; }
     if (!r.ok) return;
     var j = await r.json();
     repliesState = "ok";
@@ -1037,7 +1052,7 @@ document.getElementById("threadBackBtn").addEventListener("click", function(){
 
 /* View switching */
 function showView(id){
-  ["homeView", "msgView", "exploreView", "sentView"].forEach(function(v){
+  ["loginView", "homeView", "msgView", "exploreView", "sentView"].forEach(function(v){
     document.getElementById(v).classList.toggle("hidden", v !== id);
   });
 }
@@ -1596,30 +1611,105 @@ if (window.matchMedia && !window.matchMedia("(prefers-color-scheme: light)").mat
   });
 }
 
-/* Boot */
-renderMsgFilters();
-renderThreadList();
-refreshMsgStats();
-showView("homeView");
-setSyncLabel();
-fetch(DATA + "manifest.json").then(function(r){ return r.json(); }).then(async function(m){
-  manifest = m;
-  buildSortedCats();
-  if (TOKEN){
-    try {
-      var idx = await ghGetJson(INDEX_PATH);
-      if (idx && idx.data){ repoCounts = idx.data.cats || {}; }
-      else repoCounts = {};
-    } catch(e){ repoCounts = null; }
+/* Login gate. The one password is the bridge key: it is checked server
+   side by the bjvfi-text bridge (GET /replies answers 401 for a wrong key,
+   the same check the old page used to unlock texting), and it is never in
+   this page's code. On success it is stored on this device only, in the
+   same local storage slot the old page used, and doubles as the key for
+   /send and /replies. No leads, marks, or replies load before the gate
+   passes. The Twilio values themselves are never entered here. */
+var authed = false;
+function enterApp(){
+  authed = true;
+  renderThreadList();
+  refreshMsgStats();
+  showView("homeView");
+  bootData();
+}
+function signOut(){
+  authed = false;
+  try { localStorage.removeItem(TKEY_LS); } catch(e){}
+  var inp = document.getElementById("loginPass");
+  if (inp) inp.value = "";
+  document.getElementById("loginStat").textContent = "Wrong password";
+  showView("loginView");
+}
+async function bootGate(){
+  var key = textKey();
+  if (!key){ showView("loginView"); return; }
+  try {
+    var r = await fetch(TEXT_API + "/replies", { headers: { "X-Text-Key": key } });
+    if (r.status === 401){
+      try { localStorage.removeItem(TKEY_LS); } catch(e){}
+      showView("loginView");
+      document.getElementById("loginStat").textContent = "Wrong password";
+      return;
+    }
+    if (r.ok){
+      var j = await r.json();
+      repliesState = "ok";
+      buildThreads(j.replies || []);
+    }
+  } catch(e){ /* offline: a remembered device opens with its local data */ }
+  enterApp();
+}
+async function doLogin(){
+  var inp = document.getElementById("loginPass");
+  var st = document.getElementById("loginStat");
+  var btn = document.getElementById("loginBtn");
+  var pw = inp.value;
+  if (!pw){ st.textContent = "Password required"; return; }
+  btn.disabled = true;
+  st.textContent = "Checking";
+  try {
+    var hr = await fetch(TEXT_API + "/health");
+    var hj = await hr.json().catch(function(){ return {}; });
+    if (!hj.configured){ st.textContent = "Texting not set up yet"; btn.disabled = false; return; }
+    var r = await fetch(TEXT_API + "/replies", { headers: { "X-Text-Key": pw } });
+    if (r.status === 401){ st.textContent = "Wrong password"; btn.disabled = false; return; }
+    if (!r.ok){ st.textContent = "Check failed"; btn.disabled = false; return; }
+    var j = await r.json();
+    try { localStorage.setItem(TKEY_LS, pw); } catch(e){}
+    inp.value = "";
+    st.textContent = "";
+    btn.disabled = false;
+    repliesState = "ok";
+    buildThreads(j.replies || []);
+    enterApp();
+  } catch(e){
+    st.textContent = "Could not reach texting";
+    btn.disabled = false;
   }
-  renderCatDrop();
-  refreshStats();
+}
+document.getElementById("loginBtn").addEventListener("click", function(){ doLogin(); });
+document.getElementById("loginPass").addEventListener("keydown", function(e){ if (e.key === "Enter") doLogin(); });
+
+function bootData(){
   setSyncLabel();
-  retryPending();
-  checkTexting();
-}).catch(function(){
-  document.getElementById("bizList").innerHTML = '<div class="msg">Could not load the database. Check your connection and reopen the page.</div>';
-});
+  fetch(DATA + "manifest.json").then(function(r){ return r.json(); }).then(async function(m){
+    manifest = m;
+    buildSortedCats();
+    if (TOKEN){
+      try {
+        var idx = await ghGetJson(INDEX_PATH);
+        if (idx && idx.data){ repoCounts = idx.data.cats || {}; }
+        else repoCounts = {};
+      } catch(e){ repoCounts = null; }
+    }
+    renderCatDrop();
+    refreshStats();
+    setSyncLabel();
+    retryPending();
+    checkTexting();
+  }).catch(function(){
+    document.getElementById("bizList").innerHTML = '<div class="msg">Could not load the database. Check your connection and reopen the page.</div>';
+  });
+}
+
+/* Boot: the gate comes first. */
+renderMsgFilters();
+showView("loginView");
+bootGate();
 
 </script>
 </body>
