@@ -928,6 +928,29 @@
         if(doc.body) doc.body.style.setProperty('background-color','transparent','important');
       }catch(e){}
     }
+    // A transparent mail frame still shows the phone's black canvas behind
+    // the mail, which reads as a black box. So the frame's root is painted
+    // with the app's own void background, sized to the whole screen and
+    // offset by the frame's position, so the mail sits on the same
+    // background as everything around it with no rectangle edge.
+    function paintVoid(frame){
+      try{
+        var doc=frame.contentDocument; if(!doc||!doc.documentElement) return;
+        var before=getComputedStyle(voidEl,'::before');
+        var after=getComputedStyle(voidEl,'::after');
+        var imgs=[];
+        if(after.backgroundImage&&after.backgroundImage!=='none') imgs.push(after.backgroundImage);
+        if(before.backgroundImage&&before.backgroundImage!=='none') imgs.push(before.backgroundImage);
+        if(!imgs.length) return;
+        var r=frame.getBoundingClientRect();
+        var root=doc.documentElement;
+        root.style.setProperty('background-image',imgs.join(', '),'important');
+        root.style.setProperty('background-color',getComputedStyle(voidEl).backgroundColor,'important');
+        root.style.setProperty('background-size',window.innerWidth+'px '+window.innerHeight+'px','important');
+        root.style.setProperty('background-position',(-r.left)+'px '+(-r.top)+'px','important');
+        root.style.setProperty('background-repeat','no-repeat','important');
+      }catch(e){}
+    }
     var hf=document.getElementById('htmlFrame');
     if(hf){
       var fitFrame=function(){
@@ -939,6 +962,7 @@
           hf.style.height='0px';
           var h=Math.max(d.documentElement?d.documentElement.scrollHeight:0, d.body?d.body.scrollHeight:0);
           if(h) hf.style.height=h+'px';
+          paintVoid(hf);
         }catch(e){}
       };
       hf.addEventListener('load',function(){
@@ -955,6 +979,7 @@
           qf.style.height='0px';
           var h=Math.max(d.documentElement?d.documentElement.scrollHeight:0, d.body?d.body.scrollHeight:0);
           if(h) qf.style.height=h+'px';
+          paintVoid(qf);
         }catch(e){}
       };
       qf.__fit=fitQ;
@@ -964,6 +989,16 @@
         try{ if(qf.contentDocument) qf.contentDocument.addEventListener('load',fitQ,true); }catch(e){}
       });
     }
+    var repaintQueued=false;
+    readerEl.addEventListener('scroll',function(){
+      if(repaintQueued) return;
+      repaintQueued=true;
+      requestAnimationFrame(function(){
+        repaintQueued=false;
+        var f1=document.getElementById('htmlFrame'); if(f1) paintVoid(f1);
+        var f2=document.getElementById('qFrame'); if(f2) paintVoid(f2);
+      });
+    },{passive:true});
     readerEl.querySelectorAll('.q-h').forEach(function(b){
       b.addEventListener('click',function(){
         var seg=b.closest('.q-seg'); if(!seg) return;
