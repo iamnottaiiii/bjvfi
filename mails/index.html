@@ -256,6 +256,7 @@
   .reader h2{font-size:1.35rem; font-weight:700; margin:14px 0 6px; line-height:1.3; overflow-wrap:anywhere;}
   .reader .r-meta{font-size:.8rem; opacity:.7; padding-bottom:18px; margin-bottom:20px; line-height:1.7;}
   .reader .r-body{font-size:.94rem; line-height:1.75; max-width:none; white-space:pre-line; overflow-wrap:anywhere; word-break:break-word;}
+  .reader .r-body a{color:var(--blue); text-decoration:underline;}
   .dots.bare{border:none; background:transparent; padding:8px 10px; font-size:1.05rem;}
   .r-tr{display:flex; flex-direction:column; align-items:flex-end; gap:3px; margin-left:auto;}
   .r-tr .r-when{margin:0; padding:0; font-size:.72rem; white-space:nowrap;}
@@ -948,6 +949,7 @@
       };
       hf.addEventListener('load',function(){
         flattenPaint(hf.contentDocument);
+        wireMailLinks(hf);
         fitFrame(); setTimeout(fitFrame,400);
         try{ if(hf.contentDocument) hf.contentDocument.addEventListener('load',fitFrame,true); }catch(e){}
       });
@@ -992,6 +994,7 @@
           repaintMailFrame();
         });
         flattenPaint(qf.contentDocument);
+        wireMailLinks(qf);
         fitQ(); wireHtmlQuotes(qf); fitQ(); scrollToMain(); setTimeout(function(){fitQ(); scrollToMain();},450);
         try{ if(qf.contentDocument) qf.contentDocument.addEventListener('load',fitQ,true); }catch(e){}
       });
@@ -1132,7 +1135,34 @@
   }
 
   function fmtBody(t){
-    return esc(t).replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/_([^_]+)_/g,'<i>$1</i>');
+    var h=esc(t).replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/_([^_]+)_/g,'<i>$1</i>');
+    // Web addresses and email addresses in plain text mail are real links.
+    return h.replace(/(https?:\/\/[^\s<>"']+|www\.[^\s<>"']+|[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})/g,function(u){
+      var trail='';
+      while(/[.,;:!?]$/.test(u)){ trail=u.slice(-1)+trail; u=u.slice(0,-1); }
+      if(/\)$/.test(u)&&u.indexOf('(')===-1){ trail=')'+trail; u=u.slice(0,-1); }
+      var href;
+      if(/^https?:\/\//i.test(u)) href=u;
+      else if(/^www\./i.test(u)) href='http://'+u;
+      else href='mailto:'+u;
+      return '<a href="'+href+'" target="_blank" rel="noopener noreferrer">'+u+'</a>'+trail;
+    });
+  }
+  // Links inside framed HTML mail cannot navigate on their own (the frame
+  // is sealed), so clicks are caught here and opened by the page itself.
+  function wireMailLinks(frame){
+    try{
+      var d=frame.contentDocument; if(!d||d.__linksWired) return;
+      d.__linksWired=1;
+      d.addEventListener('click',function(e){
+        var a=e.target&&e.target.closest?e.target.closest('a'):null;
+        if(!a) return;
+        var href=a.getAttribute('href')||'';
+        if(!href||href.charAt(0)==='#') return;
+        e.preventDefault();
+        if(/^(https?:|mailto:|tel:)/i.test(href)) window.open(href,'_blank','noopener');
+      },true);
+    }catch(err){}
   }
   function fitHtml(h){
     h=h.replace(/<meta[^>]*name\s*=\s*["']viewport["'][^>]*>/gi,'');
