@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Database</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#F2F2F5;
+    --gold:#FFD24D;
+    --blue:#6FA8FF;
+    --red:#E07A7A;
+    --panel:rgba(242,242,245,.05);
+    --panel-strong:rgba(242,242,245,.09);
+    --line:rgba(242,242,245,.14);
+    --field:rgba(0,0,0,.38);
+    --cx:50%; --cy:42%;
+  }
+  @media (prefers-color-scheme: light){
+    :root{
+      --ink:#111114;
+      --panel:rgba(17,17,20,.05);
+      --panel-strong:rgba(17,17,20,.09);
+      --line:rgba(17,17,20,.16);
+      --field:rgba(255,255,255,.5);
+    }
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    font-family:"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    background:#000; color:var(--ink); margin:0;
+    position:fixed; inset:0; width:100%; overflow:hidden; overscroll-behavior:none;
+    -webkit-text-size-adjust:100%;
+  }
+  @media (prefers-color-scheme: light){ body{background:#d9d9d9;} }
+  .void{position:fixed; inset:0; overflow:hidden;}
+  .void::before{
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background:
+      repeating-conic-gradient(from 0deg at var(--cx) var(--cy), rgba(255,255,255,.012) 0deg 1deg, transparent 1deg 2deg),
+      repeating-radial-gradient(circle at var(--cx) var(--cy), rgba(255,255,255,.010) 0px 1px, transparent 1px 4px),
+      radial-gradient(circle at var(--cx) var(--cy), #161616 0%, #0d0d0d 34%, #050505 62%, #010101 100%);
+  }
+  .void::after{
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(circle at var(--cx) var(--cy), transparent 0%, transparent 45%, rgba(0,0,0,.55) 82%, rgba(0,0,0,.9) 100%);
+  }
+  @media (prefers-color-scheme: light){
+    .void::before{background:linear-gradient(155deg,#fbfbfb 0%,#e4e4e4 30%,#bcbcbc 62%,#d2d2d2 100%);}
+    .void::after{background:radial-gradient(circle at var(--cx) var(--cy), transparent 0%, transparent 55%, rgba(0,0,0,.12) 100%);}
+  }
+  .layer{position:relative; z-index:1; height:100%; display:flex; flex-direction:column;}
+  button{font:inherit; color:inherit; background:none; border:none; cursor:pointer;}
+  a{color:inherit; text-decoration:none;}
+  .top{padding:18px 16px 10px; display:flex; flex-direction:column; gap:12px;}
+  .stats{display:flex; gap:8px; flex-wrap:wrap;}
+  .stat{border:1px solid var(--line); background:var(--panel); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-radius:999px; padding:8px 14px; font-size:.8rem;}
+  .stat b{font-weight:700;}
+  .stat.gold{color:var(--gold); border-color:var(--gold);}
+  @media (prefers-color-scheme: light){ .stat.gold{color:#7a5b00;} }
+  .search{
+    width:100%; border-radius:999px; padding:12px 18px; font-size:1rem;
+    border:1px solid var(--line); background:var(--field); color:var(--ink); font:inherit;
+    outline:none;
+  }
+  .search::placeholder{color:var(--ink); opacity:.55;}
+  .scroll{flex:1; overflow-y:auto; overscroll-behavior:contain; padding:4px 16px 40px; -webkit-overflow-scrolling:touch;}
+  .cat{
+    display:flex; align-items:center; gap:10px; width:100%; text-align:left;
+    padding:14px 6px; border-bottom:1px solid var(--line); font-size:.92rem;
+  }
+  .cat .nm{flex:1; min-width:0; overflow-wrap:anywhere;}
+  .cat .ct{font-size:.78rem; opacity:.85; white-space:nowrap;}
+  .cat .sn{font-size:.78rem; color:var(--gold); white-space:nowrap;}
+  @media (prefers-color-scheme: light){ .cat .sn{color:#7a5b00;} }
+  .row{padding:14px 6px; border-bottom:1px solid var(--line);}
+  .row .nm{font-weight:700; font-size:.95rem; overflow-wrap:anywhere;}
+  .row .dt{font-size:.83rem; margin-top:4px; overflow-wrap:anywhere;}
+  .row .dt a{color:var(--blue);}
+  .acts{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;}
+  .pill{
+    border:1px solid var(--line); background:var(--panel); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    border-radius:999px; padding:8px 16px; font-size:.82rem; display:inline-flex; align-items:center; gap:6px;
+  }
+  .pill.sent{background:var(--gold); color:#191408; border-color:var(--gold); font-weight:700;}
+  .filters{display:flex; gap:8px; flex-wrap:wrap;}
+  .pill.sel{border-color:var(--ink); font-weight:700; background:var(--panel-strong);}
+  .bar{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .bar .ttl{flex:1; min-width:0; font-weight:700; font-size:1rem; overflow-wrap:anywhere;}
+  .more{width:100%; margin-top:16px; padding:13px; font-size:.9rem;}
+  .msg{padding:22px 6px; font-size:.9rem;}
+  .hidden{display:none !important;}
+</style>
+</head>
+<body>
+<div class="void"></div>
+<div class="layer">
+
+  <div id="homeView" style="display:flex; flex-direction:column; height:100%;">
+    <div class="top">
+      <div class="stats">
+        <span class="stat"><b id="totalCount">...</b> businesses</span>
+        <span class="stat gold"><b id="sentCount">0</b> sent</span>
+        <span class="stat"><b id="leftCount">...</b> not sent</span>
+        <span class="stat" id="syncStat">Device only</span>
+        <button class="stat" id="exportBtn" type="button">Export sent list</button>
+      </div>
+      <input class="search" id="catSearch" type="search" placeholder="Search categories" autocomplete="off">
+    </div>
+    <div class="scroll" id="catList"><div class="msg">Loading...</div></div>
+  </div>
+
+  <div id="catView" class="hidden" style="display:flex; flex-direction:column; height:100%;">
+    <div class="top">
+      <div class="bar">
+        <button class="pill" id="backBtn" type="button">Back</button>
+        <span class="ttl" id="catTitle"></span>
+        <span class="stat gold"><b id="catSent">0</b> sent</span>
+      </div>
+      <input class="search" id="bizSearch" type="search" placeholder="Search name, phone, address" autocomplete="off">
+      <div class="filters">
+        <button class="pill sel" id="fAll" type="button">All</button>
+        <button class="pill" id="fLeft" type="button">Not sent</button>
+        <button class="pill" id="fSent" type="button">Sent</button>
+      </div>
+    </div>
+    <div class="scroll" id="bizList"><div class="msg">Loading...</div></div>
+  </div>
+
+</div>
+<script src="https://bjvfi.com/sitedesk/config.js"></script>
+<script>
+"use strict";
+var DATA = "https://bjvfi.com/sitedesk/data/queue/";
+var KEY = "bjvfi_database_sent_v1";
+var PKEY = "bjvfi_database_pending_v1";
+var sent = {};
+try { sent = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch(e) { sent = {}; }
+function saveSent(){ try { localStorage.setItem(KEY, JSON.stringify(sent)); } catch(e){} }
+
+/* Repo sync, through the same data path SiteDesk uses. Marks live in
+   iamnottaiiii/sitedesk-data under texting/: one shard per category plus a
+   small index of counts. The local copy stays as a mirror so the page works
+   offline, and anything that fails to sync stays pending and retries. */
+var GH_API = "https://api.github.com/repos/iamnottaiiii/sitedesk-data";
+var INDEX_PATH = "texting/index.json";
+var TOKEN = (typeof SITEDESK_DATA_TOKEN !== "undefined" && SITEDESK_DATA_TOKEN) ? SITEDESK_DATA_TOKEN : null;
+var pending = {};
+try { pending = JSON.parse(localStorage.getItem(PKEY) || "{}") || {}; } catch(e) { pending = {}; }
+function savePending(){ try { localStorage.setItem(PKEY, JSON.stringify(pending)); } catch(e){} }
+var repoCounts = null;
+var loadedShards = {};
+var syncActive = 0, syncChain = Promise.resolve(), queuedOps = {}, opSeq = 0;
+
+function setSyncLabel(){
+  var el = document.getElementById("syncStat");
+  if (!el) return;
+  if (!TOKEN) el.textContent = "Device only";
+  else if (syncActive > 0) el.textContent = "Saving";
+  else if (Object.keys(pending).length) el.textContent = "Save failed";
+  else el.textContent = "Repo sync";
+}
+function b64encode(bytes){
+  var bin = "", b = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  for (var i = 0; i < b.length; i++) bin += String.fromCharCode(b[i]);
+  return btoa(bin);
+}
+function b64decodeToBytes(b64){
+  var bin = atob(String(b64).replace(/\s/g, ""));
+  var out = new Uint8Array(bin.length);
+  for (var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+function ghHeaders(){
+  return { "Accept": "application/vnd.github+json", "Authorization": "Bearer " + TOKEN, "Content-Type": "application/json" };
+}
+async function ghGetJson(path){
+  var res = await fetch(GH_API + "/contents/" + path + "?ref=main", { method: "GET", cache: "no-store", headers: ghHeaders() });
+  if (res.status === 404) return null;
+  if (!res.ok){ var e = new Error("GitHub read failed (" + res.status + ")"); e.status = res.status; throw e; }
+  var file = await res.json();
+  return { data: JSON.parse(new TextDecoder().decode(b64decodeToBytes(file.content || ""))), sha: file.sha };
+}
+async function ghPutJson(path, obj, sha){
+  var body = { message: "database: update " + path, content: b64encode(new TextEncoder().encode(JSON.stringify(obj, null, 2))) };
+  if (sha) body.sha = sha;
+  var res = await fetch(GH_API + "/contents/" + path, { method: "PUT", cache: "no-store", headers: ghHeaders(), body: JSON.stringify(body) });
+  if (!res.ok){ var e2 = new Error("GitHub save failed (" + res.status + ")"); e2.status = res.status; throw e2; }
+  return res.json();
+}
+/* Fresh read, change one thing, save with that read's sha. On a 409 or 422
+   (someone else saved first) start over with a fresh read, up to 5 tries. */
+async function ghUpdateJson(path, fallback, mutate){
+  var lastErr = null;
+  for (var attempt = 0; attempt < 5; attempt++){
+    var cur = await ghGetJson(path);
+    var data = cur ? cur.data : JSON.parse(JSON.stringify(fallback));
+    mutate(data);
+    try {
+      await ghPutJson(path, data, cur ? cur.sha : null);
+      return data;
+    } catch(e){
+      lastErr = e;
+      if ((e.status === 409 || e.status === 422) && attempt < 4) continue;
+      throw e;
+    }
+  }
+  throw lastErr;
+}
+function shardPath(catName){
+  return "texting/cats/" + manifest.cats[catName].files[0];
+}
+async function syncOp(op){
+  var shard = await ghUpdateJson(shardPath(op.c), {}, function(data){
+    if (op.mark) data[op.slug] = { t: op.t, n: op.n, p: op.p };
+    else delete data[op.slug];
+  });
+  var count = Object.keys(shard).length;
+  await ghUpdateJson(INDEX_PATH, { total: 0, cats: {} }, function(idx){
+    idx.cats = idx.cats || {};
+    if (count) idx.cats[op.c] = count; else delete idx.cats[op.c];
+    var total = 0, k;
+    for (k in idx.cats) total += idx.cats[k];
+    idx.total = total;
+    repoCounts = idx.cats;
+  });
+}
+function enqueueSync(op){
+  if (!TOKEN) { setSyncLabel(); return Promise.resolve(false); }
+  if (queuedOps[op.id]) return Promise.resolve(false);
+  queuedOps[op.id] = true;
+  syncActive++;
+  setSyncLabel();
+  syncChain = syncChain.then(async function(){
+    try {
+      await syncOp(op);
+      if (pending[op.slug] && pending[op.slug].id === op.id){ delete pending[op.slug]; savePending(); }
+      return true;
+    } catch(e){
+      return false;
+    } finally {
+      syncActive--;
+      delete queuedOps[op.id];
+      setSyncLabel();
+      refreshStats();
+      if (manifest && !document.getElementById("homeView").classList.contains("hidden")) renderCats();
+    }
+  });
+  return syncChain;
+}
+function retryPending(){
+  if (!TOKEN || !manifest) return;
+  Object.keys(pending).forEach(function(slug){ enqueueSync(pending[slug]); });
+}
+window.addEventListener("online", retryPending);
+function mirrorCounts(){
+  var mc = {}, k;
+  for (k in sent){ var c = sent[k] && sent[k].c; if (c) mc[c] = (mc[c] || 0) + 1; }
+  return mc;
+}
+function allCatCounts(){
+  var mc = mirrorCounts(), out = {}, name;
+  if (repoCounts) for (name in repoCounts) out[name] = repoCounts[name];
+  for (name in mc){
+    if (loadedShards[name] || pendingCat(name) || !(name in out)) out[name] = mc[name];
+  }
+  return out;
+}
+function pendingCat(name){
+  var k;
+  for (k in pending){ if (pending[k] && pending[k].c === name) return true; }
+  return false;
+}
+function catSentCount(name){ return allCatCounts()[name] || 0; }
+function sentTotal(){
+  var counts = allCatCounts(), total = 0, name;
+  for (name in counts) total += counts[name];
+  return total;
+}
+
+var manifest = null;
+var curCat = null, curRows = [], curFilter = "all", curQuery = "", shown = 0;
+var PAGE = 100;
+
+var WORDINGS = [
+  function(n,u){ return "Hi, this is SiteDesk. We built a website for " + n + " and it is ready to look at: " + u + " No cost to view it. Want a quick walkthrough? Reply STOP to end"; },
+  function(n,u){ return n + ", we made you a website. Take a look here: " + u + " If you like it, we can make it fully yours. From SiteDesk. Reply STOP to end"; },
+  function(n,u){ return "Hello from SiteDesk. A website for " + n + " is already built: " + u + " Have a look and tell us what you think. Reply STOP to end"; },
+  function(n,u){ return "Hi " + n + ", your website preview is live: " + u + " Built by SiteDesk, free to view. Any questions, just reply here. Reply STOP to end"; }
+];
+function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+function fmt(n){ return Number(n).toLocaleString("en-US"); }
+
+function refreshStats(){
+  document.getElementById("sentCount").textContent = fmt(sentTotal());
+  if (manifest){
+    document.getElementById("totalCount").textContent = fmt(manifest.total);
+    document.getElementById("leftCount").textContent = fmt(manifest.total - sentTotal());
+  }
+}
+function renderCats(){
+  var q = document.getElementById("catSearch").value.trim().toLowerCase();
+  var names = Object.keys(manifest.cats).sort();
+  var counts = allCatCounts();
+  var html = "";
+  names.forEach(function(name){
+    if (q && name.toLowerCase().indexOf(q) === -1) return;
+    var info = manifest.cats[name];
+    var sc = counts[name] || 0;
+    html += '<button class="cat" type="button" data-cat="' + esc(name) + '">'
+      + '<span class="nm">' + esc(name) + '</span>'
+      + (sc ? '<span class="sn">' + fmt(sc) + ' sent</span>' : '')
+      + '<span class="ct">' + fmt(info.count) + '</span></button>';
+  });
+  document.getElementById("catList").innerHTML = html || '<div class="msg">No categories match.</div>';
+  Array.prototype.forEach.call(document.querySelectorAll(".cat"), function(el){
+    el.addEventListener("click", function(){ openCat(el.getAttribute("data-cat")); });
+  });
+}
+
+function openCat(name){
+  curCat = name; curRows = []; curFilter = "all"; curQuery = ""; shown = 0;
+  document.getElementById("bizSearch").value = "";
+  setFilter("all");
+  document.getElementById("catTitle").textContent = name;
+  document.getElementById("homeView").classList.add("hidden");
+  var cv = document.getElementById("catView");
+  cv.classList.remove("hidden");
+  document.getElementById("bizList").innerHTML = '<div class="msg">Loading...</div>';
+  document.getElementById("catSent").textContent = fmt(catSentCount(name));
+  if (TOKEN && !loadedShards[name]){
+    ghGetJson(shardPath(name)).then(function(cur){
+      if (curCat !== name) return;
+      var shard = cur ? cur.data : {};
+      loadedShards[name] = true;
+      if (!repoCounts) repoCounts = {};
+      repoCounts[name] = Object.keys(shard).length;
+      var slug;
+      for (slug in shard){ var v = shard[slug] || {}; sent[slug] = { t: v.t || 0, n: v.n || "", p: v.p || "", c: name }; }
+      for (slug in sent){
+        if (sent[slug] && sent[slug].c === name && !(slug in shard) && !pending[slug]) delete sent[slug];
+      }
+      saveSent(); refreshStats();
+      document.getElementById("catSent").textContent = fmt(catSentCount(name));
+      if (curRows.length) renderBiz(false);
+    }).catch(function(){});
+  }
+  var file = manifest.cats[name].files[0];
+  fetch(DATA + file).then(function(r){ return r.json(); }).then(function(rows){
+    curRows = rows || [];
+    if (manifest.cats[name].files.length > 1){
+      var rest = manifest.cats[name].files.slice(1);
+      var chain = Promise.resolve();
+      rest.forEach(function(f){
+        chain = chain.then(function(){ return fetch(DATA + f).then(function(r){ return r.json(); }).then(function(more){ curRows = curRows.concat(more || []); renderBiz(true); }); });
+      });
+    }
+    renderBiz(true);
+  }).catch(function(){
+    document.getElementById("bizList").innerHTML = '<div class="msg">Could not load this category. Check your connection and try again.</div>';
+  });
+}
+
+function filteredRows(){
+  var q = curQuery.trim().toLowerCase();
+  return curRows.filter(function(r){
+    var isSent = !!sent[r[0]];
+    if (curFilter === "sent" && !isSent) return false;
+    if (curFilter === "left" && isSent) return false;
+    if (q){
+      var hay = ((r[1]||"") + " " + (r[3]||"") + " " + (r[4]||"")).toLowerCase();
+      if (hay.indexOf(q) === -1) return false;
+    }
+    return true;
+  });
+}
+
+function renderBiz(reset){
+  if (reset) shown = PAGE;
+  var rows = filteredRows();
+  var slice = rows.slice(0, shown);
+  var html = "";
+  slice.forEach(function(r, i){
+    var slug = r[0], name = r[1] || "", phone = r[3] || "", addr = r[4] || "";
+    var url = "bjvfi.com/" + slug + "/";
+    var isSent = !!sent[slug];
+    var digits = phone.replace(/[^0-9+]/g, "");
+    var body = WORDINGS[i % WORDINGS.length](name, url);
+    html += '<div class="row">'
+      + '<div class="nm">' + esc(name) + '</div>'
+      + (phone ? '<div class="dt">' + esc(phone) + '</div>' : '')
+      + (addr ? '<div class="dt">' + esc(addr) + '</div>' : '')
+      + '<div class="acts">'
+      + '<a class="pill" href="https://' + esc(url) + '" target="_blank" rel="noopener">Site</a>'
+      + (digits ? '<a class="pill" href="sms:' + esc(digits) + '?&body=' + encodeURIComponent(body) + '">Text</a>' : '')
+      + '<button class="pill' + (isSent ? ' sent' : '') + '" type="button" data-sent="' + esc(slug) + '">' + (isSent ? 'Sent' : 'Not sent') + '</button>'
+      + '</div></div>';
+  });
+  if (!slice.length) html = '<div class="msg">Nothing here.</div>';
+  if (rows.length > shown) html += '<button class="pill more" id="moreBtn" type="button">Show more (' + fmt(rows.length - shown) + ' more)</button>';
+  var list = document.getElementById("bizList");
+  list.innerHTML = html;
+  Array.prototype.forEach.call(list.querySelectorAll("[data-sent]"), function(el){
+    el.addEventListener("click", function(){
+      var slug = el.getAttribute("data-sent");
+      var op;
+      if (sent[slug]){
+        var prev = sent[slug];
+        delete sent[slug];
+        op = { id: ++opSeq + "-" + Date.now(), slug: slug, c: curCat, mark: false, t: prev.t || 0, n: prev.n || "", p: prev.p || "" };
+      } else {
+        var row = null;
+        curRows.forEach(function(r){ if (r[0] === slug) row = r; });
+        var entry = { t: Date.now(), n: row ? (row[1]||"") : "", p: row ? (row[3]||"") : "", c: curCat };
+        sent[slug] = entry;
+        op = { id: ++opSeq + "-" + Date.now(), slug: slug, c: curCat, mark: true, t: entry.t, n: entry.n, p: entry.p };
+      }
+      saveSent();
+      if (TOKEN){ pending[slug] = op; savePending(); }
+      refreshStats();
+      document.getElementById("catSent").textContent = fmt(catSentCount(curCat));
+      renderBiz(false);
+      enqueueSync(op);
+    });
+  });
+  var mb = document.getElementById("moreBtn");
+  if (mb) mb.addEventListener("click", function(){ shown += PAGE; renderBiz(false); });
+}
+
+function setFilter(f){
+  curFilter = f;
+  [["fAll","all"],["fLeft","left"],["fSent","sent"]].forEach(function(pair){
+    document.getElementById(pair[0]).classList.toggle("sel", pair[1] === f);
+  });
+}
+
+document.getElementById("catSearch").addEventListener("input", renderCats);
+document.getElementById("bizSearch").addEventListener("input", function(){
+  curQuery = this.value; renderBiz(true);
+});
+document.getElementById("backBtn").addEventListener("click", function(){
+  document.getElementById("catView").classList.add("hidden");
+  document.getElementById("homeView").classList.remove("hidden");
+  renderCats(); refreshStats();
+});
+document.getElementById("fAll").addEventListener("click", function(){ setFilter("all"); renderBiz(true); });
+document.getElementById("fLeft").addEventListener("click", function(){ setFilter("left"); renderBiz(true); });
+document.getElementById("fSent").addEventListener("click", function(){ setFilter("sent"); renderBiz(true); });
+document.getElementById("exportBtn").addEventListener("click", function(){
+  var lines = ["slug,name,phone,category,sent_at"];
+  Object.keys(sent).forEach(function(slug){
+    var v = sent[slug] || {};
+    function q(x){ return '"' + String(x == null ? "" : x).replace(/"/g, '""') + '"'; }
+    lines.push([q(slug), q(v.n), q(v.p), q(v.c), q(v.t ? new Date(v.t).toISOString() : "")].join(","));
+  });
+  var blob = new Blob([lines.join("\n")], {type:"text/csv"});
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "sent-list.csv";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
+});
+
+if (window.matchMedia && !window.matchMedia("(prefers-color-scheme: light)").matches){
+  document.addEventListener("pointermove", function(e){
+    if (e.pointerType === "touch") return;
+    document.documentElement.style.setProperty("--cx", (e.clientX / window.innerWidth * 100) + "%");
+    document.documentElement.style.setProperty("--cy", (e.clientY / window.innerHeight * 100) + "%");
+  });
+}
+
+setSyncLabel();
+fetch(DATA + "manifest.json").then(function(r){ return r.json(); }).then(async function(m){
+  manifest = m;
+  if (TOKEN){
+    try {
+      var idx = await ghGetJson(INDEX_PATH);
+      if (idx && idx.data){ repoCounts = idx.data.cats || {}; }
+      else repoCounts = {};
+    } catch(e){ repoCounts = null; }
+  }
+  refreshStats(); renderCats(); setSyncLabel();
+  retryPending();
+}).catch(function(){
+  document.getElementById("catList").innerHTML = '<div class="msg">Could not load the database. Check your connection and reopen the page.</div>';
+});
+</script>
+</body>
+</html>
