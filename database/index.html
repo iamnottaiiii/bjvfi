@@ -1,8 +1,10 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:,">
 <title>Database</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -14,17 +16,25 @@
     --red:#E07A7A;
     --panel:rgba(242,242,245,.05);
     --panel-strong:rgba(242,242,245,.09);
+    --panel-explore:rgba(242,242,245,.007);
+    --panel-explore-strong:rgba(242,242,245,.014);
     --line:rgba(242,242,245,.14);
     --field:rgba(0,0,0,.38);
+    --gold-ink:#7a5b00;
     --cx:50%; --cy:42%;
+    color-scheme:dark;
   }
   @media (prefers-color-scheme: light){
     :root{
       --ink:#111114;
       --panel:rgba(17,17,20,.05);
       --panel-strong:rgba(17,17,20,.09);
+      --panel-explore:rgba(17,17,20,.009);
+      --panel-explore-strong:rgba(17,17,20,.016);
       --line:rgba(17,17,20,.16);
       --field:rgba(255,255,255,.5);
+      --gold-ink:#7a5b00;
+      color-scheme:light;
     }
   }
   *,*::before,*::after{box-sizing:border-box;}
@@ -55,130 +65,426 @@
   .layer{position:relative; z-index:1; height:100%; display:flex; flex-direction:column;}
   button{font:inherit; color:inherit; background:none; border:none; cursor:pointer;}
   a{color:inherit; text-decoration:none;}
-  .top{padding:18px 16px 10px; display:flex; flex-direction:column; gap:12px;}
+  .view{display:flex; flex-direction:column; height:100%; min-height:0;}
+  .scroll{flex:1; overflow-y:auto; overscroll-behavior:contain; padding:18px 16px 48px; -webkit-overflow-scrolling:touch;}
   .stats{display:flex; gap:8px; flex-wrap:wrap;}
-  .stat{border:1px solid var(--line); background:var(--panel); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-radius:999px; padding:8px 14px; font-size:.8rem;}
+  .stat{background:var(--panel-strong); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-radius:999px; padding:9px 15px; font-size:.8rem; display:inline-flex; align-items:center; gap:6px; box-shadow:0 8px 20px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.09);}
   .stat b{font-weight:700;}
-  .stat.gold{color:var(--gold); border-color:var(--gold);}
-  @media (prefers-color-scheme: light){ .stat.gold{color:#7a5b00;} }
+  .stat.gold{color:var(--gold);}
+  .stat.redstat{color:#E5484D;}
+  @media (prefers-color-scheme: light){ .stat.gold{color:var(--gold-ink);} }
+  .pill{
+    background:var(--panel); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    border-radius:999px; padding:8px 16px; font-size:.82rem; display:inline-flex; align-items:center; gap:6px;
+    box-shadow:0 6px 16px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.08);
+  }
+  .pill.sel{font-weight:700; background:var(--panel-strong); box-shadow:0 8px 20px rgba(0,0,0,.26), inset 0 1px 0 rgba(255,255,255,.12);}
+  .pill.goldsel{background:var(--gold); color:#191408; font-weight:700; box-shadow:0 8px 22px rgba(255,210,77,.28), inset 0 1px 0 rgba(255,255,255,.35);}
+  .pill.blue{color:var(--blue);}
+  .pill:disabled,.pill.dimmed{opacity:.38; cursor:not-allowed; pointer-events:none;}
+  .secttl{font-weight:700; font-size:1rem; margin:26px 0 4px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .secttl .cnt{font-size:.8rem; font-weight:400;}
+  .inp{
+    width:100%; border-radius:999px; padding:11px 16px; font-size:16px;
+    border:none; background:var(--field); color:var(--ink); font:inherit;
+    outline:none; box-shadow:inset 0 2px 10px rgba(0,0,0,.28), inset 0 0 0 1px rgba(255,255,255,.05);
+  }
+  .inp::placeholder{color:var(--ink); opacity:.55;}
   .search{
-    width:100%; border-radius:999px; padding:12px 18px; font-size:1rem;
-    border:1px solid var(--line); background:var(--field); color:var(--ink); font:inherit;
-    outline:none;
+    width:100%; border-radius:999px; padding:12px 18px; font-size:16px;
+    border:none; background:var(--field); color:var(--ink); font:inherit;
+    outline:none; box-shadow:inset 0 2px 10px rgba(0,0,0,.28), inset 0 0 0 1px rgba(255,255,255,.05);
   }
   .search::placeholder{color:var(--ink); opacity:.55;}
-  .scroll{flex:1; overflow-y:auto; overscroll-behavior:contain; padding:4px 16px 40px; -webkit-overflow-scrolling:touch;}
-  .cat{
-    display:flex; align-items:center; gap:10px; width:100%; text-align:left;
-    padding:14px 6px; border-bottom:1px solid var(--line); font-size:.92rem;
-  }
-  .cat .nm{flex:1; min-width:0; overflow-wrap:anywhere;}
-  .cat .ct{font-size:.78rem; opacity:.85; white-space:nowrap;}
-  .cat .sn{font-size:.78rem; color:var(--gold); white-space:nowrap;}
-  @media (prefers-color-scheme: light){ .cat .sn{color:#7a5b00;} }
-  .row{padding:14px 6px; border-bottom:1px solid var(--line);}
+  .statusline{font-size:.82rem; overflow-wrap:anywhere;}
+  .statusline.err{color:var(--red);}
+  .row{padding:16px; margin-bottom:12px; background:var(--panel-explore); backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px); border-radius:18px; box-shadow:0 10px 24px rgba(0,0,0,.16), inset 0 1px 0 rgba(255,255,255,.05);}
+  .row.readonly{background:var(--panel-explore); box-shadow:0 6px 16px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.04);}
+  .status-text{display:inline-flex; align-items:center; padding:8px 4px; font-size:.82rem;}
+  .status-text.sent{color:var(--gold); font-weight:700;}
+  @media (prefers-color-scheme: light){ .status-text.sent{color:var(--gold-ink);} }
+  .biz-section{margin-bottom:8px;}
+  .sent-area{margin-top:30px; padding-top:6px;}
+  .sent-area .secttl{margin-top:0;}
+  #exploreView .stat{background:var(--panel-explore-strong); backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);}
   .row .nm{font-weight:700; font-size:.95rem; overflow-wrap:anywhere;}
   .row .dt{font-size:.83rem; margin-top:4px; overflow-wrap:anywhere;}
   .row .dt a{color:var(--blue);}
   .acts{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;}
-  .pill{
-    border:1px solid var(--line); background:var(--panel); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
-    border-radius:999px; padding:8px 16px; font-size:.82rem; display:inline-flex; align-items:center; gap:6px;
+  .biz-top{display:flex; align-items:flex-start; gap:12px;}
+  .biz-top-main{flex:1; min-width:0;}
+  .biz-select{flex:none; margin-top:1px;}
+  .biz-footer{align-items:center;}
+  .biz-spacer{flex:1 1 auto; min-width:6px;}
+  .cat{
+    display:flex; align-items:center; gap:10px; width:100%; text-align:left;
+    padding:16px; margin-bottom:10px; font-size:.92rem;
+    background:var(--panel-explore); backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
+    border-radius:16px; box-shadow:0 10px 24px rgba(0,0,0,.14), inset 0 1px 0 rgba(255,255,255,.05);
   }
-  .pill.sent{background:var(--gold); color:#191408; border-color:var(--gold); font-weight:700;}
-  .pill.picked{background:var(--gold); color:#191408; border-color:var(--gold); font-weight:700;}
-  .frm{display:flex; flex-direction:column; gap:10px; padding:6px;}
-  .lab{font-size:.8rem; margin-top:8px;}
-  .bdg{color:var(--gold); font-weight:700;}
-  @media (prefers-color-scheme: light){ .bdg{color:#7a5b00;} }
-  .filters{display:flex; gap:8px; flex-wrap:wrap;}
-  .pill.sel{border-color:var(--ink); font-weight:700; background:var(--panel-strong);}
+  .cat .nm{flex:1; min-width:0; overflow-wrap:anywhere;}
+  .cat .ct{font-size:.78rem; white-space:nowrap;}
+  .cat .sn{font-size:.78rem; color:var(--gold); white-space:nowrap;}
+  @media (prefers-color-scheme: light){ .cat .sn{color:var(--gold-ink);} }
+  .catdrop{position:relative; margin-top:12px; z-index:30;}
+  .catdrop-btn{display:inline-flex; align-items:center; gap:8px; max-width:100%; padding:9px 15px; border-radius:999px; font-size:.84rem; background:var(--panel-explore-strong); backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px); box-shadow:0 6px 16px rgba(0,0,0,.14), inset 0 1px 0 rgba(255,255,255,.05);}
+  .catdrop-btn .catdrop-label{font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .catdrop-btn .catdrop-count{font-size:.76rem; opacity:.85; white-space:nowrap;}
+  .catdrop-btn .catdrop-chev{flex:none; display:inline-flex; transition:transform .15s ease;}
+  .catdrop-btn .catdrop-chev svg{width:14px; height:14px; display:block;}
+  .catdrop.open .catdrop-btn .catdrop-chev{transform:rotate(180deg);}
+  .catdrop.hasfilter .catdrop-btn{background:var(--gold); color:#191408; box-shadow:0 8px 22px rgba(255,210,77,.28), inset 0 1px 0 rgba(255,255,255,.35);}
+  .catdrop-panel{position:absolute; top:calc(100% + 8px); left:0; width:min(420px,100%); max-width:100%; border-radius:18px; padding:10px; background:var(--panel-strong); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); box-shadow:0 18px 40px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.10);}
+  .catdrop-search{margin-bottom:6px;}
+  .catdrop-list{max-height:320px; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch;}
+  .catdrop-item{display:flex; align-items:center; gap:10px; width:100%; text-align:left; padding:11px 12px; border-radius:12px; font-size:.86rem;}
+  .catdrop-item:active{background:var(--panel-strong);}
+  .catdrop-item .nm{flex:1; min-width:0; overflow-wrap:anywhere;}
+  .catdrop-item .ct{font-size:.76rem; white-space:nowrap; opacity:.85;}
+  .catdrop-item.sel{font-weight:700; color:var(--gold);}
+  @media (prefers-color-scheme: light){ .catdrop-item.sel{color:var(--gold-ink);} }
+  .catdrop-empty{padding:12px; font-size:.84rem;}
+  .row .catlabel{display:inline-block; font-size:.7rem; font-weight:700; letter-spacing:.02em; color:var(--gold); margin-bottom:5px;}
+  @media (prefers-color-scheme: light){ .row .catlabel{color:var(--gold-ink);} }
+  #exploreView .row{background:var(--panel-explore);}
+  .explore-controls{margin-top:12px;}
+  .explore-selbar{margin-top:10px;}
+  button.stat{cursor:pointer; font:inherit;}
+  button.stat:active{transform:scale(.97);}
+  #sentView .row{background:var(--panel-explore);}
+  .sent-compose{margin:4px 0 16px; padding:16px; border-radius:18px; background:var(--panel-strong); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); box-shadow:0 10px 26px rgba(0,0,0,.26), inset 0 1px 0 rgba(255,255,255,.10);}
+  .sent-compose .nm{font-weight:700; font-size:.95rem; overflow-wrap:anywhere;}
+  .sent-compose .sub{font-size:.8rem; margin-top:2px; overflow-wrap:anywhere;}
+  .sent-compose .inp{margin-top:12px;}
+  .sent-compose .acts{margin-top:10px;}
+  .manual-msg{margin-top:10px; padding:9px 12px; border-radius:12px; background:var(--gold); color:#191408; font-size:.82rem; line-height:1.45; overflow-wrap:anywhere; max-width:92%;}
+  .manual-msg .bt{display:block; font-size:.66rem; margin-top:3px; opacity:.7;}
+  .top{padding:18px 16px 10px; display:flex; flex-direction:column; gap:12px;}
   .bar{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
   .bar .ttl{flex:1; min-width:0; font-weight:700; font-size:1rem; overflow-wrap:anywhere;}
-  .more{width:100%; margin-top:16px; padding:13px; font-size:.9rem;}
-  .msg{padding:22px 6px; font-size:.9rem;}
+  .filters{display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
+  .numinp{
+    width:110px; border-radius:999px; padding:8px 14px; font-size:16px;
+    border:none; background:var(--field); color:var(--ink); font:inherit; outline:none;
+    box-shadow:inset 0 2px 10px rgba(0,0,0,.28), inset 0 0 0 1px rgba(255,255,255,.05);
+  }
+  .selbar{
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+    border-radius:999px; padding:8px 8px 8px 16px;
+    background:var(--panel-strong); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    font-size:.85rem;
+    box-shadow:0 10px 26px rgba(0,0,0,.26), 0 0 18px rgba(255,210,77,.18), inset 0 1px 0 rgba(255,255,255,.10);
+  }
+  .selbar .grow{flex:1;}
+  .more{width:100%; margin-top:16px; padding:13px; justify-content:center;}
+  .msg{padding:18px 6px; font-size:.9rem;}
   .hidden{display:none !important;}
+
+  /* Messaging panel */
+  .mtop{padding:18px 16px 12px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .msgwrap{flex:1; display:flex; min-height:0;}
+  .tlist{width:340px; flex:none; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; padding:12px 10px; box-shadow:14px 0 28px -20px rgba(0,0,0,.55);}
+  .trow{display:flex; gap:10px; width:100%; text-align:left; padding:14px 16px; margin-bottom:8px; align-items:flex-start; background:var(--panel); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-radius:16px; box-shadow:0 8px 20px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.07);}
+  .trow.sel{background:var(--panel-strong); box-shadow:0 10px 24px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.12);}
+  .trow .main{flex:1; min-width:0;}
+  .trow .nm{font-weight:700; font-size:.92rem; overflow-wrap:anywhere;}
+  .trow .pv{font-size:.82rem; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .trow .tm{font-size:.72rem; white-space:nowrap; padding-top:2px;}
+  .dot{width:9px; height:9px; border-radius:50%; background:var(--gold); flex:none; margin-top:6px; box-shadow:0 0 9px rgba(255,210,77,.6);}
+  .dot.red{width:7px; height:7px; background:#E5484D; box-shadow:0 0 9px rgba(229,72,77,.6);}
+  .dot.off{visibility:hidden; box-shadow:none;}
+  .tpane{flex:1; display:flex; flex-direction:column; min-width:0; min-height:0;}
+  .thead{padding:14px 16px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; box-shadow:0 14px 22px -16px rgba(0,0,0,.45);}
+  .thead .who{flex:1; min-width:0;}
+  .thead .who .nm{font-weight:700; font-size:.98rem; overflow-wrap:anywhere;}
+  .thead .who .sub{font-size:.8rem; margin-top:2px; overflow-wrap:anywhere;}
+  .msgs{flex:1; overflow-y:auto; overscroll-behavior:contain; padding:18px 16px; display:flex; flex-direction:column; gap:10px; -webkit-overflow-scrolling:touch;}
+  .bub{max-width:76%; padding:10px 14px; border-radius:16px; font-size:.88rem; line-height:1.5; overflow-wrap:anywhere;}
+  .bub.in{align-self:flex-start; background:var(--panel-strong); border-bottom-left-radius:6px; box-shadow:0 6px 16px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.08);}
+  .bub.out{align-self:flex-end; background:var(--gold); color:#191408; border-bottom-right-radius:6px;}
+  .bub .bt{display:block; font-size:.68rem; margin-top:5px; opacity:.7;}
+  .inrow{display:flex; gap:8px; padding:12px 16px; align-items:center; box-shadow:0 -14px 22px -16px rgba(0,0,0,.45);}
+  .inrow .inp{flex:1; min-width:0;}
+  .attachbtn{flex:none; width:44px; height:44px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; background:var(--panel-strong); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); box-shadow:0 6px 16px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.10); color:var(--ink);}
+  .attachbtn:active{transform:scale(.96);}
+  .attachbtn svg{width:20px; height:20px; display:block;}
+  .attach-tray{display:flex; flex-wrap:wrap; gap:8px; padding:10px 16px 2px;}
+  .attach-tray:empty{display:none;}
+  .achip{display:inline-flex; align-items:center; gap:8px; max-width:100%; background:var(--panel-strong); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-radius:999px; padding:6px 8px 6px 10px; box-shadow:0 6px 16px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.09); font-size:.78rem;}
+  .achip .thumb{width:28px; height:28px; border-radius:50%; object-fit:cover; flex:none; box-shadow:0 2px 8px rgba(0,0,0,.25);}
+  .achip .ficon{width:22px; height:22px; flex:none; display:inline-flex; align-items:center; justify-content:center; opacity:.9;}
+  .achip .ficon svg{width:18px; height:18px;}
+  .achip .meta{min-width:0; display:flex; flex-direction:column; line-height:1.25;}
+  .achip .fname{font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:170px;}
+  .achip .fsize{opacity:.75; font-size:.7rem;}
+  .achip .rm{flex:none; width:26px; height:26px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; background:rgba(0,0,0,.18); font-size:1rem; line-height:1;}
+  @media (prefers-color-scheme: light){ .achip .rm{background:rgba(255,255,255,.55);} }
+  .bub.filebub{display:flex; align-items:center; gap:10px; padding:10px 12px; min-width:0;}
+  .bub.filebub .fthumb{width:44px; height:44px; border-radius:10px; object-fit:cover; flex:none; box-shadow:0 3px 10px rgba(0,0,0,.22);}
+  .bub.filebub .ficon{width:36px; height:36px; flex:none; border-radius:10px; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,.14);}
+  .bub.in.filebub .ficon{background:rgba(255,255,255,.10);}
+  @media (prefers-color-scheme: light){ .bub.out.filebub .ficon{background:rgba(0,0,0,.10);} .bub.in.filebub .ficon{background:rgba(0,0,0,.08);} }
+  .bub.filebub .ficon svg{width:20px; height:20px;}
+  .bub.filebub .fmeta{min-width:0; flex:1;}
+  .bub.filebub .fname{display:block; font-weight:700; font-size:.84rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:220px;}
+  .bub.filebub .fsize{font-size:.72rem; opacity:.75; margin-top:1px;}
+  .bub.filebub .bt{margin-top:2px;}
+  .backpane{display:none;}
+  #homeView .scroll{display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100%;}
+  .msgfilters{padding:0 16px 12px;}
+  .bigpill{position:relative;}
+  .badge{
+    flex:none; margin-left:2px;
+    background:#E5484D; color:#fff; border-radius:999px; padding:3px 10px;
+    font-size:.82rem; font-weight:700; box-shadow:0 4px 14px rgba(229,72,77,.5);
+  }
+  #homeView .stats{justify-content:center; width:100%; max-width:560px; margin-left:auto; margin-right:auto;}
+  .homeactions{display:flex; gap:10px; margin-top:22px; flex-wrap:wrap; width:100%; max-width:560px; margin-left:auto; margin-right:auto; justify-content:center;}
+  .bigpill{
+    flex:1 1 160px; justify-content:center; text-align:center;
+    padding:18px 20px; font-size:1rem; border-radius:999px;
+  }
+  .bigpill .cnt{font-weight:700;}
+  @media (max-width:720px){
+    .tlist{width:100%; border-right:none;}
+    .tpane{display:none;}
+    .msgwrap.showthread .tlist{display:none;}
+    .msgwrap.showthread .tpane{display:flex;}
+    #msgView.thread-open #msgFilters{display:none !important;}
+    #msgView.thread-open .mtop{display:none;}
+    .backpane{display:inline-flex;}
+    .bub{max-width:88%;}
+  }
+  @media (max-width:640px){
+    .scroll{padding:14px 12px 36px;}
+    .stats{gap:6px;}
+    .stat{padding:6px 11px; font-size:.72rem; gap:4px;}
+    .pill{padding:6px 12px; font-size:.74rem;}
+    .bigpill{padding:12px 14px; font-size:.88rem; flex-basis:132px;}
+    .badge{padding:2px 8px; font-size:.72rem;}
+    .homeactions{gap:8px; margin-top:16px;}
+    .mtop{padding:12px 12px 8px; gap:8px;}
+    .msgfilters{padding:0 12px 8px;}
+    #msgFilters{gap:6px;}
+    #msgFilters .pill{padding:5px 10px; font-size:.72rem; gap:4px;}
+    .filters{gap:6px;}
+    .tlist{padding:8px;}
+    .trow{padding:10px 12px; margin-bottom:6px; gap:8px; border-radius:13px;}
+    .trow .nm{font-size:.84rem;}
+    .trow .pv{font-size:.75rem; margin-top:2px;}
+    .trow .tm{font-size:.66rem; padding-top:1px;}
+    .dot{margin-top:5px;}
+    .thead{padding:10px 12px; gap:8px;}
+    .thead .who .nm{font-size:.9rem;}
+    .thead .who .sub{font-size:.74rem; margin-top:1px;}
+    .msgs{padding:12px; gap:8px;}
+    .bub{padding:8px 11px; font-size:.82rem; border-radius:13px; line-height:1.45;}
+    .bub .bt{font-size:.62rem; margin-top:4px;}
+    .bub.filebub{padding:8px 10px; gap:8px;}
+    .bub.filebub .fthumb{width:36px; height:36px; border-radius:8px;}
+    .bub.filebub .ficon{width:30px; height:30px; border-radius:8px;}
+    .bub.filebub .fname{font-size:.78rem;}
+    .bub.filebub .fsize{font-size:.66rem;}
+    .inrow{padding:8px 10px; gap:6px;}
+    .inrow .inp{padding:8px 13px;}
+    .inrow .pill{padding:7px 13px; font-size:.76rem;}
+    .attachbtn{width:38px; height:38px;}
+    .attachbtn svg{width:18px; height:18px;}
+    .attach-tray{padding:8px 10px 0; gap:6px;}
+    .achip{padding:5px 6px 5px 8px; font-size:.72rem; gap:6px;}
+    .achip .thumb{width:24px; height:24px;}
+    .achip .rm{width:22px; height:22px; font-size:.9rem;}
+  }
 </style>
 </head>
 <body>
 <div class="void"></div>
 <div class="layer">
 
-  <div id="homeView" style="display:flex; flex-direction:column; height:100%;">
-    <div class="top">
+  <div id="homeView" class="view">
+    <div class="scroll">
       <div class="stats">
-        <span class="stat"><b id="totalCount">...</b> businesses</span>
-        <span class="stat gold"><b id="sentCount">0</b> sent</span>
-        <span class="stat"><b id="leftCount">...</b> not sent</span>
-        <span class="stat" id="syncStat">Device only</span>
-        <button class="stat" id="exportBtn" type="button">Export sent list</button>
-        <button class="stat" id="repliesBtn" type="button">Replies <b class="bdg" id="replyCount"></b></button>
-        <button class="stat" id="textingBtn" type="button">Set up texting</button>
+        <span class="stat"><b id="homeReplied">0</b> replied</span>
+        <span class="stat gold"><b id="homeNotSeen">0</b> not seen</span>
+        <span class="stat redstat"><b id="homeToReply">0</b> to reply</span>
+        <span class="stat"><b id="homeAnswered">0</b> answered</span>
       </div>
-      <input class="search" id="catSearch" type="search" placeholder="Search categories" autocomplete="off">
+      <div class="homeactions">
+        <button class="pill goldsel bigpill" id="homeMessagesBtn" type="button">Messages · <span class="cnt" id="homeMsgCount">0</span><span class="badge hidden" id="homeToReplyBadge">0</span></button>
+        <button class="pill bigpill" id="homeExploreBtn" type="button">Explore</button>
+      </div>
     </div>
-    <div class="scroll" id="catList"><div class="msg">Loading...</div></div>
   </div>
 
-  <div id="catView" class="hidden" style="display:flex; flex-direction:column; height:100%;">
-    <div class="top">
-      <div class="bar">
-        <button class="pill" id="backBtn" type="button">Back</button>
-        <span class="ttl" id="catTitle"></span>
-        <span class="stat gold"><b id="catSent">0</b> sent</span>
+  <div id="msgView" class="view hidden">
+    <div class="mtop">
+      <button class="pill" id="msgBackBtn" type="button">Back</button>
+    </div>
+    <div class="filters msgfilters" id="msgFilters">
+      <button class="pill sel" type="button" data-mf="all">All · <span id="mfAll">0</span></button>
+      <button class="pill" type="button" data-mf="unseen">Not seen · <span id="mfUnseen">0</span></button>
+      <button class="pill" type="button" data-mf="toreply">To reply · <span id="mfToReply">0</span></button>
+    </div>
+    <div class="msgwrap" id="msgWrap">
+      <div class="tlist" id="threadList"></div>
+      <div class="tpane" id="threadPane">
+        <div class="thead">
+          <button class="pill backpane" id="threadBackBtn" type="button">Back</button>
+          <div class="who">
+            <div class="nm" id="threadName"></div>
+            <div class="sub" id="threadSub"></div>
+          </div>
+          <a class="pill" id="threadSite" href="#" target="_blank" rel="noopener">Site</a>
+        </div>
+        <div class="msgs" id="threadMsgs"></div>
+        <div class="attach-tray" id="attachTray" aria-live="polite"></div>
+        <div class="inrow">
+          <button class="attachbtn" id="attachBtn" type="button" aria-label="Attach file" title="Attach file">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+          </button>
+          <input type="file" id="attachInput" multiple hidden>
+          <input class="inp" id="replyInput" type="text" placeholder="Message" autocomplete="off">
+          <button class="pill goldsel" id="replySendBtn" type="button">Send</button>
+        </div>
       </div>
-      <input class="search" id="bizSearch" type="search" placeholder="Search name, phone, address" autocomplete="off">
-      <div class="filters">
-        <button class="pill sel" id="fAll" type="button">All</button>
-        <button class="pill" id="fLeft" type="button">Not sent</button>
-        <button class="pill" id="fSent" type="button">Sent</button>
+    </div>
+  </div>
+
+  <div id="exploreView" class="view hidden">
+    <div class="scroll" id="exploreScroll">
+      <div class="bar" style="margin-bottom:14px;">
+        <button class="pill" id="exploreBackBtn" type="button">Back</button>
+        <span class="ttl" style="flex:1; font-weight:700;">Leads</span>
+        <button class="stat gold" id="exploreSentBtn" type="button" aria-label="Open sent businesses"><b id="exploreSentInline">0</b> sent</button>
       </div>
-      <div class="bar hidden" id="selBar">
-        <span class="stat" id="selCount">0 selected</span>
-        <button class="pill" id="sendBtn" type="button">Send</button>
+      <div class="stats">
+        <span class="stat"><b id="totalCount">0</b> businesses</span>
+        <span class="stat"><b id="leftCount">0</b> not sent</span>
+      </div>
+      <div style="margin-top:14px;">
+        <input class="search" id="exploreSearch" type="search" placeholder="Search leads, phone, address, category" autocomplete="off">
+      </div>
+      <div class="catdrop" id="catDrop">
+        <button class="catdrop-btn" id="catDropBtn" type="button" aria-haspopup="listbox" aria-expanded="false">
+          <span class="catdrop-label" id="catDropLabel">All categories</span>
+          <span class="catdrop-count" id="catDropCount"></span>
+          <span class="catdrop-chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
+        </button>
+        <div class="catdrop-panel hidden" id="catDropPanel">
+          <div class="catdrop-search">
+            <input class="search" id="catDropSearch" type="search" placeholder="Search categories" autocomplete="off">
+          </div>
+          <div class="catdrop-list" id="catDropList" role="listbox" aria-label="Categories"></div>
+        </div>
+      </div>
+      <div class="filters explore-controls">
+        <input class="numinp" id="randNum" type="number" min="1" inputmode="numeric" placeholder="Count" aria-label="How many to select">
+        <button class="pill" id="randGo" type="button">Select</button>
+      </div>
+      <div class="selbar explore-selbar hidden" id="selBar">
+        <span><b id="selCount">0</b> selected</span>
+        <span class="grow"></span>
+        <span class="statusline" id="sendStatus"></span>
+        <button class="pill goldsel" id="sendBtn" type="button">Send</button>
         <button class="pill" id="clearSelBtn" type="button">Clear</button>
-        <span id="sendStat"></span>
       </div>
+      <div id="bizList" style="margin-top:16px;"></div>
     </div>
-    <div class="scroll" id="bizList"><div class="msg">Loading...</div></div>
   </div>
 
-  <div id="textingView" class="hidden" style="display:flex; flex-direction:column; height:100%;">
-    <div class="top">
-      <div class="bar">
-        <button class="pill" id="backBtn2" type="button">Back</button>
-        <span class="ttl">Texting</span>
+  <div id="sentView" class="view hidden">
+    <div class="scroll" id="sentScroll">
+      <div class="bar" style="margin-bottom:14px;">
+        <button class="pill" id="sentBackBtn" type="button">Back</button>
+        <span class="ttl" style="flex:1; font-weight:700;">Sent</span>
+        <span class="stat gold"><b id="sentViewCount">0</b> sent</span>
       </div>
-    </div>
-    <div class="scroll" id="textingBody"><div class="msg">Loading...</div></div>
-  </div>
-
-  <div id="repliesView" class="hidden" style="display:flex; flex-direction:column; height:100%;">
-    <div class="top">
-      <div class="bar">
-        <button class="pill" id="backBtn3" type="button">Back</button>
-        <span class="ttl">Replies</span>
-        <button class="pill" id="refreshRepliesBtn" type="button">Refresh</button>
+      <div class="filters explore-controls">
+        <input class="numinp" id="sentRandNum" type="number" min="1" inputmode="numeric" placeholder="Count" aria-label="How many sent businesses to select">
+        <button class="pill" id="sentRandGo" type="button">Select</button>
       </div>
+      <div class="selbar explore-selbar hidden" id="sentSelBar">
+        <span><b id="sentSelCount">0</b> selected</span>
+        <span class="grow"></span>
+        <button class="pill goldsel" id="sentGroupBtn" type="button">Message selected</button>
+        <button class="pill" id="sentClearSelBtn" type="button">Clear</button>
+      </div>
+      <div class="sent-compose hidden" id="sentGroupCompose">
+        <div class="nm" id="sentGroupName"></div>
+        <div class="sub" id="sentGroupSub"></div>
+        <input class="inp" id="sentGroupInput" type="text" placeholder="Message" autocomplete="off">
+        <div class="acts">
+          <button class="pill goldsel" id="sentGroupSend" type="button">Send</button>
+          <button class="pill" id="sentGroupCancel" type="button">Cancel</button>
+          <span class="statusline" id="sentGroupStatus"></span>
+        </div>
+      </div>
+      <div class="sent-compose hidden" id="sentCompose">
+        <div class="nm" id="sentComposeName"></div>
+        <div class="sub" id="sentComposeSub"></div>
+        <input class="inp" id="sentComposeInput" type="text" placeholder="Message" autocomplete="off">
+        <div class="acts">
+          <button class="pill goldsel" id="sentComposeSend" type="button">Send</button>
+          <button class="pill" id="sentComposeCancel" type="button">Cancel</button>
+          <span class="statusline" id="sentComposeStatus"></span>
+        </div>
+      </div>
+      <div id="sentList"></div>
     </div>
-    <div class="scroll" id="repliesList"><div class="msg">Loading...</div></div>
   </div>
 
 </div>
 <script src="https://bjvfi.com/sitedesk/config.js"></script>
 <script>
 "use strict";
+function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+function fmt(n){ return Number(n).toLocaleString("en-US"); }
+function fmtSize(bytes){
+  var n = Number(bytes) || 0;
+  if (n < 1024) return n + " B";
+  if (n < 1024 * 1024) return (Math.round(n / 102.4) / 10) + " KB";
+  if (n < 1024 * 1024 * 1024) return (Math.round(n / 104857.6) / 10) + " MB";
+  return (Math.round(n / 107374182.4) / 10) + " GB";
+}
+function fmtListWhen(t){
+  if (!t) return "";
+  var d = new Date(t), now = new Date();
+  var time = d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  if (d.toDateString() === now.toDateString()) return time;
+  var yest = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+  if (d.toDateString() === yest.toDateString()) return "Yesterday";
+  if ((now - d) < 7 * 86400000) return d.toLocaleDateString("en-US", { weekday: "short" });
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+function fmtBubbleWhen(t){
+  if (!t) return "Sent";
+  var d = new Date(t), now = new Date();
+  var time = d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  if (d.toDateString() === now.toDateString()) return time;
+  var yest = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+  if (d.toDateString() === yest.toDateString()) return "Yesterday " + time;
+  if ((now - d) < 7 * 86400000) return d.toLocaleDateString("en-US", { weekday: "short" }) + " " + time;
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" }) + " " + time;
+}
+var FILE_ICON_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>';
+
+var WORDINGS = [
+  function(n,u){ return "Hi, this is SiteDesk. We built a website for " + n + " and it is ready to look at: " + u + " No cost to view it. Want a quick walkthrough? Reply STOP to end"; },
+  function(n,u){ return n + ", we made you a website. Take a look here: " + u + " If you like it, we can make it fully yours. From SiteDesk. Reply STOP to end"; },
+  function(n,u){ return "Hello from SiteDesk. A website for " + n + " is already built: " + u + " Have a look and tell us what you think. Reply STOP to end"; },
+  function(n,u){ return "Hi " + n + ", your website preview is live: " + u + " Built by SiteDesk, free to view. Any questions, just reply here. Reply STOP to end"; }
+];
+
+/* Marks and repo sync, through the same data path SiteDesk uses. Marks live
+   in iamnottaiiii/sitedesk-data under texting/: one shard per category plus a
+   small index of counts. The local copy stays as a mirror so the page works
+   offline, and anything that fails to sync stays pending and retries. */
 var DATA = "https://bjvfi.com/sitedesk/data/queue/";
 var KEY = "bjvfi_database_sent_v1";
 var PKEY = "bjvfi_database_pending_v1";
 var sent = {};
 try { sent = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch(e) { sent = {}; }
 function saveSent(){ try { localStorage.setItem(KEY, JSON.stringify(sent)); } catch(e){} }
-
-/* Repo sync, through the same data path SiteDesk uses. Marks live in
-   iamnottaiiii/sitedesk-data under texting/: one shard per category plus a
-   small index of counts. The local copy stays as a mirror so the page works
-   offline, and anything that fails to sync stays pending and retries. */
 var GH_API = "https://api.github.com/repos/iamnottaiiii/sitedesk-data";
 var INDEX_PATH = "texting/index.json";
 var TOKEN = (typeof SITEDESK_DATA_TOKEN !== "undefined" && SITEDESK_DATA_TOKEN) ? SITEDESK_DATA_TOKEN : null;
@@ -187,7 +493,10 @@ try { pending = JSON.parse(localStorage.getItem(PKEY) || "{}") || {}; } catch(e)
 function savePending(){ try { localStorage.setItem(PKEY, JSON.stringify(pending)); } catch(e){} }
 var repoCounts = null;
 var loadedShards = {};
+var shardLoading = {};
 var syncActive = 0, syncChain = Promise.resolve(), queuedOps = {}, opSeq = 0;
+/* Row details for every business loaded this session, keyed by slug. */
+var bizInfo = {};
 
 function setSyncLabel(){
   var el = document.getElementById("syncStat");
@@ -249,7 +558,12 @@ function shardPath(catName){
 }
 async function syncOp(op){
   var shard = await ghUpdateJson(shardPath(op.c), {}, function(data){
-    if (op.mark) data[op.slug] = { t: op.t, n: op.n, p: op.p };
+    if (op.mark){
+      var rec = { t: op.t, n: op.n, p: op.p };
+      if (op.a) rec.a = op.a;
+      if (typeof op.w === "number") rec.w = op.w;
+      data[op.slug] = rec;
+    }
     else delete data[op.slug];
   });
   var count = Object.keys(shard).length;
@@ -280,7 +594,8 @@ function enqueueSync(op){
       delete queuedOps[op.id];
       setSyncLabel();
       refreshStats();
-      if (manifest && !document.getElementById("homeView").classList.contains("hidden")) renderCats();
+      if (!document.getElementById("exploreView").classList.contains("hidden")) renderBiz(false);
+      if (!document.getElementById("sentView").classList.contains("hidden")) renderSentView();
     }
   });
   return syncChain;
@@ -314,410 +629,650 @@ function sentTotal(){
   for (name in counts) total += counts[name];
   return total;
 }
-
-var manifest = null;
-var curCat = null, curRows = [], curFilter = "all", curQuery = "", shown = 0;
-var PAGE = 100;
-
-var WORDINGS = [
-  function(n,u){ return "Hi, this is SiteDesk. We built a website for " + n + " and it is ready to look at: " + u + " No cost to view it. Want a quick walkthrough? Reply STOP to end"; },
-  function(n,u){ return n + ", we made you a website. Take a look here: " + u + " If you like it, we can make it fully yours. From SiteDesk. Reply STOP to end"; },
-  function(n,u){ return "Hello from SiteDesk. A website for " + n + " is already built: " + u + " Have a look and tell us what you think. Reply STOP to end"; },
-  function(n,u){ return "Hi " + n + ", your website preview is live: " + u + " Built by SiteDesk, free to view. Any questions, just reply here. Reply STOP to end"; }
-];
-function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
-function fmt(n){ return Number(n).toLocaleString("en-US"); }
-/* Texting: the bjvfi-text Worker is the Twilio bridge. The Twilio config
-   and the setup password live only on the Worker side. This page keeps
-   just the unlock password in local storage and sends it as X-Text-Key.
-   No Twilio value is ever in this page. */
-var TEXT_API = "https://bjvfi-text.iamnottaiii.workers.dev";
-var TKEY_LS = "bjvfi_text_key";
-var SKEY_LS = "bjvfi_database_selection_v1";
-var textConfigured = null;
-var prevView = "home";
-function textKey(){ try { return localStorage.getItem(TKEY_LS) || ""; } catch(e){ return ""; } }
-function setTextKey(v){ try { if (v) localStorage.setItem(TKEY_LS, v); else localStorage.removeItem(TKEY_LS); } catch(e){} }
-var selStore = {};
-try { selStore = JSON.parse(localStorage.getItem(SKEY_LS) || "{}") || {}; } catch(e) { selStore = {}; }
-var selSet = {};
-function selPersist(){ try { localStorage.setItem(SKEY_LS, JSON.stringify(selStore)); } catch(e){} }
-function selLoadFor(cat){
-  selSet = {};
-  var arr = selStore[cat] || [];
-  arr.forEach(function(slug){ selSet[slug] = true; });
-}
-function selSaveFor(cat){
-  var arr = Object.keys(selSet);
-  if (arr.length) selStore[cat] = arr; else delete selStore[cat];
-  selPersist();
-}
-function updateSelBar(){
-  var n = Object.keys(selSet).length;
-  document.getElementById("selBar").classList.toggle("hidden", n === 0);
-  document.getElementById("selCount").textContent = fmt(n) + " selected";
-}
-function setMarked(slug, mark){
+function setMarked(slug, mark, w){
   var op;
   if (!mark && sent[slug]){
     var prev = sent[slug];
     delete sent[slug];
-    op = { id: ++opSeq + "-" + Date.now(), slug: slug, c: curCat, mark: false, t: prev.t || 0, n: prev.n || "", p: prev.p || "" };
+    op = { id: ++opSeq + "-" + Date.now(), slug: slug, c: prev.c || "", mark: false, t: prev.t || 0, n: prev.n || "", p: prev.p || "" };
   } else if (mark && !sent[slug]){
-    var row = null;
-    curRows.forEach(function(r){ if (r[0] === slug) row = r; });
-    var entry = { t: Date.now(), n: row ? (row[1]||"") : "", p: row ? (row[3]||"") : "", c: curCat };
+    var info = bizInfo[slug] || {};
+    var entry = { t: Date.now(), n: info.n || "", p: info.p || "", c: info.c || "" };
+    if (info.a) entry.a = info.a;
+    if (typeof w === "number") entry.w = w;
     sent[slug] = entry;
-    op = { id: ++opSeq + "-" + Date.now(), slug: slug, c: curCat, mark: true, t: entry.t, n: entry.n, p: entry.p };
+    op = { id: ++opSeq + "-" + Date.now(), slug: slug, c: entry.c, mark: true, t: entry.t, n: entry.n, p: entry.p };
+    if (entry.a) op.a = entry.a;
+    if (typeof entry.w === "number") op.w = entry.w;
   } else return;
   saveSent();
   if (TOKEN){ pending[slug] = op; savePending(); }
   enqueueSync(op);
 }
-function updateTextingPill(){
-  var el = document.getElementById("textingBtn");
-  if (!el) return;
-  if (textConfigured === false) el.textContent = "Set up texting";
-  else if (textConfigured === true && textKey()) el.textContent = "Texting ready";
-  else if (textConfigured === true) el.textContent = "Texting locked";
-  else el.textContent = "Set up texting";
-}
-function showView(name){
-  ["homeView","catView","textingView","repliesView"].forEach(function(id){
-    document.getElementById(id).classList.toggle("hidden", id !== name + "View");
+/* Load one category's shard and merge it into the mirror, the same merge
+   the category view has always done on open. */
+function ensureShard(name){
+  if (!TOKEN || !manifest || !manifest.cats[name] || loadedShards[name] || shardLoading[name]) return Promise.resolve(false);
+  shardLoading[name] = true;
+  return ghGetJson(shardPath(name)).then(function(cur){
+    var shard = cur ? cur.data : {};
+    loadedShards[name] = true;
+    if (!repoCounts) repoCounts = {};
+    repoCounts[name] = Object.keys(shard).length;
+    var slug;
+    for (slug in shard){
+      var v = shard[slug] || {};
+      var e = { t: v.t || 0, n: v.n || "", p: v.p || "", c: name };
+      if (v.a) e.a = v.a;
+      if (typeof v.w === "number") e.w = v.w;
+      sent[slug] = e;
+    }
+    for (slug in sent){
+      if (sent[slug] && sent[slug].c === name && !(slug in shard) && !pending[slug]) delete sent[slug];
+    }
+    saveSent(); refreshStats();
+    if (!document.getElementById("exploreView").classList.contains("hidden")) renderBiz(false);
+    if (!document.getElementById("sentView").classList.contains("hidden")) renderSentView();
+    return true;
+  }).catch(function(){ return false; }).then(function(r){
+    delete shardLoading[name];
+    return r;
   });
 }
-function goBack(){
-  if (prevView === "cat" && curCat) showView("cat");
-  else { showView("home"); renderCats(); refreshStats(); }
+
+/* Queue data: the manifest, one default chunk for the opening leads list,
+   and category files loaded on demand and cached after first load. */
+var manifest = null;
+var sortedCatList = [];
+var chunkRows = null, chunkLoading = null;
+var catRowsCache = {}, catLoadingMap = {};
+function regRows(rows){
+  (rows || []).forEach(function(r){
+    if (r && r[0]) bizInfo[r[0]] = { n: r[1] || "", c: r[2] || "", p: r[3] || "", a: r[4] || "" };
+  });
 }
+function buildSortedCats(){
+  sortedCatList = Object.keys(manifest.cats).map(function(name){
+    return { name: name, count: manifest.cats[name].count || 0 };
+  }).sort(function(a, b){
+    if (b.count !== a.count) return b.count - a.count;
+    return a.name < b.name ? -1 : 1;
+  });
+}
+function findCatObj(name){
+  for (var i = 0; i < sortedCatList.length; i++) if (sortedCatList[i].name === name) return sortedCatList[i];
+  return null;
+}
+function loadDefaultChunk(){
+  if (chunkRows) return Promise.resolve(chunkRows);
+  if (chunkLoading) return chunkLoading;
+  var first = (manifest && manifest.chunks && manifest.chunks[0]) || "chunk-000.json";
+  chunkLoading = fetch(DATA + first).then(function(r){ return r.json(); }).then(function(rows){
+    chunkRows = rows || [];
+    regRows(chunkRows);
+    return chunkRows;
+  }).catch(function(){ chunkRows = []; return chunkRows; });
+  return chunkLoading;
+}
+function loadCat(name){
+  if (catRowsCache[name]) return Promise.resolve(catRowsCache[name]);
+  if (catLoadingMap[name]) return catLoadingMap[name];
+  var file = manifest.cats[name].files[0];
+  catLoadingMap[name] = fetch(DATA + file).then(function(r){ return r.json(); }).then(function(rows){
+    catRowsCache[name] = rows || [];
+    regRows(catRowsCache[name]);
+    return catRowsCache[name];
+  }).catch(function(){ catRowsCache[name] = []; return catRowsCache[name]; });
+  return catLoadingMap[name];
+}
+
+/* Texting: the bjvfi-text Worker is the Twilio bridge. The Twilio config
+   and the setup password live only on the Worker side. This page keeps
+   just the unlock password in local storage and sends it as X-Text-Key.
+   No Twilio value is ever in this page. There is no setup form here:
+   configuration happens outside the page. */
+var TEXT_API = "https://bjvfi-text.iamnottaiii.workers.dev";
+var TKEY_LS = "bjvfi_text_key";
+var textConfigured = null;
+var repliesState = "idle";
+function textKey(){ try { return localStorage.getItem(TKEY_LS) || ""; } catch(e){ return ""; } }
 async function checkTexting(){
   try {
     var r = await fetch(TEXT_API + "/health");
     var j = await r.json();
     textConfigured = !!j.configured;
   } catch(e){ textConfigured = null; }
-  updateTextingPill();
-  if (textConfigured && textKey()) loadReplies(true);
+  if (textConfigured === false) repliesState = "off";
+  else if (textConfigured === true && !textKey()) repliesState = "locked";
+  if (textConfigured && textKey()) loadReplies();
+  else renderThreadList();
 }
-function setupFormHtml(update){
-  if (update){
-    return '<div class="frm">'
-      + '<div class="lab">New setup password</div><input class="search" id="updPass" type="password" autocomplete="new-password">'
-      + '<div class="lab">Account SID</div><input class="search" id="updSid" type="text" autocomplete="off">'
-      + '<div class="lab">Auth Token</div><input class="search" id="updToken" type="password" autocomplete="off">'
-      + '<div class="lab">From number</div><input class="search" id="updFrom" type="tel" autocomplete="off">'
-      + '<div class="acts"><button class="pill" id="updSave" type="button">Save</button></div>'
-      + '<div class="msg" id="updStat"></div></div>';
-  }
-  return '<div class="frm">'
-    + '<div class="lab">Setup password</div><input class="search" id="tsPass" type="password" autocomplete="new-password">'
-    + '<div class="lab">Account SID</div><input class="search" id="tsSid" type="text" autocomplete="off">'
-    + '<div class="lab">Auth Token</div><input class="search" id="tsToken" type="password" autocomplete="off">'
-    + '<div class="lab">From number</div><input class="search" id="tsFrom" type="tel" autocomplete="off">'
-    + '<div class="acts"><button class="pill" id="tsSave" type="button">Save</button></div>'
-    + '<div class="msg" id="tsStat"></div></div>';
-}
-function wireSetupForm(update){
-  var pre = update ? "upd" : "ts";
-  document.getElementById(pre + "Save").addEventListener("click", async function(){
-    var stat = document.getElementById(pre + "Stat");
-    var payload;
-    if (update){
-      var np = document.getElementById("updPass").value;
-      payload = { password: np || textKey(), currentPassword: textKey(),
-        sid: document.getElementById("updSid").value, token: document.getElementById("updToken").value, from: document.getElementById("updFrom").value };
-    } else {
-      payload = { password: document.getElementById("tsPass").value,
-        sid: document.getElementById("tsSid").value, token: document.getElementById("tsToken").value, from: document.getElementById("tsFrom").value };
-    }
-    stat.textContent = "Saving";
-    try {
-      var r = await fetch(TEXT_API + "/setup", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
-      var j = await r.json().catch(function(){ return {}; });
-      if (r.ok && j.ok){
-        setTextKey(payload.password);
-        textConfigured = true;
-        updateTextingPill();
-        renderTexting();
-      } else stat.textContent = j.error || "Save failed";
-    } catch(e){ stat.textContent = "Save failed"; }
-  });
-}
-function unlockHtml(prefix){
-  return '<div class="frm"><div class="lab">Setup password</div>'
-    + '<input class="search" id="' + prefix + 'Pass" type="password" autocomplete="current-password">'
-    + '<div class="acts"><button class="pill" id="' + prefix + 'Unlock" type="button">Unlock</button></div>'
-    + '<div class="msg" id="' + prefix + 'Stat"></div></div>';
-}
-function wireUnlock(prefix, after){
-  document.getElementById(prefix + "Unlock").addEventListener("click", async function(){
-    var stat = document.getElementById(prefix + "Stat");
-    var pw = document.getElementById(prefix + "Pass").value;
-    if (!pw){ stat.textContent = "Password required"; return; }
-    stat.textContent = "Checking";
-    try {
-      var r = await fetch(TEXT_API + "/replies", { headers: { "X-Text-Key": pw } });
-      if (r.status === 401){ stat.textContent = "Wrong password"; return; }
-      if (!r.ok){ stat.textContent = "Unlock failed"; return; }
-      setTextKey(pw);
-      updateTextingPill();
-      after();
-    } catch(e){ stat.textContent = "Unlock failed"; }
-  });
-}
-function renderTexting(){
-  var body = document.getElementById("textingBody");
-  if (textConfigured === false){
-    body.innerHTML = setupFormHtml(false);
-    wireSetupForm(false);
-  } else if (textConfigured === true && !textKey()){
-    body.innerHTML = unlockHtml("tu");
-    wireUnlock("tu", renderTexting);
-  } else if (textConfigured === true){
-    body.innerHTML = '<div class="frm"><div class="msg">Texting ready</div></div>' + setupFormHtml(true)
-      + '<div class="frm"><div class="acts"><button class="pill" id="lockBtn" type="button">Lock</button></div></div>';
-    wireSetupForm(true);
-    document.getElementById("lockBtn").addEventListener("click", function(){
-      setTextKey(""); updateTextingPill(); renderTexting();
-    });
-  } else {
-    body.innerHTML = '<div class="msg">Loading...</div>';
-    checkTexting().then(renderTexting);
-  }
-}
-function openTexting(){
-  prevView = document.getElementById("catView").classList.contains("hidden") ? "home" : "cat";
-  showView("texting");
-  renderTexting();
-}
-async function loadReplies(countOnly){
+async function loadReplies(){
   var key = textKey();
-  if (!key) return null;
+  if (!key) return;
   try {
     var r = await fetch(TEXT_API + "/replies", { headers: { "X-Text-Key": key } });
-    if (r.status === 401){ updateTextingPill(); return null; }
-    if (!r.ok) return null;
+    if (r.status === 401){ repliesState = "locked"; renderThreadList(); return; }
+    if (!r.ok) return;
     var j = await r.json();
-    var arr = j.replies || [];
-    document.getElementById("replyCount").textContent = arr.length ? fmt(arr.length) : "";
-    return arr;
-  } catch(e){ return null; }
+    repliesState = "ok";
+    buildThreads(j.replies || []);
+    refreshMsgStats();
+    renderThreadList();
+    if (curThread >= 0 && THREADS[curThread]) renderThread();
+  } catch(e){}
 }
-function renderRepliesList(arr){
-  var el = document.getElementById("repliesList");
-  if (!arr || !arr.length){ el.innerHTML = '<div class="msg">No replies yet.</div>'; return; }
-  var html = "";
-  arr.forEach(function(rep){
-    var when = rep.t ? new Date(rep.t).toLocaleString("en-US") : "";
-    html += '<div class="row">'
-      + '<div class="nm">' + esc(rep.name || rep.from || "") + '</div>'
-      + (rep.from ? '<div class="dt">' + esc(rep.from) + '</div>' : '')
-      + (rep.body ? '<div class="dt">' + esc(rep.body) + '</div>' : '')
-      + (when ? '<div class="dt">' + esc(when) + '</div>' : '')
-      + (rep.slug ? '<div class="acts"><a class="pill" href="https://bjvfi.com/' + esc(rep.slug) + '/" target="_blank" rel="noopener">Site</a></div>' : '')
-      + '</div>';
+
+/* Conversations: built only from real replies the Worker returns.
+   A reply matched to a sent business (slug present) opens its thread with
+   the text that was sent to that business as the first bubble. The wording
+   index is recorded in the mark at send time, because the Worker picks the
+   wording by the slug's position inside its send chunk. */
+var THREADS = [];
+var curThread = -1;
+var msgFilter = "all";
+var TSTATE_KEY = "bjvfi_database_threads_v1";
+var MYMSG_KEY = "bjvfi_database_mymsgs_v1";
+var threadState = {};
+try { threadState = JSON.parse(localStorage.getItem(TSTATE_KEY) || "{}") || {}; } catch(e) { threadState = {}; }
+function saveThreadState(){ try { localStorage.setItem(TSTATE_KEY, JSON.stringify(threadState)); } catch(e){} }
+var myMsgs = {};
+try { myMsgs = JSON.parse(localStorage.getItem(MYMSG_KEY) || "{}") || {}; } catch(e) { myMsgs = {}; }
+function saveMyMsgs(){ try { localStorage.setItem(MYMSG_KEY, JSON.stringify(myMsgs)); } catch(e){} }
+function buildThreads(arr){
+  THREADS = [];
+  var byKey = {};
+  (arr || []).forEach(function(rep){
+    var digits = String(rep.from || "").replace(/\D/g, "");
+    var key = rep.slug ? rep.slug : ("ph:" + digits);
+    var th = byKey[key];
+    if (!th){
+      th = byKey[key] = { key: key, slug: rep.slug || "", name: "", cat: "", phone: rep.from || "", msgs: [], latestIn: 0, lastT: 0 };
+      THREADS.push(th);
+    }
+    if (rep.name && !th.name) th.name = rep.name;
+    if (rep.cat && !th.cat) th.cat = rep.cat;
+    th.msgs.push({ who: "in", text: rep.body || "", t: rep.t || 0 });
+    if ((rep.t || 0) > th.latestIn) th.latestIn = rep.t || 0;
   });
-  el.innerHTML = html;
+  THREADS.forEach(function(th){
+    var mk = th.slug ? sent[th.slug] : null;
+    if (mk){
+      if (!th.name) th.name = mk.n || "";
+      if (!th.cat) th.cat = mk.c || "";
+      if (!th.phone) th.phone = mk.p || "";
+    }
+    if (!th.name) th.name = th.phone || "";
+    var mine = (myMsgs[th.key] || []).map(function(m){
+      return { who: "out", text: m.text || "", t: m.t || 0, atts: m.atts || [] };
+    });
+    var all = th.msgs.concat(mine);
+    all.sort(function(a, b){ return (a.t || 0) - (b.t || 0); });
+    if (th.slug){
+      var w = mk && typeof mk.w === "number" ? mk.w : 0;
+      var url = "bjvfi.com/" + th.slug + "/";
+      all.unshift({ who: "out", text: WORDINGS[w % 4](th.name || "", url), t: mk ? (mk.t || 0) : 0, sentBubble: true });
+    }
+    th.msgs = all;
+    th.lastT = all.length ? (all[all.length - 1].t || 0) : th.latestIn;
+  });
+  THREADS.sort(function(a, b){ return (b.lastT || 0) - (a.lastT || 0); });
+  if (curThread >= THREADS.length) curThread = THREADS.length - 1;
 }
-async function openReplies(){
-  prevView = "home";
-  showView("replies");
-  var el = document.getElementById("repliesList");
-  if (textConfigured === true && !textKey()){
-    el.innerHTML = unlockHtml("ru");
-    wireUnlock("ru", openReplies);
-    return;
-  }
-  el.innerHTML = '<div class="msg">Loading...</div>';
-  var arr = await loadReplies(false);
-  if (arr === null && !textKey()){
-    el.innerHTML = unlockHtml("ru");
-    wireUnlock("ru", openReplies);
-    return;
-  }
-  renderRepliesList(arr || []);
+function statusOf(th){
+  var st = threadState[th.key] || {};
+  if (th.latestIn && (st.ans || 0) >= th.latestIn) return "answered";
+  if (th.latestIn && (st.seen || 0) >= th.latestIn) return "seen";
+  return th.latestIn ? "unseen" : "answered";
 }
-async function sendSelected(){
-  var stat = document.getElementById("sendStat");
-  var slugs = curRows.map(function(r){ return r[0]; }).filter(function(slug){ return selSet[slug]; });
-  if (!slugs.length) return;
-  if (textConfigured === false || !textKey()){
-    stat.textContent = "Set up texting";
-    openTexting();
+function countStatus(s){ return THREADS.filter(function(th){ return statusOf(th) === s; }).length; }
+function toReplyCount(){ return countStatus("unseen") + countStatus("seen"); }
+function refreshMsgStats(){
+  document.getElementById("homeReplied").textContent = fmt(THREADS.length);
+  document.getElementById("homeNotSeen").textContent = fmt(countStatus("unseen"));
+  document.getElementById("homeToReply").textContent = fmt(toReplyCount());
+  document.getElementById("homeAnswered").textContent = fmt(countStatus("answered"));
+  document.getElementById("homeMsgCount").textContent = fmt(THREADS.length);
+  var badge = document.getElementById("homeToReplyBadge");
+  badge.textContent = fmt(toReplyCount());
+  badge.classList.toggle("hidden", toReplyCount() === 0);
+  document.getElementById("mfAll").textContent = fmt(THREADS.length);
+  document.getElementById("mfUnseen").textContent = fmt(countStatus("unseen"));
+  document.getElementById("mfToReply").textContent = fmt(countStatus("seen"));
+}
+function lastMsgOf(th){
+  for (var i = th.msgs.length - 1; i >= 0; i--) if (!th.msgs[i].sentBubble) return th.msgs[i];
+  return th.msgs[th.msgs.length - 1];
+}
+function previewText(m){
+  if (!m) return "";
+  if (m.text) return m.text;
+  if (m.atts && m.atts.length) return m.atts.length === 1 ? m.atts[0].name : m.atts.length + " attachments";
+  return "";
+}
+function renderMsgFilters(){
+  Array.prototype.forEach.call(document.querySelectorAll("#msgFilters [data-mf]"), function(el){
+    el.classList.toggle("sel", el.getAttribute("data-mf") === msgFilter);
+  });
+}
+function renderThreadList(){
+  var list = document.getElementById("threadList");
+  if (!list) return;
+  if (!THREADS.length){
+    var msg = "No replies yet.";
+    if (repliesState === "locked") msg = "Texting locked";
+    else if (repliesState === "off") msg = "Texting not set up yet";
+    else if (msgFilter !== "all") msg = "Nothing here.";
+    list.innerHTML = '<div class="msg">' + msg + '</div>';
     return;
   }
-  stat.textContent = "Sending";
-  document.getElementById("sendBtn").disabled = true;
-  var catFile = manifest.cats[curCat].files[0];
-  var okCount = 0, failCount = 0, sawAuthProblem = false;
-  try {
-    for (var start = 0; start < slugs.length; start += 50){
-      var chunk = slugs.slice(start, start + 50);
-      var r = await fetch(TEXT_API + "/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Text-Key": textKey() },
-        body: JSON.stringify({ catFile: catFile, slugs: chunk, catName: curCat })
-      });
-      var j = await r.json().catch(function(){ return {}; });
-      if (r.status === 401 || (j && j.error === "not configured")){
-        sawAuthProblem = true;
-        break;
-      }
-      if (!r.ok || !j.results){ failCount += chunk.length; continue; }
-      j.results.forEach(function(res){
-        if (res.ok){
-          okCount++;
-          delete selSet[res.slug];
-          setMarked(res.slug, true);
-        } else failCount++;
+  var html = "";
+  THREADS.forEach(function(th, i){
+    var st = statusOf(th);
+    if (msgFilter === "unseen" && st !== "unseen") return;
+    if (msgFilter === "toreply" && st !== "seen") return;
+    var lr = lastMsgOf(th);
+    var dot = st === "unseen" ? '<span class="dot"></span>'
+      : (st === "seen" ? '<span class="dot red"></span>' : '<span class="dot off"></span>');
+    html += '<button class="trow' + (i === curThread ? " sel" : "") + '" type="button" data-th="' + i + '">'
+      + dot
+      + '<span class="main"><span class="nm">' + esc(th.name) + '</span>'
+      + '<span class="pv" style="display:block;">' + esc(previewText(lr)) + '</span></span>'
+      + '<span class="tm">' + esc(fmtListWhen(th.lastT)) + '</span></button>';
+  });
+  if (!html) html = '<div class="msg">Nothing here.</div>';
+  list.innerHTML = html;
+  Array.prototype.forEach.call(list.querySelectorAll("[data-th]"), function(el){
+    el.addEventListener("click", function(){ openThread(parseInt(el.getAttribute("data-th"), 10)); });
+  });
+}
+Array.prototype.forEach.call(document.querySelectorAll("#msgFilters [data-mf]"), function(el){
+  el.addEventListener("click", function(){
+    msgFilter = el.getAttribute("data-mf");
+    renderMsgFilters();
+    renderThreadList();
+  });
+});
+/* Attachments: pending files are kept per thread. File contents stay on
+   this device; only names, sizes, and small image previews are kept. */
+var pendingMap = {};
+function currentPending(){
+  var th = THREADS[curThread];
+  if (!th) return [];
+  if (!pendingMap[th.key]) pendingMap[th.key] = [];
+  return pendingMap[th.key];
+}
+function renderAttachTray(){
+  var tray = document.getElementById("attachTray");
+  var list = currentPending();
+  var html = "";
+  list.forEach(function(a, idx){
+    var thumb = a.dataUrl
+      ? '<img class="thumb" src="' + a.dataUrl + '" alt="">'
+      : '<span class="ficon">' + FILE_ICON_SVG + '</span>';
+    html += '<span class="achip">' + thumb
+      + '<span class="meta"><span class="fname">' + esc(a.name) + '</span><span class="fsize">' + esc(fmtSize(a.size)) + '</span></span>'
+      + '<button class="rm" type="button" data-rmatt="' + idx + '" aria-label="Remove ' + esc(a.name) + '">&times;</button></span>';
+  });
+  tray.innerHTML = html;
+  Array.prototype.forEach.call(tray.querySelectorAll("[data-rmatt]"), function(el){
+    el.addEventListener("click", function(){
+      var i = parseInt(el.getAttribute("data-rmatt"), 10);
+      currentPending().splice(i, 1);
+      renderAttachTray();
+    });
+  });
+}
+document.getElementById("attachBtn").addEventListener("click", function(){
+  document.getElementById("attachInput").click();
+});
+document.getElementById("attachInput").addEventListener("change", function(){
+  var files = Array.prototype.slice.call(this.files || []);
+  var th = THREADS[curThread];
+  files.forEach(function(f){
+    var entry = { name: f.name, size: f.size, type: f.type || "", dataUrl: null };
+    if (th){
+      if (!pendingMap[th.key]) pendingMap[th.key] = [];
+      pendingMap[th.key].push(entry);
+    }
+    if (f.type && f.type.indexOf("image/") === 0 && f.size <= 1500000){
+      try {
+        var reader = new FileReader();
+        reader.onload = function(){
+          entry.dataUrl = String(reader.result || "");
+          renderAttachTray();
+        };
+        reader.readAsDataURL(f);
+      } catch (err) { /* generic file look is fine */ }
+    }
+  });
+  this.value = "";
+  renderAttachTray();
+});
+function renderThread(){
+  var th = THREADS[curThread];
+  var box = document.getElementById("threadMsgs");
+  if (!th){
+    document.getElementById("threadName").textContent = "";
+    document.getElementById("threadSub").textContent = "";
+    document.getElementById("threadSite").style.display = "none";
+    box.innerHTML = "";
+    renderAttachTray();
+    return;
+  }
+  document.getElementById("threadName").textContent = th.name;
+  document.getElementById("threadSub").textContent = (th.cat ? th.cat + " · " : "") + (th.phone || "");
+  var site = document.getElementById("threadSite");
+  if (th.slug){
+    site.style.display = "";
+    site.href = "https://bjvfi.com/" + th.slug + "/";
+  } else site.style.display = "none";
+  var html = "";
+  th.msgs.forEach(function(m){
+    if (m.text){
+      html += '<div class="bub ' + m.who + '">' + esc(m.text) + '<span class="bt">' + esc(m.sentBubble ? "Sent" : fmtBubbleWhen(m.t)) + '</span></div>';
+    }
+    if (m.atts && m.atts.length){
+      m.atts.forEach(function(a, ai){
+        var isLast = ai === m.atts.length - 1;
+        var visual = a.dataUrl
+          ? '<img class="fthumb" src="' + a.dataUrl + '" alt="' + esc(a.name) + '">'
+          : '<span class="ficon">' + FILE_ICON_SVG + '</span>';
+        html += '<div class="bub filebub ' + m.who + '">' + visual
+          + '<span class="fmeta"><span class="fname">' + esc(a.name) + '</span>'
+          + '<span class="fsize" style="display:block;">' + esc(fmtSize(a.size)) + '</span>'
+          + (isLast ? '<span class="bt">' + esc(fmtBubbleWhen(m.t)) + '</span>' : '')
+          + '</span></div>';
       });
     }
-  } catch(e){ failCount = slugs.length - okCount; }
-  document.getElementById("sendBtn").disabled = false;
-  if (sawAuthProblem){
-    stat.textContent = "Set up texting";
-    selSaveFor(curCat);
-    openTexting();
-    return;
-  }
-  selSaveFor(curCat);
-  refreshStats();
-  document.getElementById("catSent").textContent = fmt(catSentCount(curCat));
-  updateSelBar();
-  stat.textContent = fmt(okCount) + " sent" + (failCount ? ", " + fmt(failCount) + " failed" : "");
-  renderBiz(false);
+  });
+  box.innerHTML = html;
+  box.scrollTop = box.scrollHeight;
+  renderAttachTray();
 }
+function openThread(i){
+  curThread = i;
+  var th = THREADS[i];
+  if (!th) return;
+  var st = threadState[th.key] || (threadState[th.key] = {});
+  if (th.latestIn && (st.seen || 0) < th.latestIn) st.seen = th.latestIn;
+  saveThreadState();
+  refreshMsgStats();
+  renderThreadList();
+  renderThread();
+  document.getElementById("msgWrap").classList.add("showthread");
+  document.getElementById("msgView").classList.add("thread-open");
+}
+function sendReply(){
+  var th = THREADS[curThread];
+  if (!th) return;
+  var inp = document.getElementById("replyInput");
+  var text = inp.value.trim();
+  var atts = currentPending().slice();
+  if (!text && !atts.length) return;
+  var now = Date.now();
+  var slimAtts = atts.map(function(a){
+    return { name: a.name, size: a.size, type: a.type, dataUrl: (a.dataUrl && a.size <= 300000) ? a.dataUrl : null };
+  });
+  th.msgs.push({ who: "out", text: text, t: now, atts: atts });
+  th.lastT = now;
+  if (!myMsgs[th.key]) myMsgs[th.key] = [];
+  myMsgs[th.key].push({ text: text, t: now, atts: slimAtts });
+  saveMyMsgs();
+  var st = threadState[th.key] || (threadState[th.key] = {});
+  if (th.latestIn){ st.ans = th.latestIn; st.seen = th.latestIn; }
+  saveThreadState();
+  pendingMap[th.key] = [];
+  inp.value = "";
+  refreshMsgStats();
+  renderThread();
+  renderThreadList();
+}
+document.getElementById("replySendBtn").addEventListener("click", sendReply);
+document.getElementById("replyInput").addEventListener("keydown", function(e){ if (e.key === "Enter") sendReply(); });
+document.getElementById("threadBackBtn").addEventListener("click", function(){
+  document.getElementById("msgWrap").classList.remove("showthread");
+  document.getElementById("msgView").classList.remove("thread-open");
+});
 
+/* View switching */
+function showView(id){
+  ["homeView", "msgView", "exploreView", "sentView"].forEach(function(v){
+    document.getElementById(v).classList.toggle("hidden", v !== id);
+  });
+}
+function goHome(){
+  document.getElementById("msgWrap").classList.remove("showthread");
+  document.getElementById("msgView").classList.remove("thread-open");
+  refreshStats();
+  refreshMsgStats();
+  showView("homeView");
+}
+document.getElementById("homeMessagesBtn").addEventListener("click", function(){
+  document.getElementById("msgWrap").classList.remove("showthread");
+  document.getElementById("msgView").classList.remove("thread-open");
+  if (curThread < 0 && THREADS.length) curThread = 0;
+  renderThreadList();
+  renderThread();
+  showView("msgView");
+  if (textConfigured && textKey()) loadReplies();
+});
+document.getElementById("homeExploreBtn").addEventListener("click", function(){
+  refreshStats();
+  renderExplore();
+  showView("exploreView");
+  ensureExploreData();
+});
+document.getElementById("msgBackBtn").addEventListener("click", function(){ goHome(); });
+document.getElementById("exploreBackBtn").addEventListener("click", function(){ goHome(); });
 
-
+/* Explore: stats, category dropdown, leads, selection, sending */
 function refreshStats(){
-  document.getElementById("sentCount").textContent = fmt(sentTotal());
   if (manifest){
     document.getElementById("totalCount").textContent = fmt(manifest.total);
     document.getElementById("leftCount").textContent = fmt(manifest.total - sentTotal());
   }
+  var inline = document.getElementById("exploreSentInline");
+  if (inline) inline.textContent = fmt(sentTotal());
+  refreshMsgStats();
 }
-function renderCats(){
-  var q = document.getElementById("catSearch").value.trim().toLowerCase();
-  var names = Object.keys(manifest.cats).sort();
-  var counts = allCatCounts();
-  var html = "";
-  names.forEach(function(name){
-    if (q && name.toLowerCase().indexOf(q) === -1) return;
-    var info = manifest.cats[name];
-    var sc = counts[name] || 0;
-    html += '<button class="cat" type="button" data-cat="' + esc(name) + '">'
-      + '<span class="nm">' + esc(name) + '</span>'
-      + (sc ? '<span class="sn">' + fmt(sc) + ' sent</span>' : '')
-      + '<span class="ct">' + fmt(info.count) + '</span></button>';
-  });
-  document.getElementById("catList").innerHTML = html || '<div class="msg">No categories match.</div>';
-  Array.prototype.forEach.call(document.querySelectorAll(".cat"), function(el){
-    el.addEventListener("click", function(){ openCat(el.getAttribute("data-cat")); });
-  });
+var activeCategory = null;
+var exploreQuery = "";
+var selection = {}, sending = false;
+var shown = 100;
+var PAGE = 100;
+function currentSourceRows(){
+  if (activeCategory) return catRowsCache[activeCategory] || null;
+  return chunkRows;
 }
-
-function openCat(name){
-  curCat = name; curRows = []; curFilter = "all"; curQuery = ""; shown = 0;
-  document.getElementById("bizSearch").value = "";
-  setFilter("all");
-  document.getElementById("catTitle").textContent = name;
-  selLoadFor(name);
-  document.getElementById("sendStat").textContent = "";
-  document.getElementById("homeView").classList.add("hidden");
-  var cv = document.getElementById("catView");
-  cv.classList.remove("hidden");
-  document.getElementById("bizList").innerHTML = '<div class="msg">Loading...</div>';
-  document.getElementById("catSent").textContent = fmt(catSentCount(name));
-  if (TOKEN && !loadedShards[name]){
-    ghGetJson(shardPath(name)).then(function(cur){
-      if (curCat !== name) return;
-      var shard = cur ? cur.data : {};
-      loadedShards[name] = true;
-      if (!repoCounts) repoCounts = {};
-      repoCounts[name] = Object.keys(shard).length;
-      var slug;
-      for (slug in shard){ var v = shard[slug] || {}; sent[slug] = { t: v.t || 0, n: v.n || "", p: v.p || "", c: name }; }
-      for (slug in sent){
-        if (sent[slug] && sent[slug].c === name && !(slug in shard) && !pending[slug]) delete sent[slug];
-      }
-      saveSent(); refreshStats();
-      document.getElementById("catSent").textContent = fmt(catSentCount(name));
-      if (curRows.length) renderBiz(false);
-    }).catch(function(){});
+function ensureExploreData(){
+  if (activeCategory){
+    if (!catRowsCache[activeCategory]){
+      loadCat(activeCategory).then(function(){ renderBiz(false); });
+    }
+    ensureShard(activeCategory);
+  } else if (!chunkRows){
+    loadDefaultChunk().then(function(){ renderBiz(false); });
   }
-  var file = manifest.cats[name].files[0];
-  fetch(DATA + file).then(function(r){ return r.json(); }).then(function(rows){
-    curRows = rows || [];
-    if (manifest.cats[name].files.length > 1){
-      var rest = manifest.cats[name].files.slice(1);
-      var chain = Promise.resolve();
-      rest.forEach(function(f){
-        chain = chain.then(function(){ return fetch(DATA + f).then(function(r){ return r.json(); }).then(function(more){ curRows = curRows.concat(more || []); renderBiz(true); }); });
-      });
-    }
-    renderBiz(true);
-  }).catch(function(){
-    document.getElementById("bizList").innerHTML = '<div class="msg">Could not load this category. Check your connection and try again.</div>';
-  });
 }
-
-function filteredRows(){
-  var q = curQuery.trim().toLowerCase();
-  return curRows.filter(function(r){
-    var isSent = !!sent[r[0]];
-    if (curFilter === "sent" && !isSent) return false;
-    if (curFilter === "left" && isSent) return false;
+function visibleLeads(){
+  var src = currentSourceRows();
+  if (!src) return null;
+  var q = exploreQuery.trim().toLowerCase();
+  var out = [];
+  src.forEach(function(r){
+    var b = { slug: r[0], name: r[1] || "", cat: r[2] || "", phone: r[3] || "", addr: r[4] || "" };
+    if (activeCategory && b.cat !== activeCategory) return;
     if (q){
-      var hay = ((r[1]||"") + " " + (r[3]||"") + " " + (r[4]||"")).toLowerCase();
-      if (hay.indexOf(q) === -1) return false;
+      var hay = (b.name + " " + b.phone + " " + b.addr + " " + b.cat).toLowerCase();
+      if (hay.indexOf(q) === -1) return;
     }
-    return true;
+    out.push(b);
   });
+  return out;
 }
-
-function renderBiz(reset){
-  if (reset) shown = PAGE;
-  var rows = filteredRows();
-  var slice = rows.slice(0, shown);
+/* Category filter: ONE dropdown. Categories live only inside its panel. */
+var catDropOpen = false;
+var catDropQuery = "";
+function renderCatDrop(){
+  var wrap = document.getElementById("catDrop");
+  var btn = document.getElementById("catDropBtn");
+  var panel = document.getElementById("catDropPanel");
+  document.getElementById("catDropLabel").textContent = activeCategory ? activeCategory : "All categories";
+  var cnt = document.getElementById("catDropCount");
+  if (activeCategory){
+    var c = findCatObj(activeCategory);
+    cnt.textContent = c ? fmt(c.count) : "";
+  } else {
+    cnt.textContent = "";
+  }
+  wrap.classList.toggle("hasfilter", !!activeCategory);
+  wrap.classList.toggle("open", catDropOpen);
+  btn.setAttribute("aria-expanded", catDropOpen ? "true" : "false");
+  panel.classList.toggle("hidden", !catDropOpen);
+  if (catDropOpen) renderCatDropList();
+}
+function renderCatDropList(){
+  var q = catDropQuery.trim().toLowerCase();
   var html = "";
-  slice.forEach(function(r, i){
-    var slug = r[0], name = r[1] || "", phone = r[3] || "", addr = r[4] || "";
-    var url = "bjvfi.com/" + slug + "/";
-    var isSent = !!sent[slug];
-    var isSel = !!selSet[slug];
-    var digits = phone.replace(/[^0-9+]/g, "");
-    var body = WORDINGS[i % WORDINGS.length](name, url);
-    html += '<div class="row">'
-      + '<div class="nm">' + esc(name) + '</div>'
-      + (phone ? '<div class="dt">' + esc(phone) + '</div>' : '')
-      + (addr ? '<div class="dt">' + esc(addr) + '</div>' : '')
-      + '<div class="acts">'
-      + '<a class="pill" href="https://' + esc(url) + '" target="_blank" rel="noopener">Site</a>'
-      + (digits ? '<a class="pill" href="sms:' + esc(digits) + '?&body=' + encodeURIComponent(body) + '">Text</a>' : '')
-      + '<button class="pill' + (isSent ? ' sent' : '') + '" type="button" data-sent="' + esc(slug) + '">' + (isSent ? 'Sent' : 'Not sent') + '</button>'
-      + '<button class="pill' + (isSel ? ' picked' : '') + '" type="button" data-select="' + esc(slug) + '">Select</button>'
-      + '</div></div>';
+  var allSel = !activeCategory;
+  html += '<button class="catdrop-item' + (allSel ? " sel" : "") + '" type="button" role="option" aria-selected="' + (allSel ? "true" : "false") + '" data-catpick="">'
+    + '<span class="nm">All categories</span><span class="ct">' + (manifest ? fmt(manifest.total) : "") + '</span></button>';
+  var any = false;
+  sortedCatList.forEach(function(c){
+    if (q && c.name.toLowerCase().indexOf(q) === -1) return;
+    any = true;
+    var sel = activeCategory === c.name;
+    html += '<button class="catdrop-item' + (sel ? " sel" : "") + '" type="button" role="option" aria-selected="' + (sel ? "true" : "false") + '" data-catpick="' + esc(c.name) + '">'
+      + '<span class="nm">' + esc(c.name) + '</span><span class="ct">' + fmt(c.count) + '</span></button>';
   });
-  if (!slice.length) html = '<div class="msg">Nothing here.</div>';
-  if (rows.length > shown) html += '<button class="pill more" id="moreBtn" type="button">Show more (' + fmt(rows.length - shown) + ' more)</button>';
-  var list = document.getElementById("bizList");
+  if (!any && q) html += '<div class="catdrop-empty">No categories match.</div>';
+  var list = document.getElementById("catDropList");
   list.innerHTML = html;
-  Array.prototype.forEach.call(list.querySelectorAll("[data-sent]"), function(el){
+  Array.prototype.forEach.call(list.querySelectorAll("[data-catpick]"), function(el){
     el.addEventListener("click", function(){
-      var slug = el.getAttribute("data-sent");
-      setMarked(slug, !sent[slug]);
-      refreshStats();
-      document.getElementById("catSent").textContent = fmt(catSentCount(curCat));
-      renderBiz(false);
+      var name = el.getAttribute("data-catpick");
+      activeCategory = name ? name : null;
+      catDropOpen = false;
+      selection = {};
+      var st = document.getElementById("sendStatus");
+      if (st) st.textContent = "";
+      updateSelBar();
+      renderExplore();
+      ensureExploreData();
     });
   });
-  Array.prototype.forEach.call(list.querySelectorAll("[data-select]"), function(el){
+}
+function closeCatDrop(){
+  if (!catDropOpen) return;
+  catDropOpen = false;
+  renderCatDrop();
+}
+document.getElementById("catDropBtn").addEventListener("click", function(e){
+  e.stopPropagation();
+  catDropOpen = !catDropOpen;
+  renderCatDrop();
+});
+document.getElementById("catDropPanel").addEventListener("click", function(e){ e.stopPropagation(); });
+document.getElementById("catDropSearch").addEventListener("input", function(){
+  catDropQuery = this.value;
+  renderCatDropList();
+});
+document.addEventListener("click", function(e){
+  var wrap = document.getElementById("catDrop");
+  if (catDropOpen && wrap && !wrap.contains(e.target)) closeCatDrop();
+});
+document.addEventListener("keydown", function(e){ if (e.key === "Escape") closeCatDrop(); });
+function renderExplore(){
+  renderCatDrop();
+  renderBiz(true);
+}
+
+/* Leads list. Default (no search): ONLY Not sent businesses. Sent ones
+   live only in the Sent view, except when a search matches them: then
+   they appear as readonly cards with plain Sent status, never selectable. */
+function pruneSelection(){
+  Object.keys(selection).forEach(function(slug){
+    if (sent[slug]) delete selection[slug];
+  });
+}
+function selCount(){ pruneSelection(); return Object.keys(selection).length; }
+function updateSelBar(){
+  var n = selCount();
+  var bar = document.getElementById("selBar");
+  if (bar) bar.classList.toggle("hidden", n === 0);
+  document.getElementById("selCount").textContent = fmt(n);
+}
+function renderBiz(reset){
+  if (reset) shown = PAGE;
+  pruneSelection();
+  var list = document.getElementById("bizList");
+  var rows = visibleLeads();
+  if (!rows){
+    list.innerHTML = '<div class="msg">Loading...</div>';
+    updateSelBar();
+    return;
+  }
+  var searching = exploreQuery.trim().length > 0;
+  var notSent = [], sentRows = [];
+  rows.forEach(function(b){
+    if (sent[b.slug]){
+      if (selection[b.slug]) delete selection[b.slug];
+      sentRows.push(b);
+    } else notSent.push(b);
+  });
+  var display = searching ? rows : notSent;
+  var slice = display.slice(0, shown);
+  var html = "";
+  if (searching){
+    html += '<div class="biz-section"><div class="secttl" style="margin-top:6px;">Results <span class="cnt">' + fmt(display.length) + '</span></div>';
+  } else {
+    html += '<div class="biz-section"><div class="secttl" style="margin-top:6px;">Not sent <span class="cnt">' + fmt(notSent.length) + '</span></div>';
+  }
+  if (!slice.length){
+    html += '<div class="msg">Nothing here.</div>';
+  } else {
+    slice.forEach(function(b, i){
+      var url = "bjvfi.com/" + b.slug + "/";
+      if (sent[b.slug]){
+        html += '<div class="row readonly">'
+          + '<span class="catlabel">' + esc(b.cat) + '</span>'
+          + '<div class="nm">' + esc(b.name) + '</div>'
+          + (b.phone ? '<div class="dt">' + esc(b.phone) + '</div>' : '')
+          + (b.addr ? '<div class="dt">' + esc(b.addr) + '</div>' : '')
+          + '<div class="acts biz-footer"><span class="biz-spacer"></span><span class="status-text sent">Sent</span></div>'
+          + '</div>';
+        return;
+      }
+      var sel = !!selection[b.slug];
+      var digits = b.phone.replace(/[^0-9+]/g, "");
+      var body = WORDINGS[i % WORDINGS.length](b.name, url);
+      html += '<div class="row">'
+        + '<div class="biz-top"><div class="biz-top-main">'
+        + '<span class="catlabel">' + esc(b.cat) + '</span>'
+        + '<div class="nm">' + esc(b.name) + '</div>'
+        + (b.phone ? '<div class="dt">' + esc(b.phone) + '</div>' : '')
+        + (b.addr ? '<div class="dt">' + esc(b.addr) + '</div>' : '')
+        + '</div>'
+        + '<button class="pill biz-select' + (sel ? " goldsel" : "") + '" type="button" data-sel="' + esc(b.slug) + '">Select</button>'
+        + '</div>'
+        + '<div class="acts biz-footer">'
+        + '<a class="pill" href="https://' + esc(url) + '" target="_blank" rel="noopener">Site</a>'
+        + (digits ? '<a class="pill" href="sms:' + esc(digits) + '?&body=' + encodeURIComponent(body) + '">Text</a>' : '')
+        + '<span class="biz-spacer"></span>'
+        + '<span class="status-text">Not sent</span>'
+        + '</div></div>';
+    });
+  }
+  html += '</div>';
+  if (display.length > shown) html += '<button class="pill more" id="moreBtn" type="button">Show more (' + fmt(display.length - shown) + ' more)</button>';
+  list.innerHTML = html;
+  Array.prototype.forEach.call(list.querySelectorAll("[data-sel]"), function(el){
     el.addEventListener("click", function(){
-      var slug = el.getAttribute("data-select");
-      if (selSet[slug]) delete selSet[slug]; else selSet[slug] = true;
-      selSaveFor(curCat);
+      var slug = el.getAttribute("data-sel");
+      if (sent[slug]){ delete selection[slug]; updateSelBar(); renderBiz(false); return; }
+      if (selection[slug]) delete selection[slug]; else selection[slug] = true;
+      updateSelBar();
       renderBiz(false);
     });
   });
@@ -725,46 +1280,312 @@ function renderBiz(reset){
   if (mb) mb.addEventListener("click", function(){ shown += PAGE; renderBiz(false); });
   updateSelBar();
 }
-
-function setFilter(f){
-  curFilter = f;
-  [["fAll","all"],["fLeft","left"],["fSent","sent"]].forEach(function(pair){
-    document.getElementById(pair[0]).classList.toggle("sel", pair[1] === f);
+function randomPick(n){
+  var rows = visibleLeads();
+  if (!rows) return;
+  var pool = rows.filter(function(b){ return !sent[b.slug]; }).slice();
+  for (var i = pool.length - 1; i > 0; i--){
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+  }
+  selection = {};
+  pool.slice(0, Math.min(n, pool.length)).forEach(function(b){
+    if (!sent[b.slug]) selection[b.slug] = true;
   });
+  pruneSelection();
+  document.getElementById("sendStatus").textContent = "";
+  updateSelBar();
+  renderBiz(false);
 }
-
-document.getElementById("catSearch").addEventListener("input", renderCats);
-document.getElementById("bizSearch").addEventListener("input", function(){
-  curQuery = this.value; renderBiz(true);
-});
-document.getElementById("backBtn").addEventListener("click", function(){
-  document.getElementById("catView").classList.add("hidden");
-  document.getElementById("homeView").classList.remove("hidden");
-  renderCats(); refreshStats();
-});
-document.getElementById("fAll").addEventListener("click", function(){ setFilter("all"); renderBiz(true); });
-document.getElementById("fLeft").addEventListener("click", function(){ setFilter("left"); renderBiz(true); });
-document.getElementById("fSent").addEventListener("click", function(){ setFilter("sent"); renderBiz(true); });
-document.getElementById("textingBtn").addEventListener("click", openTexting);
-document.getElementById("repliesBtn").addEventListener("click", openReplies);
-document.getElementById("backBtn2").addEventListener("click", goBack);
-document.getElementById("backBtn3").addEventListener("click", goBack);
-document.getElementById("refreshRepliesBtn").addEventListener("click", function(){ openReplies(); });
-document.getElementById("sendBtn").addEventListener("click", sendSelected);
-document.getElementById("clearSelBtn").addEventListener("click", function(){ selSet = {}; selSaveFor(curCat); renderBiz(false); });
-document.getElementById("exportBtn").addEventListener("click", function(){
-  var lines = ["slug,name,phone,category,sent_at"];
-  Object.keys(sent).forEach(function(slug){
-    var v = sent[slug] || {};
-    function q(x){ return '"' + String(x == null ? "" : x).replace(/"/g, '""') + '"'; }
-    lines.push([q(slug), q(v.n), q(v.p), q(v.c), q(v.t ? new Date(v.t).toISOString() : "")].join(","));
+/* Sending goes through the Worker in chunks of 50 per category, exactly
+   the payload the bridge accepts. Only a per-slug ok from the Worker marks
+   that business Sent. If the bridge is not configured or this device has
+   no key, nothing is sent and the status says so. */
+async function doSend(){
+  if (sending) return;
+  pruneSelection();
+  var slugs = Object.keys(selection).filter(function(slug){ return !sent[slug]; });
+  if (!slugs.length){ updateSelBar(); renderBiz(false); return; }
+  var st = document.getElementById("sendStatus");
+  if (textConfigured !== true){ st.textContent = "Texting not set up yet"; return; }
+  if (!textKey()){ st.textContent = "Texting locked"; return; }
+  sending = true;
+  var btn = document.getElementById("sendBtn");
+  btn.disabled = true;
+  btn.textContent = "Sending";
+  var byCat = {}, order = [];
+  slugs.forEach(function(slug){
+    var c = (bizInfo[slug] && bizInfo[slug].c) || "";
+    if (!byCat[c]){ byCat[c] = []; order.push(c); }
+    byCat[c].push(slug);
   });
-  var blob = new Blob([lines.join("\n")], {type:"text/csv"});
-  var a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "sent-list.csv";
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
+  var total = slugs.length, okCount = 0, failCount = 0, authProblem = false, notConf = false;
+  st.textContent = "Sent 0 of " + fmt(total);
+  for (var ci = 0; ci < order.length && !authProblem && !notConf; ci++){
+    var cat = order[ci];
+    var arr = byCat[cat];
+    var catFile = manifest && manifest.cats[cat] ? manifest.cats[cat].files[0] : null;
+    if (!catFile){ failCount += arr.length; continue; }
+    for (var start = 0; start < arr.length; start += 50){
+      var chunk = arr.slice(start, start + 50);
+      var j = null, status = 0;
+      try {
+        var r = await fetch(TEXT_API + "/send", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-Text-Key": textKey() },
+          body: JSON.stringify({ catFile: catFile, slugs: chunk, catName: cat })
+        });
+        status = r.status;
+        j = await r.json().catch(function(){ return null; });
+      } catch(e){ j = null; }
+      if (status === 401){ authProblem = true; break; }
+      if (j && j.error === "not configured"){ notConf = true; break; }
+      if (!j || !j.results){ failCount += chunk.length; continue; }
+      j.results.forEach(function(res, ri){
+        if (res.ok){
+          okCount++;
+          delete selection[res.slug];
+          setMarked(res.slug, true, ri % 4);
+        } else failCount++;
+      });
+      st.textContent = "Sent " + fmt(okCount) + " of " + fmt(total);
+    }
+  }
+  btn.disabled = false;
+  btn.textContent = "Send";
+  sending = false;
+  if (authProblem) st.textContent = "Texting locked";
+  else if (notConf){ textConfigured = false; repliesState = "off"; st.textContent = "Texting not set up yet"; }
+  else st.textContent = fmt(okCount) + " sent" + (failCount ? ", " + fmt(failCount) + " failed" : "");
+  refreshStats();
+  updateSelBar();
+  renderBiz(false);
+}
+document.getElementById("exploreSearch").addEventListener("input", function(){ exploreQuery = this.value; renderBiz(true); });
+document.getElementById("randGo").addEventListener("click", function(){
+  var n = parseInt(document.getElementById("randNum").value, 10);
+  if (n && n > 0) randomPick(n);
+});
+document.getElementById("clearSelBtn").addEventListener("click", function(){
+  selection = {};
+  document.getElementById("sendStatus").textContent = "";
+  updateSelBar(); renderBiz(false);
+});
+document.getElementById("sendBtn").addEventListener("click", function(){ doSend(); });
+
+/* Sent view: every business in the sent mirror, across all categories.
+   The Message actions here write to one already sent business or to a
+   picked group; those compositions are kept on this device. The bulk
+   sender in Explore never includes a business that is already sent. */
+var MANUAL_KEY = "bjvfi_database_manual_v1";
+var manualMsgs = {};
+try { manualMsgs = JSON.parse(localStorage.getItem(MANUAL_KEY) || "{}") || {}; } catch(e) { manualMsgs = {}; }
+function saveManualMsgs(){ try { localStorage.setItem(MANUAL_KEY, JSON.stringify(manualMsgs)); } catch(e){} }
+var sentEntriesCache = [];
+var composeSlug = null;
+function sentEntries(){
+  var out = [];
+  Object.keys(sent).forEach(function(slug){
+    var e = sent[slug] || {};
+    out.push({ key: slug, slug: slug, name: e.n || "", cat: e.c || "", phone: e.p || "", addr: e.a || "", t: e.t || 0 });
+  });
+  out.sort(function(a, b){ return (b.t || 0) - (a.t || 0); });
+  return out;
+}
+function renderSentView(){
+  var entries = sentEntries();
+  sentEntriesCache = entries;
+  document.getElementById("sentViewCount").textContent = fmt(entries.length);
+  var html = "";
+  entries.forEach(function(e){
+    var sel = !!sentSelection[e.key];
+    html += '<div class="row">'
+      + '<div class="biz-top"><div class="biz-top-main">'
+      + (e.cat ? '<span class="catlabel">' + esc(e.cat) + '</span>' : '')
+      + '<div class="nm">' + esc(e.name) + '</div>'
+      + (e.phone ? '<div class="dt">' + esc(e.phone) + '</div>' : '')
+      + (e.addr ? '<div class="dt">' + esc(e.addr) + '</div>' : '')
+      + '</div>'
+      + '<button class="pill biz-select' + (sel ? " goldsel" : "") + '" type="button" data-sentsel="' + esc(e.key) + '">Select</button>'
+      + '</div>';
+    (manualMsgs[e.key] || []).forEach(function(m){
+      html += '<div class="manual-msg">' + esc(m.text) + '<span class="bt">' + esc(fmtBubbleWhen(m.t)) + '</span></div>';
+    });
+    var whenLabel = e.t ? fmtBubbleWhen(e.t) : "";
+    html += '<div class="acts biz-footer"><button class="pill" type="button" data-msgto="' + esc(e.key) + '">Message</button><span class="biz-spacer"></span><span class="status-text sent">Sent' + (whenLabel ? ' · ' + esc(whenLabel) : '') + '</span></div></div>';
+  });
+  var list = document.getElementById("sentList");
+  list.innerHTML = html || '<div class="msg">Nothing sent yet.</div>';
+  Array.prototype.forEach.call(list.querySelectorAll("[data-msgto]"), function(el){
+    el.addEventListener("click", function(){
+      var key = el.getAttribute("data-msgto");
+      for (var i = 0; i < sentEntriesCache.length; i++){
+        if (sentEntriesCache[i].key === key){ openSentCompose(sentEntriesCache[i]); break; }
+      }
+    });
+  });
+  Array.prototype.forEach.call(list.querySelectorAll("[data-sentsel]"), function(el){
+    el.addEventListener("click", function(){
+      var key = el.getAttribute("data-sentsel");
+      if (sentSelection[key]) delete sentSelection[key]; else sentSelection[key] = true;
+      updateSentSelBar();
+      renderSentView();
+    });
+  });
+  updateSentSelBar();
+}
+/* Group message flow (Sent view only): hand pick or random pick some sent
+   businesses, then craft ONE message that goes to all of them. */
+var sentSelection = {};
+var groupSending = false;
+function sentSelCount(){ return Object.keys(sentSelection).length; }
+function updateSentSelBar(){
+  var n = sentSelCount();
+  var bar = document.getElementById("sentSelBar");
+  if (bar) bar.classList.toggle("hidden", n === 0);
+  var cnt = document.getElementById("sentSelCount");
+  if (cnt) cnt.textContent = fmt(n);
+  var btn = document.getElementById("sentGroupBtn");
+  if (btn) btn.textContent = "Message selected · " + fmt(n);
+  if (n === 0 && !groupSending) closeGroupCompose();
+}
+function sentRandomPick(n){
+  var pool = sentEntriesCache.slice();
+  for (var i = pool.length - 1; i > 0; i--){
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+  }
+  sentSelection = {};
+  pool.slice(0, Math.min(n, pool.length)).forEach(function(e){ sentSelection[e.key] = true; });
+  updateSentSelBar();
+  renderSentView();
+}
+function openGroupCompose(){
+  var n = sentSelCount();
+  if (!n || groupSending) return;
+  closeSentCompose();
+  document.getElementById("sentGroupName").textContent = "Message to " + fmt(n) + (n === 1 ? " business" : " businesses");
+  document.getElementById("sentGroupSub").textContent = "One message, sent to every selected business";
+  document.getElementById("sentGroupStatus").textContent = "";
+  var inp = document.getElementById("sentGroupInput");
+  inp.value = "";
+  document.getElementById("sentGroupCompose").classList.remove("hidden");
+  document.getElementById("sentScroll").scrollTop = 0;
+  inp.focus();
+}
+function closeGroupCompose(){
+  if (groupSending) return;
+  var box = document.getElementById("sentGroupCompose");
+  if (box) box.classList.add("hidden");
+  var inp = document.getElementById("sentGroupInput");
+  if (inp) inp.value = "";
+  var st = document.getElementById("sentGroupStatus");
+  if (st) st.textContent = "";
+}
+function sendGroupCompose(){
+  if (groupSending) return;
+  var inp = document.getElementById("sentGroupInput");
+  var text = inp.value.trim();
+  var keys = Object.keys(sentSelection);
+  if (!text || !keys.length) return;
+  groupSending = true;
+  var st = document.getElementById("sentGroupStatus");
+  var btn = document.getElementById("sentGroupSend");
+  var cancel = document.getElementById("sentGroupCancel");
+  btn.textContent = "Sending";
+  inp.disabled = true;
+  cancel.disabled = true;
+  var total = keys.length, done = 0;
+  st.textContent = "Sent 0 of " + fmt(total);
+  var timer = setInterval(function(){
+    var step = Math.min(6, total - done);
+    for (var k = 0; k < step; k++){
+      var key = keys[done];
+      if (!manualMsgs[key]) manualMsgs[key] = [];
+      manualMsgs[key].push({ text: text, t: Date.now() });
+      done++;
+    }
+    saveManualMsgs();
+    st.textContent = "Sent " + fmt(done) + " of " + fmt(total);
+    if (done >= total){
+      clearInterval(timer);
+      btn.textContent = "Send";
+      inp.disabled = false;
+      cancel.disabled = false;
+      groupSending = false;
+      sentSelection = {};
+      var box = document.getElementById("sentGroupCompose");
+      box.classList.add("hidden");
+      inp.value = "";
+      st.textContent = "";
+      updateSentSelBar();
+      renderSentView();
+    }
+  }, 160);
+}
+document.getElementById("sentRandGo").addEventListener("click", function(){
+  var n = parseInt(document.getElementById("sentRandNum").value, 10);
+  if (n && n > 0) sentRandomPick(n);
+});
+document.getElementById("sentClearSelBtn").addEventListener("click", function(){
+  sentSelection = {};
+  updateSentSelBar();
+  renderSentView();
+});
+document.getElementById("sentGroupBtn").addEventListener("click", openGroupCompose);
+document.getElementById("sentGroupSend").addEventListener("click", sendGroupCompose);
+document.getElementById("sentGroupInput").addEventListener("keydown", function(e){ if (e.key === "Enter") sendGroupCompose(); });
+document.getElementById("sentGroupCancel").addEventListener("click", closeGroupCompose);
+function openSentCompose(entry){
+  closeGroupCompose();
+  composeSlug = entry.key;
+  document.getElementById("sentComposeName").textContent = entry.name;
+  document.getElementById("sentComposeSub").textContent = entry.cat + " · " + entry.phone;
+  document.getElementById("sentComposeStatus").textContent = "";
+  var inp = document.getElementById("sentComposeInput");
+  inp.value = "";
+  document.getElementById("sentCompose").classList.remove("hidden");
+  document.getElementById("sentScroll").scrollTop = 0;
+  inp.focus();
+}
+function closeSentCompose(){
+  composeSlug = null;
+  document.getElementById("sentCompose").classList.add("hidden");
+  document.getElementById("sentComposeInput").value = "";
+  document.getElementById("sentComposeStatus").textContent = "";
+}
+function sendSentCompose(){
+  var inp = document.getElementById("sentComposeInput");
+  var text = inp.value.trim();
+  if (!composeSlug || !text) return;
+  if (!manualMsgs[composeSlug]) manualMsgs[composeSlug] = [];
+  manualMsgs[composeSlug].push({ text: text, t: Date.now() });
+  saveManualMsgs();
+  closeSentCompose();
+  renderSentView();
+}
+document.getElementById("sentComposeSend").addEventListener("click", sendSentCompose);
+document.getElementById("sentComposeInput").addEventListener("keydown", function(e){ if (e.key === "Enter") sendSentCompose(); });
+document.getElementById("sentComposeCancel").addEventListener("click", closeSentCompose);
+document.getElementById("exploreSentBtn").addEventListener("click", function(){
+  closeCatDrop();
+  closeSentCompose();
+  closeGroupCompose();
+  renderSentView();
+  showView("sentView");
+  if (repoCounts){
+    Object.keys(repoCounts).forEach(function(name){
+      if (repoCounts[name] > 0) ensureShard(name);
+    });
+  }
+});
+document.getElementById("sentBackBtn").addEventListener("click", function(){
+  closeSentCompose();
+  closeGroupCompose();
+  refreshStats();
+  renderExplore();
+  showView("exploreView");
+  ensureExploreData();
 });
 
 if (window.matchMedia && !window.matchMedia("(prefers-color-scheme: light)").matches){
@@ -775,9 +1596,15 @@ if (window.matchMedia && !window.matchMedia("(prefers-color-scheme: light)").mat
   });
 }
 
+/* Boot */
+renderMsgFilters();
+renderThreadList();
+refreshMsgStats();
+showView("homeView");
 setSyncLabel();
 fetch(DATA + "manifest.json").then(function(r){ return r.json(); }).then(async function(m){
   manifest = m;
+  buildSortedCats();
   if (TOKEN){
     try {
       var idx = await ghGetJson(INDEX_PATH);
@@ -785,12 +1612,15 @@ fetch(DATA + "manifest.json").then(function(r){ return r.json(); }).then(async f
       else repoCounts = {};
     } catch(e){ repoCounts = null; }
   }
-  refreshStats(); renderCats(); setSyncLabel();
+  renderCatDrop();
+  refreshStats();
+  setSyncLabel();
   retryPending();
   checkTexting();
 }).catch(function(){
-  document.getElementById("catList").innerHTML = '<div class="msg">Could not load the database. Check your connection and reopen the page.</div>';
+  document.getElementById("bizList").innerHTML = '<div class="msg">Could not load the database. Check your connection and reopen the page.</div>';
 });
+
 </script>
 </body>
 </html>
