@@ -1140,7 +1140,8 @@
     return h.replace(/(https?:\/\/[^\s<>"']+|www\.[^\s<>"']+|[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})/g,function(u){
       var trail='';
       while(/[.,;:!?]$/.test(u)){ trail=u.slice(-1)+trail; u=u.slice(0,-1); }
-      if(/\)$/.test(u)&&u.indexOf('(')===-1){ trail=')'+trail; u=u.slice(0,-1); }
+      var opens=(u.match(/\(/g)||[]).length, closes=(u.match(/\)/g)||[]).length;
+      while(/\)$/.test(u)&&closes>opens){ trail=')'+trail; u=u.slice(0,-1); closes--; }
       var href;
       if(/^https?:\/\//i.test(u)) href=u;
       else if(/^www\./i.test(u)) href='http://'+u;
