@@ -3863,45 +3863,62 @@ async function refreshEditorTree(){
    They never touch the repo that serves the sites. */
 async function saveEditorDraft(el){
   const slug = state.editorSlug;
-  if(!slug) return;
+  if(!slug || state._editorDraftSaving) return;
   const ta = document.getElementById('editor-new-code');
   const code = ta ? ta.value : '';
   const btn = document.getElementById('btn-save-draft');
   const err = document.getElementById('editor-err');
   if(err) err.textContent = '';
+  state._editorDraftSaving = true;
   if(btn){ btn.disabled = true; btn.textContent = 'Saving...'; }
   try{
     const lead = editorLead();
-    let sha = (state.editorDraft && state.editorDraft._sha) || null;
-    if(!sha){
-      const rec = await ghGetJson('site-drafts/' + slug + '.json').catch(function(){ return null; });
-      if(rec) sha = rec.sha;
-    }
+    /* Only save against the version this editor actually loaded. Never adopt
+       a newer SHA just to force a stale draft over somebody else's work. */
+    const sha = (state.editorDraft && state.editorDraft._sha) || null;
     const bizName = state._editorBizName != null ? state._editorBizName : (lead.name || slug);
     const slugTarget = state._editorSlugTarget != null ? state._editorSlugTarget : slug;
     const draft = { slug: slug, business_name: bizName,
       target_slug: (slugTarget !== slug ? slugTarget : null), code: code,
       author: state.user.username, author_name: state.user.name, updated_at: nowISO() };
+    const path = 'site-drafts/' + slug + '.json';
+    let savedSha = null;
     try{
-      await ghPutJson('site-drafts/' + slug + '.json', draft, sha, 'sitedesk: draft ' + slug);
+      const result = await ghPutJson(path, draft, sha, 'sitedesk: draft ' + slug);
+      savedSha = result && result.content && result.content.sha;
     }catch(e){
-      if(isConflictError(e)){
-        const rec2 = await ghGetJson('site-drafts/' + slug + '.json');
-        await ghPutJson('site-drafts/' + slug + '.json', draft, rec2 ? rec2.sha : null,
-          'sitedesk: draft ' + slug + ' (retry)');
+      /* A lost response may still have saved. Read once to recognize our
+         exact write, but never retry with another editor's newer version. */
+      const latest = await ghGetJson(path).catch(function(){ return null; });
+      if(latest && JSON.stringify(latest.data) === JSON.stringify(draft)){
+        savedSha = latest.sha;
+      } else if(isConflictError(e)){
+        throw new Error('This draft changed in another session. Your edits are still here. Copy them before refreshing to load the newer draft.');
       } else { throw e; }
     }
-    const rec3 = await ghGetJson('site-drafts/' + slug + '.json').catch(function(){ return null; });
-    state.editorDraft = draft;
-    if(rec3) state.editorDraft._sha = rec3.sha;
-    state._editorDirty = false;
+    if(!savedSha){
+      const latest = await ghGetJson(path);
+      if(!latest || JSON.stringify(latest.data) !== JSON.stringify(draft)){
+        throw new Error('Could not verify this draft save. Your edits are still here; refresh only after copying them.');
+      }
+      savedSha = latest.sha;
+    }
+    if(state.editorSlug === slug){
+      state.editorDraft = Object.assign({}, draft, { _sha: savedSha });
+      /* Typing while a request is in flight must remain unsaved/dirty. */
+      state._editorDirty = (ta && ta.value !== code) ||
+        (state._editorBizName != null && state._editorBizName !== bizName) ||
+        (state._editorSlugTarget != null && state._editorSlugTarget !== slugTarget);
+      loadEditorDrafts(el);
+    }
     toast('Draft saved');
-    loadEditorDrafts(el);
   }catch(e){
     if(err) err.textContent = e.message;
     else toast(e.message);
+  }finally{
+    state._editorDraftSaving = false;
+    if(btn){ btn.disabled = false; btn.textContent = 'Save draft'; }
   }
-  if(btn){ btn.disabled = false; btn.textContent = 'Save draft'; }
 }
 
 async function publishEditorCode(el){
@@ -4894,20 +4911,28 @@ function logPaymentModal(username, el){
     '<div class="row"><button class="btn ghost" id="lp-cancel" type="button" style="flex:1">Cancel</button>' +
     '<button class="btn" id="lp-go" type="button" style="flex:2">Log payment</button></div>' +
     '<div class="err" id="lp-err"></div>');
+  let entry = null;
+  let saving = false;
   document.getElementById('lp-cancel').addEventListener('click', closeModal);
   document.getElementById('lp-go').addEventListener('click', async function(){
+    if(saving) return;
     const err = document.getElementById('lp-err');
     err.textContent = '';
     const amount = (document.getElementById('lp-amount').value || '').trim();
     const note = (document.getElementById('lp-note').value || '').trim();
     if(!amount || isNaN(Number(amount)) || Number(amount) <= 0){ err.textContent = 'Enter a valid amount.'; return; }
     const btn = document.getElementById('lp-go');
+    saving = true;
     btn.disabled = true;
+    /* Keep one operation id across retries, including a lost save response
+       or a failed post-save refresh. The amount cannot change mid-retry. */
+    if(!entry) entry = { id: uid('pay'), amount: amount, note: note, paid_at: new Date().toISOString(), paid_by: state.user.username };
+    document.getElementById('lp-amount').disabled = true;
+    document.getElementById('lp-note').disabled = true;
     try{
-      const entry = { id: uid('pay'), amount: amount, note: note, paid_at: new Date().toISOString(), paid_by: state.user.username };
       await updateUserRecord(username, function(u){
         u.payments = u.payments || [];
-        u.payments.push(entry);
+        if(!u.payments.some(function(p){ return p.id === entry.id; })) u.payments.push(entry);
       }, 'sitedesk: payment logged @' + username);
       await postEvent(username, 'Payment sent', '$' + amount + (note ? ' \xB7 ' + note : ''), 'tab:profile');
       closeModal();
@@ -4917,6 +4942,7 @@ function logPaymentModal(username, el){
          on the payments list. */
       renderAdminInto(el);
     }catch(e){ err.textContent = e.message; btn.disabled = false; }
+    finally{ saving = false; }
   });
 }
 
