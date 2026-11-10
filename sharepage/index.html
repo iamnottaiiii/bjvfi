@@ -67,7 +67,7 @@
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
 (function () {
-  var CHUNK = 64 * 1024;
+  var CHUNK = 12 * 1024;
   var drop = document.getElementById('drop');
   var picker = document.getElementById('picker');
   var filesEl = document.getElementById('files');
@@ -96,87 +96,147 @@
   function senderMode() {
     var myFiles = [];
     var conn = null;
+    var connGen = 0;
     var sending = false;
-    var sentCount = 0;
-    var receiverReady = false;
+    var pumpingIdx = -1;
+    var acked = {};
+    var awaiting = {};
+    var metaId = 0;
+    var pendingMeta = false;
+    var peer = null;
+    var idRetries = 0;
 
     var alphabet = 'abcdefghjkmnpqrstuvwxyz23456789';
-    var myCode = '';
-    for (var i = 0; i < 6; i++) myCode += alphabet[Math.floor(Math.random() * alphabet.length)];
+    function newCode() {
+      var c = '';
+      for (var i = 0; i < 6; i++) c += alphabet[Math.floor(Math.random() * alphabet.length)];
+      return c;
+    }
+    var myCode = null;
+    try { myCode = sessionStorage.getItem('shareCode'); } catch (e) { }
+    if (!myCode) {
+      myCode = newCode();
+      try { sessionStorage.setItem('shareCode', myCode); } catch (e) { }
+    }
 
-    var peer = new Peer('shr-' + myCode);
-    peer.on('open', function () {
-      linkInput.value = location.origin + location.pathname + '#' + myCode;
-      linkbox.classList.add('show');
-      setStatus('waiting for the other side');
-    });
-    peer.on('error', function (err) {
-      if (err && err.type === 'unavailable-id') location.reload();
-      else setStatus('connection problem, refresh to try again');
-    });
-    peer.on('connection', function (c) {
-      conn = c;
-      conn.on('open', function () { setStatus('connected'); });
-      conn.on('data', function (msg) {
-        if (!msg || typeof msg !== 'object') return;
-        if (msg.t === 'hello') sendMeta();
-        if (msg.t === 'ready') { receiverReady = true; trySend(); }
+    function allAcked() {
+      if (!myFiles.length) return false;
+      for (var i = 0; i < myFiles.length; i++) if (!acked[i]) return false;
+      return true;
+    }
+
+    function register() {
+      peer = new Peer('shr-' + myCode);
+      peer.on('open', function () {
+        idRetries = 0;
+        linkInput.value = location.origin + location.pathname + '#' + myCode;
+        linkbox.classList.add('show');
+        if (!conn) setStatus('waiting for the other side');
       });
-      conn.on('close', function () { setStatus('the other side left'); });
-    });
+      peer.on('error', function (err) {
+        if (err && err.type === 'unavailable-id' && idRetries < 10) {
+          idRetries++;
+          try { peer.destroy(); } catch (e) { }
+          setTimeout(register, 2000);
+          return;
+        }
+        if (err && err.type === 'unavailable-id') {
+          myCode = newCode();
+          try { sessionStorage.setItem('shareCode', myCode); } catch (e) { }
+          idRetries = 0;
+          try { peer.destroy(); } catch (e) { }
+          setTimeout(register, 500);
+          return;
+        }
+        setStatus('connection problem, refresh to try again');
+      });
+      peer.on('connection', function (c) {
+        conn = c;
+        connGen++;
+        sending = false;
+        pumpingIdx = -1;
+        acked = {};
+        awaiting = {};
+        var gen = connGen;
+        conn.on('open', function () { if (gen === connGen) setStatus('connected'); });
+        conn.on('data', function (msg) {
+          if (gen !== connGen) return;
+          if (!msg || typeof msg !== 'object') return;
+          if (msg.t === 'hello') { acked = {}; awaiting = {}; sendMeta(); }
+          if (msg.t === 'have') { acked[msg.idx] = true; awaiting[msg.idx] = false; }
+          if (msg.t === 'ready') trySend();
+          if (msg.t === 'ack') {
+            acked[msg.idx] = true;
+            awaiting[msg.idx] = false;
+            if (allAcked()) setStatus('sent');
+          }
+          if (msg.t === 'redo') {
+            acked[msg.idx] = false;
+            awaiting[msg.idx] = false;
+            if (pumpingIdx !== msg.idx) trySend();
+          }
+        });
+        conn.on('close', function () { if (gen === connGen) { sending = false; pumpingIdx = -1; awaiting = {}; setStatus('the other side left'); } });
+      });
+    }
+    register();
 
-    function pendingFiles() { return myFiles.slice(sentCount); }
+    function fileList() {
+      return myFiles.map(function (f) { return { name: f.name, size: f.size, type: f.type }; });
+    }
 
     function sendMeta() {
-      if (!conn || !conn.open) return;
-      conn.send({ t: 'meta', files: pendingFiles().map(function (f) { return { name: f.name, size: f.size, type: f.type }; }) });
+      if (!conn || !conn.open) { pendingMeta = true; return; }
+      metaId++;
+      conn.send({ t: 'meta', mid: metaId, files: fileList() });
     }
 
     function trySend() {
-      if (sending || !receiverReady || !conn || !conn.open) return;
-      if (sentCount >= myFiles.length) return;
+      if (sending || !conn || !conn.open) return;
+      if (pendingMeta) { pendingMeta = false; sendMeta(); return; }
+      var idx = -1;
+      for (var i = 0; i < myFiles.length; i++) if (!acked[i] && !awaiting[i]) { idx = i; break; }
+      if (idx === -1) { if (myFiles.length && allAcked()) setStatus('sent'); return; }
       sending = true;
-      sendBatch();
+      pumpingIdx = idx;
+      setStatus('sending');
+      var gen = connGen;
+      sendFile(idx, gen, function () {
+        sending = false;
+        pumpingIdx = -1;
+        if (gen === connGen && !acked[idx]) {
+          awaiting[idx] = true;
+          setTimeout(function () {
+            if (gen === connGen && !acked[idx]) { awaiting[idx] = false; trySend(); }
+          }, 8000);
+        }
+        trySend();
+      });
     }
 
-    function sendBatch() {
-      var batch = pendingFiles();
-      var total = batch.reduce(function (a, f) { return a + f.size; }, 0);
-      var sentBatch = 0;
-      var idx = 0;
-      function next() {
-        if (idx >= batch.length) {
-          sending = false;
-          if (conn && conn.open) conn.send({ t: 'done' });
-          setStatus('sent');
-          if (sentCount < myFiles.length) { receiverReady = false; sendMeta(); }
-          return;
-        }
-        sendFile(batch[idx], function (sentBytes) {
-          sentBatch += sentBytes; sentCount++; idx++; next();
-        }, function (fileSent) { progress(sentBatch + fileSent, total); });
+    function sendFile(idx, gen, done) {
+      var file = myFiles[idx];
+      var offset = 0;
+      conn.send({ t: 'start', mid: metaId, idx: idx, name: file.name, size: file.size, type: file.type });
+      function finish() { done(); }
+      function pump() {
+        if (gen !== connGen || !conn || !conn.open) { finish(); return; }
+        if (offset >= file.size) { conn.send({ t: 'end', idx: idx }); finish(); return; }
+        var dc = conn.dataChannel;
+        if (dc && dc.bufferedAmount > 4 * 1024 * 1024) { setTimeout(pump, 60); return; }
+        var slice = file.slice(offset, Math.min(offset + CHUNK, file.size));
+        var reader = new FileReader();
+        reader.onload = function () {
+          if (gen !== connGen || !conn || !conn.open) { finish(); return; }
+          conn.send(reader.result);
+          offset += slice.size;
+          pump();
+        };
+        reader.onerror = function () { finish(); };
+        reader.readAsArrayBuffer(slice);
       }
-      function sendFile(file, done, tick) {
-        var offset = 0;
-        conn.send({ t: 'start', name: file.name, size: file.size, type: file.type });
-        function pump() {
-          if (offset >= file.size) { conn.send({ t: 'end' }); done(file.size); return; }
-          var dc = conn.dataChannel;
-          if (dc && dc.bufferedAmount > 8 * 1024 * 1024) { setTimeout(pump, 60); return; }
-          var slice = file.slice(offset, Math.min(offset + CHUNK, file.size));
-          var reader = new FileReader();
-          reader.onload = function () {
-            conn.send(reader.result);
-            offset += slice.size;
-            tick(offset);
-            pump();
-          };
-          reader.readAsArrayBuffer(slice);
-        }
-        if (file.size === 0) { conn.send({ t: 'end' }); done(0); return; }
-        pump();
-      }
-      next();
+      if (file.size === 0) { conn.send({ t: 'end', idx: idx }); finish(); return; }
+      pump();
     }
 
     drop.addEventListener('click', function () { picker.click(); });
@@ -199,7 +259,9 @@
         row.appendChild(n); row.appendChild(s);
         filesEl.appendChild(row);
       }
-      if (conn && conn.open && !sending) sendMeta();
+      if (conn && conn.open) {
+        if (sending) pendingMeta = true; else sendMeta();
+      }
     }
 
     copyBtn.addEventListener('click', function () {
@@ -214,10 +276,16 @@
   function receiverMode(theCode) {
     drop.style.display = 'none';
     setStatus('connecting');
-    var peer = new Peer();
+    var peer = null;
+    var conn = null;
+    var attempts = 0;
+    var metaFiles = [];
+    var metaMid = -1;
+    var completed = {};
     var totalBytes = 0, gotBytes = 0;
     var cur = null;
     var chunkChain = Promise.resolve();
+    var finishedAll = false;
 
     function isChunk(msg) {
       if (msg instanceof ArrayBuffer) return true;
@@ -239,29 +307,75 @@
       return chunkChain;
     }
 
-    peer.on('open', function () {
-      var conn = peer.connect('shr-' + theCode, { reliable: true });
-      conn.on('open', function () { setStatus('connected'); conn.send({ t: 'hello' }); });
-      conn.on('data', function (msg) {
-        if (isChunk(msg)) {
-          if (cur) takeChunk(cur, msg);
-          return;
+    function allDone() {
+      if (!metaFiles.length) return false;
+      for (var i = 0; i < metaFiles.length; i++) if (!completed[i]) return false;
+      return true;
+    }
+
+    function makePeer() {
+      if (finishedAll) return;
+      peer = new Peer();
+      peer.on('open', function () { startConn(); });
+      peer.on('error', function (err) {
+        if (finishedAll) return;
+        if (err && err.type === 'peer-unavailable') { retry(); return; }
+        retry();
+      });
+    }
+
+    var retryScheduled = false;
+    function retry() {
+      if (finishedAll || retryScheduled) return;
+      retryScheduled = true;
+      attempts++;
+      if (attempts > 30) { setStatus('that link is dead, the sender closed it'); return; }
+      setStatus('connecting');
+      setTimeout(function () {
+        retryScheduled = false;
+        try { if (peer) peer.destroy(); } catch (e) { }
+        makePeer();
+      }, 4000);
+    }
+
+    function startConn() {
+      conn = peer.connect('shr-' + theCode, { reliable: true });
+      conn.on('open', function () {
+        attempts = 0;
+        setStatus('connected');
+        conn.send({ t: 'hello' });
+      });
+      conn.on('data', onData);
+      conn.on('close', function () { if (!finishedAll) retry(); });
+    }
+
+    function onData(msg) {
+      if (isChunk(msg)) {
+        if (cur) takeChunk(cur, msg);
+        return;
+      }
+      if (!msg || typeof msg !== 'object') return;
+      if (msg.t === 'meta') {
+        if (!msg.files.length) { setStatus('waiting for files'); return; }
+        finishedAll = false;
+        metaMid = msg.mid;
+        metaFiles = msg.files;
+        totalBytes = metaFiles.reduce(function (a, f) { return a + f.size; }, 0);
+        gotBytes = 0;
+        for (var i = 0; i < metaFiles.length; i++) {
+          if (completed[i]) { conn.send({ t: 'have', idx: i }); gotBytes += metaFiles[i].size; }
         }
-        if (!msg || typeof msg !== 'object') return;
-        if (msg.t === 'meta') {
-          if (!msg.files.length) { setStatus('waiting for files'); return; }
-          totalBytes = msg.files.reduce(function (a, f) { return a + f.size; }, 0);
-          gotBytes = 0;
-          setStatus('receiving');
-          conn.send({ t: 'ready' });
-        }
-        if (msg.t === 'start') {
-          cur = { name: msg.name, size: msg.size, type: msg.type, parts: [], got: 0 };
-        }
-        if (msg.t === 'end' && cur) {
-          var finished = cur;
-          cur = null;
-          chunkChain.then(function () {
+        setStatus('receiving');
+        conn.send({ t: 'ready' });
+      }
+      if (msg.t === 'start') {
+        cur = { idx: msg.idx, name: msg.name, size: msg.size, type: msg.type, parts: [], got: 0 };
+      }
+      if (msg.t === 'end' && cur && cur.idx === msg.idx) {
+        var finished = cur;
+        cur = null;
+        chunkChain.then(function () {
+          if (finished.got === finished.size) {
             var blob = new Blob(finished.parts, { type: finished.type || 'application/octet-stream' });
             var url = URL.createObjectURL(blob);
             var row = document.createElement('div');
@@ -272,18 +386,22 @@
             row.appendChild(n); row.appendChild(a);
             filesEl.appendChild(row);
             a.click();
-          });
-        }
-        if (msg.t === 'done') setStatus('done');
-      });
-      conn.on('close', function () { setStatus('the other side left'); });
-    });
-    peer.on('error', function (err) {
-      if (err && err.type === 'peer-unavailable') setStatus('that link is dead, the sender closed it');
-      else setStatus('connection problem, refresh to try again');
-    });
+            completed[finished.idx] = true;
+            if (conn && conn.open) conn.send({ t: 'ack', idx: finished.idx });
+            if (allDone()) { finishedAll = true; setStatus('done'); }
+          } else {
+            gotBytes -= finished.got;
+            if (conn && conn.open) conn.send({ t: 'redo', idx: finished.idx });
+            setStatus('receiving');
+          }
+        });
+      }
+    }
+
+    makePeer();
   }
 })();
+
 </script>
 </body>
 </html>
