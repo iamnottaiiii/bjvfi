@@ -97,6 +97,8 @@
     var myFiles = [];
     var conn = null;
     var sending = false;
+    var sentCount = 0;
+    var receiverReady = false;
 
     var alphabet = 'abcdefghjkmnpqrstuvwxyz23456789';
     var myCode = '';
@@ -117,30 +119,50 @@
       conn.on('open', function () { setStatus('connected'); });
       conn.on('data', function (msg) {
         if (!msg || typeof msg !== 'object') return;
-        if (msg.t === 'hello') {
-          conn.send({ t: 'meta', files: myFiles.map(function (f) { return { name: f.name, size: f.size, type: f.type }; }) });
-        }
-        if (msg.t === 'ready' && !sending) { sending = true; sendAll(); }
+        if (msg.t === 'hello') sendMeta();
+        if (msg.t === 'ready') { receiverReady = true; trySend(); }
       });
       conn.on('close', function () { setStatus('the other side left'); });
     });
 
-    function sendAll() {
-      var total = myFiles.reduce(function (a, f) { return a + f.size; }, 0);
-      var sentAll = 0;
+    function pendingFiles() { return myFiles.slice(sentCount); }
+
+    function sendMeta() {
+      if (!conn || !conn.open) return;
+      conn.send({ t: 'meta', files: pendingFiles().map(function (f) { return { name: f.name, size: f.size, type: f.type }; }) });
+    }
+
+    function trySend() {
+      if (sending || !receiverReady || !conn || !conn.open) return;
+      if (sentCount >= myFiles.length) return;
+      sending = true;
+      sendBatch();
+    }
+
+    function sendBatch() {
+      var batch = pendingFiles();
+      var total = batch.reduce(function (a, f) { return a + f.size; }, 0);
+      var sentBatch = 0;
       var idx = 0;
       function next() {
-        if (idx >= myFiles.length) { conn.send({ t: 'done' }); setStatus('sent'); return; }
-        sendFile(myFiles[idx], function (sentBytes) {
-          sentAll += sentBytes; idx++; next();
-        }, function (fileSent) { progress(sentAll + fileSent, total); });
+        if (idx >= batch.length) {
+          sending = false;
+          if (conn && conn.open) conn.send({ t: 'done' });
+          setStatus('sent');
+          if (sentCount < myFiles.length) { receiverReady = false; sendMeta(); }
+          return;
+        }
+        sendFile(batch[idx], function (sentBytes) {
+          sentBatch += sentBytes; sentCount++; idx++; next();
+        }, function (fileSent) { progress(sentBatch + fileSent, total); });
       }
       function sendFile(file, done, tick) {
         var offset = 0;
         conn.send({ t: 'start', name: file.name, size: file.size, type: file.type });
         function pump() {
           if (offset >= file.size) { conn.send({ t: 'end' }); done(file.size); return; }
-          if (conn.bufferSize > 8 * 1024 * 1024) { setTimeout(pump, 60); return; }
+          var dc = conn.dataChannel;
+          if (dc && dc.bufferedAmount > 8 * 1024 * 1024) { setTimeout(pump, 60); return; }
           var slice = file.slice(offset, Math.min(offset + CHUNK, file.size));
           var reader = new FileReader();
           reader.onload = function () {
@@ -177,9 +199,7 @@
         row.appendChild(n); row.appendChild(s);
         filesEl.appendChild(row);
       }
-      if (conn && conn.open) {
-        conn.send({ t: 'meta', files: myFiles.map(function (f) { return { name: f.name, size: f.size, type: f.type }; }) });
-      }
+      if (conn && conn.open && !sending) sendMeta();
     }
 
     copyBtn.addEventListener('click', function () {
@@ -197,36 +217,62 @@
     var peer = new Peer();
     var totalBytes = 0, gotBytes = 0;
     var cur = null;
+    var chunkChain = Promise.resolve();
+
+    function isChunk(msg) {
+      if (msg instanceof ArrayBuffer) return true;
+      if (typeof ArrayBuffer !== 'undefined' && ArrayBuffer.isView && ArrayBuffer.isView(msg)) return true;
+      if (typeof Blob !== 'undefined' && msg instanceof Blob) return true;
+      return false;
+    }
+
+    function takeChunk(target, msg) {
+      chunkChain = chunkChain.then(function () {
+        if (msg instanceof Blob) return msg.arrayBuffer();
+        return msg;
+      }).then(function (data) {
+        if (!target) return;
+        target.parts.push(data);
+        var len = (data && data.byteLength !== undefined) ? data.byteLength : 0;
+        target.got += len; gotBytes += len; progress(gotBytes, totalBytes);
+      });
+      return chunkChain;
+    }
 
     peer.on('open', function () {
       var conn = peer.connect('shr-' + theCode, { reliable: true });
       conn.on('open', function () { setStatus('connected'); conn.send({ t: 'hello' }); });
       conn.on('data', function (msg) {
-        if (msg instanceof ArrayBuffer || (msg && msg.byteLength !== undefined && typeof msg !== 'object')) {
-          if (cur) { cur.parts.push(msg); cur.got += msg.byteLength; gotBytes += msg.byteLength; progress(gotBytes, totalBytes); }
+        if (isChunk(msg)) {
+          if (cur) takeChunk(cur, msg);
           return;
         }
         if (!msg || typeof msg !== 'object') return;
         if (msg.t === 'meta') {
+          if (!msg.files.length) { setStatus('waiting for files'); return; }
           totalBytes = msg.files.reduce(function (a, f) { return a + f.size; }, 0);
-          setStatus(msg.files.length ? 'receiving' : 'waiting for files');
+          gotBytes = 0;
+          setStatus('receiving');
           conn.send({ t: 'ready' });
         }
         if (msg.t === 'start') {
           cur = { name: msg.name, size: msg.size, type: msg.type, parts: [], got: 0 };
         }
         if (msg.t === 'end' && cur) {
-          var blob = new Blob(cur.parts, { type: cur.type || 'application/octet-stream' });
-          var url = URL.createObjectURL(blob);
-          var row = document.createElement('div');
-          row.className = 'file';
-          var n = document.createElement('span'); n.className = 'n'; n.textContent = cur.name;
-          var a = document.createElement('a');
-          a.className = 'save'; a.href = url; a.download = cur.name; a.textContent = 'save · ' + human(cur.size);
-          row.appendChild(n); row.appendChild(a);
-          filesEl.appendChild(row);
-          a.click();
+          var finished = cur;
           cur = null;
+          chunkChain.then(function () {
+            var blob = new Blob(finished.parts, { type: finished.type || 'application/octet-stream' });
+            var url = URL.createObjectURL(blob);
+            var row = document.createElement('div');
+            row.className = 'file';
+            var n = document.createElement('span'); n.className = 'n'; n.textContent = finished.name;
+            var a = document.createElement('a');
+            a.className = 'save'; a.href = url; a.download = finished.name; a.textContent = 'save · ' + human(finished.size);
+            row.appendChild(n); row.appendChild(a);
+            filesEl.appendChild(row);
+            a.click();
+          });
         }
         if (msg.t === 'done') setStatus('done');
       });
