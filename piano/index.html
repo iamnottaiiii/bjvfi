@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Piano Tiles</title>
+<title>Piano Tiles Steady</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300&display=swap">
 <style>
 /* Layout: pure black. Highest score on top, a full-height four-lane board of falling white tiles below. */
@@ -35,6 +35,18 @@ body {
   user-select: none;
 }
 #best {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  color: inherit;
+  font-family: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+  width: 100%;
+  max-width: 480px;
+  transition: opacity 0.25s ease;
   flex: none;
   height: 76px;
   display: flex;
@@ -45,6 +57,8 @@ body {
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
+#best.hold { opacity: 0.5; }
+#best:focus-visible { outline: 2px solid var(--fg); outline-offset: -6px; }
 #stage {
   flex: 1;
   min-height: 0;
@@ -187,7 +201,8 @@ body {
 </style>
 </head>
 <body>
-<div id="best" role="status" aria-label="Highest score">0</div>
+
+<button id="best" type="button" aria-pressed="false" aria-label="Highest score. Tap to hold the tile speed steady during a run.">0</button>
 <div id="stage"><canvas id="board" aria-label="Piano Tiles board"></canvas></div>
 <div id="result" role="status" aria-label="Your score"><div id="resultScore">0</div><div id="resultBest"></div></div>
 <button id="soundBtn" class="pill" type="button">Sound</button>
@@ -216,7 +231,10 @@ body {
   var resultTimer = null;
   var best = 0;
   try { best = parseInt(localStorage.getItem('piano-tiles-best'), 10) || 0; } catch (e) {}
-  bestEl.textContent = best;
+  // Tapping the top score holds the tile speed steady for the current run.
+  var held = false, heldRps = 1;
+  function showBest() { bestEl.textContent = best; }
+  showBest();
 
   function saveBest() {
     try { localStorage.setItem('piano-tiles-best', String(best)); } catch (e) {}
@@ -303,7 +321,7 @@ body {
     LADDERS = buildLadders(CHORDS, pack.lo);
     CH = pack.cd;
     if (wetGain) wetGain.gain.value = pack.wet;
-    soundBtn.textContent = 'Sound \u00b7 ' + pack.name;
+    soundBtn.textContent = 'Sound · ' + pack.name;
     if (save) {
       try { localStorage.setItem('piano-tiles-sound', pack.id); } catch (e) {}
     }
@@ -621,6 +639,11 @@ body {
     state = 'over';
     overAt = performance.now();
     miss = m;
+    // The run is over: release the held speed.
+    held = false;
+    bestEl.classList.remove('hold');
+    bestEl.setAttribute('aria-pressed', 'false');
+    showBest();
     stopMusic();
     thud();
     // A run that did not reach the highest score ends on a black result screen,
@@ -649,7 +672,7 @@ body {
       row.t = performance.now();
       while (rows[cur] && rows[cur].hit) cur++;
       score++;
-      if (score > best) { best = score; bestEl.textContent = best; saveBest(); }
+      if (score > best) { best = score; showBest(); saveBest(); }
       melody();
       return;
     }
@@ -658,8 +681,9 @@ body {
 
   function update(dt) {
     if (state !== 'play') return;
-    // Starts at one row per second and gains a little with every tile.
-    curRps = Math.min(9, 1 + 0.035 * score);
+    // Starts at one row per second and gains a little with every tile,
+    // unless the speed is held steady.
+    curRps = held ? heldRps : Math.min(9, 1 + 0.035 * score);
     pos += curRps * rowH * dt;
     if (pos > (cur + 1) * rowH) {
       pos = (cur + 1) * rowH;
@@ -719,6 +743,14 @@ body {
     var lane = Math.min(LANES - 1, Math.max(0, Math.floor(x / (r.width / LANES))));
     var k = Math.ceil((H + pos - y) / rowH) - 2;
     tap(lane, k);
+  });
+
+  bestEl.addEventListener('click', function () {
+    held = !held;
+    heldRps = state === 'play' ? curRps : 1;
+    bestEl.classList.toggle('hold', held);
+    bestEl.setAttribute('aria-pressed', held ? 'true' : 'false');
+    showBest();
   });
 
   resultEl.addEventListener('pointerdown', function (e) {
