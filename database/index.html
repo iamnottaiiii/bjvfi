@@ -397,6 +397,9 @@
         <button class="pill" type="button" data-sf="replied">Replied · <span id="sfRep">0</span></button>
         <button class="pill" type="button" data-sf="notreplied">Not replied · <span id="sfNot">0</span></button>
       </div>
+      <div style="margin-top:12px;">
+        <input class="search" id="sentSearch" type="search" placeholder="Search by business name" autocomplete="off">
+      </div>
 <div id="sentList"></div>
     </div>
   </div>
@@ -448,7 +451,7 @@ function fmtBubbleWhen(t){
 }
 var FILE_ICON_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>';
 
-function messageFor(n, u){ return "Hi, I came across your business Google profile and noticed you don't have a website. I build websites for local businesses to help customers find you, know your hours, and contact you if needed. It is just $27 monthly, no building fee, it is literally cheaper than two cups of coffee. You can see our sketch minimalistic site we built for you at " + u; }
+function messageFor(n, u){ return "Hi, I came across " + n + "'s Google profile and noticed you don't have a website. I build websites for local businesses to help customers find you, know your hours, and contact you if needed. It is just $27 monthly, no building fee, it is literally cheaper than two cups of coffee. You can see our sketch minimalistic site we built for you at " + u; }
 
 /* Marks and repo sync, through the same data path SiteDesk uses. Marks live
    in iamnottaiiii/sitedesk-data under texting/: one shard per category plus a
@@ -1180,6 +1183,7 @@ function sentEntries(){
   return out;
 }
 var sentFilter = "all";
+var sentQuery = "";
 var noteEditSlug = null;
 function renderSentView(){
   var entries = sentEntries();
@@ -1194,8 +1198,10 @@ function renderSentView(){
   });
   var shownEntries = entries.filter(function(e){
     var rec = board[e.slug] || {};
-    if (sentFilter === "replied") return !!rec.r;
-    if (sentFilter === "notreplied") return !rec.r;
+    if (sentFilter === "replied" && !rec.r) return false;
+    if (sentFilter === "notreplied" && rec.r) return false;
+    var q = sentQuery.trim().toLowerCase();
+    if (q && (e.name || "").toLowerCase().indexOf(q) === -1) return false;
     return true;
   });
   var list = document.getElementById("sentList");
@@ -1220,6 +1226,7 @@ function renderSentView(){
       + '<a class="pill" href="https://bjvfi.com/' + esc(e.slug) + '/" target="_blank" rel="noopener">Site</a>'
       + '<button class="pill' + (rec.r ? " goldsel" : "") + '" type="button" data-rep="' + esc(e.slug) + '">' + (rec.r ? "Replied" : "Mark as Replied") + '</button>'
       + '<button class="pill" type="button" data-note="' + esc(e.slug) + '">' + (rec.d ? "Edit next step" : "Add next step") + '</button>'
+      + '<button class="pill" type="button" data-undo="' + esc(e.slug) + '">Undo</button>'
       + '<span class="biz-spacer"></span><span class="status-text sent">Sent' + (whenLabel ? ' · ' + esc(whenLabel) : '') + '</span></div>';
     if (noteEditSlug === e.slug){
       html += '<div class="noteedit"><input class="inp" id="noteInput" type="text" placeholder="What needs to be done" value="' + esc(rec.d || "") + '"><div class="acts"><button class="pill goldsel" type="button" data-notesave="' + esc(e.slug) + '">Save</button><button class="pill" type="button" data-notecancel="1">Cancel</button></div></div>';
@@ -1265,12 +1272,26 @@ function renderSentView(){
   Array.prototype.forEach.call(list.querySelectorAll("[data-notecancel]"), function(el){
     el.addEventListener("click", function(){ noteEditSlug = null; renderSentView(); });
   });
+  Array.prototype.forEach.call(list.querySelectorAll("[data-undo]"), function(el){
+    el.addEventListener("click", function(){
+      var slug = el.getAttribute("data-undo");
+      if (board[slug]){ delete board[slug]; saveBoard(); syncBoard(); }
+      setMarked(slug, false);
+      noteEditSlug = null;
+      refreshStats();
+      renderSentView();
+    });
+  });
 }
 Array.prototype.forEach.call(document.querySelectorAll("#sentFilters [data-sf]"), function(el){
   el.addEventListener("click", function(){
     sentFilter = el.getAttribute("data-sf");
     renderSentView();
   });
+});
+document.getElementById("sentSearch").addEventListener("input", function(){
+  sentQuery = this.value;
+  renderSentView();
 });
 document.getElementById("exploreSentBtn").addEventListener("click", function(){
   closeCatDrop();
