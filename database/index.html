@@ -667,6 +667,13 @@ function ensureShard(name){
   });
 }
 
+/* Check categories in the local mirror even when the repository index is zero. */
+function ensureSentShards(){
+  if (!repoCounts) return Promise.resolve([]);
+  var names = Object.assign({}, repoCounts, mirrorCounts());
+  return Promise.all(Object.keys(names).filter(function(name){ return names[name] > 0; }).map(ensureShard));
+}
+
 /* Queue data: the manifest paints first from its own counts alone.
    Category files load one at a time, only when that category is opened
    or picked. The All categories pool grows one queue chunk at a time as
@@ -763,11 +770,7 @@ function goHome(){
 document.getElementById("homeSentBtn").addEventListener("click", function(){
   renderSentView();
   showView("sentView");
-  if (repoCounts){
-    Object.keys(repoCounts).forEach(function(name){
-      if (repoCounts[name] > 0) ensureShard(name);
-    });
-  }
+  ensureSentShards();
 });
 document.getElementById("homeExploreBtn").addEventListener("click", function(){
   refreshStats();
@@ -1306,11 +1309,7 @@ document.getElementById("exploreSentBtn").addEventListener("click", function(){
   closeCatDrop();
   renderSentView();
   showView("sentView");
-  if (repoCounts){
-    Object.keys(repoCounts).forEach(function(name){
-      if (repoCounts[name] > 0) ensureShard(name);
-    });
-  }
+  ensureSentShards();
 });
 document.getElementById("sentBackBtn").addEventListener("click", function(){
   refreshStats();
