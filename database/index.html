@@ -257,8 +257,6 @@
     .tpane{display:none;}
     .msgwrap.showthread .tlist{display:none;}
     .msgwrap.showthread .tpane{display:flex;}
-    #msgView.thread-open #msgFilters{display:none !important;}
-    #msgView.thread-open .mtop{display:none;}
     .backpane{display:inline-flex;}
     .bub{max-width:88%;}
   }
@@ -306,6 +304,10 @@
   .confirmbox{width:100%; max-width:420px; margin:0;}
   .confirm-msg{margin-top:12px; font-size:.86rem; line-height:1.55; white-space:pre-wrap; overflow-wrap:anywhere; background:var(--field); border-radius:14px; padding:12px 14px;}
   .utilrow{margin-top:12px;}
+  .boardline{margin-top:10px;font-size:.86rem;line-height:1.45}
+  .boardline .lbl{font-size:.72rem}
+  .outcomes{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .noteedit{margin-top:10px}
 </style>
 </head>
 <body>
@@ -328,51 +330,15 @@
   <div id="homeView" class="view hidden">
     <div class="scroll">
       <div class="stats">
-        <span class="stat gold"><b id="homeNotSeen">0</b> not seen</span>
-        <span class="stat"><b id="homeReplied">0</b> replied</span>
-        <span class="stat redstat"><b id="homeToReply">0</b> to reply</span>
+        <span class="stat gold"><b id="homeSent">0</b> sent</span>
+        <span class="stat"><b id="homeRepliedCt">0</b> replied</span>
       </div>
       <div class="homeactions">
-        <button class="pill goldsel bigpill" id="homeMessagesBtn" type="button">Messages · <span class="cnt" id="homeMsgCount">0</span><span class="badge hidden" id="homeToReplyBadge">0</span></button>
+        <button class="pill bigpill" id="homeSentBtn" type="button">Sent · <span class="cnt" id="homeSentCount">0</span></button>
         <button class="pill bigpill" id="homeExploreBtn" type="button">Explore</button>
       </div>
       <div class="homeactions utilrow">
-        <button class="pill" id="notifBtn" type="button">Enable notifications</button>
         <button class="pill" id="lockBtn" type="button">Lock</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="msgView" class="view hidden">
-    <div class="mtop">
-      <button class="pill" id="msgBackBtn" type="button">Back</button>
-    </div>
-    <div class="filters msgfilters" id="msgFilters">
-      <button class="pill sel" type="button" data-mf="all">All · <span id="mfAll">0</span></button>
-      <button class="pill" type="button" data-mf="unseen">Not seen · <span id="mfUnseen">0</span></button>
-      <button class="pill" type="button" data-mf="toreply">To reply · <span id="mfToReply">0</span></button>
-    </div>
-    <div class="msgwrap" id="msgWrap">
-      <div class="tlist" id="threadList"></div>
-      <div class="tpane" id="threadPane">
-        <div class="thead">
-          <button class="pill backpane" id="threadBackBtn" type="button">Back</button>
-          <div class="who">
-            <div class="nm" id="threadName"></div>
-            <div class="sub" id="threadSub"></div>
-          </div>
-          <a class="pill" id="threadSite" href="#" target="_blank" rel="noopener">Site</a>
-        </div>
-        <div class="msgs" id="threadMsgs"></div>
-        <div class="attach-tray" id="attachTray" aria-live="polite"></div>
-        <div class="inrow">
-          <button class="attachbtn" id="attachBtn" type="button" aria-label="Attach file" title="Attach file">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-          </button>
-          <input type="file" id="attachInput" multiple hidden>
-          <input class="inp" id="replyInput" type="text" placeholder="Message" autocomplete="off">
-          <button class="pill goldsel" id="replySendBtn" type="button">Send</button>
-        </div>
       </div>
     </div>
   </div>
@@ -426,37 +392,12 @@
         <span class="ttl" style="flex:1; font-weight:700;">Sent</span>
         <span class="stat gold"><b id="sentViewCount">0</b> sent</span>
       </div>
-      <div class="filters explore-controls">
-        <input class="numinp" id="sentRandNum" type="number" min="1" inputmode="numeric" placeholder="Count" aria-label="How many sent businesses to select">
-        <button class="pill" id="sentRandGo" type="button">Select</button>
+      <div class="filters" id="sentFilters">
+        <button class="pill sel" type="button" data-sf="all">All · <span id="sfAll">0</span></button>
+        <button class="pill" type="button" data-sf="replied">Replied · <span id="sfRep">0</span></button>
+        <button class="pill" type="button" data-sf="notreplied">Not replied · <span id="sfNot">0</span></button>
       </div>
-      <div class="selbar explore-selbar hidden" id="sentSelBar">
-        <span><b id="sentSelCount">0</b> selected</span>
-        <span class="grow"></span>
-        <button class="pill goldsel" id="sentGroupBtn" type="button">Message selected</button>
-        <button class="pill" id="sentClearSelBtn" type="button">Clear</button>
-      </div>
-      <div class="sent-compose hidden" id="sentGroupCompose">
-        <div class="nm" id="sentGroupName"></div>
-        <div class="sub" id="sentGroupSub"></div>
-        <input class="inp" id="sentGroupInput" type="text" placeholder="Message" autocomplete="off">
-        <div class="acts">
-          <button class="pill goldsel" id="sentGroupSend" type="button">Send</button>
-          <button class="pill" id="sentGroupCancel" type="button">Cancel</button>
-          <span class="statusline" id="sentGroupStatus"></span>
-        </div>
-      </div>
-      <div class="sent-compose hidden" id="sentCompose">
-        <div class="nm" id="sentComposeName"></div>
-        <div class="sub" id="sentComposeSub"></div>
-        <input class="inp" id="sentComposeInput" type="text" placeholder="Message" autocomplete="off">
-        <div class="acts">
-          <button class="pill goldsel" id="sentComposeSend" type="button">Send</button>
-          <button class="pill" id="sentComposeCancel" type="button">Cancel</button>
-          <span class="statusline" id="sentComposeStatus"></span>
-        </div>
-      </div>
-      <div id="sentList"></div>
+<div id="sentList"></div>
     </div>
   </div>
 
@@ -507,12 +448,7 @@ function fmtBubbleWhen(t){
 }
 var FILE_ICON_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>';
 
-var WORDINGS = [
-  function(n,u){ return "Hi, this is SiteDesk. We built a website for " + n + " and it is ready to look at: " + u + " No cost to view it. Want a quick walkthrough? Reply STOP to end"; },
-  function(n,u){ return n + ", we made you a website. Take a look here: " + u + " If you like it, we can make it fully yours. From SiteDesk. Reply STOP to end"; },
-  function(n,u){ return "Hello from SiteDesk. A website for " + n + " is already built: " + u + " Have a look and tell us what you think. Reply STOP to end"; },
-  function(n,u){ return "Hi " + n + ", your website preview is live: " + u + " Built by SiteDesk, free to view. Any questions, just reply here. Reply STOP to end"; }
-];
+function messageFor(n, u){ return "Hi, I came across your business Google profile and noticed you don't have a website. I build websites for local businesses to help customers find you, know your hours, and contact you if needed. It is just $27 monthly, no building fee, it is literally cheaper than two cups of coffee. Your preview site is ready: " + u; }
 
 /* Marks and repo sync, through the same data path SiteDesk uses. Marks live
    in iamnottaiiii/sitedesk-data under texting/: one shard per category plus a
@@ -788,11 +724,7 @@ function loadCat(name){
 }
 function catLoadFailed(){ return !!(activeCategory && catLoadError[activeCategory]); }
 
-/* Texting: the bjvfi-text Worker is the Twilio bridge. The Twilio config
-   and the setup password live only on the Worker side. This page keeps
-   just the unlock password in local storage and sends it as X-Text-Key.
-   No Twilio value is ever in this page. There is no setup form here:
-   configuration happens outside the page. */
+/* Texting: sending goes through TextNow from this page. Tapping Send copies the message, opens TextNow, and marks the business Sent. The Worker is only the login gate now. */
 var TEXT_API = "https://bjvfi-text.iamnottaiii.workers.dev";
 var TKEY_LS = "bjvfi_text_key";
 var textConfigured = null;
@@ -804,420 +736,26 @@ async function checkTexting(){
     var j = await r.json();
     textConfigured = !!j.configured;
   } catch(e){ textConfigured = null; }
-  if (textConfigured === false) repliesState = "off";
-  else if (textConfigured === true && !textKey()) repliesState = "locked";
-  if (textConfigured && textKey()) loadReplies();
-  else renderThreadList();
 }
-async function loadReplies(){
-  var key = textKey();
-  if (!key) return;
-  try {
-    var r = await fetch(TEXT_API + "/replies", { headers: { "X-Text-Key": key } });
-    if (r.status === 401){ repliesState = "locked"; if (authed) signOut(); else renderThreadList(); return; }
-    if (!r.ok) return;
-    var j = await r.json();
-    repliesState = "ok";
-    buildThreads(j.replies || []);
-    refreshMsgStats();
-    renderThreadList();
-    if (curThread >= 0 && THREADS[curThread]) renderThread();
-  } catch(e){}
-}
-
-/* Conversations: built only from real replies the Worker returns.
-   A reply matched to a sent business (slug present) opens its thread with
-   the text that was sent to that business as the first bubble. The wording
-   index is recorded in the mark at send time, because the Worker picks the
-   wording by the slug's position inside its send chunk. */
-var THREADS = [];
-var curThread = -1;
-var msgFilter = "all";
-var TSTATE_KEY = "bjvfi_database_threads_v1";
-var MYMSG_KEY = "bjvfi_database_mymsgs_v1";
-var threadState = {};
-try { threadState = JSON.parse(localStorage.getItem(TSTATE_KEY) || "{}") || {}; } catch(e) { threadState = {}; }
-function saveThreadState(){ try { localStorage.setItem(TSTATE_KEY, JSON.stringify(threadState)); } catch(e){} }
-var myMsgs = {};
-try { myMsgs = JSON.parse(localStorage.getItem(MYMSG_KEY) || "{}") || {}; } catch(e) { myMsgs = {}; }
-function saveMyMsgs(){ try { localStorage.setItem(MYMSG_KEY, JSON.stringify(myMsgs)); } catch(e){} }
-function buildThreads(arr){
-  THREADS = [];
-  var byKey = {};
-  (arr || []).forEach(function(rep){
-    var digits = String(rep.from || "").replace(/\D/g, "");
-    var key = rep.slug ? rep.slug : ("ph:" + digits);
-    var th = byKey[key];
-    if (!th){
-      th = byKey[key] = { key: key, slug: rep.slug || "", name: "", cat: "", phone: rep.from || "", msgs: [], latestIn: 0, lastT: 0 };
-      THREADS.push(th);
-    }
-    if (rep.name && !th.name) th.name = rep.name;
-    if (rep.cat && !th.cat) th.cat = rep.cat;
-    th.msgs.push({ who: "in", text: rep.body || "", t: rep.t || 0 });
-    if ((rep.t || 0) > th.latestIn) th.latestIn = rep.t || 0;
-  });
-  THREADS.forEach(function(th){
-    var mk = th.slug ? sent[th.slug] : null;
-    if (mk){
-      if (!th.name) th.name = mk.n || "";
-      if (!th.cat) th.cat = mk.c || "";
-      if (!th.phone) th.phone = mk.p || "";
-    }
-    if (!th.name) th.name = th.phone || "";
-    var mine = (myMsgs[th.key] || []).map(function(m){
-      return { who: "out", text: m.text || "", t: m.t || 0, atts: m.atts || [], delivered: !!m.delivered, failed: !!m.failed, local: !!m.local, error: m.error || "" };
-    });
-    var all = th.msgs.concat(mine);
-    all.sort(function(a, b){ return (a.t || 0) - (b.t || 0); });
-    if (th.slug){
-      var w = mk && typeof mk.w === "number" ? mk.w : 0;
-      var url = "bjvfi.com/" + th.slug + "/";
-      all.unshift({ who: "out", text: WORDINGS[w % 4](th.name || "", url), t: mk ? (mk.t || 0) : 0, sentBubble: true });
-    }
-    th.msgs = all;
-    th.lastT = all.length ? (all[all.length - 1].t || 0) : th.latestIn;
-  });
-  THREADS.sort(function(a, b){ return (b.lastT || 0) - (a.lastT || 0); });
-  if (curThread >= THREADS.length) curThread = THREADS.length - 1;
-}
-function statusOf(th){
-  var st = threadState[th.key] || {};
-  if (th.latestIn && (st.ans || 0) >= th.latestIn) return "done";
-  if (th.latestIn && (st.seen || 0) >= th.latestIn) return "seen";
-  return th.latestIn ? "unseen" : "done";
-}
-function countStatus(s){ return THREADS.filter(function(th){ return statusOf(th) === s; }).length; }
-function toReplyCount(){ return countStatus("unseen") + countStatus("seen"); }
-function refreshMsgStats(){
-  document.getElementById("homeReplied").textContent = fmt(THREADS.length);
-  document.getElementById("homeNotSeen").textContent = fmt(countStatus("unseen"));
-  document.getElementById("homeToReply").textContent = fmt(toReplyCount());
-  document.getElementById("homeMsgCount").textContent = fmt(THREADS.length);
-  var badge = document.getElementById("homeToReplyBadge");
-  badge.textContent = fmt(toReplyCount());
-  badge.classList.toggle("hidden", toReplyCount() === 0);
-  document.getElementById("mfAll").textContent = fmt(THREADS.length);
-  document.getElementById("mfUnseen").textContent = fmt(countStatus("unseen"));
-  document.getElementById("mfToReply").textContent = fmt(countStatus("seen"));
-}
-function lastMsgOf(th){
-  for (var i = th.msgs.length - 1; i >= 0; i--) if (!th.msgs[i].sentBubble) return th.msgs[i];
-  return th.msgs[th.msgs.length - 1];
-}
-function previewText(m){
-  if (!m) return "";
-  if (m.text) return m.text;
-  if (m.atts && m.atts.length) return m.atts.length === 1 ? m.atts[0].name : m.atts.length + " attachments";
-  return "";
-}
-function renderMsgFilters(){
-  Array.prototype.forEach.call(document.querySelectorAll("#msgFilters [data-mf]"), function(el){
-    el.classList.toggle("sel", el.getAttribute("data-mf") === msgFilter);
-  });
-}
-function renderThreadList(){
-  var list = document.getElementById("threadList");
-  if (!list) return;
-  if (!THREADS.length){
-    var msg = "No replies yet.";
-    if (repliesState === "locked") msg = "Texting locked";
-    else if (repliesState === "off") msg = "Texting not set up yet";
-    else if (msgFilter !== "all") msg = "Nothing here.";
-    list.innerHTML = '<div class="msg">' + msg + '</div>';
-    return;
-  }
-  var html = "";
-  THREADS.forEach(function(th, i){
-    var st = statusOf(th);
-    if (msgFilter === "unseen" && st !== "unseen") return;
-    if (msgFilter === "toreply" && st !== "seen") return;
-    var lr = lastMsgOf(th);
-    var dot = st === "unseen" ? '<span class="dot"></span>'
-      : (st === "seen" ? '<span class="dot red"></span>' : '<span class="dot off"></span>');
-    html += '<button class="trow' + (i === curThread ? " sel" : "") + '" type="button" data-th="' + i + '">'
-      + dot
-      + '<span class="main"><span class="nm">' + esc(th.name) + '</span>'
-      + '<span class="pv" style="display:block;">' + esc(previewText(lr)) + '</span></span>'
-      + '<span class="tm">' + esc(fmtListWhen(th.lastT)) + '</span></button>';
-  });
-  if (!html) html = '<div class="msg">Nothing here.</div>';
-  list.innerHTML = html;
-  Array.prototype.forEach.call(list.querySelectorAll("[data-th]"), function(el){
-    el.addEventListener("click", function(){ openThread(parseInt(el.getAttribute("data-th"), 10)); });
-  });
-}
-Array.prototype.forEach.call(document.querySelectorAll("#msgFilters [data-mf]"), function(el){
-  el.addEventListener("click", function(){
-    msgFilter = el.getAttribute("data-mf");
-    renderMsgFilters();
-    renderThreadList();
-  });
-});
-/* Attachments: pending files are kept per thread. File contents stay on
-   this device; only names, sizes, and small image previews are kept. */
-var pendingMap = {};
-function currentPending(){
-  var th = THREADS[curThread];
-  if (!th) return [];
-  if (!pendingMap[th.key]) pendingMap[th.key] = [];
-  return pendingMap[th.key];
-}
-function renderAttachTray(){
-  var tray = document.getElementById("attachTray");
-  var list = currentPending();
-  var html = "";
-  list.forEach(function(a, idx){
-    var thumb = a.dataUrl
-      ? '<img class="thumb" src="' + a.dataUrl + '" alt="">'
-      : '<span class="ficon">' + FILE_ICON_SVG + '</span>';
-    html += '<span class="achip">' + thumb
-      + '<span class="meta"><span class="fname">' + esc(a.name) + '</span><span class="fsize">' + esc(fmtSize(a.size)) + '</span></span>'
-      + '<button class="rm" type="button" data-rmatt="' + idx + '" aria-label="Remove ' + esc(a.name) + '">&times;</button></span>';
-  });
-  if (list.length) html += '<span class="attach-note">Files are not sent by text. They stay as a note on this device only.</span>';
-  tray.innerHTML = html;
-  Array.prototype.forEach.call(tray.querySelectorAll("[data-rmatt]"), function(el){
-    el.addEventListener("click", function(){
-      var i = parseInt(el.getAttribute("data-rmatt"), 10);
-      currentPending().splice(i, 1);
-      renderAttachTray();
-    });
-  });
-}
-document.getElementById("attachBtn").addEventListener("click", function(){
-  document.getElementById("attachInput").click();
-});
-document.getElementById("attachInput").addEventListener("change", function(){
-  var files = Array.prototype.slice.call(this.files || []);
-  var th = THREADS[curThread];
-  files.forEach(function(f){
-    var entry = { name: f.name, size: f.size, type: f.type || "", dataUrl: null };
-    if (th){
-      if (!pendingMap[th.key]) pendingMap[th.key] = [];
-      pendingMap[th.key].push(entry);
-    }
-    if (f.type && f.type.indexOf("image/") === 0 && f.size <= 1500000){
-      try {
-        var reader = new FileReader();
-        reader.onload = function(){
-          entry.dataUrl = String(reader.result || "");
-          renderAttachTray();
-        };
-        reader.readAsDataURL(f);
-      } catch (err) { /* generic file look is fine */ }
-    }
-  });
-  this.value = "";
-  renderAttachTray();
-});
-function renderThread(){
-  var th = THREADS[curThread];
-  var box = document.getElementById("threadMsgs");
-  if (!th){
-    document.getElementById("threadName").textContent = "";
-    document.getElementById("threadSub").textContent = "";
-    document.getElementById("threadSite").style.display = "none";
-    box.innerHTML = "";
-    renderAttachTray();
-    return;
-  }
-  document.getElementById("threadName").textContent = th.name;
-  document.getElementById("threadSub").textContent = (th.cat ? th.cat + " · " : "") + (th.phone || "");
-  var site = document.getElementById("threadSite");
-  if (th.slug){
-    site.style.display = "";
-    site.href = "https://bjvfi.com/" + th.slug + "/";
-  } else site.style.display = "none";
-  var html = "";
-  th.msgs.forEach(function(m){
-    if (m.text){
-      var bcls = m.who, blabel = fmtBubbleWhen(m.t);
-      if (m.sentBubble) blabel = "Sent";
-      else if (m.who === "out" && m.failed){ bcls += " failed"; blabel = "Not delivered" + (m.error ? " · " + m.error : ""); }
-      else if (m.who === "out" && m.delivered) blabel = "Sent · " + fmtBubbleWhen(m.t);
-      else if (m.who === "out") blabel = fmtBubbleWhen(m.t) + " · On this device only";
-      html += '<div class="bub ' + bcls + '">' + esc(m.text) + '<span class="bt">' + esc(blabel) + '</span></div>';
-    }
-    if (m.atts && m.atts.length){
-      m.atts.forEach(function(a, ai){
-        var isLast = ai === m.atts.length - 1;
-        var visual = a.dataUrl
-          ? '<img class="fthumb" src="' + a.dataUrl + '" alt="' + esc(a.name) + '">'
-          : '<span class="ficon">' + FILE_ICON_SVG + '</span>';
-        var acls = m.who === "out" ? "out localnote" : m.who;
-        var alabel = m.who === "out" ? "Not sent by text · On this device only" : fmtBubbleWhen(m.t);
-        html += '<div class="bub filebub ' + acls + '">' + visual
-          + '<span class="fmeta"><span class="fname">' + esc(a.name) + '</span>'
-          + '<span class="fsize" style="display:block;">' + esc(fmtSize(a.size)) + '</span>'
-          + (isLast ? '<span class="bt">' + esc(alabel) + '</span>' : '')
-          + '</span></div>';
-      });
-    }
-  });
-  box.innerHTML = html;
-  box.scrollTop = box.scrollHeight;
-  renderAttachTray();
-}
-function openThread(i){
-  curThread = i;
-  var th = THREADS[i];
-  if (!th) return;
-  var st = threadState[th.key] || (threadState[th.key] = {});
-  if (th.latestIn && (st.seen || 0) < th.latestIn) st.seen = th.latestIn;
-  saveThreadState();
-  refreshMsgStats();
-  renderThreadList();
-  renderThread();
-  document.getElementById("msgWrap").classList.add("showthread");
-  document.getElementById("msgView").classList.add("thread-open");
-}
-/* Custom messages: typed replies and Sent view messages go through the
-   bridge POST /send-custom, which validates each slug against its
-   category file and sends the typed body as-is from the Twilio number.
-   Only a per-slug ok from the Worker counts as delivered. Anything else
-   is recorded on the thread or row as not delivered, never as sent. */
-async function sendCustomItems(items, onProgress){
-  var total = items.length;
-  var results = {};
-  function failAll(err){
-    items.forEach(function(it){ results[it.slug] = { slug: it.slug, ok: false, error: err }; });
-    return { results: results, okCount: 0, total: total };
-  }
-  if (textConfigured !== true) return failAll("Texting not set up yet");
-  if (!textKey()) return failAll("Texting locked");
-  var okCount = 0;
-  for (var start = 0; start < items.length; start += 50){
-    var chunk = items.slice(start, start + 50);
-    var j = null, status = 0;
-    try {
-      var r = await fetch(TEXT_API + "/send-custom", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Text-Key": textKey() },
-        body: JSON.stringify({ items: chunk.map(function(it){ return { slug: it.slug, category: it.category, body: it.body }; }) })
-      });
-      status = r.status;
-      j = await r.json().catch(function(){ return null; });
-    } catch(e){ j = null; }
-    if (status === 401){
-      chunk.forEach(function(it){ results[it.slug] = { slug: it.slug, ok: false, error: "Texting locked" }; });
-    } else if (j && j.error === "not configured"){
-      chunk.forEach(function(it){ results[it.slug] = { slug: it.slug, ok: false, error: "Texting not set up yet" }; });
-    } else if (!j || !j.results){
-      chunk.forEach(function(it){ results[it.slug] = { slug: it.slug, ok: false, error: "Send failed" }; });
-    } else {
-      var seen = {};
-      j.results.forEach(function(res){
-        seen[res.slug] = true;
-        results[res.slug] = res;
-        if (res.ok) okCount++;
-      });
-      chunk.forEach(function(it){ if (!seen[it.slug]) results[it.slug] = { slug: it.slug, ok: false, error: "Send failed" }; });
-    }
-    if (onProgress) onProgress(okCount, total);
-  }
-  return { results: results, okCount: okCount, total: total };
-}
-var replySending = false;
-async function sendReply(){
-  var th = THREADS[curThread];
-  if (!th || replySending) return;
-  var inp = document.getElementById("replyInput");
-  var text = inp.value.trim();
-  var atts = currentPending().slice();
-  if (!text && !atts.length) return;
-  var confirmText = text;
-  if (atts.length){
-    confirmText += (confirmText ? "\n\n" : "") + atts.length + (atts.length === 1 ? " file" : " files") + " will not be sent by text. " + (atts.length === 1 ? "It stays" : "They stay") + " as a note on this device only.";
-  }
-  var okReply = await showConfirm("Reply to " + (th.name || ""), th.phone || "", confirmText);
-  if (!okReply) return;
-  var now = Date.now();
-  var slimAtts = atts.map(function(a){
-    return { name: a.name, size: a.size, type: a.type, dataUrl: (a.dataUrl && a.size <= 300000) ? a.dataUrl : null };
-  });
-  function record(entry, msgEntry){
-    th.msgs.push(msgEntry);
-    th.lastT = entry.t;
-    if (!myMsgs[th.key]) myMsgs[th.key] = [];
-    myMsgs[th.key].push(entry);
-    saveMyMsgs();
-    pendingMap[th.key] = [];
-    inp.value = "";
-    refreshMsgStats();
-    renderThread();
-    renderThreadList();
-  }
-  if (!text){
-    /* Attachment only: nothing can be delivered by text, so this is a
-       local note only and does not count as an answer. */
-    record(
-      { text: "", t: now, atts: slimAtts, local: true },
-      { who: "out", text: "", t: now, atts: atts, local: true }
-    );
-    return;
-  }
-  var slug = th.slug || "";
-  var cat = th.cat || (slug && sent[slug] ? sent[slug].c || "" : "") || (slug && bizInfo[slug] ? bizInfo[slug].c || "" : "");
-  if (!slug || !cat){
-    record(
-      { text: text, t: now, atts: slimAtts, delivered: false, failed: true, error: "Business not matched to a sent text" },
-      { who: "out", text: text, t: now, atts: atts, delivered: false, failed: true, error: "Business not matched to a sent text" }
-    );
-    return;
-  }
-  var btn = document.getElementById("replySendBtn");
-  replySending = true;
-  btn.disabled = true;
-  btn.textContent = "Sending";
-  var out = await sendCustomItems([{ slug: slug, category: cat, body: text }], null);
-  btn.disabled = false;
-  btn.textContent = "Send";
-  replySending = false;
-  var res = out.results[slug] || { ok: false, error: "Send failed" };
-  if (res.ok){
-    var st = threadState[th.key] || (threadState[th.key] = {});
-    if (th.latestIn){ st.ans = th.latestIn; st.seen = th.latestIn; }
-    saveThreadState();
-    record(
-      { text: text, t: Date.now(), atts: slimAtts, delivered: true },
-      { who: "out", text: text, t: Date.now(), atts: atts, delivered: true }
-    );
-  } else {
-    record(
-      { text: text, t: Date.now(), atts: slimAtts, delivered: false, failed: true, error: res.error || "Send failed" },
-      { who: "out", text: text, t: Date.now(), atts: atts, delivered: false, failed: true, error: res.error || "Send failed" }
-    );
-  }
-}
-document.getElementById("replySendBtn").addEventListener("click", sendReply);
-document.getElementById("replyInput").addEventListener("keydown", function(e){ if (e.key === "Enter") sendReply(); });
-document.getElementById("threadBackBtn").addEventListener("click", function(){
-  document.getElementById("msgWrap").classList.remove("showthread");
-  document.getElementById("msgView").classList.remove("thread-open");
-});
 
 /* View switching */
 function showView(id){
-  ["loginView", "homeView", "msgView", "exploreView", "sentView"].forEach(function(v){
+  ["loginView", "homeView", "exploreView", "sentView"].forEach(function(v){
     document.getElementById(v).classList.toggle("hidden", v !== id);
   });
 }
 function goHome(){
-  document.getElementById("msgWrap").classList.remove("showthread");
-  document.getElementById("msgView").classList.remove("thread-open");
   refreshStats();
-  refreshMsgStats();
   showView("homeView");
 }
-document.getElementById("homeMessagesBtn").addEventListener("click", function(){
-  document.getElementById("msgWrap").classList.remove("showthread");
-  document.getElementById("msgView").classList.remove("thread-open");
-  if (curThread < 0 && THREADS.length) curThread = 0;
-  renderThreadList();
-  renderThread();
-  showView("msgView");
-  if (textConfigured && textKey()) loadReplies();
+document.getElementById("homeSentBtn").addEventListener("click", function(){
+  renderSentView();
+  showView("sentView");
+  if (repoCounts){
+    Object.keys(repoCounts).forEach(function(name){
+      if (repoCounts[name] > 0) ensureShard(name);
+    });
+  }
 });
 document.getElementById("homeExploreBtn").addEventListener("click", function(){
   refreshStats();
@@ -1225,7 +763,6 @@ document.getElementById("homeExploreBtn").addEventListener("click", function(){
   showView("exploreView");
   ensureExploreData();
 });
-document.getElementById("msgBackBtn").addEventListener("click", function(){ goHome(); });
 document.getElementById("exploreBackBtn").addEventListener("click", function(){ goHome(); });
 
 /* Explore: stats, category dropdown, leads, selection, sending */
@@ -1236,7 +773,13 @@ function refreshStats(){
   }
   var inline = document.getElementById("exploreSentInline");
   if (inline) inline.textContent = fmt(sentTotal());
-  refreshMsgStats();
+  refreshHomeStats();
+}
+function repliedCount(){ var n = 0; for (var slug in board){ if (board[slug] && board[slug].r && sent[slug]) n++; } return n; }
+function refreshHomeStats(){
+  var a = document.getElementById("homeSent"); if (a) a.textContent = fmt(sentTotal());
+  var b = document.getElementById("homeSentCount"); if (b) b.textContent = fmt(sentTotal());
+  var c = document.getElementById("homeRepliedCt"); if (c) c.textContent = fmt(repliedCount());
 }
 var activeCategory = null;
 var exploreQuery = "";
@@ -1499,99 +1042,56 @@ function closeConfirm(result){
 }
 document.getElementById("confirmYes").addEventListener("click", function(){ closeConfirm(true); });
 document.getElementById("confirmNo").addEventListener("click", function(){ closeConfirm(false); });
-/* Single Text: one business, sent through the bridge from the Twilio
-   number, after its own confirmation. A one business send is a chunk
-   of one, so the bridge uses the first wording for it. */
+/* Single Text: one business, through TextNow after its own confirmation. */
+function copyText(text){ try { if (navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).catch(function(){}); return; } } catch(e){} try { var ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); document.body.removeChild(ta); } catch(e){} }
+function sendViaTextNow(items){
+  if (!items.length) return;
+  copyText(items.map(function(it){ return it.msg; }).join("\n\n"));
+  items.forEach(function(it, i){ setMarked(it.slug, true, 0); delete selection[it.slug]; });
+  window.open("https://www.textnow.com/messaging", "_blank");
+  refreshStats();
+  updateSelBar();
+  renderBiz(false);
+}
 async function textOne(slug){
   if (sent[slug]) return;
   var info = bizInfo[slug] || {};
-  var st = document.getElementById("sendStatus");
-  if (textConfigured !== true){ if (st) st.textContent = "Texting not set up yet"; return; }
-  if (!textKey()){ if (st) st.textContent = "Texting locked"; return; }
   var name = info.n || slug;
-  var msg = WORDINGS[0](name, "bjvfi.com/" + slug + "/");
-  var okSend = await showConfirm("Text " + name, (info.p || "") + (info.c ? " · " + info.c : ""), msg);
+  var msg = messageFor(name, "bjvfi.com/" + slug + "/");
+  var okSend = await showConfirm("Send in TextNow", (info.p || "") + (info.c ? " · " + info.c : ""), msg + "\n\nCopies the message, opens TextNow, and marks it Sent.");
   if (!okSend) return;
-  selection = {};
-  selection[slug] = true;
-  updateSelBar();
-  doSend(true);
+  sendViaTextNow([{ slug: slug, msg: msg }]);
 }
 
-/* Sending goes through the Worker in chunks of 50 per category, exactly
-   the payload the bridge accepts. Only a per-slug ok from the Worker marks
-   that business Sent. If the bridge is not configured or this device has
-   no key, nothing is sent and the status says so. */
+/* Sending through TextNow: tapping Send copies the messages, opens
+   TextNow, and marks them Sent at that tap. */
 async function doSend(confirmed){
   if (sending) return;
   pruneSelection();
   var slugs = Object.keys(selection).filter(function(slug){ return !sent[slug]; });
   if (!slugs.length){ updateSelBar(); renderBiz(false); return; }
   var st = document.getElementById("sendStatus");
-  if (textConfigured !== true){ st.textContent = "Texting not set up yet"; return; }
-  if (!textKey()){ st.textContent = "Texting locked"; return; }
   if (!confirmed){
     var previewNames = slugs.slice(0, 3).map(function(s){ return (bizInfo[s] && bizInfo[s].n) || s; }).join(", ");
     var firstInfo = bizInfo[slugs[0]] || {};
-    var firstMsg = WORDINGS[0](firstInfo.n || "", "bjvfi.com/" + slugs[0] + "/");
+    var firstMsg = messageFor(firstInfo.n || "", "bjvfi.com/" + slugs[0] + "/");
     var okSend = await showConfirm(
       "Send to " + fmt(slugs.length) + (slugs.length === 1 ? " business" : " businesses"),
       previewNames + (slugs.length > 3 ? " and " + fmt(slugs.length - 3) + " more" : ""),
-      slugs.length === 1 ? firstMsg : "Each business gets its own message with its name and its own site link. First one:\n\n" + firstMsg
+      (slugs.length === 1 ? firstMsg : "Each business gets its own message with its own site link. First one:\n\n" + firstMsg) + "\n\nCopies the message, opens TextNow, and marks it Sent."
     );
     if (!okSend){ st.textContent = ""; return; }
   }
   sending = true;
   var btn = document.getElementById("sendBtn");
   btn.disabled = true;
-  btn.textContent = "Sending";
-  var byCat = {}, order = [];
-  slugs.forEach(function(slug){
-    var c = (bizInfo[slug] && bizInfo[slug].c) || "";
-    if (!byCat[c]){ byCat[c] = []; order.push(c); }
-    byCat[c].push(slug);
-  });
-  var total = slugs.length, okCount = 0, failCount = 0, authProblem = false, notConf = false;
-  st.textContent = "Sent 0 of " + fmt(total);
-  for (var ci = 0; ci < order.length && !authProblem && !notConf; ci++){
-    var cat = order[ci];
-    var arr = byCat[cat];
-    var catFile = manifest && manifest.cats[cat] ? manifest.cats[cat].files[0] : null;
-    if (!catFile){ failCount += arr.length; continue; }
-    for (var start = 0; start < arr.length; start += 50){
-      var chunk = arr.slice(start, start + 50);
-      var j = null, status = 0;
-      try {
-        var r = await fetch(TEXT_API + "/send", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "X-Text-Key": textKey() },
-          body: JSON.stringify({ catFile: catFile, slugs: chunk, catName: cat })
-        });
-        status = r.status;
-        j = await r.json().catch(function(){ return null; });
-      } catch(e){ j = null; }
-      if (status === 401){ authProblem = true; break; }
-      if (j && j.error === "not configured"){ notConf = true; break; }
-      if (!j || !j.results){ failCount += chunk.length; continue; }
-      j.results.forEach(function(res, ri){
-        if (res.ok){
-          okCount++;
-          delete selection[res.slug];
-          setMarked(res.slug, true, ri % 4);
-        } else failCount++;
-      });
-      st.textContent = "Sent " + fmt(okCount) + " of " + fmt(total);
-    }
-  }
+  btn.textContent = "Opening";
+  var items = slugs.map(function(slug){ return { slug: slug, msg: messageFor((bizInfo[slug] && bizInfo[slug].n) || slug, "bjvfi.com/" + slug + "/") }; });
+  sendViaTextNow(items);
   btn.disabled = false;
   btn.textContent = "Send";
+  st.textContent = "Marked Sent, finish in TextNow";
   sending = false;
-  if (authProblem) st.textContent = "Texting locked";
-  else if (notConf){ textConfigured = false; repliesState = "off"; st.textContent = "Texting not set up yet"; }
-  else st.textContent = fmt(okCount) + " sent" + (failCount ? ", " + fmt(failCount) + " failed" : "");
-  refreshStats();
-  updateSelBar();
-  renderBiz(false);
 }
 var searchSeq = 0;
 async function streamSearchChunks(seq){
@@ -1620,18 +1120,56 @@ document.getElementById("clearSelBtn").addEventListener("click", function(){
 });
 document.getElementById("sendBtn").addEventListener("click", function(){ doSend(false); });
 
-/* Sent view: every business in the sent mirror, across all categories.
-   The Message actions here write to one already sent business or to a
-   picked group; those messages are delivered through the bridge
-   /send-custom from the Twilio number, and only a per-slug ok from the
-   Worker shows them as sent on the row. The bulk sender in Explore
-   never includes a business that is already sent. */
-var MANUAL_KEY = "bjvfi_database_manual_v1";
-var manualMsgs = {};
-try { manualMsgs = JSON.parse(localStorage.getItem(MANUAL_KEY) || "{}") || {}; } catch(e) { manualMsgs = {}; }
-function saveManualMsgs(){ try { localStorage.setItem(MANUAL_KEY, JSON.stringify(manualMsgs)); } catch(e){} }
+/* Sent view: his board. Mark Replied is manual only, and the outcome
+   and next step note live in the board state, synced as one file. */
+var BOARD_KEY = "bjvfi_database_board_v1";
+var BOARD_PATH = "texting/board.json";
+var board = {};
+try { board = JSON.parse(localStorage.getItem(BOARD_KEY) || "{}") || {}; } catch(e) { board = {}; }
+function saveBoard(){ try { localStorage.setItem(BOARD_KEY, JSON.stringify(board)); } catch(e){} }
+var boardChain = Promise.resolve();
+function syncBoard(){
+  if (!TOKEN) return Promise.resolve();
+  boardChain = boardChain.then(async function(){
+    try {
+      await ghUpdateJson(BOARD_PATH, {}, function(data){
+        Object.keys(data).forEach(function(k){ delete data[k]; });
+        Object.keys(board).forEach(function(k){ data[k] = board[k]; });
+      });
+    } catch(e){}
+  });
+  return boardChain;
+}
+async function loadBoard(){
+  if (!TOKEN) return;
+  try {
+    var cur = await ghGetJson(BOARD_PATH);
+    if (cur && cur.data){ board = cur.data; saveBoard(); }
+  } catch(e){}
+  refreshHomeStats();
+  var sv = document.getElementById("sentView");
+  if (sv && !sv.classList.contains("hidden")) renderSentView();
+}
+function setBoard(slug, patch){
+  var rec = board[slug] || { r: 0, o: "", d: "" };
+  for (var k in patch) rec[k] = patch[k];
+  rec.t = Date.now();
+  if (!rec.r && !rec.o && !rec.d) delete board[slug];
+  else board[slug] = rec;
+  saveBoard();
+  syncBoard();
+  refreshHomeStats();
+}
+function nextStepFor(slug){
+  var rec = board[slug] || {};
+  if (rec.d) return rec.d;
+  if (rec.o === "interested") return "Build their website in SiteDesk";
+  if (rec.o === "later") return "Follow up later";
+  if (rec.o === "not") return "Nothing to do";
+  if (rec.r) return "Reply to them in TextNow";
+  return "Waiting for a reply";
+}
 var sentEntriesCache = [];
-var composeSlug = null;
 function sentEntries(){
   var out = [];
   Object.keys(sent).forEach(function(slug){
@@ -1641,224 +1179,101 @@ function sentEntries(){
   out.sort(function(a, b){ return (b.t || 0) - (a.t || 0); });
   return out;
 }
+var sentFilter = "all";
+var noteEditSlug = null;
 function renderSentView(){
   var entries = sentEntries();
   sentEntriesCache = entries;
   document.getElementById("sentViewCount").textContent = fmt(entries.length);
+  var repCount = entries.filter(function(e){ return board[e.slug] && board[e.slug].r; }).length;
+  var sfA = document.getElementById("sfAll"); if (sfA) sfA.textContent = fmt(entries.length);
+  var sfR = document.getElementById("sfRep"); if (sfR) sfR.textContent = fmt(repCount);
+  var sfN = document.getElementById("sfNot"); if (sfN) sfN.textContent = fmt(entries.length - repCount);
+  Array.prototype.forEach.call(document.querySelectorAll("#sentFilters [data-sf]"), function(el){
+    el.classList.toggle("sel", el.getAttribute("data-sf") === sentFilter);
+  });
+  var shownEntries = entries.filter(function(e){
+    var rec = board[e.slug] || {};
+    if (sentFilter === "replied") return !!rec.r;
+    if (sentFilter === "notreplied") return !rec.r;
+    return true;
+  });
+  var list = document.getElementById("sentList");
+  if (!entries.length){ list.innerHTML = '<div class="msg">Nothing sent yet.</div>'; return; }
+  if (!shownEntries.length){ list.innerHTML = '<div class="msg">Nothing here.</div>'; return; }
   var html = "";
-  entries.forEach(function(e){
-    var sel = !!sentSelection[e.key];
+  shownEntries.forEach(function(e){
+    var rec = board[e.slug] || {};
+    var whenLabel = e.t ? fmtBubbleWhen(e.t) : "";
     html += '<div class="row">'
-      + '<div class="biz-top"><div class="biz-top-main">'
       + (e.cat ? '<span class="catlabel">' + esc(e.cat) + '</span>' : '')
       + '<div class="nm">' + esc(e.name) + '</div>'
       + (e.phone ? '<div class="dt">' + esc(e.phone) + '</div>' : '')
       + (e.addr ? '<div class="dt">' + esc(e.addr) + '</div>' : '')
+      + '<div class="boardline"><span class="lbl">What needs to be done: </span>' + esc(nextStepFor(e.slug)) + '</div>'
+      + '<div class="outcomes">'
+      + '<button class="pill' + (rec.o === "interested" ? " goldsel" : "") + '" type="button" data-out="interested" data-slug="' + esc(e.slug) + '">Interested</button>'
+      + '<button class="pill' + (rec.o === "not" ? " goldsel" : "") + '" type="button" data-out="not" data-slug="' + esc(e.slug) + '">Not interested</button>'
+      + '<button class="pill' + (rec.o === "later" ? " goldsel" : "") + '" type="button" data-out="later" data-slug="' + esc(e.slug) + '">Later</button>'
       + '</div>'
-      + '<button class="pill biz-select' + (sel ? " goldsel" : "") + '" type="button" data-sentsel="' + esc(e.key) + '">Select</button>'
-      + '</div>';
-    (manualMsgs[e.key] || []).forEach(function(m){
-      var mcls = m.failed ? " failed" : (m.delivered ? "" : " local");
-      var mlab = m.failed ? ("Not delivered" + (m.error ? " · " + m.error : ""))
-        : (m.delivered ? ("Sent · " + fmtBubbleWhen(m.t)) : (fmtBubbleWhen(m.t) + " · On this device only"));
-      html += '<div class="manual-msg' + mcls + '">' + esc(m.text) + '<span class="bt">' + esc(mlab) + '</span></div>';
-    });
-    var whenLabel = e.t ? fmtBubbleWhen(e.t) : "";
-    html += '<div class="acts biz-footer"><button class="pill" type="button" data-msgto="' + esc(e.key) + '">Message</button><span class="biz-spacer"></span><span class="status-text sent">Sent' + (whenLabel ? ' · ' + esc(whenLabel) : '') + '</span></div></div>';
+      + '<div class="acts biz-footer">'
+      + '<a class="pill" href="https://bjvfi.com/' + esc(e.slug) + '/" target="_blank" rel="noopener">Site</a>'
+      + '<button class="pill' + (rec.r ? " goldsel" : "") + '" type="button" data-rep="' + esc(e.slug) + '">' + (rec.r ? "Replied" : "Mark as Replied") + '</button>'
+      + '<button class="pill" type="button" data-note="' + esc(e.slug) + '">' + (rec.d ? "Edit next step" : "Add next step") + '</button>'
+      + '<span class="biz-spacer"></span><span class="status-text sent">Sent' + (whenLabel ? ' · ' + esc(whenLabel) : '') + '</span></div>';
+    if (noteEditSlug === e.slug){
+      html += '<div class="noteedit"><input class="inp" id="noteInput" type="text" placeholder="What needs to be done" value="' + esc(rec.d || "") + '"><div class="acts"><button class="pill goldsel" type="button" data-notesave="' + esc(e.slug) + '">Save</button><button class="pill" type="button" data-notecancel="1">Cancel</button></div></div>';
+    }
+    html += '</div>';
   });
-  var list = document.getElementById("sentList");
-  list.innerHTML = html || '<div class="msg">Nothing sent yet.</div>';
-  Array.prototype.forEach.call(list.querySelectorAll("[data-msgto]"), function(el){
+  list.innerHTML = html;
+  Array.prototype.forEach.call(list.querySelectorAll("[data-rep]"), function(el){
     el.addEventListener("click", function(){
-      var key = el.getAttribute("data-msgto");
-      for (var i = 0; i < sentEntriesCache.length; i++){
-        if (sentEntriesCache[i].key === key){ openSentCompose(sentEntriesCache[i]); break; }
-      }
-    });
-  });
-  Array.prototype.forEach.call(list.querySelectorAll("[data-sentsel]"), function(el){
-    el.addEventListener("click", function(){
-      var key = el.getAttribute("data-sentsel");
-      if (sentSelection[key]) delete sentSelection[key]; else sentSelection[key] = true;
-      updateSentSelBar();
+      var slug = el.getAttribute("data-rep");
+      var cur = board[slug] || {};
+      setBoard(slug, { r: cur.r ? 0 : 1 });
       renderSentView();
     });
   });
-  updateSentSelBar();
-}
-/* Group message flow (Sent view only): hand pick or random pick some sent
-   businesses, then craft ONE message that goes to all of them. */
-var sentSelection = {};
-var groupSending = false;
-function sentSelCount(){ return Object.keys(sentSelection).length; }
-function updateSentSelBar(){
-  var n = sentSelCount();
-  var bar = document.getElementById("sentSelBar");
-  if (bar) bar.classList.toggle("hidden", n === 0);
-  var cnt = document.getElementById("sentSelCount");
-  if (cnt) cnt.textContent = fmt(n);
-  var btn = document.getElementById("sentGroupBtn");
-  if (btn) btn.textContent = "Message selected · " + fmt(n);
-  if (n === 0 && !groupSending) closeGroupCompose();
-}
-function sentRandomPick(n){
-  var pool = sentEntriesCache.slice();
-  for (var i = pool.length - 1; i > 0; i--){
-    var j = Math.floor(Math.random() * (i + 1));
-    var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
-  }
-  sentSelection = {};
-  pool.slice(0, Math.min(n, pool.length)).forEach(function(e){ sentSelection[e.key] = true; });
-  updateSentSelBar();
-  renderSentView();
-}
-function openGroupCompose(){
-  var n = sentSelCount();
-  if (!n || groupSending) return;
-  closeSentCompose();
-  document.getElementById("sentGroupName").textContent = "Message to " + fmt(n) + (n === 1 ? " business" : " businesses");
-  document.getElementById("sentGroupSub").textContent = "One message, sent to every selected business";
-  document.getElementById("sentGroupStatus").textContent = "";
-  var inp = document.getElementById("sentGroupInput");
-  inp.value = "";
-  document.getElementById("sentGroupCompose").classList.remove("hidden");
-  document.getElementById("sentScroll").scrollTop = 0;
-  inp.focus();
-}
-function closeGroupCompose(){
-  if (groupSending) return;
-  var box = document.getElementById("sentGroupCompose");
-  if (box) box.classList.add("hidden");
-  var inp = document.getElementById("sentGroupInput");
-  if (inp) inp.value = "";
-  var st = document.getElementById("sentGroupStatus");
-  if (st) st.textContent = "";
-}
-async function sendGroupCompose(){
-  if (groupSending) return;
-  var inp = document.getElementById("sentGroupInput");
-  var text = inp.value.trim();
-  var keys = Object.keys(sentSelection);
-  if (!text || !keys.length) return;
-  var okGroup = await showConfirm("Message " + fmt(keys.length) + (keys.length === 1 ? " business" : " businesses"), "One message to every selected business", text);
-  if (!okGroup) return;
-  groupSending = true;
-  var st = document.getElementById("sentGroupStatus");
-  var btn = document.getElementById("sentGroupSend");
-  var cancel = document.getElementById("sentGroupCancel");
-  btn.textContent = "Sending";
-  inp.disabled = true;
-  cancel.disabled = true;
-  var total = keys.length;
-  st.textContent = "Sent 0 of " + fmt(total);
-  var byKey = {};
-  sentEntriesCache.forEach(function(e){ byKey[e.key] = e; });
-  var items = [], invalid = [];
-  keys.forEach(function(key){
-    var e = byKey[key];
-    if (e && e.cat) items.push({ slug: key, category: e.cat, body: text });
-    else invalid.push(key);
+  Array.prototype.forEach.call(list.querySelectorAll("[data-out]"), function(el){
+    el.addEventListener("click", function(){
+      var slug = el.getAttribute("data-slug");
+      var val = el.getAttribute("data-out");
+      var cur = board[slug] || {};
+      setBoard(slug, { o: cur.o === val ? "" : val });
+      renderSentView();
+    });
   });
-  invalid.forEach(function(key){
-    if (!manualMsgs[key]) manualMsgs[key] = [];
-    manualMsgs[key].push({ text: text, t: Date.now(), delivered: false, failed: true, error: "Category not known for this business" });
+  Array.prototype.forEach.call(list.querySelectorAll("[data-note]"), function(el){
+    el.addEventListener("click", function(){
+      noteEditSlug = el.getAttribute("data-note");
+      renderSentView();
+      var inp = document.getElementById("noteInput");
+      if (inp) inp.focus();
+    });
   });
-  if (invalid.length) saveManualMsgs();
-  var out = await sendCustomItems(items, function(okSoFar){
-    st.textContent = "Sent " + fmt(okSoFar) + " of " + fmt(total);
+  Array.prototype.forEach.call(list.querySelectorAll("[data-notesave]"), function(el){
+    el.addEventListener("click", function(){
+      var slug = el.getAttribute("data-notesave");
+      var inp = document.getElementById("noteInput");
+      var val = inp ? inp.value.trim() : "";
+      setBoard(slug, { d: val });
+      noteEditSlug = null;
+      renderSentView();
+    });
   });
-  items.forEach(function(it){
-    var res = out.results[it.slug] || { ok: false, error: "Send failed" };
-    if (!manualMsgs[it.slug]) manualMsgs[it.slug] = [];
-    if (res.ok) manualMsgs[it.slug].push({ text: text, t: Date.now(), delivered: true });
-    else manualMsgs[it.slug].push({ text: text, t: Date.now(), delivered: false, failed: true, error: res.error || "Send failed" });
+  Array.prototype.forEach.call(list.querySelectorAll("[data-notecancel]"), function(el){
+    el.addEventListener("click", function(){ noteEditSlug = null; renderSentView(); });
   });
-  saveManualMsgs();
-  st.textContent = "Sent " + fmt(out.okCount) + " of " + fmt(total);
-  btn.textContent = "Send";
-  inp.disabled = false;
-  cancel.disabled = false;
-  groupSending = false;
-  sentSelection = {};
-  var box = document.getElementById("sentGroupCompose");
-  box.classList.add("hidden");
-  inp.value = "";
-  st.textContent = "";
-  updateSentSelBar();
-  renderSentView();
 }
-document.getElementById("sentRandGo").addEventListener("click", function(){
-  var n = parseInt(document.getElementById("sentRandNum").value, 10);
-  if (n && n > 0) sentRandomPick(n);
+Array.prototype.forEach.call(document.querySelectorAll("#sentFilters [data-sf]"), function(el){
+  el.addEventListener("click", function(){
+    sentFilter = el.getAttribute("data-sf");
+    renderSentView();
+  });
 });
-document.getElementById("sentClearSelBtn").addEventListener("click", function(){
-  sentSelection = {};
-  updateSentSelBar();
-  renderSentView();
-});
-document.getElementById("sentGroupBtn").addEventListener("click", openGroupCompose);
-document.getElementById("sentGroupSend").addEventListener("click", sendGroupCompose);
-document.getElementById("sentGroupInput").addEventListener("keydown", function(e){ if (e.key === "Enter") sendGroupCompose(); });
-document.getElementById("sentGroupCancel").addEventListener("click", closeGroupCompose);
-function openSentCompose(entry){
-  closeGroupCompose();
-  composeSlug = entry.key;
-  document.getElementById("sentComposeName").textContent = entry.name;
-  document.getElementById("sentComposeSub").textContent = entry.cat + " · " + entry.phone;
-  document.getElementById("sentComposeStatus").textContent = "";
-  var inp = document.getElementById("sentComposeInput");
-  inp.value = "";
-  document.getElementById("sentCompose").classList.remove("hidden");
-  document.getElementById("sentScroll").scrollTop = 0;
-  inp.focus();
-}
-function closeSentCompose(){
-  composeSlug = null;
-  document.getElementById("sentCompose").classList.add("hidden");
-  document.getElementById("sentComposeInput").value = "";
-  document.getElementById("sentComposeStatus").textContent = "";
-}
-var sentComposeSending = false;
-async function sendSentCompose(){
-  if (sentComposeSending) return;
-  var inp = document.getElementById("sentComposeInput");
-  var text = inp.value.trim();
-  if (!composeSlug || !text) return;
-  var slug = composeSlug;
-  var entry = null;
-  for (var i = 0; i < sentEntriesCache.length; i++) if (sentEntriesCache[i].key === slug) entry = sentEntriesCache[i];
-  var okOne = await showConfirm("Message " + (entry ? entry.name : ""), entry ? (entry.phone || "") : "", text);
-  if (!okOne) return;
-  var st = document.getElementById("sentComposeStatus");
-  var btn = document.getElementById("sentComposeSend");
-  sentComposeSending = true;
-  btn.disabled = true;
-  btn.textContent = "Sending";
-  st.textContent = "Sent 0 of 1";
-  var res;
-  if (!entry || !entry.cat){
-    res = { ok: false, error: "Category not known for this business" };
-  } else {
-    var out = await sendCustomItems([{ slug: slug, category: entry.cat, body: text }], null);
-    res = out.results[slug] || { ok: false, error: "Send failed" };
-  }
-  if (!manualMsgs[slug]) manualMsgs[slug] = [];
-  if (res.ok) manualMsgs[slug].push({ text: text, t: Date.now(), delivered: true });
-  else manualMsgs[slug].push({ text: text, t: Date.now(), delivered: false, failed: true, error: res.error || "Send failed" });
-  saveManualMsgs();
-  btn.disabled = false;
-  btn.textContent = "Send";
-  sentComposeSending = false;
-  closeSentCompose();
-  renderSentView();
-}
-document.getElementById("sentComposeSend").addEventListener("click", sendSentCompose);
-document.getElementById("sentComposeInput").addEventListener("keydown", function(e){ if (e.key === "Enter") sendSentCompose(); });
-document.getElementById("sentComposeCancel").addEventListener("click", closeSentCompose);
 document.getElementById("exploreSentBtn").addEventListener("click", function(){
   closeCatDrop();
-  closeSentCompose();
-  closeGroupCompose();
   renderSentView();
   showView("sentView");
   if (repoCounts){
@@ -1868,8 +1283,6 @@ document.getElementById("exploreSentBtn").addEventListener("click", function(){
   }
 });
 document.getElementById("sentBackBtn").addEventListener("click", function(){
-  closeSentCompose();
-  closeGroupCompose();
   refreshStats();
   renderExplore();
   showView("exploreView");
@@ -1892,17 +1305,14 @@ if (window.matchMedia && !window.matchMedia("(prefers-color-scheme: light)").mat
    the gate needs anyone to hand the value to this page's code, and the
    password is never a readable string in this page. On success it is
    stored on this device only, in the same local storage slot the old
-   page used, and doubles as the key for /send and /replies. No leads,
-   marks, or replies load before the gate passes. The Twilio values
+   page used, and doubles as the login key. No leads or
+   marks load before the gate passes. The Twilio values
    themselves are never entered here. */
 var authed = false;
 function enterApp(){
   authed = true;
-  renderThreadList();
-  refreshMsgStats();
+  refreshStats();
   showView("homeView");
-  refreshNotifBtn();
-  subscribePush(false);
   bootData();
 }
 function signOut(silent){
@@ -1921,7 +1331,7 @@ async function gateHealth(){
     var r = await fetch(TEXT_API + "/health");
     var j = await r.json();
     textConfigured = !!j.configured;
-    if (!j.configured){ btn.textContent = "Sign in"; if (st && !st.textContent) st.textContent = "Texting not set up yet"; return; }
+    if (!j.configured){ btn.textContent = "Sign in"; return; }
     btn.textContent = j.loginSet ? "Sign in" : "Set password";
   } catch(e){}
 }
@@ -1948,7 +1358,7 @@ async function bootGate(){
     }
     if (r.status === 400){
       showView("loginView");
-      document.getElementById("loginStat").textContent = "Texting not set up yet";
+      document.getElementById("loginStat").textContent = "Sign in failed, try again";
       gateHealth();
       return;
     }
@@ -1967,7 +1377,7 @@ async function doLogin(){
   try {
     var r = await fetch(TEXT_API + "/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: pw }) });
     if (r.status === 401){ st.textContent = "Wrong password"; btn.disabled = false; gateHealth(); return; }
-    if (r.status === 400){ st.textContent = "Texting not set up yet"; btn.disabled = false; return; }
+    if (r.status === 400){ st.textContent = "Sign in failed, try again"; btn.disabled = false; return; }
     if (!r.ok){ st.textContent = "Check failed"; btn.disabled = false; return; }
     try { localStorage.setItem(TKEY_LS, pw); } catch(e){}
     inp.value = "";
@@ -1975,7 +1385,6 @@ async function doLogin(){
     btn.disabled = false;
     repliesState = "ok";
     enterApp();
-    loadReplies();
   } catch(e){
     st.textContent = "Could not reach texting";
     btn.disabled = false;
@@ -2000,6 +1409,7 @@ function bootData(){
     refreshStats();
     setSyncLabel();
     retryPending();
+    loadBoard();
     checkTexting();
   }).catch(function(){
     document.getElementById("bizList").innerHTML = '<div class="msg">Could not load the database. Check your connection and reopen the page.</div>';
@@ -2008,65 +1418,7 @@ function bootData(){
 
 document.getElementById("lockBtn").addEventListener("click", function(){ signOut(true); });
 
-/* Notifications: Web Push through the bridge, per the page spec. The
-   whole subscribe flow starts from a tap on the home control (iPhone
-   only prompts from a tap, and only inside the Home Screen app). On
-   later loads, an already granted permission re-registers quietly. */
-function urlBase64ToUint8Array(base64String){
-  var padding = "=".repeat((4 - base64String.length % 4) % 4);
-  var base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
-  var raw = atob(base64);
-  var out = new Uint8Array(raw.length);
-  for (var i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i);
-  return out;
-}
-function notifSupported(){
-  return ("serviceWorker" in navigator) && ("PushManager" in window) && ("Notification" in window);
-}
-function refreshNotifBtn(){
-  var btn = document.getElementById("notifBtn");
-  if (!btn) return;
-  if (!notifSupported()){ btn.textContent = "Notifications not available here"; return; }
-  btn.textContent = Notification.permission === "granted" ? "Notifications on" : "Enable notifications";
-}
-async function subscribePush(ask){
-  var btn = document.getElementById("notifBtn");
-  if (!notifSupported()){
-    if (ask && btn) btn.textContent = "Notifications not available here";
-    return;
-  }
-  try {
-    if (ask){
-      var perm = await Notification.requestPermission();
-      if (perm !== "granted"){ if (btn) btn.textContent = "Notifications off"; return; }
-    }
-    if (Notification.permission !== "granted"){ refreshNotifBtn(); return; }
-    var reg = await navigator.serviceWorker.register("./sw.js");
-    await navigator.serviceWorker.ready;
-    var vr = await fetch(TEXT_API + "/vapid");
-    var vj = await vr.json();
-    if (!vj.publicKey){ refreshNotifBtn(); return; }
-    var sub = await reg.pushManager.getSubscription();
-    if (sub){
-      var cur = sub.options ? sub.options.applicationServerKey : null;
-      var want = urlBase64ToUint8Array(vj.publicKey);
-      var match = false;
-      if (cur){
-        var cb = new Uint8Array(cur);
-        match = cb.length === want.length;
-        if (match) for (var i = 0; i < cb.length; i++) if (cb[i] !== want[i]){ match = false; break; }
-      }
-      if (!match){ await sub.unsubscribe(); sub = null; }
-    }
-    if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(vj.publicKey) });
-    await fetch(TEXT_API + "/subscribe", { method: "POST", headers: { "Content-Type": "application/json", "X-Text-Key": textKey() }, body: JSON.stringify(sub.toJSON()) });
-  } catch(e){}
-  refreshNotifBtn();
-}
-document.getElementById("notifBtn").addEventListener("click", function(){ subscribePush(true); });
-
 /* Boot: the gate comes first. */
-renderMsgFilters();
 showView("loginView");
 bootGate();
 
