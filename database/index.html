@@ -472,6 +472,8 @@ function savePending(){ try { localStorage.setItem(PKEY, JSON.stringify(pending)
 var repoCounts = null;
 var loadedShards = {};
 var shardLoading = {};
+var shardEpoch = {};
+function bumpShardEpoch(name){ shardEpoch[name] = (shardEpoch[name] || 0) + 1; }
 var syncActive = 0, syncChain = Promise.resolve(), queuedOps = {}, opSeq = 0;
 /* Row details for every business loaded this session, keyed by slug. */
 var bizInfo = {};
@@ -563,6 +565,7 @@ function enqueueSync(op){
   syncChain = syncChain.then(async function(){
     try {
       await syncOp(op);
+      bumpShardEpoch(op.c);
       if (pending[op.slug] && pending[op.slug].id === op.id){ delete pending[op.slug]; savePending(); }
       return true;
     } catch(e){
@@ -594,6 +597,7 @@ function allCatCounts(){
   for (name in mc){
     if (loadedShards[name] || pendingCat(name) || !(name in out)) out[name] = mc[name];
   }
+  for (name in loadedShards) if (loadedShards[name]) out[name] = mc[name] || 0;
   return out;
 }
 function pendingCat(name){
@@ -623,6 +627,7 @@ function setMarked(slug, mark, w){
     if (entry.a) op.a = entry.a;
     if (typeof entry.w === "number") op.w = entry.w;
   } else return;
+  bumpShardEpoch(op.c);
   saveSent();
   if (TOKEN){ pending[slug] = op; savePending(); }
   enqueueSync(op);
@@ -632,13 +637,16 @@ function setMarked(slug, mark, w){
 function ensureShard(name){
   if (!TOKEN || !manifest || !manifest.cats[name] || loadedShards[name] || shardLoading[name]) return Promise.resolve(false);
   shardLoading[name] = true;
+  var epoch = shardEpoch[name] || 0, stale = false;
   return ghGetJson(shardPath(name)).then(function(cur){
+    if ((shardEpoch[name] || 0) !== epoch){ stale = true; return false; }
     var shard = cur ? cur.data : {};
     loadedShards[name] = true;
     if (!repoCounts) repoCounts = {};
     repoCounts[name] = Object.keys(shard).length;
     var slug;
     for (slug in shard){
+      if (pending[slug]) continue;
       var v = shard[slug] || {};
       var e = { t: v.t || 0, n: v.n || "", p: v.p || "", c: name };
       if (v.a) e.a = v.a;
@@ -654,6 +662,7 @@ function ensureShard(name){
     return true;
   }).catch(function(){ return false; }).then(function(r){
     delete shardLoading[name];
+    if (stale) return ensureShard(name);
     return r;
   });
 }
