@@ -453,19 +453,21 @@ var FILE_ICON_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" 
 
 function messageFor(n, u){ return "Hi, I came across " + n + "'s Google profile and noticed you don't have a website. I build websites for local businesses to help customers find you, know your hours, and contact you if needed. It is just $27 monthly, no building fee, it is literally cheaper than two cups of coffee. You can see our sketch minimalistic site we built for you at " + u; }
 
-/* Marks and repo sync, through the same data path SiteDesk uses. Marks live
-   in iamnottaiiii/sitedesk-data under texting/: one shard per category plus a
-   small index of counts. The local copy stays as a mirror so the page works
-   offline, and anything that fails to sync stays pending and retries. */
+/* Marks and account sync. Marks live in the owner's account store on the
+   bjvfi-text Worker, behind the login key: one shard per category plus a
+   small index of counts, and the Sent board beside them. The local copy
+   stays as a mirror so the page works offline, and anything that fails
+   to sync stays pending and retries. The old GitHub save path is retired:
+   its token died, so saves silently stayed on the device. */
 var DATA = "https://bjvfi.com/sitedesk/data/queue/";
 var KEY = "bjvfi_database_sent_v1";
 var PKEY = "bjvfi_database_pending_v1";
 var sent = {};
 try { sent = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch(e) { sent = {}; }
 function saveSent(){ try { localStorage.setItem(KEY, JSON.stringify(sent)); } catch(e){} }
-var GH_API = "https://api.github.com/repos/iamnottaiiii/sitedesk-data";
-var INDEX_PATH = "texting/index.json";
-var TOKEN = (typeof SITEDESK_DATA_TOKEN !== "undefined" && SITEDESK_DATA_TOKEN) ? SITEDESK_DATA_TOKEN : null;
+/* The save path is the Worker account store; this flag simply stays on
+   so the sync guards below keep their shape. */
+var TOKEN = true;
 var pending = {};
 try { pending = JSON.parse(localStorage.getItem(PKEY) || "{}") || {}; } catch(e) { pending = {}; }
 function savePending(){ try { localStorage.setItem(PKEY, JSON.stringify(pending)); } catch(e){} }
@@ -484,77 +486,28 @@ function setSyncLabel(){
   if (!TOKEN) el.textContent = "Device only";
   else if (syncActive > 0) el.textContent = "Saving";
   else if (Object.keys(pending).length) el.textContent = "Save failed";
-  else el.textContent = "Repo sync";
+  else el.textContent = "Account sync";
 }
-function b64encode(bytes){
-  var bin = "", b = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
-  for (var i = 0; i < b.length; i++) bin += String.fromCharCode(b[i]);
-  return btoa(bin);
+function shardFile(catName){
+  return manifest.cats[catName].files[0];
 }
-function b64decodeToBytes(b64){
-  var bin = atob(String(b64).replace(/\s/g, ""));
-  var out = new Uint8Array(bin.length);
-  for (var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
-  return out;
-}
-function ghHeaders(){
-  return { "Accept": "application/vnd.github+json", "Authorization": "Bearer " + TOKEN, "Content-Type": "application/json" };
-}
-async function ghGetJson(path){
-  var res = await fetch(GH_API + "/contents/" + path + "?ref=main", { method: "GET", cache: "no-store", headers: ghHeaders() });
-  if (res.status === 404) return null;
-  if (!res.ok){ var e = new Error("GitHub read failed (" + res.status + ")"); e.status = res.status; throw e; }
-  var file = await res.json();
-  return { data: JSON.parse(new TextDecoder().decode(b64decodeToBytes(file.content || ""))), sha: file.sha };
-}
-async function ghPutJson(path, obj, sha){
-  var body = { message: "database: update " + path, content: b64encode(new TextEncoder().encode(JSON.stringify(obj, null, 2))) };
-  if (sha) body.sha = sha;
-  var res = await fetch(GH_API + "/contents/" + path, { method: "PUT", cache: "no-store", headers: ghHeaders(), body: JSON.stringify(body) });
-  if (!res.ok){ var e2 = new Error("GitHub save failed (" + res.status + ")"); e2.status = res.status; throw e2; }
-  return res.json();
-}
-/* Fresh read, change one thing, save with that read's sha. On a 409 or 422
-   (someone else saved first) start over with a fresh read, up to 5 tries. */
-async function ghUpdateJson(path, fallback, mutate){
-  var lastErr = null;
-  for (var attempt = 0; attempt < 5; attempt++){
-    var cur = await ghGetJson(path);
-    var data = cur ? cur.data : JSON.parse(JSON.stringify(fallback));
-    mutate(data);
-    try {
-      await ghPutJson(path, data, cur ? cur.sha : null);
-      return data;
-    } catch(e){
-      lastErr = e;
-      if ((e.status === 409 || e.status === 422) && attempt < 4) continue;
-      throw e;
-    }
-  }
-  throw lastErr;
-}
-function shardPath(catName){
-  return "texting/cats/" + manifest.cats[catName].files[0];
+/* Account store calls to the bjvfi-text Worker, gated by the login key
+   this device already holds. TEXT_API and textKey are defined below;
+   these only run after the whole page has loaded and he has signed in. */
+async function storeFetch(path, opts){
+  opts = opts || {};
+  var headers = Object.assign({ "X-Text-Key": textKey() }, opts.headers || {});
+  var init = Object.assign({}, opts, { headers: headers, cache: "no-store" });
+  var r = await fetch(TEXT_API + path, init);
+  if (!r.ok){ var e = new Error("store failed (" + r.status + ")"); e.status = r.status; throw e; }
+  return r.json();
 }
 async function syncOp(op){
-  var shard = await ghUpdateJson(shardPath(op.c), {}, function(data){
-    if (op.mark){
-      var rec = { t: op.t, n: op.n, p: op.p };
-      if (op.a) rec.a = op.a;
-      if (typeof op.w === "number") rec.w = op.w;
-      data[op.slug] = rec;
-    }
-    else delete data[op.slug];
-  });
-  var count = Object.keys(shard).length;
-  await ghUpdateJson(INDEX_PATH, { total: 0, cats: {} }, function(idx){
-    idx.cats = idx.cats || {};
-    if (count) idx.cats[op.c] = count; else delete idx.cats[op.c];
-    var total = 0, k;
-    for (k in idx.cats) total += idx.cats[k];
-    idx.total = total;
-    repoCounts = idx.cats;
-  });
+  var out = { slug: op.slug, c: op.c, f: shardFile(op.c), mark: !!op.mark, t: op.t, n: op.n, p: op.p };
+  if (op.a) out.a = op.a;
+  if (typeof op.w === "number") out.w = op.w;
+  var j = await storeFetch("/marks-op", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ op: out }) });
+  if (j && j.index) repoCounts = j.index.cats || {};
 }
 function enqueueSync(op){
   if (!TOKEN) { setSyncLabel(); return Promise.resolve(false); }
@@ -638,9 +591,9 @@ function ensureShard(name){
   if (!TOKEN || !manifest || !manifest.cats[name] || loadedShards[name] || shardLoading[name]) return Promise.resolve(false);
   shardLoading[name] = true;
   var epoch = shardEpoch[name] || 0, stale = false;
-  return ghGetJson(shardPath(name)).then(function(cur){
+  return storeFetch("/marks-shard?file=" + encodeURIComponent(shardFile(name))).then(function(j){
     if ((shardEpoch[name] || 0) !== epoch){ stale = true; return false; }
-    var shard = cur ? cur.data : {};
+    var shard = (j && j.shard) || {};
     loadedShards[name] = true;
     if (!repoCounts) repoCounts = {};
     repoCounts[name] = Object.keys(shard).length;
@@ -743,7 +696,8 @@ function loadCat(name){
 }
 function catLoadFailed(){ return !!(activeCategory && catLoadError[activeCategory]); }
 
-/* Texting: sending goes through TextNow from this page. Tapping Send copies the message, opens TextNow, and marks the business Sent. The Worker is only the login gate now. */
+/* Sending: tapping Send copies the message and marks the business Sent.
+   Nothing else opens. The Worker is the login gate and the account store. */
 var TEXT_API = "https://bjvfi-text.iamnottaiii.workers.dev";
 var TKEY_LS = "bjvfi_text_key";
 var textConfigured = null;
@@ -1057,13 +1011,12 @@ function closeConfirm(result){
 }
 document.getElementById("confirmYes").addEventListener("click", function(){ closeConfirm(true); });
 document.getElementById("confirmNo").addEventListener("click", function(){ closeConfirm(false); });
-/* Single Text: one business, through TextNow after its own confirmation. */
+/* Single Text: one business, copied and marked after its own confirmation. */
 function copyText(text){ try { if (navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).catch(function(){}); return; } } catch(e){} try { var ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); document.body.removeChild(ta); } catch(e){} }
-function sendViaTextNow(items){
+function sendCopyMark(items){
   if (!items.length) return;
   copyText(items.map(function(it){ return it.msg; }).join("\n\n"));
   items.forEach(function(it, i){ setMarked(it.slug, true, 0); delete selection[it.slug]; });
-  window.open("https://www.textnow.com/messaging", "_blank");
   refreshStats();
   updateSelBar();
   renderBiz(false);
@@ -1073,13 +1026,13 @@ async function textOne(slug){
   var info = bizInfo[slug] || {};
   var name = info.n || slug;
   var msg = messageFor(name, "bjvfi.com/" + slug + "/");
-  var okSend = await showConfirm("Send in TextNow", (info.p || "") + (info.c ? " · " + info.c : ""), msg + "\n\nCopies the message, opens TextNow, and marks it Sent.");
+  var okSend = await showConfirm("Send to " + name, (info.p || "") + (info.c ? " · " + info.c : ""), msg + "\n\nCopies the message and marks it Sent.");
   if (!okSend) return;
-  sendViaTextNow([{ slug: slug, msg: msg }]);
+  sendCopyMark([{ slug: slug, msg: msg }]);
 }
 
-/* Sending through TextNow: tapping Send copies the messages, opens
-   TextNow, and marks them Sent at that tap. */
+/* Sending: tapping Send copies the messages and marks them Sent at
+   that tap. Nothing else opens. */
 async function doSend(confirmed){
   if (sending) return;
   pruneSelection();
@@ -1093,19 +1046,19 @@ async function doSend(confirmed){
     var okSend = await showConfirm(
       "Send to " + fmt(slugs.length) + (slugs.length === 1 ? " business" : " businesses"),
       previewNames + (slugs.length > 3 ? " and " + fmt(slugs.length - 3) + " more" : ""),
-      (slugs.length === 1 ? firstMsg : "Each business gets its own message with its own site link. First one:\n\n" + firstMsg) + "\n\nCopies the message, opens TextNow, and marks it Sent."
+      (slugs.length === 1 ? firstMsg : "Each business gets its own message with its own site link. First one:\n\n" + firstMsg) + "\n\nCopies the message and marks it Sent."
     );
     if (!okSend){ st.textContent = ""; return; }
   }
   sending = true;
   var btn = document.getElementById("sendBtn");
   btn.disabled = true;
-  btn.textContent = "Opening";
+  btn.textContent = "Sending";
   var items = slugs.map(function(slug){ return { slug: slug, msg: messageFor((bizInfo[slug] && bizInfo[slug].n) || slug, "bjvfi.com/" + slug + "/") }; });
-  sendViaTextNow(items);
+  sendCopyMark(items);
   btn.disabled = false;
   btn.textContent = "Send";
-  st.textContent = "Marked Sent, finish in TextNow";
+  st.textContent = "Marked Sent";
   sending = false;
 }
 var searchSeq = 0;
@@ -1136,30 +1089,28 @@ document.getElementById("clearSelBtn").addEventListener("click", function(){
 document.getElementById("sendBtn").addEventListener("click", function(){ doSend(false); });
 
 /* Sent view: his board. Mark Replied is manual only, and the outcome
-   and next step note live in the board state, synced as one file. */
+   and next step note live in the board state, saved to the account store. */
 var BOARD_KEY = "bjvfi_database_board_v1";
-var BOARD_PATH = "texting/board.json";
 var board = {};
 try { board = JSON.parse(localStorage.getItem(BOARD_KEY) || "{}") || {}; } catch(e) { board = {}; }
 function saveBoard(){ try { localStorage.setItem(BOARD_KEY, JSON.stringify(board)); } catch(e){} }
 var boardChain = Promise.resolve();
 function syncBoard(){
-  if (!TOKEN) return Promise.resolve();
   boardChain = boardChain.then(async function(){
     try {
-      await ghUpdateJson(BOARD_PATH, {}, function(data){
-        Object.keys(data).forEach(function(k){ delete data[k]; });
-        Object.keys(board).forEach(function(k){ data[k] = board[k]; });
-      });
+      await storeFetch("/board", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ board: board }) });
     } catch(e){}
   });
   return boardChain;
 }
 async function loadBoard(){
-  if (!TOKEN) return;
   try {
-    var cur = await ghGetJson(BOARD_PATH);
-    if (cur && cur.data){ board = cur.data; saveBoard(); }
+    var j = await storeFetch("/board");
+    var remote = (j && j.board) || {};
+    var before = JSON.stringify(remote);
+    board = Object.assign({}, remote, board);
+    saveBoard();
+    if (JSON.stringify(board) !== before) syncBoard();
   } catch(e){}
   refreshHomeStats();
   var sv = document.getElementById("sentView");
@@ -1181,7 +1132,7 @@ function nextStepFor(slug){
   if (rec.o === "interested") return "Build their website in SiteDesk";
   if (rec.o === "later") return "Follow up later";
   if (rec.o === "not") return "Nothing to do";
-  if (rec.r) return "Reply to them in TextNow";
+  if (rec.r) return "Reply to them";
   return "Waiting for a reply";
 }
 var sentEntriesCache = [];
@@ -1427,13 +1378,10 @@ function bootData(){
   fetch(DATA + "manifest.json").then(function(r){ return r.json(); }).then(async function(m){
     manifest = m;
     buildSortedCats();
-    if (TOKEN){
-      try {
-        var idx = await ghGetJson(INDEX_PATH);
-        if (idx && idx.data){ repoCounts = idx.data.cats || {}; }
-        else repoCounts = {};
-      } catch(e){ repoCounts = null; }
-    }
+    try {
+      var ij = await storeFetch("/marks-index");
+      repoCounts = (ij && ij.index && ij.index.cats) || {};
+    } catch(e){ repoCounts = null; }
     renderCatDrop();
     refreshStats();
     setSyncLabel();
